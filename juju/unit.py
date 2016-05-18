@@ -1,6 +1,10 @@
 class Unit(object):
-    def add_storage(self):
+    def add_storage(self, name, constraints=None):
         """Add unit storage dynamically.
+
+        :param str name: Storage name, as specified by the charm
+        :param str constraints: Comma-separated list of constraints in the
+            form 'POOL,COUNT,SIZE'
 
         """
         pass
@@ -18,8 +22,11 @@ class Unit(object):
         pass
     remove = destroy
 
-    def get_resources(self):
+    def get_resources(self, details=False):
         """Return resources for this unit.
+
+        :param bool details: Include detailed info about resources used by each
+            unit
 
         """
         pass

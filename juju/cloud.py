@@ -1,6 +1,13 @@
 class Cloud(object):
-    def add_credential(self):
+    """Cloud
+
+    :ivar name: Name of the cloud
+
+    """
+    def add_credential(self, credential):
         """Add or replaces credentials for this cloud.
+
+        :param `juju.Credential` credential: The Credential to add
 
         """
         pass
@@ -17,8 +24,39 @@ class Cloud(object):
         """
         pass
 
-    def bootstrap(self):
+    def bootstrap(
+            self, controller_name, region=None, agent_version=None,
+            auto_upgrade=False, bootstrap_constraints=None,
+            bootstrap_series=None, config=None, constraints=None,
+            credential=None, default_model=None, keep_broken=False,
+            metadata_source=None, no_gui=False, to=None,
+            upload_tools=False):
+
         """Initialize a cloud environment.
+
+        :param str controller_name: Name of controller to create
+        :param str region: Cloud region in which to bootstrap
+        :param str agent_version: Version of tools to use for Juju agents
+        :param bool auto_upgrade: Upgrade to latest path release tools on first
+            bootstrap
+        :param :class:`juju.Constraints` bootstrap_constraints: Constraints
+            for the bootstrap machine
+        :param str bootstrap_series: Series of the bootstrap machine
+        :param dict config: Controller configuration
+        :param :class:`juju.Constraints` constraints: Default constraints for
+            all future workload machines
+        :param :class:`juju.Credential` credential: Credential to use when
+            bootstrapping
+        :param str default_model: Name to give the default model
+        :param bool keep_broken: Don't destroy model if bootstrap fails
+        :param str metadata_source: Local path to use as tools and/or metadata
+            source
+        :param bool no_gui: Don't install the Juju GUI in the controller when
+            bootstrapping
+        :param str to: Placement directive for bootstrap node (typically used
+            with MAAS)
+        :param bool upload_tools: Upload local version of tools before
+            bootstrapping
 
         """
         pass

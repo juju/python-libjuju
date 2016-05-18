@@ -1,12 +1,25 @@
 class Juju(object):
-    def add_cloud(self):
+    def add_cloud(self, name, definition, replace=False):
         """Add a user-defined cloud to Juju from among known cloud types.
+
+        :param str name: Name of cloud
+        :param dict definition: Cloud definition
+
+        Example cloud definition, as yaml::
+
+            type: openstack
+            auth-types: [ userpass ]
+            regions:
+              london:
+                endpoint: https://london.mycloud.com:35574/v3.0/
 
         """
         pass
 
-    def agree(self):
+    def agree(self, *terms):
         """Agree to the terms of a charm.
+
+        :param str \*terms: Terms to agree to
 
         """
         pass
@@ -49,8 +62,10 @@ class Juju(object):
         """
         pass
 
-    def get_plans(self, charm_name):
+    def get_plans(self, charm_url):
         """Return list of plans available for the specified charm.
+
+        :param str charm_url: Charm url
 
         """
         pass

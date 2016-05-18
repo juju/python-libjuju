@@ -1,25 +1,43 @@
 class Service(object):
-    def add_relation(self):
+    def add_relation(self, local_relation, remote_relation):
         """Add a relation to another service.
+
+        :param str local_relation: Name of relation on this service
+        :param str remote_relation: Name of relation on the other service in
+            the form '<service>[:<relation_name>]'
 
         """
         pass
 
-    def add_unit(self):
+    def add_unit(self, count=1, to=None):
         """Add one or more units to this service.
+
+        :param int count: Number of units to add
+        :param str to: Placement directive, e.g.::
+            '23' - machine 23
+            'lxc:7' - new lxc container on machine 7
+            '24/lxc/3' - lxc container 3 or machine 24
+
+            If None, a new machine is provisioned.
 
         """
         pass
     add_units = add_unit
 
-    def allocate(self):
+    def allocate(self, budget, value):
         """Allocate budget to this service.
+
+        :param str budget: Name of budget
+        :param int value: Budget limit
 
         """
         pass
 
-    def attach(self):
+    def attach(self, resource_name, file_path):
         """Upload a file as a resource for this service.
+
+        :param str resource: Name of the resource
+        :param str file_path: Path to the file to upload
 
         """
         pass
@@ -30,8 +48,12 @@ class Service(object):
         """
         pass
 
-    def destroy_relation(self):
+    def destroy_relation(self, local_relation, remote_relation):
         """Remove a relation to another service.
+
+        :param str local_relation: Name of relation on this service
+        :param str remote_relation: Name of relation on the other service in
+            the form '<service>[:<relation_name>]'
 
         """
         pass
@@ -62,14 +84,19 @@ class Service(object):
         """
         pass
 
-    def get_actions(self):
+    def get_actions(self, schema=False):
         """Get actions defined for this service.
+
+        :param bool schema: Return the full action schema
 
         """
         pass
 
-    def get_resources(self):
+    def get_resources(self, details=False):
         """Return resources for this service.
+
+        :param bool details: Include detailed info about resources used by each
+            unit
 
         """
         pass
