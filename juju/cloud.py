@@ -41,14 +41,15 @@ class Cloud(object):
         :param str agent_version: Version of tools to use for Juju agents
         :param bool auto_upgrade: Upgrade to latest path release tools on first
             bootstrap
-        :param :class:`juju.Constraints` bootstrap_constraints: Constraints
-            for the bootstrap machine
+        :param bootstrap_constraints: Constraints for the bootstrap machine
+        :type bootstrap_constraints: :class:`juju.Constraints`
         :param str bootstrap_series: Series of the bootstrap machine
         :param dict config: Controller configuration
-        :param :class:`juju.Constraints` constraints: Default constraints for
-            all future workload machines
-        :param :class:`juju.Credential` credential: Credential to use when
-            bootstrapping
+        :param constraints: Default constraints for all future workload
+            machines
+        :type constraints: :class:`juju.Constraints`
+        :param credential: Credential to use when bootstrapping
+        :type credential: :class:`juju.Credential`
         :param str default_model: Name to give the default model
         :param bool keep_broken: Don't destroy model if bootstrap fails
         :param str metadata_source: Local path to use as tools and/or metadata

@@ -7,13 +7,15 @@ class Model(object):
 
         :param str spec: Machine specification
             Examples::
+
                 (None) - starts a new machine
                 'lxc' - starts a new machine with on lxc container
                 'lxc:4' - starts a new lxc container on machine 4
                 'ssh:user@10.10.0.3' - manually provisions a machine with ssh
                 'zone=us-east-1a' - starts a machine in zone us-east-1s on AWS
                 'maas2.name' - acquire machine maas2.name on MAAS
-        :param :class:`juju.Constraints` constraints: Machine constraints
+        :param constraints: Machine constraints
+        :type constraints: :class:`juju.Constraints`
         :param list disks: List of disk :class:`constraints <juju.Constraints>`
         :param str series: Series
         :param int count: Number of machines to deploy
@@ -156,7 +158,8 @@ class Model(object):
         :param str channel: Charm store channel from which to retrieve
             the charm or bundle, e.g. 'development'
         :param dict config: Charm configuration dictionary
-        :param :class:`juju.Constraints` constraints: Service constraints
+        :param constraints: Service constraints
+        :type constraints: :class:`juju.Constraints`
         :param bool force: Allow charm to be deployed to a machine running
             an unsupported series
         :param int num_units: Number of units to deploy
@@ -165,6 +168,7 @@ class Model(object):
         :param str series: Series on which to deploy
         :param dict storage: Storage constraints TODO how do these look?
         :param str to: Placement directive, e.g.::
+
             '23' - machine 23
             'lxc:7' - new lxc container on machine 7
             '24/lxc/3' - lxc container 3 or machine 24
@@ -194,10 +198,11 @@ class Model(object):
         """Ensure sufficient controllers exist to provide redundancy.
 
         :param int num_controllers: Number of controllers to make available
-        :param :class:`juju.Constraints` constraints: Constraints to apply
-            to the controller machines
+        :param constraints: Constraints to apply to the controller machines
+        :type constraints: :class:`juju.Constraints`
         :param str series: Series of the controller machines
         :param list to: Placement directives for controller machines, e.g.::
+
             '23' - machine 23
             'lxc:7' - new lxc container on machine 7
             '24/lxc/3' - lxc container 3 or machine 24
@@ -340,7 +345,8 @@ class Model(object):
         """Restore a backup archive to a new controller.
 
         :param bool bootstrap: Bootstrap a new state machine
-        :param :class:`juju.Constraints` constraints: Model constraints
+        :param constraints: Model constraints
+        :type constraints: :class:`juju.Constraints`
         :param str archive: Path to backup archive to restore
         :param str backup_id: Id of backup to restore
         :param bool upload_tools: Upload tools if bootstrapping a new machine
