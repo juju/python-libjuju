@@ -264,20 +264,29 @@ class Model(object):
         pass
     get_ssh_keys = get_ssh_key
 
-    def get_storage(self):
+    def get_storage(self, filesystem=False, volume=False):
         """Return details of storage instances.
 
+        :param bool filesystem: Include filesystem storage
+        :param bool volume: Include volume storage
+
         """
         pass
 
-    def get_storage_pools(self):
+    def get_storage_pools(self, names=None, providers=None):
         """Return list of storage pools.
 
+        :param list names: Only include pools with these names
+        :param list providers: Only include pools for these providers
+
         """
         pass
 
-    def get_subnets(self):
+    def get_subnets(self, space=None, zone=None):
         """Return list of known subnets.
+
+        :param str space: Only include subnets in this space
+        :param str zone: Only include subnets in this zone
 
         """
         pass
@@ -288,37 +297,41 @@ class Model(object):
         """
         pass
 
-    def remove_backup(self):
+    def remove_backup(self, backup_id):
         """Delete a backup.
 
+        :param str backup_id: The id of the backup to remove
+
         """
         pass
 
-    def remove_cached_images(self):
+    def remove_cached_images(self, arch=None, kind=None, series=None):
         """Remove cached OS images.
 
+        :param str arch: Architecture of the images to remove
+        :param str kind: Image kind to remove, e.g. 'lxd'
+        :param str series: Image series to remove, e.g. 'xenial'
+
         """
         pass
 
-    def remove_machine(self):
+    def remove_machine(self, *machine_ids):
         """Remove a machine from this model.
+
+        :param str \*machine_ids: Ids of the machines to remove
 
         """
         pass
     remove_machines = remove_machine
 
-    def remove_ssh_key(self):
+    def remove_ssh_key(self, *keys):
         """Remove a public SSH key(s) from this model.
+
+        :param str \*keys: Keys to remove
 
         """
         pass
     remove_ssh_keys = remove_ssh_key
-
-    def resolved(self):
-        """Mark unit errors resolved.
-
-        """
-        pass
 
     def restore_backup(self):
         """Restore a backup archive to a new controller.

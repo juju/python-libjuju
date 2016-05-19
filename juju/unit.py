@@ -31,6 +31,14 @@ class Unit(object):
         """
         pass
 
+    def resolved(self, retry=False):
+        """Mark unit errors resolved.
+
+        :param bool retry: Re-execute failed hooks
+
+        """
+        pass
+
     def run(self):
         """Run command on this unit.
 

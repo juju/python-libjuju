@@ -73,6 +73,8 @@ class Juju(object):
     def register(self, registration_string):
         """Register a user to a controller.
 
+        :param str registration_string: The registration string
+
         """
         pass
 

@@ -88,8 +88,10 @@ class Controller(object):
         """
         pass
 
-    def get_users(self):
+    def get_users(self, all_=False):
         """Return list of users that can connect to this controller.
+
+        :param bool all_: Include disabled users
 
         """
         pass
@@ -100,8 +102,11 @@ class Controller(object):
         """
         pass
 
-    def logout(self):
+    def logout(self, force=False):
         """Log out of this controller.
+
+        :param bool force: Don't fail even if user not previously logged in
+            with a password
 
         """
         pass

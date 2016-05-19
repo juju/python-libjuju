@@ -18,8 +18,10 @@ class Cloud(object):
         """
         pass
 
-    def remove_credential(self):
+    def remove_credential(self, credential_name):
         """Remove a credential for this cloud.
+
+        :param str credential_name: Name of the credential to remove
 
         """
         pass
