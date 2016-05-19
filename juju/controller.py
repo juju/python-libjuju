@@ -114,11 +114,15 @@ class Controller(object):
     def get_model(self, name):
         """Get a model by name.
 
+        :param str name: Model name
+
         """
         pass
 
-    def get_user(self, name):
+    def get_user(self, username):
         """Get a user by name.
+
+        :param str username: Username
 
         """
         pass

@@ -78,8 +78,11 @@ class Juju(object):
         """
         pass
 
-    def set_budget(self, name, amount):
-        """Set a budget limit.
+    def set_budget(self, name, limit):
+        """Set a monthly budget limit.
+
+        :param str name: Name of budget
+        :param int limit: Monthly limit
 
         """
         pass
@@ -87,11 +90,16 @@ class Juju(object):
     def get_cloud(self, name):
         """Get a cloud by name.
 
+        :param str name: Name of cloud
+
         """
         pass
 
-    def get_controller(self):
+    def get_controller(self, name, include_passwords=False):
         """Get a controller by name.
+
+        :param str name: Name of controller
+        :param bool include_passwords: Include passwords for accounts
 
         (maybe move this to Cloud?)
         """

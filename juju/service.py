@@ -101,32 +101,45 @@ class Service(object):
         """
         pass
 
-    def run(self):
+    def run(self, command, timeout=None):
         """Run command on all units for this service.
 
+        :param str command: The command to run
+        :param int timeout: Time to wait before command is considered failed
+
         """
         pass
 
-    def set_config(self):
+    def set_config(self, to_default=False, **config):
         """Set configuration options for this service.
 
+        :param bool to_default: Set service options to default values
+        :param \*\*config: Config key/values
+
         """
         pass
 
-    def set_constraints(self):
+    def set_constraints(self, constraints):
         """Set machine constraints for this service.
 
+        :param :class:`juju.Constraints` constraints: Machine constraints
+
         """
         pass
 
-    def set_meter_status(self):
+    def set_meter_status(self, status, info=None):
         """Set the meter status on this status.
 
+        :param str status: Meter status, e.g. 'RED', 'AMBER'
+        :param str info: Extra info message
+
         """
         pass
 
-    def set_plan(self):
+    def set_plan(self, plan_name):
         """Set the plan for this service, effective immediately.
+
+        :param str plan_name: Name of plan
 
         """
         pass
@@ -137,14 +150,29 @@ class Service(object):
         """
         pass
 
-    def update_allocation(self):
+    def update_allocation(self, allocation):
         """Update existing allocation for this service.
+
+        :param int allocation: The allocation to set
 
         """
         pass
 
-    def upgrade_charm(self):
+    def upgrade_charm(
+            self, channel=None, force_series=False, force_units=False,
+            path=None, resources=None, revision=-1, switch=None):
         """Upgrade the charm for this service.
+
+        :param str channel: Channel to use when getting the charm from the
+            charm store, e.g. 'development'
+        :param bool force_series: Upgrade even if series of deployed service
+            is not supported by the new charm
+        :param bool force_units: Upgrade all units immediately, even if in
+            error state
+        :param str path: Uprade to a charm located at path
+        :param dict resources: Dictionary of resource name/filepath pairs
+        :param int revision: Explicit upgrade revision
+        :param str switch: Crossgrade charm url
 
         """
         pass

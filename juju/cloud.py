@@ -63,14 +63,18 @@ class Cloud(object):
         """
         pass
 
-    def set_default_credential(self):
+    def set_default_credential(self, credential_name):
         """Set the default credentials for this cloud.
+
+        :param str credential_name: Credential to make default
 
         """
         pass
 
-    def set_default_region(self):
+    def set_default_region(self, region):
         """Set the default region for this cloud.
+
+        :param str region: Name of region to make default
 
         """
         pass

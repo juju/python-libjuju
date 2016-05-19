@@ -237,9 +237,10 @@ class Model(object):
         pass
     import_ssh_keys = import_ssh_key
 
-    def get_machines(self, utc=False):
+    def get_machines(self, machine, utc=False):
         """Return list of machines in this model.
 
+        :param str machine: Machine id, e.g. '0'
         :param bool utc: Display time as UTC in RFC3339 format
 
         """
@@ -333,8 +334,16 @@ class Model(object):
         pass
     remove_ssh_keys = remove_ssh_key
 
-    def restore_backup(self):
+    def restore_backup(
+            self, bootstrap=False, constraints=None, archive=None,
+            backup_id=None, upload_tools=False):
         """Restore a backup archive to a new controller.
+
+        :param bool bootstrap: Bootstrap a new state machine
+        :param :class:`juju.Constraints` constraints: Model constraints
+        :param str archive: Path to backup archive to restore
+        :param str backup_id: Id of backup to restore
+        :param bool upload_tools: Upload tools if bootstrapping a new machine
 
         """
         pass
@@ -345,69 +354,106 @@ class Model(object):
         """
         pass
 
-    def revoke(self):
+    def revoke(self, username, acl='read'):
         """Revoke a user's access to this model.
 
+        :param str username: Username to revoke
+        :param str acl: Access control ('read' or 'write')
+
         """
         pass
 
-    def run(self):
+    def run(self, command, timeout=None):
         """Run command on all machines in this model.
 
+        :param str command: The command to run
+        :param int timeout: Time to wait before command is considered failed
+
         """
         pass
 
-    def set_config(self):
+    def set_config(self, **config):
         """Set configuration keys on this model.
 
+        :param \*\*config: Config key/values
+
         """
         pass
 
-    def set_constraints(self):
+    def set_constraints(self, constraints):
         """Set machine constraints on this model.
 
+        :param :class:`juju.Constraints` constraints: Machine constraints
+
         """
         pass
 
-    def get_action_output(self, action_uuid):
+    def get_action_output(self, action_uuid, wait=-1):
         """Get the results of an action by ID.
 
+        :param str action_uuid: Id of the action
+        :param int wait: Time in seconds to wait for action to complete
+
         """
         pass
 
-    def get_action_status(self, uuid_or_prefix):
-        """Get the status of all actions, filtered by ID or prefix.
+    def get_action_status(self, uuid_or_prefix=None, name=None):
+        """Get the status of all actions, filtered by ID, ID prefix, or action name.
+
+        :param str uuid_or_prefix: Filter by action uuid or prefix
+        :param str name: Filter by action name
 
         """
         pass
 
     def get_budget(self, budget_name):
-        """Get budget by name.
+        """Get budget usage info.
+
+        :param str budget_name: Name of budget
 
         """
         pass
 
-    def get_status(self):
+    def get_status(self, filter_=None, utc=False):
         """Return the status of the model.
+
+        :param str filter_: Service or unit name or wildcard ('*')
+        :param bool utc: Display time as UTC in RFC3339 format
 
         """
         pass
     status = get_status
 
-    def sync_tools(self):
+    def sync_tools(
+            self, all_=False, destination=None, dry_run=False, public=False,
+            source=None, stream=None, version=None):
         """Copy Juju tools into this model.
 
+        :param bool all_: Copy all versions, not just the latest
+        :param str destination: Path to local destination directory
+        :param bool dry_run: Don't do the actual copy
+        :param bool public: Tools are for a public cloud, so generate mirrors
+            information
+        :param str source: Path to local source directory
+        :param str stream: Simplestreams stream for which to sync metadata
+        :param str version: Copy a specific major.minor version
+
         """
         pass
 
-    def unblock(self, operation):
+    def unblock(self, *commands):
         """Unblock an operation that would alter this model.
 
+        :param str \*commands: The commands to unblock. Valid values are
+            'all-changes', 'destroy-model', 'remove-object'
+
         """
         pass
 
-    def unset_config(self):
+    def unset_config(self, *keys):
         """Unset configuration on this model.
+
+        :param str \*keys: The keys to unset
 
         """
         pass
@@ -418,8 +464,24 @@ class Model(object):
         """
         pass
 
-    def upload_backup(self):
+    def upgrade_juju(
+            self, dry_run=False, reset_previous_upgrade=False,
+            upload_tools=False, version=None):
+        """Upgrade Juju on all machines in a model.
+
+        :param bool dry_run: Don't do the actual upgrade
+        :param bool reset_previous_upgrade: Clear the previous (incomplete)
+            upgrade status
+        :param bool upload_tools: Upload local version of tools
+        :param str version: Upgrade to a specific version
+
+        """
+        pass
+
+    def upload_backup(self, archive_path):
         """Store a backup archive remotely in Juju.
+
+        :param str archive_path: Path to local archive
 
         """
         pass
