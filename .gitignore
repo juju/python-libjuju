@@ -2,3 +2,6 @@
 .venv/
 *.pyc
 docs/_build/
+__pycache__/
+.tox/
+*.egg-info/
