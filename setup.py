@@ -21,7 +21,10 @@ setup(
     version="0.0.1",
     packages=find_packages(
         exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
-    install_requires=[],
+    install_requires=[
+        'websockets',
+        'pyyaml',
+    ],
     include_package_data=True,
     maintainer='Juju Ecosystem Engineering',
     maintainer_email='juju@lists.ubunut.com',
