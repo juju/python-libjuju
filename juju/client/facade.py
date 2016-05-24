@@ -518,7 +518,7 @@ def generate_facacdes(options):
     schemas = json.loads(Path(options.schema).read_text("utf-8"))
     capture = codegen.CodeWriter()
     capture.write("""
-from libjuju.facade import Type, ReturnMapping
+from juju.client.facade import Type, ReturnMapping
                   """)
     schemas = [Schema(s) for s in schemas]
 

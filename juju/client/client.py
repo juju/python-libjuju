@@ -1,5 +1,5 @@
 
-from libjuju.facade import Type, ReturnMapping
+from juju.client.facade import Type, ReturnMapping
                   
 class Action(Type):
     _toSchema = {'name': 'name', 'receiver': 'receiver', 'parameters': 'parameters', 'tag': 'tag'}
