@@ -9,7 +9,7 @@ from ..base import bootstrapped
 
 @bootstrapped
 class UserManagerTest(unittest.TestCase):
-    def test_connect_current(self):
+    def test_user_info(self):
         loop = asyncio.get_event_loop()
         conn = loop.run_until_complete(
             Connection.connect_current())
