@@ -232,8 +232,8 @@ class {}(Type):
                     else:
                         source.append("{}self.{} = {}".format(INDENT * 2, arg_name, arg_name))
                 elif type(arg_type) is typing.TypeVar:
-                    source.append("{}self.{} = {}.from_json({})".format(
-                        INDENT * 2, arg_name, arg_type_name, arg_name))
+                    source.append("{}self.{} = {}.from_json({}) if {} else None".format(
+                        INDENT * 2, arg_name, arg_type_name, arg_name, arg_name))
                 else:
                     source.append("{}self.{} = {}".format(INDENT * 2, arg_name, arg_name))
 

@@ -2,8 +2,8 @@
 from juju.client.facade import Type, ReturnMapping
                   
 class Action(Type):
-    _toSchema = {'receiver': 'receiver', 'name': 'name', 'tag': 'tag', 'parameters': 'parameters'}
-    _toPy = {'receiver': 'receiver', 'name': 'name', 'tag': 'tag', 'parameters': 'parameters'}
+    _toSchema = {'name': 'name', 'parameters': 'parameters', 'tag': 'tag', 'receiver': 'receiver'}
+    _toPy = {'name': 'name', 'parameters': 'parameters', 'tag': 'tag', 'receiver': 'receiver'}
     def __init__(self, name=None, parameters=None, receiver=None, tag=None):
         '''
         name : str
@@ -18,8 +18,8 @@ class Action(Type):
 
 
 class ActionResult(Type):
-    _toSchema = {'message': 'message', 'enqueued': 'enqueued', 'action': 'action', 'started': 'started', 'output': 'output', 'completed': 'completed', 'error': 'error', 'status': 'status'}
-    _toPy = {'message': 'message', 'enqueued': 'enqueued', 'action': 'action', 'started': 'started', 'output': 'output', 'completed': 'completed', 'error': 'error', 'status': 'status'}
+    _toSchema = {'completed': 'completed', 'started': 'started', 'message': 'message', 'action': 'action', 'output': 'output', 'status': 'status', 'error': 'error', 'enqueued': 'enqueued'}
+    _toPy = {'completed': 'completed', 'started': 'started', 'message': 'message', 'action': 'action', 'output': 'output', 'status': 'status', 'error': 'error', 'enqueued': 'enqueued'}
     def __init__(self, action=None, completed=None, enqueued=None, error=None, message=None, output=None, started=None, status=None):
         '''
         action : Action
@@ -31,10 +31,10 @@ class ActionResult(Type):
         started : str
         status : str
         '''
-        self.action = Action.from_json(action)
+        self.action = Action.from_json(action) if action else None
         self.completed = completed
         self.enqueued = enqueued
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.message = message
         self.output = output
         self.started = started
@@ -62,8 +62,8 @@ class Actions(Type):
 
 
 class ActionsByName(Type):
-    _toSchema = {'actions': 'actions', 'error': 'error', 'name': 'name'}
-    _toPy = {'actions': 'actions', 'error': 'error', 'name': 'name'}
+    _toSchema = {'name': 'name', 'error': 'error', 'actions': 'actions'}
+    _toPy = {'name': 'name', 'error': 'error', 'actions': 'actions'}
     def __init__(self, actions=None, error=None, name=None):
         '''
         actions : typing.Sequence[~ActionResult]
@@ -71,7 +71,7 @@ class ActionsByName(Type):
         name : str
         '''
         self.actions = [ActionResult.from_json(o) for o in actions or []]
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.name = name
 
 
@@ -86,8 +86,8 @@ class ActionsByNames(Type):
 
 
 class ActionsByReceiver(Type):
-    _toSchema = {'actions': 'actions', 'error': 'error', 'receiver': 'receiver'}
-    _toPy = {'actions': 'actions', 'error': 'error', 'receiver': 'receiver'}
+    _toSchema = {'error': 'error', 'actions': 'actions', 'receiver': 'receiver'}
+    _toPy = {'error': 'error', 'actions': 'actions', 'receiver': 'receiver'}
     def __init__(self, actions=None, error=None, receiver=None):
         '''
         actions : typing.Sequence[~ActionResult]
@@ -95,7 +95,7 @@ class ActionsByReceiver(Type):
         receiver : str
         '''
         self.actions = [ActionResult.from_json(o) for o in actions or []]
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.receiver = receiver
 
 
@@ -130,8 +130,8 @@ class Entity(Type):
 
 
 class Error(Type):
-    _toSchema = {'info': 'Info', 'code': 'Code', 'message': 'Message'}
-    _toPy = {'Code': 'code', 'Info': 'info', 'Message': 'message'}
+    _toSchema = {'message': 'Message', 'code': 'Code', 'info': 'Info'}
+    _toPy = {'Code': 'code', 'Message': 'message', 'Info': 'info'}
     def __init__(self, code=None, info=None, message=None):
         '''
         code : str
@@ -139,7 +139,7 @@ class Error(Type):
         message : str
         '''
         self.code = code
-        self.info = ErrorInfo.from_json(info)
+        self.info = ErrorInfo.from_json(info) if info else None
         self.message = message
 
 
@@ -151,7 +151,7 @@ class ErrorInfo(Type):
         macaroon : Macaroon
         macaroonpath : str
         '''
-        self.macaroon = Macaroon.from_json(macaroon)
+        self.macaroon = Macaroon.from_json(macaroon) if macaroon else None
         self.macaroonpath = macaroonpath
 
 
@@ -186,8 +186,8 @@ class FindTagsResults(Type):
 
 
 class Macaroon(Type):
-    _toSchema = {'id_': 'id', 'data': 'data', 'location': 'location', 'caveats': 'caveats', 'sig': 'sig'}
-    _toPy = {'id': 'id_', 'data': 'data', 'location': 'location', 'caveats': 'caveats', 'sig': 'sig'}
+    _toSchema = {'caveats': 'caveats', 'data': 'data', 'location': 'location', 'id_': 'id', 'sig': 'sig'}
+    _toPy = {'caveats': 'caveats', 'data': 'data', 'sig': 'sig', 'location': 'location', 'id': 'id_'}
     def __init__(self, caveats=None, data=None, id_=None, location=None, sig=None):
         '''
         caveats : typing.Sequence[~caveat]
@@ -198,14 +198,14 @@ class Macaroon(Type):
         '''
         self.caveats = [caveat.from_json(o) for o in caveats or []]
         self.data = data
-        self.id_ = packet.from_json(id_)
-        self.location = packet.from_json(location)
+        self.id_ = packet.from_json(id_) if id_ else None
+        self.location = packet.from_json(location) if location else None
         self.sig = sig
 
 
 class RunParams(Type):
-    _toSchema = {'services': 'Services', 'commands': 'Commands', 'machines': 'Machines', 'units': 'Units', 'timeout': 'Timeout'}
-    _toPy = {'Services': 'services', 'Commands': 'commands', 'Units': 'units', 'Timeout': 'timeout', 'Machines': 'machines'}
+    _toSchema = {'machines': 'Machines', 'timeout': 'Timeout', 'commands': 'Commands', 'services': 'Services', 'units': 'Units'}
+    _toPy = {'Services': 'services', 'Units': 'units', 'Timeout': 'timeout', 'Commands': 'commands', 'Machines': 'machines'}
     def __init__(self, commands=None, machines=None, services=None, timeout=None, units=None):
         '''
         commands : str
@@ -222,16 +222,16 @@ class RunParams(Type):
 
 
 class ServiceCharmActionsResult(Type):
-    _toSchema = {'actions': 'actions', 'error': 'error', 'servicetag': 'servicetag'}
-    _toPy = {'actions': 'actions', 'error': 'error', 'servicetag': 'servicetag'}
+    _toSchema = {'servicetag': 'servicetag', 'error': 'error', 'actions': 'actions'}
+    _toPy = {'servicetag': 'servicetag', 'error': 'error', 'actions': 'actions'}
     def __init__(self, actions=None, error=None, servicetag=None):
         '''
         actions : Actions
         error : Error
         servicetag : str
         '''
-        self.actions = Actions.from_json(actions)
-        self.error = Error.from_json(error)
+        self.actions = Actions.from_json(actions) if actions else None
+        self.error = Error.from_json(error) if error else None
         self.servicetag = servicetag
 
 
@@ -246,7 +246,7 @@ class ServicesCharmActionsResults(Type):
 
 
 class caveat(Type):
-    _toSchema = {'verificationid': 'verificationId', 'location': 'location', 'caveatid': 'caveatId'}
+    _toSchema = {'verificationid': 'verificationId', 'caveatid': 'caveatId', 'location': 'location'}
     _toPy = {'verificationId': 'verificationid', 'location': 'location', 'caveatId': 'caveatid'}
     def __init__(self, caveatid=None, location=None, verificationid=None):
         '''
@@ -254,14 +254,14 @@ class caveat(Type):
         location : packet
         verificationid : packet
         '''
-        self.caveatid = packet.from_json(caveatid)
-        self.location = packet.from_json(location)
-        self.verificationid = packet.from_json(verificationid)
+        self.caveatid = packet.from_json(caveatid) if caveatid else None
+        self.location = packet.from_json(location) if location else None
+        self.verificationid = packet.from_json(verificationid) if verificationid else None
 
 
 class packet(Type):
-    _toSchema = {'start': 'start', 'totallen': 'totalLen', 'headerlen': 'headerLen'}
-    _toPy = {'start': 'start', 'headerLen': 'headerlen', 'totalLen': 'totallen'}
+    _toSchema = {'headerlen': 'headerLen', 'start': 'start', 'totallen': 'totalLen'}
+    _toPy = {'start': 'start', 'totalLen': 'totallen', 'headerLen': 'headerlen'}
     def __init__(self, headerlen=None, start=None, totallen=None):
         '''
         headerlen : int
@@ -275,19 +275,19 @@ class packet(Type):
 
 class BoolResult(Type):
     _toSchema = {'error': 'Error', 'result': 'Result'}
-    _toPy = {'Error': 'error', 'Result': 'result'}
+    _toPy = {'Result': 'result', 'Error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
         result : bool
         '''
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.result = result
 
 
 class EntitiesWatchResult(Type):
-    _toSchema = {'entitywatcherid': 'EntityWatcherId', 'changes': 'Changes', 'error': 'Error'}
-    _toPy = {'Error': 'error', 'EntityWatcherId': 'entitywatcherid', 'Changes': 'changes'}
+    _toSchema = {'error': 'Error', 'changes': 'Changes', 'entitywatcherid': 'EntityWatcherId'}
+    _toPy = {'Changes': 'changes', 'EntityWatcherId': 'entitywatcherid', 'Error': 'error'}
     def __init__(self, changes=None, entitywatcherid=None, error=None):
         '''
         changes : typing.Sequence[str]
@@ -296,12 +296,12 @@ class EntitiesWatchResult(Type):
         '''
         self.changes = changes
         self.entitywatcherid = entitywatcherid
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
 
 
 class ErrorResult(Type):
-    _toSchema = {'info': 'Info', 'code': 'Code', 'message': 'Message'}
-    _toPy = {'Code': 'code', 'Info': 'info', 'Message': 'message'}
+    _toSchema = {'message': 'Message', 'code': 'Code', 'info': 'Info'}
+    _toPy = {'Code': 'code', 'Message': 'message', 'Info': 'info'}
     def __init__(self, code=None, info=None, message=None):
         '''
         code : str
@@ -309,13 +309,13 @@ class ErrorResult(Type):
         message : str
         '''
         self.code = code
-        self.info = ErrorInfo.from_json(info)
+        self.info = ErrorInfo.from_json(info) if info else None
         self.message = message
 
 
 class AgentGetEntitiesResult(Type):
-    _toSchema = {'containertype': 'ContainerType', 'jobs': 'Jobs', 'life': 'Life', 'error': 'Error'}
-    _toPy = {'Life': 'life', 'Error': 'error', 'ContainerType': 'containertype', 'Jobs': 'jobs'}
+    _toSchema = {'jobs': 'Jobs', 'error': 'Error', 'containertype': 'ContainerType', 'life': 'Life'}
+    _toPy = {'Life': 'life', 'ContainerType': 'containertype', 'Jobs': 'jobs', 'Error': 'error'}
     def __init__(self, containertype=None, error=None, jobs=None, life=None):
         '''
         containertype : str
@@ -324,7 +324,7 @@ class AgentGetEntitiesResult(Type):
         life : str
         '''
         self.containertype = containertype
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.jobs = jobs
         self.life = life
 
@@ -340,7 +340,7 @@ class AgentGetEntitiesResults(Type):
 
 
 class EntityPassword(Type):
-    _toSchema = {'tag': 'Tag', 'password': 'Password'}
+    _toSchema = {'password': 'Password', 'tag': 'Tag'}
     _toPy = {'Password': 'password', 'Tag': 'tag'}
     def __init__(self, password=None, tag=None):
         '''
@@ -392,20 +392,20 @@ class ModelConfigResult(Type):
 
 
 class NotifyWatchResult(Type):
-    _toSchema = {'notifywatcherid': 'NotifyWatcherId', 'error': 'Error'}
-    _toPy = {'Error': 'error', 'NotifyWatcherId': 'notifywatcherid'}
+    _toSchema = {'error': 'Error', 'notifywatcherid': 'NotifyWatcherId'}
+    _toPy = {'NotifyWatcherId': 'notifywatcherid', 'Error': 'error'}
     def __init__(self, error=None, notifywatcherid=None):
         '''
         error : Error
         notifywatcherid : str
         '''
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.notifywatcherid = notifywatcherid
 
 
 class StateServingInfo(Type):
-    _toSchema = {'systemidentity': 'SystemIdentity', 'caprivatekey': 'CAPrivateKey', 'sharedsecret': 'SharedSecret', 'privatekey': 'PrivateKey', 'stateport': 'StatePort', 'cert': 'Cert', 'apiport': 'APIPort'}
-    _toPy = {'StatePort': 'stateport', 'APIPort': 'apiport', 'CAPrivateKey': 'caprivatekey', 'Cert': 'cert', 'SharedSecret': 'sharedsecret', 'SystemIdentity': 'systemidentity', 'PrivateKey': 'privatekey'}
+    _toSchema = {'stateport': 'StatePort', 'caprivatekey': 'CAPrivateKey', 'sharedsecret': 'SharedSecret', 'apiport': 'APIPort', 'privatekey': 'PrivateKey', 'cert': 'Cert', 'systemidentity': 'SystemIdentity'}
+    _toPy = {'CAPrivateKey': 'caprivatekey', 'Cert': 'cert', 'SystemIdentity': 'systemidentity', 'PrivateKey': 'privatekey', 'StatePort': 'stateport', 'SharedSecret': 'sharedsecret', 'APIPort': 'apiport'}
     def __init__(self, apiport=None, caprivatekey=None, cert=None, privatekey=None, sharedsecret=None, stateport=None, systemidentity=None):
         '''
         apiport : int
@@ -446,8 +446,8 @@ class Delta(Type):
 
 
 class AnnotationsGetResult(Type):
-    _toSchema = {'annotations': 'Annotations', 'entitytag': 'EntityTag', 'error': 'Error'}
-    _toPy = {'Error': 'error', 'Annotations': 'annotations', 'EntityTag': 'entitytag'}
+    _toSchema = {'error': 'Error', 'entitytag': 'EntityTag', 'annotations': 'Annotations'}
+    _toPy = {'EntityTag': 'entitytag', 'Error': 'error', 'Annotations': 'annotations'}
     def __init__(self, annotations=None, entitytag=None, error=None):
         '''
         annotations : typing.Mapping[str, str]
@@ -456,7 +456,7 @@ class AnnotationsGetResult(Type):
         '''
         self.annotations = annotations
         self.entitytag = entitytag
-        self.error = ErrorResult.from_json(error)
+        self.error = ErrorResult.from_json(error) if error else None
 
 
 class AnnotationsGetResults(Type):
@@ -480,8 +480,8 @@ class AnnotationsSet(Type):
 
 
 class EntityAnnotations(Type):
-    _toSchema = {'annotations': 'Annotations', 'entitytag': 'EntityTag'}
-    _toPy = {'Annotations': 'annotations', 'EntityTag': 'entitytag'}
+    _toSchema = {'entitytag': 'EntityTag', 'annotations': 'Annotations'}
+    _toPy = {'EntityTag': 'entitytag', 'Annotations': 'annotations'}
     def __init__(self, annotations=None, entitytag=None):
         '''
         annotations : typing.Mapping[str, str]
@@ -532,8 +532,8 @@ class BackupsListResult(Type):
 
 
 class BackupsMetadataResult(Type):
-    _toSchema = {'finished': 'Finished', 'caprivatekey': 'CAPrivateKey', 'hostname': 'Hostname', 'size': 'Size', 'notes': 'Notes', 'model': 'Model', 'stored': 'Stored', 'checksum': 'Checksum', 'id_': 'ID', 'checksumformat': 'ChecksumFormat', 'started': 'Started', 'version': 'Version', 'cacert': 'CACert', 'machine': 'Machine'}
-    _toPy = {'ID': 'id_', 'Started': 'started', 'Version': 'version', 'Model': 'model', 'Stored': 'stored', 'Checksum': 'checksum', 'Machine': 'machine', 'Hostname': 'hostname', 'CAPrivateKey': 'caprivatekey', 'Finished': 'finished', 'ChecksumFormat': 'checksumformat', 'CACert': 'cacert', 'Size': 'size', 'Notes': 'notes'}
+    _toSchema = {'cacert': 'CACert', 'finished': 'Finished', 'hostname': 'Hostname', 'model': 'Model', 'checksumformat': 'ChecksumFormat', 'checksum': 'Checksum', 'size': 'Size', 'notes': 'Notes', 'stored': 'Stored', 'started': 'Started', 'caprivatekey': 'CAPrivateKey', 'version': 'Version', 'id_': 'ID', 'machine': 'Machine'}
+    _toPy = {'CAPrivateKey': 'caprivatekey', 'ID': 'id_', 'Machine': 'machine', 'Notes': 'notes', 'Checksum': 'checksum', 'Version': 'version', 'Stored': 'stored', 'ChecksumFormat': 'checksumformat', 'Finished': 'finished', 'Hostname': 'hostname', 'Started': 'started', 'Size': 'size', 'CACert': 'cacert', 'Model': 'model'}
     def __init__(self, cacert=None, caprivatekey=None, checksum=None, checksumformat=None, finished=None, hostname=None, id_=None, machine=None, model=None, notes=None, size=None, started=None, stored=None, version=None):
         '''
         cacert : str
@@ -564,7 +564,7 @@ class BackupsMetadataResult(Type):
         self.size = size
         self.started = started
         self.stored = stored
-        self.version = Number.from_json(version)
+        self.version = Number.from_json(version) if version else None
 
 
 class BackupsRemoveArgs(Type):
@@ -578,8 +578,8 @@ class BackupsRemoveArgs(Type):
 
 
 class Number(Type):
-    _toSchema = {'tag': 'Tag', 'patch': 'Patch', 'major': 'Major', 'minor': 'Minor', 'build': 'Build'}
-    _toPy = {'Patch': 'patch', 'Tag': 'tag', 'Minor': 'minor', 'Build': 'build', 'Major': 'major'}
+    _toSchema = {'build': 'Build', 'major': 'Major', 'tag': 'Tag', 'patch': 'Patch', 'minor': 'Minor'}
+    _toPy = {'Tag': 'tag', 'Build': 'build', 'Patch': 'patch', 'Major': 'major', 'Minor': 'minor'}
     def __init__(self, build=None, major=None, minor=None, patch=None, tag=None):
         '''
         build : int
@@ -606,8 +606,8 @@ class RestoreArgs(Type):
 
 
 class Block(Type):
-    _toSchema = {'message': 'message', 'id_': 'id', 'type_': 'type', 'tag': 'tag'}
-    _toPy = {'message': 'message', 'id': 'id_', 'type': 'type_', 'tag': 'tag'}
+    _toSchema = {'tag': 'tag', 'message': 'message', 'type_': 'type', 'id_': 'id'}
+    _toPy = {'id': 'id_', 'tag': 'tag', 'message': 'message', 'type': 'type_'}
     def __init__(self, id_=None, message=None, tag=None, type_=None):
         '''
         id_ : str
@@ -629,8 +629,8 @@ class BlockResult(Type):
         error : Error
         result : Block
         '''
-        self.error = Error.from_json(error)
-        self.result = Block.from_json(result)
+        self.error = Error.from_json(error) if error else None
+        self.result = Block.from_json(result) if result else None
 
 
 class BlockResults(Type):
@@ -644,7 +644,7 @@ class BlockResults(Type):
 
 
 class BlockSwitchParams(Type):
-    _toSchema = {'message': 'message', 'type_': 'type'}
+    _toSchema = {'type_': 'type', 'message': 'message'}
     _toPy = {'message': 'message', 'type': 'type_'}
     def __init__(self, message=None, type_=None):
         '''
@@ -706,7 +706,7 @@ class APIHostPortsResult(Type):
 
 
 class AddCharm(Type):
-    _toSchema = {'url': 'URL', 'channel': 'Channel'}
+    _toSchema = {'channel': 'Channel', 'url': 'URL'}
     _toPy = {'Channel': 'channel', 'URL': 'url'}
     def __init__(self, channel=None, url=None):
         '''
@@ -718,8 +718,8 @@ class AddCharm(Type):
 
 
 class AddCharmWithAuthorization(Type):
-    _toSchema = {'url': 'URL', 'charmstoremacaroon': 'CharmStoreMacaroon', 'channel': 'Channel'}
-    _toPy = {'CharmStoreMacaroon': 'charmstoremacaroon', 'Channel': 'channel', 'URL': 'url'}
+    _toSchema = {'channel': 'Channel', 'charmstoremacaroon': 'CharmStoreMacaroon', 'url': 'URL'}
+    _toPy = {'Channel': 'channel', 'URL': 'url', 'CharmStoreMacaroon': 'charmstoremacaroon'}
     def __init__(self, channel=None, charmstoremacaroon=None, url=None):
         '''
         channel : str
@@ -727,13 +727,13 @@ class AddCharmWithAuthorization(Type):
         url : str
         '''
         self.channel = channel
-        self.charmstoremacaroon = Macaroon.from_json(charmstoremacaroon)
+        self.charmstoremacaroon = Macaroon.from_json(charmstoremacaroon) if charmstoremacaroon else None
         self.url = url
 
 
 class AddMachineParams(Type):
-    _toSchema = {'containertype': 'ContainerType', 'disks': 'Disks', 'placement': 'Placement', 'series': 'Series', 'instanceid': 'InstanceId', 'hardwarecharacteristics': 'HardwareCharacteristics', 'parentid': 'ParentId', 'constraints': 'Constraints', 'jobs': 'Jobs', 'addrs': 'Addrs', 'nonce': 'Nonce'}
-    _toPy = {'Constraints': 'constraints', 'ParentId': 'parentid', 'Addrs': 'addrs', 'Jobs': 'jobs', 'Disks': 'disks', 'HardwareCharacteristics': 'hardwarecharacteristics', 'Placement': 'placement', 'InstanceId': 'instanceid', 'ContainerType': 'containertype', 'Nonce': 'nonce', 'Series': 'series'}
+    _toSchema = {'series': 'Series', 'jobs': 'Jobs', 'disks': 'Disks', 'containertype': 'ContainerType', 'constraints': 'Constraints', 'instanceid': 'InstanceId', 'placement': 'Placement', 'parentid': 'ParentId', 'addrs': 'Addrs', 'hardwarecharacteristics': 'HardwareCharacteristics', 'nonce': 'Nonce'}
+    _toPy = {'Series': 'series', 'Placement': 'placement', 'Disks': 'disks', 'Addrs': 'addrs', 'Jobs': 'jobs', 'ParentId': 'parentid', 'InstanceId': 'instanceid', 'Nonce': 'nonce', 'ContainerType': 'containertype', 'HardwareCharacteristics': 'hardwarecharacteristics', 'Constraints': 'constraints'}
     def __init__(self, addrs=None, constraints=None, containertype=None, disks=None, hardwarecharacteristics=None, instanceid=None, jobs=None, nonce=None, parentid=None, placement=None, series=None):
         '''
         addrs : typing.Sequence[~Address]
@@ -749,15 +749,15 @@ class AddMachineParams(Type):
         series : str
         '''
         self.addrs = [Address.from_json(o) for o in addrs or []]
-        self.constraints = Value.from_json(constraints)
+        self.constraints = Value.from_json(constraints) if constraints else None
         self.containertype = containertype
         self.disks = [Constraints.from_json(o) for o in disks or []]
-        self.hardwarecharacteristics = HardwareCharacteristics.from_json(hardwarecharacteristics)
+        self.hardwarecharacteristics = HardwareCharacteristics.from_json(hardwarecharacteristics) if hardwarecharacteristics else None
         self.instanceid = instanceid
         self.jobs = jobs
         self.nonce = nonce
         self.parentid = parentid
-        self.placement = Placement.from_json(placement)
+        self.placement = Placement.from_json(placement) if placement else None
         self.series = series
 
 
@@ -779,7 +779,7 @@ class AddMachinesResult(Type):
         error : Error
         machine : str
         '''
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.machine = machine
 
 
@@ -794,8 +794,8 @@ class AddMachinesResults(Type):
 
 
 class Address(Type):
-    _toSchema = {'scope': 'Scope', 'spacename': 'SpaceName', 'type_': 'Type', 'value': 'Value'}
-    _toPy = {'Scope': 'scope', 'Value': 'value', 'Type': 'type_', 'SpaceName': 'spacename'}
+    _toSchema = {'value': 'Value', 'type_': 'Type', 'scope': 'Scope', 'spacename': 'SpaceName'}
+    _toPy = {'Value': 'value', 'SpaceName': 'spacename', 'Type': 'type_', 'Scope': 'scope'}
     def __init__(self, scope=None, spacename=None, type_=None, value=None):
         '''
         scope : str
@@ -810,8 +810,8 @@ class Address(Type):
 
 
 class AgentVersionResult(Type):
-    _toSchema = {'tag': 'Tag', 'patch': 'Patch', 'major': 'Major', 'minor': 'Minor', 'build': 'Build'}
-    _toPy = {'Patch': 'patch', 'Tag': 'tag', 'Minor': 'minor', 'Build': 'build', 'Major': 'major'}
+    _toSchema = {'build': 'Build', 'major': 'Major', 'tag': 'Tag', 'patch': 'Patch', 'minor': 'Minor'}
+    _toPy = {'Tag': 'tag', 'Build': 'build', 'Patch': 'patch', 'Major': 'major', 'Minor': 'minor'}
     def __init__(self, build=None, major=None, minor=None, patch=None, tag=None):
         '''
         build : int
@@ -838,8 +838,8 @@ class AllWatcherId(Type):
 
 
 class Binary(Type):
-    _toSchema = {'series': 'Series', 'number': 'Number', 'arch': 'Arch'}
-    _toPy = {'Number': 'number', 'Arch': 'arch', 'Series': 'series'}
+    _toSchema = {'series': 'Series', 'arch': 'Arch', 'number': 'Number'}
+    _toPy = {'Series': 'series', 'Arch': 'arch', 'Number': 'number'}
     def __init__(self, arch=None, number=None, series=None):
         '''
         arch : str
@@ -847,13 +847,13 @@ class Binary(Type):
         series : str
         '''
         self.arch = arch
-        self.number = Number.from_json(number)
+        self.number = Number.from_json(number) if number else None
         self.series = series
 
 
 class BundleChangesChange(Type):
-    _toSchema = {'id_': 'id', 'requires': 'requires', 'method': 'method', 'args': 'args'}
-    _toPy = {'id': 'id_', 'requires': 'requires', 'method': 'method', 'args': 'args'}
+    _toSchema = {'method': 'method', 'args': 'args', 'id_': 'id', 'requires': 'requires'}
+    _toPy = {'id': 'id_', 'requires': 'requires', 'args': 'args', 'method': 'method'}
     def __init__(self, args=None, id_=None, method=None, requires=None):
         '''
         args : typing.Sequence[typing.Any]
@@ -868,8 +868,8 @@ class BundleChangesChange(Type):
 
 
 class Constraints(Type):
-    _toSchema = {'pool': 'Pool', 'count': 'Count', 'size': 'Size'}
-    _toPy = {'Pool': 'pool', 'Count': 'count', 'Size': 'size'}
+    _toSchema = {'size': 'Size', 'pool': 'Pool', 'count': 'Count'}
+    _toPy = {'Size': 'size', 'Count': 'count', 'Pool': 'pool'}
     def __init__(self, count=None, pool=None, size=None):
         '''
         count : int
@@ -883,7 +883,7 @@ class Constraints(Type):
 
 class DestroyMachines(Type):
     _toSchema = {'force': 'Force', 'machinenames': 'MachineNames'}
-    _toPy = {'Force': 'force', 'MachineNames': 'machinenames'}
+    _toPy = {'MachineNames': 'machinenames', 'Force': 'force'}
     def __init__(self, force=None, machinenames=None):
         '''
         force : bool
@@ -894,8 +894,8 @@ class DestroyMachines(Type):
 
 
 class DetailedStatus(Type):
-    _toSchema = {'info': 'Info', 'since': 'Since', 'kind': 'Kind', 'life': 'Life', 'version': 'Version', 'data': 'Data', 'status': 'Status'}
-    _toPy = {'Version': 'version', 'Data': 'data', 'Kind': 'kind', 'Status': 'status', 'Since': 'since', 'Life': 'life', 'Info': 'info'}
+    _toSchema = {'kind': 'Kind', 'since': 'Since', 'version': 'Version', 'data': 'Data', 'status': 'Status', 'info': 'Info', 'life': 'Life'}
+    _toPy = {'Life': 'life', 'Data': 'data', 'Info': 'info', 'Kind': 'kind', 'Version': 'version', 'Since': 'since', 'Status': 'status'}
     def __init__(self, data=None, info=None, kind=None, life=None, since=None, status=None, version=None):
         '''
         data : typing.Mapping[str, typing.Any]
@@ -916,8 +916,8 @@ class DetailedStatus(Type):
 
 
 class EndpointStatus(Type):
-    _toSchema = {'role': 'Role', 'servicename': 'ServiceName', 'subordinate': 'Subordinate', 'name': 'Name'}
-    _toPy = {'Name': 'name', 'ServiceName': 'servicename', 'Role': 'role', 'Subordinate': 'subordinate'}
+    _toSchema = {'name': 'Name', 'subordinate': 'Subordinate', 'role': 'Role', 'servicename': 'ServiceName'}
+    _toPy = {'Subordinate': 'subordinate', 'Name': 'name', 'Role': 'role', 'ServiceName': 'servicename'}
     def __init__(self, name=None, role=None, servicename=None, subordinate=None):
         '''
         name : str
@@ -932,8 +932,8 @@ class EndpointStatus(Type):
 
 
 class EntityStatus(Type):
-    _toSchema = {'info': 'Info', 'since': 'Since', 'data': 'Data', 'status': 'Status'}
-    _toPy = {'Status': 'status', 'Since': 'since', 'Data': 'data', 'Info': 'info'}
+    _toSchema = {'data': 'Data', 'since': 'Since', 'status': 'Status', 'info': 'Info'}
+    _toPy = {'Since': 'since', 'Data': 'data', 'Status': 'status', 'Info': 'info'}
     def __init__(self, data=None, info=None, since=None, status=None):
         '''
         data : typing.Mapping[str, typing.Any]
@@ -948,8 +948,8 @@ class EntityStatus(Type):
 
 
 class FindToolsParams(Type):
-    _toSchema = {'series': 'Series', 'minorversion': 'MinorVersion', 'number': 'Number', 'majorversion': 'MajorVersion', 'arch': 'Arch'}
-    _toPy = {'MinorVersion': 'minorversion', 'MajorVersion': 'majorversion', 'Series': 'series', 'Arch': 'arch', 'Number': 'number'}
+    _toSchema = {'majorversion': 'MajorVersion', 'series': 'Series', 'arch': 'Arch', 'number': 'Number', 'minorversion': 'MinorVersion'}
+    _toPy = {'Series': 'series', 'MinorVersion': 'minorversion', 'MajorVersion': 'majorversion', 'Arch': 'arch', 'Number': 'number'}
     def __init__(self, arch=None, majorversion=None, minorversion=None, number=None, series=None):
         '''
         arch : str
@@ -961,25 +961,25 @@ class FindToolsParams(Type):
         self.arch = arch
         self.majorversion = majorversion
         self.minorversion = minorversion
-        self.number = Number.from_json(number)
+        self.number = Number.from_json(number) if number else None
         self.series = series
 
 
 class FindToolsResult(Type):
-    _toSchema = {'list_': 'List', 'error': 'Error'}
+    _toSchema = {'error': 'Error', 'list_': 'List'}
     _toPy = {'List': 'list_', 'Error': 'error'}
     def __init__(self, error=None, list_=None):
         '''
         error : Error
         list_ : typing.Sequence[~Tools]
         '''
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.list_ = [Tools.from_json(o) for o in list_ or []]
 
 
 class FullStatus(Type):
-    _toSchema = {'modelname': 'ModelName', 'availableversion': 'AvailableVersion', 'relations': 'Relations', 'machines': 'Machines', 'services': 'Services'}
-    _toPy = {'ModelName': 'modelname', 'Relations': 'relations', 'AvailableVersion': 'availableversion', 'Machines': 'machines', 'Services': 'services'}
+    _toSchema = {'machines': 'Machines', 'modelname': 'ModelName', 'availableversion': 'AvailableVersion', 'services': 'Services', 'relations': 'Relations'}
+    _toPy = {'Services': 'services', 'ModelName': 'modelname', 'Relations': 'relations', 'AvailableVersion': 'availableversion', 'Machines': 'machines'}
     def __init__(self, availableversion=None, machines=None, modelname=None, relations=None, services=None):
         '''
         availableversion : str
@@ -1006,8 +1006,8 @@ class GetBundleChangesParams(Type):
 
 
 class GetBundleChangesResults(Type):
-    _toSchema = {'changes': 'changes', 'errors': 'errors'}
-    _toPy = {'changes': 'changes', 'errors': 'errors'}
+    _toSchema = {'errors': 'errors', 'changes': 'changes'}
+    _toPy = {'errors': 'errors', 'changes': 'changes'}
     def __init__(self, changes=None, errors=None):
         '''
         changes : typing.Sequence[~BundleChangesChange]
@@ -1018,8 +1018,8 @@ class GetBundleChangesResults(Type):
 
 
 class GetConstraintsResults(Type):
-    _toSchema = {'tags': 'tags', 'root_disk': 'root-disk', 'spaces': 'spaces', 'virt_type': 'virt-type', 'container': 'container', 'mem': 'mem', 'arch': 'arch', 'cpu_power': 'cpu-power', 'cpu_cores': 'cpu-cores', 'instance_type': 'instance-type'}
-    _toPy = {'spaces': 'spaces', 'instance-type': 'instance_type', 'virt-type': 'virt_type', 'container': 'container', 'cpu-cores': 'cpu_cores', 'tags': 'tags', 'cpu-power': 'cpu_power', 'mem': 'mem', 'root-disk': 'root_disk', 'arch': 'arch'}
+    _toSchema = {'tags': 'tags', 'container': 'container', 'mem': 'mem', 'arch': 'arch', 'cpu_cores': 'cpu-cores', 'cpu_power': 'cpu-power', 'root_disk': 'root-disk', 'instance_type': 'instance-type', 'spaces': 'spaces', 'virt_type': 'virt-type'}
+    _toPy = {'tags': 'tags', 'container': 'container', 'instance-type': 'instance_type', 'mem': 'mem', 'virt-type': 'virt_type', 'cpu-cores': 'cpu_cores', 'arch': 'arch', 'spaces': 'spaces', 'root-disk': 'root_disk', 'cpu-power': 'cpu_power'}
     def __init__(self, arch=None, container=None, cpu_cores=None, cpu_power=None, instance_type=None, mem=None, root_disk=None, spaces=None, tags=None, virt_type=None):
         '''
         arch : str
@@ -1046,8 +1046,8 @@ class GetConstraintsResults(Type):
 
 
 class HardwareCharacteristics(Type):
-    _toSchema = {'cpucores': 'CpuCores', 'cpupower': 'CpuPower', 'rootdisk': 'RootDisk', 'availabilityzone': 'AvailabilityZone', 'mem': 'Mem', 'tags': 'Tags', 'arch': 'Arch'}
-    _toPy = {'Tags': 'tags', 'Mem': 'mem', 'AvailabilityZone': 'availabilityzone', 'RootDisk': 'rootdisk', 'CpuCores': 'cpucores', 'CpuPower': 'cpupower', 'Arch': 'arch'}
+    _toSchema = {'tags': 'Tags', 'rootdisk': 'RootDisk', 'mem': 'Mem', 'availabilityzone': 'AvailabilityZone', 'cpupower': 'CpuPower', 'arch': 'Arch', 'cpucores': 'CpuCores'}
+    _toPy = {'CpuPower': 'cpupower', 'Arch': 'arch', 'AvailabilityZone': 'availabilityzone', 'Tags': 'tags', 'Mem': 'mem', 'RootDisk': 'rootdisk', 'CpuCores': 'cpucores'}
     def __init__(self, arch=None, availabilityzone=None, cpucores=None, cpupower=None, mem=None, rootdisk=None, tags=None):
         '''
         arch : str
@@ -1075,13 +1075,13 @@ class HostPort(Type):
         address : Address
         port : int
         '''
-        self.address = Address.from_json(address)
+        self.address = Address.from_json(address) if address else None
         self.port = port
 
 
 class MachineStatus(Type):
-    _toSchema = {'containers': 'Containers', 'hasvote': 'HasVote', 'agentstatus': 'AgentStatus', 'id_': 'Id', 'hardware': 'Hardware', 'series': 'Series', 'instanceid': 'InstanceId', 'instancestatus': 'InstanceStatus', 'dnsname': 'DNSName', 'wantsvote': 'WantsVote', 'jobs': 'Jobs'}
-    _toPy = {'Id': 'id_', 'HasVote': 'hasvote', 'Jobs': 'jobs', 'DNSName': 'dnsname', 'WantsVote': 'wantsvote', 'Containers': 'containers', 'Hardware': 'hardware', 'AgentStatus': 'agentstatus', 'Series': 'series', 'InstanceId': 'instanceid', 'InstanceStatus': 'instancestatus'}
+    _toSchema = {'jobs': 'Jobs', 'hasvote': 'HasVote', 'hardware': 'Hardware', 'dnsname': 'DNSName', 'agentstatus': 'AgentStatus', 'wantsvote': 'WantsVote', 'instanceid': 'InstanceId', 'containers': 'Containers', 'series': 'Series', 'id_': 'Id', 'instancestatus': 'InstanceStatus'}
+    _toPy = {'Containers': 'containers', 'Series': 'series', 'InstanceStatus': 'instancestatus', 'Jobs': 'jobs', 'HasVote': 'hasvote', 'Id': 'id_', 'Hardware': 'hardware', 'DNSName': 'dnsname', 'InstanceId': 'instanceid', 'WantsVote': 'wantsvote', 'AgentStatus': 'agentstatus'}
     def __init__(self, agentstatus=None, containers=None, dnsname=None, hardware=None, hasvote=None, id_=None, instanceid=None, instancestatus=None, jobs=None, series=None, wantsvote=None):
         '''
         agentstatus : DetailedStatus
@@ -1096,14 +1096,14 @@ class MachineStatus(Type):
         series : str
         wantsvote : bool
         '''
-        self.agentstatus = DetailedStatus.from_json(agentstatus)
+        self.agentstatus = DetailedStatus.from_json(agentstatus) if agentstatus else None
         self.containers = {k: MachineStatus.from_json(v) for k, v in (containers or dict()).items()}
         self.dnsname = dnsname
         self.hardware = hardware
         self.hasvote = hasvote
         self.id_ = id_
         self.instanceid = instanceid
-        self.instancestatus = DetailedStatus.from_json(instancestatus)
+        self.instancestatus = DetailedStatus.from_json(instancestatus) if instancestatus else None
         self.jobs = jobs
         self.series = series
         self.wantsvote = wantsvote
@@ -1132,8 +1132,8 @@ class ModelConfigResults(Type):
 
 
 class ModelInfo(Type):
-    _toSchema = {'providertype': 'ProviderType', 'life': 'Life', 'name': 'Name', 'uuid': 'UUID', 'defaultseries': 'DefaultSeries', 'serveruuid': 'ServerUUID', 'users': 'Users', 'ownertag': 'OwnerTag', 'status': 'Status'}
-    _toPy = {'Name': 'name', 'UUID': 'uuid', 'ProviderType': 'providertype', 'Status': 'status', 'Life': 'life', 'Users': 'users', 'OwnerTag': 'ownertag', 'DefaultSeries': 'defaultseries', 'ServerUUID': 'serveruuid'}
+    _toSchema = {'name': 'Name', 'defaultseries': 'DefaultSeries', 'users': 'Users', 'uuid': 'UUID', 'serveruuid': 'ServerUUID', 'status': 'Status', 'ownertag': 'OwnerTag', 'life': 'Life', 'providertype': 'ProviderType'}
+    _toPy = {'Name': 'name', 'Life': 'life', 'OwnerTag': 'ownertag', 'UUID': 'uuid', 'ProviderType': 'providertype', 'DefaultSeries': 'defaultseries', 'Users': 'users', 'Status': 'status', 'ServerUUID': 'serveruuid'}
     def __init__(self, defaultseries=None, life=None, name=None, ownertag=None, providertype=None, serveruuid=None, status=None, uuid=None, users=None):
         '''
         defaultseries : str
@@ -1152,7 +1152,7 @@ class ModelInfo(Type):
         self.ownertag = ownertag
         self.providertype = providertype
         self.serveruuid = serveruuid
-        self.status = EntityStatus.from_json(status)
+        self.status = EntityStatus.from_json(status) if status else None
         self.uuid = uuid
         self.users = [ModelUserInfo.from_json(o) for o in users or []]
 
@@ -1178,8 +1178,8 @@ class ModelUnset(Type):
 
 
 class ModelUserInfo(Type):
-    _toSchema = {'access': 'access', 'displayname': 'displayname', 'user': 'user', 'lastconnection': 'lastconnection'}
-    _toPy = {'access': 'access', 'displayname': 'displayname', 'user': 'user', 'lastconnection': 'lastconnection'}
+    _toSchema = {'displayname': 'displayname', 'access': 'access', 'user': 'user', 'lastconnection': 'lastconnection'}
+    _toPy = {'displayname': 'displayname', 'access': 'access', 'user': 'user', 'lastconnection': 'lastconnection'}
     def __init__(self, access=None, displayname=None, lastconnection=None, user=None):
         '''
         access : str
@@ -1201,8 +1201,8 @@ class ModelUserInfoResult(Type):
         error : Error
         result : ModelUserInfo
         '''
-        self.error = Error.from_json(error)
-        self.result = ModelUserInfo.from_json(result)
+        self.error = Error.from_json(error) if error else None
+        self.result = ModelUserInfo.from_json(result) if result else None
 
 
 class ModelUserInfoResults(Type):
@@ -1217,7 +1217,7 @@ class ModelUserInfoResults(Type):
 
 class Placement(Type):
     _toSchema = {'scope': 'Scope', 'directive': 'Directive'}
-    _toPy = {'Scope': 'scope', 'Directive': 'directive'}
+    _toPy = {'Directive': 'directive', 'Scope': 'scope'}
     def __init__(self, directive=None, scope=None):
         '''
         directive : str
@@ -1248,8 +1248,8 @@ class PrivateAddressResults(Type):
 
 
 class ProvisioningScriptParams(Type):
-    _toSchema = {'nonce': 'Nonce', 'machineid': 'MachineId', 'datadir': 'DataDir', 'disablepackagecommands': 'DisablePackageCommands'}
-    _toPy = {'MachineId': 'machineid', 'DisablePackageCommands': 'disablepackagecommands', 'Nonce': 'nonce', 'DataDir': 'datadir'}
+    _toSchema = {'datadir': 'DataDir', 'nonce': 'Nonce', 'disablepackagecommands': 'DisablePackageCommands', 'machineid': 'MachineId'}
+    _toPy = {'MachineId': 'machineid', 'Nonce': 'nonce', 'DataDir': 'datadir', 'DisablePackageCommands': 'disablepackagecommands'}
     def __init__(self, datadir=None, disablepackagecommands=None, machineid=None, nonce=None):
         '''
         datadir : str
@@ -1294,8 +1294,8 @@ class PublicAddressResults(Type):
 
 
 class RelationStatus(Type):
-    _toSchema = {'scope': 'Scope', 'interface': 'Interface', 'id_': 'Id', 'key': 'Key', 'endpoints': 'Endpoints'}
-    _toPy = {'Id': 'id_', 'Interface': 'interface', 'Scope': 'scope', 'Endpoints': 'endpoints', 'Key': 'key'}
+    _toSchema = {'scope': 'Scope', 'endpoints': 'Endpoints', 'key': 'Key', 'interface': 'Interface', 'id_': 'Id'}
+    _toPy = {'Id': 'id_', 'Scope': 'scope', 'Key': 'key', 'Endpoints': 'endpoints', 'Interface': 'interface'}
     def __init__(self, endpoints=None, id_=None, interface=None, key=None, scope=None):
         '''
         endpoints : typing.Sequence[~EndpointStatus]
@@ -1312,15 +1312,15 @@ class RelationStatus(Type):
 
 
 class ResolveCharmResult(Type):
-    _toSchema = {'url': 'URL', 'error': 'Error'}
-    _toPy = {'Error': 'error', 'URL': 'url'}
+    _toSchema = {'error': 'Error', 'url': 'URL'}
+    _toPy = {'URL': 'url', 'Error': 'error'}
     def __init__(self, error=None, url=None):
         '''
         error : str
         url : URL
         '''
         self.error = error
-        self.url = URL.from_json(url)
+        self.url = URL.from_json(url) if url else None
 
 
 class ResolveCharmResults(Type):
@@ -1356,8 +1356,8 @@ class Resolved(Type):
 
 
 class ServiceStatus(Type):
-    _toSchema = {'canupgradeto': 'CanUpgradeTo', 'meterstatuses': 'MeterStatuses', 'exposed': 'Exposed', 'life': 'Life', 'units': 'Units', 'charm': 'Charm', 'relations': 'Relations', 'subordinateto': 'SubordinateTo', 'status': 'Status'}
-    _toPy = {'CanUpgradeTo': 'canupgradeto', 'Relations': 'relations', 'MeterStatuses': 'meterstatuses', 'SubordinateTo': 'subordinateto', 'Status': 'status', 'Charm': 'charm', 'Exposed': 'exposed', 'Units': 'units', 'Life': 'life'}
+    _toSchema = {'canupgradeto': 'CanUpgradeTo', 'relations': 'Relations', 'units': 'Units', 'charm': 'Charm', 'status': 'Status', 'meterstatuses': 'MeterStatuses', 'life': 'Life', 'subordinateto': 'SubordinateTo', 'exposed': 'Exposed'}
+    _toPy = {'Life': 'life', 'MeterStatuses': 'meterstatuses', 'Exposed': 'exposed', 'Relations': 'relations', 'Units': 'units', 'Status': 'status', 'CanUpgradeTo': 'canupgradeto', 'SubordinateTo': 'subordinateto', 'Charm': 'charm'}
     def __init__(self, canupgradeto=None, charm=None, exposed=None, life=None, meterstatuses=None, relations=None, status=None, subordinateto=None, units=None):
         '''
         canupgradeto : str
@@ -1376,26 +1376,26 @@ class ServiceStatus(Type):
         self.life = life
         self.meterstatuses = {k: MeterStatus.from_json(v) for k, v in (meterstatuses or dict()).items()}
         self.relations = relations
-        self.status = DetailedStatus.from_json(status)
+        self.status = DetailedStatus.from_json(status) if status else None
         self.subordinateto = subordinateto
         self.units = {k: UnitStatus.from_json(v) for k, v in (units or dict()).items()}
 
 
 class SetConstraints(Type):
     _toSchema = {'servicename': 'ServiceName', 'constraints': 'Constraints'}
-    _toPy = {'Constraints': 'constraints', 'ServiceName': 'servicename'}
+    _toPy = {'ServiceName': 'servicename', 'Constraints': 'constraints'}
     def __init__(self, constraints=None, servicename=None):
         '''
         constraints : Value
         servicename : str
         '''
-        self.constraints = Value.from_json(constraints)
+        self.constraints = Value.from_json(constraints) if constraints else None
         self.servicename = servicename
 
 
 class SetModelAgentVersion(Type):
-    _toSchema = {'tag': 'Tag', 'patch': 'Patch', 'major': 'Major', 'minor': 'Minor', 'build': 'Build'}
-    _toPy = {'Patch': 'patch', 'Tag': 'tag', 'Minor': 'minor', 'Build': 'build', 'Major': 'major'}
+    _toSchema = {'build': 'Build', 'major': 'Major', 'tag': 'Tag', 'patch': 'Patch', 'minor': 'Minor'}
+    _toPy = {'Tag': 'tag', 'Build': 'build', 'Patch': 'patch', 'Major': 'major', 'Minor': 'minor'}
     def __init__(self, build=None, major=None, minor=None, patch=None, tag=None):
         '''
         build : int
@@ -1413,7 +1413,7 @@ class SetModelAgentVersion(Type):
 
 class StatusHistoryArgs(Type):
     _toSchema = {'kind': 'Kind', 'name': 'Name', 'size': 'Size'}
-    _toPy = {'Name': 'name', 'Size': 'size', 'Kind': 'kind'}
+    _toPy = {'Kind': 'kind', 'Size': 'size', 'Name': 'name'}
     def __init__(self, kind=None, name=None, size=None):
         '''
         kind : str
@@ -1446,8 +1446,8 @@ class StatusParams(Type):
 
 
 class Tools(Type):
-    _toSchema = {'url': 'url', 'size': 'size', 'sha256': 'sha256', 'version': 'version'}
-    _toPy = {'url': 'url', 'size': 'size', 'sha256': 'sha256', 'version': 'version'}
+    _toSchema = {'version': 'version', 'url': 'url', 'size': 'size', 'sha256': 'sha256'}
+    _toPy = {'version': 'version', 'url': 'url', 'size': 'size', 'sha256': 'sha256'}
     def __init__(self, sha256=None, size=None, url=None, version=None):
         '''
         sha256 : str
@@ -1458,12 +1458,12 @@ class Tools(Type):
         self.sha256 = sha256
         self.size = size
         self.url = url
-        self.version = Binary.from_json(version)
+        self.version = Binary.from_json(version) if version else None
 
 
 class URL(Type):
-    _toSchema = {'series': 'Series', 'name': 'Name', 'channel': 'Channel', 'revision': 'Revision', 'schema': 'Schema', 'user': 'User'}
-    _toPy = {'Name': 'name', 'Revision': 'revision', 'Channel': 'channel', 'Schema': 'schema', 'User': 'user', 'Series': 'series'}
+    _toSchema = {'name': 'Name', 'revision': 'Revision', 'series': 'Series', 'user': 'User', 'channel': 'Channel', 'schema': 'Schema'}
+    _toPy = {'Name': 'name', 'Channel': 'channel', 'Series': 'series', 'Revision': 'revision', 'User': 'user', 'Schema': 'schema'}
     def __init__(self, channel=None, name=None, revision=None, schema=None, series=None, user=None):
         '''
         channel : str
@@ -1482,8 +1482,8 @@ class URL(Type):
 
 
 class UnitStatus(Type):
-    _toSchema = {'agentstatus': 'AgentStatus', 'subordinates': 'Subordinates', 'charm': 'Charm', 'openedports': 'OpenedPorts', 'workloadstatus': 'WorkloadStatus', 'publicaddress': 'PublicAddress', 'machine': 'Machine'}
-    _toPy = {'WorkloadStatus': 'workloadstatus', 'Machine': 'machine', 'PublicAddress': 'publicaddress', 'OpenedPorts': 'openedports', 'Subordinates': 'subordinates', 'AgentStatus': 'agentstatus', 'Charm': 'charm'}
+    _toSchema = {'subordinates': 'Subordinates', 'charm': 'Charm', 'agentstatus': 'AgentStatus', 'publicaddress': 'PublicAddress', 'openedports': 'OpenedPorts', 'workloadstatus': 'WorkloadStatus', 'machine': 'Machine'}
+    _toPy = {'OpenedPorts': 'openedports', 'Subordinates': 'subordinates', 'WorkloadStatus': 'workloadstatus', 'Machine': 'machine', 'PublicAddress': 'publicaddress', 'AgentStatus': 'agentstatus', 'Charm': 'charm'}
     def __init__(self, agentstatus=None, charm=None, machine=None, openedports=None, publicaddress=None, subordinates=None, workloadstatus=None):
         '''
         agentstatus : DetailedStatus
@@ -1494,18 +1494,18 @@ class UnitStatus(Type):
         subordinates : typing.Mapping[str, ~UnitStatus]
         workloadstatus : DetailedStatus
         '''
-        self.agentstatus = DetailedStatus.from_json(agentstatus)
+        self.agentstatus = DetailedStatus.from_json(agentstatus) if agentstatus else None
         self.charm = charm
         self.machine = machine
         self.openedports = openedports
         self.publicaddress = publicaddress
         self.subordinates = {k: UnitStatus.from_json(v) for k, v in (subordinates or dict()).items()}
-        self.workloadstatus = DetailedStatus.from_json(workloadstatus)
+        self.workloadstatus = DetailedStatus.from_json(workloadstatus) if workloadstatus else None
 
 
 class Value(Type):
-    _toSchema = {'tags': 'tags', 'root_disk': 'root-disk', 'spaces': 'spaces', 'virt_type': 'virt-type', 'container': 'container', 'mem': 'mem', 'arch': 'arch', 'cpu_power': 'cpu-power', 'cpu_cores': 'cpu-cores', 'instance_type': 'instance-type'}
-    _toPy = {'spaces': 'spaces', 'instance-type': 'instance_type', 'virt-type': 'virt_type', 'container': 'container', 'cpu-cores': 'cpu_cores', 'tags': 'tags', 'cpu-power': 'cpu_power', 'mem': 'mem', 'root-disk': 'root_disk', 'arch': 'arch'}
+    _toSchema = {'tags': 'tags', 'container': 'container', 'mem': 'mem', 'arch': 'arch', 'cpu_cores': 'cpu-cores', 'cpu_power': 'cpu-power', 'root_disk': 'root-disk', 'instance_type': 'instance-type', 'spaces': 'spaces', 'virt_type': 'virt-type'}
+    _toPy = {'tags': 'tags', 'container': 'container', 'instance-type': 'instance_type', 'mem': 'mem', 'virt-type': 'virt_type', 'cpu-cores': 'cpu_cores', 'arch': 'arch', 'spaces': 'spaces', 'root-disk': 'root_disk', 'cpu-power': 'cpu_power'}
     def __init__(self, arch=None, container=None, cpu_cores=None, cpu_power=None, instance_type=None, mem=None, root_disk=None, spaces=None, tags=None, virt_type=None):
         '''
         arch : str
@@ -1552,7 +1552,7 @@ class InitiateModelMigrationArgs(Type):
 
 
 class InitiateModelMigrationResult(Type):
-    _toSchema = {'model_tag': 'model-tag', 'id_': 'id', 'error': 'error'}
+    _toSchema = {'model_tag': 'model-tag', 'error': 'error', 'id_': 'id'}
     _toPy = {'model-tag': 'model_tag', 'id': 'id_', 'error': 'error'}
     def __init__(self, error=None, id_=None, model_tag=None):
         '''
@@ -1560,7 +1560,7 @@ class InitiateModelMigrationResult(Type):
         id_ : str
         model_tag : str
         '''
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.id_ = id_
         self.model_tag = model_tag
 
@@ -1576,7 +1576,7 @@ class InitiateModelMigrationResults(Type):
 
 
 class Model(Type):
-    _toSchema = {'uuid': 'UUID', 'name': 'Name', 'ownertag': 'OwnerTag'}
+    _toSchema = {'name': 'Name', 'uuid': 'UUID', 'ownertag': 'OwnerTag'}
     _toPy = {'Name': 'name', 'OwnerTag': 'ownertag', 'UUID': 'uuid'}
     def __init__(self, name=None, ownertag=None, uuid=None):
         '''
@@ -1590,8 +1590,8 @@ class Model(Type):
 
 
 class ModelBlockInfo(Type):
-    _toSchema = {'blocks': 'blocks', 'owner_tag': 'owner-tag', 'name': 'name', 'model_uuid': 'model-uuid'}
-    _toPy = {'blocks': 'blocks', 'owner-tag': 'owner_tag', 'name': 'name', 'model-uuid': 'model_uuid'}
+    _toSchema = {'name': 'name', 'blocks': 'blocks', 'model_uuid': 'model-uuid', 'owner_tag': 'owner-tag'}
+    _toPy = {'name': 'name', 'blocks': 'blocks', 'owner-tag': 'owner_tag', 'model-uuid': 'model_uuid'}
     def __init__(self, blocks=None, model_uuid=None, name=None, owner_tag=None):
         '''
         blocks : typing.Sequence[str]
@@ -1624,12 +1624,12 @@ class ModelMigrationSpec(Type):
         target_info : ModelMigrationTargetInfo
         '''
         self.model_tag = model_tag
-        self.target_info = ModelMigrationTargetInfo.from_json(target_info)
+        self.target_info = ModelMigrationTargetInfo.from_json(target_info) if target_info else None
 
 
 class ModelMigrationTargetInfo(Type):
-    _toSchema = {'ca_cert': 'ca-cert', 'controller_tag': 'controller-tag', 'auth_tag': 'auth-tag', 'addrs': 'addrs', 'password': 'password'}
-    _toPy = {'auth-tag': 'auth_tag', 'password': 'password', 'ca-cert': 'ca_cert', 'addrs': 'addrs', 'controller-tag': 'controller_tag'}
+    _toSchema = {'ca_cert': 'ca-cert', 'auth_tag': 'auth-tag', 'addrs': 'addrs', 'password': 'password', 'controller_tag': 'controller-tag'}
+    _toPy = {'ca-cert': 'ca_cert', 'auth-tag': 'auth_tag', 'addrs': 'addrs', 'password': 'password', 'controller-tag': 'controller_tag'}
     def __init__(self, addrs=None, auth_tag=None, ca_cert=None, controller_tag=None, password=None):
         '''
         addrs : typing.Sequence[str]
@@ -1646,8 +1646,8 @@ class ModelMigrationTargetInfo(Type):
 
 
 class ModelStatus(Type):
-    _toSchema = {'hosted_machine_count': 'hosted-machine-count', 'model_tag': 'model-tag', 'service_count': 'service-count', 'life': 'life', 'owner_tag': 'owner-tag'}
-    _toPy = {'life': 'life', 'model-tag': 'model_tag', 'owner-tag': 'owner_tag', 'hosted-machine-count': 'hosted_machine_count', 'service-count': 'service_count'}
+    _toSchema = {'model_tag': 'model-tag', 'owner_tag': 'owner-tag', 'service_count': 'service-count', 'life': 'life', 'hosted_machine_count': 'hosted-machine-count'}
+    _toPy = {'model-tag': 'model_tag', 'owner-tag': 'owner_tag', 'life': 'life', 'hosted-machine-count': 'hosted_machine_count', 'service-count': 'service_count'}
     def __init__(self, hosted_machine_count=None, life=None, model_tag=None, owner_tag=None, service_count=None):
         '''
         hosted_machine_count : int
@@ -1684,7 +1684,7 @@ class RemoveBlocksArgs(Type):
 
 
 class UserModel(Type):
-    _toSchema = {'lastconnection': 'LastConnection', 'model': 'Model'}
+    _toSchema = {'model': 'Model', 'lastconnection': 'LastConnection'}
     _toPy = {'Model': 'model', 'LastConnection': 'lastconnection'}
     def __init__(self, lastconnection=None, model=None):
         '''
@@ -1692,7 +1692,7 @@ class UserModel(Type):
         model : Model
         '''
         self.lastconnection = lastconnection
-        self.model = Model.from_json(model)
+        self.model = Model.from_json(model) if model else None
 
 
 class UserModelList(Type):
@@ -1716,7 +1716,7 @@ class BytesResult(Type):
 
 
 class DeployerConnectionValues(Type):
-    _toSchema = {'apiaddresses': 'APIAddresses', 'stateaddresses': 'StateAddresses'}
+    _toSchema = {'stateaddresses': 'StateAddresses', 'apiaddresses': 'APIAddresses'}
     _toPy = {'APIAddresses': 'apiaddresses', 'StateAddresses': 'stateaddresses'}
     def __init__(self, apiaddresses=None, stateaddresses=None):
         '''
@@ -1728,14 +1728,14 @@ class DeployerConnectionValues(Type):
 
 
 class LifeResult(Type):
-    _toSchema = {'life': 'Life', 'error': 'Error'}
+    _toSchema = {'error': 'Error', 'life': 'Life'}
     _toPy = {'Life': 'life', 'Error': 'error'}
     def __init__(self, error=None, life=None):
         '''
         error : Error
         life : str
         '''
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.life = life
 
 
@@ -1751,31 +1751,31 @@ class LifeResults(Type):
 
 class StringResult(Type):
     _toSchema = {'error': 'Error', 'result': 'Result'}
-    _toPy = {'Error': 'error', 'Result': 'result'}
+    _toPy = {'Result': 'result', 'Error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
         result : str
         '''
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.result = result
 
 
 class StringsResult(Type):
     _toSchema = {'error': 'Error', 'result': 'Result'}
-    _toPy = {'Error': 'error', 'Result': 'result'}
+    _toPy = {'Result': 'result', 'Error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
         result : typing.Sequence[str]
         '''
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.result = result
 
 
 class StringsWatchResult(Type):
-    _toSchema = {'changes': 'Changes', 'error': 'Error', 'stringswatcherid': 'StringsWatcherId'}
-    _toPy = {'Error': 'error', 'StringsWatcherId': 'stringswatcherid', 'Changes': 'changes'}
+    _toSchema = {'stringswatcherid': 'StringsWatcherId', 'error': 'Error', 'changes': 'Changes'}
+    _toPy = {'StringsWatcherId': 'stringswatcherid', 'Changes': 'changes', 'Error': 'error'}
     def __init__(self, changes=None, error=None, stringswatcherid=None):
         '''
         changes : typing.Sequence[str]
@@ -1783,7 +1783,7 @@ class StringsWatchResult(Type):
         stringswatcherid : str
         '''
         self.changes = changes
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.stringswatcherid = stringswatcherid
 
 
@@ -1798,8 +1798,8 @@ class StringsWatchResults(Type):
 
 
 class AddSubnetParams(Type):
-    _toSchema = {'subnetproviderid': 'SubnetProviderId', 'zones': 'Zones', 'subnettag': 'SubnetTag', 'spacetag': 'SpaceTag'}
-    _toPy = {'SubnetProviderId': 'subnetproviderid', 'SubnetTag': 'subnettag', 'SpaceTag': 'spacetag', 'Zones': 'zones'}
+    _toSchema = {'subnettag': 'SubnetTag', 'zones': 'Zones', 'spacetag': 'SpaceTag', 'subnetproviderid': 'SubnetProviderId'}
+    _toPy = {'SubnetProviderId': 'subnetproviderid', 'Zones': 'zones', 'SubnetTag': 'subnettag', 'SpaceTag': 'spacetag'}
     def __init__(self, spacetag=None, subnetproviderid=None, subnettag=None, zones=None):
         '''
         spacetag : str
@@ -1824,8 +1824,8 @@ class AddSubnetsParams(Type):
 
 
 class CreateSpaceParams(Type):
-    _toSchema = {'public': 'Public', 'providerid': 'ProviderId', 'spacetag': 'SpaceTag', 'subnettags': 'SubnetTags'}
-    _toPy = {'Public': 'public', 'SubnetTags': 'subnettags', 'ProviderId': 'providerid', 'SpaceTag': 'spacetag'}
+    _toSchema = {'providerid': 'ProviderId', 'public': 'Public', 'spacetag': 'SpaceTag', 'subnettags': 'SubnetTags'}
+    _toPy = {'SubnetTags': 'subnettags', 'Public': 'public', 'ProviderId': 'providerid', 'SpaceTag': 'spacetag'}
     def __init__(self, providerid=None, public=None, spacetag=None, subnettags=None):
         '''
         providerid : str
@@ -1870,8 +1870,8 @@ class ListSubnetsResults(Type):
 
 
 class ProviderSpace(Type):
-    _toSchema = {'providerid': 'ProviderId', 'name': 'Name', 'error': 'Error', 'subnets': 'Subnets'}
-    _toPy = {'Name': 'name', 'Subnets': 'subnets', 'Error': 'error', 'ProviderId': 'providerid'}
+    _toSchema = {'name': 'Name', 'providerid': 'ProviderId', 'subnets': 'Subnets', 'error': 'Error'}
+    _toPy = {'Name': 'name', 'ProviderId': 'providerid', 'Error': 'error', 'Subnets': 'subnets'}
     def __init__(self, error=None, name=None, providerid=None, subnets=None):
         '''
         error : Error
@@ -1879,15 +1879,15 @@ class ProviderSpace(Type):
         providerid : str
         subnets : typing.Sequence[~Subnet]
         '''
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.name = name
         self.providerid = providerid
         self.subnets = [Subnet.from_json(o) for o in subnets or []]
 
 
 class Subnet(Type):
-    _toSchema = {'providerid': 'ProviderId', 'cidr': 'CIDR', 'life': 'Life', 'staticrangehighip': 'StaticRangeHighIP', 'zones': 'Zones', 'vlantag': 'VLANTag', 'staticrangelowip': 'StaticRangeLowIP', 'spacetag': 'SpaceTag', 'status': 'Status'}
-    _toPy = {'StaticRangeHighIP': 'staticrangehighip', 'Zones': 'zones', 'StaticRangeLowIP': 'staticrangelowip', 'CIDR': 'cidr', 'VLANTag': 'vlantag', 'Status': 'status', 'Life': 'life', 'ProviderId': 'providerid', 'SpaceTag': 'spacetag'}
+    _toSchema = {'staticrangehighip': 'StaticRangeHighIP', 'vlantag': 'VLANTag', 'spacetag': 'SpaceTag', 'cidr': 'CIDR', 'providerid': 'ProviderId', 'status': 'Status', 'zones': 'Zones', 'life': 'Life', 'staticrangelowip': 'StaticRangeLowIP'}
+    _toPy = {'StaticRangeLowIP': 'staticrangelowip', 'Life': 'life', 'StaticRangeHighIP': 'staticrangehighip', 'ProviderId': 'providerid', 'SpaceTag': 'spacetag', 'VLANTag': 'vlantag', 'Zones': 'zones', 'CIDR': 'cidr', 'Status': 'status'}
     def __init__(self, cidr=None, life=None, providerid=None, spacetag=None, staticrangehighip=None, staticrangelowip=None, status=None, vlantag=None, zones=None):
         '''
         cidr : str
@@ -1912,7 +1912,7 @@ class Subnet(Type):
 
 
 class SubnetsFilters(Type):
-    _toSchema = {'spacetag': 'SpaceTag', 'zone': 'Zone'}
+    _toSchema = {'zone': 'Zone', 'spacetag': 'SpaceTag'}
     _toPy = {'Zone': 'zone', 'SpaceTag': 'spacetag'}
     def __init__(self, spacetag=None, zone=None):
         '''
@@ -1924,8 +1924,8 @@ class SubnetsFilters(Type):
 
 
 class BlockDevice(Type):
-    _toSchema = {'hardwareid': 'HardwareId', 'inuse': 'InUse', 'size': 'Size', 'uuid': 'UUID', 'filesystemtype': 'FilesystemType', 'mountpoint': 'MountPoint', 'label': 'Label', 'busaddress': 'BusAddress', 'devicename': 'DeviceName', 'devicelinks': 'DeviceLinks'}
-    _toPy = {'FilesystemType': 'filesystemtype', 'DeviceLinks': 'devicelinks', 'Label': 'label', 'InUse': 'inuse', 'MountPoint': 'mountpoint', 'DeviceName': 'devicename', 'UUID': 'uuid', 'Size': 'size', 'HardwareId': 'hardwareid', 'BusAddress': 'busaddress'}
+    _toSchema = {'uuid': 'UUID', 'devicename': 'DeviceName', 'busaddress': 'BusAddress', 'hardwareid': 'HardwareId', 'inuse': 'InUse', 'mountpoint': 'MountPoint', 'devicelinks': 'DeviceLinks', 'filesystemtype': 'FilesystemType', 'size': 'Size', 'label': 'Label'}
+    _toPy = {'Size': 'size', 'InUse': 'inuse', 'Label': 'label', 'FilesystemType': 'filesystemtype', 'UUID': 'uuid', 'BusAddress': 'busaddress', 'HardwareId': 'hardwareid', 'DeviceName': 'devicename', 'MountPoint': 'mountpoint', 'DeviceLinks': 'devicelinks'}
     def __init__(self, busaddress=None, devicelinks=None, devicename=None, filesystemtype=None, hardwareid=None, inuse=None, label=None, mountpoint=None, size=None, uuid=None):
         '''
         busaddress : str
@@ -1974,8 +1974,8 @@ class SetMachineBlockDevices(Type):
 
 
 class MachineStorageId(Type):
-    _toSchema = {'attachmenttag': 'attachmenttag', 'machinetag': 'machinetag'}
-    _toPy = {'attachmenttag': 'attachmenttag', 'machinetag': 'machinetag'}
+    _toSchema = {'machinetag': 'machinetag', 'attachmenttag': 'attachmenttag'}
+    _toPy = {'machinetag': 'machinetag', 'attachmenttag': 'attachmenttag'}
     def __init__(self, attachmenttag=None, machinetag=None):
         '''
         attachmenttag : str
@@ -1986,8 +1986,8 @@ class MachineStorageId(Type):
 
 
 class MachineStorageIdsWatchResult(Type):
-    _toSchema = {'machinestorageidswatcherid': 'MachineStorageIdsWatcherId', 'changes': 'Changes', 'error': 'Error'}
-    _toPy = {'Error': 'error', 'Changes': 'changes', 'MachineStorageIdsWatcherId': 'machinestorageidswatcherid'}
+    _toSchema = {'machinestorageidswatcherid': 'MachineStorageIdsWatcherId', 'error': 'Error', 'changes': 'Changes'}
+    _toPy = {'Changes': 'changes', 'MachineStorageIdsWatcherId': 'machinestorageidswatcherid', 'Error': 'error'}
     def __init__(self, changes=None, error=None, machinestorageidswatcherid=None):
         '''
         changes : typing.Sequence[~MachineStorageId]
@@ -1995,7 +1995,7 @@ class MachineStorageIdsWatchResult(Type):
         machinestorageidswatcherid : str
         '''
         self.changes = [MachineStorageId.from_json(o) for o in changes or []]
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.machinestorageidswatcherid = machinestorageidswatcherid
 
 
@@ -2010,21 +2010,21 @@ class BoolResults(Type):
 
 
 class MachinePortRange(Type):
-    _toSchema = {'relationtag': 'RelationTag', 'portrange': 'PortRange', 'unittag': 'UnitTag'}
-    _toPy = {'UnitTag': 'unittag', 'PortRange': 'portrange', 'RelationTag': 'relationtag'}
+    _toSchema = {'unittag': 'UnitTag', 'portrange': 'PortRange', 'relationtag': 'RelationTag'}
+    _toPy = {'PortRange': 'portrange', 'UnitTag': 'unittag', 'RelationTag': 'relationtag'}
     def __init__(self, portrange=None, relationtag=None, unittag=None):
         '''
         portrange : PortRange
         relationtag : str
         unittag : str
         '''
-        self.portrange = PortRange.from_json(portrange)
+        self.portrange = PortRange.from_json(portrange) if portrange else None
         self.relationtag = relationtag
         self.unittag = unittag
 
 
 class MachinePorts(Type):
-    _toSchema = {'machinetag': 'MachineTag', 'subnettag': 'SubnetTag'}
+    _toSchema = {'subnettag': 'SubnetTag', 'machinetag': 'MachineTag'}
     _toPy = {'MachineTag': 'machinetag', 'SubnetTag': 'subnettag'}
     def __init__(self, machinetag=None, subnettag=None):
         '''
@@ -2046,14 +2046,14 @@ class MachinePortsParams(Type):
 
 
 class MachinePortsResult(Type):
-    _toSchema = {'error': 'Error', 'ports': 'Ports'}
-    _toPy = {'Error': 'error', 'Ports': 'ports'}
+    _toSchema = {'ports': 'Ports', 'error': 'Error'}
+    _toPy = {'Ports': 'ports', 'Error': 'error'}
     def __init__(self, error=None, ports=None):
         '''
         error : Error
         ports : typing.Sequence[~MachinePortRange]
         '''
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.ports = [MachinePortRange.from_json(o) for o in ports or []]
 
 
@@ -2078,8 +2078,8 @@ class NotifyWatchResults(Type):
 
 
 class PortRange(Type):
-    _toSchema = {'protocol': 'Protocol', 'toport': 'ToPort', 'fromport': 'FromPort'}
-    _toPy = {'FromPort': 'fromport', 'Protocol': 'protocol', 'ToPort': 'toport'}
+    _toSchema = {'fromport': 'FromPort', 'protocol': 'Protocol', 'toport': 'ToPort'}
+    _toPy = {'Protocol': 'protocol', 'FromPort': 'fromport', 'ToPort': 'toport'}
     def __init__(self, fromport=None, protocol=None, toport=None):
         '''
         fromport : int
@@ -2113,14 +2113,14 @@ class StringsResults(Type):
 
 class ControllersChangeResult(Type):
     _toSchema = {'error': 'Error', 'result': 'Result'}
-    _toPy = {'Error': 'error', 'Result': 'result'}
+    _toPy = {'Result': 'result', 'Error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
         result : ControllersChanges
         '''
-        self.error = Error.from_json(error)
-        self.result = ControllersChanges.from_json(result)
+        self.error = Error.from_json(error) if error else None
+        self.result = ControllersChanges.from_json(result) if result else None
 
 
 class ControllersChangeResults(Type):
@@ -2134,8 +2134,8 @@ class ControllersChangeResults(Type):
 
 
 class ControllersChanges(Type):
-    _toSchema = {'added': 'added', 'promoted': 'promoted', 'removed': 'removed', 'demoted': 'demoted', 'maintained': 'maintained', 'converted': 'converted'}
-    _toPy = {'added': 'added', 'promoted': 'promoted', 'removed': 'removed', 'demoted': 'demoted', 'maintained': 'maintained', 'converted': 'converted'}
+    _toSchema = {'converted': 'converted', 'demoted': 'demoted', 'promoted': 'promoted', 'removed': 'removed', 'maintained': 'maintained', 'added': 'added'}
+    _toPy = {'converted': 'converted', 'demoted': 'demoted', 'promoted': 'promoted', 'removed': 'removed', 'maintained': 'maintained', 'added': 'added'}
     def __init__(self, added=None, converted=None, demoted=None, maintained=None, promoted=None, removed=None):
         '''
         added : typing.Sequence[str]
@@ -2154,8 +2154,8 @@ class ControllersChanges(Type):
 
 
 class ControllersSpec(Type):
-    _toSchema = {'modeltag': 'ModelTag', 'num_controllers': 'num-controllers', 'constraints': 'constraints', 'placement': 'placement', 'series': 'series'}
-    _toPy = {'placement': 'placement', 'constraints': 'constraints', 'series': 'series', 'num-controllers': 'num_controllers', 'ModelTag': 'modeltag'}
+    _toSchema = {'num_controllers': 'num-controllers', 'placement': 'placement', 'modeltag': 'ModelTag', 'series': 'series', 'constraints': 'constraints'}
+    _toPy = {'num-controllers': 'num_controllers', 'placement': 'placement', 'ModelTag': 'modeltag', 'series': 'series', 'constraints': 'constraints'}
     def __init__(self, modeltag=None, constraints=None, num_controllers=None, placement=None, series=None):
         '''
         modeltag : str
@@ -2165,7 +2165,7 @@ class ControllersSpec(Type):
         series : str
         '''
         self.modeltag = modeltag
-        self.constraints = Value.from_json(constraints)
+        self.constraints = Value.from_json(constraints) if constraints else None
         self.num_controllers = num_controllers
         self.placement = placement
         self.series = series
@@ -2182,22 +2182,22 @@ class ControllersSpecs(Type):
 
 
 class HAMember(Type):
-    _toSchema = {'publicaddress': 'PublicAddress', 'series': 'Series', 'tag': 'Tag'}
-    _toPy = {'Tag': 'tag', 'PublicAddress': 'publicaddress', 'Series': 'series'}
+    _toSchema = {'series': 'Series', 'publicaddress': 'PublicAddress', 'tag': 'Tag'}
+    _toPy = {'Series': 'series', 'PublicAddress': 'publicaddress', 'Tag': 'tag'}
     def __init__(self, publicaddress=None, series=None, tag=None):
         '''
         publicaddress : Address
         series : str
         tag : str
         '''
-        self.publicaddress = Address.from_json(publicaddress)
+        self.publicaddress = Address.from_json(publicaddress) if publicaddress else None
         self.series = series
         self.tag = tag
 
 
 class Member(Type):
-    _toSchema = {'slavedelay': 'SlaveDelay', 'id_': 'Id', 'priority': 'Priority', 'hidden': 'Hidden', 'address': 'Address', 'buildindexes': 'BuildIndexes', 'arbiter': 'Arbiter', 'votes': 'Votes', 'tags': 'Tags'}
-    _toPy = {'SlaveDelay': 'slavedelay', 'Id': 'id_', 'Hidden': 'hidden', 'Arbiter': 'arbiter', 'Priority': 'priority', 'Address': 'address', 'Votes': 'votes', 'Tags': 'tags', 'BuildIndexes': 'buildindexes'}
+    _toSchema = {'priority': 'Priority', 'tags': 'Tags', 'buildindexes': 'BuildIndexes', 'arbiter': 'Arbiter', 'votes': 'Votes', 'slavedelay': 'SlaveDelay', 'hidden': 'Hidden', 'address': 'Address', 'id_': 'Id'}
+    _toPy = {'SlaveDelay': 'slavedelay', 'Priority': 'priority', 'Votes': 'votes', 'BuildIndexes': 'buildindexes', 'Tags': 'tags', 'Id': 'id_', 'Arbiter': 'arbiter', 'Hidden': 'hidden', 'Address': 'address'}
     def __init__(self, address=None, arbiter=None, buildindexes=None, hidden=None, id_=None, priority=None, slavedelay=None, tags=None, votes=None):
         '''
         address : str
@@ -2222,15 +2222,15 @@ class Member(Type):
 
 
 class MongoUpgradeResults(Type):
-    _toSchema = {'members': 'Members', 'master': 'Master', 'rsmembers': 'RsMembers'}
-    _toPy = {'Members': 'members', 'RsMembers': 'rsmembers', 'Master': 'master'}
+    _toSchema = {'master': 'Master', 'rsmembers': 'RsMembers', 'members': 'Members'}
+    _toPy = {'Master': 'master', 'RsMembers': 'rsmembers', 'Members': 'members'}
     def __init__(self, master=None, members=None, rsmembers=None):
         '''
         master : HAMember
         members : typing.Sequence[~HAMember]
         rsmembers : typing.Sequence[~Member]
         '''
-        self.master = HAMember.from_json(master)
+        self.master = HAMember.from_json(master) if master else None
         self.members = [HAMember.from_json(o) for o in members or []]
         self.rsmembers = [Member.from_json(o) for o in rsmembers or []]
 
@@ -2246,8 +2246,8 @@ class ResumeReplicationParams(Type):
 
 
 class UpgradeMongoParams(Type):
-    _toSchema = {'patch': 'Patch', 'major': 'Major', 'storageengine': 'StorageEngine', 'minor': 'Minor'}
-    _toPy = {'Patch': 'patch', 'StorageEngine': 'storageengine', 'Major': 'major', 'Minor': 'minor'}
+    _toSchema = {'major': 'Major', 'storageengine': 'StorageEngine', 'patch': 'Patch', 'minor': 'Minor'}
+    _toPy = {'StorageEngine': 'storageengine', 'Patch': 'patch', 'Major': 'major', 'Minor': 'minor'}
     def __init__(self, major=None, minor=None, patch=None, storageengine=None):
         '''
         major : int
@@ -2262,8 +2262,8 @@ class UpgradeMongoParams(Type):
 
 
 class Version(Type):
-    _toSchema = {'patch': 'Patch', 'major': 'Major', 'storageengine': 'StorageEngine', 'minor': 'Minor'}
-    _toPy = {'Patch': 'patch', 'StorageEngine': 'storageengine', 'Major': 'major', 'Minor': 'minor'}
+    _toSchema = {'major': 'Major', 'storageengine': 'StorageEngine', 'patch': 'Patch', 'minor': 'Minor'}
+    _toPy = {'StorageEngine': 'storageengine', 'Patch': 'patch', 'Major': 'major', 'Minor': 'minor'}
     def __init__(self, major=None, minor=None, patch=None, storageengine=None):
         '''
         major : int
@@ -2288,8 +2288,8 @@ class SSHHostKeySet(Type):
 
 
 class SSHHostKeys(Type):
-    _toSchema = {'tag': 'tag', 'public_keys': 'public-keys'}
-    _toPy = {'public-keys': 'public_keys', 'tag': 'tag'}
+    _toSchema = {'public_keys': 'public-keys', 'tag': 'tag'}
+    _toPy = {'tag': 'tag', 'public-keys': 'public_keys'}
     def __init__(self, public_keys=None, tag=None):
         '''
         public_keys : typing.Sequence[str]
@@ -2310,8 +2310,8 @@ class ImageFilterParams(Type):
 
 
 class ImageMetadata(Type):
-    _toSchema = {'url': 'url', 'created': 'created', 'kind': 'kind', 'series': 'series', 'arch': 'arch'}
-    _toPy = {'url': 'url', 'created': 'created', 'kind': 'kind', 'series': 'series', 'arch': 'arch'}
+    _toSchema = {'kind': 'kind', 'series': 'series', 'arch': 'arch', 'created': 'created', 'url': 'url'}
+    _toPy = {'kind': 'kind', 'series': 'series', 'arch': 'arch', 'created': 'created', 'url': 'url'}
     def __init__(self, arch=None, created=None, kind=None, series=None, url=None):
         '''
         arch : str
@@ -2352,8 +2352,8 @@ class ListImageResult(Type):
 
 
 class CloudImageMetadata(Type):
-    _toSchema = {'source': 'source', 'root_storage_size': 'root_storage_size', 'series': 'series', 'version': 'version', 'priority': 'priority', 'image_id': 'image_id', 'virt_type': 'virt_type', 'stream': 'stream', 'root_storage_type': 'root_storage_type', 'region': 'region', 'arch': 'arch'}
-    _toPy = {'source': 'source', 'root_storage_size': 'root_storage_size', 'series': 'series', 'version': 'version', 'priority': 'priority', 'image_id': 'image_id', 'virt_type': 'virt_type', 'stream': 'stream', 'root_storage_type': 'root_storage_type', 'region': 'region', 'arch': 'arch'}
+    _toSchema = {'priority': 'priority', 'source': 'source', 'series': 'series', 'root_storage_type': 'root_storage_type', 'version': 'version', 'root_storage_size': 'root_storage_size', 'image_id': 'image_id', 'region': 'region', 'arch': 'arch', 'virt_type': 'virt_type', 'stream': 'stream'}
+    _toPy = {'priority': 'priority', 'source': 'source', 'series': 'series', 'root_storage_type': 'root_storage_type', 'version': 'version', 'root_storage_size': 'root_storage_size', 'image_id': 'image_id', 'region': 'region', 'arch': 'arch', 'virt_type': 'virt_type', 'stream': 'stream'}
     def __init__(self, arch=None, image_id=None, priority=None, region=None, root_storage_size=None, root_storage_type=None, series=None, source=None, stream=None, version=None, virt_type=None):
         '''
         arch : str
@@ -2392,8 +2392,8 @@ class CloudImageMetadataList(Type):
 
 
 class ImageMetadataFilter(Type):
-    _toSchema = {'series': 'series', 'virt_type': 'virt_type', 'stream': 'stream', 'arches': 'arches', 'region': 'region', 'root_storage_type': 'root-storage-type'}
-    _toPy = {'series': 'series', 'root-storage-type': 'root_storage_type', 'virt_type': 'virt_type', 'stream': 'stream', 'arches': 'arches', 'region': 'region'}
+    _toSchema = {'series': 'series', 'stream': 'stream', 'root_storage_type': 'root-storage-type', 'arches': 'arches', 'region': 'region', 'virt_type': 'virt_type'}
+    _toPy = {'series': 'series', 'stream': 'stream', 'root-storage-type': 'root_storage_type', 'arches': 'arches', 'region': 'region', 'virt_type': 'virt_type'}
     def __init__(self, arches=None, region=None, root_storage_type=None, series=None, stream=None, virt_type=None):
         '''
         arches : typing.Sequence[str]
@@ -2442,8 +2442,8 @@ class MetadataSaveParams(Type):
 
 
 class EntityStatusArgs(Type):
-    _toSchema = {'info': 'Info', 'data': 'Data', 'tag': 'Tag', 'status': 'Status'}
-    _toPy = {'Status': 'status', 'Tag': 'tag', 'Data': 'data', 'Info': 'info'}
+    _toSchema = {'data': 'Data', 'status': 'Status', 'tag': 'Tag', 'info': 'Info'}
+    _toPy = {'Tag': 'tag', 'Data': 'data', 'Status': 'status', 'Info': 'info'}
     def __init__(self, data=None, info=None, status=None, tag=None):
         '''
         data : typing.Mapping[str, typing.Any]
@@ -2459,7 +2459,7 @@ class EntityStatusArgs(Type):
 
 class MachineAddresses(Type):
     _toSchema = {'addresses': 'Addresses', 'tag': 'Tag'}
-    _toPy = {'Addresses': 'addresses', 'Tag': 'tag'}
+    _toPy = {'Tag': 'tag', 'Addresses': 'addresses'}
     def __init__(self, addresses=None, tag=None):
         '''
         addresses : typing.Sequence[~Address]
@@ -2471,14 +2471,14 @@ class MachineAddresses(Type):
 
 class MachineAddressesResult(Type):
     _toSchema = {'addresses': 'Addresses', 'error': 'Error'}
-    _toPy = {'Error': 'error', 'Addresses': 'addresses'}
+    _toPy = {'Addresses': 'addresses', 'Error': 'error'}
     def __init__(self, addresses=None, error=None):
         '''
         addresses : typing.Sequence[~Address]
         error : Error
         '''
         self.addresses = [Address.from_json(o) for o in addresses or []]
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
 
 
 class MachineAddressesResults(Type):
@@ -2512,8 +2512,8 @@ class SetStatus(Type):
 
 
 class StatusResult(Type):
-    _toSchema = {'info': 'Info', 'since': 'Since', 'id_': 'Id', 'life': 'Life', 'data': 'Data', 'error': 'Error', 'status': 'Status'}
-    _toPy = {'Since': 'since', 'Data': 'data', 'Id': 'id_', 'Status': 'status', 'Life': 'life', 'Error': 'error', 'Info': 'info'}
+    _toSchema = {'since': 'Since', 'data': 'Data', 'status': 'Status', 'error': 'Error', 'info': 'Info', 'id_': 'Id', 'life': 'Life'}
+    _toPy = {'Life': 'life', 'Info': 'info', 'Id': 'id_', 'Since': 'since', 'Data': 'data', 'Status': 'status', 'Error': 'error'}
     def __init__(self, data=None, error=None, id_=None, info=None, life=None, since=None, status=None):
         '''
         data : typing.Mapping[str, typing.Any]
@@ -2525,7 +2525,7 @@ class StatusResult(Type):
         status : str
         '''
         self.data = data
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.id_ = id_
         self.info = info
         self.life = life
@@ -2544,20 +2544,20 @@ class StatusResults(Type):
 
 
 class ListSSHKeys(Type):
-    _toSchema = {'mode': 'Mode', 'entities': 'Entities'}
+    _toSchema = {'entities': 'Entities', 'mode': 'Mode'}
     _toPy = {'Mode': 'mode', 'Entities': 'entities'}
     def __init__(self, entities=None, mode=None):
         '''
         entities : Entities
         mode : bool
         '''
-        self.entities = Entities.from_json(entities)
+        self.entities = Entities.from_json(entities) if entities else None
         self.mode = mode
 
 
 class ModifyUserSSHKeys(Type):
-    _toSchema = {'keys': 'Keys', 'user': 'User'}
-    _toPy = {'Keys': 'keys', 'User': 'user'}
+    _toSchema = {'user': 'User', 'keys': 'Keys'}
+    _toPy = {'User': 'user', 'Keys': 'keys'}
     def __init__(self, keys=None, user=None):
         '''
         keys : typing.Sequence[str]
@@ -2588,8 +2588,8 @@ class ClaimLeadershipBulkResults(Type):
 
 
 class ClaimLeadershipParams(Type):
-    _toSchema = {'durationseconds': 'DurationSeconds', 'unittag': 'UnitTag', 'servicetag': 'ServiceTag'}
-    _toPy = {'ServiceTag': 'servicetag', 'UnitTag': 'unittag', 'DurationSeconds': 'durationseconds'}
+    _toSchema = {'servicetag': 'ServiceTag', 'unittag': 'UnitTag', 'durationseconds': 'DurationSeconds'}
+    _toPy = {'ServiceTag': 'servicetag', 'DurationSeconds': 'durationseconds', 'UnitTag': 'unittag'}
     def __init__(self, durationseconds=None, servicetag=None, unittag=None):
         '''
         durationseconds : float
@@ -2612,8 +2612,8 @@ class ServiceTag(Type):
 
 
 class ActionExecutionResult(Type):
-    _toSchema = {'message': 'message', 'results': 'results', 'status': 'status', 'actiontag': 'actiontag'}
-    _toPy = {'message': 'message', 'results': 'results', 'status': 'status', 'actiontag': 'actiontag'}
+    _toSchema = {'results': 'results', 'message': 'message', 'status': 'status', 'actiontag': 'actiontag'}
+    _toPy = {'results': 'results', 'message': 'message', 'status': 'status', 'actiontag': 'actiontag'}
     def __init__(self, actiontag=None, message=None, results=None, status=None):
         '''
         actiontag : str
@@ -2639,13 +2639,13 @@ class ActionExecutionResults(Type):
 
 class JobsResult(Type):
     _toSchema = {'jobs': 'Jobs', 'error': 'Error'}
-    _toPy = {'Error': 'error', 'Jobs': 'jobs'}
+    _toPy = {'Jobs': 'jobs', 'Error': 'error'}
     def __init__(self, error=None, jobs=None):
         '''
         error : Error
         jobs : typing.Sequence[str]
         '''
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.jobs = jobs
 
 
@@ -2660,8 +2660,8 @@ class JobsResults(Type):
 
 
 class NetworkConfig(Type):
-    _toSchema = {'parentinterfacename': 'ParentInterfaceName', 'macaddress': 'MACAddress', 'cidr': 'CIDR', 'dnsservers': 'DNSServers', 'noautostart': 'NoAutoStart', 'address': 'Address', 'providersubnetid': 'ProviderSubnetId', 'providerspaceid': 'ProviderSpaceId', 'gatewayaddress': 'GatewayAddress', 'provideraddressid': 'ProviderAddressId', 'providerid': 'ProviderId', 'disabled': 'Disabled', 'dnssearchdomains': 'DNSSearchDomains', 'deviceindex': 'DeviceIndex', 'configtype': 'ConfigType', 'vlantag': 'VLANTag', 'interfacetype': 'InterfaceType', 'interfacename': 'InterfaceName', 'mtu': 'MTU', 'providervlanid': 'ProviderVLANId'}
-    _toPy = {'ParentInterfaceName': 'parentinterfacename', 'VLANTag': 'vlantag', 'MTU': 'mtu', 'CIDR': 'cidr', 'ProviderAddressId': 'provideraddressid', 'ConfigType': 'configtype', 'ProviderSpaceId': 'providerspaceid', 'GatewayAddress': 'gatewayaddress', 'ProviderId': 'providerid', 'InterfaceName': 'interfacename', 'InterfaceType': 'interfacetype', 'NoAutoStart': 'noautostart', 'DNSServers': 'dnsservers', 'DNSSearchDomains': 'dnssearchdomains', 'ProviderSubnetId': 'providersubnetid', 'MACAddress': 'macaddress', 'Address': 'address', 'Disabled': 'disabled', 'DeviceIndex': 'deviceindex', 'ProviderVLANId': 'providervlanid'}
+    _toSchema = {'interfacename': 'InterfaceName', 'macaddress': 'MACAddress', 'dnssearchdomains': 'DNSSearchDomains', 'providervlanid': 'ProviderVLANId', 'dnsservers': 'DNSServers', 'parentinterfacename': 'ParentInterfaceName', 'disabled': 'Disabled', 'mtu': 'MTU', 'configtype': 'ConfigType', 'provideraddressid': 'ProviderAddressId', 'address': 'Address', 'providerspaceid': 'ProviderSpaceId', 'cidr': 'CIDR', 'noautostart': 'NoAutoStart', 'providerid': 'ProviderId', 'gatewayaddress': 'GatewayAddress', 'deviceindex': 'DeviceIndex', 'providersubnetid': 'ProviderSubnetId', 'interfacetype': 'InterfaceType', 'vlantag': 'VLANTag'}
+    _toPy = {'CIDR': 'cidr', 'ProviderSpaceId': 'providerspaceid', 'ConfigType': 'configtype', 'DNSServers': 'dnsservers', 'NoAutoStart': 'noautostart', 'InterfaceName': 'interfacename', 'InterfaceType': 'interfacetype', 'Address': 'address', 'Disabled': 'disabled', 'ProviderSubnetId': 'providersubnetid', 'DeviceIndex': 'deviceindex', 'ProviderAddressId': 'provideraddressid', 'ParentInterfaceName': 'parentinterfacename', 'VLANTag': 'vlantag', 'MTU': 'mtu', 'ProviderVLANId': 'providervlanid', 'DNSSearchDomains': 'dnssearchdomains', 'MACAddress': 'macaddress', 'GatewayAddress': 'gatewayaddress', 'ProviderId': 'providerid'}
     def __init__(self, address=None, cidr=None, configtype=None, dnssearchdomains=None, dnsservers=None, deviceindex=None, disabled=None, gatewayaddress=None, interfacename=None, interfacetype=None, macaddress=None, mtu=None, noautostart=None, parentinterfacename=None, provideraddressid=None, providerid=None, providerspaceid=None, providersubnetid=None, providervlanid=None, vlantag=None):
         '''
         address : str
@@ -2720,8 +2720,8 @@ class SetMachineNetworkConfig(Type):
 
 
 class MeterStatusResult(Type):
-    _toSchema = {'info': 'Info', 'code': 'Code', 'error': 'Error'}
-    _toPy = {'Error': 'error', 'Code': 'code', 'Info': 'info'}
+    _toSchema = {'error': 'Error', 'code': 'Code', 'info': 'Info'}
+    _toPy = {'Code': 'code', 'Error': 'error', 'Info': 'info'}
     def __init__(self, code=None, error=None, info=None):
         '''
         code : str
@@ -2729,7 +2729,7 @@ class MeterStatusResult(Type):
         info : str
         '''
         self.code = code
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.info = info
 
 
@@ -2744,8 +2744,8 @@ class MeterStatusResults(Type):
 
 
 class Metric(Type):
-    _toSchema = {'key': 'Key', 'time': 'Time', 'value': 'Value'}
-    _toPy = {'Key': 'key', 'Value': 'value', 'Time': 'time'}
+    _toSchema = {'key': 'Key', 'value': 'Value', 'time': 'Time'}
+    _toPy = {'Value': 'value', 'Key': 'key', 'Time': 'time'}
     def __init__(self, key=None, time=None, value=None):
         '''
         key : str
@@ -2758,8 +2758,8 @@ class Metric(Type):
 
 
 class MetricBatch(Type):
-    _toSchema = {'created': 'Created', 'metrics': 'Metrics', 'uuid': 'UUID', 'charmurl': 'CharmURL'}
-    _toPy = {'Metrics': 'metrics', 'UUID': 'uuid', 'CharmURL': 'charmurl', 'Created': 'created'}
+    _toSchema = {'uuid': 'UUID', 'created': 'Created', 'charmurl': 'CharmURL', 'metrics': 'Metrics'}
+    _toPy = {'CharmURL': 'charmurl', 'Metrics': 'metrics', 'UUID': 'uuid', 'Created': 'created'}
     def __init__(self, charmurl=None, created=None, metrics=None, uuid=None):
         '''
         charmurl : str
@@ -2774,14 +2774,14 @@ class MetricBatch(Type):
 
 
 class MetricBatchParam(Type):
-    _toSchema = {'batch': 'Batch', 'tag': 'Tag'}
+    _toSchema = {'tag': 'Tag', 'batch': 'Batch'}
     _toPy = {'Tag': 'tag', 'Batch': 'batch'}
     def __init__(self, batch=None, tag=None):
         '''
         batch : MetricBatch
         tag : str
         '''
-        self.batch = MetricBatch.from_json(batch)
+        self.batch = MetricBatch.from_json(batch) if batch else None
         self.tag = tag
 
 
@@ -2796,20 +2796,20 @@ class MetricBatchParams(Type):
 
 
 class EntityMetrics(Type):
-    _toSchema = {'metrics': 'metrics', 'error': 'error'}
-    _toPy = {'metrics': 'metrics', 'error': 'error'}
+    _toSchema = {'error': 'error', 'metrics': 'metrics'}
+    _toPy = {'error': 'error', 'metrics': 'metrics'}
     def __init__(self, error=None, metrics=None):
         '''
         error : Error
         metrics : typing.Sequence[~MetricResult]
         '''
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.metrics = [MetricResult.from_json(o) for o in metrics or []]
 
 
 class MeterStatusParam(Type):
-    _toSchema = {'info': 'info', 'code': 'code', 'tag': 'tag'}
-    _toPy = {'info': 'info', 'code': 'code', 'tag': 'tag'}
+    _toSchema = {'tag': 'tag', 'code': 'code', 'info': 'info'}
+    _toPy = {'tag': 'tag', 'code': 'code', 'info': 'info'}
     def __init__(self, code=None, info=None, tag=None):
         '''
         code : str
@@ -2832,8 +2832,8 @@ class MeterStatusParams(Type):
 
 
 class MetricResult(Type):
-    _toSchema = {'key': 'key', 'time': 'time', 'value': 'value'}
-    _toPy = {'key': 'key', 'time': 'time', 'value': 'value'}
+    _toSchema = {'key': 'key', 'value': 'value', 'time': 'time'}
+    _toPy = {'key': 'key', 'value': 'value', 'time': 'time'}
     def __init__(self, key=None, time=None, value=None):
         '''
         key : str
@@ -2856,14 +2856,14 @@ class MetricResults(Type):
 
 
 class PhaseResult(Type):
-    _toSchema = {'phase': 'phase', 'error': 'Error'}
-    _toPy = {'phase': 'phase', 'Error': 'error'}
+    _toSchema = {'error': 'Error', 'phase': 'phase'}
+    _toPy = {'Error': 'error', 'phase': 'phase'}
     def __init__(self, error=None, phase=None):
         '''
         error : Error
         phase : str
         '''
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.phase = phase
 
 
@@ -2878,8 +2878,8 @@ class PhaseResults(Type):
 
 
 class FullMigrationStatus(Type):
-    _toSchema = {'attempt': 'attempt', 'phase': 'phase', 'spec': 'spec'}
-    _toPy = {'attempt': 'attempt', 'phase': 'phase', 'spec': 'spec'}
+    _toSchema = {'attempt': 'attempt', 'spec': 'spec', 'phase': 'phase'}
+    _toPy = {'attempt': 'attempt', 'spec': 'spec', 'phase': 'phase'}
     def __init__(self, attempt=None, phase=None, spec=None):
         '''
         attempt : int
@@ -2888,7 +2888,7 @@ class FullMigrationStatus(Type):
         '''
         self.attempt = attempt
         self.phase = phase
-        self.spec = ModelMigrationSpec.from_json(spec)
+        self.spec = ModelMigrationSpec.from_json(spec) if spec else None
 
 
 class SerializedModel(Type):
@@ -2912,8 +2912,8 @@ class SetMigrationPhaseArgs(Type):
 
 
 class MigrationStatus(Type):
-    _toSchema = {'source_ca_cert': 'source-ca-cert', 'attempt': 'attempt', 'target_api_addrs': 'target-api-addrs', 'source_api_addrs': 'source-api-addrs', 'target_ca_cert': 'target-ca-cert', 'phase': 'phase'}
-    _toPy = {'attempt': 'attempt', 'target-ca-cert': 'target_ca_cert', 'source-ca-cert': 'source_ca_cert', 'target-api-addrs': 'target_api_addrs', 'phase': 'phase', 'source-api-addrs': 'source_api_addrs'}
+    _toSchema = {'phase': 'phase', 'attempt': 'attempt', 'source_api_addrs': 'source-api-addrs', 'source_ca_cert': 'source-ca-cert', 'target_api_addrs': 'target-api-addrs', 'target_ca_cert': 'target-ca-cert'}
+    _toPy = {'target-ca-cert': 'target_ca_cert', 'source-api-addrs': 'source_api_addrs', 'source-ca-cert': 'source_ca_cert', 'attempt': 'attempt', 'phase': 'phase', 'target-api-addrs': 'target_api_addrs'}
     def __init__(self, attempt=None, phase=None, source_api_addrs=None, source_ca_cert=None, target_api_addrs=None, target_ca_cert=None):
         '''
         attempt : int
@@ -2943,7 +2943,7 @@ class ModelArgs(Type):
 
 class ModelCreateArgs(Type):
     _toSchema = {'config': 'Config', 'ownertag': 'OwnerTag', 'account': 'Account'}
-    _toPy = {'OwnerTag': 'ownertag', 'Config': 'config', 'Account': 'account'}
+    _toPy = {'OwnerTag': 'ownertag', 'Account': 'account', 'Config': 'config'}
     def __init__(self, account=None, config=None, ownertag=None):
         '''
         account : typing.Mapping[str, typing.Any]
@@ -2963,8 +2963,8 @@ class ModelInfoResult(Type):
         error : Error
         result : ModelInfo
         '''
-        self.error = Error.from_json(error)
-        self.result = ModelInfo.from_json(result)
+        self.error = Error.from_json(error) if error else None
+        self.result = ModelInfo.from_json(result) if result else None
 
 
 class ModelInfoResults(Type):
@@ -2990,8 +2990,8 @@ class ModelSkeletonConfigArgs(Type):
 
 
 class ModifyModelAccess(Type):
-    _toSchema = {'access': 'access', 'model_tag': 'model-tag', 'action': 'action', 'user_tag': 'user-tag'}
-    _toPy = {'access': 'access', 'model-tag': 'model_tag', 'action': 'action', 'user-tag': 'user_tag'}
+    _toSchema = {'model_tag': 'model-tag', 'access': 'access', 'user_tag': 'user-tag', 'action': 'action'}
+    _toPy = {'model-tag': 'model_tag', 'access': 'access', 'user-tag': 'user_tag', 'action': 'action'}
     def __init__(self, access=None, action=None, model_tag=None, user_tag=None):
         '''
         access : str
@@ -3016,15 +3016,15 @@ class ModifyModelAccessRequest(Type):
 
 
 class ConstraintsResult(Type):
-    _toSchema = {'constraints': 'Constraints', 'error': 'Error'}
-    _toPy = {'Constraints': 'constraints', 'Error': 'error'}
+    _toSchema = {'error': 'Error', 'constraints': 'Constraints'}
+    _toPy = {'Error': 'error', 'Constraints': 'constraints'}
     def __init__(self, constraints=None, error=None):
         '''
         constraints : Value
         error : Error
         '''
-        self.constraints = Value.from_json(constraints)
-        self.error = Error.from_json(error)
+        self.constraints = Value.from_json(constraints) if constraints else None
+        self.error = Error.from_json(error) if error else None
 
 
 class ConstraintsResults(Type):
@@ -3038,8 +3038,8 @@ class ConstraintsResults(Type):
 
 
 class ContainerConfig(Type):
-    _toSchema = {'preferipv6': 'PreferIPv6', 'allowlxcloopmounts': 'AllowLXCLoopMounts', 'providertype': 'ProviderType', 'aptproxy': 'AptProxy', 'authorizedkeys': 'AuthorizedKeys', 'proxy': 'Proxy', 'aptmirror': 'AptMirror', 'updatebehavior': 'UpdateBehavior', 'sslhostnameverification': 'SSLHostnameVerification'}
-    _toPy = {'AptProxy': 'aptproxy', 'AllowLXCLoopMounts': 'allowlxcloopmounts', 'AptMirror': 'aptmirror', 'AuthorizedKeys': 'authorizedkeys', 'ProviderType': 'providertype', 'PreferIPv6': 'preferipv6', 'Proxy': 'proxy', 'SSLHostnameVerification': 'sslhostnameverification', 'UpdateBehavior': 'updatebehavior'}
+    _toSchema = {'proxy': 'Proxy', 'sslhostnameverification': 'SSLHostnameVerification', 'aptmirror': 'AptMirror', 'allowlxcloopmounts': 'AllowLXCLoopMounts', 'authorizedkeys': 'AuthorizedKeys', 'aptproxy': 'AptProxy', 'preferipv6': 'PreferIPv6', 'updatebehavior': 'UpdateBehavior', 'providertype': 'ProviderType'}
+    _toPy = {'UpdateBehavior': 'updatebehavior', 'AptProxy': 'aptproxy', 'Proxy': 'proxy', 'AuthorizedKeys': 'authorizedkeys', 'ProviderType': 'providertype', 'AllowLXCLoopMounts': 'allowlxcloopmounts', 'PreferIPv6': 'preferipv6', 'SSLHostnameVerification': 'sslhostnameverification', 'AptMirror': 'aptmirror'}
     def __init__(self, allowlxcloopmounts=None, aptmirror=None, aptproxy=None, authorizedkeys=None, preferipv6=None, providertype=None, proxy=None, sslhostnameverification=None, updatebehavior=None):
         '''
         allowlxcloopmounts : bool
@@ -3054,13 +3054,13 @@ class ContainerConfig(Type):
         '''
         self.allowlxcloopmounts = allowlxcloopmounts
         self.aptmirror = aptmirror
-        self.aptproxy = Settings.from_json(aptproxy)
+        self.aptproxy = Settings.from_json(aptproxy) if aptproxy else None
         self.authorizedkeys = authorizedkeys
         self.preferipv6 = preferipv6
         self.providertype = providertype
-        self.proxy = Settings.from_json(proxy)
+        self.proxy = Settings.from_json(proxy) if proxy else None
         self.sslhostnameverification = sslhostnameverification
-        self.updatebehavior = UpdateBehavior.from_json(updatebehavior)
+        self.updatebehavior = UpdateBehavior.from_json(updatebehavior) if updatebehavior else None
 
 
 class ContainerManagerConfig(Type):
@@ -3085,13 +3085,13 @@ class ContainerManagerConfigParams(Type):
 
 class DistributionGroupResult(Type):
     _toSchema = {'error': 'Error', 'result': 'Result'}
-    _toPy = {'Error': 'error', 'Result': 'result'}
+    _toPy = {'Result': 'result', 'Error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
         result : typing.Sequence[str]
         '''
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.result = result
 
 
@@ -3106,8 +3106,8 @@ class DistributionGroupResults(Type):
 
 
 class InstanceInfo(Type):
-    _toSchema = {'nonce': 'Nonce', 'volumes': 'Volumes', 'volumeattachments': 'VolumeAttachments', 'tag': 'Tag', 'instanceid': 'InstanceId', 'characteristics': 'Characteristics', 'networkconfig': 'NetworkConfig'}
-    _toPy = {'NetworkConfig': 'networkconfig', 'Tag': 'tag', 'Characteristics': 'characteristics', 'VolumeAttachments': 'volumeattachments', 'InstanceId': 'instanceid', 'Volumes': 'volumes', 'Nonce': 'nonce'}
+    _toSchema = {'characteristics': 'Characteristics', 'volumes': 'Volumes', 'networkconfig': 'NetworkConfig', 'volumeattachments': 'VolumeAttachments', 'instanceid': 'InstanceId', 'tag': 'Tag', 'nonce': 'Nonce'}
+    _toPy = {'Characteristics': 'characteristics', 'Volumes': 'volumes', 'NetworkConfig': 'networkconfig', 'InstanceId': 'instanceid', 'Nonce': 'nonce', 'Tag': 'tag', 'VolumeAttachments': 'volumeattachments'}
     def __init__(self, characteristics=None, instanceid=None, networkconfig=None, nonce=None, tag=None, volumeattachments=None, volumes=None):
         '''
         characteristics : HardwareCharacteristics
@@ -3118,7 +3118,7 @@ class InstanceInfo(Type):
         volumeattachments : typing.Mapping[str, ~VolumeAttachmentInfo]
         volumes : typing.Sequence[~Volume]
         '''
-        self.characteristics = HardwareCharacteristics.from_json(characteristics)
+        self.characteristics = HardwareCharacteristics.from_json(characteristics) if characteristics else None
         self.instanceid = instanceid
         self.networkconfig = [NetworkConfig.from_json(o) for o in networkconfig or []]
         self.nonce = nonce
@@ -3138,7 +3138,7 @@ class InstancesInfo(Type):
 
 
 class MachineContainers(Type):
-    _toSchema = {'containertypes': 'ContainerTypes', 'machinetag': 'MachineTag'}
+    _toSchema = {'machinetag': 'MachineTag', 'containertypes': 'ContainerTypes'}
     _toPy = {'MachineTag': 'machinetag', 'ContainerTypes': 'containertypes'}
     def __init__(self, containertypes=None, machinetag=None):
         '''
@@ -3160,14 +3160,14 @@ class MachineContainersParams(Type):
 
 
 class MachineNetworkConfigResult(Type):
-    _toSchema = {'info': 'Info', 'error': 'Error'}
-    _toPy = {'Error': 'error', 'Info': 'info'}
+    _toSchema = {'error': 'Error', 'info': 'Info'}
+    _toPy = {'Info': 'info', 'Error': 'error'}
     def __init__(self, error=None, info=None):
         '''
         error : Error
         info : typing.Sequence[~NetworkConfig]
         '''
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.info = [NetworkConfig.from_json(o) for o in info or []]
 
 
@@ -3182,8 +3182,8 @@ class MachineNetworkConfigResults(Type):
 
 
 class ProvisioningInfo(Type):
-    _toSchema = {'jobs': 'Jobs', 'placement': 'Placement', 'series': 'Series', 'endpointbindings': 'EndpointBindings', 'subnetstozones': 'SubnetsToZones', 'imagemetadata': 'ImageMetadata', 'volumes': 'Volumes', 'constraints': 'Constraints', 'tags': 'Tags'}
-    _toPy = {'SubnetsToZones': 'subnetstozones', 'Constraints': 'constraints', 'Tags': 'tags', 'Jobs': 'jobs', 'Placement': 'placement', 'Volumes': 'volumes', 'ImageMetadata': 'imagemetadata', 'EndpointBindings': 'endpointbindings', 'Series': 'series'}
+    _toSchema = {'tags': 'Tags', 'imagemetadata': 'ImageMetadata', 'placement': 'Placement', 'volumes': 'Volumes', 'constraints': 'Constraints', 'jobs': 'Jobs', 'endpointbindings': 'EndpointBindings', 'series': 'Series', 'subnetstozones': 'SubnetsToZones'}
+    _toPy = {'SubnetsToZones': 'subnetstozones', 'Series': 'series', 'EndpointBindings': 'endpointbindings', 'Placement': 'placement', 'Jobs': 'jobs', 'Tags': 'tags', 'ImageMetadata': 'imagemetadata', 'Volumes': 'volumes', 'Constraints': 'constraints'}
     def __init__(self, constraints=None, endpointbindings=None, imagemetadata=None, jobs=None, placement=None, series=None, subnetstozones=None, tags=None, volumes=None):
         '''
         constraints : Value
@@ -3196,7 +3196,7 @@ class ProvisioningInfo(Type):
         tags : typing.Mapping[str, str]
         volumes : typing.Sequence[~VolumeParams]
         '''
-        self.constraints = Value.from_json(constraints)
+        self.constraints = Value.from_json(constraints) if constraints else None
         self.endpointbindings = endpointbindings
         self.imagemetadata = [CloudImageMetadata.from_json(o) for o in imagemetadata or []]
         self.jobs = jobs
@@ -3209,14 +3209,14 @@ class ProvisioningInfo(Type):
 
 class ProvisioningInfoResult(Type):
     _toSchema = {'error': 'Error', 'result': 'Result'}
-    _toPy = {'Error': 'error', 'Result': 'result'}
+    _toPy = {'Result': 'result', 'Error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
         result : ProvisioningInfo
         '''
-        self.error = Error.from_json(error)
-        self.result = ProvisioningInfo.from_json(result)
+        self.error = Error.from_json(error) if error else None
+        self.result = ProvisioningInfo.from_json(result) if result else None
 
 
 class ProvisioningInfoResults(Type):
@@ -3230,7 +3230,7 @@ class ProvisioningInfoResults(Type):
 
 
 class Settings(Type):
-    _toSchema = {'http': 'Http', 'ftp': 'Ftp', 'noproxy': 'NoProxy', 'https': 'Https'}
+    _toSchema = {'noproxy': 'NoProxy', 'http': 'Http', 'https': 'Https', 'ftp': 'Ftp'}
     _toPy = {'Ftp': 'ftp', 'Https': 'https', 'Http': 'http', 'NoProxy': 'noproxy'}
     def __init__(self, ftp=None, http=None, https=None, noproxy=None):
         '''
@@ -3246,8 +3246,8 @@ class Settings(Type):
 
 
 class ToolsResult(Type):
-    _toSchema = {'toolslist': 'ToolsList', 'error': 'Error', 'disablesslhostnameverification': 'DisableSSLHostnameVerification'}
-    _toPy = {'DisableSSLHostnameVerification': 'disablesslhostnameverification', 'ToolsList': 'toolslist', 'Error': 'error'}
+    _toSchema = {'disablesslhostnameverification': 'DisableSSLHostnameVerification', 'error': 'Error', 'toolslist': 'ToolsList'}
+    _toPy = {'ToolsList': 'toolslist', 'DisableSSLHostnameVerification': 'disablesslhostnameverification', 'Error': 'error'}
     def __init__(self, disablesslhostnameverification=None, error=None, toolslist=None):
         '''
         disablesslhostnameverification : bool
@@ -3255,7 +3255,7 @@ class ToolsResult(Type):
         toolslist : typing.Sequence[~Tools]
         '''
         self.disablesslhostnameverification = disablesslhostnameverification
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.toolslist = [Tools.from_json(o) for o in toolslist or []]
 
 
@@ -3270,7 +3270,7 @@ class ToolsResults(Type):
 
 
 class UpdateBehavior(Type):
-    _toSchema = {'enableosrefreshupdate': 'EnableOSRefreshUpdate', 'enableosupgrade': 'EnableOSUpgrade'}
+    _toSchema = {'enableosupgrade': 'EnableOSUpgrade', 'enableosrefreshupdate': 'EnableOSRefreshUpdate'}
     _toPy = {'EnableOSRefreshUpdate': 'enableosrefreshupdate', 'EnableOSUpgrade': 'enableosupgrade'}
     def __init__(self, enableosrefreshupdate=None, enableosupgrade=None):
         '''
@@ -3282,20 +3282,20 @@ class UpdateBehavior(Type):
 
 
 class Volume(Type):
-    _toSchema = {'info': 'info', 'volumetag': 'volumetag'}
-    _toPy = {'info': 'info', 'volumetag': 'volumetag'}
+    _toSchema = {'volumetag': 'volumetag', 'info': 'info'}
+    _toPy = {'volumetag': 'volumetag', 'info': 'info'}
     def __init__(self, info=None, volumetag=None):
         '''
         info : VolumeInfo
         volumetag : str
         '''
-        self.info = VolumeInfo.from_json(info)
+        self.info = VolumeInfo.from_json(info) if info else None
         self.volumetag = volumetag
 
 
 class VolumeAttachmentInfo(Type):
-    _toSchema = {'read_only': 'read-only', 'busaddress': 'busaddress', 'devicename': 'devicename', 'devicelink': 'devicelink'}
-    _toPy = {'busaddress': 'busaddress', 'devicename': 'devicename', 'devicelink': 'devicelink', 'read-only': 'read_only'}
+    _toSchema = {'devicename': 'devicename', 'busaddress': 'busaddress', 'read_only': 'read-only', 'devicelink': 'devicelink'}
+    _toPy = {'devicename': 'devicename', 'busaddress': 'busaddress', 'read-only': 'read_only', 'devicelink': 'devicelink'}
     def __init__(self, busaddress=None, devicelink=None, devicename=None, read_only=None):
         '''
         busaddress : str
@@ -3310,8 +3310,8 @@ class VolumeAttachmentInfo(Type):
 
 
 class VolumeAttachmentParams(Type):
-    _toSchema = {'read_only': 'read-only', 'machinetag': 'machinetag', 'instanceid': 'instanceid', 'provider': 'provider', 'volumetag': 'volumetag', 'volumeid': 'volumeid'}
-    _toPy = {'volumetag': 'volumetag', 'machinetag': 'machinetag', 'instanceid': 'instanceid', 'volumeid': 'volumeid', 'read-only': 'read_only', 'provider': 'provider'}
+    _toSchema = {'provider': 'provider', 'machinetag': 'machinetag', 'instanceid': 'instanceid', 'volumetag': 'volumetag', 'volumeid': 'volumeid', 'read_only': 'read-only'}
+    _toPy = {'provider': 'provider', 'machinetag': 'machinetag', 'instanceid': 'instanceid', 'volumetag': 'volumetag', 'volumeid': 'volumeid', 'read-only': 'read_only'}
     def __init__(self, instanceid=None, machinetag=None, provider=None, read_only=None, volumeid=None, volumetag=None):
         '''
         instanceid : str
@@ -3330,8 +3330,8 @@ class VolumeAttachmentParams(Type):
 
 
 class VolumeInfo(Type):
-    _toSchema = {'hardwareid': 'hardwareid', 'persistent': 'persistent', 'volumeid': 'volumeid', 'size': 'size'}
-    _toPy = {'hardwareid': 'hardwareid', 'persistent': 'persistent', 'volumeid': 'volumeid', 'size': 'size'}
+    _toSchema = {'persistent': 'persistent', 'volumeid': 'volumeid', 'hardwareid': 'hardwareid', 'size': 'size'}
+    _toPy = {'persistent': 'persistent', 'volumeid': 'volumeid', 'hardwareid': 'hardwareid', 'size': 'size'}
     def __init__(self, hardwareid=None, persistent=None, size=None, volumeid=None):
         '''
         hardwareid : str
@@ -3346,8 +3346,8 @@ class VolumeInfo(Type):
 
 
 class VolumeParams(Type):
-    _toSchema = {'volumetag': 'volumetag', 'attachment': 'attachment', 'size': 'size', 'attributes': 'attributes', 'provider': 'provider', 'tags': 'tags'}
-    _toPy = {'volumetag': 'volumetag', 'attachment': 'attachment', 'size': 'size', 'attributes': 'attributes', 'provider': 'provider', 'tags': 'tags'}
+    _toSchema = {'provider': 'provider', 'tags': 'tags', 'attributes': 'attributes', 'volumetag': 'volumetag', 'size': 'size', 'attachment': 'attachment'}
+    _toPy = {'provider': 'provider', 'tags': 'tags', 'attributes': 'attributes', 'volumetag': 'volumetag', 'size': 'size', 'attachment': 'attachment'}
     def __init__(self, attachment=None, attributes=None, provider=None, size=None, tags=None, volumetag=None):
         '''
         attachment : VolumeAttachmentParams
@@ -3357,7 +3357,7 @@ class VolumeParams(Type):
         tags : typing.Mapping[str, str]
         volumetag : str
         '''
-        self.attachment = VolumeAttachmentParams.from_json(attachment)
+        self.attachment = VolumeAttachmentParams.from_json(attachment) if attachment else None
         self.attributes = attributes
         self.provider = provider
         self.size = size
@@ -3366,7 +3366,7 @@ class VolumeParams(Type):
 
 
 class WatchContainer(Type):
-    _toSchema = {'containertype': 'ContainerType', 'machinetag': 'MachineTag'}
+    _toSchema = {'machinetag': 'MachineTag', 'containertype': 'ContainerType'}
     _toPy = {'MachineTag': 'machinetag', 'ContainerType': 'containertype'}
     def __init__(self, containertype=None, machinetag=None):
         '''
@@ -3388,8 +3388,8 @@ class WatchContainers(Type):
 
 
 class ProxyConfig(Type):
-    _toSchema = {'http': 'HTTP', 'ftp': 'FTP', 'noproxy': 'NoProxy', 'https': 'HTTPS'}
-    _toPy = {'HTTP': 'http', 'FTP': 'ftp', 'HTTPS': 'https', 'NoProxy': 'noproxy'}
+    _toSchema = {'noproxy': 'NoProxy', 'http': 'HTTP', 'https': 'HTTPS', 'ftp': 'FTP'}
+    _toPy = {'HTTP': 'http', 'HTTPS': 'https', 'FTP': 'ftp', 'NoProxy': 'noproxy'}
     def __init__(self, ftp=None, http=None, https=None, noproxy=None):
         '''
         ftp : str
@@ -3404,17 +3404,17 @@ class ProxyConfig(Type):
 
 
 class ProxyConfigResult(Type):
-    _toSchema = {'proxysettings': 'ProxySettings', 'error': 'Error', 'aptproxysettings': 'APTProxySettings'}
-    _toPy = {'Error': 'error', 'ProxySettings': 'proxysettings', 'APTProxySettings': 'aptproxysettings'}
+    _toSchema = {'aptproxysettings': 'APTProxySettings', 'error': 'Error', 'proxysettings': 'ProxySettings'}
+    _toPy = {'APTProxySettings': 'aptproxysettings', 'Error': 'error', 'ProxySettings': 'proxysettings'}
     def __init__(self, aptproxysettings=None, error=None, proxysettings=None):
         '''
         aptproxysettings : ProxyConfig
         error : Error
         proxysettings : ProxyConfig
         '''
-        self.aptproxysettings = ProxyConfig.from_json(aptproxysettings)
-        self.error = Error.from_json(error)
-        self.proxysettings = ProxyConfig.from_json(proxysettings)
+        self.aptproxysettings = ProxyConfig.from_json(aptproxysettings) if aptproxysettings else None
+        self.error = Error.from_json(error) if error else None
+        self.proxysettings = ProxyConfig.from_json(proxysettings) if proxysettings else None
 
 
 class ProxyConfigResults(Type):
@@ -3435,7 +3435,7 @@ class RebootActionResult(Type):
         error : Error
         result : str
         '''
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.result = result
 
 
@@ -3451,7 +3451,7 @@ class RebootActionResults(Type):
 
 class RelationUnitsChange(Type):
     _toSchema = {'changed': 'Changed', 'departed': 'Departed'}
-    _toPy = {'Changed': 'changed', 'Departed': 'departed'}
+    _toPy = {'Departed': 'departed', 'Changed': 'changed'}
     def __init__(self, changed=None, departed=None):
         '''
         changed : typing.Mapping[str, ~UnitSettings]
@@ -3462,16 +3462,16 @@ class RelationUnitsChange(Type):
 
 
 class RelationUnitsWatchResult(Type):
-    _toSchema = {'changes': 'Changes', 'relationunitswatcherid': 'RelationUnitsWatcherId', 'error': 'Error'}
-    _toPy = {'RelationUnitsWatcherId': 'relationunitswatcherid', 'Error': 'error', 'Changes': 'changes'}
+    _toSchema = {'error': 'Error', 'changes': 'Changes', 'relationunitswatcherid': 'RelationUnitsWatcherId'}
+    _toPy = {'Changes': 'changes', 'Error': 'error', 'RelationUnitsWatcherId': 'relationunitswatcherid'}
     def __init__(self, changes=None, error=None, relationunitswatcherid=None):
         '''
         changes : RelationUnitsChange
         error : Error
         relationunitswatcherid : str
         '''
-        self.changes = RelationUnitsChange.from_json(changes)
-        self.error = Error.from_json(error)
+        self.changes = RelationUnitsChange.from_json(changes) if changes else None
+        self.error = Error.from_json(error) if error else None
         self.relationunitswatcherid = relationunitswatcherid
 
 
@@ -3486,8 +3486,8 @@ class UnitSettings(Type):
 
 
 class RetryStrategy(Type):
-    _toSchema = {'jitterretrytime': 'JitterRetryTime', 'shouldretry': 'ShouldRetry', 'retrytimefactor': 'RetryTimeFactor', 'minretrytime': 'MinRetryTime', 'maxretrytime': 'MaxRetryTime'}
-    _toPy = {'MaxRetryTime': 'maxretrytime', 'JitterRetryTime': 'jitterretrytime', 'MinRetryTime': 'minretrytime', 'ShouldRetry': 'shouldretry', 'RetryTimeFactor': 'retrytimefactor'}
+    _toSchema = {'maxretrytime': 'MaxRetryTime', 'minretrytime': 'MinRetryTime', 'shouldretry': 'ShouldRetry', 'jitterretrytime': 'JitterRetryTime', 'retrytimefactor': 'RetryTimeFactor'}
+    _toPy = {'RetryTimeFactor': 'retrytimefactor', 'ShouldRetry': 'shouldretry', 'MinRetryTime': 'minretrytime', 'JitterRetryTime': 'jitterretrytime', 'MaxRetryTime': 'maxretrytime'}
     def __init__(self, jitterretrytime=None, maxretrytime=None, minretrytime=None, retrytimefactor=None, shouldretry=None):
         '''
         jitterretrytime : bool
@@ -3505,14 +3505,14 @@ class RetryStrategy(Type):
 
 class RetryStrategyResult(Type):
     _toSchema = {'error': 'Error', 'result': 'Result'}
-    _toPy = {'Error': 'error', 'Result': 'result'}
+    _toPy = {'Result': 'result', 'Error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
         result : RetryStrategy
         '''
-        self.error = Error.from_json(error)
-        self.result = RetryStrategy.from_json(result)
+        self.error = Error.from_json(error) if error else None
+        self.result = RetryStrategy.from_json(result) if result else None
 
 
 class RetryStrategyResults(Type):
@@ -3534,7 +3534,7 @@ class SSHAddressResult(Type):
         error : Error
         '''
         self.address = address
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
 
 
 class SSHAddressResults(Type):
@@ -3558,14 +3558,14 @@ class SSHProxyResult(Type):
 
 
 class SSHPublicKeysResult(Type):
-    _toSchema = {'error': 'error', 'public_keys': 'public-keys'}
-    _toPy = {'public-keys': 'public_keys', 'error': 'error'}
+    _toSchema = {'public_keys': 'public-keys', 'error': 'error'}
+    _toPy = {'error': 'error', 'public-keys': 'public_keys'}
     def __init__(self, error=None, public_keys=None):
         '''
         error : Error
         public_keys : typing.Sequence[str]
         '''
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.public_keys = public_keys
 
 
@@ -3600,8 +3600,8 @@ class AddRelationResults(Type):
 
 
 class AddServiceUnits(Type):
-    _toSchema = {'servicename': 'ServiceName', 'placement': 'Placement', 'numunits': 'NumUnits'}
-    _toPy = {'NumUnits': 'numunits', 'Placement': 'placement', 'ServiceName': 'servicename'}
+    _toSchema = {'numunits': 'NumUnits', 'placement': 'Placement', 'servicename': 'ServiceName'}
+    _toPy = {'ServiceName': 'servicename', 'Placement': 'placement', 'NumUnits': 'numunits'}
     def __init__(self, numunits=None, placement=None, servicename=None):
         '''
         numunits : int
@@ -3654,8 +3654,8 @@ class GetServiceConstraints(Type):
 
 
 class Relation(Type):
-    _toSchema = {'scope': 'Scope', 'name': 'Name', 'optional': 'Optional', 'role': 'Role', 'interface': 'Interface', 'limit': 'Limit'}
-    _toPy = {'Interface': 'interface', 'Scope': 'scope', 'Role': 'role', 'Name': 'name', 'Limit': 'limit', 'Optional': 'optional'}
+    _toSchema = {'name': 'Name', 'limit': 'Limit', 'role': 'Role', 'optional': 'Optional', 'scope': 'Scope', 'interface': 'Interface'}
+    _toPy = {'Name': 'name', 'Limit': 'limit', 'Optional': 'optional', 'Role': 'role', 'Interface': 'interface', 'Scope': 'scope'}
     def __init__(self, interface=None, limit=None, name=None, optional=None, role=None, scope=None):
         '''
         interface : str
@@ -3694,8 +3694,8 @@ class ServiceCharmRelationsResults(Type):
 
 
 class ServiceDeploy(Type):
-    _toSchema = {'placement': 'Placement', 'numunits': 'NumUnits', 'endpointbindings': 'EndpointBindings', 'servicename': 'ServiceName', 'storage': 'Storage', 'resources': 'Resources', 'charmurl': 'CharmUrl', 'configyaml': 'ConfigYAML', 'series': 'Series', 'channel': 'Channel', 'config': 'Config', 'constraints': 'Constraints'}
-    _toPy = {'Constraints': 'constraints', 'Channel': 'channel', 'Config': 'config', 'Placement': 'placement', 'Resources': 'resources', 'Storage': 'storage', 'CharmUrl': 'charmurl', 'ConfigYAML': 'configyaml', 'NumUnits': 'numunits', 'ServiceName': 'servicename', 'EndpointBindings': 'endpointbindings', 'Series': 'series'}
+    _toSchema = {'config': 'Config', 'storage': 'Storage', 'numunits': 'NumUnits', 'endpointbindings': 'EndpointBindings', 'series': 'Series', 'charmurl': 'CharmUrl', 'configyaml': 'ConfigYAML', 'constraints': 'Constraints', 'placement': 'Placement', 'servicename': 'ServiceName', 'channel': 'Channel', 'resources': 'Resources'}
+    _toPy = {'Storage': 'storage', 'Series': 'series', 'Placement': 'placement', 'ServiceName': 'servicename', 'Resources': 'resources', 'Config': 'config', 'EndpointBindings': 'endpointbindings', 'Channel': 'channel', 'ConfigYAML': 'configyaml', 'CharmUrl': 'charmurl', 'Constraints': 'constraints', 'NumUnits': 'numunits'}
     def __init__(self, channel=None, charmurl=None, config=None, configyaml=None, constraints=None, endpointbindings=None, numunits=None, placement=None, resources=None, series=None, servicename=None, storage=None):
         '''
         channel : str
@@ -3715,7 +3715,7 @@ class ServiceDeploy(Type):
         self.charmurl = charmurl
         self.config = config
         self.configyaml = configyaml
-        self.constraints = Value.from_json(constraints)
+        self.constraints = Value.from_json(constraints) if constraints else None
         self.endpointbindings = endpointbindings
         self.numunits = numunits
         self.placement = [Placement.from_json(o) for o in placement or []]
@@ -3756,8 +3756,8 @@ class ServiceGet(Type):
 
 
 class ServiceGetResults(Type):
-    _toSchema = {'service': 'Service', 'charm': 'Charm', 'constraints': 'Constraints', 'config': 'Config'}
-    _toPy = {'Constraints': 'constraints', 'Charm': 'charm', 'Service': 'service', 'Config': 'config'}
+    _toSchema = {'config': 'Config', 'service': 'Service', 'constraints': 'Constraints', 'charm': 'Charm'}
+    _toPy = {'Service': 'service', 'Constraints': 'constraints', 'Charm': 'charm', 'Config': 'config'}
     def __init__(self, charm=None, config=None, constraints=None, service=None):
         '''
         charm : str
@@ -3767,13 +3767,13 @@ class ServiceGetResults(Type):
         '''
         self.charm = charm
         self.config = config
-        self.constraints = Value.from_json(constraints)
+        self.constraints = Value.from_json(constraints) if constraints else None
         self.service = service
 
 
 class ServiceMetricCredential(Type):
-    _toSchema = {'servicename': 'ServiceName', 'metriccredentials': 'MetricCredentials'}
-    _toPy = {'ServiceName': 'servicename', 'MetricCredentials': 'metriccredentials'}
+    _toSchema = {'metriccredentials': 'MetricCredentials', 'servicename': 'ServiceName'}
+    _toPy = {'MetricCredentials': 'metriccredentials', 'ServiceName': 'servicename'}
     def __init__(self, metriccredentials=None, servicename=None):
         '''
         metriccredentials : typing.Sequence[int]
@@ -3794,8 +3794,8 @@ class ServiceMetricCredentials(Type):
 
 
 class ServiceSet(Type):
-    _toSchema = {'servicename': 'ServiceName', 'options': 'Options'}
-    _toPy = {'Options': 'options', 'ServiceName': 'servicename'}
+    _toSchema = {'options': 'Options', 'servicename': 'ServiceName'}
+    _toPy = {'ServiceName': 'servicename', 'Options': 'options'}
     def __init__(self, options=None, servicename=None):
         '''
         options : typing.Mapping[str, str]
@@ -3806,8 +3806,8 @@ class ServiceSet(Type):
 
 
 class ServiceSetCharm(Type):
-    _toSchema = {'forceunits': 'forceunits', 'servicename': 'servicename', 'resourceids': 'resourceids', 'cs_channel': 'cs-channel', 'charmurl': 'charmurl', 'forceseries': 'forceseries'}
-    _toPy = {'cs-channel': 'cs_channel', 'forceunits': 'forceunits', 'servicename': 'servicename', 'resourceids': 'resourceids', 'charmurl': 'charmurl', 'forceseries': 'forceseries'}
+    _toSchema = {'forceseries': 'forceseries', 'forceunits': 'forceunits', 'cs_channel': 'cs-channel', 'resourceids': 'resourceids', 'servicename': 'servicename', 'charmurl': 'charmurl'}
+    _toPy = {'forceseries': 'forceseries', 'forceunits': 'forceunits', 'servicename': 'servicename', 'cs-channel': 'cs_channel', 'charmurl': 'charmurl', 'resourceids': 'resourceids'}
     def __init__(self, charmurl=None, cs_channel=None, forceseries=None, forceunits=None, resourceids=None, servicename=None):
         '''
         charmurl : str
@@ -3836,8 +3836,8 @@ class ServiceUnexpose(Type):
 
 
 class ServiceUnset(Type):
-    _toSchema = {'servicename': 'ServiceName', 'options': 'Options'}
-    _toPy = {'Options': 'options', 'ServiceName': 'servicename'}
+    _toSchema = {'options': 'Options', 'servicename': 'ServiceName'}
+    _toPy = {'ServiceName': 'servicename', 'Options': 'options'}
     def __init__(self, options=None, servicename=None):
         '''
         options : typing.Sequence[str]
@@ -3848,8 +3848,8 @@ class ServiceUnset(Type):
 
 
 class ServiceUpdate(Type):
-    _toSchema = {'minunits': 'MinUnits', 'settingsyaml': 'SettingsYAML', 'servicename': 'ServiceName', 'settingsstrings': 'SettingsStrings', 'forcecharmurl': 'ForceCharmUrl', 'constraints': 'Constraints', 'charmurl': 'CharmUrl', 'forceseries': 'ForceSeries'}
-    _toPy = {'Constraints': 'constraints', 'CharmUrl': 'charmurl', 'ForceSeries': 'forceseries', 'ForceCharmUrl': 'forcecharmurl', 'MinUnits': 'minunits', 'ServiceName': 'servicename', 'SettingsStrings': 'settingsstrings', 'SettingsYAML': 'settingsyaml'}
+    _toSchema = {'minunits': 'MinUnits', 'forceseries': 'ForceSeries', 'settingsstrings': 'SettingsStrings', 'constraints': 'Constraints', 'forcecharmurl': 'ForceCharmUrl', 'settingsyaml': 'SettingsYAML', 'charmurl': 'CharmUrl', 'servicename': 'ServiceName'}
+    _toPy = {'ForceSeries': 'forceseries', 'ForceCharmUrl': 'forcecharmurl', 'SettingsYAML': 'settingsyaml', 'SettingsStrings': 'settingsstrings', 'ServiceName': 'servicename', 'CharmUrl': 'charmurl', 'MinUnits': 'minunits', 'Constraints': 'constraints'}
     def __init__(self, charmurl=None, constraints=None, forcecharmurl=None, forceseries=None, minunits=None, servicename=None, settingsstrings=None, settingsyaml=None):
         '''
         charmurl : str
@@ -3862,7 +3862,7 @@ class ServiceUpdate(Type):
         settingsyaml : str
         '''
         self.charmurl = charmurl
-        self.constraints = Value.from_json(constraints)
+        self.constraints = Value.from_json(constraints) if constraints else None
         self.forcecharmurl = forcecharmurl
         self.forceseries = forceseries
         self.minunits = minunits
@@ -3882,8 +3882,8 @@ class ServicesDeploy(Type):
 
 
 class SingularClaim(Type):
-    _toSchema = {'modeltag': 'ModelTag', 'controllertag': 'ControllerTag', 'duration': 'Duration'}
-    _toPy = {'Duration': 'duration', 'ControllerTag': 'controllertag', 'ModelTag': 'modeltag'}
+    _toSchema = {'controllertag': 'ControllerTag', 'modeltag': 'ModelTag', 'duration': 'Duration'}
+    _toPy = {'ControllerTag': 'controllertag', 'ModelTag': 'modeltag', 'Duration': 'duration'}
     def __init__(self, controllertag=None, duration=None, modeltag=None):
         '''
         controllertag : str
@@ -3916,15 +3916,15 @@ class ListSpacesResults(Type):
 
 
 class Space(Type):
-    _toSchema = {'name': 'Name', 'error': 'Error', 'subnets': 'Subnets'}
-    _toPy = {'Name': 'name', 'Subnets': 'subnets', 'Error': 'error'}
+    _toSchema = {'name': 'Name', 'subnets': 'Subnets', 'error': 'Error'}
+    _toPy = {'Name': 'name', 'Error': 'error', 'Subnets': 'subnets'}
     def __init__(self, error=None, name=None, subnets=None):
         '''
         error : Error
         name : str
         subnets : typing.Sequence[~Subnet]
         '''
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.name = name
         self.subnets = [Subnet.from_json(o) for o in subnets or []]
 
@@ -3940,8 +3940,8 @@ class StatusHistoryPruneArgs(Type):
 
 
 class FilesystemAttachmentInfo(Type):
-    _toSchema = {'read_only': 'read-only', 'mountpoint': 'mountpoint'}
-    _toPy = {'read-only': 'read_only', 'mountpoint': 'mountpoint'}
+    _toSchema = {'mountpoint': 'mountpoint', 'read_only': 'read-only'}
+    _toPy = {'mountpoint': 'mountpoint', 'read-only': 'read_only'}
     def __init__(self, mountpoint=None, read_only=None):
         '''
         mountpoint : str
@@ -3952,8 +3952,8 @@ class FilesystemAttachmentInfo(Type):
 
 
 class FilesystemDetails(Type):
-    _toSchema = {'info': 'info', 'volumetag': 'volumetag', 'machineattachments': 'machineattachments', 'storage': 'storage', 'filesystemtag': 'filesystemtag', 'status': 'status'}
-    _toPy = {'info': 'info', 'volumetag': 'volumetag', 'machineattachments': 'machineattachments', 'storage': 'storage', 'filesystemtag': 'filesystemtag', 'status': 'status'}
+    _toSchema = {'volumetag': 'volumetag', 'storage': 'storage', 'machineattachments': 'machineattachments', 'filesystemtag': 'filesystemtag', 'status': 'status', 'info': 'info'}
+    _toPy = {'volumetag': 'volumetag', 'storage': 'storage', 'machineattachments': 'machineattachments', 'filesystemtag': 'filesystemtag', 'status': 'status', 'info': 'info'}
     def __init__(self, filesystemtag=None, info=None, machineattachments=None, status=None, storage=None, volumetag=None):
         '''
         filesystemtag : str
@@ -3964,10 +3964,10 @@ class FilesystemDetails(Type):
         volumetag : str
         '''
         self.filesystemtag = filesystemtag
-        self.info = FilesystemInfo.from_json(info)
+        self.info = FilesystemInfo.from_json(info) if info else None
         self.machineattachments = {k: FilesystemAttachmentInfo.from_json(v) for k, v in (machineattachments or dict()).items()}
-        self.status = EntityStatus.from_json(status)
-        self.storage = StorageDetails.from_json(storage)
+        self.status = EntityStatus.from_json(status) if status else None
+        self.storage = StorageDetails.from_json(storage) if storage else None
         self.volumetag = volumetag
 
 
@@ -3979,7 +3979,7 @@ class FilesystemDetailsListResult(Type):
         error : Error
         result : typing.Sequence[~FilesystemDetails]
         '''
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.result = [FilesystemDetails.from_json(o) for o in result or []]
 
 
@@ -4014,8 +4014,8 @@ class FilesystemFilters(Type):
 
 
 class FilesystemInfo(Type):
-    _toSchema = {'size': 'size', 'filesystemid': 'filesystemid'}
-    _toPy = {'size': 'size', 'filesystemid': 'filesystemid'}
+    _toSchema = {'filesystemid': 'filesystemid', 'size': 'size'}
+    _toPy = {'filesystemid': 'filesystemid', 'size': 'size'}
     def __init__(self, filesystemid=None, size=None):
         '''
         filesystemid : str
@@ -4026,7 +4026,7 @@ class FilesystemInfo(Type):
 
 
 class StorageAddParams(Type):
-    _toSchema = {'storagename': 'StorageName', 'storage': 'storage', 'unit': 'unit'}
+    _toSchema = {'storage': 'storage', 'unit': 'unit', 'storagename': 'StorageName'}
     _toPy = {'StorageName': 'storagename', 'storage': 'storage', 'unit': 'unit'}
     def __init__(self, storagename=None, storage=None, unit=None):
         '''
@@ -4035,13 +4035,13 @@ class StorageAddParams(Type):
         unit : str
         '''
         self.storagename = storagename
-        self.storage = StorageConstraints.from_json(storage)
+        self.storage = StorageConstraints.from_json(storage) if storage else None
         self.unit = unit
 
 
 class StorageAttachmentDetails(Type):
-    _toSchema = {'storagetag': 'storagetag', 'machinetag': 'machinetag', 'location': 'location', 'unittag': 'unittag'}
-    _toPy = {'storagetag': 'storagetag', 'machinetag': 'machinetag', 'location': 'location', 'unittag': 'unittag'}
+    _toSchema = {'machinetag': 'machinetag', 'unittag': 'unittag', 'storagetag': 'storagetag', 'location': 'location'}
+    _toPy = {'machinetag': 'machinetag', 'unittag': 'unittag', 'storagetag': 'storagetag', 'location': 'location'}
     def __init__(self, location=None, machinetag=None, storagetag=None, unittag=None):
         '''
         location : str
@@ -4056,8 +4056,8 @@ class StorageAttachmentDetails(Type):
 
 
 class StorageConstraints(Type):
-    _toSchema = {'pool': 'Pool', 'count': 'Count', 'size': 'Size'}
-    _toPy = {'Pool': 'pool', 'Count': 'count', 'Size': 'size'}
+    _toSchema = {'size': 'Size', 'pool': 'Pool', 'count': 'Count'}
+    _toPy = {'Size': 'size', 'Count': 'count', 'Pool': 'pool'}
     def __init__(self, count=None, pool=None, size=None):
         '''
         count : int
@@ -4070,8 +4070,8 @@ class StorageConstraints(Type):
 
 
 class StorageDetails(Type):
-    _toSchema = {'kind': 'kind', 'persistent': 'Persistent', 'attachments': 'attachments', 'storagetag': 'storagetag', 'ownertag': 'ownertag', 'status': 'status'}
-    _toPy = {'kind': 'kind', 'attachments': 'attachments', 'storagetag': 'storagetag', 'Persistent': 'persistent', 'ownertag': 'ownertag', 'status': 'status'}
+    _toSchema = {'kind': 'kind', 'attachments': 'attachments', 'storagetag': 'storagetag', 'persistent': 'Persistent', 'ownertag': 'ownertag', 'status': 'status'}
+    _toPy = {'kind': 'kind', 'attachments': 'attachments', 'Persistent': 'persistent', 'storagetag': 'storagetag', 'status': 'status', 'ownertag': 'ownertag'}
     def __init__(self, persistent=None, attachments=None, kind=None, ownertag=None, status=None, storagetag=None):
         '''
         persistent : bool
@@ -4085,7 +4085,7 @@ class StorageDetails(Type):
         self.attachments = {k: StorageAttachmentDetails.from_json(v) for k, v in (attachments or dict()).items()}
         self.kind = kind
         self.ownertag = ownertag
-        self.status = EntityStatus.from_json(status)
+        self.status = EntityStatus.from_json(status) if status else None
         self.storagetag = storagetag
 
 
@@ -4097,7 +4097,7 @@ class StorageDetailsListResult(Type):
         error : Error
         result : typing.Sequence[~StorageDetails]
         '''
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.result = [StorageDetails.from_json(o) for o in result or []]
 
 
@@ -4119,8 +4119,8 @@ class StorageDetailsResult(Type):
         error : Error
         result : StorageDetails
         '''
-        self.error = Error.from_json(error)
-        self.result = StorageDetails.from_json(result)
+        self.error = Error.from_json(error) if error else None
+        self.result = StorageDetails.from_json(result) if result else None
 
 
 class StorageDetailsResults(Type):
@@ -4154,8 +4154,8 @@ class StorageFilters(Type):
 
 
 class StoragePool(Type):
-    _toSchema = {'attrs': 'attrs', 'name': 'name', 'provider': 'provider'}
-    _toPy = {'attrs': 'attrs', 'name': 'name', 'provider': 'provider'}
+    _toSchema = {'name': 'name', 'provider': 'provider', 'attrs': 'attrs'}
+    _toPy = {'name': 'name', 'provider': 'provider', 'attrs': 'attrs'}
     def __init__(self, attrs=None, name=None, provider=None):
         '''
         attrs : typing.Mapping[str, typing.Any]
@@ -4168,8 +4168,8 @@ class StoragePool(Type):
 
 
 class StoragePoolFilter(Type):
-    _toSchema = {'names': 'names', 'providers': 'providers'}
-    _toPy = {'names': 'names', 'providers': 'providers'}
+    _toSchema = {'providers': 'providers', 'names': 'names'}
+    _toPy = {'providers': 'providers', 'names': 'names'}
     def __init__(self, names=None, providers=None):
         '''
         names : typing.Sequence[str]
@@ -4190,14 +4190,14 @@ class StoragePoolFilters(Type):
 
 
 class StoragePoolsResult(Type):
-    _toSchema = {'storagepools': 'storagepools', 'error': 'error'}
-    _toPy = {'storagepools': 'storagepools', 'error': 'error'}
+    _toSchema = {'error': 'error', 'storagepools': 'storagepools'}
+    _toPy = {'error': 'error', 'storagepools': 'storagepools'}
     def __init__(self, error=None, storagepools=None):
         '''
         error : Error
         storagepools : typing.Sequence[~StoragePool]
         '''
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.storagepools = [StoragePool.from_json(o) for o in storagepools or []]
 
 
@@ -4222,8 +4222,8 @@ class StoragesAddParams(Type):
 
 
 class VolumeDetails(Type):
-    _toSchema = {'info': 'info', 'volumetag': 'volumetag', 'machineattachments': 'machineattachments', 'storage': 'storage', 'status': 'status'}
-    _toPy = {'info': 'info', 'volumetag': 'volumetag', 'machineattachments': 'machineattachments', 'storage': 'storage', 'status': 'status'}
+    _toSchema = {'machineattachments': 'machineattachments', 'status': 'status', 'storage': 'storage', 'info': 'info', 'volumetag': 'volumetag'}
+    _toPy = {'machineattachments': 'machineattachments', 'status': 'status', 'storage': 'storage', 'info': 'info', 'volumetag': 'volumetag'}
     def __init__(self, info=None, machineattachments=None, status=None, storage=None, volumetag=None):
         '''
         info : VolumeInfo
@@ -4232,10 +4232,10 @@ class VolumeDetails(Type):
         storage : StorageDetails
         volumetag : str
         '''
-        self.info = VolumeInfo.from_json(info)
+        self.info = VolumeInfo.from_json(info) if info else None
         self.machineattachments = {k: VolumeAttachmentInfo.from_json(v) for k, v in (machineattachments or dict()).items()}
-        self.status = EntityStatus.from_json(status)
-        self.storage = StorageDetails.from_json(storage)
+        self.status = EntityStatus.from_json(status) if status else None
+        self.storage = StorageDetails.from_json(storage) if storage else None
         self.volumetag = volumetag
 
 
@@ -4247,7 +4247,7 @@ class VolumeDetailsListResult(Type):
         error : Error
         result : typing.Sequence[~VolumeDetails]
         '''
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.result = [VolumeDetails.from_json(o) for o in result or []]
 
 
@@ -4289,8 +4289,8 @@ class BlockDeviceResult(Type):
         error : Error
         result : BlockDevice
         '''
-        self.error = Error.from_json(error)
-        self.result = BlockDevice.from_json(result)
+        self.error = Error.from_json(error) if error else None
+        self.result = BlockDevice.from_json(result) if result else None
 
 
 class BlockDeviceResults(Type):
@@ -4304,8 +4304,8 @@ class BlockDeviceResults(Type):
 
 
 class Filesystem(Type):
-    _toSchema = {'info': 'info', 'volumetag': 'volumetag', 'filesystemtag': 'filesystemtag'}
-    _toPy = {'info': 'info', 'volumetag': 'volumetag', 'filesystemtag': 'filesystemtag'}
+    _toSchema = {'filesystemtag': 'filesystemtag', 'volumetag': 'volumetag', 'info': 'info'}
+    _toPy = {'filesystemtag': 'filesystemtag', 'volumetag': 'volumetag', 'info': 'info'}
     def __init__(self, filesystemtag=None, info=None, volumetag=None):
         '''
         filesystemtag : str
@@ -4313,13 +4313,13 @@ class Filesystem(Type):
         volumetag : str
         '''
         self.filesystemtag = filesystemtag
-        self.info = FilesystemInfo.from_json(info)
+        self.info = FilesystemInfo.from_json(info) if info else None
         self.volumetag = volumetag
 
 
 class FilesystemAttachment(Type):
-    _toSchema = {'info': 'info', 'filesystemtag': 'filesystemtag', 'machinetag': 'machinetag'}
-    _toPy = {'info': 'info', 'filesystemtag': 'filesystemtag', 'machinetag': 'machinetag'}
+    _toSchema = {'filesystemtag': 'filesystemtag', 'info': 'info', 'machinetag': 'machinetag'}
+    _toPy = {'filesystemtag': 'filesystemtag', 'info': 'info', 'machinetag': 'machinetag'}
     def __init__(self, filesystemtag=None, info=None, machinetag=None):
         '''
         filesystemtag : str
@@ -4327,13 +4327,13 @@ class FilesystemAttachment(Type):
         machinetag : str
         '''
         self.filesystemtag = filesystemtag
-        self.info = FilesystemAttachmentInfo.from_json(info)
+        self.info = FilesystemAttachmentInfo.from_json(info) if info else None
         self.machinetag = machinetag
 
 
 class FilesystemAttachmentParams(Type):
-    _toSchema = {'read_only': 'read-only', 'machinetag': 'machinetag', 'mountpoint': 'mountpoint', 'instanceid': 'instanceid', 'filesystemtag': 'filesystemtag', 'provider': 'provider', 'filesystemid': 'filesystemid'}
-    _toPy = {'read-only': 'read_only', 'machinetag': 'machinetag', 'mountpoint': 'mountpoint', 'instanceid': 'instanceid', 'filesystemtag': 'filesystemtag', 'provider': 'provider', 'filesystemid': 'filesystemid'}
+    _toSchema = {'filesystemid': 'filesystemid', 'machinetag': 'machinetag', 'provider': 'provider', 'instanceid': 'instanceid', 'filesystemtag': 'filesystemtag', 'mountpoint': 'mountpoint', 'read_only': 'read-only'}
+    _toPy = {'filesystemid': 'filesystemid', 'machinetag': 'machinetag', 'provider': 'provider', 'instanceid': 'instanceid', 'filesystemtag': 'filesystemtag', 'mountpoint': 'mountpoint', 'read-only': 'read_only'}
     def __init__(self, filesystemid=None, filesystemtag=None, instanceid=None, machinetag=None, mountpoint=None, provider=None, read_only=None):
         '''
         filesystemid : str
@@ -4361,8 +4361,8 @@ class FilesystemAttachmentParamsResult(Type):
         error : Error
         result : FilesystemAttachmentParams
         '''
-        self.error = Error.from_json(error)
-        self.result = FilesystemAttachmentParams.from_json(result)
+        self.error = Error.from_json(error) if error else None
+        self.result = FilesystemAttachmentParams.from_json(result) if result else None
 
 
 class FilesystemAttachmentParamsResults(Type):
@@ -4383,8 +4383,8 @@ class FilesystemAttachmentResult(Type):
         error : Error
         result : FilesystemAttachment
         '''
-        self.error = Error.from_json(error)
-        self.result = FilesystemAttachment.from_json(result)
+        self.error = Error.from_json(error) if error else None
+        self.result = FilesystemAttachment.from_json(result) if result else None
 
 
 class FilesystemAttachmentResults(Type):
@@ -4408,8 +4408,8 @@ class FilesystemAttachments(Type):
 
 
 class FilesystemParams(Type):
-    _toSchema = {'volumetag': 'volumetag', 'attachment': 'attachment', 'size': 'size', 'attributes': 'attributes', 'filesystemtag': 'filesystemtag', 'provider': 'provider', 'tags': 'tags'}
-    _toPy = {'volumetag': 'volumetag', 'attachment': 'attachment', 'size': 'size', 'attributes': 'attributes', 'filesystemtag': 'filesystemtag', 'provider': 'provider', 'tags': 'tags'}
+    _toSchema = {'provider': 'provider', 'tags': 'tags', 'attributes': 'attributes', 'filesystemtag': 'filesystemtag', 'volumetag': 'volumetag', 'size': 'size', 'attachment': 'attachment'}
+    _toPy = {'provider': 'provider', 'tags': 'tags', 'attributes': 'attributes', 'filesystemtag': 'filesystemtag', 'volumetag': 'volumetag', 'size': 'size', 'attachment': 'attachment'}
     def __init__(self, attachment=None, attributes=None, filesystemtag=None, provider=None, size=None, tags=None, volumetag=None):
         '''
         attachment : FilesystemAttachmentParams
@@ -4420,7 +4420,7 @@ class FilesystemParams(Type):
         tags : typing.Mapping[str, str]
         volumetag : str
         '''
-        self.attachment = FilesystemAttachmentParams.from_json(attachment)
+        self.attachment = FilesystemAttachmentParams.from_json(attachment) if attachment else None
         self.attributes = attributes
         self.filesystemtag = filesystemtag
         self.provider = provider
@@ -4437,8 +4437,8 @@ class FilesystemParamsResult(Type):
         error : Error
         result : FilesystemParams
         '''
-        self.error = Error.from_json(error)
-        self.result = FilesystemParams.from_json(result)
+        self.error = Error.from_json(error) if error else None
+        self.result = FilesystemParams.from_json(result) if result else None
 
 
 class FilesystemParamsResults(Type):
@@ -4459,8 +4459,8 @@ class FilesystemResult(Type):
         error : Error
         result : Filesystem
         '''
-        self.error = Error.from_json(error)
-        self.result = Filesystem.from_json(result)
+        self.error = Error.from_json(error) if error else None
+        self.result = Filesystem.from_json(result) if result else None
 
 
 class FilesystemResults(Type):
@@ -4504,15 +4504,15 @@ class MachineStorageIdsWatchResults(Type):
 
 
 class VolumeAttachment(Type):
-    _toSchema = {'info': 'info', 'volumetag': 'volumetag', 'machinetag': 'machinetag'}
-    _toPy = {'info': 'info', 'volumetag': 'volumetag', 'machinetag': 'machinetag'}
+    _toSchema = {'machinetag': 'machinetag', 'volumetag': 'volumetag', 'info': 'info'}
+    _toPy = {'machinetag': 'machinetag', 'volumetag': 'volumetag', 'info': 'info'}
     def __init__(self, info=None, machinetag=None, volumetag=None):
         '''
         info : VolumeAttachmentInfo
         machinetag : str
         volumetag : str
         '''
-        self.info = VolumeAttachmentInfo.from_json(info)
+        self.info = VolumeAttachmentInfo.from_json(info) if info else None
         self.machinetag = machinetag
         self.volumetag = volumetag
 
@@ -4525,8 +4525,8 @@ class VolumeAttachmentParamsResult(Type):
         error : Error
         result : VolumeAttachmentParams
         '''
-        self.error = Error.from_json(error)
-        self.result = VolumeAttachmentParams.from_json(result)
+        self.error = Error.from_json(error) if error else None
+        self.result = VolumeAttachmentParams.from_json(result) if result else None
 
 
 class VolumeAttachmentParamsResults(Type):
@@ -4547,8 +4547,8 @@ class VolumeAttachmentResult(Type):
         error : Error
         result : VolumeAttachment
         '''
-        self.error = Error.from_json(error)
-        self.result = VolumeAttachment.from_json(result)
+        self.error = Error.from_json(error) if error else None
+        self.result = VolumeAttachment.from_json(result) if result else None
 
 
 class VolumeAttachmentResults(Type):
@@ -4579,8 +4579,8 @@ class VolumeParamsResult(Type):
         error : Error
         result : VolumeParams
         '''
-        self.error = Error.from_json(error)
-        self.result = VolumeParams.from_json(result)
+        self.error = Error.from_json(error) if error else None
+        self.result = VolumeParams.from_json(result) if result else None
 
 
 class VolumeParamsResults(Type):
@@ -4601,8 +4601,8 @@ class VolumeResult(Type):
         error : Error
         result : Volume
         '''
-        self.error = Error.from_json(error)
-        self.result = Volume.from_json(result)
+        self.error = Error.from_json(error) if error else None
+        self.result = Volume.from_json(result) if result else None
 
 
 class VolumeResults(Type):
@@ -4627,13 +4627,13 @@ class Volumes(Type):
 
 class SpaceResult(Type):
     _toSchema = {'tag': 'Tag', 'error': 'Error'}
-    _toPy = {'Error': 'error', 'Tag': 'tag'}
+    _toPy = {'Tag': 'tag', 'Error': 'error'}
     def __init__(self, error=None, tag=None):
         '''
         error : Error
         tag : str
         '''
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.tag = tag
 
 
@@ -4648,8 +4648,8 @@ class SpaceResults(Type):
 
 
 class ZoneResult(Type):
-    _toSchema = {'available': 'Available', 'name': 'Name', 'error': 'Error'}
-    _toPy = {'Error': 'error', 'Name': 'name', 'Available': 'available'}
+    _toSchema = {'name': 'Name', 'error': 'Error', 'available': 'Available'}
+    _toPy = {'Available': 'available', 'Error': 'error', 'Name': 'name'}
     def __init__(self, available=None, error=None, name=None):
         '''
         available : bool
@@ -4657,7 +4657,7 @@ class ZoneResult(Type):
         name : str
         '''
         self.available = available
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.name = name
 
 
@@ -4672,8 +4672,8 @@ class ZoneResults(Type):
 
 
 class UndertakerModelInfo(Type):
-    _toSchema = {'globalname': 'GlobalName', 'life': 'Life', 'issystem': 'IsSystem', 'name': 'Name', 'uuid': 'UUID'}
-    _toPy = {'Name': 'name', 'Life': 'life', 'GlobalName': 'globalname', 'IsSystem': 'issystem', 'UUID': 'uuid'}
+    _toSchema = {'globalname': 'GlobalName', 'name': 'Name', 'uuid': 'UUID', 'issystem': 'IsSystem', 'life': 'Life'}
+    _toPy = {'IsSystem': 'issystem', 'GlobalName': 'globalname', 'Name': 'name', 'UUID': 'uuid', 'Life': 'life'}
     def __init__(self, globalname=None, issystem=None, life=None, name=None, uuid=None):
         '''
         globalname : str
@@ -4691,14 +4691,14 @@ class UndertakerModelInfo(Type):
 
 class UndertakerModelInfoResult(Type):
     _toSchema = {'error': 'Error', 'result': 'Result'}
-    _toPy = {'Error': 'error', 'Result': 'result'}
+    _toPy = {'Result': 'result', 'Error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
         result : UndertakerModelInfo
         '''
-        self.error = Error.from_json(error)
-        self.result = UndertakerModelInfo.from_json(result)
+        self.error = Error.from_json(error) if error else None
+        self.result = UndertakerModelInfo.from_json(result) if result else None
 
 
 class CharmURL(Type):
@@ -4722,14 +4722,14 @@ class CharmURLs(Type):
 
 
 class ConfigSettingsResult(Type):
-    _toSchema = {'settings': 'Settings', 'error': 'Error'}
-    _toPy = {'Error': 'error', 'Settings': 'settings'}
+    _toSchema = {'error': 'Error', 'settings': 'Settings'}
+    _toPy = {'Settings': 'settings', 'Error': 'error'}
     def __init__(self, error=None, settings=None):
         '''
         error : Error
         settings : typing.Mapping[str, typing.Any]
         '''
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.settings = settings
 
 
@@ -4744,14 +4744,14 @@ class ConfigSettingsResults(Type):
 
 
 class Endpoint(Type):
-    _toSchema = {'relation': 'Relation', 'servicename': 'ServiceName'}
+    _toSchema = {'servicename': 'ServiceName', 'relation': 'Relation'}
     _toPy = {'Relation': 'relation', 'ServiceName': 'servicename'}
     def __init__(self, relation=None, servicename=None):
         '''
         relation : Relation
         servicename : str
         '''
-        self.relation = Relation.from_json(relation)
+        self.relation = Relation.from_json(relation) if relation else None
         self.servicename = servicename
 
 
@@ -4777,7 +4777,7 @@ class EntitiesPortRanges(Type):
 
 class EntityCharmURL(Type):
     _toSchema = {'tag': 'Tag', 'charmurl': 'CharmURL'}
-    _toPy = {'Tag': 'tag', 'CharmURL': 'charmurl'}
+    _toPy = {'CharmURL': 'charmurl', 'Tag': 'tag'}
     def __init__(self, charmurl=None, tag=None):
         '''
         charmurl : str
@@ -4788,8 +4788,8 @@ class EntityCharmURL(Type):
 
 
 class EntityPortRange(Type):
-    _toSchema = {'protocol': 'Protocol', 'toport': 'ToPort', 'tag': 'Tag', 'fromport': 'FromPort'}
-    _toPy = {'FromPort': 'fromport', 'Protocol': 'protocol', 'Tag': 'tag', 'ToPort': 'toport'}
+    _toSchema = {'fromport': 'FromPort', 'protocol': 'Protocol', 'tag': 'Tag', 'toport': 'ToPort'}
+    _toPy = {'Protocol': 'protocol', 'Tag': 'tag', 'FromPort': 'fromport', 'ToPort': 'toport'}
     def __init__(self, fromport=None, protocol=None, tag=None, toport=None):
         '''
         fromport : int
@@ -4814,26 +4814,26 @@ class GetLeadershipSettingsBulkResults(Type):
 
 
 class GetLeadershipSettingsResult(Type):
-    _toSchema = {'settings': 'Settings', 'error': 'Error'}
-    _toPy = {'Error': 'error', 'Settings': 'settings'}
+    _toSchema = {'error': 'Error', 'settings': 'Settings'}
+    _toPy = {'Settings': 'settings', 'Error': 'error'}
     def __init__(self, error=None, settings=None):
         '''
         error : Error
         settings : typing.Mapping[str, str]
         '''
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.settings = settings
 
 
 class IntResult(Type):
     _toSchema = {'error': 'Error', 'result': 'Result'}
-    _toPy = {'Error': 'error', 'Result': 'result'}
+    _toPy = {'Result': 'result', 'Error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
         result : int
         '''
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.result = result
 
 
@@ -4858,8 +4858,8 @@ class MergeLeadershipSettingsBulkParams(Type):
 
 
 class MergeLeadershipSettingsParam(Type):
-    _toSchema = {'settings': 'Settings', 'servicetag': 'ServiceTag'}
-    _toPy = {'ServiceTag': 'servicetag', 'Settings': 'settings'}
+    _toSchema = {'servicetag': 'ServiceTag', 'settings': 'Settings'}
+    _toPy = {'Settings': 'settings', 'ServiceTag': 'servicetag'}
     def __init__(self, servicetag=None, settings=None):
         '''
         servicetag : str
@@ -4870,7 +4870,7 @@ class MergeLeadershipSettingsParam(Type):
 
 
 class ModelResult(Type):
-    _toSchema = {'uuid': 'UUID', 'name': 'Name', 'error': 'Error'}
+    _toSchema = {'name': 'Name', 'uuid': 'UUID', 'error': 'Error'}
     _toPy = {'Name': 'name', 'UUID': 'uuid', 'Error': 'error'}
     def __init__(self, error=None, name=None, uuid=None):
         '''
@@ -4878,7 +4878,7 @@ class ModelResult(Type):
         name : str
         uuid : str
         '''
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.name = name
         self.uuid = uuid
 
@@ -4894,8 +4894,8 @@ class RelationIds(Type):
 
 
 class RelationResult(Type):
-    _toSchema = {'life': 'Life', 'endpoint': 'Endpoint', 'id_': 'Id', 'key': 'Key', 'error': 'Error'}
-    _toPy = {'Error': 'error', 'Id': 'id_', 'Life': 'life', 'Endpoint': 'endpoint', 'Key': 'key'}
+    _toSchema = {'key': 'Key', 'error': 'Error', 'id_': 'Id', 'endpoint': 'Endpoint', 'life': 'Life'}
+    _toPy = {'Id': 'id_', 'Endpoint': 'endpoint', 'Life': 'life', 'Key': 'key', 'Error': 'error'}
     def __init__(self, endpoint=None, error=None, id_=None, key=None, life=None):
         '''
         endpoint : Endpoint
@@ -4904,8 +4904,8 @@ class RelationResult(Type):
         key : str
         life : str
         '''
-        self.endpoint = Endpoint.from_json(endpoint)
-        self.error = Error.from_json(error)
+        self.endpoint = Endpoint.from_json(endpoint) if endpoint else None
+        self.error = Error.from_json(error) if error else None
         self.id_ = id_
         self.key = key
         self.life = life
@@ -4922,7 +4922,7 @@ class RelationResults(Type):
 
 
 class RelationUnit(Type):
-    _toSchema = {'relation': 'Relation', 'unit': 'Unit'}
+    _toSchema = {'unit': 'Unit', 'relation': 'Relation'}
     _toPy = {'Relation': 'relation', 'Unit': 'unit'}
     def __init__(self, relation=None, unit=None):
         '''
@@ -4934,8 +4934,8 @@ class RelationUnit(Type):
 
 
 class RelationUnitPair(Type):
-    _toSchema = {'relation': 'Relation', 'remoteunit': 'RemoteUnit', 'localunit': 'LocalUnit'}
-    _toPy = {'Relation': 'relation', 'LocalUnit': 'localunit', 'RemoteUnit': 'remoteunit'}
+    _toSchema = {'remoteunit': 'RemoteUnit', 'localunit': 'LocalUnit', 'relation': 'Relation'}
+    _toPy = {'LocalUnit': 'localunit', 'RemoteUnit': 'remoteunit', 'Relation': 'relation'}
     def __init__(self, localunit=None, relation=None, remoteunit=None):
         '''
         localunit : str
@@ -4958,8 +4958,8 @@ class RelationUnitPairs(Type):
 
 
 class RelationUnitSettings(Type):
-    _toSchema = {'relation': 'Relation', 'settings': 'Settings', 'unit': 'Unit'}
-    _toPy = {'Relation': 'relation', 'Settings': 'settings', 'Unit': 'unit'}
+    _toSchema = {'unit': 'Unit', 'settings': 'Settings', 'relation': 'Relation'}
+    _toPy = {'Settings': 'settings', 'Relation': 'relation', 'Unit': 'unit'}
     def __init__(self, relation=None, settings=None, unit=None):
         '''
         relation : str
@@ -5002,14 +5002,14 @@ class RelationUnitsWatchResults(Type):
 
 
 class ResolvedModeResult(Type):
-    _toSchema = {'mode': 'Mode', 'error': 'Error'}
-    _toPy = {'Error': 'error', 'Mode': 'mode'}
+    _toSchema = {'error': 'Error', 'mode': 'Mode'}
+    _toPy = {'Mode': 'mode', 'Error': 'error'}
     def __init__(self, error=None, mode=None):
         '''
         error : Error
         mode : str
         '''
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.mode = mode
 
 
@@ -5024,16 +5024,16 @@ class ResolvedModeResults(Type):
 
 
 class ServiceStatusResult(Type):
-    _toSchema = {'service': 'Service', 'units': 'Units', 'error': 'Error'}
-    _toPy = {'Error': 'error', 'Units': 'units', 'Service': 'service'}
+    _toSchema = {'error': 'Error', 'service': 'Service', 'units': 'Units'}
+    _toPy = {'Service': 'service', 'Units': 'units', 'Error': 'error'}
     def __init__(self, error=None, service=None, units=None):
         '''
         error : Error
         service : StatusResult
         units : typing.Mapping[str, ~StatusResult]
         '''
-        self.error = Error.from_json(error)
-        self.service = StatusResult.from_json(service)
+        self.error = Error.from_json(error) if error else None
+        self.service = StatusResult.from_json(service) if service else None
         self.units = {k: StatusResult.from_json(v) for k, v in (units or dict()).items()}
 
 
@@ -5048,14 +5048,14 @@ class ServiceStatusResults(Type):
 
 
 class SettingsResult(Type):
-    _toSchema = {'settings': 'Settings', 'error': 'Error'}
-    _toPy = {'Error': 'error', 'Settings': 'settings'}
+    _toSchema = {'error': 'Error', 'settings': 'Settings'}
+    _toPy = {'Settings': 'settings', 'Error': 'error'}
     def __init__(self, error=None, settings=None):
         '''
         error : Error
         settings : typing.Mapping[str, str]
         '''
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.settings = settings
 
 
@@ -5070,8 +5070,8 @@ class SettingsResults(Type):
 
 
 class StorageAttachment(Type):
-    _toSchema = {'kind': 'Kind', 'life': 'Life', 'location': 'Location', 'storagetag': 'StorageTag', 'unittag': 'UnitTag', 'ownertag': 'OwnerTag'}
-    _toPy = {'StorageTag': 'storagetag', 'UnitTag': 'unittag', 'Location': 'location', 'Kind': 'kind', 'Life': 'life', 'OwnerTag': 'ownertag'}
+    _toSchema = {'kind': 'Kind', 'unittag': 'UnitTag', 'storagetag': 'StorageTag', 'ownertag': 'OwnerTag', 'life': 'Life', 'location': 'Location'}
+    _toPy = {'StorageTag': 'storagetag', 'Life': 'life', 'OwnerTag': 'ownertag', 'Kind': 'kind', 'Location': 'location', 'UnitTag': 'unittag'}
     def __init__(self, kind=None, life=None, location=None, ownertag=None, storagetag=None, unittag=None):
         '''
         kind : int
@@ -5090,8 +5090,8 @@ class StorageAttachment(Type):
 
 
 class StorageAttachmentId(Type):
-    _toSchema = {'storagetag': 'storagetag', 'unittag': 'unittag'}
-    _toPy = {'storagetag': 'storagetag', 'unittag': 'unittag'}
+    _toSchema = {'unittag': 'unittag', 'storagetag': 'storagetag'}
+    _toPy = {'unittag': 'unittag', 'storagetag': 'storagetag'}
     def __init__(self, storagetag=None, unittag=None):
         '''
         storagetag : str
@@ -5119,8 +5119,8 @@ class StorageAttachmentIdsResult(Type):
         error : Error
         result : StorageAttachmentIds
         '''
-        self.error = Error.from_json(error)
-        self.result = StorageAttachmentIds.from_json(result)
+        self.error = Error.from_json(error) if error else None
+        self.result = StorageAttachmentIds.from_json(result) if result else None
 
 
 class StorageAttachmentIdsResults(Type):
@@ -5141,8 +5141,8 @@ class StorageAttachmentResult(Type):
         error : Error
         result : StorageAttachment
         '''
-        self.error = Error.from_json(error)
-        self.result = StorageAttachment.from_json(result)
+        self.error = Error.from_json(error) if error else None
+        self.result = StorageAttachment.from_json(result) if result else None
 
 
 class StorageAttachmentResults(Type):
@@ -5156,15 +5156,15 @@ class StorageAttachmentResults(Type):
 
 
 class StringBoolResult(Type):
-    _toSchema = {'ok': 'Ok', 'error': 'Error', 'result': 'Result'}
-    _toPy = {'Ok': 'ok', 'Error': 'error', 'Result': 'result'}
+    _toSchema = {'error': 'Error', 'result': 'Result', 'ok': 'Ok'}
+    _toPy = {'Result': 'result', 'Error': 'error', 'Ok': 'ok'}
     def __init__(self, error=None, ok=None, result=None):
         '''
         error : Error
         ok : bool
         result : str
         '''
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.ok = ok
         self.result = result
 
@@ -5192,14 +5192,14 @@ class UnitNetworkConfig(Type):
 
 
 class UnitNetworkConfigResult(Type):
-    _toSchema = {'info': 'Info', 'error': 'Error'}
-    _toPy = {'Error': 'error', 'Info': 'info'}
+    _toSchema = {'error': 'Error', 'info': 'Info'}
+    _toPy = {'Info': 'info', 'Error': 'error'}
     def __init__(self, error=None, info=None):
         '''
         error : Error
         info : typing.Sequence[~NetworkConfig]
         '''
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.info = [NetworkConfig.from_json(o) for o in info or []]
 
 
@@ -5234,7 +5234,7 @@ class EntitiesVersion(Type):
 
 
 class EntityVersion(Type):
-    _toSchema = {'tools': 'Tools', 'tag': 'Tag'}
+    _toSchema = {'tag': 'Tag', 'tools': 'Tools'}
     _toPy = {'Tools': 'tools', 'Tag': 'tag'}
     def __init__(self, tag=None, tools=None):
         '''
@@ -5242,19 +5242,19 @@ class EntityVersion(Type):
         tools : Version
         '''
         self.tag = tag
-        self.tools = Version.from_json(tools)
+        self.tools = Version.from_json(tools) if tools else None
 
 
 class VersionResult(Type):
-    _toSchema = {'error': 'Error', 'version': 'Version'}
+    _toSchema = {'version': 'Version', 'error': 'Error'}
     _toPy = {'Version': 'version', 'Error': 'error'}
     def __init__(self, error=None, version=None):
         '''
         error : Error
         version : Number
         '''
-        self.error = Error.from_json(error)
-        self.version = Number.from_json(version)
+        self.error = Error.from_json(error) if error else None
+        self.version = Number.from_json(version) if version else None
 
 
 class VersionResults(Type):
@@ -5268,8 +5268,8 @@ class VersionResults(Type):
 
 
 class AddUser(Type):
-    _toSchema = {'shared_model_tags': 'shared-model-tags', 'model_access_permission': 'model-access-permission', 'username': 'username', 'display_name': 'display-name', 'password': 'password'}
-    _toPy = {'shared-model-tags': 'shared_model_tags', 'display-name': 'display_name', 'username': 'username', 'model-access-permission': 'model_access_permission', 'password': 'password'}
+    _toSchema = {'display_name': 'display-name', 'model_access_permission': 'model-access-permission', 'shared_model_tags': 'shared-model-tags', 'password': 'password', 'username': 'username'}
+    _toPy = {'model-access-permission': 'model_access_permission', 'password': 'password', 'shared-model-tags': 'shared_model_tags', 'display-name': 'display_name', 'username': 'username'}
     def __init__(self, display_name=None, model_access_permission=None, password=None, shared_model_tags=None, username=None):
         '''
         display_name : str
@@ -5286,7 +5286,7 @@ class AddUser(Type):
 
 
 class AddUserResult(Type):
-    _toSchema = {'secret_key': 'secret-key', 'tag': 'tag', 'error': 'error'}
+    _toSchema = {'tag': 'tag', 'error': 'error', 'secret_key': 'secret-key'}
     _toPy = {'tag': 'tag', 'error': 'error', 'secret-key': 'secret_key'}
     def __init__(self, error=None, secret_key=None, tag=None):
         '''
@@ -5294,7 +5294,7 @@ class AddUserResult(Type):
         secret_key : typing.Sequence[int]
         tag : str
         '''
-        self.error = Error.from_json(error)
+        self.error = Error.from_json(error) if error else None
         self.secret_key = secret_key
         self.tag = tag
 
@@ -5327,8 +5327,8 @@ class MacaroonResult(Type):
         error : Error
         result : Macaroon
         '''
-        self.error = Error.from_json(error)
-        self.result = Macaroon.from_json(result)
+        self.error = Error.from_json(error) if error else None
+        self.result = Macaroon.from_json(result) if result else None
 
 
 class MacaroonResults(Type):
@@ -5342,8 +5342,8 @@ class MacaroonResults(Type):
 
 
 class UserInfo(Type):
-    _toSchema = {'date_created': 'date-created', 'disabled': 'disabled', 'last_connection': 'last-connection', 'created_by': 'created-by', 'username': 'username', 'display_name': 'display-name'}
-    _toPy = {'disabled': 'disabled', 'username': 'username', 'last-connection': 'last_connection', 'display-name': 'display_name', 'created-by': 'created_by', 'date-created': 'date_created'}
+    _toSchema = {'last_connection': 'last-connection', 'created_by': 'created-by', 'date_created': 'date-created', 'username': 'username', 'display_name': 'display-name', 'disabled': 'disabled'}
+    _toPy = {'created-by': 'created_by', 'date-created': 'date_created', 'display-name': 'display_name', 'disabled': 'disabled', 'last-connection': 'last_connection', 'username': 'username'}
     def __init__(self, created_by=None, date_created=None, disabled=None, display_name=None, last_connection=None, username=None):
         '''
         created_by : str
@@ -5363,7 +5363,7 @@ class UserInfo(Type):
 
 class UserInfoRequest(Type):
     _toSchema = {'entities': 'entities', 'include_disabled': 'include-disabled'}
-    _toPy = {'include-disabled': 'include_disabled', 'entities': 'entities'}
+    _toPy = {'entities': 'entities', 'include-disabled': 'include_disabled'}
     def __init__(self, entities=None, include_disabled=None):
         '''
         entities : typing.Sequence[~Entity]
@@ -5381,8 +5381,8 @@ class UserInfoResult(Type):
         error : Error
         result : UserInfo
         '''
-        self.error = Error.from_json(error)
-        self.result = UserInfo.from_json(result)
+        self.error = Error.from_json(error) if error else None
+        self.result = UserInfo.from_json(result) if result else None
 
 
 class UserInfoResults(Type):
