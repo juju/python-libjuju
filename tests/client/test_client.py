@@ -2,7 +2,7 @@ import asyncio
 import unittest
 
 from juju.client.connection import Connection
-from juju.client.client import UserManager, Entity
+from juju.client import client
 
 from ..base import bootstrapped
 
@@ -14,9 +14,11 @@ class UserManagerTest(unittest.TestCase):
         conn = loop.run_until_complete(
             Connection.connect_current())
 
-        um = UserManager()
+        um = client.UserManager()
         um.connect(conn)
         result = loop.run_until_complete(
-            um.UserInfo([Entity('user-admin')], True))
+            um.UserInfo([client.Entity('user-admin')], True))
 
-        assert result
+        self.assertIsInstance(result, client.UserInfoResults)
+        for r in result.results:
+            self.assertIsInstance(r, client.UserInfoResult)

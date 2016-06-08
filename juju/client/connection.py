@@ -55,14 +55,14 @@ class Connection:
             result = json.loads(result)
         return result
 
-    async def rpc(self, msg):
+    async def rpc(self, msg, encoder=None):
         self.__request_id__ += 1
         msg['RequestId'] = self.__request_id__
         if'Params' not in msg:
             msg['Params'] = {}
         if "Version" not in msg:
             msg['Version'] = self.facades[msg['Type']]
-        outgoing = json.dumps(msg, indent=2)
+        outgoing = json.dumps(msg, indent=2, cls=encoder)
         await self.ws.send(outgoing)
         result = await self.recv()
         log.debug("send %s got %s", msg, result)
