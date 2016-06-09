@@ -5,7 +5,7 @@ PY := .tox/py35/bin/python3.5
 
 .phony: client
 client:
-	$(PY) -m juju.client.facade -s juju/client/schemas.json -o juju/client/client.py
+	$(PY) -m juju.client.facade -s juju/client/schemas.json -o juju/client/_client.py
 
 .phony: test
 test:
