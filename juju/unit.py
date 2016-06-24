@@ -1,4 +1,7 @@
-class Unit(object):
+from . import model
+
+
+class Unit(model.ModelEntity):
     def add_storage(self, name, constraints=None):
         """Add unit storage dynamically.
 

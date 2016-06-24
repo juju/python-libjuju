@@ -1,4 +1,122 @@
+from .client import watcher
+from .delta import get_entity_delta
+
+
+class ModelEntity(object):
+    """An object in the Model tree"""
+
+    def __init__(self, data, model):
+        """Initialize a new entity
+
+        :param data: dict of data from a watcher delta
+        :param model: The model instance in whose object tree this
+            entity resides
+
+        """
+        self.data = data
+        self.model = model
+
+
 class Model(object):
+    def __init__(self, connection):
+        """Instantiate a new connected Model.
+
+        :param connection: `juju.client.connection.Connection` instance
+
+        """
+        self.connection = connection
+        self.observers = set()
+        self.state = dict()
+
+    def add_observer(self, callable_):
+        """Register an "on-model-change" callback
+
+        Once a watch is started (Model.watch() is called), ``callable_``
+        will be called each time the model changes. callable_ should
+        accept the following positional arguments:
+
+            delta - An instance of :class:`juju.delta.EntityDelta`
+                containing the raw delta data recv'd from the Juju
+                websocket.
+
+            old_obj - If the delta modifies an existing object in the model,
+                old_obj will be a copy of that object, as it was before the
+                delta was applied. Will be None if the delta creates a new
+                entity in the model.
+
+            new_obj - A copy of the new or updated object, after the delta
+                is applied. Will be None if the delta removes an entity
+                from the model.
+
+            model - The :class:`Model` itself.
+
+        """
+        self.observers.add(callable_)
+
+    async def watch(self):
+        """Start an asynchronous watch against this model.
+
+        See :meth:`add_observer` to register an onchange callback.
+
+        """
+        allwatcher = watcher.AllWatcher()
+        allwatcher.connect(self.connection)
+        while True:
+            results = await allwatcher.Next()
+            for delta in results.deltas:
+                delta = get_entity_delta(delta)
+                old_obj, new_obj = self._apply_delta(delta)
+                self._notify_observers(delta, old_obj, new_obj)
+
+    def _apply_delta(self, delta):
+        """Apply delta to our model state and return the a copy of the
+        affected object as it was before and after the update, e.g.:
+
+            old_obj, new_obj = self._apply_delta(delta)
+
+        old_obj may be None if the delta is for the creation of a new object,
+        e.g. a new application or unit is deployed.
+
+        new_obj may be if no object was created or updated, or if an object
+        was deleted as a result of the delta being applied.
+
+        """
+        old_obj, new_obj = None, None
+
+        if (delta.entity in self.state and
+                delta.get_id() in self.state[delta.entity]):
+            old_obj = self.state[delta.entity][delta.get_id()]
+            if delta.type == 'remove':
+                del self.state[delta.entity][delta.get_id()]
+                return old_obj, new_obj
+
+        new_obj = self.state.setdefault(delta.entity, {})[delta.get_id()] = (
+            self._create_model_entity(delta))
+
+        return old_obj, new_obj
+
+    def _create_model_entity(self, delta):
+        """Return an object instance representing the entity created or
+        updated by ``delta``
+
+        """
+        entity_class = delta.get_entity_class()
+        return entity_class(delta.data, self)
+
+    def _notify_observers(self, delta, old_obj, new_obj):
+        """Call observing callbacks, notifying them of a change in model state
+
+        :param delta: The raw change from the watcher
+            (:class:`juju.client.overrides.Delta`)
+        :param old_obj: The object in the model that this delta updates.
+            May be None.
+        :param new_obj: The object in the model that is created or updated
+            by applying this delta.
+
+        """
+        for o in self.observers:
+            o(delta, old_obj, new_obj, self)
+
     def add_machine(
             self, spec=None, constraints=None, disks=None, series=None,
             count=1):

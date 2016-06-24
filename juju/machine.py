@@ -1,4 +1,7 @@
-class Machine(object):
+from . import model
+
+
+class Machine(model.ModelEntity):
     def run(self, command, timeout=None):
         """Run command on this machine.
 

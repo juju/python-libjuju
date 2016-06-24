@@ -1,4 +1,7 @@
-class Service(object):
+from . import model
+
+
+class Application(model.ModelEntity):
     def add_relation(self, local_relation, remote_relation):
         """Add a relation to another service.
 
