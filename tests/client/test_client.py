@@ -14,7 +14,7 @@ class UserManagerTest(unittest.TestCase):
         conn = loop.run_until_complete(
             Connection.connect_current())
 
-        um = client.UserManager()
+        um = client.UserManagerFacade()
         um.connect(conn)
         result = loop.run_until_complete(
             um.UserInfo([client.Entity('user-admin')], True))

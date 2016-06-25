@@ -1,7 +1,15 @@
+import logging
+
 from . import model
+from .client import client
+
+log = logging.getLogger(__name__)
 
 
 class Unit(model.ModelEntity):
+    def _get_tag(self):
+        return 'unit-{}'.format(self.data['Name'].replace('/', '-'))
+
     def add_storage(self, name, constraints=None):
         """Add unit storage dynamically.
 
@@ -42,14 +50,27 @@ class Unit(model.ModelEntity):
         """
         pass
 
-    def run(self, command, timeout=None):
+    async def run(self, command, timeout=None):
         """Run command on this unit.
 
         :param str command: The command to run
         :param int timeout: Time to wait before command is considered failed
 
         """
-        pass
+        action = client.ActionFacade()
+        conn = await self.model.connection.clone()
+        action.connect(conn)
+
+        log.debug(
+            'Running `%s` on %s', command, self.Name)
+
+        return await action.Run(
+            [],
+            command,
+            [],
+            timeout,
+            [self.Name],
+        )
 
     def run_action(self, action_name, **params):
         """Run action on this unit.

@@ -395,7 +395,7 @@ def buildFacade(schema):
                                           version=schema.version,
                                           schema=schema))
     source = """
-class {name}(Type):
+class {name}Facade(Type):
     name = '{name}'
     version = {version}
     schema = {schema}
@@ -428,7 +428,11 @@ class Type:
         for k, v in (data or {}).items():
             d[cls._toPy.get(k, k)] = v
 
-        return cls(**d)
+        try:
+            return cls(**d)
+        except TypeError:
+            print(cls)
+            raise
 
     def serialize(self):
         d = {}

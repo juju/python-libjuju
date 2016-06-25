@@ -28,7 +28,13 @@ class Connection:
         client = await Connection.connect_current()
 
     """
-    def __init__(self):
+    def __init__(self, endpoint, uuid, username, password, cacert=None):
+        self.endpoint = endpoint
+        self.uuid = uuid
+        self.username = username
+        self.password = password
+        self.cacert = cacert
+
         self.__request_id__ = 0
         self.addr = None
         self.ws = None
@@ -70,14 +76,28 @@ class Connection:
             raise RuntimeError(result)
         return result
 
+    async def clone(self):
+        """Return a new Connection, connected to the same websocket endpoint
+        as this one.
+
+        """
+        return await Connection.connect(
+            self.endpoint,
+            self.uuid,
+            self.username,
+            self.password,
+            self.cacert,
+        )
+
     @classmethod
     async def connect(cls, endpoint, uuid, username, password, cacert=None):
         url = "wss://{}/model/{}/api".format(endpoint, uuid)
-        client = cls()
+        client = cls(endpoint, uuid, username, password, cacert)
         await client.open(url, cacert)
         server_info = await client.login(username, password)
         client.build_facades(server_info['facades'])
         log.info("Driver connected to juju %s", endpoint)
+
         return client
 
     @classmethod

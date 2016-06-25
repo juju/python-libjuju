@@ -5,8 +5,8 @@ from juju.client.facade import Type, ReturnMapping
 
 
 class Action(Type):
-    _toSchema = {'receiver': 'receiver', 'tag': 'tag', 'parameters': 'parameters', 'name': 'name'}
-    _toPy = {'receiver': 'receiver', 'tag': 'tag', 'parameters': 'parameters', 'name': 'name'}
+    _toSchema = {'parameters': 'parameters', 'receiver': 'receiver', 'tag': 'tag', 'name': 'name'}
+    _toPy = {'parameters': 'parameters', 'receiver': 'receiver', 'tag': 'tag', 'name': 'name'}
     def __init__(self, name=None, parameters=None, receiver=None, tag=None):
         '''
         name : str
@@ -21,8 +21,8 @@ class Action(Type):
 
 
 class ActionResult(Type):
-    _toSchema = {'action': 'action', 'completed': 'completed', 'output': 'output', 'status': 'status', 'started': 'started', 'message': 'message', 'enqueued': 'enqueued', 'error': 'error'}
-    _toPy = {'action': 'action', 'completed': 'completed', 'output': 'output', 'status': 'status', 'started': 'started', 'message': 'message', 'enqueued': 'enqueued', 'error': 'error'}
+    _toSchema = {'action': 'action', 'completed': 'completed', 'output': 'output', 'started': 'started', 'enqueued': 'enqueued', 'message': 'message', 'error': 'error', 'status': 'status'}
+    _toPy = {'action': 'action', 'completed': 'completed', 'output': 'output', 'started': 'started', 'enqueued': 'enqueued', 'message': 'message', 'error': 'error', 'status': 'status'}
     def __init__(self, action=None, completed=None, enqueued=None, error=None, message=None, output=None, started=None, status=None):
         '''
         action : Action
@@ -54,19 +54,31 @@ class ActionResults(Type):
         self.results = [ActionResult.from_json(o) for o in results or []]
 
 
+class ActionSpec(Type):
+    _toSchema = {'description': 'Description', 'params': 'Params'}
+    _toPy = {'Description': 'description', 'Params': 'params'}
+    def __init__(self, description=None, params=None):
+        '''
+        description : str
+        params : typing.Mapping[str, typing.Any]
+        '''
+        self.description = description
+        self.params = params
+
+
 class Actions(Type):
-    _toSchema = {'actions': 'actions'}
-    _toPy = {'actions': 'actions'}
-    def __init__(self, actions=None):
+    _toSchema = {'actionspecs': 'ActionSpecs'}
+    _toPy = {'ActionSpecs': 'actionspecs'}
+    def __init__(self, actionspecs=None):
         '''
-        actions : typing.Sequence[~Action]
+        actionspecs : typing.Mapping[str, ~ActionSpec]
         '''
-        self.actions = [Action.from_json(o) for o in actions or []]
+        self.actionspecs = {k: ActionSpec.from_json(v) for k, v in (actionspecs or dict()).items()}
 
 
 class ActionsByName(Type):
-    _toSchema = {'actions': 'actions', 'error': 'error', 'name': 'name'}
-    _toPy = {'actions': 'actions', 'error': 'error', 'name': 'name'}
+    _toSchema = {'name': 'name', 'actions': 'actions', 'error': 'error'}
+    _toPy = {'name': 'name', 'actions': 'actions', 'error': 'error'}
     def __init__(self, actions=None, error=None, name=None):
         '''
         actions : typing.Sequence[~ActionResult]
@@ -89,8 +101,8 @@ class ActionsByNames(Type):
 
 
 class ActionsByReceiver(Type):
-    _toSchema = {'actions': 'actions', 'receiver': 'receiver', 'error': 'error'}
-    _toPy = {'actions': 'actions', 'receiver': 'receiver', 'error': 'error'}
+    _toSchema = {'receiver': 'receiver', 'actions': 'actions', 'error': 'error'}
+    _toPy = {'receiver': 'receiver', 'actions': 'actions', 'error': 'error'}
     def __init__(self, actions=None, error=None, receiver=None):
         '''
         actions : typing.Sequence[~ActionResult]
@@ -110,6 +122,30 @@ class ActionsByReceivers(Type):
         actions : typing.Sequence[~ActionsByReceiver]
         '''
         self.actions = [ActionsByReceiver.from_json(o) for o in actions or []]
+
+
+class ApplicationCharmActionsResult(Type):
+    _toSchema = {'applicationtag': 'ApplicationTag', 'actions': 'actions', 'error': 'error'}
+    _toPy = {'actions': 'actions', 'ApplicationTag': 'applicationtag', 'error': 'error'}
+    def __init__(self, applicationtag=None, actions=None, error=None):
+        '''
+        applicationtag : str
+        actions : Actions
+        error : Error
+        '''
+        self.applicationtag = applicationtag
+        self.actions = Actions.from_json(actions) if actions else None
+        self.error = Error.from_json(error) if error else None
+
+
+class ApplicationsCharmActionsResults(Type):
+    _toSchema = {'results': 'results'}
+    _toPy = {'results': 'results'}
+    def __init__(self, results=None):
+        '''
+        results : typing.Sequence[~ApplicationCharmActionsResult]
+        '''
+        self.results = [ApplicationCharmActionsResult.from_json(o) for o in results or []]
 
 
 class Entities(Type):
@@ -133,8 +169,8 @@ class Entity(Type):
 
 
 class Error(Type):
-    _toSchema = {'info': 'Info', 'message': 'Message', 'code': 'Code'}
-    _toPy = {'Info': 'info', 'Code': 'code', 'Message': 'message'}
+    _toSchema = {'code': 'Code', 'message': 'Message', 'info': 'Info'}
+    _toPy = {'Code': 'code', 'Message': 'message', 'Info': 'info'}
     def __init__(self, code=None, info=None, message=None):
         '''
         code : str
@@ -148,7 +184,7 @@ class Error(Type):
 
 class ErrorInfo(Type):
     _toSchema = {'macaroonpath': 'MacaroonPath', 'macaroon': 'Macaroon'}
-    _toPy = {'MacaroonPath': 'macaroonpath', 'Macaroon': 'macaroon'}
+    _toPy = {'Macaroon': 'macaroon', 'MacaroonPath': 'macaroonpath'}
     def __init__(self, macaroon=None, macaroonpath=None):
         '''
         macaroon : Macaroon
@@ -189,8 +225,8 @@ class FindTagsResults(Type):
 
 
 class Macaroon(Type):
-    _toSchema = {'location': 'location', 'caveats': 'caveats', 'sig': 'sig', 'id_': 'id', 'data': 'data'}
-    _toPy = {'location': 'location', 'caveats': 'caveats', 'sig': 'sig', 'id': 'id_', 'data': 'data'}
+    _toSchema = {'caveats': 'caveats', 'location': 'location', 'data': 'data', 'id_': 'id', 'sig': 'sig'}
+    _toPy = {'caveats': 'caveats', 'location': 'location', 'data': 'data', 'sig': 'sig', 'id': 'id_'}
     def __init__(self, caveats=None, data=None, id_=None, location=None, sig=None):
         '''
         caveats : typing.Sequence[~caveat]
@@ -207,50 +243,26 @@ class Macaroon(Type):
 
 
 class RunParams(Type):
-    _toSchema = {'timeout': 'Timeout', 'machines': 'Machines', 'units': 'Units', 'services': 'Services', 'commands': 'Commands'}
-    _toPy = {'Services': 'services', 'Units': 'units', 'Machines': 'machines', 'Commands': 'commands', 'Timeout': 'timeout'}
-    def __init__(self, commands=None, machines=None, services=None, timeout=None, units=None):
+    _toSchema = {'units': 'Units', 'applications': 'Applications', 'commands': 'Commands', 'machines': 'Machines', 'timeout': 'Timeout'}
+    _toPy = {'Applications': 'applications', 'Commands': 'commands', 'Timeout': 'timeout', 'Units': 'units', 'Machines': 'machines'}
+    def __init__(self, applications=None, commands=None, machines=None, timeout=None, units=None):
         '''
+        applications : typing.Sequence[str]
         commands : str
         machines : typing.Sequence[str]
-        services : typing.Sequence[str]
         timeout : int
         units : typing.Sequence[str]
         '''
+        self.applications = applications
         self.commands = commands
         self.machines = machines
-        self.services = services
         self.timeout = timeout
         self.units = units
 
 
-class ServiceCharmActionsResult(Type):
-    _toSchema = {'actions': 'actions', 'error': 'error', 'servicetag': 'servicetag'}
-    _toPy = {'actions': 'actions', 'error': 'error', 'servicetag': 'servicetag'}
-    def __init__(self, actions=None, error=None, servicetag=None):
-        '''
-        actions : Actions
-        error : Error
-        servicetag : str
-        '''
-        self.actions = Actions.from_json(actions) if actions else None
-        self.error = Error.from_json(error) if error else None
-        self.servicetag = servicetag
-
-
-class ServicesCharmActionsResults(Type):
-    _toSchema = {'results': 'results'}
-    _toPy = {'results': 'results'}
-    def __init__(self, results=None):
-        '''
-        results : typing.Sequence[~ServiceCharmActionsResult]
-        '''
-        self.results = [ServiceCharmActionsResult.from_json(o) for o in results or []]
-
-
 class caveat(Type):
-    _toSchema = {'location': 'location', 'caveatid': 'caveatId', 'verificationid': 'verificationId'}
-    _toPy = {'location': 'location', 'caveatId': 'caveatid', 'verificationId': 'verificationid'}
+    _toSchema = {'caveatid': 'caveatId', 'location': 'location', 'verificationid': 'verificationId'}
+    _toPy = {'verificationId': 'verificationid', 'location': 'location', 'caveatId': 'caveatid'}
     def __init__(self, caveatid=None, location=None, verificationid=None):
         '''
         caveatid : packet
@@ -263,8 +275,8 @@ class caveat(Type):
 
 
 class packet(Type):
-    _toSchema = {'headerlen': 'headerLen', 'start': 'start', 'totallen': 'totalLen'}
-    _toPy = {'totalLen': 'totallen', 'headerLen': 'headerlen', 'start': 'start'}
+    _toSchema = {'start': 'start', 'totallen': 'totalLen', 'headerlen': 'headerLen'}
+    _toPy = {'start': 'start', 'totalLen': 'totallen', 'headerLen': 'headerlen'}
     def __init__(self, headerlen=None, start=None, totallen=None):
         '''
         headerlen : int
@@ -277,8 +289,8 @@ class packet(Type):
 
 
 class BoolResult(Type):
-    _toSchema = {'error': 'Error', 'result': 'Result'}
-    _toPy = {'Error': 'error', 'Result': 'result'}
+    _toSchema = {'result': 'Result', 'error': 'Error'}
+    _toPy = {'Result': 'result', 'Error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -303,8 +315,8 @@ class EntitiesWatchResult(Type):
 
 
 class ErrorResult(Type):
-    _toSchema = {'info': 'Info', 'message': 'Message', 'code': 'Code'}
-    _toPy = {'Info': 'info', 'Code': 'code', 'Message': 'message'}
+    _toSchema = {'code': 'Code', 'message': 'Message', 'info': 'Info'}
+    _toPy = {'Code': 'code', 'Message': 'message', 'Info': 'info'}
     def __init__(self, code=None, info=None, message=None):
         '''
         code : str
@@ -317,8 +329,8 @@ class ErrorResult(Type):
 
 
 class AgentGetEntitiesResult(Type):
-    _toSchema = {'containertype': 'ContainerType', 'error': 'Error', 'life': 'Life', 'jobs': 'Jobs'}
-    _toPy = {'Error': 'error', 'Jobs': 'jobs', 'ContainerType': 'containertype', 'Life': 'life'}
+    _toSchema = {'jobs': 'Jobs', 'life': 'Life', 'error': 'Error', 'containertype': 'ContainerType'}
+    _toPy = {'Life': 'life', 'ContainerType': 'containertype', 'Error': 'error', 'Jobs': 'jobs'}
     def __init__(self, containertype=None, error=None, jobs=None, life=None):
         '''
         containertype : str
@@ -344,7 +356,7 @@ class AgentGetEntitiesResults(Type):
 
 class EntityPassword(Type):
     _toSchema = {'password': 'Password', 'tag': 'Tag'}
-    _toPy = {'Password': 'password', 'Tag': 'tag'}
+    _toPy = {'Tag': 'tag', 'Password': 'password'}
     def __init__(self, password=None, tag=None):
         '''
         password : str
@@ -395,8 +407,8 @@ class ModelConfigResult(Type):
 
 
 class NotifyWatchResult(Type):
-    _toSchema = {'error': 'Error', 'notifywatcherid': 'NotifyWatcherId'}
-    _toPy = {'Error': 'error', 'NotifyWatcherId': 'notifywatcherid'}
+    _toSchema = {'notifywatcherid': 'NotifyWatcherId', 'error': 'Error'}
+    _toPy = {'NotifyWatcherId': 'notifywatcherid', 'Error': 'error'}
     def __init__(self, error=None, notifywatcherid=None):
         '''
         error : Error
@@ -407,8 +419,8 @@ class NotifyWatchResult(Type):
 
 
 class StateServingInfo(Type):
-    _toSchema = {'sharedsecret': 'SharedSecret', 'caprivatekey': 'CAPrivateKey', 'stateport': 'StatePort', 'cert': 'Cert', 'apiport': 'APIPort', 'privatekey': 'PrivateKey', 'systemidentity': 'SystemIdentity'}
-    _toPy = {'StatePort': 'stateport', 'APIPort': 'apiport', 'CAPrivateKey': 'caprivatekey', 'PrivateKey': 'privatekey', 'SystemIdentity': 'systemidentity', 'Cert': 'cert', 'SharedSecret': 'sharedsecret'}
+    _toSchema = {'apiport': 'APIPort', 'stateport': 'StatePort', 'cert': 'Cert', 'caprivatekey': 'CAPrivateKey', 'systemidentity': 'SystemIdentity', 'sharedsecret': 'SharedSecret', 'privatekey': 'PrivateKey'}
+    _toPy = {'SharedSecret': 'sharedsecret', 'CAPrivateKey': 'caprivatekey', 'Cert': 'cert', 'PrivateKey': 'privatekey', 'StatePort': 'stateport', 'SystemIdentity': 'systemidentity', 'APIPort': 'apiport'}
     def __init__(self, apiport=None, caprivatekey=None, cert=None, privatekey=None, sharedsecret=None, stateport=None, systemidentity=None):
         '''
         apiport : int
@@ -439,7 +451,7 @@ class AllWatcherNextResults(Type):
 
 
 class Delta(Type):
-    _toSchema = {'removed': 'Removed', 'entity': 'Entity'}
+    _toSchema = {'entity': 'Entity', 'removed': 'Removed'}
     _toPy = {'Removed': 'removed', 'Entity': 'entity'}
     def __init__(self, entity=None, removed=None):
         '''
@@ -451,8 +463,8 @@ class Delta(Type):
 
 
 class AnnotationsGetResult(Type):
-    _toSchema = {'error': 'Error', 'entitytag': 'EntityTag', 'annotations': 'Annotations'}
-    _toPy = {'EntityTag': 'entitytag', 'Annotations': 'annotations', 'Error': 'error'}
+    _toSchema = {'entitytag': 'EntityTag', 'annotations': 'Annotations', 'error': 'Error'}
+    _toPy = {'Error': 'error', 'Annotations': 'annotations', 'EntityTag': 'entitytag'}
     def __init__(self, annotations=None, entitytag=None, error=None):
         '''
         annotations : typing.Mapping[str, str]
@@ -486,7 +498,7 @@ class AnnotationsSet(Type):
 
 class EntityAnnotations(Type):
     _toSchema = {'entitytag': 'EntityTag', 'annotations': 'Annotations'}
-    _toPy = {'EntityTag': 'entitytag', 'Annotations': 'annotations'}
+    _toPy = {'Annotations': 'annotations', 'EntityTag': 'entitytag'}
     def __init__(self, annotations=None, entitytag=None):
         '''
         annotations : typing.Mapping[str, str]
@@ -494,6 +506,428 @@ class EntityAnnotations(Type):
         '''
         self.annotations = annotations
         self.entitytag = entitytag
+
+
+class AddApplicationUnits(Type):
+    _toSchema = {'numunits': 'NumUnits', 'applicationname': 'ApplicationName', 'placement': 'Placement'}
+    _toPy = {'NumUnits': 'numunits', 'Placement': 'placement', 'ApplicationName': 'applicationname'}
+    def __init__(self, applicationname=None, numunits=None, placement=None):
+        '''
+        applicationname : str
+        numunits : int
+        placement : typing.Sequence[~Placement]
+        '''
+        self.applicationname = applicationname
+        self.numunits = numunits
+        self.placement = [Placement.from_json(o) for o in placement or []]
+
+
+class AddApplicationUnitsResults(Type):
+    _toSchema = {'units': 'Units'}
+    _toPy = {'Units': 'units'}
+    def __init__(self, units=None):
+        '''
+        units : typing.Sequence[str]
+        '''
+        self.units = units
+
+
+class AddRelation(Type):
+    _toSchema = {'endpoints': 'Endpoints'}
+    _toPy = {'Endpoints': 'endpoints'}
+    def __init__(self, endpoints=None):
+        '''
+        endpoints : typing.Sequence[str]
+        '''
+        self.endpoints = endpoints
+
+
+class AddRelationResults(Type):
+    _toSchema = {'endpoints': 'Endpoints'}
+    _toPy = {'Endpoints': 'endpoints'}
+    def __init__(self, endpoints=None):
+        '''
+        endpoints : typing.Mapping[str, ~Relation]
+        '''
+        self.endpoints = {k: Relation.from_json(v) for k, v in (endpoints or dict()).items()}
+
+
+class ApplicationCharmRelations(Type):
+    _toSchema = {'applicationname': 'ApplicationName'}
+    _toPy = {'ApplicationName': 'applicationname'}
+    def __init__(self, applicationname=None):
+        '''
+        applicationname : str
+        '''
+        self.applicationname = applicationname
+
+
+class ApplicationCharmRelationsResults(Type):
+    _toSchema = {'charmrelations': 'CharmRelations'}
+    _toPy = {'CharmRelations': 'charmrelations'}
+    def __init__(self, charmrelations=None):
+        '''
+        charmrelations : typing.Sequence[str]
+        '''
+        self.charmrelations = charmrelations
+
+
+class ApplicationDeploy(Type):
+    _toSchema = {'resources': 'Resources', 'channel': 'Channel', 'numunits': 'NumUnits', 'charmurl': 'CharmUrl', 'endpointbindings': 'EndpointBindings', 'configyaml': 'ConfigYAML', 'series': 'Series', 'storage': 'Storage', 'placement': 'Placement', 'config': 'Config', 'constraints': 'Constraints', 'applicationname': 'ApplicationName'}
+    _toPy = {'Storage': 'storage', 'ApplicationName': 'applicationname', 'Channel': 'channel', 'CharmUrl': 'charmurl', 'Constraints': 'constraints', 'Config': 'config', 'ConfigYAML': 'configyaml', 'Resources': 'resources', 'EndpointBindings': 'endpointbindings', 'NumUnits': 'numunits', 'Placement': 'placement', 'Series': 'series'}
+    def __init__(self, applicationname=None, channel=None, charmurl=None, config=None, configyaml=None, constraints=None, endpointbindings=None, numunits=None, placement=None, resources=None, series=None, storage=None):
+        '''
+        applicationname : str
+        channel : str
+        charmurl : str
+        config : typing.Mapping[str, str]
+        configyaml : str
+        constraints : Value
+        endpointbindings : typing.Mapping[str, str]
+        numunits : int
+        placement : typing.Sequence[~Placement]
+        resources : typing.Mapping[str, str]
+        series : str
+        storage : typing.Mapping[str, ~Constraints]
+        '''
+        self.applicationname = applicationname
+        self.channel = channel
+        self.charmurl = charmurl
+        self.config = config
+        self.configyaml = configyaml
+        self.constraints = Value.from_json(constraints) if constraints else None
+        self.endpointbindings = endpointbindings
+        self.numunits = numunits
+        self.placement = [Placement.from_json(o) for o in placement or []]
+        self.resources = resources
+        self.series = series
+        self.storage = {k: Constraints.from_json(v) for k, v in (storage or dict()).items()}
+
+
+class ApplicationDestroy(Type):
+    _toSchema = {'applicationname': 'ApplicationName'}
+    _toPy = {'ApplicationName': 'applicationname'}
+    def __init__(self, applicationname=None):
+        '''
+        applicationname : str
+        '''
+        self.applicationname = applicationname
+
+
+class ApplicationExpose(Type):
+    _toSchema = {'applicationname': 'ApplicationName'}
+    _toPy = {'ApplicationName': 'applicationname'}
+    def __init__(self, applicationname=None):
+        '''
+        applicationname : str
+        '''
+        self.applicationname = applicationname
+
+
+class ApplicationGet(Type):
+    _toSchema = {'applicationname': 'ApplicationName'}
+    _toPy = {'ApplicationName': 'applicationname'}
+    def __init__(self, applicationname=None):
+        '''
+        applicationname : str
+        '''
+        self.applicationname = applicationname
+
+
+class ApplicationGetResults(Type):
+    _toSchema = {'charm': 'Charm', 'config': 'Config', 'application': 'Application', 'constraints': 'Constraints'}
+    _toPy = {'Constraints': 'constraints', 'Charm': 'charm', 'Application': 'application', 'Config': 'config'}
+    def __init__(self, application=None, charm=None, config=None, constraints=None):
+        '''
+        application : str
+        charm : str
+        config : typing.Mapping[str, typing.Any]
+        constraints : Value
+        '''
+        self.application = application
+        self.charm = charm
+        self.config = config
+        self.constraints = Value.from_json(constraints) if constraints else None
+
+
+class ApplicationMetricCredential(Type):
+    _toSchema = {'metriccredentials': 'MetricCredentials', 'applicationname': 'ApplicationName'}
+    _toPy = {'MetricCredentials': 'metriccredentials', 'ApplicationName': 'applicationname'}
+    def __init__(self, applicationname=None, metriccredentials=None):
+        '''
+        applicationname : str
+        metriccredentials : typing.Sequence[int]
+        '''
+        self.applicationname = applicationname
+        self.metriccredentials = metriccredentials
+
+
+class ApplicationMetricCredentials(Type):
+    _toSchema = {'creds': 'Creds'}
+    _toPy = {'Creds': 'creds'}
+    def __init__(self, creds=None):
+        '''
+        creds : typing.Sequence[~ApplicationMetricCredential]
+        '''
+        self.creds = [ApplicationMetricCredential.from_json(o) for o in creds or []]
+
+
+class ApplicationSet(Type):
+    _toSchema = {'options': 'Options', 'applicationname': 'ApplicationName'}
+    _toPy = {'Options': 'options', 'ApplicationName': 'applicationname'}
+    def __init__(self, applicationname=None, options=None):
+        '''
+        applicationname : str
+        options : typing.Mapping[str, str]
+        '''
+        self.applicationname = applicationname
+        self.options = options
+
+
+class ApplicationSetCharm(Type):
+    _toSchema = {'forceseries': 'forceseries', 'charmurl': 'charmurl', 'resourceids': 'resourceids', 'forceunits': 'forceunits', 'cs_channel': 'cs-channel', 'applicationname': 'applicationname'}
+    _toPy = {'forceseries': 'forceseries', 'charmurl': 'charmurl', 'forceunits': 'forceunits', 'cs-channel': 'cs_channel', 'applicationname': 'applicationname', 'resourceids': 'resourceids'}
+    def __init__(self, applicationname=None, charmurl=None, cs_channel=None, forceseries=None, forceunits=None, resourceids=None):
+        '''
+        applicationname : str
+        charmurl : str
+        cs_channel : str
+        forceseries : bool
+        forceunits : bool
+        resourceids : typing.Mapping[str, str]
+        '''
+        self.applicationname = applicationname
+        self.charmurl = charmurl
+        self.cs_channel = cs_channel
+        self.forceseries = forceseries
+        self.forceunits = forceunits
+        self.resourceids = resourceids
+
+
+class ApplicationUnexpose(Type):
+    _toSchema = {'applicationname': 'ApplicationName'}
+    _toPy = {'ApplicationName': 'applicationname'}
+    def __init__(self, applicationname=None):
+        '''
+        applicationname : str
+        '''
+        self.applicationname = applicationname
+
+
+class ApplicationUnset(Type):
+    _toSchema = {'options': 'Options', 'applicationname': 'ApplicationName'}
+    _toPy = {'Options': 'options', 'ApplicationName': 'applicationname'}
+    def __init__(self, applicationname=None, options=None):
+        '''
+        applicationname : str
+        options : typing.Sequence[str]
+        '''
+        self.applicationname = applicationname
+        self.options = options
+
+
+class ApplicationUpdate(Type):
+    _toSchema = {'forceseries': 'ForceSeries', 'charmurl': 'CharmUrl', 'settingsyaml': 'SettingsYAML', 'constraints': 'Constraints', 'forcecharmurl': 'ForceCharmUrl', 'settingsstrings': 'SettingsStrings', 'applicationname': 'ApplicationName', 'minunits': 'MinUnits'}
+    _toPy = {'Constraints': 'constraints', 'SettingsYAML': 'settingsyaml', 'SettingsStrings': 'settingsstrings', 'ApplicationName': 'applicationname', 'MinUnits': 'minunits', 'ForceCharmUrl': 'forcecharmurl', 'CharmUrl': 'charmurl', 'ForceSeries': 'forceseries'}
+    def __init__(self, applicationname=None, charmurl=None, constraints=None, forcecharmurl=None, forceseries=None, minunits=None, settingsstrings=None, settingsyaml=None):
+        '''
+        applicationname : str
+        charmurl : str
+        constraints : Value
+        forcecharmurl : bool
+        forceseries : bool
+        minunits : int
+        settingsstrings : typing.Mapping[str, str]
+        settingsyaml : str
+        '''
+        self.applicationname = applicationname
+        self.charmurl = charmurl
+        self.constraints = Value.from_json(constraints) if constraints else None
+        self.forcecharmurl = forcecharmurl
+        self.forceseries = forceseries
+        self.minunits = minunits
+        self.settingsstrings = settingsstrings
+        self.settingsyaml = settingsyaml
+
+
+class ApplicationsDeploy(Type):
+    _toSchema = {'applications': 'Applications'}
+    _toPy = {'Applications': 'applications'}
+    def __init__(self, applications=None):
+        '''
+        applications : typing.Sequence[~ApplicationDeploy]
+        '''
+        self.applications = [ApplicationDeploy.from_json(o) for o in applications or []]
+
+
+class Constraints(Type):
+    _toSchema = {'pool': 'Pool', 'size': 'Size', 'count': 'Count'}
+    _toPy = {'Count': 'count', 'Pool': 'pool', 'Size': 'size'}
+    def __init__(self, count=None, pool=None, size=None):
+        '''
+        count : int
+        pool : str
+        size : int
+        '''
+        self.count = count
+        self.pool = pool
+        self.size = size
+
+
+class DestroyApplicationUnits(Type):
+    _toSchema = {'unitnames': 'UnitNames'}
+    _toPy = {'UnitNames': 'unitnames'}
+    def __init__(self, unitnames=None):
+        '''
+        unitnames : typing.Sequence[str]
+        '''
+        self.unitnames = unitnames
+
+
+class DestroyRelation(Type):
+    _toSchema = {'endpoints': 'Endpoints'}
+    _toPy = {'Endpoints': 'endpoints'}
+    def __init__(self, endpoints=None):
+        '''
+        endpoints : typing.Sequence[str]
+        '''
+        self.endpoints = endpoints
+
+
+class GetApplicationConstraints(Type):
+    _toSchema = {'applicationname': 'ApplicationName'}
+    _toPy = {'ApplicationName': 'applicationname'}
+    def __init__(self, applicationname=None):
+        '''
+        applicationname : str
+        '''
+        self.applicationname = applicationname
+
+
+class GetConstraintsResults(Type):
+    _toSchema = {'root_disk': 'root-disk', 'mem': 'mem', 'container': 'container', 'virt_type': 'virt-type', 'cpu_power': 'cpu-power', 'cpu_cores': 'cpu-cores', 'tags': 'tags', 'arch': 'arch', 'spaces': 'spaces', 'instance_type': 'instance-type'}
+    _toPy = {'spaces': 'spaces', 'container': 'container', 'cpu-cores': 'cpu_cores', 'instance-type': 'instance_type', 'mem': 'mem', 'cpu-power': 'cpu_power', 'tags': 'tags', 'arch': 'arch', 'root-disk': 'root_disk', 'virt-type': 'virt_type'}
+    def __init__(self, arch=None, container=None, cpu_cores=None, cpu_power=None, instance_type=None, mem=None, root_disk=None, spaces=None, tags=None, virt_type=None):
+        '''
+        arch : str
+        container : str
+        cpu_cores : int
+        cpu_power : int
+        instance_type : str
+        mem : int
+        root_disk : int
+        spaces : typing.Sequence[str]
+        tags : typing.Sequence[str]
+        virt_type : str
+        '''
+        self.arch = arch
+        self.container = container
+        self.cpu_cores = cpu_cores
+        self.cpu_power = cpu_power
+        self.instance_type = instance_type
+        self.mem = mem
+        self.root_disk = root_disk
+        self.spaces = spaces
+        self.tags = tags
+        self.virt_type = virt_type
+
+
+class Placement(Type):
+    _toSchema = {'directive': 'Directive', 'scope': 'Scope'}
+    _toPy = {'Directive': 'directive', 'Scope': 'scope'}
+    def __init__(self, directive=None, scope=None):
+        '''
+        directive : str
+        scope : str
+        '''
+        self.directive = directive
+        self.scope = scope
+
+
+class Relation(Type):
+    _toSchema = {'role': 'Role', 'limit': 'Limit', 'optional': 'Optional', 'name': 'Name', 'scope': 'Scope', 'interface': 'Interface'}
+    _toPy = {'Name': 'name', 'Role': 'role', 'Scope': 'scope', 'Limit': 'limit', 'Interface': 'interface', 'Optional': 'optional'}
+    def __init__(self, interface=None, limit=None, name=None, optional=None, role=None, scope=None):
+        '''
+        interface : str
+        limit : int
+        name : str
+        optional : bool
+        role : str
+        scope : str
+        '''
+        self.interface = interface
+        self.limit = limit
+        self.name = name
+        self.optional = optional
+        self.role = role
+        self.scope = scope
+
+
+class SetConstraints(Type):
+    _toSchema = {'constraints': 'Constraints', 'applicationname': 'ApplicationName'}
+    _toPy = {'Constraints': 'constraints', 'ApplicationName': 'applicationname'}
+    def __init__(self, applicationname=None, constraints=None):
+        '''
+        applicationname : str
+        constraints : Value
+        '''
+        self.applicationname = applicationname
+        self.constraints = Value.from_json(constraints) if constraints else None
+
+
+class StringResult(Type):
+    _toSchema = {'result': 'Result', 'error': 'Error'}
+    _toPy = {'Result': 'result', 'Error': 'error'}
+    def __init__(self, error=None, result=None):
+        '''
+        error : Error
+        result : str
+        '''
+        self.error = Error.from_json(error) if error else None
+        self.result = result
+
+
+class Value(Type):
+    _toSchema = {'root_disk': 'root-disk', 'mem': 'mem', 'container': 'container', 'virt_type': 'virt-type', 'cpu_power': 'cpu-power', 'cpu_cores': 'cpu-cores', 'tags': 'tags', 'arch': 'arch', 'spaces': 'spaces', 'instance_type': 'instance-type'}
+    _toPy = {'spaces': 'spaces', 'container': 'container', 'cpu-cores': 'cpu_cores', 'instance-type': 'instance_type', 'mem': 'mem', 'cpu-power': 'cpu_power', 'tags': 'tags', 'arch': 'arch', 'root-disk': 'root_disk', 'virt-type': 'virt_type'}
+    def __init__(self, arch=None, container=None, cpu_cores=None, cpu_power=None, instance_type=None, mem=None, root_disk=None, spaces=None, tags=None, virt_type=None):
+        '''
+        arch : str
+        container : str
+        cpu_cores : int
+        cpu_power : int
+        instance_type : str
+        mem : int
+        root_disk : int
+        spaces : typing.Sequence[str]
+        tags : typing.Sequence[str]
+        virt_type : str
+        '''
+        self.arch = arch
+        self.container = container
+        self.cpu_cores = cpu_cores
+        self.cpu_power = cpu_power
+        self.instance_type = instance_type
+        self.mem = mem
+        self.root_disk = root_disk
+        self.spaces = spaces
+        self.tags = tags
+        self.virt_type = virt_type
+
+
+class StringsWatchResult(Type):
+    _toSchema = {'changes': 'Changes', 'stringswatcherid': 'StringsWatcherId', 'error': 'Error'}
+    _toPy = {'Changes': 'changes', 'Error': 'error', 'StringsWatcherId': 'stringswatcherid'}
+    def __init__(self, changes=None, error=None, stringswatcherid=None):
+        '''
+        changes : typing.Sequence[str]
+        error : Error
+        stringswatcherid : str
+        '''
+        self.changes = changes
+        self.error = Error.from_json(error) if error else None
+        self.stringswatcherid = stringswatcherid
 
 
 class BackupsCreateArgs(Type):
@@ -537,9 +971,9 @@ class BackupsListResult(Type):
 
 
 class BackupsMetadataResult(Type):
-    _toSchema = {'caprivatekey': 'CAPrivateKey', 'started': 'Started', 'finished': 'Finished', 'size': 'Size', 'stored': 'Stored', 'checksum': 'Checksum', 'model': 'Model', 'version': 'Version', 'cacert': 'CACert', 'machine': 'Machine', 'hostname': 'Hostname', 'notes': 'Notes', 'checksumformat': 'ChecksumFormat', 'id_': 'ID'}
-    _toPy = {'Hostname': 'hostname', 'Stored': 'stored', 'CACert': 'cacert', 'Checksum': 'checksum', 'Started': 'started', 'Model': 'model', 'ChecksumFormat': 'checksumformat', 'Machine': 'machine', 'Version': 'version', 'CAPrivateKey': 'caprivatekey', 'Size': 'size', 'ID': 'id_', 'Finished': 'finished', 'Notes': 'notes'}
-    def __init__(self, cacert=None, caprivatekey=None, checksum=None, checksumformat=None, finished=None, hostname=None, id_=None, machine=None, model=None, notes=None, size=None, started=None, stored=None, version=None):
+    _toSchema = {'checksumformat': 'ChecksumFormat', 'started': 'Started', 'stored': 'Stored', 'cacert': 'CACert', 'version': 'Version', 'machine': 'Machine', 'checksum': 'Checksum', 'series': 'Series', 'id_': 'ID', 'hostname': 'Hostname', 'size': 'Size', 'finished': 'Finished', 'caprivatekey': 'CAPrivateKey', 'model': 'Model', 'notes': 'Notes'}
+    _toPy = {'Finished': 'finished', 'ChecksumFormat': 'checksumformat', 'CAPrivateKey': 'caprivatekey', 'Started': 'started', 'ID': 'id_', 'Notes': 'notes', 'Stored': 'stored', 'Hostname': 'hostname', 'Model': 'model', 'Size': 'size', 'Checksum': 'checksum', 'Machine': 'machine', 'Version': 'version', 'CACert': 'cacert', 'Series': 'series'}
+    def __init__(self, cacert=None, caprivatekey=None, checksum=None, checksumformat=None, finished=None, hostname=None, id_=None, machine=None, model=None, notes=None, series=None, size=None, started=None, stored=None, version=None):
         '''
         cacert : str
         caprivatekey : str
@@ -551,6 +985,7 @@ class BackupsMetadataResult(Type):
         machine : str
         model : str
         notes : str
+        series : str
         size : int
         started : str
         stored : str
@@ -566,6 +1001,7 @@ class BackupsMetadataResult(Type):
         self.machine = machine
         self.model = model
         self.notes = notes
+        self.series = series
         self.size = size
         self.started = started
         self.stored = stored
@@ -583,8 +1019,8 @@ class BackupsRemoveArgs(Type):
 
 
 class Number(Type):
-    _toSchema = {'minor': 'Minor', 'major': 'Major', 'tag': 'Tag', 'patch': 'Patch', 'build': 'Build'}
-    _toPy = {'Tag': 'tag', 'Build': 'build', 'Major': 'major', 'Minor': 'minor', 'Patch': 'patch'}
+    _toSchema = {'minor': 'Minor', 'major': 'Major', 'patch': 'Patch', 'tag': 'Tag', 'build': 'Build'}
+    _toPy = {'Patch': 'patch', 'Major': 'major', 'Minor': 'minor', 'Tag': 'tag', 'Build': 'build'}
     def __init__(self, build=None, major=None, minor=None, patch=None, tag=None):
         '''
         build : int
@@ -611,8 +1047,8 @@ class RestoreArgs(Type):
 
 
 class Block(Type):
-    _toSchema = {'message': 'message', 'type_': 'type', 'id_': 'id', 'tag': 'tag'}
-    _toPy = {'message': 'message', 'id': 'id_', 'tag': 'tag', 'type': 'type_'}
+    _toSchema = {'type_': 'type', 'id_': 'id', 'message': 'message', 'tag': 'tag'}
+    _toPy = {'type': 'type_', 'id': 'id_', 'message': 'message', 'tag': 'tag'}
     def __init__(self, id_=None, message=None, tag=None, type_=None):
         '''
         id_ : str
@@ -627,8 +1063,8 @@ class Block(Type):
 
 
 class BlockResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -649,8 +1085,8 @@ class BlockResults(Type):
 
 
 class BlockSwitchParams(Type):
-    _toSchema = {'message': 'message', 'type_': 'type'}
-    _toPy = {'message': 'message', 'type': 'type_'}
+    _toSchema = {'type_': 'type', 'message': 'message'}
+    _toPy = {'type': 'type_', 'message': 'message'}
     def __init__(self, message=None, type_=None):
         '''
         message : str
@@ -711,8 +1147,8 @@ class APIHostPortsResult(Type):
 
 
 class AddCharm(Type):
-    _toSchema = {'channel': 'Channel', 'url': 'URL'}
-    _toPy = {'Channel': 'channel', 'URL': 'url'}
+    _toSchema = {'url': 'URL', 'channel': 'Channel'}
+    _toPy = {'URL': 'url', 'Channel': 'channel'}
     def __init__(self, channel=None, url=None):
         '''
         channel : str
@@ -723,8 +1159,8 @@ class AddCharm(Type):
 
 
 class AddCharmWithAuthorization(Type):
-    _toSchema = {'channel': 'Channel', 'charmstoremacaroon': 'CharmStoreMacaroon', 'url': 'URL'}
-    _toPy = {'Channel': 'channel', 'CharmStoreMacaroon': 'charmstoremacaroon', 'URL': 'url'}
+    _toSchema = {'url': 'URL', 'channel': 'Channel', 'charmstoremacaroon': 'CharmStoreMacaroon'}
+    _toPy = {'URL': 'url', 'CharmStoreMacaroon': 'charmstoremacaroon', 'Channel': 'channel'}
     def __init__(self, channel=None, charmstoremacaroon=None, url=None):
         '''
         channel : str
@@ -737,8 +1173,8 @@ class AddCharmWithAuthorization(Type):
 
 
 class AddMachineParams(Type):
-    _toSchema = {'parentid': 'ParentId', 'containertype': 'ContainerType', 'instanceid': 'InstanceId', 'disks': 'Disks', 'jobs': 'Jobs', 'placement': 'Placement', 'addrs': 'Addrs', 'nonce': 'Nonce', 'constraints': 'Constraints', 'series': 'Series', 'hardwarecharacteristics': 'HardwareCharacteristics'}
-    _toPy = {'HardwareCharacteristics': 'hardwarecharacteristics', 'Constraints': 'constraints', 'InstanceId': 'instanceid', 'ContainerType': 'containertype', 'ParentId': 'parentid', 'Addrs': 'addrs', 'Placement': 'placement', 'Disks': 'disks', 'Nonce': 'nonce', 'Jobs': 'jobs', 'Series': 'series'}
+    _toSchema = {'jobs': 'Jobs', 'series': 'Series', 'hardwarecharacteristics': 'HardwareCharacteristics', 'nonce': 'Nonce', 'containertype': 'ContainerType', 'constraints': 'Constraints', 'disks': 'Disks', 'placement': 'Placement', 'instanceid': 'InstanceId', 'parentid': 'ParentId', 'addrs': 'Addrs'}
+    _toPy = {'Constraints': 'constraints', 'InstanceId': 'instanceid', 'ContainerType': 'containertype', 'Nonce': 'nonce', 'Disks': 'disks', 'Addrs': 'addrs', 'HardwareCharacteristics': 'hardwarecharacteristics', 'Series': 'series', 'ParentId': 'parentid', 'Placement': 'placement', 'Jobs': 'jobs'}
     def __init__(self, addrs=None, constraints=None, containertype=None, disks=None, hardwarecharacteristics=None, instanceid=None, jobs=None, nonce=None, parentid=None, placement=None, series=None):
         '''
         addrs : typing.Sequence[~Address]
@@ -799,8 +1235,8 @@ class AddMachinesResults(Type):
 
 
 class Address(Type):
-    _toSchema = {'spacename': 'SpaceName', 'value': 'Value', 'scope': 'Scope', 'type_': 'Type'}
-    _toPy = {'SpaceName': 'spacename', 'Type': 'type_', 'Scope': 'scope', 'Value': 'value'}
+    _toSchema = {'value': 'Value', 'type_': 'Type', 'spacename': 'SpaceName', 'scope': 'Scope'}
+    _toPy = {'Value': 'value', 'Type': 'type_', 'SpaceName': 'spacename', 'Scope': 'scope'}
     def __init__(self, scope=None, spacename=None, type_=None, value=None):
         '''
         scope : str
@@ -815,8 +1251,8 @@ class Address(Type):
 
 
 class AgentVersionResult(Type):
-    _toSchema = {'minor': 'Minor', 'major': 'Major', 'tag': 'Tag', 'patch': 'Patch', 'build': 'Build'}
-    _toPy = {'Tag': 'tag', 'Build': 'build', 'Major': 'major', 'Minor': 'minor', 'Patch': 'patch'}
+    _toSchema = {'minor': 'Minor', 'major': 'Major', 'patch': 'Patch', 'tag': 'Tag', 'build': 'Build'}
+    _toPy = {'Patch': 'patch', 'Major': 'major', 'Minor': 'minor', 'Tag': 'tag', 'Build': 'build'}
     def __init__(self, build=None, major=None, minor=None, patch=None, tag=None):
         '''
         build : int
@@ -842,9 +1278,37 @@ class AllWatcherId(Type):
         self.allwatcherid = allwatcherid
 
 
+class ApplicationStatus(Type):
+    _toSchema = {'charm': 'Charm', 'exposed': 'Exposed', 'err': 'Err', 'meterstatuses': 'MeterStatuses', 'relations': 'Relations', 'units': 'Units', 'life': 'Life', 'canupgradeto': 'CanUpgradeTo', 'subordinateto': 'SubordinateTo', 'status': 'Status'}
+    _toPy = {'Charm': 'charm', 'Err': 'err', 'Units': 'units', 'MeterStatuses': 'meterstatuses', 'CanUpgradeTo': 'canupgradeto', 'Status': 'status', 'SubordinateTo': 'subordinateto', 'Life': 'life', 'Relations': 'relations', 'Exposed': 'exposed'}
+    def __init__(self, canupgradeto=None, charm=None, err=None, exposed=None, life=None, meterstatuses=None, relations=None, status=None, subordinateto=None, units=None):
+        '''
+        canupgradeto : str
+        charm : str
+        err : typing.Mapping[str, typing.Any]
+        exposed : bool
+        life : str
+        meterstatuses : typing.Mapping[str, ~MeterStatus]
+        relations : typing.Sequence[str]
+        status : DetailedStatus
+        subordinateto : typing.Sequence[str]
+        units : typing.Mapping[str, ~UnitStatus]
+        '''
+        self.canupgradeto = canupgradeto
+        self.charm = charm
+        self.err = err
+        self.exposed = exposed
+        self.life = life
+        self.meterstatuses = {k: MeterStatus.from_json(v) for k, v in (meterstatuses or dict()).items()}
+        self.relations = relations
+        self.status = DetailedStatus.from_json(status) if status else None
+        self.subordinateto = subordinateto
+        self.units = {k: UnitStatus.from_json(v) for k, v in (units or dict()).items()}
+
+
 class Binary(Type):
-    _toSchema = {'series': 'Series', 'arch': 'Arch', 'number': 'Number'}
-    _toPy = {'Arch': 'arch', 'Number': 'number', 'Series': 'series'}
+    _toSchema = {'number': 'Number', 'series': 'Series', 'arch': 'Arch'}
+    _toPy = {'Number': 'number', 'Arch': 'arch', 'Series': 'series'}
     def __init__(self, arch=None, number=None, series=None):
         '''
         arch : str
@@ -857,8 +1321,8 @@ class Binary(Type):
 
 
 class BundleChangesChange(Type):
-    _toSchema = {'requires': 'requires', 'args': 'args', 'id_': 'id', 'method': 'method'}
-    _toPy = {'args': 'args', 'id': 'id_', 'method': 'method', 'requires': 'requires'}
+    _toSchema = {'method': 'method', 'args': 'args', 'requires': 'requires', 'id_': 'id'}
+    _toPy = {'method': 'method', 'id': 'id_', 'args': 'args', 'requires': 'requires'}
     def __init__(self, args=None, id_=None, method=None, requires=None):
         '''
         args : typing.Sequence[typing.Any]
@@ -872,23 +1336,9 @@ class BundleChangesChange(Type):
         self.requires = requires
 
 
-class Constraints(Type):
-    _toSchema = {'pool': 'Pool', 'count': 'Count', 'size': 'Size'}
-    _toPy = {'Pool': 'pool', 'Count': 'count', 'Size': 'size'}
-    def __init__(self, count=None, pool=None, size=None):
-        '''
-        count : int
-        pool : str
-        size : int
-        '''
-        self.count = count
-        self.pool = pool
-        self.size = size
-
-
 class DestroyMachines(Type):
     _toSchema = {'force': 'Force', 'machinenames': 'MachineNames'}
-    _toPy = {'MachineNames': 'machinenames', 'Force': 'force'}
+    _toPy = {'Force': 'force', 'MachineNames': 'machinenames'}
     def __init__(self, force=None, machinenames=None):
         '''
         force : bool
@@ -899,8 +1349,8 @@ class DestroyMachines(Type):
 
 
 class DetailedStatus(Type):
-    _toSchema = {'info': 'Info', 'status': 'Status', 'version': 'Version', 'data': 'Data', 'kind': 'Kind', 'since': 'Since', 'err': 'Err', 'life': 'Life'}
-    _toPy = {'Status': 'status', 'Since': 'since', 'Version': 'version', 'Err': 'err', 'Info': 'info', 'Data': 'data', 'Life': 'life', 'Kind': 'kind'}
+    _toSchema = {'since': 'Since', 'data': 'Data', 'life': 'Life', 'version': 'Version', 'err': 'Err', 'kind': 'Kind', 'info': 'Info', 'status': 'Status'}
+    _toPy = {'Err': 'err', 'Data': 'data', 'Since': 'since', 'Status': 'status', 'Info': 'info', 'Life': 'life', 'Version': 'version', 'Kind': 'kind'}
     def __init__(self, data=None, err=None, info=None, kind=None, life=None, since=None, status=None, version=None):
         '''
         data : typing.Mapping[str, typing.Any]
@@ -923,24 +1373,24 @@ class DetailedStatus(Type):
 
 
 class EndpointStatus(Type):
-    _toSchema = {'role': 'Role', 'subordinate': 'Subordinate', 'servicename': 'ServiceName', 'name': 'Name'}
-    _toPy = {'ServiceName': 'servicename', 'Subordinate': 'subordinate', 'Role': 'role', 'Name': 'name'}
-    def __init__(self, name=None, role=None, servicename=None, subordinate=None):
+    _toSchema = {'role': 'Role', 'subordinate': 'Subordinate', 'applicationname': 'ApplicationName', 'name': 'Name'}
+    _toPy = {'Subordinate': 'subordinate', 'Name': 'name', 'Role': 'role', 'ApplicationName': 'applicationname'}
+    def __init__(self, applicationname=None, name=None, role=None, subordinate=None):
         '''
+        applicationname : str
         name : str
         role : str
-        servicename : str
         subordinate : bool
         '''
+        self.applicationname = applicationname
         self.name = name
         self.role = role
-        self.servicename = servicename
         self.subordinate = subordinate
 
 
 class EntityStatus(Type):
-    _toSchema = {'info': 'Info', 'status': 'Status', 'since': 'Since', 'data': 'Data'}
-    _toPy = {'Info': 'info', 'Since': 'since', 'Status': 'status', 'Data': 'data'}
+    _toSchema = {'since': 'Since', 'data': 'Data', 'info': 'Info', 'status': 'Status'}
+    _toPy = {'Since': 'since', 'Status': 'status', 'Data': 'data', 'Info': 'info'}
     def __init__(self, data=None, info=None, since=None, status=None):
         '''
         data : typing.Mapping[str, typing.Any]
@@ -955,8 +1405,8 @@ class EntityStatus(Type):
 
 
 class FindToolsParams(Type):
-    _toSchema = {'minorversion': 'MinorVersion', 'arch': 'Arch', 'number': 'Number', 'majorversion': 'MajorVersion', 'series': 'Series'}
-    _toPy = {'Arch': 'arch', 'MinorVersion': 'minorversion', 'MajorVersion': 'majorversion', 'Number': 'number', 'Series': 'series'}
+    _toSchema = {'minorversion': 'MinorVersion', 'number': 'Number', 'series': 'Series', 'arch': 'Arch', 'majorversion': 'MajorVersion'}
+    _toPy = {'Number': 'number', 'Series': 'series', 'Arch': 'arch', 'MinorVersion': 'minorversion', 'MajorVersion': 'majorversion'}
     def __init__(self, arch=None, majorversion=None, minorversion=None, number=None, series=None):
         '''
         arch : str
@@ -974,7 +1424,7 @@ class FindToolsParams(Type):
 
 class FindToolsResult(Type):
     _toSchema = {'error': 'Error', 'list_': 'List'}
-    _toPy = {'Error': 'error', 'List': 'list_'}
+    _toPy = {'List': 'list_', 'Error': 'error'}
     def __init__(self, error=None, list_=None):
         '''
         error : Error
@@ -985,21 +1435,21 @@ class FindToolsResult(Type):
 
 
 class FullStatus(Type):
-    _toSchema = {'machines': 'Machines', 'modelname': 'ModelName', 'availableversion': 'AvailableVersion', 'relations': 'Relations', 'services': 'Services'}
-    _toPy = {'Services': 'services', 'Relations': 'relations', 'AvailableVersion': 'availableversion', 'ModelName': 'modelname', 'Machines': 'machines'}
-    def __init__(self, availableversion=None, machines=None, modelname=None, relations=None, services=None):
+    _toSchema = {'modelname': 'ModelName', 'availableversion': 'AvailableVersion', 'applications': 'Applications', 'relations': 'Relations', 'machines': 'Machines'}
+    _toPy = {'Applications': 'applications', 'Machines': 'machines', 'AvailableVersion': 'availableversion', 'ModelName': 'modelname', 'Relations': 'relations'}
+    def __init__(self, applications=None, availableversion=None, machines=None, modelname=None, relations=None):
         '''
+        applications : typing.Mapping[str, ~ApplicationStatus]
         availableversion : str
         machines : typing.Mapping[str, ~MachineStatus]
         modelname : str
         relations : typing.Sequence[~RelationStatus]
-        services : typing.Mapping[str, ~ServiceStatus]
         '''
+        self.applications = {k: ApplicationStatus.from_json(v) for k, v in (applications or dict()).items()}
         self.availableversion = availableversion
         self.machines = {k: MachineStatus.from_json(v) for k, v in (machines or dict()).items()}
         self.modelname = modelname
         self.relations = [RelationStatus.from_json(o) for o in relations or []]
-        self.services = {k: ServiceStatus.from_json(v) for k, v in (services or dict()).items()}
 
 
 class GetBundleChangesParams(Type):
@@ -1013,8 +1463,8 @@ class GetBundleChangesParams(Type):
 
 
 class GetBundleChangesResults(Type):
-    _toSchema = {'errors': 'errors', 'changes': 'changes'}
-    _toPy = {'errors': 'errors', 'changes': 'changes'}
+    _toSchema = {'changes': 'changes', 'errors': 'errors'}
+    _toPy = {'changes': 'changes', 'errors': 'errors'}
     def __init__(self, changes=None, errors=None):
         '''
         changes : typing.Sequence[~BundleChangesChange]
@@ -1024,37 +1474,9 @@ class GetBundleChangesResults(Type):
         self.errors = errors
 
 
-class GetConstraintsResults(Type):
-    _toSchema = {'virt_type': 'virt-type', 'mem': 'mem', 'container': 'container', 'instance_type': 'instance-type', 'root_disk': 'root-disk', 'tags': 'tags', 'arch': 'arch', 'cpu_power': 'cpu-power', 'cpu_cores': 'cpu-cores', 'spaces': 'spaces'}
-    _toPy = {'instance-type': 'instance_type', 'root-disk': 'root_disk', 'cpu-power': 'cpu_power', 'mem': 'mem', 'tags': 'tags', 'arch': 'arch', 'spaces': 'spaces', 'virt-type': 'virt_type', 'container': 'container', 'cpu-cores': 'cpu_cores'}
-    def __init__(self, arch=None, container=None, cpu_cores=None, cpu_power=None, instance_type=None, mem=None, root_disk=None, spaces=None, tags=None, virt_type=None):
-        '''
-        arch : str
-        container : str
-        cpu_cores : int
-        cpu_power : int
-        instance_type : str
-        mem : int
-        root_disk : int
-        spaces : typing.Sequence[str]
-        tags : typing.Sequence[str]
-        virt_type : str
-        '''
-        self.arch = arch
-        self.container = container
-        self.cpu_cores = cpu_cores
-        self.cpu_power = cpu_power
-        self.instance_type = instance_type
-        self.mem = mem
-        self.root_disk = root_disk
-        self.spaces = spaces
-        self.tags = tags
-        self.virt_type = virt_type
-
-
 class HardwareCharacteristics(Type):
-    _toSchema = {'tags': 'Tags', 'rootdisk': 'RootDisk', 'arch': 'Arch', 'cpupower': 'CpuPower', 'availabilityzone': 'AvailabilityZone', 'cpucores': 'CpuCores', 'mem': 'Mem'}
-    _toPy = {'RootDisk': 'rootdisk', 'Arch': 'arch', 'CpuCores': 'cpucores', 'Tags': 'tags', 'AvailabilityZone': 'availabilityzone', 'CpuPower': 'cpupower', 'Mem': 'mem'}
+    _toSchema = {'rootdisk': 'RootDisk', 'cpucores': 'CpuCores', 'mem': 'Mem', 'tags': 'Tags', 'arch': 'Arch', 'availabilityzone': 'AvailabilityZone', 'cpupower': 'CpuPower'}
+    _toPy = {'CpuPower': 'cpupower', 'RootDisk': 'rootdisk', 'AvailabilityZone': 'availabilityzone', 'Mem': 'mem', 'CpuCores': 'cpucores', 'Tags': 'tags', 'Arch': 'arch'}
     def __init__(self, arch=None, availabilityzone=None, cpucores=None, cpupower=None, mem=None, rootdisk=None, tags=None):
         '''
         arch : str
@@ -1074,6 +1496,18 @@ class HardwareCharacteristics(Type):
         self.tags = tags
 
 
+class History(Type):
+    _toSchema = {'error': 'Error', 'statuses': 'Statuses'}
+    _toPy = {'Error': 'error', 'Statuses': 'statuses'}
+    def __init__(self, error=None, statuses=None):
+        '''
+        error : Error
+        statuses : typing.Sequence[~DetailedStatus]
+        '''
+        self.error = Error.from_json(error) if error else None
+        self.statuses = [DetailedStatus.from_json(o) for o in statuses or []]
+
+
 class HostPort(Type):
     _toSchema = {'address': 'Address', 'port': 'Port'}
     _toPy = {'Port': 'port', 'Address': 'address'}
@@ -1087,8 +1521,8 @@ class HostPort(Type):
 
 
 class MachineStatus(Type):
-    _toSchema = {'series': 'Series', 'jobs': 'Jobs', 'instanceid': 'InstanceId', 'instancestatus': 'InstanceStatus', 'hasvote': 'HasVote', 'wantsvote': 'WantsVote', 'containers': 'Containers', 'agentstatus': 'AgentStatus', 'dnsname': 'DNSName', 'hardware': 'Hardware', 'id_': 'Id'}
-    _toPy = {'AgentStatus': 'agentstatus', 'InstanceId': 'instanceid', 'HasVote': 'hasvote', 'Series': 'series', 'Hardware': 'hardware', 'DNSName': 'dnsname', 'WantsVote': 'wantsvote', 'Id': 'id_', 'Jobs': 'jobs', 'InstanceStatus': 'instancestatus', 'Containers': 'containers'}
+    _toSchema = {'dnsname': 'DNSName', 'hardware': 'Hardware', 'series': 'Series', 'id_': 'Id', 'hasvote': 'HasVote', 'jobs': 'Jobs', 'containers': 'Containers', 'agentstatus': 'AgentStatus', 'instanceid': 'InstanceId', 'wantsvote': 'WantsVote', 'instancestatus': 'InstanceStatus'}
+    _toPy = {'AgentStatus': 'agentstatus', 'InstanceId': 'instanceid', 'Hardware': 'hardware', 'HasVote': 'hasvote', 'Containers': 'containers', 'Id': 'id_', 'WantsVote': 'wantsvote', 'Series': 'series', 'DNSName': 'dnsname', 'InstanceStatus': 'instancestatus', 'Jobs': 'jobs'}
     def __init__(self, agentstatus=None, containers=None, dnsname=None, hardware=None, hasvote=None, id_=None, instanceid=None, instancestatus=None, jobs=None, series=None, wantsvote=None):
         '''
         agentstatus : DetailedStatus
@@ -1117,7 +1551,7 @@ class MachineStatus(Type):
 
 
 class MeterStatus(Type):
-    _toSchema = {'message': 'Message', 'color': 'Color'}
+    _toSchema = {'color': 'Color', 'message': 'Message'}
     _toPy = {'Message': 'message', 'Color': 'color'}
     def __init__(self, color=None, message=None):
         '''
@@ -1139,10 +1573,11 @@ class ModelConfigResults(Type):
 
 
 class ModelInfo(Type):
-    _toSchema = {'users': 'Users', 'status': 'Status', 'serveruuid': 'ServerUUID', 'uuid': 'UUID', 'name': 'Name', 'providertype': 'ProviderType', 'defaultseries': 'DefaultSeries', 'ownertag': 'OwnerTag', 'life': 'Life'}
-    _toPy = {'Status': 'status', 'UUID': 'uuid', 'OwnerTag': 'ownertag', 'Name': 'name', 'ServerUUID': 'serveruuid', 'DefaultSeries': 'defaultseries', 'Life': 'life', 'Users': 'users', 'ProviderType': 'providertype'}
-    def __init__(self, defaultseries=None, life=None, name=None, ownertag=None, providertype=None, serveruuid=None, status=None, uuid=None, users=None):
+    _toSchema = {'uuid': 'UUID', 'cloud': 'Cloud', 'life': 'Life', 'users': 'Users', 'name': 'Name', 'serveruuid': 'ServerUUID', 'defaultseries': 'DefaultSeries', 'ownertag': 'OwnerTag', 'providertype': 'ProviderType', 'status': 'Status'}
+    _toPy = {'OwnerTag': 'ownertag', 'Cloud': 'cloud', 'DefaultSeries': 'defaultseries', 'Name': 'name', 'UUID': 'uuid', 'Status': 'status', 'ServerUUID': 'serveruuid', 'Users': 'users', 'Life': 'life', 'ProviderType': 'providertype'}
+    def __init__(self, cloud=None, defaultseries=None, life=None, name=None, ownertag=None, providertype=None, serveruuid=None, status=None, uuid=None, users=None):
         '''
+        cloud : str
         defaultseries : str
         life : str
         name : str
@@ -1153,6 +1588,7 @@ class ModelInfo(Type):
         uuid : str
         users : typing.Sequence[~ModelUserInfo]
         '''
+        self.cloud = cloud
         self.defaultseries = defaultseries
         self.life = life
         self.name = name
@@ -1185,8 +1621,8 @@ class ModelUnset(Type):
 
 
 class ModelUserInfo(Type):
-    _toSchema = {'displayname': 'displayname', 'access': 'access', 'user': 'user', 'lastconnection': 'lastconnection'}
-    _toPy = {'displayname': 'displayname', 'access': 'access', 'user': 'user', 'lastconnection': 'lastconnection'}
+    _toSchema = {'displayname': 'displayname', 'user': 'user', 'lastconnection': 'lastconnection', 'access': 'access'}
+    _toPy = {'displayname': 'displayname', 'user': 'user', 'lastconnection': 'lastconnection', 'access': 'access'}
     def __init__(self, access=None, displayname=None, lastconnection=None, user=None):
         '''
         access : str
@@ -1201,8 +1637,8 @@ class ModelUserInfo(Type):
 
 
 class ModelUserInfoResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -1220,18 +1656,6 @@ class ModelUserInfoResults(Type):
         results : typing.Sequence[~ModelUserInfoResult]
         '''
         self.results = [ModelUserInfoResult.from_json(o) for o in results or []]
-
-
-class Placement(Type):
-    _toSchema = {'scope': 'Scope', 'directive': 'Directive'}
-    _toPy = {'Directive': 'directive', 'Scope': 'scope'}
-    def __init__(self, directive=None, scope=None):
-        '''
-        directive : str
-        scope : str
-        '''
-        self.directive = directive
-        self.scope = scope
 
 
 class PrivateAddress(Type):
@@ -1255,8 +1679,8 @@ class PrivateAddressResults(Type):
 
 
 class ProvisioningScriptParams(Type):
-    _toSchema = {'machineid': 'MachineId', 'disablepackagecommands': 'DisablePackageCommands', 'nonce': 'Nonce', 'datadir': 'DataDir'}
-    _toPy = {'Nonce': 'nonce', 'DisablePackageCommands': 'disablepackagecommands', 'MachineId': 'machineid', 'DataDir': 'datadir'}
+    _toSchema = {'disablepackagecommands': 'DisablePackageCommands', 'machineid': 'MachineId', 'datadir': 'DataDir', 'nonce': 'Nonce'}
+    _toPy = {'MachineId': 'machineid', 'DisablePackageCommands': 'disablepackagecommands', 'DataDir': 'datadir', 'Nonce': 'nonce'}
     def __init__(self, datadir=None, disablepackagecommands=None, machineid=None, nonce=None):
         '''
         datadir : str
@@ -1301,8 +1725,8 @@ class PublicAddressResults(Type):
 
 
 class RelationStatus(Type):
-    _toSchema = {'key': 'Key', 'interface': 'Interface', 'scope': 'Scope', 'endpoints': 'Endpoints', 'id_': 'Id'}
-    _toPy = {'Key': 'key', 'Id': 'id_', 'Scope': 'scope', 'Interface': 'interface', 'Endpoints': 'endpoints'}
+    _toSchema = {'key': 'Key', 'endpoints': 'Endpoints', 'scope': 'Scope', 'id_': 'Id', 'interface': 'Interface'}
+    _toPy = {'Key': 'key', 'Interface': 'interface', 'Id': 'id_', 'Endpoints': 'endpoints', 'Scope': 'scope'}
     def __init__(self, endpoints=None, id_=None, interface=None, key=None, scope=None):
         '''
         endpoints : typing.Sequence[~EndpointStatus]
@@ -1320,7 +1744,7 @@ class RelationStatus(Type):
 
 class ResolveCharmResult(Type):
     _toSchema = {'error': 'Error', 'url': 'URL'}
-    _toPy = {'Error': 'error', 'URL': 'url'}
+    _toPy = {'URL': 'url', 'Error': 'error'}
     def __init__(self, error=None, url=None):
         '''
         error : str
@@ -1351,7 +1775,7 @@ class ResolveCharms(Type):
 
 
 class Resolved(Type):
-    _toSchema = {'retry': 'Retry', 'unitname': 'UnitName'}
+    _toSchema = {'unitname': 'UnitName', 'retry': 'Retry'}
     _toPy = {'UnitName': 'unitname', 'Retry': 'retry'}
     def __init__(self, retry=None, unitname=None):
         '''
@@ -1362,49 +1786,9 @@ class Resolved(Type):
         self.unitname = unitname
 
 
-class ServiceStatus(Type):
-    _toSchema = {'units': 'Units', 'charm': 'Charm', 'relations': 'Relations', 'status': 'Status', 'exposed': 'Exposed', 'canupgradeto': 'CanUpgradeTo', 'meterstatuses': 'MeterStatuses', 'subordinateto': 'SubordinateTo', 'life': 'Life', 'err': 'Err'}
-    _toPy = {'Status': 'status', 'Relations': 'relations', 'Exposed': 'exposed', 'Err': 'err', 'SubordinateTo': 'subordinateto', 'Charm': 'charm', 'CanUpgradeTo': 'canupgradeto', 'Units': 'units', 'Life': 'life', 'MeterStatuses': 'meterstatuses'}
-    def __init__(self, canupgradeto=None, charm=None, err=None, exposed=None, life=None, meterstatuses=None, relations=None, status=None, subordinateto=None, units=None):
-        '''
-        canupgradeto : str
-        charm : str
-        err : typing.Mapping[str, typing.Any]
-        exposed : bool
-        life : str
-        meterstatuses : typing.Mapping[str, ~MeterStatus]
-        relations : typing.Sequence[str]
-        status : DetailedStatus
-        subordinateto : typing.Sequence[str]
-        units : typing.Mapping[str, ~UnitStatus]
-        '''
-        self.canupgradeto = canupgradeto
-        self.charm = charm
-        self.err = err
-        self.exposed = exposed
-        self.life = life
-        self.meterstatuses = {k: MeterStatus.from_json(v) for k, v in (meterstatuses or dict()).items()}
-        self.relations = relations
-        self.status = DetailedStatus.from_json(status) if status else None
-        self.subordinateto = subordinateto
-        self.units = {k: UnitStatus.from_json(v) for k, v in (units or dict()).items()}
-
-
-class SetConstraints(Type):
-    _toSchema = {'constraints': 'Constraints', 'servicename': 'ServiceName'}
-    _toPy = {'ServiceName': 'servicename', 'Constraints': 'constraints'}
-    def __init__(self, constraints=None, servicename=None):
-        '''
-        constraints : Value
-        servicename : str
-        '''
-        self.constraints = Value.from_json(constraints) if constraints else None
-        self.servicename = servicename
-
-
 class SetModelAgentVersion(Type):
-    _toSchema = {'minor': 'Minor', 'major': 'Major', 'tag': 'Tag', 'patch': 'Patch', 'build': 'Build'}
-    _toPy = {'Tag': 'tag', 'Build': 'build', 'Major': 'major', 'Minor': 'minor', 'Patch': 'patch'}
+    _toSchema = {'minor': 'Minor', 'major': 'Major', 'patch': 'Patch', 'tag': 'Tag', 'build': 'Build'}
+    _toPy = {'Patch': 'patch', 'Major': 'major', 'Minor': 'minor', 'Tag': 'tag', 'Build': 'build'}
     def __init__(self, build=None, major=None, minor=None, patch=None, tag=None):
         '''
         build : int
@@ -1420,28 +1804,66 @@ class SetModelAgentVersion(Type):
         self.tag = tag
 
 
-class StatusHistoryArgs(Type):
-    _toSchema = {'kind': 'Kind', 'size': 'Size', 'name': 'Name'}
-    _toPy = {'Size': 'size', 'Kind': 'kind', 'Name': 'name'}
-    def __init__(self, kind=None, name=None, size=None):
+class StatusHistoryFilter(Type):
+    _toSchema = {'delta': 'Delta', 'date': 'Date', 'size': 'Size'}
+    _toPy = {'Delta': 'delta', 'Date': 'date', 'Size': 'size'}
+    def __init__(self, date=None, delta=None, size=None):
         '''
-        kind : str
-        name : str
+        date : str
+        delta : int
         size : int
         '''
-        self.kind = kind
-        self.name = name
+        self.date = date
+        self.delta = delta
         self.size = size
 
 
+class StatusHistoryRequest(Type):
+    _toSchema = {'historykind': 'HistoryKind', 'filter_': 'Filter', 'tag': 'Tag', 'size': 'Size'}
+    _toPy = {'Tag': 'tag', 'Size': 'size', 'Filter': 'filter_', 'HistoryKind': 'historykind'}
+    def __init__(self, filter_=None, historykind=None, size=None, tag=None):
+        '''
+        filter_ : StatusHistoryFilter
+        historykind : str
+        size : int
+        tag : str
+        '''
+        self.filter_ = StatusHistoryFilter.from_json(filter_) if filter_ else None
+        self.historykind = historykind
+        self.size = size
+        self.tag = tag
+
+
+class StatusHistoryRequests(Type):
+    _toSchema = {'requests': 'Requests'}
+    _toPy = {'Requests': 'requests'}
+    def __init__(self, requests=None):
+        '''
+        requests : typing.Sequence[~StatusHistoryRequest]
+        '''
+        self.requests = [StatusHistoryRequest.from_json(o) for o in requests or []]
+
+
+class StatusHistoryResult(Type):
+    _toSchema = {'history': 'History', 'error': 'Error'}
+    _toPy = {'History': 'history', 'Error': 'error'}
+    def __init__(self, error=None, history=None):
+        '''
+        error : Error
+        history : History
+        '''
+        self.error = Error.from_json(error) if error else None
+        self.history = History.from_json(history) if history else None
+
+
 class StatusHistoryResults(Type):
-    _toSchema = {'statuses': 'Statuses'}
-    _toPy = {'Statuses': 'statuses'}
-    def __init__(self, statuses=None):
+    _toSchema = {'results': 'Results'}
+    _toPy = {'Results': 'results'}
+    def __init__(self, results=None):
         '''
-        statuses : typing.Sequence[~DetailedStatus]
+        results : typing.Sequence[~StatusHistoryResult]
         '''
-        self.statuses = [DetailedStatus.from_json(o) for o in statuses or []]
+        self.results = [StatusHistoryResult.from_json(o) for o in results or []]
 
 
 class StatusParams(Type):
@@ -1455,8 +1877,8 @@ class StatusParams(Type):
 
 
 class Tools(Type):
-    _toSchema = {'url': 'url', 'version': 'version', 'size': 'size', 'sha256': 'sha256'}
-    _toPy = {'url': 'url', 'version': 'version', 'size': 'size', 'sha256': 'sha256'}
+    _toSchema = {'sha256': 'sha256', 'url': 'url', 'size': 'size', 'version': 'version'}
+    _toPy = {'sha256': 'sha256', 'url': 'url', 'size': 'size', 'version': 'version'}
     def __init__(self, sha256=None, size=None, url=None, version=None):
         '''
         sha256 : str
@@ -1471,8 +1893,8 @@ class Tools(Type):
 
 
 class URL(Type):
-    _toSchema = {'series': 'Series', 'channel': 'Channel', 'schema': 'Schema', 'revision': 'Revision', 'name': 'Name', 'user': 'User'}
-    _toPy = {'Schema': 'schema', 'Name': 'name', 'Channel': 'channel', 'User': 'user', 'Revision': 'revision', 'Series': 'series'}
+    _toSchema = {'revision': 'Revision', 'series': 'Series', 'schema': 'Schema', 'channel': 'Channel', 'name': 'Name', 'user': 'User'}
+    _toPy = {'Name': 'name', 'Revision': 'revision', 'User': 'user', 'Schema': 'schema', 'Channel': 'channel', 'Series': 'series'}
     def __init__(self, channel=None, name=None, revision=None, schema=None, series=None, user=None):
         '''
         channel : str
@@ -1491,8 +1913,8 @@ class URL(Type):
 
 
 class UnitStatus(Type):
-    _toSchema = {'charm': 'Charm', 'subordinates': 'Subordinates', 'workloadstatus': 'WorkloadStatus', 'machine': 'Machine', 'openedports': 'OpenedPorts', 'agentstatus': 'AgentStatus', 'publicaddress': 'PublicAddress'}
-    _toPy = {'AgentStatus': 'agentstatus', 'Machine': 'machine', 'Charm': 'charm', 'Subordinates': 'subordinates', 'PublicAddress': 'publicaddress', 'WorkloadStatus': 'workloadstatus', 'OpenedPorts': 'openedports'}
+    _toSchema = {'charm': 'Charm', 'publicaddress': 'PublicAddress', 'openedports': 'OpenedPorts', 'agentstatus': 'AgentStatus', 'subordinates': 'Subordinates', 'workloadstatus': 'WorkloadStatus', 'machine': 'Machine'}
+    _toPy = {'AgentStatus': 'agentstatus', 'Charm': 'charm', 'OpenedPorts': 'openedports', 'WorkloadStatus': 'workloadstatus', 'PublicAddress': 'publicaddress', 'Machine': 'machine', 'Subordinates': 'subordinates'}
     def __init__(self, agentstatus=None, charm=None, machine=None, openedports=None, publicaddress=None, subordinates=None, workloadstatus=None):
         '''
         agentstatus : DetailedStatus
@@ -1510,34 +1932,6 @@ class UnitStatus(Type):
         self.publicaddress = publicaddress
         self.subordinates = {k: UnitStatus.from_json(v) for k, v in (subordinates or dict()).items()}
         self.workloadstatus = DetailedStatus.from_json(workloadstatus) if workloadstatus else None
-
-
-class Value(Type):
-    _toSchema = {'virt_type': 'virt-type', 'mem': 'mem', 'container': 'container', 'instance_type': 'instance-type', 'root_disk': 'root-disk', 'tags': 'tags', 'arch': 'arch', 'cpu_power': 'cpu-power', 'cpu_cores': 'cpu-cores', 'spaces': 'spaces'}
-    _toPy = {'instance-type': 'instance_type', 'root-disk': 'root_disk', 'cpu-power': 'cpu_power', 'mem': 'mem', 'tags': 'tags', 'arch': 'arch', 'spaces': 'spaces', 'virt-type': 'virt_type', 'container': 'container', 'cpu-cores': 'cpu_cores'}
-    def __init__(self, arch=None, container=None, cpu_cores=None, cpu_power=None, instance_type=None, mem=None, root_disk=None, spaces=None, tags=None, virt_type=None):
-        '''
-        arch : str
-        container : str
-        cpu_cores : int
-        cpu_power : int
-        instance_type : str
-        mem : int
-        root_disk : int
-        spaces : typing.Sequence[str]
-        tags : typing.Sequence[str]
-        virt_type : str
-        '''
-        self.arch = arch
-        self.container = container
-        self.cpu_cores = cpu_cores
-        self.cpu_power = cpu_power
-        self.instance_type = instance_type
-        self.mem = mem
-        self.root_disk = root_disk
-        self.spaces = spaces
-        self.tags = tags
-        self.virt_type = virt_type
 
 
 class DestroyControllerArgs(Type):
@@ -1561,8 +1955,8 @@ class InitiateModelMigrationArgs(Type):
 
 
 class InitiateModelMigrationResult(Type):
-    _toSchema = {'error': 'error', 'id_': 'id', 'model_tag': 'model-tag'}
-    _toPy = {'model-tag': 'model_tag', 'error': 'error', 'id': 'id_'}
+    _toSchema = {'id_': 'id', 'model_tag': 'model-tag', 'error': 'error'}
+    _toPy = {'id': 'id_', 'error': 'error', 'model-tag': 'model_tag'}
     def __init__(self, error=None, id_=None, model_tag=None):
         '''
         error : Error
@@ -1585,8 +1979,8 @@ class InitiateModelMigrationResults(Type):
 
 
 class Model(Type):
-    _toSchema = {'ownertag': 'OwnerTag', 'uuid': 'UUID', 'name': 'Name'}
-    _toPy = {'UUID': 'uuid', 'OwnerTag': 'ownertag', 'Name': 'name'}
+    _toSchema = {'uuid': 'UUID', 'ownertag': 'OwnerTag', 'name': 'Name'}
+    _toPy = {'OwnerTag': 'ownertag', 'Name': 'name', 'UUID': 'uuid'}
     def __init__(self, name=None, ownertag=None, uuid=None):
         '''
         name : str
@@ -1599,8 +1993,8 @@ class Model(Type):
 
 
 class ModelBlockInfo(Type):
-    _toSchema = {'model_uuid': 'model-uuid', 'owner_tag': 'owner-tag', 'blocks': 'blocks', 'name': 'name'}
-    _toPy = {'model-uuid': 'model_uuid', 'blocks': 'blocks', 'owner-tag': 'owner_tag', 'name': 'name'}
+    _toSchema = {'blocks': 'blocks', 'model_uuid': 'model-uuid', 'owner_tag': 'owner-tag', 'name': 'name'}
+    _toPy = {'owner-tag': 'owner_tag', 'blocks': 'blocks', 'model-uuid': 'model_uuid', 'name': 'name'}
     def __init__(self, blocks=None, model_uuid=None, name=None, owner_tag=None):
         '''
         blocks : typing.Sequence[str]
@@ -1637,8 +2031,8 @@ class ModelMigrationSpec(Type):
 
 
 class ModelMigrationTargetInfo(Type):
-    _toSchema = {'auth_tag': 'auth-tag', 'password': 'password', 'controller_tag': 'controller-tag', 'ca_cert': 'ca-cert', 'addrs': 'addrs'}
-    _toPy = {'password': 'password', 'auth-tag': 'auth_tag', 'ca-cert': 'ca_cert', 'controller-tag': 'controller_tag', 'addrs': 'addrs'}
+    _toSchema = {'auth_tag': 'auth-tag', 'ca_cert': 'ca-cert', 'controller_tag': 'controller-tag', 'password': 'password', 'addrs': 'addrs'}
+    _toPy = {'ca-cert': 'ca_cert', 'auth-tag': 'auth_tag', 'password': 'password', 'controller-tag': 'controller_tag', 'addrs': 'addrs'}
     def __init__(self, addrs=None, auth_tag=None, ca_cert=None, controller_tag=None, password=None):
         '''
         addrs : typing.Sequence[str]
@@ -1655,21 +2049,21 @@ class ModelMigrationTargetInfo(Type):
 
 
 class ModelStatus(Type):
-    _toSchema = {'hosted_machine_count': 'hosted-machine-count', 'service_count': 'service-count', 'life': 'life', 'model_tag': 'model-tag', 'owner_tag': 'owner-tag'}
-    _toPy = {'model-tag': 'model_tag', 'service-count': 'service_count', 'life': 'life', 'hosted-machine-count': 'hosted_machine_count', 'owner-tag': 'owner_tag'}
-    def __init__(self, hosted_machine_count=None, life=None, model_tag=None, owner_tag=None, service_count=None):
+    _toSchema = {'model_tag': 'model-tag', 'life': 'life', 'application_count': 'application-count', 'hosted_machine_count': 'hosted-machine-count', 'owner_tag': 'owner-tag'}
+    _toPy = {'life': 'life', 'application-count': 'application_count', 'hosted-machine-count': 'hosted_machine_count', 'model-tag': 'model_tag', 'owner-tag': 'owner_tag'}
+    def __init__(self, application_count=None, hosted_machine_count=None, life=None, model_tag=None, owner_tag=None):
         '''
+        application_count : int
         hosted_machine_count : int
         life : str
         model_tag : str
         owner_tag : str
-        service_count : int
         '''
+        self.application_count = application_count
         self.hosted_machine_count = hosted_machine_count
         self.life = life
         self.model_tag = model_tag
         self.owner_tag = owner_tag
-        self.service_count = service_count
 
 
 class ModelStatusResults(Type):
@@ -1694,7 +2088,7 @@ class RemoveBlocksArgs(Type):
 
 class UserModel(Type):
     _toSchema = {'model': 'Model', 'lastconnection': 'LastConnection'}
-    _toPy = {'LastConnection': 'lastconnection', 'Model': 'model'}
+    _toPy = {'Model': 'model', 'LastConnection': 'lastconnection'}
     def __init__(self, lastconnection=None, model=None):
         '''
         lastconnection : str
@@ -1725,7 +2119,7 @@ class BytesResult(Type):
 
 
 class DeployerConnectionValues(Type):
-    _toSchema = {'apiaddresses': 'APIAddresses', 'stateaddresses': 'StateAddresses'}
+    _toSchema = {'stateaddresses': 'StateAddresses', 'apiaddresses': 'APIAddresses'}
     _toPy = {'StateAddresses': 'stateaddresses', 'APIAddresses': 'apiaddresses'}
     def __init__(self, apiaddresses=None, stateaddresses=None):
         '''
@@ -1737,8 +2131,8 @@ class DeployerConnectionValues(Type):
 
 
 class LifeResult(Type):
-    _toSchema = {'error': 'Error', 'life': 'Life'}
-    _toPy = {'Error': 'error', 'Life': 'life'}
+    _toSchema = {'life': 'Life', 'error': 'Error'}
+    _toPy = {'Life': 'life', 'Error': 'error'}
     def __init__(self, error=None, life=None):
         '''
         error : Error
@@ -1758,21 +2152,9 @@ class LifeResults(Type):
         self.results = [LifeResult.from_json(o) for o in results or []]
 
 
-class StringResult(Type):
-    _toSchema = {'error': 'Error', 'result': 'Result'}
-    _toPy = {'Error': 'error', 'Result': 'result'}
-    def __init__(self, error=None, result=None):
-        '''
-        error : Error
-        result : str
-        '''
-        self.error = Error.from_json(error) if error else None
-        self.result = result
-
-
 class StringsResult(Type):
-    _toSchema = {'error': 'Error', 'result': 'Result'}
-    _toPy = {'Error': 'error', 'Result': 'result'}
+    _toSchema = {'result': 'Result', 'error': 'Error'}
+    _toPy = {'Result': 'result', 'Error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -1780,20 +2162,6 @@ class StringsResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = result
-
-
-class StringsWatchResult(Type):
-    _toSchema = {'changes': 'Changes', 'stringswatcherid': 'StringsWatcherId', 'error': 'Error'}
-    _toPy = {'Changes': 'changes', 'Error': 'error', 'StringsWatcherId': 'stringswatcherid'}
-    def __init__(self, changes=None, error=None, stringswatcherid=None):
-        '''
-        changes : typing.Sequence[str]
-        error : Error
-        stringswatcherid : str
-        '''
-        self.changes = changes
-        self.error = Error.from_json(error) if error else None
-        self.stringswatcherid = stringswatcherid
 
 
 class StringsWatchResults(Type):
@@ -1807,8 +2175,8 @@ class StringsWatchResults(Type):
 
 
 class AddSubnetParams(Type):
-    _toSchema = {'subnettag': 'SubnetTag', 'zones': 'Zones', 'subnetproviderid': 'SubnetProviderId', 'spacetag': 'SpaceTag'}
-    _toPy = {'SpaceTag': 'spacetag', 'SubnetProviderId': 'subnetproviderid', 'SubnetTag': 'subnettag', 'Zones': 'zones'}
+    _toSchema = {'subnetproviderid': 'SubnetProviderId', 'spacetag': 'SpaceTag', 'subnettag': 'SubnetTag', 'zones': 'Zones'}
+    _toPy = {'SubnetTag': 'subnettag', 'SpaceTag': 'spacetag', 'Zones': 'zones', 'SubnetProviderId': 'subnetproviderid'}
     def __init__(self, spacetag=None, subnetproviderid=None, subnettag=None, zones=None):
         '''
         spacetag : str
@@ -1833,8 +2201,8 @@ class AddSubnetsParams(Type):
 
 
 class CreateSpaceParams(Type):
-    _toSchema = {'public': 'Public', 'subnettags': 'SubnetTags', 'providerid': 'ProviderId', 'spacetag': 'SpaceTag'}
-    _toPy = {'ProviderId': 'providerid', 'Public': 'public', 'SpaceTag': 'spacetag', 'SubnetTags': 'subnettags'}
+    _toSchema = {'providerid': 'ProviderId', 'public': 'Public', 'spacetag': 'SpaceTag', 'subnettags': 'SubnetTags'}
+    _toPy = {'Public': 'public', 'SpaceTag': 'spacetag', 'SubnetTags': 'subnettags', 'ProviderId': 'providerid'}
     def __init__(self, providerid=None, public=None, spacetag=None, subnettags=None):
         '''
         providerid : str
@@ -1879,8 +2247,8 @@ class ListSubnetsResults(Type):
 
 
 class ProviderSpace(Type):
-    _toSchema = {'subnets': 'Subnets', 'error': 'Error', 'providerid': 'ProviderId', 'name': 'Name'}
-    _toPy = {'ProviderId': 'providerid', 'Error': 'error', 'Subnets': 'subnets', 'Name': 'name'}
+    _toSchema = {'providerid': 'ProviderId', 'subnets': 'Subnets', 'error': 'Error', 'name': 'Name'}
+    _toPy = {'ProviderId': 'providerid', 'Subnets': 'subnets', 'Error': 'error', 'Name': 'name'}
     def __init__(self, error=None, name=None, providerid=None, subnets=None):
         '''
         error : Error
@@ -1895,8 +2263,8 @@ class ProviderSpace(Type):
 
 
 class Subnet(Type):
-    _toSchema = {'zones': 'Zones', 'vlantag': 'VLANTag', 'staticrangelowip': 'StaticRangeLowIP', 'providerid': 'ProviderId', 'spacetag': 'SpaceTag', 'status': 'Status', 'staticrangehighip': 'StaticRangeHighIP', 'life': 'Life', 'cidr': 'CIDR'}
-    _toPy = {'ProviderId': 'providerid', 'SpaceTag': 'spacetag', 'StaticRangeLowIP': 'staticrangelowip', 'StaticRangeHighIP': 'staticrangehighip', 'Status': 'status', 'CIDR': 'cidr', 'Life': 'life', 'VLANTag': 'vlantag', 'Zones': 'zones'}
+    _toSchema = {'staticrangelowip': 'StaticRangeLowIP', 'spacetag': 'SpaceTag', 'cidr': 'CIDR', 'providerid': 'ProviderId', 'life': 'Life', 'staticrangehighip': 'StaticRangeHighIP', 'zones': 'Zones', 'vlantag': 'VLANTag', 'status': 'Status'}
+    _toPy = {'StaticRangeHighIP': 'staticrangehighip', 'VLANTag': 'vlantag', 'Zones': 'zones', 'SpaceTag': 'spacetag', 'Life': 'life', 'Status': 'status', 'ProviderId': 'providerid', 'StaticRangeLowIP': 'staticrangelowip', 'CIDR': 'cidr'}
     def __init__(self, cidr=None, life=None, providerid=None, spacetag=None, staticrangehighip=None, staticrangelowip=None, status=None, vlantag=None, zones=None):
         '''
         cidr : str
@@ -1921,7 +2289,7 @@ class Subnet(Type):
 
 
 class SubnetsFilters(Type):
-    _toSchema = {'zone': 'Zone', 'spacetag': 'SpaceTag'}
+    _toSchema = {'spacetag': 'SpaceTag', 'zone': 'Zone'}
     _toPy = {'SpaceTag': 'spacetag', 'Zone': 'zone'}
     def __init__(self, spacetag=None, zone=None):
         '''
@@ -1933,8 +2301,8 @@ class SubnetsFilters(Type):
 
 
 class BlockDevice(Type):
-    _toSchema = {'devicename': 'DeviceName', 'hardwareid': 'HardwareId', 'inuse': 'InUse', 'uuid': 'UUID', 'mountpoint': 'MountPoint', 'filesystemtype': 'FilesystemType', 'label': 'Label', 'devicelinks': 'DeviceLinks', 'size': 'Size', 'busaddress': 'BusAddress'}
-    _toPy = {'DeviceLinks': 'devicelinks', 'BusAddress': 'busaddress', 'Size': 'size', 'Label': 'label', 'InUse': 'inuse', 'HardwareId': 'hardwareid', 'UUID': 'uuid', 'DeviceName': 'devicename', 'FilesystemType': 'filesystemtype', 'MountPoint': 'mountpoint'}
+    _toSchema = {'inuse': 'InUse', 'busaddress': 'BusAddress', 'devicename': 'DeviceName', 'size': 'Size', 'filesystemtype': 'FilesystemType', 'uuid': 'UUID', 'hardwareid': 'HardwareId', 'label': 'Label', 'mountpoint': 'MountPoint', 'devicelinks': 'DeviceLinks'}
+    _toPy = {'FilesystemType': 'filesystemtype', 'Label': 'label', 'Size': 'size', 'UUID': 'uuid', 'MountPoint': 'mountpoint', 'BusAddress': 'busaddress', 'InUse': 'inuse', 'DeviceName': 'devicename', 'DeviceLinks': 'devicelinks', 'HardwareId': 'hardwareid'}
     def __init__(self, busaddress=None, devicelinks=None, devicename=None, filesystemtype=None, hardwareid=None, inuse=None, label=None, mountpoint=None, size=None, uuid=None):
         '''
         busaddress : str
@@ -1961,8 +2329,8 @@ class BlockDevice(Type):
 
 
 class MachineBlockDevices(Type):
-    _toSchema = {'machine': 'machine', 'blockdevices': 'blockdevices'}
-    _toPy = {'machine': 'machine', 'blockdevices': 'blockdevices'}
+    _toSchema = {'blockdevices': 'blockdevices', 'machine': 'machine'}
+    _toPy = {'blockdevices': 'blockdevices', 'machine': 'machine'}
     def __init__(self, blockdevices=None, machine=None):
         '''
         blockdevices : typing.Sequence[~BlockDevice]
@@ -1983,8 +2351,8 @@ class SetMachineBlockDevices(Type):
 
 
 class MachineStorageId(Type):
-    _toSchema = {'machinetag': 'machinetag', 'attachmenttag': 'attachmenttag'}
-    _toPy = {'machinetag': 'machinetag', 'attachmenttag': 'attachmenttag'}
+    _toSchema = {'attachmenttag': 'attachmenttag', 'machinetag': 'machinetag'}
+    _toPy = {'attachmenttag': 'attachmenttag', 'machinetag': 'machinetag'}
     def __init__(self, attachmenttag=None, machinetag=None):
         '''
         attachmenttag : str
@@ -1995,7 +2363,7 @@ class MachineStorageId(Type):
 
 
 class MachineStorageIdsWatchResult(Type):
-    _toSchema = {'machinestorageidswatcherid': 'MachineStorageIdsWatcherId', 'changes': 'Changes', 'error': 'Error'}
+    _toSchema = {'changes': 'Changes', 'machinestorageidswatcherid': 'MachineStorageIdsWatcherId', 'error': 'Error'}
     _toPy = {'Changes': 'changes', 'Error': 'error', 'MachineStorageIdsWatcherId': 'machinestorageidswatcherid'}
     def __init__(self, changes=None, error=None, machinestorageidswatcherid=None):
         '''
@@ -2019,7 +2387,7 @@ class BoolResults(Type):
 
 
 class MachinePortRange(Type):
-    _toSchema = {'unittag': 'UnitTag', 'relationtag': 'RelationTag', 'portrange': 'PortRange'}
+    _toSchema = {'unittag': 'UnitTag', 'portrange': 'PortRange', 'relationtag': 'RelationTag'}
     _toPy = {'RelationTag': 'relationtag', 'UnitTag': 'unittag', 'PortRange': 'portrange'}
     def __init__(self, portrange=None, relationtag=None, unittag=None):
         '''
@@ -2033,7 +2401,7 @@ class MachinePortRange(Type):
 
 
 class MachinePorts(Type):
-    _toSchema = {'machinetag': 'MachineTag', 'subnettag': 'SubnetTag'}
+    _toSchema = {'subnettag': 'SubnetTag', 'machinetag': 'MachineTag'}
     _toPy = {'MachineTag': 'machinetag', 'SubnetTag': 'subnettag'}
     def __init__(self, machinetag=None, subnettag=None):
         '''
@@ -2055,7 +2423,7 @@ class MachinePortsParams(Type):
 
 
 class MachinePortsResult(Type):
-    _toSchema = {'error': 'Error', 'ports': 'Ports'}
+    _toSchema = {'ports': 'Ports', 'error': 'Error'}
     _toPy = {'Error': 'error', 'Ports': 'ports'}
     def __init__(self, error=None, ports=None):
         '''
@@ -2087,8 +2455,8 @@ class NotifyWatchResults(Type):
 
 
 class PortRange(Type):
-    _toSchema = {'protocol': 'Protocol', 'fromport': 'FromPort', 'toport': 'ToPort'}
-    _toPy = {'ToPort': 'toport', 'Protocol': 'protocol', 'FromPort': 'fromport'}
+    _toSchema = {'toport': 'ToPort', 'fromport': 'FromPort', 'protocol': 'Protocol'}
+    _toPy = {'FromPort': 'fromport', 'Protocol': 'protocol', 'ToPort': 'toport'}
     def __init__(self, fromport=None, protocol=None, toport=None):
         '''
         fromport : int
@@ -2121,8 +2489,8 @@ class StringsResults(Type):
 
 
 class ControllersChangeResult(Type):
-    _toSchema = {'error': 'Error', 'result': 'Result'}
-    _toPy = {'Error': 'error', 'Result': 'result'}
+    _toSchema = {'result': 'Result', 'error': 'Error'}
+    _toPy = {'Result': 'result', 'Error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -2143,8 +2511,8 @@ class ControllersChangeResults(Type):
 
 
 class ControllersChanges(Type):
-    _toSchema = {'added': 'added', 'maintained': 'maintained', 'promoted': 'promoted', 'removed': 'removed', 'demoted': 'demoted', 'converted': 'converted'}
-    _toPy = {'added': 'added', 'maintained': 'maintained', 'promoted': 'promoted', 'removed': 'removed', 'demoted': 'demoted', 'converted': 'converted'}
+    _toSchema = {'maintained': 'maintained', 'added': 'added', 'removed': 'removed', 'promoted': 'promoted', 'converted': 'converted', 'demoted': 'demoted'}
+    _toPy = {'maintained': 'maintained', 'added': 'added', 'removed': 'removed', 'promoted': 'promoted', 'converted': 'converted', 'demoted': 'demoted'}
     def __init__(self, added=None, converted=None, demoted=None, maintained=None, promoted=None, removed=None):
         '''
         added : typing.Sequence[str]
@@ -2163,8 +2531,8 @@ class ControllersChanges(Type):
 
 
 class ControllersSpec(Type):
-    _toSchema = {'modeltag': 'ModelTag', 'num_controllers': 'num-controllers', 'constraints': 'constraints', 'placement': 'placement', 'series': 'series'}
-    _toPy = {'num-controllers': 'num_controllers', 'ModelTag': 'modeltag', 'constraints': 'constraints', 'placement': 'placement', 'series': 'series'}
+    _toSchema = {'constraints': 'constraints', 'modeltag': 'ModelTag', 'num_controllers': 'num-controllers', 'placement': 'placement', 'series': 'series'}
+    _toPy = {'ModelTag': 'modeltag', 'series': 'series', 'num-controllers': 'num_controllers', 'placement': 'placement', 'constraints': 'constraints'}
     def __init__(self, modeltag=None, constraints=None, num_controllers=None, placement=None, series=None):
         '''
         modeltag : str
@@ -2191,7 +2559,7 @@ class ControllersSpecs(Type):
 
 
 class HAMember(Type):
-    _toSchema = {'series': 'Series', 'publicaddress': 'PublicAddress', 'tag': 'Tag'}
+    _toSchema = {'publicaddress': 'PublicAddress', 'series': 'Series', 'tag': 'Tag'}
     _toPy = {'Tag': 'tag', 'PublicAddress': 'publicaddress', 'Series': 'series'}
     def __init__(self, publicaddress=None, series=None, tag=None):
         '''
@@ -2205,8 +2573,8 @@ class HAMember(Type):
 
 
 class Member(Type):
-    _toSchema = {'hidden': 'Hidden', 'tags': 'Tags', 'buildindexes': 'BuildIndexes', 'address': 'Address', 'slavedelay': 'SlaveDelay', 'votes': 'Votes', 'id_': 'Id', 'arbiter': 'Arbiter', 'priority': 'Priority'}
-    _toPy = {'Tags': 'tags', 'SlaveDelay': 'slavedelay', 'Votes': 'votes', 'Arbiter': 'arbiter', 'Address': 'address', 'Hidden': 'hidden', 'Priority': 'priority', 'BuildIndexes': 'buildindexes', 'Id': 'id_'}
+    _toSchema = {'priority': 'Priority', 'slavedelay': 'SlaveDelay', 'id_': 'Id', 'hidden': 'Hidden', 'votes': 'Votes', 'buildindexes': 'BuildIndexes', 'address': 'Address', 'tags': 'Tags', 'arbiter': 'Arbiter'}
+    _toPy = {'Hidden': 'hidden', 'Priority': 'priority', 'SlaveDelay': 'slavedelay', 'Id': 'id_', 'Arbiter': 'arbiter', 'Votes': 'votes', 'Tags': 'tags', 'Address': 'address', 'BuildIndexes': 'buildindexes'}
     def __init__(self, address=None, arbiter=None, buildindexes=None, hidden=None, id_=None, priority=None, slavedelay=None, tags=None, votes=None):
         '''
         address : str
@@ -2255,8 +2623,8 @@ class ResumeReplicationParams(Type):
 
 
 class UpgradeMongoParams(Type):
-    _toSchema = {'minor': 'Minor', 'major': 'Major', 'storageengine': 'StorageEngine', 'patch': 'Patch'}
-    _toPy = {'StorageEngine': 'storageengine', 'Major': 'major', 'Minor': 'minor', 'Patch': 'patch'}
+    _toSchema = {'minor': 'Minor', 'storageengine': 'StorageEngine', 'patch': 'Patch', 'major': 'Major'}
+    _toPy = {'Patch': 'patch', 'Major': 'major', 'StorageEngine': 'storageengine', 'Minor': 'minor'}
     def __init__(self, major=None, minor=None, patch=None, storageengine=None):
         '''
         major : int
@@ -2271,8 +2639,8 @@ class UpgradeMongoParams(Type):
 
 
 class Version(Type):
-    _toSchema = {'minor': 'Minor', 'major': 'Major', 'storageengine': 'StorageEngine', 'patch': 'Patch'}
-    _toPy = {'StorageEngine': 'storageengine', 'Major': 'major', 'Minor': 'minor', 'Patch': 'patch'}
+    _toSchema = {'minor': 'Minor', 'storageengine': 'StorageEngine', 'patch': 'Patch', 'major': 'Major'}
+    _toPy = {'Patch': 'patch', 'Major': 'major', 'StorageEngine': 'storageengine', 'Minor': 'minor'}
     def __init__(self, major=None, minor=None, patch=None, storageengine=None):
         '''
         major : int
@@ -2297,7 +2665,7 @@ class SSHHostKeySet(Type):
 
 
 class SSHHostKeys(Type):
-    _toSchema = {'tag': 'tag', 'public_keys': 'public-keys'}
+    _toSchema = {'public_keys': 'public-keys', 'tag': 'tag'}
     _toPy = {'public-keys': 'public_keys', 'tag': 'tag'}
     def __init__(self, public_keys=None, tag=None):
         '''
@@ -2319,8 +2687,8 @@ class ImageFilterParams(Type):
 
 
 class ImageMetadata(Type):
-    _toSchema = {'series': 'series', 'arch': 'arch', 'kind': 'kind', 'created': 'created', 'url': 'url'}
-    _toPy = {'series': 'series', 'arch': 'arch', 'kind': 'kind', 'created': 'created', 'url': 'url'}
+    _toSchema = {'created': 'created', 'arch': 'arch', 'kind': 'kind', 'series': 'series', 'url': 'url'}
+    _toPy = {'created': 'created', 'arch': 'arch', 'kind': 'kind', 'series': 'series', 'url': 'url'}
     def __init__(self, arch=None, created=None, kind=None, series=None, url=None):
         '''
         arch : str
@@ -2361,8 +2729,8 @@ class ListImageResult(Type):
 
 
 class CloudImageMetadata(Type):
-    _toSchema = {'root_storage_type': 'root_storage_type', 'virt_type': 'virt_type', 'version': 'version', 'image_id': 'image_id', 'series': 'series', 'source': 'source', 'root_storage_size': 'root_storage_size', 'arch': 'arch', 'stream': 'stream', 'region': 'region', 'priority': 'priority'}
-    _toPy = {'root_storage_type': 'root_storage_type', 'virt_type': 'virt_type', 'version': 'version', 'image_id': 'image_id', 'series': 'series', 'source': 'source', 'root_storage_size': 'root_storage_size', 'arch': 'arch', 'stream': 'stream', 'region': 'region', 'priority': 'priority'}
+    _toSchema = {'image_id': 'image_id', 'priority': 'priority', 'series': 'series', 'region': 'region', 'virt_type': 'virt_type', 'version': 'version', 'root_storage_size': 'root_storage_size', 'stream': 'stream', 'arch': 'arch', 'source': 'source', 'root_storage_type': 'root_storage_type'}
+    _toPy = {'image_id': 'image_id', 'priority': 'priority', 'series': 'series', 'region': 'region', 'virt_type': 'virt_type', 'version': 'version', 'root_storage_size': 'root_storage_size', 'stream': 'stream', 'arch': 'arch', 'source': 'source', 'root_storage_type': 'root_storage_type'}
     def __init__(self, arch=None, image_id=None, priority=None, region=None, root_storage_size=None, root_storage_type=None, series=None, source=None, stream=None, version=None, virt_type=None):
         '''
         arch : str
@@ -2401,8 +2769,8 @@ class CloudImageMetadataList(Type):
 
 
 class ImageMetadataFilter(Type):
-    _toSchema = {'series': 'series', 'virt_type': 'virt_type', 'stream': 'stream', 'arches': 'arches', 'root_storage_type': 'root-storage-type', 'region': 'region'}
-    _toPy = {'arches': 'arches', 'virt_type': 'virt_type', 'stream': 'stream', 'series': 'series', 'root-storage-type': 'root_storage_type', 'region': 'region'}
+    _toSchema = {'virt_type': 'virt_type', 'series': 'series', 'region': 'region', 'arches': 'arches', 'stream': 'stream', 'root_storage_type': 'root-storage-type'}
+    _toPy = {'virt_type': 'virt_type', 'series': 'series', 'region': 'region', 'arches': 'arches', 'stream': 'stream', 'root-storage-type': 'root_storage_type'}
     def __init__(self, arches=None, region=None, root_storage_type=None, series=None, stream=None, virt_type=None):
         '''
         arches : typing.Sequence[str]
@@ -2451,8 +2819,8 @@ class MetadataSaveParams(Type):
 
 
 class EntityStatusArgs(Type):
-    _toSchema = {'info': 'Info', 'status': 'Status', 'tag': 'Tag', 'data': 'Data'}
-    _toPy = {'Info': 'info', 'Status': 'status', 'Tag': 'tag', 'Data': 'data'}
+    _toSchema = {'data': 'Data', 'tag': 'Tag', 'info': 'Info', 'status': 'Status'}
+    _toPy = {'Tag': 'tag', 'Status': 'status', 'Data': 'data', 'Info': 'info'}
     def __init__(self, data=None, info=None, status=None, tag=None):
         '''
         data : typing.Mapping[str, typing.Any]
@@ -2468,7 +2836,7 @@ class EntityStatusArgs(Type):
 
 class MachineAddresses(Type):
     _toSchema = {'addresses': 'Addresses', 'tag': 'Tag'}
-    _toPy = {'Tag': 'tag', 'Addresses': 'addresses'}
+    _toPy = {'Addresses': 'addresses', 'Tag': 'tag'}
     def __init__(self, addresses=None, tag=None):
         '''
         addresses : typing.Sequence[~Address]
@@ -2480,7 +2848,7 @@ class MachineAddresses(Type):
 
 class MachineAddressesResult(Type):
     _toSchema = {'addresses': 'Addresses', 'error': 'Error'}
-    _toPy = {'Error': 'error', 'Addresses': 'addresses'}
+    _toPy = {'Addresses': 'addresses', 'Error': 'error'}
     def __init__(self, addresses=None, error=None):
         '''
         addresses : typing.Sequence[~Address]
@@ -2521,8 +2889,8 @@ class SetStatus(Type):
 
 
 class StatusResult(Type):
-    _toSchema = {'info': 'Info', 'status': 'Status', 'data': 'Data', 'error': 'Error', 'since': 'Since', 'id_': 'Id', 'life': 'Life'}
-    _toPy = {'Status': 'status', 'Since': 'since', 'Life': 'life', 'Info': 'info', 'Error': 'error', 'Data': 'data', 'Id': 'id_'}
+    _toSchema = {'since': 'Since', 'data': 'Data', 'info': 'Info', 'life': 'Life', 'error': 'Error', 'id_': 'Id', 'status': 'Status'}
+    _toPy = {'Id': 'id_', 'Data': 'data', 'Since': 'since', 'Error': 'error', 'Life': 'life', 'Status': 'status', 'Info': 'info'}
     def __init__(self, data=None, error=None, id_=None, info=None, life=None, since=None, status=None):
         '''
         data : typing.Mapping[str, typing.Any]
@@ -2554,7 +2922,7 @@ class StatusResults(Type):
 
 class ListSSHKeys(Type):
     _toSchema = {'mode': 'Mode', 'entities': 'Entities'}
-    _toPy = {'Mode': 'mode', 'Entities': 'entities'}
+    _toPy = {'Entities': 'entities', 'Mode': 'mode'}
     def __init__(self, entities=None, mode=None):
         '''
         entities : Entities
@@ -2566,7 +2934,7 @@ class ListSSHKeys(Type):
 
 class ModifyUserSSHKeys(Type):
     _toSchema = {'keys': 'Keys', 'user': 'User'}
-    _toPy = {'Keys': 'keys', 'User': 'user'}
+    _toPy = {'User': 'user', 'Keys': 'keys'}
     def __init__(self, keys=None, user=None):
         '''
         keys : typing.Sequence[str]
@@ -2574,6 +2942,16 @@ class ModifyUserSSHKeys(Type):
         '''
         self.keys = keys
         self.user = user
+
+
+class ApplicationTag(Type):
+    _toSchema = {'name': 'Name'}
+    _toPy = {'Name': 'name'}
+    def __init__(self, name=None):
+        '''
+        name : str
+        '''
+        self.name = name
 
 
 class ClaimLeadershipBulkParams(Type):
@@ -2597,32 +2975,22 @@ class ClaimLeadershipBulkResults(Type):
 
 
 class ClaimLeadershipParams(Type):
-    _toSchema = {'unittag': 'UnitTag', 'durationseconds': 'DurationSeconds', 'servicetag': 'ServiceTag'}
-    _toPy = {'UnitTag': 'unittag', 'DurationSeconds': 'durationseconds', 'ServiceTag': 'servicetag'}
-    def __init__(self, durationseconds=None, servicetag=None, unittag=None):
+    _toSchema = {'unittag': 'UnitTag', 'applicationtag': 'ApplicationTag', 'durationseconds': 'DurationSeconds'}
+    _toPy = {'UnitTag': 'unittag', 'DurationSeconds': 'durationseconds', 'ApplicationTag': 'applicationtag'}
+    def __init__(self, applicationtag=None, durationseconds=None, unittag=None):
         '''
+        applicationtag : str
         durationseconds : float
-        servicetag : str
         unittag : str
         '''
+        self.applicationtag = applicationtag
         self.durationseconds = durationseconds
-        self.servicetag = servicetag
         self.unittag = unittag
 
 
-class ServiceTag(Type):
-    _toSchema = {'name': 'Name'}
-    _toPy = {'Name': 'name'}
-    def __init__(self, name=None):
-        '''
-        name : str
-        '''
-        self.name = name
-
-
 class ActionExecutionResult(Type):
-    _toSchema = {'message': 'message', 'results': 'results', 'status': 'status', 'actiontag': 'actiontag'}
-    _toPy = {'message': 'message', 'results': 'results', 'status': 'status', 'actiontag': 'actiontag'}
+    _toSchema = {'message': 'message', 'results': 'results', 'actiontag': 'actiontag', 'status': 'status'}
+    _toPy = {'message': 'message', 'results': 'results', 'actiontag': 'actiontag', 'status': 'status'}
     def __init__(self, actiontag=None, message=None, results=None, status=None):
         '''
         actiontag : str
@@ -2669,8 +3037,8 @@ class JobsResults(Type):
 
 
 class NetworkConfig(Type):
-    _toSchema = {'dnssearchdomains': 'DNSSearchDomains', 'gatewayaddress': 'GatewayAddress', 'providerspaceid': 'ProviderSpaceId', 'providersubnetid': 'ProviderSubnetId', 'noautostart': 'NoAutoStart', 'mtu': 'MTU', 'providervlanid': 'ProviderVLANId', 'provideraddressid': 'ProviderAddressId', 'dnsservers': 'DNSServers', 'interfacename': 'InterfaceName', 'providerid': 'ProviderId', 'vlantag': 'VLANTag', 'cidr': 'CIDR', 'address': 'Address', 'parentinterfacename': 'ParentInterfaceName', 'interfacetype': 'InterfaceType', 'disabled': 'Disabled', 'deviceindex': 'DeviceIndex', 'configtype': 'ConfigType', 'macaddress': 'MACAddress'}
-    _toPy = {'DeviceIndex': 'deviceindex', 'MTU': 'mtu', 'Disabled': 'disabled', 'ProviderId': 'providerid', 'CIDR': 'cidr', 'MACAddress': 'macaddress', 'InterfaceType': 'interfacetype', 'GatewayAddress': 'gatewayaddress', 'InterfaceName': 'interfacename', 'NoAutoStart': 'noautostart', 'DNSServers': 'dnsservers', 'ParentInterfaceName': 'parentinterfacename', 'VLANTag': 'vlantag', 'ProviderVLANId': 'providervlanid', 'ProviderSubnetId': 'providersubnetid', 'ProviderSpaceId': 'providerspaceid', 'Address': 'address', 'ConfigType': 'configtype', 'ProviderAddressId': 'provideraddressid', 'DNSSearchDomains': 'dnssearchdomains'}
+    _toSchema = {'mtu': 'MTU', 'disabled': 'Disabled', 'interfacename': 'InterfaceName', 'dnsservers': 'DNSServers', 'providerid': 'ProviderId', 'providersubnetid': 'ProviderSubnetId', 'deviceindex': 'DeviceIndex', 'vlantag': 'VLANTag', 'provideraddressid': 'ProviderAddressId', 'dnssearchdomains': 'DNSSearchDomains', 'noautostart': 'NoAutoStart', 'macaddress': 'MACAddress', 'address': 'Address', 'cidr': 'CIDR', 'interfacetype': 'InterfaceType', 'parentinterfacename': 'ParentInterfaceName', 'gatewayaddress': 'GatewayAddress', 'providervlanid': 'ProviderVLANId', 'configtype': 'ConfigType', 'providerspaceid': 'ProviderSpaceId'}
+    _toPy = {'InterfaceType': 'interfacetype', 'ConfigType': 'configtype', 'ProviderVLANId': 'providervlanid', 'ProviderAddressId': 'provideraddressid', 'Disabled': 'disabled', 'ProviderSpaceId': 'providerspaceid', 'GatewayAddress': 'gatewayaddress', 'InterfaceName': 'interfacename', 'ProviderSubnetId': 'providersubnetid', 'MTU': 'mtu', 'VLANTag': 'vlantag', 'NoAutoStart': 'noautostart', 'DNSServers': 'dnsservers', 'DNSSearchDomains': 'dnssearchdomains', 'DeviceIndex': 'deviceindex', 'Address': 'address', 'ProviderId': 'providerid', 'MACAddress': 'macaddress', 'CIDR': 'cidr', 'ParentInterfaceName': 'parentinterfacename'}
     def __init__(self, address=None, cidr=None, configtype=None, dnssearchdomains=None, dnsservers=None, deviceindex=None, disabled=None, gatewayaddress=None, interfacename=None, interfacetype=None, macaddress=None, mtu=None, noautostart=None, parentinterfacename=None, provideraddressid=None, providerid=None, providerspaceid=None, providersubnetid=None, providervlanid=None, vlantag=None):
         '''
         address : str
@@ -2729,8 +3097,8 @@ class SetMachineNetworkConfig(Type):
 
 
 class MeterStatusResult(Type):
-    _toSchema = {'info': 'Info', 'error': 'Error', 'code': 'Code'}
-    _toPy = {'Info': 'info', 'Error': 'error', 'Code': 'code'}
+    _toSchema = {'code': 'Code', 'error': 'Error', 'info': 'Info'}
+    _toPy = {'Code': 'code', 'Error': 'error', 'Info': 'info'}
     def __init__(self, code=None, error=None, info=None):
         '''
         code : str
@@ -2754,7 +3122,7 @@ class MeterStatusResults(Type):
 
 class Metric(Type):
     _toSchema = {'key': 'Key', 'time': 'Time', 'value': 'Value'}
-    _toPy = {'Time': 'time', 'Value': 'value', 'Key': 'key'}
+    _toPy = {'Value': 'value', 'Key': 'key', 'Time': 'time'}
     def __init__(self, key=None, time=None, value=None):
         '''
         key : str
@@ -2767,8 +3135,8 @@ class Metric(Type):
 
 
 class MetricBatch(Type):
-    _toSchema = {'charmurl': 'CharmURL', 'metrics': 'Metrics', 'created': 'Created', 'uuid': 'UUID'}
-    _toPy = {'Metrics': 'metrics', 'CharmURL': 'charmurl', 'Created': 'created', 'UUID': 'uuid'}
+    _toSchema = {'charmurl': 'CharmURL', 'uuid': 'UUID', 'created': 'Created', 'metrics': 'Metrics'}
+    _toPy = {'CharmURL': 'charmurl', 'Metrics': 'metrics', 'Created': 'created', 'UUID': 'uuid'}
     def __init__(self, charmurl=None, created=None, metrics=None, uuid=None):
         '''
         charmurl : str
@@ -2817,8 +3185,8 @@ class EntityMetrics(Type):
 
 
 class MeterStatusParam(Type):
-    _toSchema = {'info': 'info', 'tag': 'tag', 'code': 'code'}
-    _toPy = {'info': 'info', 'tag': 'tag', 'code': 'code'}
+    _toSchema = {'code': 'code', 'tag': 'tag', 'info': 'info'}
+    _toPy = {'code': 'code', 'tag': 'tag', 'info': 'info'}
     def __init__(self, code=None, info=None, tag=None):
         '''
         code : str
@@ -2921,8 +3289,8 @@ class SetMigrationPhaseArgs(Type):
 
 
 class MigrationStatus(Type):
-    _toSchema = {'source_api_addrs': 'source-api-addrs', 'attempt': 'attempt', 'target_api_addrs': 'target-api-addrs', 'source_ca_cert': 'source-ca-cert', 'phase': 'phase', 'target_ca_cert': 'target-ca-cert'}
-    _toPy = {'attempt': 'attempt', 'target-api-addrs': 'target_api_addrs', 'target-ca-cert': 'target_ca_cert', 'phase': 'phase', 'source-ca-cert': 'source_ca_cert', 'source-api-addrs': 'source_api_addrs'}
+    _toSchema = {'attempt': 'attempt', 'source_api_addrs': 'source-api-addrs', 'target_api_addrs': 'target-api-addrs', 'source_ca_cert': 'source-ca-cert', 'phase': 'phase', 'target_ca_cert': 'target-ca-cert'}
+    _toPy = {'target-ca-cert': 'target_ca_cert', 'source-ca-cert': 'source_ca_cert', 'attempt': 'attempt', 'source-api-addrs': 'source_api_addrs', 'phase': 'phase', 'target-api-addrs': 'target_api_addrs'}
     def __init__(self, attempt=None, phase=None, source_api_addrs=None, source_ca_cert=None, target_api_addrs=None, target_ca_cert=None):
         '''
         attempt : int
@@ -2951,8 +3319,8 @@ class ModelArgs(Type):
 
 
 class ModelCreateArgs(Type):
-    _toSchema = {'config': 'Config', 'account': 'Account', 'ownertag': 'OwnerTag'}
-    _toPy = {'Account': 'account', 'Config': 'config', 'OwnerTag': 'ownertag'}
+    _toSchema = {'account': 'Account', 'ownertag': 'OwnerTag', 'config': 'Config'}
+    _toPy = {'Account': 'account', 'OwnerTag': 'ownertag', 'Config': 'config'}
     def __init__(self, account=None, config=None, ownertag=None):
         '''
         account : typing.Mapping[str, typing.Any]
@@ -2965,8 +3333,8 @@ class ModelCreateArgs(Type):
 
 
 class ModelInfoResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -2987,8 +3355,8 @@ class ModelInfoResults(Type):
 
 
 class ModelSkeletonConfigArgs(Type):
-    _toSchema = {'provider': 'Provider', 'region': 'Region'}
-    _toPy = {'Region': 'region', 'Provider': 'provider'}
+    _toSchema = {'region': 'Region', 'provider': 'Provider'}
+    _toPy = {'Provider': 'provider', 'Region': 'region'}
     def __init__(self, provider=None, region=None):
         '''
         provider : str
@@ -2999,8 +3367,8 @@ class ModelSkeletonConfigArgs(Type):
 
 
 class ModifyModelAccess(Type):
-    _toSchema = {'user_tag': 'user-tag', 'access': 'access', 'action': 'action', 'model_tag': 'model-tag'}
-    _toPy = {'model-tag': 'model_tag', 'access': 'access', 'action': 'action', 'user-tag': 'user_tag'}
+    _toSchema = {'action': 'action', 'model_tag': 'model-tag', 'user_tag': 'user-tag', 'access': 'access'}
+    _toPy = {'user-tag': 'user_tag', 'action': 'action', 'model-tag': 'model_tag', 'access': 'access'}
     def __init__(self, access=None, action=None, model_tag=None, user_tag=None):
         '''
         access : str
@@ -3025,7 +3393,7 @@ class ModifyModelAccessRequest(Type):
 
 
 class ConstraintsResult(Type):
-    _toSchema = {'error': 'Error', 'constraints': 'Constraints'}
+    _toSchema = {'constraints': 'Constraints', 'error': 'Error'}
     _toPy = {'Constraints': 'constraints', 'Error': 'error'}
     def __init__(self, constraints=None, error=None):
         '''
@@ -3047,15 +3415,14 @@ class ConstraintsResults(Type):
 
 
 class ContainerConfig(Type):
-    _toSchema = {'sslhostnameverification': 'SSLHostnameVerification', 'authorizedkeys': 'AuthorizedKeys', 'aptproxy': 'AptProxy', 'updatebehavior': 'UpdateBehavior', 'providertype': 'ProviderType', 'allowlxcloopmounts': 'AllowLXCLoopMounts', 'proxy': 'Proxy', 'aptmirror': 'AptMirror', 'preferipv6': 'PreferIPv6'}
-    _toPy = {'AuthorizedKeys': 'authorizedkeys', 'AptMirror': 'aptmirror', 'AptProxy': 'aptproxy', 'SSLHostnameVerification': 'sslhostnameverification', 'PreferIPv6': 'preferipv6', 'AllowLXCLoopMounts': 'allowlxcloopmounts', 'UpdateBehavior': 'updatebehavior', 'Proxy': 'proxy', 'ProviderType': 'providertype'}
-    def __init__(self, allowlxcloopmounts=None, aptmirror=None, aptproxy=None, authorizedkeys=None, preferipv6=None, providertype=None, proxy=None, sslhostnameverification=None, updatebehavior=None):
+    _toSchema = {'allowlxcloopmounts': 'AllowLXCLoopMounts', 'updatebehavior': 'UpdateBehavior', 'aptmirror': 'AptMirror', 'authorizedkeys': 'AuthorizedKeys', 'sslhostnameverification': 'SSLHostnameVerification', 'aptproxy': 'AptProxy', 'providertype': 'ProviderType', 'proxy': 'Proxy'}
+    _toPy = {'UpdateBehavior': 'updatebehavior', 'SSLHostnameVerification': 'sslhostnameverification', 'AptMirror': 'aptmirror', 'Proxy': 'proxy', 'AptProxy': 'aptproxy', 'AuthorizedKeys': 'authorizedkeys', 'AllowLXCLoopMounts': 'allowlxcloopmounts', 'ProviderType': 'providertype'}
+    def __init__(self, allowlxcloopmounts=None, aptmirror=None, aptproxy=None, authorizedkeys=None, providertype=None, proxy=None, sslhostnameverification=None, updatebehavior=None):
         '''
         allowlxcloopmounts : bool
         aptmirror : str
         aptproxy : Settings
         authorizedkeys : str
-        preferipv6 : bool
         providertype : str
         proxy : Settings
         sslhostnameverification : bool
@@ -3065,7 +3432,6 @@ class ContainerConfig(Type):
         self.aptmirror = aptmirror
         self.aptproxy = Settings.from_json(aptproxy) if aptproxy else None
         self.authorizedkeys = authorizedkeys
-        self.preferipv6 = preferipv6
         self.providertype = providertype
         self.proxy = Settings.from_json(proxy) if proxy else None
         self.sslhostnameverification = sslhostnameverification
@@ -3093,8 +3459,8 @@ class ContainerManagerConfigParams(Type):
 
 
 class DistributionGroupResult(Type):
-    _toSchema = {'error': 'Error', 'result': 'Result'}
-    _toPy = {'Error': 'error', 'Result': 'result'}
+    _toSchema = {'result': 'Result', 'error': 'Error'}
+    _toPy = {'Result': 'result', 'Error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -3115,8 +3481,8 @@ class DistributionGroupResults(Type):
 
 
 class InstanceInfo(Type):
-    _toSchema = {'nonce': 'Nonce', 'networkconfig': 'NetworkConfig', 'tag': 'Tag', 'characteristics': 'Characteristics', 'volumeattachments': 'VolumeAttachments', 'volumes': 'Volumes', 'instanceid': 'InstanceId'}
-    _toPy = {'Tag': 'tag', 'InstanceId': 'instanceid', 'Volumes': 'volumes', 'Characteristics': 'characteristics', 'Nonce': 'nonce', 'NetworkConfig': 'networkconfig', 'VolumeAttachments': 'volumeattachments'}
+    _toSchema = {'networkconfig': 'NetworkConfig', 'nonce': 'Nonce', 'characteristics': 'Characteristics', 'volumeattachments': 'VolumeAttachments', 'instanceid': 'InstanceId', 'tag': 'Tag', 'volumes': 'Volumes'}
+    _toPy = {'Characteristics': 'characteristics', 'InstanceId': 'instanceid', 'Volumes': 'volumes', 'Nonce': 'nonce', 'VolumeAttachments': 'volumeattachments', 'Tag': 'tag', 'NetworkConfig': 'networkconfig'}
     def __init__(self, characteristics=None, instanceid=None, networkconfig=None, nonce=None, tag=None, volumeattachments=None, volumes=None):
         '''
         characteristics : HardwareCharacteristics
@@ -3147,8 +3513,8 @@ class InstancesInfo(Type):
 
 
 class MachineContainers(Type):
-    _toSchema = {'machinetag': 'MachineTag', 'containertypes': 'ContainerTypes'}
-    _toPy = {'ContainerTypes': 'containertypes', 'MachineTag': 'machinetag'}
+    _toSchema = {'containertypes': 'ContainerTypes', 'machinetag': 'MachineTag'}
+    _toPy = {'MachineTag': 'machinetag', 'ContainerTypes': 'containertypes'}
     def __init__(self, containertypes=None, machinetag=None):
         '''
         containertypes : typing.Sequence[str]
@@ -3170,7 +3536,7 @@ class MachineContainersParams(Type):
 
 class MachineNetworkConfigResult(Type):
     _toSchema = {'info': 'Info', 'error': 'Error'}
-    _toPy = {'Info': 'info', 'Error': 'error'}
+    _toPy = {'Error': 'error', 'Info': 'info'}
     def __init__(self, error=None, info=None):
         '''
         error : Error
@@ -3191,8 +3557,8 @@ class MachineNetworkConfigResults(Type):
 
 
 class ProvisioningInfo(Type):
-    _toSchema = {'jobs': 'Jobs', 'volumes': 'Volumes', 'tags': 'Tags', 'endpointbindings': 'EndpointBindings', 'placement': 'Placement', 'series': 'Series', 'constraints': 'Constraints', 'subnetstozones': 'SubnetsToZones', 'imagemetadata': 'ImageMetadata'}
-    _toPy = {'Constraints': 'constraints', 'EndpointBindings': 'endpointbindings', 'Volumes': 'volumes', 'Placement': 'placement', 'SubnetsToZones': 'subnetstozones', 'Tags': 'tags', 'Jobs': 'jobs', 'ImageMetadata': 'imagemetadata', 'Series': 'series'}
+    _toSchema = {'jobs': 'Jobs', 'series': 'Series', 'imagemetadata': 'ImageMetadata', 'placement': 'Placement', 'subnetstozones': 'SubnetsToZones', 'constraints': 'Constraints', 'tags': 'Tags', 'endpointbindings': 'EndpointBindings', 'volumes': 'Volumes'}
+    _toPy = {'Constraints': 'constraints', 'ImageMetadata': 'imagemetadata', 'SubnetsToZones': 'subnetstozones', 'Series': 'series', 'Volumes': 'volumes', 'Tags': 'tags', 'EndpointBindings': 'endpointbindings', 'Placement': 'placement', 'Jobs': 'jobs'}
     def __init__(self, constraints=None, endpointbindings=None, imagemetadata=None, jobs=None, placement=None, series=None, subnetstozones=None, tags=None, volumes=None):
         '''
         constraints : Value
@@ -3217,8 +3583,8 @@ class ProvisioningInfo(Type):
 
 
 class ProvisioningInfoResult(Type):
-    _toSchema = {'error': 'Error', 'result': 'Result'}
-    _toPy = {'Error': 'error', 'Result': 'result'}
+    _toSchema = {'result': 'Result', 'error': 'Error'}
+    _toPy = {'Result': 'result', 'Error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -3239,8 +3605,8 @@ class ProvisioningInfoResults(Type):
 
 
 class Settings(Type):
-    _toSchema = {'https': 'Https', 'noproxy': 'NoProxy', 'ftp': 'Ftp', 'http': 'Http'}
-    _toPy = {'Http': 'http', 'Ftp': 'ftp', 'Https': 'https', 'NoProxy': 'noproxy'}
+    _toSchema = {'ftp': 'Ftp', 'noproxy': 'NoProxy', 'http': 'Http', 'https': 'Https'}
+    _toPy = {'Http': 'http', 'Https': 'https', 'NoProxy': 'noproxy', 'Ftp': 'ftp'}
     def __init__(self, ftp=None, http=None, https=None, noproxy=None):
         '''
         ftp : str
@@ -3255,8 +3621,8 @@ class Settings(Type):
 
 
 class ToolsResult(Type):
-    _toSchema = {'error': 'Error', 'disablesslhostnameverification': 'DisableSSLHostnameVerification', 'toolslist': 'ToolsList'}
-    _toPy = {'Error': 'error', 'ToolsList': 'toolslist', 'DisableSSLHostnameVerification': 'disablesslhostnameverification'}
+    _toSchema = {'toolslist': 'ToolsList', 'disablesslhostnameverification': 'DisableSSLHostnameVerification', 'error': 'Error'}
+    _toPy = {'Error': 'error', 'DisableSSLHostnameVerification': 'disablesslhostnameverification', 'ToolsList': 'toolslist'}
     def __init__(self, disablesslhostnameverification=None, error=None, toolslist=None):
         '''
         disablesslhostnameverification : bool
@@ -3280,7 +3646,7 @@ class ToolsResults(Type):
 
 class UpdateBehavior(Type):
     _toSchema = {'enableosupgrade': 'EnableOSUpgrade', 'enableosrefreshupdate': 'EnableOSRefreshUpdate'}
-    _toPy = {'EnableOSUpgrade': 'enableosupgrade', 'EnableOSRefreshUpdate': 'enableosrefreshupdate'}
+    _toPy = {'EnableOSRefreshUpdate': 'enableosrefreshupdate', 'EnableOSUpgrade': 'enableosupgrade'}
     def __init__(self, enableosrefreshupdate=None, enableosupgrade=None):
         '''
         enableosrefreshupdate : bool
@@ -3291,8 +3657,8 @@ class UpdateBehavior(Type):
 
 
 class Volume(Type):
-    _toSchema = {'info': 'info', 'volumetag': 'volumetag'}
-    _toPy = {'info': 'info', 'volumetag': 'volumetag'}
+    _toSchema = {'volumetag': 'volumetag', 'info': 'info'}
+    _toPy = {'volumetag': 'volumetag', 'info': 'info'}
     def __init__(self, info=None, volumetag=None):
         '''
         info : VolumeInfo
@@ -3303,8 +3669,8 @@ class Volume(Type):
 
 
 class VolumeAttachmentInfo(Type):
-    _toSchema = {'devicename': 'devicename', 'devicelink': 'devicelink', 'read_only': 'read-only', 'busaddress': 'busaddress'}
-    _toPy = {'read-only': 'read_only', 'devicename': 'devicename', 'devicelink': 'devicelink', 'busaddress': 'busaddress'}
+    _toSchema = {'read_only': 'read-only', 'devicelink': 'devicelink', 'busaddress': 'busaddress', 'devicename': 'devicename'}
+    _toPy = {'devicelink': 'devicelink', 'busaddress': 'busaddress', 'devicename': 'devicename', 'read-only': 'read_only'}
     def __init__(self, busaddress=None, devicelink=None, devicename=None, read_only=None):
         '''
         busaddress : str
@@ -3319,8 +3685,8 @@ class VolumeAttachmentInfo(Type):
 
 
 class VolumeAttachmentParams(Type):
-    _toSchema = {'volumeid': 'volumeid', 'instanceid': 'instanceid', 'volumetag': 'volumetag', 'machinetag': 'machinetag', 'provider': 'provider', 'read_only': 'read-only'}
-    _toPy = {'volumeid': 'volumeid', 'instanceid': 'instanceid', 'read-only': 'read_only', 'volumetag': 'volumetag', 'machinetag': 'machinetag', 'provider': 'provider'}
+    _toSchema = {'volumetag': 'volumetag', 'read_only': 'read-only', 'provider': 'provider', 'volumeid': 'volumeid', 'instanceid': 'instanceid', 'machinetag': 'machinetag'}
+    _toPy = {'volumetag': 'volumetag', 'provider': 'provider', 'read-only': 'read_only', 'volumeid': 'volumeid', 'instanceid': 'instanceid', 'machinetag': 'machinetag'}
     def __init__(self, instanceid=None, machinetag=None, provider=None, read_only=None, volumeid=None, volumetag=None):
         '''
         instanceid : str
@@ -3339,8 +3705,8 @@ class VolumeAttachmentParams(Type):
 
 
 class VolumeInfo(Type):
-    _toSchema = {'volumeid': 'volumeid', 'hardwareid': 'hardwareid', 'persistent': 'persistent', 'size': 'size'}
-    _toPy = {'volumeid': 'volumeid', 'hardwareid': 'hardwareid', 'persistent': 'persistent', 'size': 'size'}
+    _toSchema = {'hardwareid': 'hardwareid', 'persistent': 'persistent', 'size': 'size', 'volumeid': 'volumeid'}
+    _toPy = {'hardwareid': 'hardwareid', 'persistent': 'persistent', 'size': 'size', 'volumeid': 'volumeid'}
     def __init__(self, hardwareid=None, persistent=None, size=None, volumeid=None):
         '''
         hardwareid : str
@@ -3355,8 +3721,8 @@ class VolumeInfo(Type):
 
 
 class VolumeParams(Type):
-    _toSchema = {'volumetag': 'volumetag', 'tags': 'tags', 'attachment': 'attachment', 'provider': 'provider', 'size': 'size', 'attributes': 'attributes'}
-    _toPy = {'volumetag': 'volumetag', 'tags': 'tags', 'attachment': 'attachment', 'provider': 'provider', 'size': 'size', 'attributes': 'attributes'}
+    _toSchema = {'attachment': 'attachment', 'attributes': 'attributes', 'size': 'size', 'volumetag': 'volumetag', 'tags': 'tags', 'provider': 'provider'}
+    _toPy = {'attachment': 'attachment', 'attributes': 'attributes', 'size': 'size', 'volumetag': 'volumetag', 'tags': 'tags', 'provider': 'provider'}
     def __init__(self, attachment=None, attributes=None, provider=None, size=None, tags=None, volumetag=None):
         '''
         attachment : VolumeAttachmentParams
@@ -3375,7 +3741,7 @@ class VolumeParams(Type):
 
 
 class WatchContainer(Type):
-    _toSchema = {'containertype': 'ContainerType', 'machinetag': 'MachineTag'}
+    _toSchema = {'machinetag': 'MachineTag', 'containertype': 'ContainerType'}
     _toPy = {'MachineTag': 'machinetag', 'ContainerType': 'containertype'}
     def __init__(self, containertype=None, machinetag=None):
         '''
@@ -3397,8 +3763,8 @@ class WatchContainers(Type):
 
 
 class ProxyConfig(Type):
-    _toSchema = {'https': 'HTTPS', 'noproxy': 'NoProxy', 'ftp': 'FTP', 'http': 'HTTP'}
-    _toPy = {'HTTP': 'http', 'HTTPS': 'https', 'NoProxy': 'noproxy', 'FTP': 'ftp'}
+    _toSchema = {'ftp': 'FTP', 'noproxy': 'NoProxy', 'http': 'HTTP', 'https': 'HTTPS'}
+    _toPy = {'NoProxy': 'noproxy', 'FTP': 'ftp', 'HTTPS': 'https', 'HTTP': 'http'}
     def __init__(self, ftp=None, http=None, https=None, noproxy=None):
         '''
         ftp : str
@@ -3413,8 +3779,8 @@ class ProxyConfig(Type):
 
 
 class ProxyConfigResult(Type):
-    _toSchema = {'proxysettings': 'ProxySettings', 'error': 'Error', 'aptproxysettings': 'APTProxySettings'}
-    _toPy = {'Error': 'error', 'APTProxySettings': 'aptproxysettings', 'ProxySettings': 'proxysettings'}
+    _toSchema = {'proxysettings': 'ProxySettings', 'aptproxysettings': 'APTProxySettings', 'error': 'Error'}
+    _toPy = {'ProxySettings': 'proxysettings', 'APTProxySettings': 'aptproxysettings', 'Error': 'error'}
     def __init__(self, aptproxysettings=None, error=None, proxysettings=None):
         '''
         aptproxysettings : ProxyConfig
@@ -3437,8 +3803,8 @@ class ProxyConfigResults(Type):
 
 
 class RebootActionResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -3460,7 +3826,7 @@ class RebootActionResults(Type):
 
 class RelationUnitsChange(Type):
     _toSchema = {'departed': 'Departed', 'changed': 'Changed'}
-    _toPy = {'Departed': 'departed', 'Changed': 'changed'}
+    _toPy = {'Changed': 'changed', 'Departed': 'departed'}
     def __init__(self, changed=None, departed=None):
         '''
         changed : typing.Mapping[str, ~UnitSettings]
@@ -3471,8 +3837,8 @@ class RelationUnitsChange(Type):
 
 
 class RelationUnitsWatchResult(Type):
-    _toSchema = {'changes': 'Changes', 'error': 'Error', 'relationunitswatcherid': 'RelationUnitsWatcherId'}
-    _toPy = {'Changes': 'changes', 'Error': 'error', 'RelationUnitsWatcherId': 'relationunitswatcherid'}
+    _toSchema = {'changes': 'Changes', 'relationunitswatcherid': 'RelationUnitsWatcherId', 'error': 'Error'}
+    _toPy = {'Changes': 'changes', 'RelationUnitsWatcherId': 'relationunitswatcherid', 'Error': 'error'}
     def __init__(self, changes=None, error=None, relationunitswatcherid=None):
         '''
         changes : RelationUnitsChange
@@ -3495,8 +3861,8 @@ class UnitSettings(Type):
 
 
 class RetryStrategy(Type):
-    _toSchema = {'maxretrytime': 'MaxRetryTime', 'minretrytime': 'MinRetryTime', 'jitterretrytime': 'JitterRetryTime', 'shouldretry': 'ShouldRetry', 'retrytimefactor': 'RetryTimeFactor'}
-    _toPy = {'MinRetryTime': 'minretrytime', 'ShouldRetry': 'shouldretry', 'MaxRetryTime': 'maxretrytime', 'RetryTimeFactor': 'retrytimefactor', 'JitterRetryTime': 'jitterretrytime'}
+    _toSchema = {'jitterretrytime': 'JitterRetryTime', 'shouldretry': 'ShouldRetry', 'minretrytime': 'MinRetryTime', 'retrytimefactor': 'RetryTimeFactor', 'maxretrytime': 'MaxRetryTime'}
+    _toPy = {'MinRetryTime': 'minretrytime', 'JitterRetryTime': 'jitterretrytime', 'RetryTimeFactor': 'retrytimefactor', 'MaxRetryTime': 'maxretrytime', 'ShouldRetry': 'shouldretry'}
     def __init__(self, jitterretrytime=None, maxretrytime=None, minretrytime=None, retrytimefactor=None, shouldretry=None):
         '''
         jitterretrytime : bool
@@ -3513,8 +3879,8 @@ class RetryStrategy(Type):
 
 
 class RetryStrategyResult(Type):
-    _toSchema = {'error': 'Error', 'result': 'Result'}
-    _toPy = {'Error': 'error', 'Result': 'result'}
+    _toSchema = {'result': 'Result', 'error': 'Error'}
+    _toPy = {'Result': 'result', 'Error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -3535,8 +3901,8 @@ class RetryStrategyResults(Type):
 
 
 class SSHAddressResult(Type):
-    _toSchema = {'error': 'error', 'address': 'address'}
-    _toPy = {'error': 'error', 'address': 'address'}
+    _toSchema = {'address': 'address', 'error': 'error'}
+    _toPy = {'address': 'address', 'error': 'error'}
     def __init__(self, address=None, error=None):
         '''
         address : str
@@ -3567,8 +3933,8 @@ class SSHProxyResult(Type):
 
 
 class SSHPublicKeysResult(Type):
-    _toSchema = {'error': 'error', 'public_keys': 'public-keys'}
-    _toPy = {'error': 'error', 'public-keys': 'public_keys'}
+    _toSchema = {'public_keys': 'public-keys', 'error': 'error'}
+    _toPy = {'public-keys': 'public_keys', 'error': 'error'}
     def __init__(self, error=None, public_keys=None):
         '''
         error : Error
@@ -3588,311 +3954,9 @@ class SSHPublicKeysResults(Type):
         self.results = [SSHPublicKeysResult.from_json(o) for o in results or []]
 
 
-class AddRelation(Type):
-    _toSchema = {'endpoints': 'Endpoints'}
-    _toPy = {'Endpoints': 'endpoints'}
-    def __init__(self, endpoints=None):
-        '''
-        endpoints : typing.Sequence[str]
-        '''
-        self.endpoints = endpoints
-
-
-class AddRelationResults(Type):
-    _toSchema = {'endpoints': 'Endpoints'}
-    _toPy = {'Endpoints': 'endpoints'}
-    def __init__(self, endpoints=None):
-        '''
-        endpoints : typing.Mapping[str, ~Relation]
-        '''
-        self.endpoints = {k: Relation.from_json(v) for k, v in (endpoints or dict()).items()}
-
-
-class AddServiceUnits(Type):
-    _toSchema = {'servicename': 'ServiceName', 'placement': 'Placement', 'numunits': 'NumUnits'}
-    _toPy = {'ServiceName': 'servicename', 'Placement': 'placement', 'NumUnits': 'numunits'}
-    def __init__(self, numunits=None, placement=None, servicename=None):
-        '''
-        numunits : int
-        placement : typing.Sequence[~Placement]
-        servicename : str
-        '''
-        self.numunits = numunits
-        self.placement = [Placement.from_json(o) for o in placement or []]
-        self.servicename = servicename
-
-
-class AddServiceUnitsResults(Type):
-    _toSchema = {'units': 'Units'}
-    _toPy = {'Units': 'units'}
-    def __init__(self, units=None):
-        '''
-        units : typing.Sequence[str]
-        '''
-        self.units = units
-
-
-class DestroyRelation(Type):
-    _toSchema = {'endpoints': 'Endpoints'}
-    _toPy = {'Endpoints': 'endpoints'}
-    def __init__(self, endpoints=None):
-        '''
-        endpoints : typing.Sequence[str]
-        '''
-        self.endpoints = endpoints
-
-
-class DestroyServiceUnits(Type):
-    _toSchema = {'unitnames': 'UnitNames'}
-    _toPy = {'UnitNames': 'unitnames'}
-    def __init__(self, unitnames=None):
-        '''
-        unitnames : typing.Sequence[str]
-        '''
-        self.unitnames = unitnames
-
-
-class GetServiceConstraints(Type):
-    _toSchema = {'servicename': 'ServiceName'}
-    _toPy = {'ServiceName': 'servicename'}
-    def __init__(self, servicename=None):
-        '''
-        servicename : str
-        '''
-        self.servicename = servicename
-
-
-class Relation(Type):
-    _toSchema = {'name': 'Name', 'limit': 'Limit', 'role': 'Role', 'optional': 'Optional', 'scope': 'Scope', 'interface': 'Interface'}
-    _toPy = {'Optional': 'optional', 'Limit': 'limit', 'Scope': 'scope', 'Name': 'name', 'Role': 'role', 'Interface': 'interface'}
-    def __init__(self, interface=None, limit=None, name=None, optional=None, role=None, scope=None):
-        '''
-        interface : str
-        limit : int
-        name : str
-        optional : bool
-        role : str
-        scope : str
-        '''
-        self.interface = interface
-        self.limit = limit
-        self.name = name
-        self.optional = optional
-        self.role = role
-        self.scope = scope
-
-
-class ServiceCharmRelations(Type):
-    _toSchema = {'servicename': 'ServiceName'}
-    _toPy = {'ServiceName': 'servicename'}
-    def __init__(self, servicename=None):
-        '''
-        servicename : str
-        '''
-        self.servicename = servicename
-
-
-class ServiceCharmRelationsResults(Type):
-    _toSchema = {'charmrelations': 'CharmRelations'}
-    _toPy = {'CharmRelations': 'charmrelations'}
-    def __init__(self, charmrelations=None):
-        '''
-        charmrelations : typing.Sequence[str]
-        '''
-        self.charmrelations = charmrelations
-
-
-class ServiceDeploy(Type):
-    _toSchema = {'configyaml': 'ConfigYAML', 'storage': 'Storage', 'endpointbindings': 'EndpointBindings', 'resources': 'Resources', 'servicename': 'ServiceName', 'series': 'Series', 'charmurl': 'CharmUrl', 'config': 'Config', 'channel': 'Channel', 'placement': 'Placement', 'numunits': 'NumUnits', 'constraints': 'Constraints'}
-    _toPy = {'ServiceName': 'servicename', 'Constraints': 'constraints', 'ConfigYAML': 'configyaml', 'Resources': 'resources', 'Channel': 'channel', 'Storage': 'storage', 'Config': 'config', 'Placement': 'placement', 'EndpointBindings': 'endpointbindings', 'NumUnits': 'numunits', 'CharmUrl': 'charmurl', 'Series': 'series'}
-    def __init__(self, channel=None, charmurl=None, config=None, configyaml=None, constraints=None, endpointbindings=None, numunits=None, placement=None, resources=None, series=None, servicename=None, storage=None):
-        '''
-        channel : str
-        charmurl : str
-        config : typing.Mapping[str, str]
-        configyaml : str
-        constraints : Value
-        endpointbindings : typing.Mapping[str, str]
-        numunits : int
-        placement : typing.Sequence[~Placement]
-        resources : typing.Mapping[str, str]
-        series : str
-        servicename : str
-        storage : typing.Mapping[str, ~Constraints]
-        '''
-        self.channel = channel
-        self.charmurl = charmurl
-        self.config = config
-        self.configyaml = configyaml
-        self.constraints = Value.from_json(constraints) if constraints else None
-        self.endpointbindings = endpointbindings
-        self.numunits = numunits
-        self.placement = [Placement.from_json(o) for o in placement or []]
-        self.resources = resources
-        self.series = series
-        self.servicename = servicename
-        self.storage = {k: Constraints.from_json(v) for k, v in (storage or dict()).items()}
-
-
-class ServiceDestroy(Type):
-    _toSchema = {'servicename': 'ServiceName'}
-    _toPy = {'ServiceName': 'servicename'}
-    def __init__(self, servicename=None):
-        '''
-        servicename : str
-        '''
-        self.servicename = servicename
-
-
-class ServiceExpose(Type):
-    _toSchema = {'servicename': 'ServiceName'}
-    _toPy = {'ServiceName': 'servicename'}
-    def __init__(self, servicename=None):
-        '''
-        servicename : str
-        '''
-        self.servicename = servicename
-
-
-class ServiceGet(Type):
-    _toSchema = {'servicename': 'ServiceName'}
-    _toPy = {'ServiceName': 'servicename'}
-    def __init__(self, servicename=None):
-        '''
-        servicename : str
-        '''
-        self.servicename = servicename
-
-
-class ServiceGetResults(Type):
-    _toSchema = {'config': 'Config', 'charm': 'Charm', 'constraints': 'Constraints', 'service': 'Service'}
-    _toPy = {'Charm': 'charm', 'Constraints': 'constraints', 'Config': 'config', 'Service': 'service'}
-    def __init__(self, charm=None, config=None, constraints=None, service=None):
-        '''
-        charm : str
-        config : typing.Mapping[str, typing.Any]
-        constraints : Value
-        service : str
-        '''
-        self.charm = charm
-        self.config = config
-        self.constraints = Value.from_json(constraints) if constraints else None
-        self.service = service
-
-
-class ServiceMetricCredential(Type):
-    _toSchema = {'metriccredentials': 'MetricCredentials', 'servicename': 'ServiceName'}
-    _toPy = {'MetricCredentials': 'metriccredentials', 'ServiceName': 'servicename'}
-    def __init__(self, metriccredentials=None, servicename=None):
-        '''
-        metriccredentials : typing.Sequence[int]
-        servicename : str
-        '''
-        self.metriccredentials = metriccredentials
-        self.servicename = servicename
-
-
-class ServiceMetricCredentials(Type):
-    _toSchema = {'creds': 'Creds'}
-    _toPy = {'Creds': 'creds'}
-    def __init__(self, creds=None):
-        '''
-        creds : typing.Sequence[~ServiceMetricCredential]
-        '''
-        self.creds = [ServiceMetricCredential.from_json(o) for o in creds or []]
-
-
-class ServiceSet(Type):
-    _toSchema = {'options': 'Options', 'servicename': 'ServiceName'}
-    _toPy = {'ServiceName': 'servicename', 'Options': 'options'}
-    def __init__(self, options=None, servicename=None):
-        '''
-        options : typing.Mapping[str, str]
-        servicename : str
-        '''
-        self.options = options
-        self.servicename = servicename
-
-
-class ServiceSetCharm(Type):
-    _toSchema = {'charmurl': 'charmurl', 'forceseries': 'forceseries', 'forceunits': 'forceunits', 'resourceids': 'resourceids', 'cs_channel': 'cs-channel', 'servicename': 'servicename'}
-    _toPy = {'charmurl': 'charmurl', 'forceseries': 'forceseries', 'forceunits': 'forceunits', 'cs-channel': 'cs_channel', 'resourceids': 'resourceids', 'servicename': 'servicename'}
-    def __init__(self, charmurl=None, cs_channel=None, forceseries=None, forceunits=None, resourceids=None, servicename=None):
-        '''
-        charmurl : str
-        cs_channel : str
-        forceseries : bool
-        forceunits : bool
-        resourceids : typing.Mapping[str, str]
-        servicename : str
-        '''
-        self.charmurl = charmurl
-        self.cs_channel = cs_channel
-        self.forceseries = forceseries
-        self.forceunits = forceunits
-        self.resourceids = resourceids
-        self.servicename = servicename
-
-
-class ServiceUnexpose(Type):
-    _toSchema = {'servicename': 'ServiceName'}
-    _toPy = {'ServiceName': 'servicename'}
-    def __init__(self, servicename=None):
-        '''
-        servicename : str
-        '''
-        self.servicename = servicename
-
-
-class ServiceUnset(Type):
-    _toSchema = {'options': 'Options', 'servicename': 'ServiceName'}
-    _toPy = {'ServiceName': 'servicename', 'Options': 'options'}
-    def __init__(self, options=None, servicename=None):
-        '''
-        options : typing.Sequence[str]
-        servicename : str
-        '''
-        self.options = options
-        self.servicename = servicename
-
-
-class ServiceUpdate(Type):
-    _toSchema = {'charmurl': 'CharmUrl', 'forceseries': 'ForceSeries', 'minunits': 'MinUnits', 'forcecharmurl': 'ForceCharmUrl', 'settingsyaml': 'SettingsYAML', 'settingsstrings': 'SettingsStrings', 'constraints': 'Constraints', 'servicename': 'ServiceName'}
-    _toPy = {'ServiceName': 'servicename', 'Constraints': 'constraints', 'SettingsStrings': 'settingsstrings', 'ForceSeries': 'forceseries', 'CharmUrl': 'charmurl', 'SettingsYAML': 'settingsyaml', 'MinUnits': 'minunits', 'ForceCharmUrl': 'forcecharmurl'}
-    def __init__(self, charmurl=None, constraints=None, forcecharmurl=None, forceseries=None, minunits=None, servicename=None, settingsstrings=None, settingsyaml=None):
-        '''
-        charmurl : str
-        constraints : Value
-        forcecharmurl : bool
-        forceseries : bool
-        minunits : int
-        servicename : str
-        settingsstrings : typing.Mapping[str, str]
-        settingsyaml : str
-        '''
-        self.charmurl = charmurl
-        self.constraints = Value.from_json(constraints) if constraints else None
-        self.forcecharmurl = forcecharmurl
-        self.forceseries = forceseries
-        self.minunits = minunits
-        self.servicename = servicename
-        self.settingsstrings = settingsstrings
-        self.settingsyaml = settingsyaml
-
-
-class ServicesDeploy(Type):
-    _toSchema = {'services': 'Services'}
-    _toPy = {'Services': 'services'}
-    def __init__(self, services=None):
-        '''
-        services : typing.Sequence[~ServiceDeploy]
-        '''
-        self.services = [ServiceDeploy.from_json(o) for o in services or []]
-
-
 class SingularClaim(Type):
-    _toSchema = {'modeltag': 'ModelTag', 'controllertag': 'ControllerTag', 'duration': 'Duration'}
-    _toPy = {'ControllerTag': 'controllertag', 'Duration': 'duration', 'ModelTag': 'modeltag'}
+    _toSchema = {'controllertag': 'ControllerTag', 'duration': 'Duration', 'modeltag': 'ModelTag'}
+    _toPy = {'ModelTag': 'modeltag', 'ControllerTag': 'controllertag', 'Duration': 'duration'}
     def __init__(self, controllertag=None, duration=None, modeltag=None):
         '''
         controllertag : str
@@ -3926,7 +3990,7 @@ class ListSpacesResults(Type):
 
 class Space(Type):
     _toSchema = {'subnets': 'Subnets', 'error': 'Error', 'name': 'Name'}
-    _toPy = {'Error': 'error', 'Subnets': 'subnets', 'Name': 'name'}
+    _toPy = {'Subnets': 'subnets', 'Error': 'error', 'Name': 'name'}
     def __init__(self, error=None, name=None, subnets=None):
         '''
         error : Error
@@ -3939,13 +4003,15 @@ class Space(Type):
 
 
 class StatusHistoryPruneArgs(Type):
-    _toSchema = {'maxlogsperentity': 'MaxLogsPerEntity'}
-    _toPy = {'MaxLogsPerEntity': 'maxlogsperentity'}
-    def __init__(self, maxlogsperentity=None):
+    _toSchema = {'maxhistorytime': 'MaxHistoryTime', 'maxhistorymb': 'MaxHistoryMB'}
+    _toPy = {'MaxHistoryTime': 'maxhistorytime', 'MaxHistoryMB': 'maxhistorymb'}
+    def __init__(self, maxhistorymb=None, maxhistorytime=None):
         '''
-        maxlogsperentity : int
+        maxhistorymb : int
+        maxhistorytime : int
         '''
-        self.maxlogsperentity = maxlogsperentity
+        self.maxhistorymb = maxhistorymb
+        self.maxhistorytime = maxhistorytime
 
 
 class FilesystemAttachmentInfo(Type):
@@ -3961,8 +4027,8 @@ class FilesystemAttachmentInfo(Type):
 
 
 class FilesystemDetails(Type):
-    _toSchema = {'filesystemtag': 'filesystemtag', 'info': 'info', 'status': 'status', 'volumetag': 'volumetag', 'storage': 'storage', 'machineattachments': 'machineattachments'}
-    _toPy = {'filesystemtag': 'filesystemtag', 'info': 'info', 'status': 'status', 'volumetag': 'volumetag', 'storage': 'storage', 'machineattachments': 'machineattachments'}
+    _toSchema = {'machineattachments': 'machineattachments', 'info': 'info', 'volumetag': 'volumetag', 'filesystemtag': 'filesystemtag', 'storage': 'storage', 'status': 'status'}
+    _toPy = {'machineattachments': 'machineattachments', 'info': 'info', 'volumetag': 'volumetag', 'filesystemtag': 'filesystemtag', 'storage': 'storage', 'status': 'status'}
     def __init__(self, filesystemtag=None, info=None, machineattachments=None, status=None, storage=None, volumetag=None):
         '''
         filesystemtag : str
@@ -3981,8 +4047,8 @@ class FilesystemDetails(Type):
 
 
 class FilesystemDetailsListResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -4035,8 +4101,8 @@ class FilesystemInfo(Type):
 
 
 class StorageAddParams(Type):
-    _toSchema = {'unit': 'unit', 'storagename': 'StorageName', 'storage': 'storage'}
-    _toPy = {'unit': 'unit', 'StorageName': 'storagename', 'storage': 'storage'}
+    _toSchema = {'storage': 'storage', 'storagename': 'StorageName', 'unit': 'unit'}
+    _toPy = {'StorageName': 'storagename', 'storage': 'storage', 'unit': 'unit'}
     def __init__(self, storagename=None, storage=None, unit=None):
         '''
         storagename : str
@@ -4049,8 +4115,8 @@ class StorageAddParams(Type):
 
 
 class StorageAttachmentDetails(Type):
-    _toSchema = {'unittag': 'unittag', 'location': 'location', 'machinetag': 'machinetag', 'storagetag': 'storagetag'}
-    _toPy = {'unittag': 'unittag', 'location': 'location', 'machinetag': 'machinetag', 'storagetag': 'storagetag'}
+    _toSchema = {'unittag': 'unittag', 'storagetag': 'storagetag', 'location': 'location', 'machinetag': 'machinetag'}
+    _toPy = {'unittag': 'unittag', 'storagetag': 'storagetag', 'location': 'location', 'machinetag': 'machinetag'}
     def __init__(self, location=None, machinetag=None, storagetag=None, unittag=None):
         '''
         location : str
@@ -4065,8 +4131,8 @@ class StorageAttachmentDetails(Type):
 
 
 class StorageConstraints(Type):
-    _toSchema = {'pool': 'Pool', 'count': 'Count', 'size': 'Size'}
-    _toPy = {'Pool': 'pool', 'Count': 'count', 'Size': 'size'}
+    _toSchema = {'pool': 'Pool', 'size': 'Size', 'count': 'Count'}
+    _toPy = {'Count': 'count', 'Pool': 'pool', 'Size': 'size'}
     def __init__(self, count=None, pool=None, size=None):
         '''
         count : int
@@ -4079,8 +4145,8 @@ class StorageConstraints(Type):
 
 
 class StorageDetails(Type):
-    _toSchema = {'attachments': 'attachments', 'status': 'status', 'persistent': 'Persistent', 'kind': 'kind', 'ownertag': 'ownertag', 'storagetag': 'storagetag'}
-    _toPy = {'Persistent': 'persistent', 'status': 'status', 'attachments': 'attachments', 'kind': 'kind', 'ownertag': 'ownertag', 'storagetag': 'storagetag'}
+    _toSchema = {'persistent': 'Persistent', 'storagetag': 'storagetag', 'kind': 'kind', 'ownertag': 'ownertag', 'attachments': 'attachments', 'status': 'status'}
+    _toPy = {'storagetag': 'storagetag', 'kind': 'kind', 'Persistent': 'persistent', 'ownertag': 'ownertag', 'attachments': 'attachments', 'status': 'status'}
     def __init__(self, persistent=None, attachments=None, kind=None, ownertag=None, status=None, storagetag=None):
         '''
         persistent : bool
@@ -4099,8 +4165,8 @@ class StorageDetails(Type):
 
 
 class StorageDetailsListResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -4121,8 +4187,8 @@ class StorageDetailsListResults(Type):
 
 
 class StorageDetailsResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -4163,8 +4229,8 @@ class StorageFilters(Type):
 
 
 class StoragePool(Type):
-    _toSchema = {'name': 'name', 'provider': 'provider', 'attrs': 'attrs'}
-    _toPy = {'name': 'name', 'provider': 'provider', 'attrs': 'attrs'}
+    _toSchema = {'provider': 'provider', 'attrs': 'attrs', 'name': 'name'}
+    _toPy = {'provider': 'provider', 'attrs': 'attrs', 'name': 'name'}
     def __init__(self, attrs=None, name=None, provider=None):
         '''
         attrs : typing.Mapping[str, typing.Any]
@@ -4199,8 +4265,8 @@ class StoragePoolFilters(Type):
 
 
 class StoragePoolsResult(Type):
-    _toSchema = {'storagepools': 'storagepools', 'error': 'error'}
-    _toPy = {'storagepools': 'storagepools', 'error': 'error'}
+    _toSchema = {'error': 'error', 'storagepools': 'storagepools'}
+    _toPy = {'error': 'error', 'storagepools': 'storagepools'}
     def __init__(self, error=None, storagepools=None):
         '''
         error : Error
@@ -4231,8 +4297,8 @@ class StoragesAddParams(Type):
 
 
 class VolumeDetails(Type):
-    _toSchema = {'info': 'info', 'machineattachments': 'machineattachments', 'status': 'status', 'volumetag': 'volumetag', 'storage': 'storage'}
-    _toPy = {'info': 'info', 'machineattachments': 'machineattachments', 'status': 'status', 'volumetag': 'volumetag', 'storage': 'storage'}
+    _toSchema = {'machineattachments': 'machineattachments', 'volumetag': 'volumetag', 'info': 'info', 'storage': 'storage', 'status': 'status'}
+    _toPy = {'machineattachments': 'machineattachments', 'volumetag': 'volumetag', 'info': 'info', 'storage': 'storage', 'status': 'status'}
     def __init__(self, info=None, machineattachments=None, status=None, storage=None, volumetag=None):
         '''
         info : VolumeInfo
@@ -4249,8 +4315,8 @@ class VolumeDetails(Type):
 
 
 class VolumeDetailsListResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -4291,8 +4357,8 @@ class VolumeFilters(Type):
 
 
 class BlockDeviceResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -4313,8 +4379,8 @@ class BlockDeviceResults(Type):
 
 
 class Filesystem(Type):
-    _toSchema = {'filesystemtag': 'filesystemtag', 'info': 'info', 'volumetag': 'volumetag'}
-    _toPy = {'filesystemtag': 'filesystemtag', 'info': 'info', 'volumetag': 'volumetag'}
+    _toSchema = {'filesystemtag': 'filesystemtag', 'volumetag': 'volumetag', 'info': 'info'}
+    _toPy = {'filesystemtag': 'filesystemtag', 'volumetag': 'volumetag', 'info': 'info'}
     def __init__(self, filesystemtag=None, info=None, volumetag=None):
         '''
         filesystemtag : str
@@ -4341,8 +4407,8 @@ class FilesystemAttachment(Type):
 
 
 class FilesystemAttachmentParams(Type):
-    _toSchema = {'filesystemtag': 'filesystemtag', 'instanceid': 'instanceid', 'mountpoint': 'mountpoint', 'machinetag': 'machinetag', 'filesystemid': 'filesystemid', 'provider': 'provider', 'read_only': 'read-only'}
-    _toPy = {'filesystemtag': 'filesystemtag', 'instanceid': 'instanceid', 'read-only': 'read_only', 'mountpoint': 'mountpoint', 'machinetag': 'machinetag', 'filesystemid': 'filesystemid', 'provider': 'provider'}
+    _toSchema = {'filesystemtag': 'filesystemtag', 'mountpoint': 'mountpoint', 'read_only': 'read-only', 'provider': 'provider', 'filesystemid': 'filesystemid', 'instanceid': 'instanceid', 'machinetag': 'machinetag'}
+    _toPy = {'filesystemtag': 'filesystemtag', 'mountpoint': 'mountpoint', 'provider': 'provider', 'read-only': 'read_only', 'filesystemid': 'filesystemid', 'instanceid': 'instanceid', 'machinetag': 'machinetag'}
     def __init__(self, filesystemid=None, filesystemtag=None, instanceid=None, machinetag=None, mountpoint=None, provider=None, read_only=None):
         '''
         filesystemid : str
@@ -4363,8 +4429,8 @@ class FilesystemAttachmentParams(Type):
 
 
 class FilesystemAttachmentParamsResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -4385,8 +4451,8 @@ class FilesystemAttachmentParamsResults(Type):
 
 
 class FilesystemAttachmentResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -4417,8 +4483,8 @@ class FilesystemAttachments(Type):
 
 
 class FilesystemParams(Type):
-    _toSchema = {'filesystemtag': 'filesystemtag', 'volumetag': 'volumetag', 'tags': 'tags', 'attachment': 'attachment', 'provider': 'provider', 'size': 'size', 'attributes': 'attributes'}
-    _toPy = {'filesystemtag': 'filesystemtag', 'volumetag': 'volumetag', 'tags': 'tags', 'attachment': 'attachment', 'provider': 'provider', 'size': 'size', 'attributes': 'attributes'}
+    _toSchema = {'attachment': 'attachment', 'attributes': 'attributes', 'size': 'size', 'volumetag': 'volumetag', 'filesystemtag': 'filesystemtag', 'tags': 'tags', 'provider': 'provider'}
+    _toPy = {'attachment': 'attachment', 'attributes': 'attributes', 'size': 'size', 'volumetag': 'volumetag', 'filesystemtag': 'filesystemtag', 'tags': 'tags', 'provider': 'provider'}
     def __init__(self, attachment=None, attributes=None, filesystemtag=None, provider=None, size=None, tags=None, volumetag=None):
         '''
         attachment : FilesystemAttachmentParams
@@ -4439,8 +4505,8 @@ class FilesystemParams(Type):
 
 
 class FilesystemParamsResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -4461,8 +4527,8 @@ class FilesystemParamsResults(Type):
 
 
 class FilesystemResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -4513,8 +4579,8 @@ class MachineStorageIdsWatchResults(Type):
 
 
 class VolumeAttachment(Type):
-    _toSchema = {'info': 'info', 'machinetag': 'machinetag', 'volumetag': 'volumetag'}
-    _toPy = {'info': 'info', 'machinetag': 'machinetag', 'volumetag': 'volumetag'}
+    _toSchema = {'volumetag': 'volumetag', 'info': 'info', 'machinetag': 'machinetag'}
+    _toPy = {'volumetag': 'volumetag', 'info': 'info', 'machinetag': 'machinetag'}
     def __init__(self, info=None, machinetag=None, volumetag=None):
         '''
         info : VolumeAttachmentInfo
@@ -4527,8 +4593,8 @@ class VolumeAttachment(Type):
 
 
 class VolumeAttachmentParamsResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -4549,8 +4615,8 @@ class VolumeAttachmentParamsResults(Type):
 
 
 class VolumeAttachmentResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -4581,8 +4647,8 @@ class VolumeAttachments(Type):
 
 
 class VolumeParamsResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -4603,8 +4669,8 @@ class VolumeParamsResults(Type):
 
 
 class VolumeResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -4657,7 +4723,7 @@ class SpaceResults(Type):
 
 
 class ZoneResult(Type):
-    _toSchema = {'available': 'Available', 'error': 'Error', 'name': 'Name'}
+    _toSchema = {'error': 'Error', 'available': 'Available', 'name': 'Name'}
     _toPy = {'Error': 'error', 'Available': 'available', 'Name': 'name'}
     def __init__(self, available=None, error=None, name=None):
         '''
@@ -4681,8 +4747,8 @@ class ZoneResults(Type):
 
 
 class UndertakerModelInfo(Type):
-    _toSchema = {'globalname': 'GlobalName', 'name': 'Name', 'life': 'Life', 'uuid': 'UUID', 'issystem': 'IsSystem'}
-    _toPy = {'UUID': 'uuid', 'Name': 'name', 'Life': 'life', 'GlobalName': 'globalname', 'IsSystem': 'issystem'}
+    _toSchema = {'globalname': 'GlobalName', 'uuid': 'UUID', 'life': 'Life', 'issystem': 'IsSystem', 'name': 'Name'}
+    _toPy = {'GlobalName': 'globalname', 'IsSystem': 'issystem', 'Life': 'life', 'Name': 'name', 'UUID': 'uuid'}
     def __init__(self, globalname=None, issystem=None, life=None, name=None, uuid=None):
         '''
         globalname : str
@@ -4699,8 +4765,8 @@ class UndertakerModelInfo(Type):
 
 
 class UndertakerModelInfoResult(Type):
-    _toSchema = {'error': 'Error', 'result': 'Result'}
-    _toPy = {'Error': 'error', 'Result': 'result'}
+    _toSchema = {'result': 'Result', 'error': 'Error'}
+    _toPy = {'Result': 'result', 'Error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -4708,6 +4774,30 @@ class UndertakerModelInfoResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = UndertakerModelInfo.from_json(result) if result else None
+
+
+class ApplicationStatusResult(Type):
+    _toSchema = {'units': 'Units', 'application': 'Application', 'error': 'Error'}
+    _toPy = {'Error': 'error', 'Application': 'application', 'Units': 'units'}
+    def __init__(self, application=None, error=None, units=None):
+        '''
+        application : StatusResult
+        error : Error
+        units : typing.Mapping[str, ~StatusResult]
+        '''
+        self.application = StatusResult.from_json(application) if application else None
+        self.error = Error.from_json(error) if error else None
+        self.units = {k: StatusResult.from_json(v) for k, v in (units or dict()).items()}
+
+
+class ApplicationStatusResults(Type):
+    _toSchema = {'results': 'Results'}
+    _toPy = {'Results': 'results'}
+    def __init__(self, results=None):
+        '''
+        results : typing.Sequence[~ApplicationStatusResult]
+        '''
+        self.results = [ApplicationStatusResult.from_json(o) for o in results or []]
 
 
 class CharmURL(Type):
@@ -4731,8 +4821,8 @@ class CharmURLs(Type):
 
 
 class ConfigSettingsResult(Type):
-    _toSchema = {'error': 'Error', 'settings': 'Settings'}
-    _toPy = {'Error': 'error', 'Settings': 'settings'}
+    _toSchema = {'settings': 'Settings', 'error': 'Error'}
+    _toPy = {'Settings': 'settings', 'Error': 'error'}
     def __init__(self, error=None, settings=None):
         '''
         error : Error
@@ -4753,15 +4843,15 @@ class ConfigSettingsResults(Type):
 
 
 class Endpoint(Type):
-    _toSchema = {'relation': 'Relation', 'servicename': 'ServiceName'}
-    _toPy = {'Relation': 'relation', 'ServiceName': 'servicename'}
-    def __init__(self, relation=None, servicename=None):
+    _toSchema = {'relation': 'Relation', 'applicationname': 'ApplicationName'}
+    _toPy = {'Relation': 'relation', 'ApplicationName': 'applicationname'}
+    def __init__(self, applicationname=None, relation=None):
         '''
+        applicationname : str
         relation : Relation
-        servicename : str
         '''
+        self.applicationname = applicationname
         self.relation = Relation.from_json(relation) if relation else None
-        self.servicename = servicename
 
 
 class EntitiesCharmURL(Type):
@@ -4786,7 +4876,7 @@ class EntitiesPortRanges(Type):
 
 class EntityCharmURL(Type):
     _toSchema = {'charmurl': 'CharmURL', 'tag': 'Tag'}
-    _toPy = {'Tag': 'tag', 'CharmURL': 'charmurl'}
+    _toPy = {'CharmURL': 'charmurl', 'Tag': 'tag'}
     def __init__(self, charmurl=None, tag=None):
         '''
         charmurl : str
@@ -4797,8 +4887,8 @@ class EntityCharmURL(Type):
 
 
 class EntityPortRange(Type):
-    _toSchema = {'protocol': 'Protocol', 'fromport': 'FromPort', 'tag': 'Tag', 'toport': 'ToPort'}
-    _toPy = {'Tag': 'tag', 'ToPort': 'toport', 'Protocol': 'protocol', 'FromPort': 'fromport'}
+    _toSchema = {'toport': 'ToPort', 'fromport': 'FromPort', 'protocol': 'Protocol', 'tag': 'Tag'}
+    _toPy = {'FromPort': 'fromport', 'Tag': 'tag', 'Protocol': 'protocol', 'ToPort': 'toport'}
     def __init__(self, fromport=None, protocol=None, tag=None, toport=None):
         '''
         fromport : int
@@ -4823,8 +4913,8 @@ class GetLeadershipSettingsBulkResults(Type):
 
 
 class GetLeadershipSettingsResult(Type):
-    _toSchema = {'error': 'Error', 'settings': 'Settings'}
-    _toPy = {'Error': 'error', 'Settings': 'settings'}
+    _toSchema = {'settings': 'Settings', 'error': 'Error'}
+    _toPy = {'Settings': 'settings', 'Error': 'error'}
     def __init__(self, error=None, settings=None):
         '''
         error : Error
@@ -4835,8 +4925,8 @@ class GetLeadershipSettingsResult(Type):
 
 
 class IntResult(Type):
-    _toSchema = {'error': 'Error', 'result': 'Result'}
-    _toPy = {'Error': 'error', 'Result': 'result'}
+    _toSchema = {'result': 'Result', 'error': 'Error'}
+    _toPy = {'Result': 'result', 'Error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -4867,20 +4957,20 @@ class MergeLeadershipSettingsBulkParams(Type):
 
 
 class MergeLeadershipSettingsParam(Type):
-    _toSchema = {'settings': 'Settings', 'servicetag': 'ServiceTag'}
-    _toPy = {'Settings': 'settings', 'ServiceTag': 'servicetag'}
-    def __init__(self, servicetag=None, settings=None):
+    _toSchema = {'applicationtag': 'ApplicationTag', 'settings': 'Settings'}
+    _toPy = {'Settings': 'settings', 'ApplicationTag': 'applicationtag'}
+    def __init__(self, applicationtag=None, settings=None):
         '''
-        servicetag : str
+        applicationtag : str
         settings : typing.Mapping[str, str]
         '''
-        self.servicetag = servicetag
+        self.applicationtag = applicationtag
         self.settings = settings
 
 
 class ModelResult(Type):
-    _toSchema = {'error': 'Error', 'uuid': 'UUID', 'name': 'Name'}
-    _toPy = {'Error': 'error', 'UUID': 'uuid', 'Name': 'name'}
+    _toSchema = {'uuid': 'UUID', 'error': 'Error', 'name': 'Name'}
+    _toPy = {'Error': 'error', 'Name': 'name', 'UUID': 'uuid'}
     def __init__(self, error=None, name=None, uuid=None):
         '''
         error : Error
@@ -4903,8 +4993,8 @@ class RelationIds(Type):
 
 
 class RelationResult(Type):
-    _toSchema = {'endpoint': 'Endpoint', 'key': 'Key', 'error': 'Error', 'id_': 'Id', 'life': 'Life'}
-    _toPy = {'Error': 'error', 'Endpoint': 'endpoint', 'Key': 'key', 'Life': 'life', 'Id': 'id_'}
+    _toSchema = {'key': 'Key', 'life': 'Life', 'id_': 'Id', 'endpoint': 'Endpoint', 'error': 'Error'}
+    _toPy = {'Endpoint': 'endpoint', 'Id': 'id_', 'Error': 'error', 'Key': 'key', 'Life': 'life'}
     def __init__(self, endpoint=None, error=None, id_=None, key=None, life=None):
         '''
         endpoint : Endpoint
@@ -4931,7 +5021,7 @@ class RelationResults(Type):
 
 
 class RelationUnit(Type):
-    _toSchema = {'unit': 'Unit', 'relation': 'Relation'}
+    _toSchema = {'relation': 'Relation', 'unit': 'Unit'}
     _toPy = {'Relation': 'relation', 'Unit': 'unit'}
     def __init__(self, relation=None, unit=None):
         '''
@@ -4943,8 +5033,8 @@ class RelationUnit(Type):
 
 
 class RelationUnitPair(Type):
-    _toSchema = {'relation': 'Relation', 'localunit': 'LocalUnit', 'remoteunit': 'RemoteUnit'}
-    _toPy = {'Relation': 'relation', 'RemoteUnit': 'remoteunit', 'LocalUnit': 'localunit'}
+    _toSchema = {'localunit': 'LocalUnit', 'relation': 'Relation', 'remoteunit': 'RemoteUnit'}
+    _toPy = {'RemoteUnit': 'remoteunit', 'Relation': 'relation', 'LocalUnit': 'localunit'}
     def __init__(self, localunit=None, relation=None, remoteunit=None):
         '''
         localunit : str
@@ -4967,8 +5057,8 @@ class RelationUnitPairs(Type):
 
 
 class RelationUnitSettings(Type):
-    _toSchema = {'unit': 'Unit', 'relation': 'Relation', 'settings': 'Settings'}
-    _toPy = {'Relation': 'relation', 'Unit': 'unit', 'Settings': 'settings'}
+    _toSchema = {'settings': 'Settings', 'relation': 'Relation', 'unit': 'Unit'}
+    _toPy = {'Settings': 'settings', 'Relation': 'relation', 'Unit': 'unit'}
     def __init__(self, relation=None, settings=None, unit=None):
         '''
         relation : str
@@ -5011,7 +5101,7 @@ class RelationUnitsWatchResults(Type):
 
 
 class ResolvedModeResult(Type):
-    _toSchema = {'error': 'Error', 'mode': 'Mode'}
+    _toSchema = {'mode': 'Mode', 'error': 'Error'}
     _toPy = {'Error': 'error', 'Mode': 'mode'}
     def __init__(self, error=None, mode=None):
         '''
@@ -5032,33 +5122,9 @@ class ResolvedModeResults(Type):
         self.results = [ResolvedModeResult.from_json(o) for o in results or []]
 
 
-class ServiceStatusResult(Type):
-    _toSchema = {'units': 'Units', 'error': 'Error', 'service': 'Service'}
-    _toPy = {'Error': 'error', 'Service': 'service', 'Units': 'units'}
-    def __init__(self, error=None, service=None, units=None):
-        '''
-        error : Error
-        service : StatusResult
-        units : typing.Mapping[str, ~StatusResult]
-        '''
-        self.error = Error.from_json(error) if error else None
-        self.service = StatusResult.from_json(service) if service else None
-        self.units = {k: StatusResult.from_json(v) for k, v in (units or dict()).items()}
-
-
-class ServiceStatusResults(Type):
-    _toSchema = {'results': 'Results'}
-    _toPy = {'Results': 'results'}
-    def __init__(self, results=None):
-        '''
-        results : typing.Sequence[~ServiceStatusResult]
-        '''
-        self.results = [ServiceStatusResult.from_json(o) for o in results or []]
-
-
 class SettingsResult(Type):
-    _toSchema = {'error': 'Error', 'settings': 'Settings'}
-    _toPy = {'Error': 'error', 'Settings': 'settings'}
+    _toSchema = {'settings': 'Settings', 'error': 'Error'}
+    _toPy = {'Settings': 'settings', 'Error': 'error'}
     def __init__(self, error=None, settings=None):
         '''
         error : Error
@@ -5079,8 +5145,8 @@ class SettingsResults(Type):
 
 
 class StorageAttachment(Type):
-    _toSchema = {'ownertag': 'OwnerTag', 'unittag': 'UnitTag', 'location': 'Location', 'kind': 'Kind', 'life': 'Life', 'storagetag': 'StorageTag'}
-    _toPy = {'UnitTag': 'unittag', 'OwnerTag': 'ownertag', 'Location': 'location', 'Life': 'life', 'StorageTag': 'storagetag', 'Kind': 'kind'}
+    _toSchema = {'storagetag': 'StorageTag', 'location': 'Location', 'life': 'Life', 'unittag': 'UnitTag', 'ownertag': 'OwnerTag', 'kind': 'Kind'}
+    _toPy = {'OwnerTag': 'ownertag', 'StorageTag': 'storagetag', 'UnitTag': 'unittag', 'Life': 'life', 'Location': 'location', 'Kind': 'kind'}
     def __init__(self, kind=None, life=None, location=None, ownertag=None, storagetag=None, unittag=None):
         '''
         kind : int
@@ -5121,8 +5187,8 @@ class StorageAttachmentIds(Type):
 
 
 class StorageAttachmentIdsResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -5143,8 +5209,8 @@ class StorageAttachmentIdsResults(Type):
 
 
 class StorageAttachmentResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -5165,8 +5231,8 @@ class StorageAttachmentResults(Type):
 
 
 class StringBoolResult(Type):
-    _toSchema = {'error': 'Error', 'ok': 'Ok', 'result': 'Result'}
-    _toPy = {'Error': 'error', 'Result': 'result', 'Ok': 'ok'}
+    _toSchema = {'result': 'Result', 'ok': 'Ok', 'error': 'Error'}
+    _toPy = {'Result': 'result', 'Error': 'error', 'Ok': 'ok'}
     def __init__(self, error=None, ok=None, result=None):
         '''
         error : Error
@@ -5190,7 +5256,7 @@ class StringBoolResults(Type):
 
 class UnitNetworkConfig(Type):
     _toSchema = {'unittag': 'UnitTag', 'bindingname': 'BindingName'}
-    _toPy = {'UnitTag': 'unittag', 'BindingName': 'bindingname'}
+    _toPy = {'BindingName': 'bindingname', 'UnitTag': 'unittag'}
     def __init__(self, bindingname=None, unittag=None):
         '''
         bindingname : str
@@ -5202,7 +5268,7 @@ class UnitNetworkConfig(Type):
 
 class UnitNetworkConfigResult(Type):
     _toSchema = {'info': 'Info', 'error': 'Error'}
-    _toPy = {'Info': 'info', 'Error': 'error'}
+    _toPy = {'Error': 'error', 'Info': 'info'}
     def __init__(self, error=None, info=None):
         '''
         error : Error
@@ -5277,8 +5343,8 @@ class VersionResults(Type):
 
 
 class AddUser(Type):
-    _toSchema = {'model_access_permission': 'model-access-permission', 'display_name': 'display-name', 'username': 'username', 'shared_model_tags': 'shared-model-tags', 'password': 'password'}
-    _toPy = {'password': 'password', 'model-access-permission': 'model_access_permission', 'display-name': 'display_name', 'username': 'username', 'shared-model-tags': 'shared_model_tags'}
+    _toSchema = {'model_access_permission': 'model-access-permission', 'shared_model_tags': 'shared-model-tags', 'password': 'password', 'username': 'username', 'display_name': 'display-name'}
+    _toPy = {'model-access-permission': 'model_access_permission', 'password': 'password', 'username': 'username', 'shared-model-tags': 'shared_model_tags', 'display-name': 'display_name'}
     def __init__(self, display_name=None, model_access_permission=None, password=None, shared_model_tags=None, username=None):
         '''
         display_name : str
@@ -5295,8 +5361,8 @@ class AddUser(Type):
 
 
 class AddUserResult(Type):
-    _toSchema = {'error': 'error', 'tag': 'tag', 'secret_key': 'secret-key'}
-    _toPy = {'error': 'error', 'secret-key': 'secret_key', 'tag': 'tag'}
+    _toSchema = {'tag': 'tag', 'error': 'error', 'secret_key': 'secret-key'}
+    _toPy = {'error': 'error', 'tag': 'tag', 'secret-key': 'secret_key'}
     def __init__(self, error=None, secret_key=None, tag=None):
         '''
         error : Error
@@ -5329,8 +5395,8 @@ class AddUsers(Type):
 
 
 class MacaroonResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -5351,8 +5417,8 @@ class MacaroonResults(Type):
 
 
 class UserInfo(Type):
-    _toSchema = {'created_by': 'created-by', 'username': 'username', 'display_name': 'display-name', 'last_connection': 'last-connection', 'disabled': 'disabled', 'date_created': 'date-created'}
-    _toPy = {'username': 'username', 'created-by': 'created_by', 'display-name': 'display_name', 'disabled': 'disabled', 'last-connection': 'last_connection', 'date-created': 'date_created'}
+    _toSchema = {'date_created': 'date-created', 'last_connection': 'last-connection', 'disabled': 'disabled', 'display_name': 'display-name', 'created_by': 'created-by', 'username': 'username'}
+    _toPy = {'last-connection': 'last_connection', 'date-created': 'date_created', 'disabled': 'disabled', 'created-by': 'created_by', 'username': 'username', 'display-name': 'display_name'}
     def __init__(self, created_by=None, date_created=None, disabled=None, display_name=None, last_connection=None, username=None):
         '''
         created_by : str
@@ -5383,8 +5449,8 @@ class UserInfoRequest(Type):
 
 
 class UserInfoResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -5404,9 +5470,9 @@ class UserInfoResults(Type):
         self.results = [UserInfoResult.from_json(o) for o in results or []]
 
 
-class Action(Type):
+class ActionFacade(Type):
     name = 'Action'
-    version = 1
+    version = 2
     schema =     {'definitions': {'Action': {'additionalProperties': False,
                                 'properties': {'name': {'type': 'string'},
                                                'parameters': {'patternProperties': {'.*': {'additionalProperties': True,
@@ -5435,9 +5501,17 @@ class Action(Type):
                                        'properties': {'results': {'items': {'$ref': '#/definitions/ActionResult'},
                                                                   'type': 'array'}},
                                        'type': 'object'},
+                     'ActionSpec': {'additionalProperties': False,
+                                    'properties': {'Description': {'type': 'string'},
+                                                   'Params': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                           'type': 'object'}},
+                                                              'type': 'object'}},
+                                    'required': ['Description', 'Params'],
+                                    'type': 'object'},
                      'Actions': {'additionalProperties': False,
-                                 'properties': {'actions': {'items': {'$ref': '#/definitions/Action'},
-                                                            'type': 'array'}},
+                                 'properties': {'ActionSpecs': {'patternProperties': {'.*': {'$ref': '#/definitions/ActionSpec'}},
+                                                                'type': 'object'}},
+                                 'required': ['ActionSpecs'],
                                  'type': 'object'},
                      'ActionsByName': {'additionalProperties': False,
                                        'properties': {'actions': {'items': {'$ref': '#/definitions/ActionResult'},
@@ -5459,6 +5533,15 @@ class Action(Type):
                                             'properties': {'actions': {'items': {'$ref': '#/definitions/ActionsByReceiver'},
                                                                        'type': 'array'}},
                                             'type': 'object'},
+                     'ApplicationCharmActionsResult': {'additionalProperties': False,
+                                                       'properties': {'ApplicationTag': {'type': 'string'},
+                                                                      'actions': {'$ref': '#/definitions/Actions'},
+                                                                      'error': {'$ref': '#/definitions/Error'}},
+                                                       'type': 'object'},
+                     'ApplicationsCharmActionsResults': {'additionalProperties': False,
+                                                         'properties': {'results': {'items': {'$ref': '#/definitions/ApplicationCharmActionsResult'},
+                                                                                    'type': 'array'}},
+                                                         'type': 'object'},
                      'Entities': {'additionalProperties': False,
                                   'properties': {'Entities': {'items': {'$ref': '#/definitions/Entity'},
                                                               'type': 'array'}},
@@ -5509,10 +5592,10 @@ class Action(Type):
                                                'sig'],
                                   'type': 'object'},
                      'RunParams': {'additionalProperties': False,
-                                   'properties': {'Commands': {'type': 'string'},
+                                   'properties': {'Applications': {'items': {'type': 'string'},
+                                                                   'type': 'array'},
+                                                  'Commands': {'type': 'string'},
                                                   'Machines': {'items': {'type': 'string'},
-                                                               'type': 'array'},
-                                                  'Services': {'items': {'type': 'string'},
                                                                'type': 'array'},
                                                   'Timeout': {'type': 'integer'},
                                                   'Units': {'items': {'type': 'string'},
@@ -5520,18 +5603,9 @@ class Action(Type):
                                    'required': ['Commands',
                                                 'Timeout',
                                                 'Machines',
-                                                'Services',
+                                                'Applications',
                                                 'Units'],
                                    'type': 'object'},
-                     'ServiceCharmActionsResult': {'additionalProperties': False,
-                                                   'properties': {'actions': {'$ref': '#/definitions/Actions'},
-                                                                  'error': {'$ref': '#/definitions/Error'},
-                                                                  'servicetag': {'type': 'string'}},
-                                                   'type': 'object'},
-                     'ServicesCharmActionsResults': {'additionalProperties': False,
-                                                     'properties': {'results': {'items': {'$ref': '#/definitions/ServiceCharmActionsResult'},
-                                                                                'type': 'array'}},
-                                                     'type': 'object'},
                      'caveat': {'additionalProperties': False,
                                 'properties': {'caveatId': {'$ref': '#/definitions/packet'},
                                                'location': {'$ref': '#/definitions/packet'},
@@ -5549,6 +5623,9 @@ class Action(Type):
      'properties': {'Actions': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                'Result': {'$ref': '#/definitions/ActionResults'}},
                                 'type': 'object'},
+                    'ApplicationsCharmsActions': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                                 'Result': {'$ref': '#/definitions/ApplicationsCharmActionsResults'}},
+                                                  'type': 'object'},
                     'Cancel': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                               'Result': {'$ref': '#/definitions/ActionResults'}},
                                'type': 'object'},
@@ -5578,10 +5655,7 @@ class Action(Type):
                             'type': 'object'},
                     'RunOnAllMachines': {'properties': {'Params': {'$ref': '#/definitions/RunParams'},
                                                         'Result': {'$ref': '#/definitions/ActionResults'}},
-                                         'type': 'object'},
-                    'ServicesCharmActions': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                            'Result': {'$ref': '#/definitions/ServicesCharmActionsResults'}},
-                                             'type': 'object'}},
+                                         'type': 'object'}},
      'type': 'object'}
     
 
@@ -5593,7 +5667,22 @@ class Action(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Action', Request='Actions', Version=1, Params=params)
+        msg = dict(Type='Action', Request='Actions', Version=2, Params=params)
+        params['Entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ApplicationsCharmActionsResults)
+    async def ApplicationsCharmsActions(self, entities):
+        '''
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~ApplicationCharmActionsResult]
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(Type='Action', Request='ApplicationsCharmsActions', Version=2, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -5608,7 +5697,7 @@ class Action(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Action', Request='Cancel', Version=1, Params=params)
+        msg = dict(Type='Action', Request='Cancel', Version=2, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -5616,15 +5705,15 @@ class Action(Type):
 
 
     @ReturnMapping(ActionResults)
-    async def Enqueue(self, actions):
+    async def Enqueue(self, actionspecs):
         '''
-        actions : typing.Sequence[~Action]
+        actionspecs : typing.Mapping[str, ~ActionSpec]
         Returns -> typing.Sequence[~ActionResult]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Action', Request='Enqueue', Version=1, Params=params)
-        params['actions'] = actions
+        msg = dict(Type='Action', Request='Enqueue', Version=2, Params=params)
+        params['ActionSpecs'] = actionspecs
         reply = await self.rpc(msg)
         return reply
 
@@ -5638,7 +5727,7 @@ class Action(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Action', Request='FindActionTagsByPrefix', Version=1, Params=params)
+        msg = dict(Type='Action', Request='FindActionTagsByPrefix', Version=2, Params=params)
         params['prefixes'] = prefixes
         reply = await self.rpc(msg)
         return reply
@@ -5653,7 +5742,7 @@ class Action(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Action', Request='FindActionsByNames', Version=1, Params=params)
+        msg = dict(Type='Action', Request='FindActionsByNames', Version=2, Params=params)
         params['names'] = names
         reply = await self.rpc(msg)
         return reply
@@ -5668,7 +5757,7 @@ class Action(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Action', Request='ListAll', Version=1, Params=params)
+        msg = dict(Type='Action', Request='ListAll', Version=2, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -5683,7 +5772,7 @@ class Action(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Action', Request='ListCompleted', Version=1, Params=params)
+        msg = dict(Type='Action', Request='ListCompleted', Version=2, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -5698,7 +5787,7 @@ class Action(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Action', Request='ListPending', Version=1, Params=params)
+        msg = dict(Type='Action', Request='ListPending', Version=2, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -5713,7 +5802,7 @@ class Action(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Action', Request='ListRunning', Version=1, Params=params)
+        msg = dict(Type='Action', Request='ListRunning', Version=2, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -5721,21 +5810,21 @@ class Action(Type):
 
 
     @ReturnMapping(ActionResults)
-    async def Run(self, commands, machines, services, timeout, units):
+    async def Run(self, applications, commands, machines, timeout, units):
         '''
+        applications : typing.Sequence[str]
         commands : str
         machines : typing.Sequence[str]
-        services : typing.Sequence[str]
         timeout : int
         units : typing.Sequence[str]
         Returns -> typing.Sequence[~ActionResult]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Action', Request='Run', Version=1, Params=params)
+        msg = dict(Type='Action', Request='Run', Version=2, Params=params)
+        params['Applications'] = applications
         params['Commands'] = commands
         params['Machines'] = machines
-        params['Services'] = services
         params['Timeout'] = timeout
         params['Units'] = units
         reply = await self.rpc(msg)
@@ -5744,43 +5833,28 @@ class Action(Type):
 
 
     @ReturnMapping(ActionResults)
-    async def RunOnAllMachines(self, commands, machines, services, timeout, units):
+    async def RunOnAllMachines(self, applications, commands, machines, timeout, units):
         '''
+        applications : typing.Sequence[str]
         commands : str
         machines : typing.Sequence[str]
-        services : typing.Sequence[str]
         timeout : int
         units : typing.Sequence[str]
         Returns -> typing.Sequence[~ActionResult]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Action', Request='RunOnAllMachines', Version=1, Params=params)
+        msg = dict(Type='Action', Request='RunOnAllMachines', Version=2, Params=params)
+        params['Applications'] = applications
         params['Commands'] = commands
         params['Machines'] = machines
-        params['Services'] = services
         params['Timeout'] = timeout
         params['Units'] = units
         reply = await self.rpc(msg)
         return reply
 
 
-
-    @ReturnMapping(ServicesCharmActionsResults)
-    async def ServicesCharmActions(self, entities):
-        '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ServiceCharmActionsResult]
-        '''
-        # map input types to rpc msg
-        params = dict()
-        msg = dict(Type='Action', Request='ServicesCharmActions', Version=1, Params=params)
-        params['Entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-class Addresser(Type):
+class AddresserFacade(Type):
     name = 'Addresser'
     version = 2
     schema =     {'definitions': {'BoolResult': {'additionalProperties': False,
@@ -5893,7 +5967,7 @@ class Addresser(Type):
         return reply
 
 
-class Agent(Type):
+class AgentFacade(Type):
     name = 'Agent'
     version = 2
     schema =     {'definitions': {'AgentGetEntitiesResult': {'additionalProperties': False,
@@ -6134,7 +6208,7 @@ class Agent(Type):
         return reply
 
 
-class AgentTools(Type):
+class AgentToolsFacade(Type):
     name = 'AgentTools'
     version = 1
     schema =     {'properties': {'UpdateToolsAvailable': {'type': 'object'}}, 'type': 'object'}
@@ -6154,7 +6228,7 @@ class AgentTools(Type):
         return reply
 
 
-class AllModelWatcher(Type):
+class AllModelWatcherFacade(Type):
     name = 'AllModelWatcher'
     version = 2
     schema =     {'definitions': {'AllWatcherNextResults': {'additionalProperties': False,
@@ -6203,7 +6277,7 @@ class AllModelWatcher(Type):
         return reply
 
 
-class AllWatcher(Type):
+class AllWatcherFacade(Type):
     name = 'AllWatcher'
     version = 1
     schema =     {'definitions': {'AllWatcherNextResults': {'additionalProperties': False,
@@ -6252,7 +6326,7 @@ class AllWatcher(Type):
         return reply
 
 
-class Annotations(Type):
+class AnnotationsFacade(Type):
     name = 'Annotations'
     version = 2
     schema =     {'definitions': {'AnnotationsGetResult': {'additionalProperties': False,
@@ -6375,7 +6449,738 @@ class Annotations(Type):
         return reply
 
 
-class Backups(Type):
+class ApplicationFacade(Type):
+    name = 'Application'
+    version = 1
+    schema =     {'definitions': {'AddApplicationUnits': {'additionalProperties': False,
+                                             'properties': {'ApplicationName': {'type': 'string'},
+                                                            'NumUnits': {'type': 'integer'},
+                                                            'Placement': {'items': {'$ref': '#/definitions/Placement'},
+                                                                          'type': 'array'}},
+                                             'required': ['ApplicationName',
+                                                          'NumUnits',
+                                                          'Placement'],
+                                             'type': 'object'},
+                     'AddApplicationUnitsResults': {'additionalProperties': False,
+                                                    'properties': {'Units': {'items': {'type': 'string'},
+                                                                             'type': 'array'}},
+                                                    'required': ['Units'],
+                                                    'type': 'object'},
+                     'AddRelation': {'additionalProperties': False,
+                                     'properties': {'Endpoints': {'items': {'type': 'string'},
+                                                                  'type': 'array'}},
+                                     'required': ['Endpoints'],
+                                     'type': 'object'},
+                     'AddRelationResults': {'additionalProperties': False,
+                                            'properties': {'Endpoints': {'patternProperties': {'.*': {'$ref': '#/definitions/Relation'}},
+                                                                         'type': 'object'}},
+                                            'required': ['Endpoints'],
+                                            'type': 'object'},
+                     'ApplicationCharmRelations': {'additionalProperties': False,
+                                                   'properties': {'ApplicationName': {'type': 'string'}},
+                                                   'required': ['ApplicationName'],
+                                                   'type': 'object'},
+                     'ApplicationCharmRelationsResults': {'additionalProperties': False,
+                                                          'properties': {'CharmRelations': {'items': {'type': 'string'},
+                                                                                            'type': 'array'}},
+                                                          'required': ['CharmRelations'],
+                                                          'type': 'object'},
+                     'ApplicationDeploy': {'additionalProperties': False,
+                                           'properties': {'ApplicationName': {'type': 'string'},
+                                                          'Channel': {'type': 'string'},
+                                                          'CharmUrl': {'type': 'string'},
+                                                          'Config': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                     'type': 'object'},
+                                                          'ConfigYAML': {'type': 'string'},
+                                                          'Constraints': {'$ref': '#/definitions/Value'},
+                                                          'EndpointBindings': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                               'type': 'object'},
+                                                          'NumUnits': {'type': 'integer'},
+                                                          'Placement': {'items': {'$ref': '#/definitions/Placement'},
+                                                                        'type': 'array'},
+                                                          'Resources': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                        'type': 'object'},
+                                                          'Series': {'type': 'string'},
+                                                          'Storage': {'patternProperties': {'.*': {'$ref': '#/definitions/Constraints'}},
+                                                                      'type': 'object'}},
+                                           'required': ['ApplicationName',
+                                                        'Series',
+                                                        'CharmUrl',
+                                                        'Channel',
+                                                        'NumUnits',
+                                                        'Config',
+                                                        'ConfigYAML',
+                                                        'Constraints',
+                                                        'Placement',
+                                                        'Storage',
+                                                        'EndpointBindings',
+                                                        'Resources'],
+                                           'type': 'object'},
+                     'ApplicationDestroy': {'additionalProperties': False,
+                                            'properties': {'ApplicationName': {'type': 'string'}},
+                                            'required': ['ApplicationName'],
+                                            'type': 'object'},
+                     'ApplicationExpose': {'additionalProperties': False,
+                                           'properties': {'ApplicationName': {'type': 'string'}},
+                                           'required': ['ApplicationName'],
+                                           'type': 'object'},
+                     'ApplicationGet': {'additionalProperties': False,
+                                        'properties': {'ApplicationName': {'type': 'string'}},
+                                        'required': ['ApplicationName'],
+                                        'type': 'object'},
+                     'ApplicationGetResults': {'additionalProperties': False,
+                                               'properties': {'Application': {'type': 'string'},
+                                                              'Charm': {'type': 'string'},
+                                                              'Config': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                      'type': 'object'}},
+                                                                         'type': 'object'},
+                                                              'Constraints': {'$ref': '#/definitions/Value'}},
+                                               'required': ['Application',
+                                                            'Charm',
+                                                            'Config',
+                                                            'Constraints'],
+                                               'type': 'object'},
+                     'ApplicationMetricCredential': {'additionalProperties': False,
+                                                     'properties': {'ApplicationName': {'type': 'string'},
+                                                                    'MetricCredentials': {'items': {'type': 'integer'},
+                                                                                          'type': 'array'}},
+                                                     'required': ['ApplicationName',
+                                                                  'MetricCredentials'],
+                                                     'type': 'object'},
+                     'ApplicationMetricCredentials': {'additionalProperties': False,
+                                                      'properties': {'Creds': {'items': {'$ref': '#/definitions/ApplicationMetricCredential'},
+                                                                               'type': 'array'}},
+                                                      'required': ['Creds'],
+                                                      'type': 'object'},
+                     'ApplicationSet': {'additionalProperties': False,
+                                        'properties': {'ApplicationName': {'type': 'string'},
+                                                       'Options': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                   'type': 'object'}},
+                                        'required': ['ApplicationName', 'Options'],
+                                        'type': 'object'},
+                     'ApplicationSetCharm': {'additionalProperties': False,
+                                             'properties': {'applicationname': {'type': 'string'},
+                                                            'charmurl': {'type': 'string'},
+                                                            'cs-channel': {'type': 'string'},
+                                                            'forceseries': {'type': 'boolean'},
+                                                            'forceunits': {'type': 'boolean'},
+                                                            'resourceids': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                            'type': 'object'}},
+                                             'required': ['applicationname',
+                                                          'charmurl',
+                                                          'cs-channel',
+                                                          'forceunits',
+                                                          'forceseries',
+                                                          'resourceids'],
+                                             'type': 'object'},
+                     'ApplicationUnexpose': {'additionalProperties': False,
+                                             'properties': {'ApplicationName': {'type': 'string'}},
+                                             'required': ['ApplicationName'],
+                                             'type': 'object'},
+                     'ApplicationUnset': {'additionalProperties': False,
+                                          'properties': {'ApplicationName': {'type': 'string'},
+                                                         'Options': {'items': {'type': 'string'},
+                                                                     'type': 'array'}},
+                                          'required': ['ApplicationName',
+                                                       'Options'],
+                                          'type': 'object'},
+                     'ApplicationUpdate': {'additionalProperties': False,
+                                           'properties': {'ApplicationName': {'type': 'string'},
+                                                          'CharmUrl': {'type': 'string'},
+                                                          'Constraints': {'$ref': '#/definitions/Value'},
+                                                          'ForceCharmUrl': {'type': 'boolean'},
+                                                          'ForceSeries': {'type': 'boolean'},
+                                                          'MinUnits': {'type': 'integer'},
+                                                          'SettingsStrings': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                              'type': 'object'},
+                                                          'SettingsYAML': {'type': 'string'}},
+                                           'required': ['ApplicationName',
+                                                        'CharmUrl',
+                                                        'ForceCharmUrl',
+                                                        'ForceSeries',
+                                                        'MinUnits',
+                                                        'SettingsStrings',
+                                                        'SettingsYAML',
+                                                        'Constraints'],
+                                           'type': 'object'},
+                     'ApplicationsDeploy': {'additionalProperties': False,
+                                            'properties': {'Applications': {'items': {'$ref': '#/definitions/ApplicationDeploy'},
+                                                                            'type': 'array'}},
+                                            'required': ['Applications'],
+                                            'type': 'object'},
+                     'Constraints': {'additionalProperties': False,
+                                     'properties': {'Count': {'type': 'integer'},
+                                                    'Pool': {'type': 'string'},
+                                                    'Size': {'type': 'integer'}},
+                                     'required': ['Pool', 'Size', 'Count'],
+                                     'type': 'object'},
+                     'DestroyApplicationUnits': {'additionalProperties': False,
+                                                 'properties': {'UnitNames': {'items': {'type': 'string'},
+                                                                              'type': 'array'}},
+                                                 'required': ['UnitNames'],
+                                                 'type': 'object'},
+                     'DestroyRelation': {'additionalProperties': False,
+                                         'properties': {'Endpoints': {'items': {'type': 'string'},
+                                                                      'type': 'array'}},
+                                         'required': ['Endpoints'],
+                                         'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'Code': {'type': 'string'},
+                                              'Info': {'$ref': '#/definitions/ErrorInfo'},
+                                              'Message': {'type': 'string'}},
+                               'required': ['Message', 'Code'],
+                               'type': 'object'},
+                     'ErrorInfo': {'additionalProperties': False,
+                                   'properties': {'Macaroon': {'$ref': '#/definitions/Macaroon'},
+                                                  'MacaroonPath': {'type': 'string'}},
+                                   'type': 'object'},
+                     'ErrorResult': {'additionalProperties': False,
+                                     'properties': {'Error': {'$ref': '#/definitions/Error'}},
+                                     'required': ['Error'],
+                                     'type': 'object'},
+                     'ErrorResults': {'additionalProperties': False,
+                                      'properties': {'Results': {'items': {'$ref': '#/definitions/ErrorResult'},
+                                                                 'type': 'array'}},
+                                      'required': ['Results'],
+                                      'type': 'object'},
+                     'GetApplicationConstraints': {'additionalProperties': False,
+                                                   'properties': {'ApplicationName': {'type': 'string'}},
+                                                   'required': ['ApplicationName'],
+                                                   'type': 'object'},
+                     'GetConstraintsResults': {'additionalProperties': False,
+                                               'properties': {'Constraints': {'$ref': '#/definitions/Value'}},
+                                               'required': ['Constraints'],
+                                               'type': 'object'},
+                     'Macaroon': {'additionalProperties': False,
+                                  'properties': {'caveats': {'items': {'$ref': '#/definitions/caveat'},
+                                                             'type': 'array'},
+                                                 'data': {'items': {'type': 'integer'},
+                                                          'type': 'array'},
+                                                 'id': {'$ref': '#/definitions/packet'},
+                                                 'location': {'$ref': '#/definitions/packet'},
+                                                 'sig': {'items': {'type': 'integer'},
+                                                         'type': 'array'}},
+                                  'required': ['data',
+                                               'location',
+                                               'id',
+                                               'caveats',
+                                               'sig'],
+                                  'type': 'object'},
+                     'Placement': {'additionalProperties': False,
+                                   'properties': {'Directive': {'type': 'string'},
+                                                  'Scope': {'type': 'string'}},
+                                   'required': ['Scope', 'Directive'],
+                                   'type': 'object'},
+                     'Relation': {'additionalProperties': False,
+                                  'properties': {'Interface': {'type': 'string'},
+                                                 'Limit': {'type': 'integer'},
+                                                 'Name': {'type': 'string'},
+                                                 'Optional': {'type': 'boolean'},
+                                                 'Role': {'type': 'string'},
+                                                 'Scope': {'type': 'string'}},
+                                  'required': ['Name',
+                                               'Role',
+                                               'Interface',
+                                               'Optional',
+                                               'Limit',
+                                               'Scope'],
+                                  'type': 'object'},
+                     'SetConstraints': {'additionalProperties': False,
+                                        'properties': {'ApplicationName': {'type': 'string'},
+                                                       'Constraints': {'$ref': '#/definitions/Value'}},
+                                        'required': ['ApplicationName',
+                                                     'Constraints'],
+                                        'type': 'object'},
+                     'StringResult': {'additionalProperties': False,
+                                      'properties': {'Error': {'$ref': '#/definitions/Error'},
+                                                     'Result': {'type': 'string'}},
+                                      'required': ['Error', 'Result'],
+                                      'type': 'object'},
+                     'Value': {'additionalProperties': False,
+                               'properties': {'arch': {'type': 'string'},
+                                              'container': {'type': 'string'},
+                                              'cpu-cores': {'type': 'integer'},
+                                              'cpu-power': {'type': 'integer'},
+                                              'instance-type': {'type': 'string'},
+                                              'mem': {'type': 'integer'},
+                                              'root-disk': {'type': 'integer'},
+                                              'spaces': {'items': {'type': 'string'},
+                                                         'type': 'array'},
+                                              'tags': {'items': {'type': 'string'},
+                                                       'type': 'array'},
+                                              'virt-type': {'type': 'string'}},
+                               'type': 'object'},
+                     'caveat': {'additionalProperties': False,
+                                'properties': {'caveatId': {'$ref': '#/definitions/packet'},
+                                               'location': {'$ref': '#/definitions/packet'},
+                                               'verificationId': {'$ref': '#/definitions/packet'}},
+                                'required': ['location',
+                                             'caveatId',
+                                             'verificationId'],
+                                'type': 'object'},
+                     'packet': {'additionalProperties': False,
+                                'properties': {'headerLen': {'type': 'integer'},
+                                               'start': {'type': 'integer'},
+                                               'totalLen': {'type': 'integer'}},
+                                'required': ['start', 'totalLen', 'headerLen'],
+                                'type': 'object'}},
+     'properties': {'AddRelation': {'properties': {'Params': {'$ref': '#/definitions/AddRelation'},
+                                                   'Result': {'$ref': '#/definitions/AddRelationResults'}},
+                                    'type': 'object'},
+                    'AddUnits': {'properties': {'Params': {'$ref': '#/definitions/AddApplicationUnits'},
+                                                'Result': {'$ref': '#/definitions/AddApplicationUnitsResults'}},
+                                 'type': 'object'},
+                    'CharmRelations': {'properties': {'Params': {'$ref': '#/definitions/ApplicationCharmRelations'},
+                                                      'Result': {'$ref': '#/definitions/ApplicationCharmRelationsResults'}},
+                                       'type': 'object'},
+                    'Deploy': {'properties': {'Params': {'$ref': '#/definitions/ApplicationsDeploy'},
+                                              'Result': {'$ref': '#/definitions/ErrorResults'}},
+                               'type': 'object'},
+                    'Destroy': {'properties': {'Params': {'$ref': '#/definitions/ApplicationDestroy'}},
+                                'type': 'object'},
+                    'DestroyRelation': {'properties': {'Params': {'$ref': '#/definitions/DestroyRelation'}},
+                                        'type': 'object'},
+                    'DestroyUnits': {'properties': {'Params': {'$ref': '#/definitions/DestroyApplicationUnits'}},
+                                     'type': 'object'},
+                    'Expose': {'properties': {'Params': {'$ref': '#/definitions/ApplicationExpose'}},
+                               'type': 'object'},
+                    'Get': {'properties': {'Params': {'$ref': '#/definitions/ApplicationGet'},
+                                           'Result': {'$ref': '#/definitions/ApplicationGetResults'}},
+                            'type': 'object'},
+                    'GetCharmURL': {'properties': {'Params': {'$ref': '#/definitions/ApplicationGet'},
+                                                   'Result': {'$ref': '#/definitions/StringResult'}},
+                                    'type': 'object'},
+                    'GetConstraints': {'properties': {'Params': {'$ref': '#/definitions/GetApplicationConstraints'},
+                                                      'Result': {'$ref': '#/definitions/GetConstraintsResults'}},
+                                       'type': 'object'},
+                    'Set': {'properties': {'Params': {'$ref': '#/definitions/ApplicationSet'}},
+                            'type': 'object'},
+                    'SetCharm': {'properties': {'Params': {'$ref': '#/definitions/ApplicationSetCharm'}},
+                                 'type': 'object'},
+                    'SetConstraints': {'properties': {'Params': {'$ref': '#/definitions/SetConstraints'}},
+                                       'type': 'object'},
+                    'SetMetricCredentials': {'properties': {'Params': {'$ref': '#/definitions/ApplicationMetricCredentials'},
+                                                            'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                             'type': 'object'},
+                    'Unexpose': {'properties': {'Params': {'$ref': '#/definitions/ApplicationUnexpose'}},
+                                 'type': 'object'},
+                    'Unset': {'properties': {'Params': {'$ref': '#/definitions/ApplicationUnset'}},
+                              'type': 'object'},
+                    'Update': {'properties': {'Params': {'$ref': '#/definitions/ApplicationUpdate'}},
+                               'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(AddRelationResults)
+    async def AddRelation(self, endpoints):
+        '''
+        endpoints : typing.Sequence[str]
+        Returns -> typing.Mapping[str, ~Relation]
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(Type='Application', Request='AddRelation', Version=1, Params=params)
+        params['Endpoints'] = endpoints
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(AddApplicationUnitsResults)
+    async def AddUnits(self, applicationname, numunits, placement):
+        '''
+        applicationname : str
+        numunits : int
+        placement : typing.Sequence[~Placement]
+        Returns -> typing.Sequence[str]
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(Type='Application', Request='AddUnits', Version=1, Params=params)
+        params['ApplicationName'] = applicationname
+        params['NumUnits'] = numunits
+        params['Placement'] = placement
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ApplicationCharmRelationsResults)
+    async def CharmRelations(self, applicationname):
+        '''
+        applicationname : str
+        Returns -> typing.Sequence[str]
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(Type='Application', Request='CharmRelations', Version=1, Params=params)
+        params['ApplicationName'] = applicationname
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def Deploy(self, applications):
+        '''
+        applications : typing.Sequence[~ApplicationDeploy]
+        Returns -> typing.Sequence[~ErrorResult]
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(Type='Application', Request='Deploy', Version=1, Params=params)
+        params['Applications'] = applications
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def Destroy(self, applicationname):
+        '''
+        applicationname : str
+        Returns -> None
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(Type='Application', Request='Destroy', Version=1, Params=params)
+        params['ApplicationName'] = applicationname
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def DestroyRelation(self, endpoints):
+        '''
+        endpoints : typing.Sequence[str]
+        Returns -> None
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(Type='Application', Request='DestroyRelation', Version=1, Params=params)
+        params['Endpoints'] = endpoints
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def DestroyUnits(self, unitnames):
+        '''
+        unitnames : typing.Sequence[str]
+        Returns -> None
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(Type='Application', Request='DestroyUnits', Version=1, Params=params)
+        params['UnitNames'] = unitnames
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def Expose(self, applicationname):
+        '''
+        applicationname : str
+        Returns -> None
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(Type='Application', Request='Expose', Version=1, Params=params)
+        params['ApplicationName'] = applicationname
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ApplicationGetResults)
+    async def Get(self, applicationname):
+        '''
+        applicationname : str
+        Returns -> typing.Union[str, typing.Mapping[str, typing.Any], _ForwardRef('Value')]
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(Type='Application', Request='Get', Version=1, Params=params)
+        params['ApplicationName'] = applicationname
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResult)
+    async def GetCharmURL(self, applicationname):
+        '''
+        applicationname : str
+        Returns -> typing.Union[_ForwardRef('Error'), str]
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(Type='Application', Request='GetCharmURL', Version=1, Params=params)
+        params['ApplicationName'] = applicationname
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(GetConstraintsResults)
+    async def GetConstraints(self, applicationname):
+        '''
+        applicationname : str
+        Returns -> Value
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(Type='Application', Request='GetConstraints', Version=1, Params=params)
+        params['ApplicationName'] = applicationname
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def Set(self, applicationname, options):
+        '''
+        applicationname : str
+        options : typing.Mapping[str, str]
+        Returns -> None
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(Type='Application', Request='Set', Version=1, Params=params)
+        params['ApplicationName'] = applicationname
+        params['Options'] = options
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def SetCharm(self, applicationname, charmurl, cs_channel, forceseries, forceunits, resourceids):
+        '''
+        applicationname : str
+        charmurl : str
+        cs_channel : str
+        forceseries : bool
+        forceunits : bool
+        resourceids : typing.Mapping[str, str]
+        Returns -> None
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(Type='Application', Request='SetCharm', Version=1, Params=params)
+        params['applicationname'] = applicationname
+        params['charmurl'] = charmurl
+        params['cs-channel'] = cs_channel
+        params['forceseries'] = forceseries
+        params['forceunits'] = forceunits
+        params['resourceids'] = resourceids
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def SetConstraints(self, applicationname, constraints):
+        '''
+        applicationname : str
+        constraints : Value
+        Returns -> None
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(Type='Application', Request='SetConstraints', Version=1, Params=params)
+        params['ApplicationName'] = applicationname
+        params['Constraints'] = constraints
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def SetMetricCredentials(self, creds):
+        '''
+        creds : typing.Sequence[~ApplicationMetricCredential]
+        Returns -> typing.Sequence[~ErrorResult]
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(Type='Application', Request='SetMetricCredentials', Version=1, Params=params)
+        params['Creds'] = creds
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def Unexpose(self, applicationname):
+        '''
+        applicationname : str
+        Returns -> None
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(Type='Application', Request='Unexpose', Version=1, Params=params)
+        params['ApplicationName'] = applicationname
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def Unset(self, applicationname, options):
+        '''
+        applicationname : str
+        options : typing.Sequence[str]
+        Returns -> None
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(Type='Application', Request='Unset', Version=1, Params=params)
+        params['ApplicationName'] = applicationname
+        params['Options'] = options
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def Update(self, applicationname, charmurl, constraints, forcecharmurl, forceseries, minunits, settingsstrings, settingsyaml):
+        '''
+        applicationname : str
+        charmurl : str
+        constraints : Value
+        forcecharmurl : bool
+        forceseries : bool
+        minunits : int
+        settingsstrings : typing.Mapping[str, str]
+        settingsyaml : str
+        Returns -> None
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(Type='Application', Request='Update', Version=1, Params=params)
+        params['ApplicationName'] = applicationname
+        params['CharmUrl'] = charmurl
+        params['Constraints'] = constraints
+        params['ForceCharmUrl'] = forcecharmurl
+        params['ForceSeries'] = forceseries
+        params['MinUnits'] = minunits
+        params['SettingsStrings'] = settingsstrings
+        params['SettingsYAML'] = settingsyaml
+        reply = await self.rpc(msg)
+        return reply
+
+
+class ApplicationScalerFacade(Type):
+    name = 'ApplicationScaler'
+    version = 1
+    schema =     {'definitions': {'Entities': {'additionalProperties': False,
+                                  'properties': {'Entities': {'items': {'$ref': '#/definitions/Entity'},
+                                                              'type': 'array'}},
+                                  'required': ['Entities'],
+                                  'type': 'object'},
+                     'Entity': {'additionalProperties': False,
+                                'properties': {'Tag': {'type': 'string'}},
+                                'required': ['Tag'],
+                                'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'Code': {'type': 'string'},
+                                              'Info': {'$ref': '#/definitions/ErrorInfo'},
+                                              'Message': {'type': 'string'}},
+                               'required': ['Message', 'Code'],
+                               'type': 'object'},
+                     'ErrorInfo': {'additionalProperties': False,
+                                   'properties': {'Macaroon': {'$ref': '#/definitions/Macaroon'},
+                                                  'MacaroonPath': {'type': 'string'}},
+                                   'type': 'object'},
+                     'ErrorResult': {'additionalProperties': False,
+                                     'properties': {'Error': {'$ref': '#/definitions/Error'}},
+                                     'required': ['Error'],
+                                     'type': 'object'},
+                     'ErrorResults': {'additionalProperties': False,
+                                      'properties': {'Results': {'items': {'$ref': '#/definitions/ErrorResult'},
+                                                                 'type': 'array'}},
+                                      'required': ['Results'],
+                                      'type': 'object'},
+                     'Macaroon': {'additionalProperties': False,
+                                  'properties': {'caveats': {'items': {'$ref': '#/definitions/caveat'},
+                                                             'type': 'array'},
+                                                 'data': {'items': {'type': 'integer'},
+                                                          'type': 'array'},
+                                                 'id': {'$ref': '#/definitions/packet'},
+                                                 'location': {'$ref': '#/definitions/packet'},
+                                                 'sig': {'items': {'type': 'integer'},
+                                                         'type': 'array'}},
+                                  'required': ['data',
+                                               'location',
+                                               'id',
+                                               'caveats',
+                                               'sig'],
+                                  'type': 'object'},
+                     'StringsWatchResult': {'additionalProperties': False,
+                                            'properties': {'Changes': {'items': {'type': 'string'},
+                                                                       'type': 'array'},
+                                                           'Error': {'$ref': '#/definitions/Error'},
+                                                           'StringsWatcherId': {'type': 'string'}},
+                                            'required': ['StringsWatcherId',
+                                                         'Changes',
+                                                         'Error'],
+                                            'type': 'object'},
+                     'caveat': {'additionalProperties': False,
+                                'properties': {'caveatId': {'$ref': '#/definitions/packet'},
+                                               'location': {'$ref': '#/definitions/packet'},
+                                               'verificationId': {'$ref': '#/definitions/packet'}},
+                                'required': ['location',
+                                             'caveatId',
+                                             'verificationId'],
+                                'type': 'object'},
+                     'packet': {'additionalProperties': False,
+                                'properties': {'headerLen': {'type': 'integer'},
+                                               'start': {'type': 'integer'},
+                                               'totalLen': {'type': 'integer'}},
+                                'required': ['start', 'totalLen', 'headerLen'],
+                                'type': 'object'}},
+     'properties': {'Rescale': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                               'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                'type': 'object'},
+                    'Watch': {'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
+                              'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(ErrorResults)
+    async def Rescale(self, entities):
+        '''
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~ErrorResult]
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(Type='ApplicationScaler', Request='Rescale', Version=1, Params=params)
+        params['Entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResult)
+    async def Watch(self):
+        '''
+
+        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error')]
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(Type='ApplicationScaler', Request='Watch', Version=1, Params=params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+class BackupsFacade(Type):
     name = 'Backups'
     version = 1
     schema =     {'definitions': {'BackupsCreateArgs': {'additionalProperties': False,
@@ -6405,6 +7210,7 @@ class Backups(Type):
                                                               'Machine': {'type': 'string'},
                                                               'Model': {'type': 'string'},
                                                               'Notes': {'type': 'string'},
+                                                              'Series': {'type': 'string'},
                                                               'Size': {'type': 'integer'},
                                                               'Started': {'format': 'date-time',
                                                                           'type': 'string'},
@@ -6423,6 +7229,7 @@ class Backups(Type):
                                                             'Machine',
                                                             'Hostname',
                                                             'Version',
+                                                            'Series',
                                                             'CACert',
                                                             'CAPrivateKey'],
                                                'type': 'object'},
@@ -6568,7 +7375,7 @@ class Backups(Type):
         return reply
 
 
-class Block(Type):
+class BlockFacade(Type):
     name = 'Block'
     version = 2
     schema =     {'definitions': {'Block': {'additionalProperties': False,
@@ -6694,9 +7501,9 @@ class Block(Type):
         return reply
 
 
-class CharmRevisionUpdater(Type):
+class CharmRevisionUpdaterFacade(Type):
     name = 'CharmRevisionUpdater'
-    version = 1
+    version = 2
     schema =     {'definitions': {'Error': {'additionalProperties': False,
                                'properties': {'Code': {'type': 'string'},
                                               'Info': {'$ref': '#/definitions/ErrorInfo'},
@@ -6753,13 +7560,13 @@ class CharmRevisionUpdater(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='CharmRevisionUpdater', Request='UpdateLatestRevisions', Version=1, Params=params)
+        msg = dict(Type='CharmRevisionUpdater', Request='UpdateLatestRevisions', Version=2, Params=params)
 
         reply = await self.rpc(msg)
         return reply
 
 
-class Charms(Type):
+class CharmsFacade(Type):
     name = 'Charms'
     version = 2
     schema =     {'definitions': {'CharmInfo': {'additionalProperties': False,
@@ -6836,7 +7643,7 @@ class Charms(Type):
         return reply
 
 
-class Cleaner(Type):
+class CleanerFacade(Type):
     name = 'Cleaner'
     version = 2
     schema =     {'definitions': {'Error': {'additionalProperties': False,
@@ -6918,7 +7725,7 @@ class Cleaner(Type):
         return reply
 
 
-class Client(Type):
+class ClientFacade(Type):
     name = 'Client'
     version = 1
     schema =     {'definitions': {'APIHostPortsResult': {'additionalProperties': False,
@@ -6997,6 +7804,34 @@ class Client(Type):
                                       'properties': {'AllWatcherId': {'type': 'string'}},
                                       'required': ['AllWatcherId'],
                                       'type': 'object'},
+                     'ApplicationStatus': {'additionalProperties': False,
+                                           'properties': {'CanUpgradeTo': {'type': 'string'},
+                                                          'Charm': {'type': 'string'},
+                                                          'Err': {'additionalProperties': True,
+                                                                  'type': 'object'},
+                                                          'Exposed': {'type': 'boolean'},
+                                                          'Life': {'type': 'string'},
+                                                          'MeterStatuses': {'patternProperties': {'.*': {'$ref': '#/definitions/MeterStatus'}},
+                                                                            'type': 'object'},
+                                                          'Relations': {'patternProperties': {'.*': {'items': {'type': 'string'},
+                                                                                                     'type': 'array'}},
+                                                                        'type': 'object'},
+                                                          'Status': {'$ref': '#/definitions/DetailedStatus'},
+                                                          'SubordinateTo': {'items': {'type': 'string'},
+                                                                            'type': 'array'},
+                                                          'Units': {'patternProperties': {'.*': {'$ref': '#/definitions/UnitStatus'}},
+                                                                    'type': 'object'}},
+                                           'required': ['Err',
+                                                        'Charm',
+                                                        'Exposed',
+                                                        'Life',
+                                                        'Relations',
+                                                        'CanUpgradeTo',
+                                                        'SubordinateTo',
+                                                        'Units',
+                                                        'MeterStatuses',
+                                                        'Status'],
+                                           'type': 'object'},
                      'Binary': {'additionalProperties': False,
                                 'properties': {'Arch': {'type': 'string'},
                                                'Number': {'$ref': '#/definitions/Number'},
@@ -7055,11 +7890,11 @@ class Client(Type):
                                                      'Err'],
                                         'type': 'object'},
                      'EndpointStatus': {'additionalProperties': False,
-                                        'properties': {'Name': {'type': 'string'},
+                                        'properties': {'ApplicationName': {'type': 'string'},
+                                                       'Name': {'type': 'string'},
                                                        'Role': {'type': 'string'},
-                                                       'ServiceName': {'type': 'string'},
                                                        'Subordinate': {'type': 'boolean'}},
-                                        'required': ['ServiceName',
+                                        'required': ['ApplicationName',
                                                      'Name',
                                                      'Role',
                                                      'Subordinate'],
@@ -7124,18 +7959,18 @@ class Client(Type):
                                          'required': ['List', 'Error'],
                                          'type': 'object'},
                      'FullStatus': {'additionalProperties': False,
-                                    'properties': {'AvailableVersion': {'type': 'string'},
+                                    'properties': {'Applications': {'patternProperties': {'.*': {'$ref': '#/definitions/ApplicationStatus'}},
+                                                                    'type': 'object'},
+                                                   'AvailableVersion': {'type': 'string'},
                                                    'Machines': {'patternProperties': {'.*': {'$ref': '#/definitions/MachineStatus'}},
                                                                 'type': 'object'},
                                                    'ModelName': {'type': 'string'},
                                                    'Relations': {'items': {'$ref': '#/definitions/RelationStatus'},
-                                                                 'type': 'array'},
-                                                   'Services': {'patternProperties': {'.*': {'$ref': '#/definitions/ServiceStatus'}},
-                                                                'type': 'object'}},
+                                                                 'type': 'array'}},
                                     'required': ['ModelName',
                                                  'AvailableVersion',
                                                  'Machines',
-                                                 'Services',
+                                                 'Applications',
                                                  'Relations'],
                                     'type': 'object'},
                      'GetBundleChangesParams': {'additionalProperties': False,
@@ -7162,6 +7997,12 @@ class Client(Type):
                                                                 'Tags': {'items': {'type': 'string'},
                                                                          'type': 'array'}},
                                                  'type': 'object'},
+                     'History': {'additionalProperties': False,
+                                 'properties': {'Error': {'$ref': '#/definitions/Error'},
+                                                'Statuses': {'items': {'$ref': '#/definitions/DetailedStatus'},
+                                                             'type': 'array'}},
+                                 'required': ['Statuses'],
+                                 'type': 'object'},
                      'HostPort': {'additionalProperties': False,
                                   'properties': {'Address': {'$ref': '#/definitions/Address'},
                                                  'Port': {'type': 'integer'}},
@@ -7220,7 +8061,8 @@ class Client(Type):
                                             'required': ['Config'],
                                             'type': 'object'},
                      'ModelInfo': {'additionalProperties': False,
-                                   'properties': {'DefaultSeries': {'type': 'string'},
+                                   'properties': {'Cloud': {'type': 'string'},
+                                                  'DefaultSeries': {'type': 'string'},
                                                   'Life': {'type': 'string'},
                                                   'Name': {'type': 'string'},
                                                   'OwnerTag': {'type': 'string'},
@@ -7235,6 +8077,7 @@ class Client(Type):
                                                 'ServerUUID',
                                                 'ProviderType',
                                                 'DefaultSeries',
+                                                'Cloud',
                                                 'OwnerTag',
                                                 'Life',
                                                 'Status',
@@ -7350,53 +8193,47 @@ class Client(Type):
                                                  'UnitName': {'type': 'string'}},
                                   'required': ['UnitName', 'Retry'],
                                   'type': 'object'},
-                     'ServiceStatus': {'additionalProperties': False,
-                                       'properties': {'CanUpgradeTo': {'type': 'string'},
-                                                      'Charm': {'type': 'string'},
-                                                      'Err': {'additionalProperties': True,
-                                                              'type': 'object'},
-                                                      'Exposed': {'type': 'boolean'},
-                                                      'Life': {'type': 'string'},
-                                                      'MeterStatuses': {'patternProperties': {'.*': {'$ref': '#/definitions/MeterStatus'}},
-                                                                        'type': 'object'},
-                                                      'Relations': {'patternProperties': {'.*': {'items': {'type': 'string'},
-                                                                                                 'type': 'array'}},
-                                                                    'type': 'object'},
-                                                      'Status': {'$ref': '#/definitions/DetailedStatus'},
-                                                      'SubordinateTo': {'items': {'type': 'string'},
-                                                                        'type': 'array'},
-                                                      'Units': {'patternProperties': {'.*': {'$ref': '#/definitions/UnitStatus'}},
-                                                                'type': 'object'}},
-                                       'required': ['Err',
-                                                    'Charm',
-                                                    'Exposed',
-                                                    'Life',
-                                                    'Relations',
-                                                    'CanUpgradeTo',
-                                                    'SubordinateTo',
-                                                    'Units',
-                                                    'MeterStatuses',
-                                                    'Status'],
-                                       'type': 'object'},
                      'SetConstraints': {'additionalProperties': False,
-                                        'properties': {'Constraints': {'$ref': '#/definitions/Value'},
-                                                       'ServiceName': {'type': 'string'}},
-                                        'required': ['ServiceName', 'Constraints'],
+                                        'properties': {'ApplicationName': {'type': 'string'},
+                                                       'Constraints': {'$ref': '#/definitions/Value'}},
+                                        'required': ['ApplicationName',
+                                                     'Constraints'],
                                         'type': 'object'},
                      'SetModelAgentVersion': {'additionalProperties': False,
                                               'properties': {'Version': {'$ref': '#/definitions/Number'}},
                                               'required': ['Version'],
                                               'type': 'object'},
-                     'StatusHistoryArgs': {'additionalProperties': False,
-                                           'properties': {'Kind': {'type': 'string'},
-                                                          'Name': {'type': 'string'},
-                                                          'Size': {'type': 'integer'}},
-                                           'required': ['Kind', 'Size', 'Name'],
-                                           'type': 'object'},
+                     'StatusHistoryFilter': {'additionalProperties': False,
+                                             'properties': {'Date': {'format': 'date-time',
+                                                                     'type': 'string'},
+                                                            'Delta': {'type': 'integer'},
+                                                            'Size': {'type': 'integer'}},
+                                             'required': ['Size', 'Date', 'Delta'],
+                                             'type': 'object'},
+                     'StatusHistoryRequest': {'additionalProperties': False,
+                                              'properties': {'Filter': {'$ref': '#/definitions/StatusHistoryFilter'},
+                                                             'HistoryKind': {'type': 'string'},
+                                                             'Size': {'type': 'integer'},
+                                                             'Tag': {'type': 'string'}},
+                                              'required': ['HistoryKind',
+                                                           'Size',
+                                                           'Filter',
+                                                           'Tag'],
+                                              'type': 'object'},
+                     'StatusHistoryRequests': {'additionalProperties': False,
+                                               'properties': {'Requests': {'items': {'$ref': '#/definitions/StatusHistoryRequest'},
+                                                                           'type': 'array'}},
+                                               'required': ['Requests'],
+                                               'type': 'object'},
+                     'StatusHistoryResult': {'additionalProperties': False,
+                                             'properties': {'Error': {'$ref': '#/definitions/Error'},
+                                                            'History': {'$ref': '#/definitions/History'}},
+                                             'required': ['History'],
+                                             'type': 'object'},
                      'StatusHistoryResults': {'additionalProperties': False,
-                                              'properties': {'Statuses': {'items': {'$ref': '#/definitions/DetailedStatus'},
-                                                                          'type': 'array'}},
-                                              'required': ['Statuses'],
+                                              'properties': {'Results': {'items': {'$ref': '#/definitions/StatusHistoryResult'},
+                                                                         'type': 'array'}},
+                                              'required': ['Results'],
                                               'type': 'object'},
                      'StatusParams': {'additionalProperties': False,
                                       'properties': {'Patterns': {'items': {'type': 'string'},
@@ -7536,7 +8373,7 @@ class Client(Type):
                                              'type': 'object'},
                     'SetModelConstraints': {'properties': {'Params': {'$ref': '#/definitions/SetConstraints'}},
                                             'type': 'object'},
-                    'StatusHistory': {'properties': {'Params': {'$ref': '#/definitions/StatusHistoryArgs'},
+                    'StatusHistory': {'properties': {'Params': {'$ref': '#/definitions/StatusHistoryRequests'},
                                                      'Result': {'$ref': '#/definitions/StatusHistoryResults'}},
                                       'type': 'object'},
                     'WatchAll': {'properties': {'Result': {'$ref': '#/definitions/AllWatcherId'}},
@@ -7729,7 +8566,7 @@ class Client(Type):
     async def FullStatus(self, patterns):
         '''
         patterns : typing.Sequence[str]
-        Returns -> typing.Union[typing.Sequence[~RelationStatus], typing.Mapping[str, ~ServiceStatus]]
+        Returns -> typing.Union[typing.Mapping[str, ~MachineStatus], typing.Sequence[~RelationStatus]]
         '''
         # map input types to rpc msg
         params = dict()
@@ -7982,36 +8819,32 @@ class Client(Type):
 
 
     @ReturnMapping(None)
-    async def SetModelConstraints(self, constraints, servicename):
+    async def SetModelConstraints(self, applicationname, constraints):
         '''
+        applicationname : str
         constraints : Value
-        servicename : str
         Returns -> None
         '''
         # map input types to rpc msg
         params = dict()
         msg = dict(Type='Client', Request='SetModelConstraints', Version=1, Params=params)
+        params['ApplicationName'] = applicationname
         params['Constraints'] = constraints
-        params['ServiceName'] = servicename
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StatusHistoryResults)
-    async def StatusHistory(self, kind, name, size):
+    async def StatusHistory(self, requests):
         '''
-        kind : str
-        name : str
-        size : int
-        Returns -> typing.Sequence[~DetailedStatus]
+        requests : typing.Sequence[~StatusHistoryRequest]
+        Returns -> typing.Sequence[~StatusHistoryResult]
         '''
         # map input types to rpc msg
         params = dict()
         msg = dict(Type='Client', Request='StatusHistory', Version=1, Params=params)
-        params['Kind'] = kind
-        params['Name'] = name
-        params['Size'] = size
+        params['Requests'] = requests
         reply = await self.rpc(msg)
         return reply
 
@@ -8031,9 +8864,9 @@ class Client(Type):
         return reply
 
 
-class Controller(Type):
+class ControllerFacade(Type):
     name = 'Controller'
-    version = 2
+    version = 3
     schema =     {'definitions': {'AllWatcherId': {'additionalProperties': False,
                                       'properties': {'AllWatcherId': {'type': 'string'}},
                                       'required': ['AllWatcherId'],
@@ -8141,15 +8974,15 @@ class Controller(Type):
                                                                'password'],
                                                   'type': 'object'},
                      'ModelStatus': {'additionalProperties': False,
-                                     'properties': {'hosted-machine-count': {'type': 'integer'},
+                                     'properties': {'application-count': {'type': 'integer'},
+                                                    'hosted-machine-count': {'type': 'integer'},
                                                     'life': {'type': 'string'},
                                                     'model-tag': {'type': 'string'},
-                                                    'owner-tag': {'type': 'string'},
-                                                    'service-count': {'type': 'integer'}},
+                                                    'owner-tag': {'type': 'string'}},
                                      'required': ['model-tag',
                                                   'life',
                                                   'hosted-machine-count',
-                                                  'service-count',
+                                                  'application-count',
                                                   'owner-tag'],
                                      'type': 'object'},
                      'ModelStatusResults': {'additionalProperties': False,
@@ -8215,7 +9048,7 @@ class Controller(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Controller', Request='AllModels', Version=2, Params=params)
+        msg = dict(Type='Controller', Request='AllModels', Version=3, Params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -8230,7 +9063,7 @@ class Controller(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Controller', Request='DestroyController', Version=2, Params=params)
+        msg = dict(Type='Controller', Request='DestroyController', Version=3, Params=params)
         params['destroy-models'] = destroy_models
         reply = await self.rpc(msg)
         return reply
@@ -8245,7 +9078,7 @@ class Controller(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Controller', Request='InitiateModelMigration', Version=2, Params=params)
+        msg = dict(Type='Controller', Request='InitiateModelMigration', Version=3, Params=params)
         params['specs'] = specs
         reply = await self.rpc(msg)
         return reply
@@ -8260,7 +9093,7 @@ class Controller(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Controller', Request='ListBlockedModels', Version=2, Params=params)
+        msg = dict(Type='Controller', Request='ListBlockedModels', Version=3, Params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -8275,7 +9108,7 @@ class Controller(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Controller', Request='ModelConfig', Version=2, Params=params)
+        msg = dict(Type='Controller', Request='ModelConfig', Version=3, Params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -8290,7 +9123,7 @@ class Controller(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Controller', Request='ModelStatus', Version=2, Params=params)
+        msg = dict(Type='Controller', Request='ModelStatus', Version=3, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -8305,7 +9138,7 @@ class Controller(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Controller', Request='RemoveBlocks', Version=2, Params=params)
+        msg = dict(Type='Controller', Request='RemoveBlocks', Version=3, Params=params)
         params['all'] = all_
         reply = await self.rpc(msg)
         return reply
@@ -8320,13 +9153,13 @@ class Controller(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Controller', Request='WatchAllModels', Version=2, Params=params)
+        msg = dict(Type='Controller', Request='WatchAllModels', Version=3, Params=params)
 
         reply = await self.rpc(msg)
         return reply
 
 
-class Deployer(Type):
+class DeployerFacade(Type):
     name = 'Deployer'
     version = 1
     schema =     {'definitions': {'APIHostPortsResult': {'additionalProperties': False,
@@ -8660,7 +9493,7 @@ class Deployer(Type):
         return reply
 
 
-class DiscoverSpaces(Type):
+class DiscoverSpacesFacade(Type):
     name = 'DiscoverSpaces'
     version = 2
     schema =     {'definitions': {'AddSubnetParams': {'additionalProperties': False,
@@ -8880,7 +9713,7 @@ class DiscoverSpaces(Type):
         return reply
 
 
-class DiskManager(Type):
+class DiskManagerFacade(Type):
     name = 'DiskManager'
     version = 2
     schema =     {'definitions': {'BlockDevice': {'additionalProperties': False,
@@ -8985,7 +9818,7 @@ class DiskManager(Type):
         return reply
 
 
-class EntityWatcher(Type):
+class EntityWatcherFacade(Type):
     name = 'EntityWatcher'
     version = 2
     schema =     {'definitions': {'EntitiesWatchResult': {'additionalProperties': False,
@@ -9071,7 +9904,7 @@ class EntityWatcher(Type):
         return reply
 
 
-class FilesystemAttachmentsWatcher(Type):
+class FilesystemAttachmentsWatcherFacade(Type):
     name = 'FilesystemAttachmentsWatcher'
     version = 2
     schema =     {'definitions': {'Error': {'additionalProperties': False,
@@ -9163,9 +9996,9 @@ class FilesystemAttachmentsWatcher(Type):
         return reply
 
 
-class Firewaller(Type):
+class FirewallerFacade(Type):
     name = 'Firewaller'
-    version = 2
+    version = 3
     schema =     {'definitions': {'BoolResult': {'additionalProperties': False,
                                     'properties': {'Error': {'$ref': '#/definitions/Error'},
                                                    'Result': {'type': 'boolean'}},
@@ -9364,7 +10197,7 @@ class Firewaller(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Firewaller', Request='GetAssignedMachine', Version=2, Params=params)
+        msg = dict(Type='Firewaller', Request='GetAssignedMachine', Version=3, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -9379,7 +10212,7 @@ class Firewaller(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Firewaller', Request='GetExposed', Version=2, Params=params)
+        msg = dict(Type='Firewaller', Request='GetExposed', Version=3, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -9394,7 +10227,7 @@ class Firewaller(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Firewaller', Request='GetMachineActiveSubnets', Version=2, Params=params)
+        msg = dict(Type='Firewaller', Request='GetMachineActiveSubnets', Version=3, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -9409,7 +10242,7 @@ class Firewaller(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Firewaller', Request='GetMachinePorts', Version=2, Params=params)
+        msg = dict(Type='Firewaller', Request='GetMachinePorts', Version=3, Params=params)
         params['Params'] = params
         reply = await self.rpc(msg)
         return reply
@@ -9424,7 +10257,7 @@ class Firewaller(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Firewaller', Request='InstanceId', Version=2, Params=params)
+        msg = dict(Type='Firewaller', Request='InstanceId', Version=3, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -9439,7 +10272,7 @@ class Firewaller(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Firewaller', Request='Life', Version=2, Params=params)
+        msg = dict(Type='Firewaller', Request='Life', Version=3, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -9454,7 +10287,7 @@ class Firewaller(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Firewaller', Request='ModelConfig', Version=2, Params=params)
+        msg = dict(Type='Firewaller', Request='ModelConfig', Version=3, Params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -9469,7 +10302,7 @@ class Firewaller(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Firewaller', Request='Watch', Version=2, Params=params)
+        msg = dict(Type='Firewaller', Request='Watch', Version=3, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -9484,7 +10317,7 @@ class Firewaller(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Firewaller', Request='WatchForModelConfigChanges', Version=2, Params=params)
+        msg = dict(Type='Firewaller', Request='WatchForModelConfigChanges', Version=3, Params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -9499,7 +10332,7 @@ class Firewaller(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Firewaller', Request='WatchModelMachines', Version=2, Params=params)
+        msg = dict(Type='Firewaller', Request='WatchModelMachines', Version=3, Params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -9514,7 +10347,7 @@ class Firewaller(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Firewaller', Request='WatchOpenedPorts', Version=2, Params=params)
+        msg = dict(Type='Firewaller', Request='WatchOpenedPorts', Version=3, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -9529,13 +10362,13 @@ class Firewaller(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Firewaller', Request='WatchUnits', Version=2, Params=params)
+        msg = dict(Type='Firewaller', Request='WatchUnits', Version=3, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
-class HighAvailability(Type):
+class HighAvailabilityFacade(Type):
     name = 'HighAvailability'
     version = 2
     schema =     {'definitions': {'Address': {'additionalProperties': False,
@@ -9759,7 +10592,7 @@ class HighAvailability(Type):
         return reply
 
 
-class HostKeyReporter(Type):
+class HostKeyReporterFacade(Type):
     name = 'HostKeyReporter'
     version = 1
     schema =     {'definitions': {'Error': {'additionalProperties': False,
@@ -9841,7 +10674,7 @@ class HostKeyReporter(Type):
         return reply
 
 
-class ImageManager(Type):
+class ImageManagerFacade(Type):
     name = 'ImageManager'
     version = 2
     schema =     {'definitions': {'Error': {'additionalProperties': False,
@@ -9959,7 +10792,7 @@ class ImageManager(Type):
         return reply
 
 
-class ImageMetadata(Type):
+class ImageMetadataFacade(Type):
     name = 'ImageMetadata'
     version = 2
     schema =     {'definitions': {'CloudImageMetadata': {'additionalProperties': False,
@@ -10140,9 +10973,9 @@ class ImageMetadata(Type):
         return reply
 
 
-class InstancePoller(Type):
+class InstancePollerFacade(Type):
     name = 'InstancePoller'
-    version = 2
+    version = 3
     schema =     {'definitions': {'Address': {'additionalProperties': False,
                                  'properties': {'Scope': {'type': 'string'},
                                                 'SpaceName': {'type': 'string'},
@@ -10361,7 +11194,7 @@ class InstancePoller(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='InstancePoller', Request='AreManuallyProvisioned', Version=2, Params=params)
+        msg = dict(Type='InstancePoller', Request='AreManuallyProvisioned', Version=3, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -10376,7 +11209,7 @@ class InstancePoller(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='InstancePoller', Request='InstanceId', Version=2, Params=params)
+        msg = dict(Type='InstancePoller', Request='InstanceId', Version=3, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -10391,7 +11224,7 @@ class InstancePoller(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='InstancePoller', Request='InstanceStatus', Version=2, Params=params)
+        msg = dict(Type='InstancePoller', Request='InstanceStatus', Version=3, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -10406,7 +11239,7 @@ class InstancePoller(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='InstancePoller', Request='Life', Version=2, Params=params)
+        msg = dict(Type='InstancePoller', Request='Life', Version=3, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -10421,7 +11254,7 @@ class InstancePoller(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='InstancePoller', Request='ModelConfig', Version=2, Params=params)
+        msg = dict(Type='InstancePoller', Request='ModelConfig', Version=3, Params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -10436,7 +11269,7 @@ class InstancePoller(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='InstancePoller', Request='ProviderAddresses', Version=2, Params=params)
+        msg = dict(Type='InstancePoller', Request='ProviderAddresses', Version=3, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -10451,7 +11284,7 @@ class InstancePoller(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='InstancePoller', Request='SetInstanceStatus', Version=2, Params=params)
+        msg = dict(Type='InstancePoller', Request='SetInstanceStatus', Version=3, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -10466,7 +11299,7 @@ class InstancePoller(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='InstancePoller', Request='SetProviderAddresses', Version=2, Params=params)
+        msg = dict(Type='InstancePoller', Request='SetProviderAddresses', Version=3, Params=params)
         params['MachineAddresses'] = machineaddresses
         reply = await self.rpc(msg)
         return reply
@@ -10481,7 +11314,7 @@ class InstancePoller(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='InstancePoller', Request='Status', Version=2, Params=params)
+        msg = dict(Type='InstancePoller', Request='Status', Version=3, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -10496,7 +11329,7 @@ class InstancePoller(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='InstancePoller', Request='WatchForModelConfigChanges', Version=2, Params=params)
+        msg = dict(Type='InstancePoller', Request='WatchForModelConfigChanges', Version=3, Params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -10511,13 +11344,13 @@ class InstancePoller(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='InstancePoller', Request='WatchModelMachines', Version=2, Params=params)
+        msg = dict(Type='InstancePoller', Request='WatchModelMachines', Version=3, Params=params)
 
         reply = await self.rpc(msg)
         return reply
 
 
-class KeyManager(Type):
+class KeyManagerFacade(Type):
     name = 'KeyManager'
     version = 1
     schema =     {'definitions': {'Entities': {'additionalProperties': False,
@@ -10681,7 +11514,7 @@ class KeyManager(Type):
         return reply
 
 
-class KeyUpdater(Type):
+class KeyUpdaterFacade(Type):
     name = 'KeyUpdater'
     version = 1
     schema =     {'definitions': {'Entities': {'additionalProperties': False,
@@ -10791,10 +11624,14 @@ class KeyUpdater(Type):
         return reply
 
 
-class LeadershipService(Type):
+class LeadershipServiceFacade(Type):
     name = 'LeadershipService'
     version = 2
-    schema =     {'definitions': {'ClaimLeadershipBulkParams': {'additionalProperties': False,
+    schema =     {'definitions': {'ApplicationTag': {'additionalProperties': False,
+                                        'properties': {'Name': {'type': 'string'}},
+                                        'required': ['Name'],
+                                        'type': 'object'},
+                     'ClaimLeadershipBulkParams': {'additionalProperties': False,
                                                    'properties': {'Params': {'items': {'$ref': '#/definitions/ClaimLeadershipParams'},
                                                                              'type': 'array'}},
                                                    'required': ['Params'],
@@ -10805,10 +11642,10 @@ class LeadershipService(Type):
                                                     'required': ['Results'],
                                                     'type': 'object'},
                      'ClaimLeadershipParams': {'additionalProperties': False,
-                                               'properties': {'DurationSeconds': {'type': 'number'},
-                                                              'ServiceTag': {'type': 'string'},
+                                               'properties': {'ApplicationTag': {'type': 'string'},
+                                                              'DurationSeconds': {'type': 'number'},
                                                               'UnitTag': {'type': 'string'}},
-                                               'required': ['ServiceTag',
+                                               'required': ['ApplicationTag',
                                                             'UnitTag',
                                                             'DurationSeconds'],
                                                'type': 'object'},
@@ -10841,10 +11678,6 @@ class LeadershipService(Type):
                                                'caveats',
                                                'sig'],
                                   'type': 'object'},
-                     'ServiceTag': {'additionalProperties': False,
-                                    'properties': {'Name': {'type': 'string'}},
-                                    'required': ['Name'],
-                                    'type': 'object'},
                      'caveat': {'additionalProperties': False,
                                 'properties': {'caveatId': {'$ref': '#/definitions/packet'},
                                                'location': {'$ref': '#/definitions/packet'},
@@ -10859,7 +11692,7 @@ class LeadershipService(Type):
                                                'totalLen': {'type': 'integer'}},
                                 'required': ['start', 'totalLen', 'headerLen'],
                                 'type': 'object'}},
-     'properties': {'BlockUntilLeadershipReleased': {'properties': {'Params': {'$ref': '#/definitions/ServiceTag'},
+     'properties': {'BlockUntilLeadershipReleased': {'properties': {'Params': {'$ref': '#/definitions/ApplicationTag'},
                                                                     'Result': {'$ref': '#/definitions/ErrorResult'}},
                                                      'type': 'object'},
                     'ClaimLeadership': {'properties': {'Params': {'$ref': '#/definitions/ClaimLeadershipBulkParams'},
@@ -10897,7 +11730,7 @@ class LeadershipService(Type):
         return reply
 
 
-class LifeFlag(Type):
+class LifeFlagFacade(Type):
     name = 'LifeFlag'
     version = 1
     schema =     {'definitions': {'Entities': {'additionalProperties': False,
@@ -11006,7 +11839,7 @@ class LifeFlag(Type):
         return reply
 
 
-class Logger(Type):
+class LoggerFacade(Type):
     name = 'Logger'
     version = 1
     schema =     {'definitions': {'Entities': {'additionalProperties': False,
@@ -11115,7 +11948,7 @@ class Logger(Type):
         return reply
 
 
-class MachineActions(Type):
+class MachineActionsFacade(Type):
     name = 'MachineActions'
     version = 1
     schema =     {'definitions': {'Action': {'additionalProperties': False,
@@ -11332,7 +12165,7 @@ class MachineActions(Type):
         return reply
 
 
-class MachineManager(Type):
+class MachineManagerFacade(Type):
     name = 'MachineManager'
     version = 2
     schema =     {'definitions': {'AddMachineParams': {'additionalProperties': False,
@@ -11478,7 +12311,7 @@ class MachineManager(Type):
         return reply
 
 
-class Machiner(Type):
+class MachinerFacade(Type):
     name = 'Machiner'
     version = 1
     schema =     {'definitions': {'APIHostPortsResult': {'additionalProperties': False,
@@ -11925,7 +12758,7 @@ class Machiner(Type):
         return reply
 
 
-class MeterStatus(Type):
+class MeterStatusFacade(Type):
     name = 'MeterStatus'
     version = 1
     schema =     {'definitions': {'Entities': {'additionalProperties': False,
@@ -12035,7 +12868,7 @@ class MeterStatus(Type):
         return reply
 
 
-class MetricsAdder(Type):
+class MetricsAdderFacade(Type):
     name = 'MetricsAdder'
     version = 2
     schema =     {'definitions': {'Error': {'additionalProperties': False,
@@ -12135,9 +12968,9 @@ class MetricsAdder(Type):
         return reply
 
 
-class MetricsDebug(Type):
+class MetricsDebugFacade(Type):
     name = 'MetricsDebug'
-    version = 1
+    version = 2
     schema =     {'definitions': {'Entities': {'additionalProperties': False,
                                   'properties': {'Entities': {'items': {'$ref': '#/definitions/Entity'},
                                                               'type': 'array'}},
@@ -12240,7 +13073,7 @@ class MetricsDebug(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='MetricsDebug', Request='GetMetrics', Version=1, Params=params)
+        msg = dict(Type='MetricsDebug', Request='GetMetrics', Version=2, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -12255,13 +13088,13 @@ class MetricsDebug(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='MetricsDebug', Request='SetMeterStatus', Version=1, Params=params)
+        msg = dict(Type='MetricsDebug', Request='SetMeterStatus', Version=2, Params=params)
         params['statues'] = statues
         reply = await self.rpc(msg)
         return reply
 
 
-class MetricsManager(Type):
+class MetricsManagerFacade(Type):
     name = 'MetricsManager'
     version = 1
     schema =     {'definitions': {'Entities': {'additionalProperties': False,
@@ -12359,7 +13192,7 @@ class MetricsManager(Type):
         return reply
 
 
-class MigrationFlag(Type):
+class MigrationFlagFacade(Type):
     name = 'MigrationFlag'
     version = 1
     schema =     {'definitions': {'Entities': {'additionalProperties': False,
@@ -12468,7 +13301,7 @@ class MigrationFlag(Type):
         return reply
 
 
-class MigrationMaster(Type):
+class MigrationMasterFacade(Type):
     name = 'MigrationMaster'
     version = 1
     schema =     {'definitions': {'Error': {'additionalProperties': False,
@@ -12621,7 +13454,7 @@ class MigrationMaster(Type):
         return reply
 
 
-class MigrationMinion(Type):
+class MigrationMinionFacade(Type):
     name = 'MigrationMinion'
     version = 1
     schema =     {'definitions': {'Error': {'additionalProperties': False,
@@ -12687,7 +13520,7 @@ class MigrationMinion(Type):
         return reply
 
 
-class MigrationStatusWatcher(Type):
+class MigrationStatusWatcherFacade(Type):
     name = 'MigrationStatusWatcher'
     version = 1
     schema =     {'definitions': {'MigrationStatus': {'additionalProperties': False,
@@ -12741,7 +13574,7 @@ class MigrationStatusWatcher(Type):
         return reply
 
 
-class MigrationTarget(Type):
+class MigrationTargetFacade(Type):
     name = 'MigrationTarget'
     version = 1
     schema =     {'definitions': {'ModelArgs': {'additionalProperties': False,
@@ -12806,7 +13639,7 @@ class MigrationTarget(Type):
         return reply
 
 
-class ModelManager(Type):
+class ModelManagerFacade(Type):
     name = 'ModelManager'
     version = 2
     schema =     {'definitions': {'Entities': {'additionalProperties': False,
@@ -12890,7 +13723,8 @@ class ModelManager(Type):
                                                       'Config'],
                                          'type': 'object'},
                      'ModelInfo': {'additionalProperties': False,
-                                   'properties': {'DefaultSeries': {'type': 'string'},
+                                   'properties': {'Cloud': {'type': 'string'},
+                                                  'DefaultSeries': {'type': 'string'},
                                                   'Life': {'type': 'string'},
                                                   'Name': {'type': 'string'},
                                                   'OwnerTag': {'type': 'string'},
@@ -12905,6 +13739,7 @@ class ModelManager(Type):
                                                 'ServerUUID',
                                                 'ProviderType',
                                                 'DefaultSeries',
+                                                'Cloud',
                                                 'OwnerTag',
                                                 'Life',
                                                 'Status',
@@ -13073,7 +13908,7 @@ class ModelManager(Type):
         return reply
 
 
-class NotifyWatcher(Type):
+class NotifyWatcherFacade(Type):
     name = 'NotifyWatcher'
     version = 1
     schema =     {'properties': {'Next': {'type': 'object'}, 'Stop': {'type': 'object'}},
@@ -13109,7 +13944,7 @@ class NotifyWatcher(Type):
         return reply
 
 
-class Pinger(Type):
+class PingerFacade(Type):
     name = 'Pinger'
     version = 1
     schema =     {'properties': {'Ping': {'type': 'object'}, 'Stop': {'type': 'object'}},
@@ -13145,9 +13980,9 @@ class Pinger(Type):
         return reply
 
 
-class Provisioner(Type):
+class ProvisionerFacade(Type):
     name = 'Provisioner'
-    version = 2
+    version = 3
     schema =     {'definitions': {'APIHostPortsResult': {'additionalProperties': False,
                                             'properties': {'Servers': {'items': {'items': {'$ref': '#/definitions/HostPort'},
                                                                                  'type': 'array'},
@@ -13207,7 +14042,6 @@ class Provisioner(Type):
                                                         'AptMirror': {'type': 'string'},
                                                         'AptProxy': {'$ref': '#/definitions/Settings'},
                                                         'AuthorizedKeys': {'type': 'string'},
-                                                        'PreferIPv6': {'type': 'boolean'},
                                                         'ProviderType': {'type': 'string'},
                                                         'Proxy': {'$ref': '#/definitions/Settings'},
                                                         'SSLHostnameVerification': {'type': 'boolean'},
@@ -13218,7 +14052,6 @@ class Provisioner(Type):
                                                       'Proxy',
                                                       'AptProxy',
                                                       'AptMirror',
-                                                      'PreferIPv6',
                                                       'AllowLXCLoopMounts',
                                                       'UpdateBehavior'],
                                          'type': 'object'},
@@ -13774,7 +14607,7 @@ class Provisioner(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='APIAddresses', Version=2, Params=params)
+        msg = dict(Type='Provisioner', Request='APIAddresses', Version=3, Params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -13789,7 +14622,7 @@ class Provisioner(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='APIHostPorts', Version=2, Params=params)
+        msg = dict(Type='Provisioner', Request='APIHostPorts', Version=3, Params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -13804,7 +14637,7 @@ class Provisioner(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='CACert', Version=2, Params=params)
+        msg = dict(Type='Provisioner', Request='CACert', Version=3, Params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -13819,7 +14652,7 @@ class Provisioner(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='Constraints', Version=2, Params=params)
+        msg = dict(Type='Provisioner', Request='Constraints', Version=3, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -13834,7 +14667,7 @@ class Provisioner(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='ContainerConfig', Version=2, Params=params)
+        msg = dict(Type='Provisioner', Request='ContainerConfig', Version=3, Params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -13849,7 +14682,7 @@ class Provisioner(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='ContainerManagerConfig', Version=2, Params=params)
+        msg = dict(Type='Provisioner', Request='ContainerManagerConfig', Version=3, Params=params)
         params['Type'] = type_
         reply = await self.rpc(msg)
         return reply
@@ -13864,7 +14697,7 @@ class Provisioner(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='DistributionGroup', Version=2, Params=params)
+        msg = dict(Type='Provisioner', Request='DistributionGroup', Version=3, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -13879,7 +14712,7 @@ class Provisioner(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='EnsureDead', Version=2, Params=params)
+        msg = dict(Type='Provisioner', Request='EnsureDead', Version=3, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -13898,7 +14731,7 @@ class Provisioner(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='FindTools', Version=2, Params=params)
+        msg = dict(Type='Provisioner', Request='FindTools', Version=3, Params=params)
         params['Arch'] = arch
         params['MajorVersion'] = majorversion
         params['MinorVersion'] = minorversion
@@ -13917,7 +14750,7 @@ class Provisioner(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='GetContainerInterfaceInfo', Version=2, Params=params)
+        msg = dict(Type='Provisioner', Request='GetContainerInterfaceInfo', Version=3, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -13932,7 +14765,7 @@ class Provisioner(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='InstanceId', Version=2, Params=params)
+        msg = dict(Type='Provisioner', Request='InstanceId', Version=3, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -13947,7 +14780,7 @@ class Provisioner(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='InstanceStatus', Version=2, Params=params)
+        msg = dict(Type='Provisioner', Request='InstanceStatus', Version=3, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -13962,7 +14795,7 @@ class Provisioner(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='Life', Version=2, Params=params)
+        msg = dict(Type='Provisioner', Request='Life', Version=3, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -13977,7 +14810,7 @@ class Provisioner(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='MachinesWithTransientErrors', Version=2, Params=params)
+        msg = dict(Type='Provisioner', Request='MachinesWithTransientErrors', Version=3, Params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -13992,7 +14825,7 @@ class Provisioner(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='ModelConfig', Version=2, Params=params)
+        msg = dict(Type='Provisioner', Request='ModelConfig', Version=3, Params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -14007,7 +14840,7 @@ class Provisioner(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='ModelUUID', Version=2, Params=params)
+        msg = dict(Type='Provisioner', Request='ModelUUID', Version=3, Params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -14022,7 +14855,7 @@ class Provisioner(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='PrepareContainerInterfaceInfo', Version=2, Params=params)
+        msg = dict(Type='Provisioner', Request='PrepareContainerInterfaceInfo', Version=3, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -14037,7 +14870,7 @@ class Provisioner(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='ProvisioningInfo', Version=2, Params=params)
+        msg = dict(Type='Provisioner', Request='ProvisioningInfo', Version=3, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -14052,7 +14885,7 @@ class Provisioner(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='ReleaseContainerAddresses', Version=2, Params=params)
+        msg = dict(Type='Provisioner', Request='ReleaseContainerAddresses', Version=3, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -14067,7 +14900,7 @@ class Provisioner(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='Remove', Version=2, Params=params)
+        msg = dict(Type='Provisioner', Request='Remove', Version=3, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -14082,7 +14915,7 @@ class Provisioner(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='Series', Version=2, Params=params)
+        msg = dict(Type='Provisioner', Request='Series', Version=3, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -14097,7 +14930,7 @@ class Provisioner(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='SetInstanceInfo', Version=2, Params=params)
+        msg = dict(Type='Provisioner', Request='SetInstanceInfo', Version=3, Params=params)
         params['Machines'] = machines
         reply = await self.rpc(msg)
         return reply
@@ -14112,7 +14945,7 @@ class Provisioner(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='SetInstanceStatus', Version=2, Params=params)
+        msg = dict(Type='Provisioner', Request='SetInstanceStatus', Version=3, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -14127,7 +14960,7 @@ class Provisioner(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='SetPasswords', Version=2, Params=params)
+        msg = dict(Type='Provisioner', Request='SetPasswords', Version=3, Params=params)
         params['Changes'] = changes
         reply = await self.rpc(msg)
         return reply
@@ -14142,7 +14975,7 @@ class Provisioner(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='SetStatus', Version=2, Params=params)
+        msg = dict(Type='Provisioner', Request='SetStatus', Version=3, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -14157,7 +14990,7 @@ class Provisioner(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='SetSupportedContainers', Version=2, Params=params)
+        msg = dict(Type='Provisioner', Request='SetSupportedContainers', Version=3, Params=params)
         params['Params'] = params
         reply = await self.rpc(msg)
         return reply
@@ -14172,7 +15005,7 @@ class Provisioner(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='StateAddresses', Version=2, Params=params)
+        msg = dict(Type='Provisioner', Request='StateAddresses', Version=3, Params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -14187,7 +15020,7 @@ class Provisioner(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='Status', Version=2, Params=params)
+        msg = dict(Type='Provisioner', Request='Status', Version=3, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -14202,7 +15035,7 @@ class Provisioner(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='Tools', Version=2, Params=params)
+        msg = dict(Type='Provisioner', Request='Tools', Version=3, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -14217,7 +15050,7 @@ class Provisioner(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='UpdateStatus', Version=2, Params=params)
+        msg = dict(Type='Provisioner', Request='UpdateStatus', Version=3, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -14232,7 +15065,7 @@ class Provisioner(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='WatchAPIHostPorts', Version=2, Params=params)
+        msg = dict(Type='Provisioner', Request='WatchAPIHostPorts', Version=3, Params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -14247,7 +15080,7 @@ class Provisioner(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='WatchAllContainers', Version=2, Params=params)
+        msg = dict(Type='Provisioner', Request='WatchAllContainers', Version=3, Params=params)
         params['Params'] = params
         reply = await self.rpc(msg)
         return reply
@@ -14262,7 +15095,7 @@ class Provisioner(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='WatchContainers', Version=2, Params=params)
+        msg = dict(Type='Provisioner', Request='WatchContainers', Version=3, Params=params)
         params['Params'] = params
         reply = await self.rpc(msg)
         return reply
@@ -14277,7 +15110,7 @@ class Provisioner(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='WatchForModelConfigChanges', Version=2, Params=params)
+        msg = dict(Type='Provisioner', Request='WatchForModelConfigChanges', Version=3, Params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -14292,7 +15125,7 @@ class Provisioner(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='WatchMachineErrorRetry', Version=2, Params=params)
+        msg = dict(Type='Provisioner', Request='WatchMachineErrorRetry', Version=3, Params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -14307,13 +15140,13 @@ class Provisioner(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='WatchModelMachines', Version=2, Params=params)
+        msg = dict(Type='Provisioner', Request='WatchModelMachines', Version=3, Params=params)
 
         reply = await self.rpc(msg)
         return reply
 
 
-class ProxyUpdater(Type):
+class ProxyUpdaterFacade(Type):
     name = 'ProxyUpdater'
     version = 1
     schema =     {'definitions': {'Entities': {'additionalProperties': False,
@@ -14434,7 +15267,7 @@ class ProxyUpdater(Type):
         return reply
 
 
-class Reboot(Type):
+class RebootFacade(Type):
     name = 'Reboot'
     version = 2
     schema =     {'definitions': {'Entities': {'additionalProperties': False,
@@ -14580,7 +15413,7 @@ class Reboot(Type):
         return reply
 
 
-class RelationUnitsWatcher(Type):
+class RelationUnitsWatcherFacade(Type):
     name = 'RelationUnitsWatcher'
     version = 1
     schema =     {'definitions': {'Error': {'additionalProperties': False,
@@ -14676,7 +15509,7 @@ class RelationUnitsWatcher(Type):
         return reply
 
 
-class Resumer(Type):
+class ResumerFacade(Type):
     name = 'Resumer'
     version = 2
     schema =     {'properties': {'ResumeTransactions': {'type': 'object'}}, 'type': 'object'}
@@ -14696,7 +15529,7 @@ class Resumer(Type):
         return reply
 
 
-class RetryStrategy(Type):
+class RetryStrategyFacade(Type):
     name = 'RetryStrategy'
     version = 1
     schema =     {'definitions': {'Entities': {'additionalProperties': False,
@@ -14817,7 +15650,7 @@ class RetryStrategy(Type):
         return reply
 
 
-class SSHClient(Type):
+class SSHClientFacade(Type):
     name = 'SSHClient'
     version = 1
     schema =     {'definitions': {'Entities': {'additionalProperties': False,
@@ -14964,736 +15797,7 @@ class SSHClient(Type):
         return reply
 
 
-class Service(Type):
-    name = 'Service'
-    version = 3
-    schema =     {'definitions': {'AddRelation': {'additionalProperties': False,
-                                     'properties': {'Endpoints': {'items': {'type': 'string'},
-                                                                  'type': 'array'}},
-                                     'required': ['Endpoints'],
-                                     'type': 'object'},
-                     'AddRelationResults': {'additionalProperties': False,
-                                            'properties': {'Endpoints': {'patternProperties': {'.*': {'$ref': '#/definitions/Relation'}},
-                                                                         'type': 'object'}},
-                                            'required': ['Endpoints'],
-                                            'type': 'object'},
-                     'AddServiceUnits': {'additionalProperties': False,
-                                         'properties': {'NumUnits': {'type': 'integer'},
-                                                        'Placement': {'items': {'$ref': '#/definitions/Placement'},
-                                                                      'type': 'array'},
-                                                        'ServiceName': {'type': 'string'}},
-                                         'required': ['ServiceName',
-                                                      'NumUnits',
-                                                      'Placement'],
-                                         'type': 'object'},
-                     'AddServiceUnitsResults': {'additionalProperties': False,
-                                                'properties': {'Units': {'items': {'type': 'string'},
-                                                                         'type': 'array'}},
-                                                'required': ['Units'],
-                                                'type': 'object'},
-                     'Constraints': {'additionalProperties': False,
-                                     'properties': {'Count': {'type': 'integer'},
-                                                    'Pool': {'type': 'string'},
-                                                    'Size': {'type': 'integer'}},
-                                     'required': ['Pool', 'Size', 'Count'],
-                                     'type': 'object'},
-                     'DestroyRelation': {'additionalProperties': False,
-                                         'properties': {'Endpoints': {'items': {'type': 'string'},
-                                                                      'type': 'array'}},
-                                         'required': ['Endpoints'],
-                                         'type': 'object'},
-                     'DestroyServiceUnits': {'additionalProperties': False,
-                                             'properties': {'UnitNames': {'items': {'type': 'string'},
-                                                                          'type': 'array'}},
-                                             'required': ['UnitNames'],
-                                             'type': 'object'},
-                     'Error': {'additionalProperties': False,
-                               'properties': {'Code': {'type': 'string'},
-                                              'Info': {'$ref': '#/definitions/ErrorInfo'},
-                                              'Message': {'type': 'string'}},
-                               'required': ['Message', 'Code'],
-                               'type': 'object'},
-                     'ErrorInfo': {'additionalProperties': False,
-                                   'properties': {'Macaroon': {'$ref': '#/definitions/Macaroon'},
-                                                  'MacaroonPath': {'type': 'string'}},
-                                   'type': 'object'},
-                     'ErrorResult': {'additionalProperties': False,
-                                     'properties': {'Error': {'$ref': '#/definitions/Error'}},
-                                     'required': ['Error'],
-                                     'type': 'object'},
-                     'ErrorResults': {'additionalProperties': False,
-                                      'properties': {'Results': {'items': {'$ref': '#/definitions/ErrorResult'},
-                                                                 'type': 'array'}},
-                                      'required': ['Results'],
-                                      'type': 'object'},
-                     'GetConstraintsResults': {'additionalProperties': False,
-                                               'properties': {'Constraints': {'$ref': '#/definitions/Value'}},
-                                               'required': ['Constraints'],
-                                               'type': 'object'},
-                     'GetServiceConstraints': {'additionalProperties': False,
-                                               'properties': {'ServiceName': {'type': 'string'}},
-                                               'required': ['ServiceName'],
-                                               'type': 'object'},
-                     'Macaroon': {'additionalProperties': False,
-                                  'properties': {'caveats': {'items': {'$ref': '#/definitions/caveat'},
-                                                             'type': 'array'},
-                                                 'data': {'items': {'type': 'integer'},
-                                                          'type': 'array'},
-                                                 'id': {'$ref': '#/definitions/packet'},
-                                                 'location': {'$ref': '#/definitions/packet'},
-                                                 'sig': {'items': {'type': 'integer'},
-                                                         'type': 'array'}},
-                                  'required': ['data',
-                                               'location',
-                                               'id',
-                                               'caveats',
-                                               'sig'],
-                                  'type': 'object'},
-                     'Placement': {'additionalProperties': False,
-                                   'properties': {'Directive': {'type': 'string'},
-                                                  'Scope': {'type': 'string'}},
-                                   'required': ['Scope', 'Directive'],
-                                   'type': 'object'},
-                     'Relation': {'additionalProperties': False,
-                                  'properties': {'Interface': {'type': 'string'},
-                                                 'Limit': {'type': 'integer'},
-                                                 'Name': {'type': 'string'},
-                                                 'Optional': {'type': 'boolean'},
-                                                 'Role': {'type': 'string'},
-                                                 'Scope': {'type': 'string'}},
-                                  'required': ['Name',
-                                               'Role',
-                                               'Interface',
-                                               'Optional',
-                                               'Limit',
-                                               'Scope'],
-                                  'type': 'object'},
-                     'ServiceCharmRelations': {'additionalProperties': False,
-                                               'properties': {'ServiceName': {'type': 'string'}},
-                                               'required': ['ServiceName'],
-                                               'type': 'object'},
-                     'ServiceCharmRelationsResults': {'additionalProperties': False,
-                                                      'properties': {'CharmRelations': {'items': {'type': 'string'},
-                                                                                        'type': 'array'}},
-                                                      'required': ['CharmRelations'],
-                                                      'type': 'object'},
-                     'ServiceDeploy': {'additionalProperties': False,
-                                       'properties': {'Channel': {'type': 'string'},
-                                                      'CharmUrl': {'type': 'string'},
-                                                      'Config': {'patternProperties': {'.*': {'type': 'string'}},
-                                                                 'type': 'object'},
-                                                      'ConfigYAML': {'type': 'string'},
-                                                      'Constraints': {'$ref': '#/definitions/Value'},
-                                                      'EndpointBindings': {'patternProperties': {'.*': {'type': 'string'}},
-                                                                           'type': 'object'},
-                                                      'NumUnits': {'type': 'integer'},
-                                                      'Placement': {'items': {'$ref': '#/definitions/Placement'},
-                                                                    'type': 'array'},
-                                                      'Resources': {'patternProperties': {'.*': {'type': 'string'}},
-                                                                    'type': 'object'},
-                                                      'Series': {'type': 'string'},
-                                                      'ServiceName': {'type': 'string'},
-                                                      'Storage': {'patternProperties': {'.*': {'$ref': '#/definitions/Constraints'}},
-                                                                  'type': 'object'}},
-                                       'required': ['ServiceName',
-                                                    'Series',
-                                                    'CharmUrl',
-                                                    'Channel',
-                                                    'NumUnits',
-                                                    'Config',
-                                                    'ConfigYAML',
-                                                    'Constraints',
-                                                    'Placement',
-                                                    'Storage',
-                                                    'EndpointBindings',
-                                                    'Resources'],
-                                       'type': 'object'},
-                     'ServiceDestroy': {'additionalProperties': False,
-                                        'properties': {'ServiceName': {'type': 'string'}},
-                                        'required': ['ServiceName'],
-                                        'type': 'object'},
-                     'ServiceExpose': {'additionalProperties': False,
-                                       'properties': {'ServiceName': {'type': 'string'}},
-                                       'required': ['ServiceName'],
-                                       'type': 'object'},
-                     'ServiceGet': {'additionalProperties': False,
-                                    'properties': {'ServiceName': {'type': 'string'}},
-                                    'required': ['ServiceName'],
-                                    'type': 'object'},
-                     'ServiceGetResults': {'additionalProperties': False,
-                                           'properties': {'Charm': {'type': 'string'},
-                                                          'Config': {'patternProperties': {'.*': {'additionalProperties': True,
-                                                                                                  'type': 'object'}},
-                                                                     'type': 'object'},
-                                                          'Constraints': {'$ref': '#/definitions/Value'},
-                                                          'Service': {'type': 'string'}},
-                                           'required': ['Service',
-                                                        'Charm',
-                                                        'Config',
-                                                        'Constraints'],
-                                           'type': 'object'},
-                     'ServiceMetricCredential': {'additionalProperties': False,
-                                                 'properties': {'MetricCredentials': {'items': {'type': 'integer'},
-                                                                                      'type': 'array'},
-                                                                'ServiceName': {'type': 'string'}},
-                                                 'required': ['ServiceName',
-                                                              'MetricCredentials'],
-                                                 'type': 'object'},
-                     'ServiceMetricCredentials': {'additionalProperties': False,
-                                                  'properties': {'Creds': {'items': {'$ref': '#/definitions/ServiceMetricCredential'},
-                                                                           'type': 'array'}},
-                                                  'required': ['Creds'],
-                                                  'type': 'object'},
-                     'ServiceSet': {'additionalProperties': False,
-                                    'properties': {'Options': {'patternProperties': {'.*': {'type': 'string'}},
-                                                               'type': 'object'},
-                                                   'ServiceName': {'type': 'string'}},
-                                    'required': ['ServiceName', 'Options'],
-                                    'type': 'object'},
-                     'ServiceSetCharm': {'additionalProperties': False,
-                                         'properties': {'charmurl': {'type': 'string'},
-                                                        'cs-channel': {'type': 'string'},
-                                                        'forceseries': {'type': 'boolean'},
-                                                        'forceunits': {'type': 'boolean'},
-                                                        'resourceids': {'patternProperties': {'.*': {'type': 'string'}},
-                                                                        'type': 'object'},
-                                                        'servicename': {'type': 'string'}},
-                                         'required': ['servicename',
-                                                      'charmurl',
-                                                      'cs-channel',
-                                                      'forceunits',
-                                                      'forceseries',
-                                                      'resourceids'],
-                                         'type': 'object'},
-                     'ServiceUnexpose': {'additionalProperties': False,
-                                         'properties': {'ServiceName': {'type': 'string'}},
-                                         'required': ['ServiceName'],
-                                         'type': 'object'},
-                     'ServiceUnset': {'additionalProperties': False,
-                                      'properties': {'Options': {'items': {'type': 'string'},
-                                                                 'type': 'array'},
-                                                     'ServiceName': {'type': 'string'}},
-                                      'required': ['ServiceName', 'Options'],
-                                      'type': 'object'},
-                     'ServiceUpdate': {'additionalProperties': False,
-                                       'properties': {'CharmUrl': {'type': 'string'},
-                                                      'Constraints': {'$ref': '#/definitions/Value'},
-                                                      'ForceCharmUrl': {'type': 'boolean'},
-                                                      'ForceSeries': {'type': 'boolean'},
-                                                      'MinUnits': {'type': 'integer'},
-                                                      'ServiceName': {'type': 'string'},
-                                                      'SettingsStrings': {'patternProperties': {'.*': {'type': 'string'}},
-                                                                          'type': 'object'},
-                                                      'SettingsYAML': {'type': 'string'}},
-                                       'required': ['ServiceName',
-                                                    'CharmUrl',
-                                                    'ForceCharmUrl',
-                                                    'ForceSeries',
-                                                    'MinUnits',
-                                                    'SettingsStrings',
-                                                    'SettingsYAML',
-                                                    'Constraints'],
-                                       'type': 'object'},
-                     'ServicesDeploy': {'additionalProperties': False,
-                                        'properties': {'Services': {'items': {'$ref': '#/definitions/ServiceDeploy'},
-                                                                    'type': 'array'}},
-                                        'required': ['Services'],
-                                        'type': 'object'},
-                     'SetConstraints': {'additionalProperties': False,
-                                        'properties': {'Constraints': {'$ref': '#/definitions/Value'},
-                                                       'ServiceName': {'type': 'string'}},
-                                        'required': ['ServiceName', 'Constraints'],
-                                        'type': 'object'},
-                     'StringResult': {'additionalProperties': False,
-                                      'properties': {'Error': {'$ref': '#/definitions/Error'},
-                                                     'Result': {'type': 'string'}},
-                                      'required': ['Error', 'Result'],
-                                      'type': 'object'},
-                     'Value': {'additionalProperties': False,
-                               'properties': {'arch': {'type': 'string'},
-                                              'container': {'type': 'string'},
-                                              'cpu-cores': {'type': 'integer'},
-                                              'cpu-power': {'type': 'integer'},
-                                              'instance-type': {'type': 'string'},
-                                              'mem': {'type': 'integer'},
-                                              'root-disk': {'type': 'integer'},
-                                              'spaces': {'items': {'type': 'string'},
-                                                         'type': 'array'},
-                                              'tags': {'items': {'type': 'string'},
-                                                       'type': 'array'},
-                                              'virt-type': {'type': 'string'}},
-                               'type': 'object'},
-                     'caveat': {'additionalProperties': False,
-                                'properties': {'caveatId': {'$ref': '#/definitions/packet'},
-                                               'location': {'$ref': '#/definitions/packet'},
-                                               'verificationId': {'$ref': '#/definitions/packet'}},
-                                'required': ['location',
-                                             'caveatId',
-                                             'verificationId'],
-                                'type': 'object'},
-                     'packet': {'additionalProperties': False,
-                                'properties': {'headerLen': {'type': 'integer'},
-                                               'start': {'type': 'integer'},
-                                               'totalLen': {'type': 'integer'}},
-                                'required': ['start', 'totalLen', 'headerLen'],
-                                'type': 'object'}},
-     'properties': {'AddRelation': {'properties': {'Params': {'$ref': '#/definitions/AddRelation'},
-                                                   'Result': {'$ref': '#/definitions/AddRelationResults'}},
-                                    'type': 'object'},
-                    'AddUnits': {'properties': {'Params': {'$ref': '#/definitions/AddServiceUnits'},
-                                                'Result': {'$ref': '#/definitions/AddServiceUnitsResults'}},
-                                 'type': 'object'},
-                    'CharmRelations': {'properties': {'Params': {'$ref': '#/definitions/ServiceCharmRelations'},
-                                                      'Result': {'$ref': '#/definitions/ServiceCharmRelationsResults'}},
-                                       'type': 'object'},
-                    'Deploy': {'properties': {'Params': {'$ref': '#/definitions/ServicesDeploy'},
-                                              'Result': {'$ref': '#/definitions/ErrorResults'}},
-                               'type': 'object'},
-                    'Destroy': {'properties': {'Params': {'$ref': '#/definitions/ServiceDestroy'}},
-                                'type': 'object'},
-                    'DestroyRelation': {'properties': {'Params': {'$ref': '#/definitions/DestroyRelation'}},
-                                        'type': 'object'},
-                    'DestroyUnits': {'properties': {'Params': {'$ref': '#/definitions/DestroyServiceUnits'}},
-                                     'type': 'object'},
-                    'Expose': {'properties': {'Params': {'$ref': '#/definitions/ServiceExpose'}},
-                               'type': 'object'},
-                    'Get': {'properties': {'Params': {'$ref': '#/definitions/ServiceGet'},
-                                           'Result': {'$ref': '#/definitions/ServiceGetResults'}},
-                            'type': 'object'},
-                    'GetCharmURL': {'properties': {'Params': {'$ref': '#/definitions/ServiceGet'},
-                                                   'Result': {'$ref': '#/definitions/StringResult'}},
-                                    'type': 'object'},
-                    'GetConstraints': {'properties': {'Params': {'$ref': '#/definitions/GetServiceConstraints'},
-                                                      'Result': {'$ref': '#/definitions/GetConstraintsResults'}},
-                                       'type': 'object'},
-                    'Set': {'properties': {'Params': {'$ref': '#/definitions/ServiceSet'}},
-                            'type': 'object'},
-                    'SetCharm': {'properties': {'Params': {'$ref': '#/definitions/ServiceSetCharm'}},
-                                 'type': 'object'},
-                    'SetConstraints': {'properties': {'Params': {'$ref': '#/definitions/SetConstraints'}},
-                                       'type': 'object'},
-                    'SetMetricCredentials': {'properties': {'Params': {'$ref': '#/definitions/ServiceMetricCredentials'},
-                                                            'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                             'type': 'object'},
-                    'Unexpose': {'properties': {'Params': {'$ref': '#/definitions/ServiceUnexpose'}},
-                                 'type': 'object'},
-                    'Unset': {'properties': {'Params': {'$ref': '#/definitions/ServiceUnset'}},
-                              'type': 'object'},
-                    'Update': {'properties': {'Params': {'$ref': '#/definitions/ServiceUpdate'}},
-                               'type': 'object'}},
-     'type': 'object'}
-    
-
-    @ReturnMapping(AddRelationResults)
-    async def AddRelation(self, endpoints):
-        '''
-        endpoints : typing.Sequence[str]
-        Returns -> typing.Mapping[str, ~Relation]
-        '''
-        # map input types to rpc msg
-        params = dict()
-        msg = dict(Type='Service', Request='AddRelation', Version=3, Params=params)
-        params['Endpoints'] = endpoints
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(AddServiceUnitsResults)
-    async def AddUnits(self, numunits, placement, servicename):
-        '''
-        numunits : int
-        placement : typing.Sequence[~Placement]
-        servicename : str
-        Returns -> typing.Sequence[str]
-        '''
-        # map input types to rpc msg
-        params = dict()
-        msg = dict(Type='Service', Request='AddUnits', Version=3, Params=params)
-        params['NumUnits'] = numunits
-        params['Placement'] = placement
-        params['ServiceName'] = servicename
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ServiceCharmRelationsResults)
-    async def CharmRelations(self, servicename):
-        '''
-        servicename : str
-        Returns -> typing.Sequence[str]
-        '''
-        # map input types to rpc msg
-        params = dict()
-        msg = dict(Type='Service', Request='CharmRelations', Version=3, Params=params)
-        params['ServiceName'] = servicename
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
-    async def Deploy(self, services):
-        '''
-        services : typing.Sequence[~ServiceDeploy]
-        Returns -> typing.Sequence[~ErrorResult]
-        '''
-        # map input types to rpc msg
-        params = dict()
-        msg = dict(Type='Service', Request='Deploy', Version=3, Params=params)
-        params['Services'] = services
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(None)
-    async def Destroy(self, servicename):
-        '''
-        servicename : str
-        Returns -> None
-        '''
-        # map input types to rpc msg
-        params = dict()
-        msg = dict(Type='Service', Request='Destroy', Version=3, Params=params)
-        params['ServiceName'] = servicename
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(None)
-    async def DestroyRelation(self, endpoints):
-        '''
-        endpoints : typing.Sequence[str]
-        Returns -> None
-        '''
-        # map input types to rpc msg
-        params = dict()
-        msg = dict(Type='Service', Request='DestroyRelation', Version=3, Params=params)
-        params['Endpoints'] = endpoints
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(None)
-    async def DestroyUnits(self, unitnames):
-        '''
-        unitnames : typing.Sequence[str]
-        Returns -> None
-        '''
-        # map input types to rpc msg
-        params = dict()
-        msg = dict(Type='Service', Request='DestroyUnits', Version=3, Params=params)
-        params['UnitNames'] = unitnames
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(None)
-    async def Expose(self, servicename):
-        '''
-        servicename : str
-        Returns -> None
-        '''
-        # map input types to rpc msg
-        params = dict()
-        msg = dict(Type='Service', Request='Expose', Version=3, Params=params)
-        params['ServiceName'] = servicename
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ServiceGetResults)
-    async def Get(self, servicename):
-        '''
-        servicename : str
-        Returns -> typing.Union[str, typing.Mapping[str, typing.Any], _ForwardRef('Value')]
-        '''
-        # map input types to rpc msg
-        params = dict()
-        msg = dict(Type='Service', Request='Get', Version=3, Params=params)
-        params['ServiceName'] = servicename
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(StringResult)
-    async def GetCharmURL(self, servicename):
-        '''
-        servicename : str
-        Returns -> typing.Union[_ForwardRef('Error'), str]
-        '''
-        # map input types to rpc msg
-        params = dict()
-        msg = dict(Type='Service', Request='GetCharmURL', Version=3, Params=params)
-        params['ServiceName'] = servicename
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(GetConstraintsResults)
-    async def GetConstraints(self, servicename):
-        '''
-        servicename : str
-        Returns -> Value
-        '''
-        # map input types to rpc msg
-        params = dict()
-        msg = dict(Type='Service', Request='GetConstraints', Version=3, Params=params)
-        params['ServiceName'] = servicename
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(None)
-    async def Set(self, options, servicename):
-        '''
-        options : typing.Mapping[str, str]
-        servicename : str
-        Returns -> None
-        '''
-        # map input types to rpc msg
-        params = dict()
-        msg = dict(Type='Service', Request='Set', Version=3, Params=params)
-        params['Options'] = options
-        params['ServiceName'] = servicename
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(None)
-    async def SetCharm(self, charmurl, cs_channel, forceseries, forceunits, resourceids, servicename):
-        '''
-        charmurl : str
-        cs_channel : str
-        forceseries : bool
-        forceunits : bool
-        resourceids : typing.Mapping[str, str]
-        servicename : str
-        Returns -> None
-        '''
-        # map input types to rpc msg
-        params = dict()
-        msg = dict(Type='Service', Request='SetCharm', Version=3, Params=params)
-        params['charmurl'] = charmurl
-        params['cs-channel'] = cs_channel
-        params['forceseries'] = forceseries
-        params['forceunits'] = forceunits
-        params['resourceids'] = resourceids
-        params['servicename'] = servicename
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(None)
-    async def SetConstraints(self, constraints, servicename):
-        '''
-        constraints : Value
-        servicename : str
-        Returns -> None
-        '''
-        # map input types to rpc msg
-        params = dict()
-        msg = dict(Type='Service', Request='SetConstraints', Version=3, Params=params)
-        params['Constraints'] = constraints
-        params['ServiceName'] = servicename
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
-    async def SetMetricCredentials(self, creds):
-        '''
-        creds : typing.Sequence[~ServiceMetricCredential]
-        Returns -> typing.Sequence[~ErrorResult]
-        '''
-        # map input types to rpc msg
-        params = dict()
-        msg = dict(Type='Service', Request='SetMetricCredentials', Version=3, Params=params)
-        params['Creds'] = creds
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(None)
-    async def Unexpose(self, servicename):
-        '''
-        servicename : str
-        Returns -> None
-        '''
-        # map input types to rpc msg
-        params = dict()
-        msg = dict(Type='Service', Request='Unexpose', Version=3, Params=params)
-        params['ServiceName'] = servicename
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(None)
-    async def Unset(self, options, servicename):
-        '''
-        options : typing.Sequence[str]
-        servicename : str
-        Returns -> None
-        '''
-        # map input types to rpc msg
-        params = dict()
-        msg = dict(Type='Service', Request='Unset', Version=3, Params=params)
-        params['Options'] = options
-        params['ServiceName'] = servicename
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(None)
-    async def Update(self, charmurl, constraints, forcecharmurl, forceseries, minunits, servicename, settingsstrings, settingsyaml):
-        '''
-        charmurl : str
-        constraints : Value
-        forcecharmurl : bool
-        forceseries : bool
-        minunits : int
-        servicename : str
-        settingsstrings : typing.Mapping[str, str]
-        settingsyaml : str
-        Returns -> None
-        '''
-        # map input types to rpc msg
-        params = dict()
-        msg = dict(Type='Service', Request='Update', Version=3, Params=params)
-        params['CharmUrl'] = charmurl
-        params['Constraints'] = constraints
-        params['ForceCharmUrl'] = forcecharmurl
-        params['ForceSeries'] = forceseries
-        params['MinUnits'] = minunits
-        params['ServiceName'] = servicename
-        params['SettingsStrings'] = settingsstrings
-        params['SettingsYAML'] = settingsyaml
-        reply = await self.rpc(msg)
-        return reply
-
-
-class ServiceScaler(Type):
-    name = 'ServiceScaler'
-    version = 1
-    schema =     {'definitions': {'Entities': {'additionalProperties': False,
-                                  'properties': {'Entities': {'items': {'$ref': '#/definitions/Entity'},
-                                                              'type': 'array'}},
-                                  'required': ['Entities'],
-                                  'type': 'object'},
-                     'Entity': {'additionalProperties': False,
-                                'properties': {'Tag': {'type': 'string'}},
-                                'required': ['Tag'],
-                                'type': 'object'},
-                     'Error': {'additionalProperties': False,
-                               'properties': {'Code': {'type': 'string'},
-                                              'Info': {'$ref': '#/definitions/ErrorInfo'},
-                                              'Message': {'type': 'string'}},
-                               'required': ['Message', 'Code'],
-                               'type': 'object'},
-                     'ErrorInfo': {'additionalProperties': False,
-                                   'properties': {'Macaroon': {'$ref': '#/definitions/Macaroon'},
-                                                  'MacaroonPath': {'type': 'string'}},
-                                   'type': 'object'},
-                     'ErrorResult': {'additionalProperties': False,
-                                     'properties': {'Error': {'$ref': '#/definitions/Error'}},
-                                     'required': ['Error'],
-                                     'type': 'object'},
-                     'ErrorResults': {'additionalProperties': False,
-                                      'properties': {'Results': {'items': {'$ref': '#/definitions/ErrorResult'},
-                                                                 'type': 'array'}},
-                                      'required': ['Results'],
-                                      'type': 'object'},
-                     'Macaroon': {'additionalProperties': False,
-                                  'properties': {'caveats': {'items': {'$ref': '#/definitions/caveat'},
-                                                             'type': 'array'},
-                                                 'data': {'items': {'type': 'integer'},
-                                                          'type': 'array'},
-                                                 'id': {'$ref': '#/definitions/packet'},
-                                                 'location': {'$ref': '#/definitions/packet'},
-                                                 'sig': {'items': {'type': 'integer'},
-                                                         'type': 'array'}},
-                                  'required': ['data',
-                                               'location',
-                                               'id',
-                                               'caveats',
-                                               'sig'],
-                                  'type': 'object'},
-                     'StringsWatchResult': {'additionalProperties': False,
-                                            'properties': {'Changes': {'items': {'type': 'string'},
-                                                                       'type': 'array'},
-                                                           'Error': {'$ref': '#/definitions/Error'},
-                                                           'StringsWatcherId': {'type': 'string'}},
-                                            'required': ['StringsWatcherId',
-                                                         'Changes',
-                                                         'Error'],
-                                            'type': 'object'},
-                     'caveat': {'additionalProperties': False,
-                                'properties': {'caveatId': {'$ref': '#/definitions/packet'},
-                                               'location': {'$ref': '#/definitions/packet'},
-                                               'verificationId': {'$ref': '#/definitions/packet'}},
-                                'required': ['location',
-                                             'caveatId',
-                                             'verificationId'],
-                                'type': 'object'},
-                     'packet': {'additionalProperties': False,
-                                'properties': {'headerLen': {'type': 'integer'},
-                                               'start': {'type': 'integer'},
-                                               'totalLen': {'type': 'integer'}},
-                                'required': ['start', 'totalLen', 'headerLen'],
-                                'type': 'object'}},
-     'properties': {'Rescale': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                               'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                'type': 'object'},
-                    'Watch': {'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
-                              'type': 'object'}},
-     'type': 'object'}
-    
-
-    @ReturnMapping(ErrorResults)
-    async def Rescale(self, entities):
-        '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
-        '''
-        # map input types to rpc msg
-        params = dict()
-        msg = dict(Type='ServiceScaler', Request='Rescale', Version=1, Params=params)
-        params['Entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(StringsWatchResult)
-    async def Watch(self):
-        '''
-
-        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error')]
-        '''
-        # map input types to rpc msg
-        params = dict()
-        msg = dict(Type='ServiceScaler', Request='Watch', Version=1, Params=params)
-
-        reply = await self.rpc(msg)
-        return reply
-
-
-class Singular(Type):
+class SingularFacade(Type):
     name = 'Singular'
     version = 1
     schema =     {'definitions': {'Entities': {'additionalProperties': False,
@@ -15804,7 +15908,7 @@ class Singular(Type):
         return reply
 
 
-class Spaces(Type):
+class SpacesFacade(Type):
     name = 'Spaces'
     version = 2
     schema =     {'definitions': {'CreateSpaceParams': {'additionalProperties': False,
@@ -15938,12 +16042,14 @@ class Spaces(Type):
         return reply
 
 
-class StatusHistory(Type):
+class StatusHistoryFacade(Type):
     name = 'StatusHistory'
     version = 2
     schema =     {'definitions': {'StatusHistoryPruneArgs': {'additionalProperties': False,
-                                                'properties': {'MaxLogsPerEntity': {'type': 'integer'}},
-                                                'required': ['MaxLogsPerEntity'],
+                                                'properties': {'MaxHistoryMB': {'type': 'integer'},
+                                                               'MaxHistoryTime': {'type': 'integer'}},
+                                                'required': ['MaxHistoryTime',
+                                                             'MaxHistoryMB'],
                                                 'type': 'object'}},
      'properties': {'Prune': {'properties': {'Params': {'$ref': '#/definitions/StatusHistoryPruneArgs'}},
                               'type': 'object'}},
@@ -15951,20 +16057,22 @@ class StatusHistory(Type):
     
 
     @ReturnMapping(None)
-    async def Prune(self, maxlogsperentity):
+    async def Prune(self, maxhistorymb, maxhistorytime):
         '''
-        maxlogsperentity : int
+        maxhistorymb : int
+        maxhistorytime : int
         Returns -> None
         '''
         # map input types to rpc msg
         params = dict()
         msg = dict(Type='StatusHistory', Request='Prune', Version=2, Params=params)
-        params['MaxLogsPerEntity'] = maxlogsperentity
+        params['MaxHistoryMB'] = maxhistorymb
+        params['MaxHistoryTime'] = maxhistorytime
         reply = await self.rpc(msg)
         return reply
 
 
-class Storage(Type):
+class StorageFacade(Type):
     name = 'Storage'
     version = 2
     schema =     {'definitions': {'Entities': {'additionalProperties': False,
@@ -16337,7 +16445,7 @@ class Storage(Type):
         return reply
 
 
-class StorageProvisioner(Type):
+class StorageProvisionerFacade(Type):
     name = 'StorageProvisioner'
     version = 2
     schema =     {'definitions': {'BlockDevice': {'additionalProperties': False,
@@ -17234,7 +17342,7 @@ class StorageProvisioner(Type):
         return reply
 
 
-class StringsWatcher(Type):
+class StringsWatcherFacade(Type):
     name = 'StringsWatcher'
     version = 1
     schema =     {'definitions': {'Error': {'additionalProperties': False,
@@ -17320,7 +17428,7 @@ class StringsWatcher(Type):
         return reply
 
 
-class Subnets(Type):
+class SubnetsFacade(Type):
     name = 'Subnets'
     version = 2
     schema =     {'definitions': {'AddSubnetParams': {'additionalProperties': False,
@@ -17507,7 +17615,7 @@ class Subnets(Type):
         return reply
 
 
-class Undertaker(Type):
+class UndertakerFacade(Type):
     name = 'Undertaker'
     version = 1
     schema =     {'definitions': {'EntityStatusArgs': {'additionalProperties': False,
@@ -17729,7 +17837,7 @@ class Undertaker(Type):
         return reply
 
 
-class UnitAssigner(Type):
+class UnitAssignerFacade(Type):
     name = 'UnitAssigner'
     version = 1
     schema =     {'definitions': {'Entities': {'additionalProperties': False,
@@ -17870,9 +17978,9 @@ class UnitAssigner(Type):
         return reply
 
 
-class Uniter(Type):
+class UniterFacade(Type):
     name = 'Uniter'
-    version = 3
+    version = 4
     schema =     {'definitions': {'APIHostPortsResult': {'additionalProperties': False,
                                             'properties': {'Servers': {'items': {'items': {'$ref': '#/definitions/HostPort'},
                                                                                  'type': 'array'},
@@ -17927,6 +18035,20 @@ class Uniter(Type):
                                                 'Value': {'type': 'string'}},
                                  'required': ['Value', 'Type', 'Scope'],
                                  'type': 'object'},
+                     'ApplicationStatusResult': {'additionalProperties': False,
+                                                 'properties': {'Application': {'$ref': '#/definitions/StatusResult'},
+                                                                'Error': {'$ref': '#/definitions/Error'},
+                                                                'Units': {'patternProperties': {'.*': {'$ref': '#/definitions/StatusResult'}},
+                                                                          'type': 'object'}},
+                                                 'required': ['Application',
+                                                              'Units',
+                                                              'Error'],
+                                                 'type': 'object'},
+                     'ApplicationStatusResults': {'additionalProperties': False,
+                                                  'properties': {'Results': {'items': {'$ref': '#/definitions/ApplicationStatusResult'},
+                                                                             'type': 'array'}},
+                                                  'required': ['Results'],
+                                                  'type': 'object'},
                      'BoolResult': {'additionalProperties': False,
                                     'properties': {'Error': {'$ref': '#/definitions/Error'},
                                                    'Result': {'type': 'boolean'}},
@@ -17964,9 +18086,9 @@ class Uniter(Type):
                                                'required': ['Results'],
                                                'type': 'object'},
                      'Endpoint': {'additionalProperties': False,
-                                  'properties': {'Relation': {'$ref': '#/definitions/Relation'},
-                                                 'ServiceName': {'type': 'string'}},
-                                  'required': ['ServiceName', 'Relation'],
+                                  'properties': {'ApplicationName': {'type': 'string'},
+                                                 'Relation': {'$ref': '#/definitions/Relation'}},
+                                  'required': ['ApplicationName', 'Relation'],
                                   'type': 'object'},
                      'Entities': {'additionalProperties': False,
                                   'properties': {'Entities': {'items': {'$ref': '#/definitions/Entity'},
@@ -18110,10 +18232,10 @@ class Uniter(Type):
                                                            'required': ['Params'],
                                                            'type': 'object'},
                      'MergeLeadershipSettingsParam': {'additionalProperties': False,
-                                                      'properties': {'ServiceTag': {'type': 'string'},
+                                                      'properties': {'ApplicationTag': {'type': 'string'},
                                                                      'Settings': {'patternProperties': {'.*': {'type': 'string'}},
                                                                                   'type': 'object'}},
-                                                      'required': ['ServiceTag',
+                                                      'required': ['ApplicationTag',
                                                                    'Settings'],
                                                       'type': 'object'},
                      'MeterStatusResult': {'additionalProperties': False,
@@ -18325,20 +18447,6 @@ class Uniter(Type):
                                                                         'type': 'array'}},
                                              'required': ['Results'],
                                              'type': 'object'},
-                     'ServiceStatusResult': {'additionalProperties': False,
-                                             'properties': {'Error': {'$ref': '#/definitions/Error'},
-                                                            'Service': {'$ref': '#/definitions/StatusResult'},
-                                                            'Units': {'patternProperties': {'.*': {'$ref': '#/definitions/StatusResult'}},
-                                                                      'type': 'object'}},
-                                             'required': ['Service',
-                                                          'Units',
-                                                          'Error'],
-                                             'type': 'object'},
-                     'ServiceStatusResults': {'additionalProperties': False,
-                                              'properties': {'Results': {'items': {'$ref': '#/definitions/ServiceStatusResult'},
-                                                                         'type': 'array'}},
-                                              'required': ['Results'],
-                                              'type': 'object'},
                      'SetStatus': {'additionalProperties': False,
                                    'properties': {'Entities': {'items': {'$ref': '#/definitions/EntityStatusArgs'},
                                                                'type': 'array'}},
@@ -18541,6 +18649,12 @@ class Uniter(Type):
                     'AllMachinePorts': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                        'Result': {'$ref': '#/definitions/MachinePortsResults'}},
                                         'type': 'object'},
+                    'ApplicationOwner': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                        'Result': {'$ref': '#/definitions/StringResults'}},
+                                         'type': 'object'},
+                    'ApplicationStatus': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                         'Result': {'$ref': '#/definitions/ApplicationStatusResults'}},
+                                          'type': 'object'},
                     'AssignedMachine': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                        'Result': {'$ref': '#/definitions/StringResults'}},
                                         'type': 'object'},
@@ -18653,21 +18767,15 @@ class Uniter(Type):
                     'Resolved': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                 'Result': {'$ref': '#/definitions/ResolvedModeResults'}},
                                  'type': 'object'},
-                    'ServiceOwner': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                    'Result': {'$ref': '#/definitions/StringResults'}},
-                                     'type': 'object'},
-                    'ServiceStatus': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                     'Result': {'$ref': '#/definitions/ServiceStatusResults'}},
-                                      'type': 'object'},
                     'SetAgentStatus': {'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
                                                       'Result': {'$ref': '#/definitions/ErrorResults'}},
                                        'type': 'object'},
+                    'SetApplicationStatus': {'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
+                                                            'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                             'type': 'object'},
                     'SetCharmURL': {'properties': {'Params': {'$ref': '#/definitions/EntitiesCharmURL'},
                                                    'Result': {'$ref': '#/definitions/ErrorResults'}},
                                     'type': 'object'},
-                    'SetServiceStatus': {'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
-                                                        'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                         'type': 'object'},
                     'SetStatus': {'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
                                                  'Result': {'$ref': '#/definitions/ErrorResults'}},
                                   'type': 'object'},
@@ -18697,6 +18805,9 @@ class Uniter(Type):
                     'WatchActionNotifications': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                                 'Result': {'$ref': '#/definitions/StringsWatchResults'}},
                                                  'type': 'object'},
+                    'WatchApplicationRelations': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                                 'Result': {'$ref': '#/definitions/StringsWatchResults'}},
+                                                  'type': 'object'},
                     'WatchConfigSettings': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                            'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
                                             'type': 'object'},
@@ -18711,9 +18822,6 @@ class Uniter(Type):
                     'WatchRelationUnits': {'properties': {'Params': {'$ref': '#/definitions/RelationUnits'},
                                                           'Result': {'$ref': '#/definitions/RelationUnitsWatchResults'}},
                                            'type': 'object'},
-                    'WatchServiceRelations': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                             'Result': {'$ref': '#/definitions/StringsWatchResults'}},
-                                              'type': 'object'},
                     'WatchStorageAttachments': {'properties': {'Params': {'$ref': '#/definitions/StorageAttachmentIds'},
                                                                'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
                                                 'type': 'object'},
@@ -18734,7 +18842,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='APIAddresses', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='APIAddresses', Version=4, Params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -18749,7 +18857,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='APIHostPorts', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='APIHostPorts', Version=4, Params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -18764,7 +18872,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='Actions', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='Actions', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18779,7 +18887,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='AddMetricBatches', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='AddMetricBatches', Version=4, Params=params)
         params['Batches'] = batches
         reply = await self.rpc(msg)
         return reply
@@ -18794,7 +18902,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='AddUnitStorage', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='AddUnitStorage', Version=4, Params=params)
         params['storages'] = storages
         reply = await self.rpc(msg)
         return reply
@@ -18809,7 +18917,37 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='AllMachinePorts', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='AllMachinePorts', Version=4, Params=params)
+        params['Entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResults)
+    async def ApplicationOwner(self, entities):
+        '''
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~StringResult]
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(Type='Uniter', Request='ApplicationOwner', Version=4, Params=params)
+        params['Entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ApplicationStatusResults)
+    async def ApplicationStatus(self, entities):
+        '''
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~ApplicationStatusResult]
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(Type='Uniter', Request='ApplicationStatus', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18824,7 +18962,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='AssignedMachine', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='AssignedMachine', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18839,7 +18977,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='AvailabilityZone', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='AvailabilityZone', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18854,7 +18992,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='BeginActions', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='BeginActions', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18869,7 +19007,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='CACert', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='CACert', Version=4, Params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -18884,7 +19022,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='CharmArchiveSha256', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='CharmArchiveSha256', Version=4, Params=params)
         params['URLs'] = urls
         reply = await self.rpc(msg)
         return reply
@@ -18899,7 +19037,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='CharmModifiedVersion', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='CharmModifiedVersion', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18914,7 +19052,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='CharmURL', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='CharmURL', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18929,7 +19067,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='ClearResolved', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='ClearResolved', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18944,7 +19082,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='ClosePorts', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='ClosePorts', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18959,7 +19097,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='ConfigSettings', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='ConfigSettings', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18974,7 +19112,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='CurrentModel', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='CurrentModel', Version=4, Params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -18989,7 +19127,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='Destroy', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='Destroy', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -19004,7 +19142,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='DestroyAllSubordinates', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='DestroyAllSubordinates', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -19019,7 +19157,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='DestroyUnitStorageAttachments', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='DestroyUnitStorageAttachments', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -19034,7 +19172,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='EnsureDead', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='EnsureDead', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -19049,7 +19187,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='EnterScope', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='EnterScope', Version=4, Params=params)
         params['RelationUnits'] = relationunits
         reply = await self.rpc(msg)
         return reply
@@ -19064,7 +19202,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='FinishActions', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='FinishActions', Version=4, Params=params)
         params['results'] = results
         reply = await self.rpc(msg)
         return reply
@@ -19079,7 +19217,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='GetMeterStatus', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='GetMeterStatus', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -19094,7 +19232,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='GetPrincipal', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='GetPrincipal', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -19109,7 +19247,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='HasSubordinates', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='HasSubordinates', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -19124,7 +19262,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='JoinedRelations', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='JoinedRelations', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -19139,7 +19277,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='LeaveScope', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='LeaveScope', Version=4, Params=params)
         params['RelationUnits'] = relationunits
         reply = await self.rpc(msg)
         return reply
@@ -19154,7 +19292,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='Life', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='Life', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -19169,7 +19307,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='Merge', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='Merge', Version=4, Params=params)
         params['Params'] = params
         reply = await self.rpc(msg)
         return reply
@@ -19184,7 +19322,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='ModelConfig', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='ModelConfig', Version=4, Params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -19199,7 +19337,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='ModelUUID', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='ModelUUID', Version=4, Params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -19214,7 +19352,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='NetworkConfig', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='NetworkConfig', Version=4, Params=params)
         params['Args'] = args
         reply = await self.rpc(msg)
         return reply
@@ -19229,7 +19367,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='OpenPorts', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='OpenPorts', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -19244,7 +19382,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='PrivateAddress', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='PrivateAddress', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -19259,7 +19397,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='ProviderType', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='ProviderType', Version=4, Params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -19274,7 +19412,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='PublicAddress', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='PublicAddress', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -19289,7 +19427,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='Read', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='Read', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -19304,7 +19442,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='ReadRemoteSettings', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='ReadRemoteSettings', Version=4, Params=params)
         params['RelationUnitPairs'] = relationunitpairs
         reply = await self.rpc(msg)
         return reply
@@ -19319,7 +19457,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='ReadSettings', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='ReadSettings', Version=4, Params=params)
         params['RelationUnits'] = relationunits
         reply = await self.rpc(msg)
         return reply
@@ -19334,7 +19472,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='Relation', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='Relation', Version=4, Params=params)
         params['RelationUnits'] = relationunits
         reply = await self.rpc(msg)
         return reply
@@ -19349,7 +19487,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='RelationById', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='RelationById', Version=4, Params=params)
         params['RelationIds'] = relationids
         reply = await self.rpc(msg)
         return reply
@@ -19364,7 +19502,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='RemoveStorageAttachments', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='RemoveStorageAttachments', Version=4, Params=params)
         params['ids'] = ids
         reply = await self.rpc(msg)
         return reply
@@ -19379,7 +19517,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='RequestReboot', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='RequestReboot', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -19394,37 +19532,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='Resolved', Version=3, Params=params)
-        params['Entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(StringResults)
-    async def ServiceOwner(self, entities):
-        '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~StringResult]
-        '''
-        # map input types to rpc msg
-        params = dict()
-        msg = dict(Type='Uniter', Request='ServiceOwner', Version=3, Params=params)
-        params['Entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ServiceStatusResults)
-    async def ServiceStatus(self, entities):
-        '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ServiceStatusResult]
-        '''
-        # map input types to rpc msg
-        params = dict()
-        msg = dict(Type='Uniter', Request='ServiceStatus', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='Resolved', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -19439,7 +19547,22 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='SetAgentStatus', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='SetAgentStatus', Version=4, Params=params)
+        params['Entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def SetApplicationStatus(self, entities):
+        '''
+        entities : typing.Sequence[~EntityStatusArgs]
+        Returns -> typing.Sequence[~ErrorResult]
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(Type='Uniter', Request='SetApplicationStatus', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -19454,22 +19577,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='SetCharmURL', Version=3, Params=params)
-        params['Entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
-    async def SetServiceStatus(self, entities):
-        '''
-        entities : typing.Sequence[~EntityStatusArgs]
-        Returns -> typing.Sequence[~ErrorResult]
-        '''
-        # map input types to rpc msg
-        params = dict()
-        msg = dict(Type='Uniter', Request='SetServiceStatus', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='SetCharmURL', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -19484,7 +19592,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='SetStatus', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='SetStatus', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -19499,7 +19607,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='SetUnitStatus', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='SetUnitStatus', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -19514,7 +19622,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='StorageAttachmentLife', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='StorageAttachmentLife', Version=4, Params=params)
         params['ids'] = ids
         reply = await self.rpc(msg)
         return reply
@@ -19529,7 +19637,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='StorageAttachments', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='StorageAttachments', Version=4, Params=params)
         params['ids'] = ids
         reply = await self.rpc(msg)
         return reply
@@ -19544,7 +19652,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='UnitStatus', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='UnitStatus', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -19559,7 +19667,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='UnitStorageAttachments', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='UnitStorageAttachments', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -19574,7 +19682,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='UpdateSettings', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='UpdateSettings', Version=4, Params=params)
         params['RelationUnits'] = relationunits
         reply = await self.rpc(msg)
         return reply
@@ -19589,7 +19697,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='Watch', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='Watch', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -19604,7 +19712,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='WatchAPIHostPorts', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='WatchAPIHostPorts', Version=4, Params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -19619,7 +19727,22 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='WatchActionNotifications', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='WatchActionNotifications', Version=4, Params=params)
+        params['Entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResults)
+    async def WatchApplicationRelations(self, entities):
+        '''
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~StringsWatchResult]
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(Type='Uniter', Request='WatchApplicationRelations', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -19634,7 +19757,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='WatchConfigSettings', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='WatchConfigSettings', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -19649,7 +19772,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='WatchForModelConfigChanges', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='WatchForModelConfigChanges', Version=4, Params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -19664,7 +19787,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='WatchLeadershipSettings', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='WatchLeadershipSettings', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -19679,7 +19802,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='WatchMeterStatus', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='WatchMeterStatus', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -19694,23 +19817,8 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='WatchRelationUnits', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='WatchRelationUnits', Version=4, Params=params)
         params['RelationUnits'] = relationunits
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(StringsWatchResults)
-    async def WatchServiceRelations(self, entities):
-        '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~StringsWatchResult]
-        '''
-        # map input types to rpc msg
-        params = dict()
-        msg = dict(Type='Uniter', Request='WatchServiceRelations', Version=3, Params=params)
-        params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
@@ -19724,7 +19832,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='WatchStorageAttachments', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='WatchStorageAttachments', Version=4, Params=params)
         params['ids'] = ids
         reply = await self.rpc(msg)
         return reply
@@ -19739,7 +19847,7 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='WatchUnitAddresses', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='WatchUnitAddresses', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -19754,13 +19862,13 @@ class Uniter(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='WatchUnitStorageAttachments', Version=3, Params=params)
+        msg = dict(Type='Uniter', Request='WatchUnitStorageAttachments', Version=4, Params=params)
         params['Entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
-class Upgrader(Type):
+class UpgraderFacade(Type):
     name = 'Upgrader'
     version = 1
     schema =     {'definitions': {'Binary': {'additionalProperties': False,
@@ -19967,7 +20075,7 @@ class Upgrader(Type):
         return reply
 
 
-class UserManager(Type):
+class UserManagerFacade(Type):
     name = 'UserManager'
     version = 1
     schema =     {'definitions': {'AddUser': {'additionalProperties': False,
@@ -20216,7 +20324,7 @@ class UserManager(Type):
         return reply
 
 
-class VolumeAttachmentsWatcher(Type):
+class VolumeAttachmentsWatcherFacade(Type):
     name = 'VolumeAttachmentsWatcher'
     version = 2
     schema =     {'definitions': {'Error': {'additionalProperties': False,

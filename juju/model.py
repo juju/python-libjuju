@@ -16,6 +16,9 @@ class ModelEntity(object):
         self.data = data
         self.model = model
 
+    def __getattr__(self, name):
+        return self.data[name]
+
 
 class Model(object):
     def __init__(self, connection):
