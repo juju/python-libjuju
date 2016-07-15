@@ -16,7 +16,7 @@ async def status():
     status = await client.FullStatus(patterns)
     await conn.close()
 
-    print('Services:', list(status.services.keys()))
+    print('Applications:', list(status.applications.keys()))
     print('Machines:', list(status.machines.keys()))
     print('Relations:', status.relations)
 

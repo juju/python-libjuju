@@ -308,7 +308,7 @@ def ReturnMapping(cls):
             reply = await f(*args, **kwargs)
             if cls is None:
                 return reply
-            if 'Error' in reply:
+            if 'error' in reply:
                 cls = classes['Error']
             if issubclass(cls, typing.Sequence):
                 result = []
@@ -316,7 +316,7 @@ def ReturnMapping(cls):
                 for item in reply:
                     result.append(item_cls.from_json(item))
             else:
-                result = cls.from_json(reply['Response'])
+                result = cls.from_json(reply['response'])
 
             return result
         return wrapper

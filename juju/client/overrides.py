@@ -8,8 +8,8 @@ __all__ = [
 
 
 class Delta(Type):
-    _toSchema = {'deltas': 'Deltas'}
-    _toPy = {'Deltas': 'deltas'}
+    _toSchema = {'deltas': 'deltas'}
+    _toPy = {'deltas': 'deltas'}
 
     def __init__(self, deltas=None):
         '''

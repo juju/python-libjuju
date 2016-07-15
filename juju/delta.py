@@ -14,7 +14,7 @@ def get_entity_delta(d):
 
 class EntityDelta(client.Delta):
     def get_id(self):
-        return self.data['Id']
+        return self.data['id']
 
     def get_entity_class(self):
         return None
@@ -22,7 +22,7 @@ class EntityDelta(client.Delta):
 
 class ApplicationDelta(EntityDelta):
     def get_id(self):
-        return self.data['Name']
+        return self.data['name']
 
     def get_entity_class(self):
         from .application import Application
@@ -37,7 +37,7 @@ class MachineDelta(EntityDelta):
 
 class UnitDelta(EntityDelta):
     def get_id(self):
-        return self.data['Name']
+        return self.data['name']
 
     def get_entity_class(self):
         from .unit import Unit

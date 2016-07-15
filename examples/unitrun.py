@@ -17,16 +17,16 @@ _seen_units = set()
 
 
 async def run_stuff_on_unit(unit):
-    if unit.Name in _seen_units:
+    if unit.name in _seen_units:
         return
 
-    print('Running command on unit', unit.Name)
+    print('Running command on unit', unit.name)
     # unit.run() returns a client.ActionResults instance
     action_results = await unit.run('unit-get public-address')
-    _seen_units.add(unit.Name)
+    _seen_units.add(unit.name)
     action_result = action_results.results[0]
 
-    print('Results from unit', unit.Name)
+    print('Results from unit', unit.name)
     print(action_result.__dict__)
 
 

@@ -4,8 +4,10 @@ import json
 import logging
 import os
 import random
+import shlex
 import ssl
 import string
+import subprocess
 import websockets
 
 import yaml
@@ -63,16 +65,16 @@ class Connection:
 
     async def rpc(self, msg, encoder=None):
         self.__request_id__ += 1
-        msg['RequestId'] = self.__request_id__
-        if'Params' not in msg:
-            msg['Params'] = {}
-        if "Version" not in msg:
-            msg['Version'] = self.facades[msg['Type']]
+        msg['request-id'] = self.__request_id__
+        if'params' not in msg:
+            msg['params'] = {}
+        if "version" not in msg:
+            msg['version'] = self.facades[msg['Type']]
         outgoing = json.dumps(msg, indent=2, cls=encoder)
         await self.ws.send(outgoing)
         result = await self.recv()
         log.debug("send %s got %s", msg, result)
-        if result and 'Error' in result:
+        if result and 'error' in result:
             raise RuntimeError(result)
         return result
 
@@ -145,22 +147,22 @@ class Connection:
     def build_facades(self, info):
         self.facades.clear()
         for facade in info:
-            self.facades[facade['Name']] = facade['Versions'][-1]
+            self.facades[facade['name']] = facade['versions'][-1]
 
     async def login(self, username, password):
         if not username.startswith('user-'):
             username = 'user-{}'.format(username)
 
         result = await self.rpc({
-            "Type": "Admin",
-            "Request": "Login",
-            "Version": 3,
-            "Params": {
+            "type": "Admin",
+            "request": "Login",
+            "version": 3,
+            "params": {
                 "auth-tag": username,
                 "credentials": password,
-                "Nonce": "".join(random.sample(string.printable, 12)),
+                "nonce": "".join(random.sample(string.printable, 12)),
             }})
-        return result['Response']
+        return result['response']
 
 
 class JujuData:
@@ -169,13 +171,10 @@ class JujuData:
         self.path = os.path.abspath(os.path.expanduser(self.path))
 
     def current_controller(self):
-        try:
-            filepath = os.path.join(self.path, 'current-controller')
-            with io.open(filepath, 'rt') as f:
-                return f.read().strip()
-        except OSError as e:
-            log.exception(e)
-            return None
+        cmd = shlex.split('juju show-controller --format yaml')
+        output = subprocess.check_output(cmd)
+        output = yaml.safe_load(output)
+        return list(output.keys())[0]
 
     def controllers(self):
         return self._load_yaml('controllers.yaml', 'controllers')

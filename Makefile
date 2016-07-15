@@ -8,7 +8,7 @@ clean:
 	tox -r --notest
 
 client:
-	$(PY) -m juju.client.facade -s juju/client/schemas-20160608.json -o juju/client/_client.py
+	$(PY) -m juju.client.facade -s juju/client/schemas.json -o juju/client/_client.py
 
 test:
 	tox

@@ -1,4 +1,6 @@
 import asyncio
+import logging
+logging.basicConfig(level=logging.DEBUG)
 
 from juju.client.connection import Connection
 from juju.client import watcher

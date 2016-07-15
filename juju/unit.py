@@ -8,7 +8,7 @@ log = logging.getLogger(__name__)
 
 class Unit(model.ModelEntity):
     def _get_tag(self):
-        return 'unit-{}'.format(self.data['Name'].replace('/', '-'))
+        return 'unit-{}'.format(self.data['name'].replace('/', '-'))
 
     def add_storage(self, name, constraints=None):
         """Add unit storage dynamically.
@@ -62,14 +62,14 @@ class Unit(model.ModelEntity):
         action.connect(conn)
 
         log.debug(
-            'Running `%s` on %s', command, self.Name)
+            'Running `%s` on %s', command, self.name)
 
         return await action.Run(
             [],
             command,
             [],
             timeout,
-            [self.Name],
+            [self.name],
         )
 
     def run_action(self, action_name, **params):

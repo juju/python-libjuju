@@ -9,7 +9,7 @@ class AllWatcher(BaseAllWatcher):
             client.connect(self.connection)
 
             result = await client.WatchAll()
-            self.Id = result.allwatcherid
+            self.Id = result.watcher_id
 
         msg['Id'] = self.Id
         return await super(AllWatcher, self).rpc(msg)
