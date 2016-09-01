@@ -1,4 +1,4 @@
-*.swp
+*.sw[mnop]
 .venv/
 *.pyc
 docs/_build/

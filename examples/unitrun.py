@@ -4,6 +4,7 @@ Run this one against a model that has at least one unit deployed.
 """
 import asyncio
 import functools
+import logging
 
 from juju.model import Model
 from juju.unit import Unit
@@ -44,4 +45,5 @@ async def watch_model():
     model.add_observer(on_model_change)
     await model.watch()
 
+logging.basicConfig(level=logging.INFO)
 loop.run_until_complete(watch_model())

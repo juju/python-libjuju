@@ -13,6 +13,8 @@ class UserManagerTest(unittest.TestCase):
         loop = asyncio.get_event_loop()
         conn = loop.run_until_complete(
             Connection.connect_current())
+        conn = loop.run_until_complete(
+            conn.controller())
 
         um = client.UserManagerFacade()
         um.connect(conn)

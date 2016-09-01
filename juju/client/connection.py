@@ -69,7 +69,7 @@ class Connection:
         if'params' not in msg:
             msg['params'] = {}
         if "version" not in msg:
-            msg['version'] = self.facades[msg['Type']]
+            msg['version'] = self.facades[msg['type']]
         outgoing = json.dumps(msg, indent=2, cls=encoder)
         await self.ws.send(outgoing)
         result = await self.recv()
@@ -91,14 +91,35 @@ class Connection:
             self.cacert,
         )
 
+    async def controller(self):
+        """Return a Connection to the controller at self.endpoint
+
+        """
+        return await Connection.connect(
+            self.endpoint,
+            None,
+            self.username,
+            self.password,
+            self.cacert,
+        )
+
     @classmethod
     async def connect(cls, endpoint, uuid, username, password, cacert=None):
-        url = "wss://{}/model/{}/api".format(endpoint, uuid)
+        """Connect to the websocket.
+
+        If uuid is None, the connection will be to the controller. Otherwise it
+        will be to the model.
+
+        """
+        if uuid:
+            url = "wss://{}/model/{}/api".format(endpoint, uuid)
+        else:
+            url = "wss://{}/api".format(endpoint)
         client = cls(endpoint, uuid, username, password, cacert)
         await client.open(url, cacert)
         server_info = await client.login(username, password)
         client.build_facades(server_info['facades'])
-        log.info("Driver connected to juju %s", endpoint)
+        log.info("Driver connected to juju %s", url)
 
         return client
 
@@ -113,9 +134,9 @@ class Connection:
         endpoint = controller['api-endpoints'][0]
         cacert = controller.get('ca-cert')
         accounts = jujudata.accounts()[controller_name]
-        username = accounts['current-account']
-        password = accounts['accounts'][username]['password']
-        models = jujudata.models()[controller_name]['accounts'][username]
+        username = accounts['user']
+        password = accounts['password']
+        models = jujudata.models()[controller_name]
         model_name = models['current-model']
         model_uuid = models['models'][model_name]['uuid']
 
@@ -136,9 +157,9 @@ class Connection:
         endpoint = controller['api-endpoints'][0]
         cacert = controller.get('ca-cert')
         accounts = jujudata.accounts()[controller_name]
-        username = accounts['current-account']
-        password = accounts['accounts'][username]['password']
-        models = jujudata.models()[controller_name]['accounts'][username]
+        username = accounts['user']
+        password = accounts['password']
+        models = jujudata.models()[controller_name]
         model_uuid = models['models'][model_name]['uuid']
 
         return await cls.connect(

@@ -5,12 +5,12 @@ from juju.client.facade import Type, ReturnMapping
 
 
 class Action(Type):
-    _toSchema = {'name': 'name', 'receiver': 'receiver', 'parameters': 'parameters', 'tag': 'tag'}
-    _toPy = {'name': 'name', 'receiver': 'receiver', 'parameters': 'parameters', 'tag': 'tag'}
+    _toSchema = {'name': 'name', 'receiver': 'receiver', 'tag': 'tag', 'parameters': 'parameters'}
+    _toPy = {'name': 'name', 'receiver': 'receiver', 'tag': 'tag', 'parameters': 'parameters'}
     def __init__(self, name=None, parameters=None, receiver=None, tag=None):
         '''
         name : str
-        parameters : typing.Mapping[str, typing.Any]
+        parameters : typing.Mapping<~KT, +VT_co>[str, typing.Any]
         receiver : str
         tag : str
         '''
@@ -21,8 +21,8 @@ class Action(Type):
 
 
 class ActionResult(Type):
-    _toSchema = {'started': 'started', 'error': 'error', 'action': 'action', 'enqueued': 'enqueued', 'status': 'status', 'completed': 'completed', 'message': 'message', 'output': 'output'}
-    _toPy = {'started': 'started', 'error': 'error', 'action': 'action', 'enqueued': 'enqueued', 'status': 'status', 'completed': 'completed', 'message': 'message', 'output': 'output'}
+    _toSchema = {'started': 'started', 'error': 'error', 'message': 'message', 'status': 'status', 'enqueued': 'enqueued', 'action': 'action', 'completed': 'completed', 'output': 'output'}
+    _toPy = {'started': 'started', 'error': 'error', 'message': 'message', 'status': 'status', 'enqueued': 'enqueued', 'action': 'action', 'completed': 'completed', 'output': 'output'}
     def __init__(self, action=None, completed=None, enqueued=None, error=None, message=None, output=None, started=None, status=None):
         '''
         action : Action
@@ -30,7 +30,7 @@ class ActionResult(Type):
         enqueued : str
         error : Error
         message : str
-        output : typing.Mapping[str, typing.Any]
+        output : typing.Mapping<~KT, +VT_co>[str, typing.Any]
         started : str
         status : str
         '''
@@ -49,18 +49,18 @@ class ActionResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~ActionResult]
+        results : typing.Sequence<+T_co>[~ActionResult]<~ActionResult>
         '''
         self.results = [ActionResult.from_json(o) for o in results or []]
 
 
 class ActionSpec(Type):
-    _toSchema = {'params': 'params', 'description': 'description'}
-    _toPy = {'params': 'params', 'description': 'description'}
+    _toSchema = {'description': 'description', 'params': 'params'}
+    _toPy = {'description': 'description', 'params': 'params'}
     def __init__(self, description=None, params=None):
         '''
         description : str
-        params : typing.Mapping[str, typing.Any]
+        params : typing.Mapping<~KT, +VT_co>[str, typing.Any]
         '''
         self.description = description
         self.params = params
@@ -71,17 +71,17 @@ class Actions(Type):
     _toPy = {'actions': 'actions'}
     def __init__(self, actions=None):
         '''
-        actions : typing.Sequence[~Action]
+        actions : typing.Sequence<+T_co>[~Action]<~Action>
         '''
         self.actions = [Action.from_json(o) for o in actions or []]
 
 
 class ActionsByName(Type):
-    _toSchema = {'name': 'name', 'error': 'error', 'actions': 'actions'}
-    _toPy = {'name': 'name', 'error': 'error', 'actions': 'actions'}
+    _toSchema = {'name': 'name', 'actions': 'actions', 'error': 'error'}
+    _toPy = {'name': 'name', 'actions': 'actions', 'error': 'error'}
     def __init__(self, actions=None, error=None, name=None):
         '''
-        actions : typing.Sequence[~ActionResult]
+        actions : typing.Sequence<+T_co>[~ActionResult]<~ActionResult>
         error : Error
         name : str
         '''
@@ -95,17 +95,17 @@ class ActionsByNames(Type):
     _toPy = {'actions': 'actions'}
     def __init__(self, actions=None):
         '''
-        actions : typing.Sequence[~ActionsByName]
+        actions : typing.Sequence<+T_co>[~ActionsByName]<~ActionsByName>
         '''
         self.actions = [ActionsByName.from_json(o) for o in actions or []]
 
 
 class ActionsByReceiver(Type):
-    _toSchema = {'error': 'error', 'receiver': 'receiver', 'actions': 'actions'}
-    _toPy = {'error': 'error', 'receiver': 'receiver', 'actions': 'actions'}
+    _toSchema = {'receiver': 'receiver', 'actions': 'actions', 'error': 'error'}
+    _toPy = {'receiver': 'receiver', 'actions': 'actions', 'error': 'error'}
     def __init__(self, actions=None, error=None, receiver=None):
         '''
-        actions : typing.Sequence[~ActionResult]
+        actions : typing.Sequence<+T_co>[~ActionResult]<~ActionResult>
         error : Error
         receiver : str
         '''
@@ -119,21 +119,21 @@ class ActionsByReceivers(Type):
     _toPy = {'actions': 'actions'}
     def __init__(self, actions=None):
         '''
-        actions : typing.Sequence[~ActionsByReceiver]
+        actions : typing.Sequence<+T_co>[~ActionsByReceiver]<~ActionsByReceiver>
         '''
         self.actions = [ActionsByReceiver.from_json(o) for o in actions or []]
 
 
 class ApplicationCharmActionsResult(Type):
     _toSchema = {'error': 'error', 'actions': 'actions', 'application_tag': 'application-tag'}
-    _toPy = {'error': 'error', 'actions': 'actions', 'application-tag': 'application_tag'}
+    _toPy = {'application-tag': 'application_tag', 'actions': 'actions', 'error': 'error'}
     def __init__(self, actions=None, application_tag=None, error=None):
         '''
-        actions : typing.Mapping[str, ~ActionSpec]
+        actions : typing.Mapping<~KT, +VT_co>[str, ~ActionSpec]<~ActionSpec>
         application_tag : str
         error : Error
         '''
-        self.actions = {k: ActionSpec.from_json(v) for k, v in (actions or dict()).items()}
+        self.actions = actions
         self.application_tag = application_tag
         self.error = Error.from_json(error) if error else None
 
@@ -143,7 +143,7 @@ class ApplicationsCharmActionsResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~ApplicationCharmActionsResult]
+        results : typing.Sequence<+T_co>[~ApplicationCharmActionsResult]<~ApplicationCharmActionsResult>
         '''
         self.results = [ApplicationCharmActionsResult.from_json(o) for o in results or []]
 
@@ -153,7 +153,7 @@ class Entities(Type):
     _toPy = {'entities': 'entities'}
     def __init__(self, entities=None):
         '''
-        entities : typing.Sequence[~Entity]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         '''
         self.entities = [Entity.from_json(o) for o in entities or []]
 
@@ -169,8 +169,8 @@ class Entity(Type):
 
 
 class Error(Type):
-    _toSchema = {'code': 'code', 'info': 'info', 'message': 'message'}
-    _toPy = {'code': 'code', 'info': 'info', 'message': 'message'}
+    _toSchema = {'info': 'info', 'code': 'code', 'message': 'message'}
+    _toPy = {'info': 'info', 'code': 'code', 'message': 'message'}
     def __init__(self, code=None, info=None, message=None):
         '''
         code : str
@@ -183,7 +183,7 @@ class Error(Type):
 
 
 class ErrorInfo(Type):
-    _toSchema = {'macaroon_path': 'macaroon-path', 'macaroon': 'macaroon'}
+    _toSchema = {'macaroon': 'macaroon', 'macaroon_path': 'macaroon-path'}
     _toPy = {'macaroon-path': 'macaroon_path', 'macaroon': 'macaroon'}
     def __init__(self, macaroon=None, macaroon_path=None):
         '''
@@ -199,7 +199,7 @@ class FindActionsByNames(Type):
     _toPy = {'names': 'names'}
     def __init__(self, names=None):
         '''
-        names : typing.Sequence[str]
+        names : typing.Sequence<+T_co>[str]
         '''
         self.names = names
 
@@ -209,7 +209,7 @@ class FindTags(Type):
     _toPy = {'prefixes': 'prefixes'}
     def __init__(self, prefixes=None):
         '''
-        prefixes : typing.Sequence[str]
+        prefixes : typing.Sequence<+T_co>[str]
         '''
         self.prefixes = prefixes
 
@@ -219,7 +219,7 @@ class FindTagsResults(Type):
     _toPy = {'matches': 'matches'}
     def __init__(self, matches=None):
         '''
-        matches : typing.Sequence[~Entity]
+        matches : typing.Sequence<+T_co>[~Entity]<~Entity>
         '''
         self.matches = [Entity.from_json(o) for o in matches or []]
 
@@ -235,15 +235,15 @@ class Macaroon(Type):
 
 
 class RunParams(Type):
-    _toSchema = {'machines': 'machines', 'units': 'units', 'commands': 'commands', 'timeout': 'timeout', 'applications': 'applications'}
-    _toPy = {'machines': 'machines', 'units': 'units', 'commands': 'commands', 'timeout': 'timeout', 'applications': 'applications'}
+    _toSchema = {'commands': 'commands', 'machines': 'machines', 'units': 'units', 'applications': 'applications', 'timeout': 'timeout'}
+    _toPy = {'commands': 'commands', 'machines': 'machines', 'units': 'units', 'applications': 'applications', 'timeout': 'timeout'}
     def __init__(self, applications=None, commands=None, machines=None, timeout=None, units=None):
         '''
-        applications : typing.Sequence[str]
+        applications : typing.Sequence<+T_co>[str]
         commands : str
-        machines : typing.Sequence[str]
+        machines : typing.Sequence<+T_co>[str]
         timeout : int
-        units : typing.Sequence[str]
+        units : typing.Sequence<+T_co>[str]
         '''
         self.applications = applications
         self.commands = commands
@@ -253,13 +253,13 @@ class RunParams(Type):
 
 
 class AgentGetEntitiesResult(Type):
-    _toSchema = {'jobs': 'jobs', 'error': 'error', 'life': 'life', 'container_type': 'container-type'}
-    _toPy = {'jobs': 'jobs', 'error': 'error', 'life': 'life', 'container-type': 'container_type'}
+    _toSchema = {'life': 'life', 'error': 'error', 'jobs': 'jobs', 'container_type': 'container-type'}
+    _toPy = {'life': 'life', 'container-type': 'container_type', 'jobs': 'jobs', 'error': 'error'}
     def __init__(self, container_type=None, error=None, jobs=None, life=None):
         '''
         container_type : str
         error : Error
-        jobs : typing.Sequence[str]
+        jobs : typing.Sequence<+T_co>[str]
         life : str
         '''
         self.container_type = container_type
@@ -273,9 +273,67 @@ class AgentGetEntitiesResults(Type):
     _toPy = {'entities': 'entities'}
     def __init__(self, entities=None):
         '''
-        entities : typing.Sequence[~AgentGetEntitiesResult]
+        entities : typing.Sequence<+T_co>[~AgentGetEntitiesResult]<~AgentGetEntitiesResult>
         '''
         self.entities = [AgentGetEntitiesResult.from_json(o) for o in entities or []]
+
+
+class CloudCredential(Type):
+    _toSchema = {'auth_type': 'auth-type', 'attrs': 'attrs', 'redacted': 'redacted'}
+    _toPy = {'auth-type': 'auth_type', 'attrs': 'attrs', 'redacted': 'redacted'}
+    def __init__(self, attrs=None, auth_type=None, redacted=None):
+        '''
+        attrs : typing.Mapping<~KT, +VT_co>[str, str]
+        auth_type : str
+        redacted : typing.Sequence<+T_co>[str]
+        '''
+        self.attrs = attrs
+        self.auth_type = auth_type
+        self.redacted = redacted
+
+
+class CloudSpec(Type):
+    _toSchema = {'type_': 'type', 'identity_endpoint': 'identity-endpoint', 'storage_endpoint': 'storage-endpoint', 'region': 'region', 'name': 'name', 'endpoint': 'endpoint', 'credential': 'credential'}
+    _toPy = {'region': 'region', 'name': 'name', 'type': 'type_', 'identity-endpoint': 'identity_endpoint', 'endpoint': 'endpoint', 'credential': 'credential', 'storage-endpoint': 'storage_endpoint'}
+    def __init__(self, credential=None, endpoint=None, identity_endpoint=None, name=None, region=None, storage_endpoint=None, type_=None):
+        '''
+        credential : CloudCredential
+        endpoint : str
+        identity_endpoint : str
+        name : str
+        region : str
+        storage_endpoint : str
+        type_ : str
+        '''
+        self.credential = CloudCredential.from_json(credential) if credential else None
+        self.endpoint = endpoint
+        self.identity_endpoint = identity_endpoint
+        self.name = name
+        self.region = region
+        self.storage_endpoint = storage_endpoint
+        self.type_ = type_
+
+
+class CloudSpecResult(Type):
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
+    def __init__(self, error=None, result=None):
+        '''
+        error : Error
+        result : CloudSpec
+        '''
+        self.error = Error.from_json(error) if error else None
+        self.result = CloudSpec.from_json(result) if result else None
+
+
+class CloudSpecResults(Type):
+    _toSchema = {'results': 'results'}
+    _toPy = {'results': 'results'}
+    def __init__(self, results=None):
+        '''
+        results : typing.Sequence<+T_co>[~CloudSpecResult]<~CloudSpecResult>
+        '''
+        self.results = [CloudSpecResult.from_json(o) for o in results or []]
 
 
 class ControllerConfigResult(Type):
@@ -283,14 +341,14 @@ class ControllerConfigResult(Type):
     _toPy = {'config': 'config'}
     def __init__(self, config=None):
         '''
-        config : typing.Mapping[str, typing.Any]
+        config : typing.Mapping<~KT, +VT_co>[str, typing.Any]
         '''
         self.config = config
 
 
 class EntityPassword(Type):
-    _toSchema = {'password': 'password', 'tag': 'tag'}
-    _toPy = {'password': 'password', 'tag': 'tag'}
+    _toSchema = {'tag': 'tag', 'password': 'password'}
+    _toPy = {'tag': 'tag', 'password': 'password'}
     def __init__(self, password=None, tag=None):
         '''
         password : str
@@ -305,14 +363,14 @@ class EntityPasswords(Type):
     _toPy = {'changes': 'changes'}
     def __init__(self, changes=None):
         '''
-        changes : typing.Sequence[~EntityPassword]
+        changes : typing.Sequence<+T_co>[~EntityPassword]<~EntityPassword>
         '''
         self.changes = [EntityPassword.from_json(o) for o in changes or []]
 
 
 class ErrorResult(Type):
-    _toSchema = {'code': 'code', 'info': 'info', 'message': 'message'}
-    _toPy = {'code': 'code', 'info': 'info', 'message': 'message'}
+    _toSchema = {'info': 'info', 'code': 'code', 'message': 'message'}
+    _toPy = {'info': 'info', 'code': 'code', 'message': 'message'}
     def __init__(self, code=None, info=None, message=None):
         '''
         code : str
@@ -329,7 +387,7 @@ class ErrorResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~ErrorResult]
+        results : typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         self.results = [ErrorResult.from_json(o) for o in results or []]
 
@@ -349,14 +407,14 @@ class ModelConfigResult(Type):
     _toPy = {'config': 'config'}
     def __init__(self, config=None):
         '''
-        config : typing.Mapping[str, typing.Any]
+        config : typing.Mapping<~KT, +VT_co>[str, typing.Any]
         '''
         self.config = config
 
 
 class NotifyWatchResult(Type):
-    _toSchema = {'error': 'error', 'notifywatcherid': 'NotifyWatcherId'}
-    _toPy = {'error': 'error', 'NotifyWatcherId': 'notifywatcherid'}
+    _toSchema = {'notifywatcherid': 'NotifyWatcherId', 'error': 'error'}
+    _toPy = {'NotifyWatcherId': 'notifywatcherid', 'error': 'error'}
     def __init__(self, notifywatcherid=None, error=None):
         '''
         notifywatcherid : str
@@ -367,8 +425,8 @@ class NotifyWatchResult(Type):
 
 
 class StateServingInfo(Type):
-    _toSchema = {'private_key': 'private-key', 'cert': 'cert', 'shared_secret': 'shared-secret', 'api_port': 'api-port', 'state_port': 'state-port', 'system_identity': 'system-identity', 'ca_private_key': 'ca-private-key'}
-    _toPy = {'api-port': 'api_port', 'cert': 'cert', 'shared-secret': 'shared_secret', 'ca-private-key': 'ca_private_key', 'state-port': 'state_port', 'system-identity': 'system_identity', 'private-key': 'private_key'}
+    _toSchema = {'state_port': 'state-port', 'system_identity': 'system-identity', 'api_port': 'api-port', 'cert': 'cert', 'shared_secret': 'shared-secret', 'private_key': 'private-key', 'ca_private_key': 'ca-private-key'}
+    _toPy = {'shared-secret': 'shared_secret', 'state-port': 'state_port', 'cert': 'cert', 'ca-private-key': 'ca_private_key', 'api-port': 'api_port', 'system-identity': 'system_identity', 'private-key': 'private_key'}
     def __init__(self, api_port=None, ca_private_key=None, cert=None, private_key=None, shared_secret=None, state_port=None, system_identity=None):
         '''
         api_port : int
@@ -393,17 +451,17 @@ class AllWatcherNextResults(Type):
     _toPy = {'deltas': 'deltas'}
     def __init__(self, deltas=None):
         '''
-        deltas : typing.Sequence[~Delta]
+        deltas : typing.Sequence<+T_co>[~Delta]<~Delta>
         '''
         self.deltas = [Delta.from_json(o) for o in deltas or []]
 
 
 class Delta(Type):
-    _toSchema = {'removed': 'removed', 'entity': 'entity'}
-    _toPy = {'removed': 'removed', 'entity': 'entity'}
+    _toSchema = {'entity': 'entity', 'removed': 'removed'}
+    _toPy = {'entity': 'entity', 'removed': 'removed'}
     def __init__(self, entity=None, removed=None):
         '''
-        entity : typing.Mapping[str, typing.Any]
+        entity : typing.Mapping<~KT, +VT_co>[str, typing.Any]
         removed : bool
         '''
         self.entity = entity
@@ -411,11 +469,11 @@ class Delta(Type):
 
 
 class AnnotationsGetResult(Type):
-    _toSchema = {'error': 'error', 'annotations': 'annotations', 'entity': 'entity'}
-    _toPy = {'error': 'error', 'annotations': 'annotations', 'entity': 'entity'}
+    _toSchema = {'entity': 'entity', 'annotations': 'annotations', 'error': 'error'}
+    _toPy = {'entity': 'entity', 'annotations': 'annotations', 'error': 'error'}
     def __init__(self, annotations=None, entity=None, error=None):
         '''
-        annotations : typing.Mapping[str, str]
+        annotations : typing.Mapping<~KT, +VT_co>[str, str]
         entity : str
         error : ErrorResult
         '''
@@ -429,7 +487,7 @@ class AnnotationsGetResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~AnnotationsGetResult]
+        results : typing.Sequence<+T_co>[~AnnotationsGetResult]<~AnnotationsGetResult>
         '''
         self.results = [AnnotationsGetResult.from_json(o) for o in results or []]
 
@@ -439,17 +497,17 @@ class AnnotationsSet(Type):
     _toPy = {'annotations': 'annotations'}
     def __init__(self, annotations=None):
         '''
-        annotations : typing.Sequence[~EntityAnnotations]
+        annotations : typing.Sequence<+T_co>[~EntityAnnotations]<~EntityAnnotations>
         '''
         self.annotations = [EntityAnnotations.from_json(o) for o in annotations or []]
 
 
 class EntityAnnotations(Type):
-    _toSchema = {'annotations': 'annotations', 'entity': 'entity'}
-    _toPy = {'annotations': 'annotations', 'entity': 'entity'}
+    _toSchema = {'entity': 'entity', 'annotations': 'annotations'}
+    _toPy = {'entity': 'entity', 'annotations': 'annotations'}
     def __init__(self, annotations=None, entity=None):
         '''
-        annotations : typing.Mapping[str, str]
+        annotations : typing.Mapping<~KT, +VT_co>[str, str]
         entity : str
         '''
         self.annotations = annotations
@@ -457,13 +515,13 @@ class EntityAnnotations(Type):
 
 
 class AddApplicationUnits(Type):
-    _toSchema = {'num_units': 'num-units', 'placement': 'placement', 'application': 'application'}
-    _toPy = {'num-units': 'num_units', 'placement': 'placement', 'application': 'application'}
+    _toSchema = {'application': 'application', 'placement': 'placement', 'num_units': 'num-units'}
+    _toPy = {'application': 'application', 'placement': 'placement', 'num-units': 'num_units'}
     def __init__(self, application=None, num_units=None, placement=None):
         '''
         application : str
         num_units : int
-        placement : typing.Sequence[~Placement]
+        placement : typing.Sequence<+T_co>[~Placement]<~Placement>
         '''
         self.application = application
         self.num_units = num_units
@@ -475,7 +533,7 @@ class AddApplicationUnitsResults(Type):
     _toPy = {'units': 'units'}
     def __init__(self, units=None):
         '''
-        units : typing.Sequence[str]
+        units : typing.Sequence<+T_co>[str]
         '''
         self.units = units
 
@@ -485,7 +543,7 @@ class AddRelation(Type):
     _toPy = {'endpoints': 'endpoints'}
     def __init__(self, endpoints=None):
         '''
-        endpoints : typing.Sequence[str]
+        endpoints : typing.Sequence<+T_co>[str]
         '''
         self.endpoints = endpoints
 
@@ -495,9 +553,9 @@ class AddRelationResults(Type):
     _toPy = {'endpoints': 'endpoints'}
     def __init__(self, endpoints=None):
         '''
-        endpoints : typing.Mapping[str, ~CharmRelation]
+        endpoints : typing.Mapping<~KT, +VT_co>[str, ~CharmRelation]<~CharmRelation>
         '''
-        self.endpoints = {k: CharmRelation.from_json(v) for k, v in (endpoints or dict()).items()}
+        self.endpoints = endpoints
 
 
 class ApplicationCharmRelations(Type):
@@ -515,28 +573,28 @@ class ApplicationCharmRelationsResults(Type):
     _toPy = {'charm-relations': 'charm_relations'}
     def __init__(self, charm_relations=None):
         '''
-        charm_relations : typing.Sequence[str]
+        charm_relations : typing.Sequence<+T_co>[str]
         '''
         self.charm_relations = charm_relations
 
 
 class ApplicationDeploy(Type):
-    _toSchema = {'placement': 'placement', 'charm_url': 'charm-url', 'series': 'series', 'config_yaml': 'config-yaml', 'storage': 'storage', 'channel': 'channel', 'application': 'application', 'config': 'config', 'constraints': 'constraints', 'num_units': 'num-units', 'resources': 'resources', 'endpoint_bindings': 'endpoint-bindings'}
-    _toPy = {'placement': 'placement', 'endpoint-bindings': 'endpoint_bindings', 'num-units': 'num_units', 'series': 'series', 'storage': 'storage', 'channel': 'channel', 'application': 'application', 'charm-url': 'charm_url', 'constraints': 'constraints', 'config-yaml': 'config_yaml', 'resources': 'resources', 'config': 'config'}
+    _toSchema = {'application': 'application', 'charm_url': 'charm-url', 'channel': 'channel', 'resources': 'resources', 'placement': 'placement', 'config_yaml': 'config-yaml', 'config': 'config', 'constraints': 'constraints', 'num_units': 'num-units', 'storage': 'storage', 'endpoint_bindings': 'endpoint-bindings', 'series': 'series'}
+    _toPy = {'application': 'application', 'num-units': 'num_units', 'channel': 'channel', 'resources': 'resources', 'placement': 'placement', 'endpoint-bindings': 'endpoint_bindings', 'config': 'config', 'constraints': 'constraints', 'series': 'series', 'storage': 'storage', 'charm-url': 'charm_url', 'config-yaml': 'config_yaml'}
     def __init__(self, application=None, channel=None, charm_url=None, config=None, config_yaml=None, constraints=None, endpoint_bindings=None, num_units=None, placement=None, resources=None, series=None, storage=None):
         '''
         application : str
         channel : str
         charm_url : str
-        config : typing.Mapping[str, str]
+        config : typing.Mapping<~KT, +VT_co>[str, str]
         config_yaml : str
         constraints : Value
-        endpoint_bindings : typing.Mapping[str, str]
+        endpoint_bindings : typing.Mapping<~KT, +VT_co>[str, str]
         num_units : int
-        placement : typing.Sequence[~Placement]
-        resources : typing.Mapping[str, str]
+        placement : typing.Sequence<+T_co>[~Placement]<~Placement>
+        resources : typing.Mapping<~KT, +VT_co>[str, str]
         series : str
-        storage : typing.Mapping[str, ~Constraints]
+        storage : typing.Mapping<~KT, +VT_co>[str, ~Constraints]<~Constraints>
         '''
         self.application = application
         self.channel = channel
@@ -549,7 +607,7 @@ class ApplicationDeploy(Type):
         self.placement = [Placement.from_json(o) for o in placement or []]
         self.resources = resources
         self.series = series
-        self.storage = {k: Constraints.from_json(v) for k, v in (storage or dict()).items()}
+        self.storage = storage
 
 
 class ApplicationDestroy(Type):
@@ -583,28 +641,30 @@ class ApplicationGet(Type):
 
 
 class ApplicationGetResults(Type):
-    _toSchema = {'application': 'application', 'config': 'config', 'constraints': 'constraints', 'charm': 'charm'}
-    _toPy = {'application': 'application', 'config': 'config', 'constraints': 'constraints', 'charm': 'charm'}
-    def __init__(self, application=None, charm=None, config=None, constraints=None):
+    _toSchema = {'application': 'application', 'config': 'config', 'charm': 'charm', 'constraints': 'constraints', 'series': 'series'}
+    _toPy = {'application': 'application', 'config': 'config', 'charm': 'charm', 'constraints': 'constraints', 'series': 'series'}
+    def __init__(self, application=None, charm=None, config=None, constraints=None, series=None):
         '''
         application : str
         charm : str
-        config : typing.Mapping[str, typing.Any]
+        config : typing.Mapping<~KT, +VT_co>[str, typing.Any]
         constraints : Value
+        series : str
         '''
         self.application = application
         self.charm = charm
         self.config = config
         self.constraints = Value.from_json(constraints) if constraints else None
+        self.series = series
 
 
 class ApplicationMetricCredential(Type):
-    _toSchema = {'metrics_credentials': 'metrics-credentials', 'application': 'application'}
+    _toSchema = {'application': 'application', 'metrics_credentials': 'metrics-credentials'}
     _toPy = {'application': 'application', 'metrics-credentials': 'metrics_credentials'}
     def __init__(self, application=None, metrics_credentials=None):
         '''
         application : str
-        metrics_credentials : typing.Sequence[int]
+        metrics_credentials : typing.Sequence<+T_co>[int]
         '''
         self.application = application
         self.metrics_credentials = metrics_credentials
@@ -615,26 +675,26 @@ class ApplicationMetricCredentials(Type):
     _toPy = {'creds': 'creds'}
     def __init__(self, creds=None):
         '''
-        creds : typing.Sequence[~ApplicationMetricCredential]
+        creds : typing.Sequence<+T_co>[~ApplicationMetricCredential]<~ApplicationMetricCredential>
         '''
         self.creds = [ApplicationMetricCredential.from_json(o) for o in creds or []]
 
 
 class ApplicationSet(Type):
-    _toSchema = {'options': 'options', 'application': 'application'}
-    _toPy = {'options': 'options', 'application': 'application'}
+    _toSchema = {'application': 'application', 'options': 'options'}
+    _toPy = {'application': 'application', 'options': 'options'}
     def __init__(self, application=None, options=None):
         '''
         application : str
-        options : typing.Mapping[str, str]
+        options : typing.Mapping<~KT, +VT_co>[str, str]
         '''
         self.application = application
         self.options = options
 
 
 class ApplicationSetCharm(Type):
-    _toSchema = {'channel': 'channel', 'force_series': 'force-series', 'application': 'application', 'charm_url': 'charm-url', 'resource_ids': 'resource-ids', 'force_units': 'force-units'}
-    _toPy = {'channel': 'channel', 'force-units': 'force_units', 'application': 'application', 'charm-url': 'charm_url', 'resource-ids': 'resource_ids', 'force-series': 'force_series'}
+    _toSchema = {'application': 'application', 'charm_url': 'charm-url', 'channel': 'channel', 'force_units': 'force-units', 'force_series': 'force-series', 'resource_ids': 'resource-ids'}
+    _toPy = {'application': 'application', 'force-units': 'force_units', 'channel': 'channel', 'charm-url': 'charm_url', 'force-series': 'force_series', 'resource-ids': 'resource_ids'}
     def __init__(self, application=None, channel=None, charm_url=None, force_series=None, force_units=None, resource_ids=None):
         '''
         application : str
@@ -642,7 +702,7 @@ class ApplicationSetCharm(Type):
         charm_url : str
         force_series : bool
         force_units : bool
-        resource_ids : typing.Mapping[str, str]
+        resource_ids : typing.Mapping<~KT, +VT_co>[str, str]
         '''
         self.application = application
         self.channel = channel
@@ -663,20 +723,20 @@ class ApplicationUnexpose(Type):
 
 
 class ApplicationUnset(Type):
-    _toSchema = {'options': 'options', 'application': 'application'}
-    _toPy = {'options': 'options', 'application': 'application'}
+    _toSchema = {'application': 'application', 'options': 'options'}
+    _toPy = {'application': 'application', 'options': 'options'}
     def __init__(self, application=None, options=None):
         '''
         application : str
-        options : typing.Sequence[str]
+        options : typing.Sequence<+T_co>[str]
         '''
         self.application = application
         self.options = options
 
 
 class ApplicationUpdate(Type):
-    _toSchema = {'force_series': 'force-series', 'application': 'application', 'charm_url': 'charm-url', 'constraints': 'constraints', 'min_units': 'min-units', 'settings': 'settings', 'settings_yaml': 'settings-yaml', 'force_charm_url': 'force-charm-url'}
-    _toPy = {'min-units': 'min_units', 'force-charm-url': 'force_charm_url', 'charm-url': 'charm_url', 'constraints': 'constraints', 'settings-yaml': 'settings_yaml', 'application': 'application', 'settings': 'settings', 'force-series': 'force_series'}
+    _toSchema = {'application': 'application', 'charm_url': 'charm-url', 'constraints': 'constraints', 'settings_yaml': 'settings-yaml', 'min_units': 'min-units', 'settings': 'settings', 'force_series': 'force-series', 'force_charm_url': 'force-charm-url'}
+    _toPy = {'application': 'application', 'constraints': 'constraints', 'settings-yaml': 'settings_yaml', 'min-units': 'min_units', 'charm-url': 'charm_url', 'force-series': 'force_series', 'settings': 'settings', 'force-charm-url': 'force_charm_url'}
     def __init__(self, application=None, charm_url=None, constraints=None, force_charm_url=None, force_series=None, min_units=None, settings=None, settings_yaml=None):
         '''
         application : str
@@ -685,7 +745,7 @@ class ApplicationUpdate(Type):
         force_charm_url : bool
         force_series : bool
         min_units : int
-        settings : typing.Mapping[str, str]
+        settings : typing.Mapping<~KT, +VT_co>[str, str]
         settings_yaml : str
         '''
         self.application = application
@@ -703,14 +763,14 @@ class ApplicationsDeploy(Type):
     _toPy = {'applications': 'applications'}
     def __init__(self, applications=None):
         '''
-        applications : typing.Sequence[~ApplicationDeploy]
+        applications : typing.Sequence<+T_co>[~ApplicationDeploy]<~ApplicationDeploy>
         '''
         self.applications = [ApplicationDeploy.from_json(o) for o in applications or []]
 
 
 class CharmRelation(Type):
-    _toSchema = {'name': 'name', 'limit': 'limit', 'scope': 'scope', 'interface': 'interface', 'optional': 'optional', 'role': 'role'}
-    _toPy = {'name': 'name', 'limit': 'limit', 'scope': 'scope', 'interface': 'interface', 'optional': 'optional', 'role': 'role'}
+    _toSchema = {'limit': 'limit', 'role': 'role', 'scope': 'scope', 'optional': 'optional', 'name': 'name', 'interface': 'interface'}
+    _toPy = {'limit': 'limit', 'role': 'role', 'scope': 'scope', 'optional': 'optional', 'name': 'name', 'interface': 'interface'}
     def __init__(self, interface=None, limit=None, name=None, optional=None, role=None, scope=None):
         '''
         interface : str
@@ -729,8 +789,8 @@ class CharmRelation(Type):
 
 
 class Constraints(Type):
-    _toSchema = {'size': 'Size', 'count': 'Count', 'pool': 'Pool'}
-    _toPy = {'Pool': 'pool', 'Size': 'size', 'Count': 'count'}
+    _toSchema = {'size': 'Size', 'pool': 'Pool', 'count': 'Count'}
+    _toPy = {'Size': 'size', 'Count': 'count', 'Pool': 'pool'}
     def __init__(self, count=None, pool=None, size=None):
         '''
         count : int
@@ -747,7 +807,7 @@ class DestroyApplicationUnits(Type):
     _toPy = {'unit-names': 'unit_names'}
     def __init__(self, unit_names=None):
         '''
-        unit_names : typing.Sequence[str]
+        unit_names : typing.Sequence<+T_co>[str]
         '''
         self.unit_names = unit_names
 
@@ -757,7 +817,7 @@ class DestroyRelation(Type):
     _toPy = {'endpoints': 'endpoints'}
     def __init__(self, endpoints=None):
         '''
-        endpoints : typing.Sequence[str]
+        endpoints : typing.Sequence<+T_co>[str]
         '''
         self.endpoints = endpoints
 
@@ -773,8 +833,8 @@ class GetApplicationConstraints(Type):
 
 
 class GetConstraintsResults(Type):
-    _toSchema = {'tags': 'tags', 'cpu_cores': 'cpu-cores', 'arch': 'arch', 'container': 'container', 'root_disk': 'root-disk', 'mem': 'mem', 'cpu_power': 'cpu-power', 'instance_type': 'instance-type', 'spaces': 'spaces', 'virt_type': 'virt-type'}
-    _toPy = {'instance-type': 'instance_type', 'cpu-cores': 'cpu_cores', 'tags': 'tags', 'arch': 'arch', 'container': 'container', 'mem': 'mem', 'root-disk': 'root_disk', 'spaces': 'spaces', 'cpu-power': 'cpu_power', 'virt-type': 'virt_type'}
+    _toSchema = {'cpu_power': 'cpu-power', 'instance_type': 'instance-type', 'tags': 'tags', 'virt_type': 'virt-type', 'arch': 'arch', 'container': 'container', 'root_disk': 'root-disk', 'mem': 'mem', 'cpu_cores': 'cpu-cores', 'spaces': 'spaces'}
+    _toPy = {'virt-type': 'virt_type', 'cpu-power': 'cpu_power', 'container': 'container', 'cpu-cores': 'cpu_cores', 'arch': 'arch', 'tags': 'tags', 'mem': 'mem', 'spaces': 'spaces', 'instance-type': 'instance_type', 'root-disk': 'root_disk'}
     def __init__(self, arch=None, container=None, cpu_cores=None, cpu_power=None, instance_type=None, mem=None, root_disk=None, spaces=None, tags=None, virt_type=None):
         '''
         arch : str
@@ -784,8 +844,8 @@ class GetConstraintsResults(Type):
         instance_type : str
         mem : int
         root_disk : int
-        spaces : typing.Sequence[str]
-        tags : typing.Sequence[str]
+        spaces : typing.Sequence<+T_co>[str]
+        tags : typing.Sequence<+T_co>[str]
         virt_type : str
         '''
         self.arch = arch
@@ -801,8 +861,8 @@ class GetConstraintsResults(Type):
 
 
 class Placement(Type):
-    _toSchema = {'scope': 'scope', 'directive': 'directive'}
-    _toPy = {'scope': 'scope', 'directive': 'directive'}
+    _toSchema = {'directive': 'directive', 'scope': 'scope'}
+    _toPy = {'directive': 'directive', 'scope': 'scope'}
     def __init__(self, directive=None, scope=None):
         '''
         directive : str
@@ -825,8 +885,8 @@ class SetConstraints(Type):
 
 
 class StringResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -837,8 +897,8 @@ class StringResult(Type):
 
 
 class Value(Type):
-    _toSchema = {'tags': 'tags', 'cpu_cores': 'cpu-cores', 'arch': 'arch', 'container': 'container', 'root_disk': 'root-disk', 'mem': 'mem', 'cpu_power': 'cpu-power', 'instance_type': 'instance-type', 'spaces': 'spaces', 'virt_type': 'virt-type'}
-    _toPy = {'instance-type': 'instance_type', 'cpu-cores': 'cpu_cores', 'tags': 'tags', 'arch': 'arch', 'container': 'container', 'mem': 'mem', 'root-disk': 'root_disk', 'spaces': 'spaces', 'cpu-power': 'cpu_power', 'virt-type': 'virt_type'}
+    _toSchema = {'cpu_power': 'cpu-power', 'instance_type': 'instance-type', 'tags': 'tags', 'virt_type': 'virt-type', 'arch': 'arch', 'container': 'container', 'root_disk': 'root-disk', 'mem': 'mem', 'cpu_cores': 'cpu-cores', 'spaces': 'spaces'}
+    _toPy = {'virt-type': 'virt_type', 'cpu-power': 'cpu_power', 'container': 'container', 'cpu-cores': 'cpu_cores', 'arch': 'arch', 'tags': 'tags', 'mem': 'mem', 'spaces': 'spaces', 'instance-type': 'instance_type', 'root-disk': 'root_disk'}
     def __init__(self, arch=None, container=None, cpu_cores=None, cpu_power=None, instance_type=None, mem=None, root_disk=None, spaces=None, tags=None, virt_type=None):
         '''
         arch : str
@@ -848,8 +908,8 @@ class Value(Type):
         instance_type : str
         mem : int
         root_disk : int
-        spaces : typing.Sequence[str]
-        tags : typing.Sequence[str]
+        spaces : typing.Sequence<+T_co>[str]
+        tags : typing.Sequence<+T_co>[str]
         virt_type : str
         '''
         self.arch = arch
@@ -865,11 +925,11 @@ class Value(Type):
 
 
 class StringsWatchResult(Type):
-    _toSchema = {'error': 'error', 'changes': 'changes', 'watcher_id': 'watcher-id'}
-    _toPy = {'error': 'error', 'changes': 'changes', 'watcher-id': 'watcher_id'}
+    _toSchema = {'changes': 'changes', 'watcher_id': 'watcher-id', 'error': 'error'}
+    _toPy = {'watcher-id': 'watcher_id', 'changes': 'changes', 'error': 'error'}
     def __init__(self, changes=None, error=None, watcher_id=None):
         '''
-        changes : typing.Sequence[str]
+        changes : typing.Sequence<+T_co>[str]
         error : Error
         watcher_id : str
         '''
@@ -913,14 +973,14 @@ class BackupsListResult(Type):
     _toPy = {'list': 'list_'}
     def __init__(self, list_=None):
         '''
-        list_ : typing.Sequence[~BackupsMetadataResult]
+        list_ : typing.Sequence<+T_co>[~BackupsMetadataResult]<~BackupsMetadataResult>
         '''
         self.list_ = [BackupsMetadataResult.from_json(o) for o in list_ or []]
 
 
 class BackupsMetadataResult(Type):
-    _toSchema = {'version': 'version', 'id_': 'id', 'checksum': 'checksum', 'checksum_format': 'checksum-format', 'machine': 'machine', 'notes': 'notes', 'series': 'series', 'stored': 'stored', 'finished': 'finished', 'started': 'started', 'model': 'model', 'hostname': 'hostname', 'size': 'size', 'ca_cert': 'ca-cert', 'ca_private_key': 'ca-private-key'}
-    _toPy = {'ca-private-key': 'ca_private_key', 'checksum': 'checksum', 'machine': 'machine', 'id': 'id_', 'notes': 'notes', 'series': 'series', 'checksum-format': 'checksum_format', 'ca-cert': 'ca_cert', 'finished': 'finished', 'started': 'started', 'stored': 'stored', 'model': 'model', 'hostname': 'hostname', 'size': 'size', 'version': 'version'}
+    _toSchema = {'ca_private_key': 'ca-private-key', 'size': 'size', 'started': 'started', 'id_': 'id', 'checksum': 'checksum', 'finished': 'finished', 'hostname': 'hostname', 'stored': 'stored', 'series': 'series', 'machine': 'machine', 'notes': 'notes', 'ca_cert': 'ca-cert', 'checksum_format': 'checksum-format', 'model': 'model', 'version': 'version'}
+    _toPy = {'started': 'started', 'size': 'size', 'ca-cert': 'ca_cert', 'ca-private-key': 'ca_private_key', 'checksum': 'checksum', 'machine': 'machine', 'finished': 'finished', 'hostname': 'hostname', 'stored': 'stored', 'series': 'series', 'notes': 'notes', 'id': 'id_', 'checksum-format': 'checksum_format', 'model': 'model', 'version': 'version'}
     def __init__(self, ca_cert=None, ca_private_key=None, checksum=None, checksum_format=None, finished=None, hostname=None, id_=None, machine=None, model=None, notes=None, series=None, size=None, started=None, stored=None, version=None):
         '''
         ca_cert : str
@@ -967,8 +1027,8 @@ class BackupsRemoveArgs(Type):
 
 
 class Number(Type):
-    _toSchema = {'patch': 'Patch', 'tag': 'Tag', 'major': 'Major', 'build': 'Build', 'minor': 'Minor'}
-    _toPy = {'Patch': 'patch', 'Major': 'major', 'Tag': 'tag', 'Minor': 'minor', 'Build': 'build'}
+    _toSchema = {'build': 'Build', 'patch': 'Patch', 'tag': 'Tag', 'minor': 'Minor', 'major': 'Major'}
+    _toPy = {'Tag': 'tag', 'Major': 'major', 'Patch': 'patch', 'Minor': 'minor', 'Build': 'build'}
     def __init__(self, build=None, major=None, minor=None, patch=None, tag=None):
         '''
         build : int
@@ -995,7 +1055,7 @@ class RestoreArgs(Type):
 
 
 class Block(Type):
-    _toSchema = {'id_': 'id', 'tag': 'tag', 'message': 'message', 'type_': 'type'}
+    _toSchema = {'tag': 'tag', 'type_': 'type', 'id_': 'id', 'message': 'message'}
     _toPy = {'type': 'type_', 'id': 'id_', 'tag': 'tag', 'message': 'message'}
     def __init__(self, id_=None, message=None, tag=None, type_=None):
         '''
@@ -1011,8 +1071,8 @@ class Block(Type):
 
 
 class BlockResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -1027,7 +1087,7 @@ class BlockResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~BlockResult]
+        results : typing.Sequence<+T_co>[~BlockResult]<~BlockResult>
         '''
         self.results = [BlockResult.from_json(o) for o in results or []]
 
@@ -1045,12 +1105,12 @@ class BlockSwitchParams(Type):
 
 
 class CharmActionSpec(Type):
-    _toSchema = {'params': 'params', 'description': 'description'}
-    _toPy = {'params': 'params', 'description': 'description'}
+    _toSchema = {'description': 'description', 'params': 'params'}
+    _toPy = {'description': 'description', 'params': 'params'}
     def __init__(self, description=None, params=None):
         '''
         description : str
-        params : typing.Mapping[str, typing.Any]
+        params : typing.Mapping<~KT, +VT_co>[str, typing.Any]
         '''
         self.description = description
         self.params = params
@@ -1061,25 +1121,25 @@ class CharmActions(Type):
     _toPy = {'specs': 'specs'}
     def __init__(self, specs=None):
         '''
-        specs : typing.Mapping[str, ~CharmActionSpec]
+        specs : typing.Mapping<~KT, +VT_co>[str, ~CharmActionSpec]<~CharmActionSpec>
         '''
-        self.specs = {k: CharmActionSpec.from_json(v) for k, v in (specs or dict()).items()}
+        self.specs = specs
 
 
 class CharmInfo(Type):
-    _toSchema = {'metrics': 'metrics', 'actions': 'actions', 'config': 'config', 'url': 'url', 'revision': 'revision', 'meta': 'meta'}
-    _toPy = {'metrics': 'metrics', 'actions': 'actions', 'config': 'config', 'url': 'url', 'revision': 'revision', 'meta': 'meta'}
+    _toSchema = {'config': 'config', 'actions': 'actions', 'revision': 'revision', 'metrics': 'metrics', 'url': 'url', 'meta': 'meta'}
+    _toPy = {'config': 'config', 'actions': 'actions', 'revision': 'revision', 'metrics': 'metrics', 'url': 'url', 'meta': 'meta'}
     def __init__(self, actions=None, config=None, meta=None, metrics=None, revision=None, url=None):
         '''
         actions : CharmActions
-        config : typing.Mapping[str, ~CharmOption]
+        config : typing.Mapping<~KT, +VT_co>[str, ~CharmOption]<~CharmOption>
         meta : CharmMeta
         metrics : CharmMetrics
         revision : int
         url : str
         '''
         self.actions = CharmActions.from_json(actions) if actions else None
-        self.config = {k: CharmOption.from_json(v) for k, v in (config or dict()).items()}
+        self.config = config
         self.meta = CharmMeta.from_json(meta) if meta else None
         self.metrics = CharmMetrics.from_json(metrics) if metrics else None
         self.revision = revision
@@ -1087,39 +1147,39 @@ class CharmInfo(Type):
 
 
 class CharmMeta(Type):
-    _toSchema = {'name': 'name', 'tags': 'tags', 'subordinate': 'subordinate', 'series': 'series', 'provides': 'provides', 'peers': 'peers', 'storage': 'storage', 'terms': 'terms', 'categories': 'categories', 'description': 'description', 'min_juju_version': 'min-juju-version', 'summary': 'summary', 'resources': 'resources', 'extra_bindings': 'extra-bindings', 'requires': 'requires', 'payload_classes': 'payload-classes'}
-    _toPy = {'name': 'name', 'payload-classes': 'payload_classes', 'tags': 'tags', 'min-juju-version': 'min_juju_version', 'subordinate': 'subordinate', 'series': 'series', 'provides': 'provides', 'peers': 'peers', 'storage': 'storage', 'terms': 'terms', 'extra-bindings': 'extra_bindings', 'categories': 'categories', 'description': 'description', 'summary': 'summary', 'resources': 'resources', 'requires': 'requires'}
+    _toSchema = {'description': 'description', 'extra_bindings': 'extra-bindings', 'tags': 'tags', 'min_juju_version': 'min-juju-version', 'payload_classes': 'payload-classes', 'resources': 'resources', 'storage': 'storage', 'subordinate': 'subordinate', 'categories': 'categories', 'terms': 'terms', 'series': 'series', 'peers': 'peers', 'name': 'name', 'requires': 'requires', 'summary': 'summary', 'provides': 'provides'}
+    _toPy = {'description': 'description', 'min-juju-version': 'min_juju_version', 'peers': 'peers', 'provides': 'provides', 'resources': 'resources', 'extra-bindings': 'extra_bindings', 'terms': 'terms', 'subordinate': 'subordinate', 'categories': 'categories', 'series': 'series', 'storage': 'storage', 'name': 'name', 'requires': 'requires', 'summary': 'summary', 'payload-classes': 'payload_classes', 'tags': 'tags'}
     def __init__(self, categories=None, description=None, extra_bindings=None, min_juju_version=None, name=None, payload_classes=None, peers=None, provides=None, requires=None, resources=None, series=None, storage=None, subordinate=None, summary=None, tags=None, terms=None):
         '''
-        categories : typing.Sequence[str]
+        categories : typing.Sequence<+T_co>[str]
         description : str
-        extra_bindings : typing.Mapping[str, str]
+        extra_bindings : typing.Mapping<~KT, +VT_co>[str, str]
         min_juju_version : str
         name : str
-        payload_classes : typing.Mapping[str, ~CharmPayloadClass]
-        peers : typing.Mapping[str, ~CharmRelation]
-        provides : typing.Mapping[str, ~CharmRelation]
-        requires : typing.Mapping[str, ~CharmRelation]
-        resources : typing.Mapping[str, ~CharmResourceMeta]
-        series : typing.Sequence[str]
-        storage : typing.Mapping[str, ~CharmStorage]
+        payload_classes : typing.Mapping<~KT, +VT_co>[str, ~CharmPayloadClass]<~CharmPayloadClass>
+        peers : typing.Mapping<~KT, +VT_co>[str, ~CharmRelation]<~CharmRelation>
+        provides : typing.Mapping<~KT, +VT_co>[str, ~CharmRelation]<~CharmRelation>
+        requires : typing.Mapping<~KT, +VT_co>[str, ~CharmRelation]<~CharmRelation>
+        resources : typing.Mapping<~KT, +VT_co>[str, ~CharmResourceMeta]<~CharmResourceMeta>
+        series : typing.Sequence<+T_co>[str]
+        storage : typing.Mapping<~KT, +VT_co>[str, ~CharmStorage]<~CharmStorage>
         subordinate : bool
         summary : str
-        tags : typing.Sequence[str]
-        terms : typing.Sequence[str]
+        tags : typing.Sequence<+T_co>[str]
+        terms : typing.Sequence<+T_co>[str]
         '''
         self.categories = categories
         self.description = description
         self.extra_bindings = extra_bindings
         self.min_juju_version = min_juju_version
         self.name = name
-        self.payload_classes = {k: CharmPayloadClass.from_json(v) for k, v in (payload_classes or dict()).items()}
-        self.peers = {k: CharmRelation.from_json(v) for k, v in (peers or dict()).items()}
-        self.provides = {k: CharmRelation.from_json(v) for k, v in (provides or dict()).items()}
-        self.requires = {k: CharmRelation.from_json(v) for k, v in (requires or dict()).items()}
-        self.resources = {k: CharmResourceMeta.from_json(v) for k, v in (resources or dict()).items()}
+        self.payload_classes = payload_classes
+        self.peers = peers
+        self.provides = provides
+        self.requires = requires
+        self.resources = resources
         self.series = series
-        self.storage = {k: CharmStorage.from_json(v) for k, v in (storage or dict()).items()}
+        self.storage = storage
         self.subordinate = subordinate
         self.summary = summary
         self.tags = tags
@@ -1143,17 +1203,17 @@ class CharmMetrics(Type):
     _toPy = {'metrics': 'metrics'}
     def __init__(self, metrics=None):
         '''
-        metrics : typing.Mapping[str, ~CharmMetric]
+        metrics : typing.Mapping<~KT, +VT_co>[str, ~CharmMetric]<~CharmMetric>
         '''
-        self.metrics = {k: CharmMetric.from_json(v) for k, v in (metrics or dict()).items()}
+        self.metrics = metrics
 
 
 class CharmOption(Type):
-    _toSchema = {'default': 'default', 'description': 'description', 'type_': 'type'}
-    _toPy = {'type': 'type_', 'default': 'default', 'description': 'description'}
+    _toSchema = {'description': 'description', 'default': 'default', 'type_': 'type'}
+    _toPy = {'type': 'type_', 'description': 'description', 'default': 'default'}
     def __init__(self, default=None, description=None, type_=None):
         '''
-        default : typing.Mapping[str, typing.Any]
+        default : typing.Mapping<~KT, +VT_co>[str, typing.Any]
         description : str
         type_ : str
         '''
@@ -1164,7 +1224,7 @@ class CharmOption(Type):
 
 class CharmPayloadClass(Type):
     _toSchema = {'name': 'name', 'type_': 'type'}
-    _toPy = {'name': 'name', 'type': 'type_'}
+    _toPy = {'type': 'type_', 'name': 'name'}
     def __init__(self, name=None, type_=None):
         '''
         name : str
@@ -1175,8 +1235,8 @@ class CharmPayloadClass(Type):
 
 
 class CharmResourceMeta(Type):
-    _toSchema = {'name': 'name', 'path': 'path', 'description': 'description', 'type_': 'type'}
-    _toPy = {'name': 'name', 'type': 'type_', 'path': 'path', 'description': 'description'}
+    _toSchema = {'description': 'description', 'type_': 'type', 'path': 'path', 'name': 'name'}
+    _toPy = {'type': 'type_', 'description': 'description', 'path': 'path', 'name': 'name'}
     def __init__(self, description=None, name=None, path=None, type_=None):
         '''
         description : str
@@ -1191,8 +1251,8 @@ class CharmResourceMeta(Type):
 
 
 class CharmStorage(Type):
-    _toSchema = {'name': 'name', 'location': 'location', 'count_max': 'count-max', 'description': 'description', 'read_only': 'read-only', 'properties': 'properties', 'shared': 'shared', 'count_min': 'count-min', 'minimum_size': 'minimum-size', 'type_': 'type'}
-    _toPy = {'name': 'name', 'location': 'location', 'count-min': 'count_min', 'description': 'description', 'properties': 'properties', 'type': 'type_', 'read-only': 'read_only', 'count-max': 'count_max', 'shared': 'shared', 'minimum-size': 'minimum_size'}
+    _toSchema = {'shared': 'shared', 'count_min': 'count-min', 'properties': 'properties', 'type_': 'type', 'description': 'description', 'name': 'name', 'location': 'location', 'minimum_size': 'minimum-size', 'read_only': 'read-only', 'count_max': 'count-max'}
+    _toPy = {'description': 'description', 'count-min': 'count_min', 'minimum-size': 'minimum_size', 'shared': 'shared', 'name': 'name', 'location': 'location', 'type': 'type_', 'count-max': 'count_max', 'read-only': 'read_only', 'properties': 'properties'}
     def __init__(self, count_max=None, count_min=None, description=None, location=None, minimum_size=None, name=None, properties=None, read_only=None, shared=None, type_=None):
         '''
         count_max : int
@@ -1201,7 +1261,7 @@ class CharmStorage(Type):
         location : str
         minimum_size : int
         name : str
-        properties : typing.Sequence[str]
+        properties : typing.Sequence<+T_co>[str]
         read_only : bool
         shared : bool
         type_ : str
@@ -1233,7 +1293,7 @@ class CharmsList(Type):
     _toPy = {'names': 'names'}
     def __init__(self, names=None):
         '''
-        names : typing.Sequence[str]
+        names : typing.Sequence<+T_co>[str]
         '''
         self.names = names
 
@@ -1243,7 +1303,7 @@ class CharmsListResult(Type):
     _toPy = {'charm-urls': 'charm_urls'}
     def __init__(self, charm_urls=None):
         '''
-        charm_urls : typing.Sequence[str]
+        charm_urls : typing.Sequence<+T_co>[str]
         '''
         self.charm_urls = charm_urls
 
@@ -1263,7 +1323,7 @@ class APIHostPortsResult(Type):
     _toPy = {'servers': 'servers'}
     def __init__(self, servers=None):
         '''
-        servers : typing.Sequence[~HostPort]
+        servers : typing.Sequence<+T_co>[~HostPort]<~HostPort>
         '''
         self.servers = [HostPort.from_json(o) for o in servers or []]
 
@@ -1281,8 +1341,8 @@ class AddCharm(Type):
 
 
 class AddCharmWithAuthorization(Type):
-    _toSchema = {'channel': 'channel', 'url': 'url', 'macaroon': 'macaroon'}
-    _toPy = {'channel': 'channel', 'url': 'url', 'macaroon': 'macaroon'}
+    _toSchema = {'macaroon': 'macaroon', 'channel': 'channel', 'url': 'url'}
+    _toPy = {'macaroon': 'macaroon', 'channel': 'channel', 'url': 'url'}
     def __init__(self, channel=None, macaroon=None, url=None):
         '''
         channel : str
@@ -1295,17 +1355,17 @@ class AddCharmWithAuthorization(Type):
 
 
 class AddMachineParams(Type):
-    _toSchema = {'jobs': 'jobs', 'placement': 'placement', 'disks': 'disks', 'instance_id': 'instance-id', 'constraints': 'constraints', 'hardware_characteristics': 'hardware-characteristics', 'parent_id': 'parent-id', 'nonce': 'nonce', 'container_type': 'container-type', 'addresses': 'addresses', 'series': 'series'}
-    _toPy = {'jobs': 'jobs', 'constraints': 'constraints', 'disks': 'disks', 'hardware-characteristics': 'hardware_characteristics', 'container-type': 'container_type', 'placement': 'placement', 'parent-id': 'parent_id', 'instance-id': 'instance_id', 'nonce': 'nonce', 'addresses': 'addresses', 'series': 'series'}
+    _toSchema = {'addresses': 'addresses', 'disks': 'disks', 'hardware_characteristics': 'hardware-characteristics', 'nonce': 'nonce', 'constraints': 'constraints', 'series': 'series', 'placement': 'placement', 'parent_id': 'parent-id', 'jobs': 'jobs', 'instance_id': 'instance-id', 'container_type': 'container-type'}
+    _toPy = {'addresses': 'addresses', 'disks': 'disks', 'instance-id': 'instance_id', 'container-type': 'container_type', 'nonce': 'nonce', 'constraints': 'constraints', 'series': 'series', 'placement': 'placement', 'parent-id': 'parent_id', 'hardware-characteristics': 'hardware_characteristics', 'jobs': 'jobs'}
     def __init__(self, addresses=None, constraints=None, container_type=None, disks=None, hardware_characteristics=None, instance_id=None, jobs=None, nonce=None, parent_id=None, placement=None, series=None):
         '''
-        addresses : typing.Sequence[~Address]
+        addresses : typing.Sequence<+T_co>[~Address]<~Address>
         constraints : Value
         container_type : str
-        disks : typing.Sequence[~Constraints]
+        disks : typing.Sequence<+T_co>[~Constraints]<~Constraints>
         hardware_characteristics : HardwareCharacteristics
         instance_id : str
-        jobs : typing.Sequence[str]
+        jobs : typing.Sequence<+T_co>[str]
         nonce : str
         parent_id : str
         placement : Placement
@@ -1329,14 +1389,14 @@ class AddMachines(Type):
     _toPy = {'params': 'params'}
     def __init__(self, params=None):
         '''
-        params : typing.Sequence[~AddMachineParams]
+        params : typing.Sequence<+T_co>[~AddMachineParams]<~AddMachineParams>
         '''
         self.params = [AddMachineParams.from_json(o) for o in params or []]
 
 
 class AddMachinesResult(Type):
-    _toSchema = {'error': 'error', 'machine': 'machine'}
-    _toPy = {'error': 'error', 'machine': 'machine'}
+    _toSchema = {'machine': 'machine', 'error': 'error'}
+    _toPy = {'machine': 'machine', 'error': 'error'}
     def __init__(self, error=None, machine=None):
         '''
         error : Error
@@ -1351,14 +1411,14 @@ class AddMachinesResults(Type):
     _toPy = {'machines': 'machines'}
     def __init__(self, machines=None):
         '''
-        machines : typing.Sequence[~AddMachinesResult]
+        machines : typing.Sequence<+T_co>[~AddMachinesResult]<~AddMachinesResult>
         '''
         self.machines = [AddMachinesResult.from_json(o) for o in machines or []]
 
 
 class Address(Type):
-    _toSchema = {'scope': 'scope', 'type_': 'type', 'value': 'value', 'space_name': 'space-name'}
-    _toPy = {'type': 'type_', 'scope': 'scope', 'value': 'value', 'space-name': 'space_name'}
+    _toSchema = {'space_name': 'space-name', 'type_': 'type', 'scope': 'scope', 'value': 'value'}
+    _toPy = {'type': 'type_', 'value': 'value', 'scope': 'scope', 'space-name': 'space_name'}
     def __init__(self, scope=None, space_name=None, type_=None, value=None):
         '''
         scope : str
@@ -1373,8 +1433,8 @@ class Address(Type):
 
 
 class AgentVersionResult(Type):
-    _toSchema = {'patch': 'Patch', 'tag': 'Tag', 'major': 'Major', 'build': 'Build', 'minor': 'Minor'}
-    _toPy = {'Patch': 'patch', 'Major': 'major', 'Tag': 'tag', 'Minor': 'minor', 'Build': 'build'}
+    _toSchema = {'build': 'Build', 'patch': 'Patch', 'tag': 'Tag', 'minor': 'Minor', 'major': 'Major'}
+    _toPy = {'Tag': 'tag', 'Major': 'major', 'Patch': 'patch', 'Minor': 'minor', 'Build': 'build'}
     def __init__(self, build=None, major=None, minor=None, patch=None, tag=None):
         '''
         build : int
@@ -1401,21 +1461,21 @@ class AllWatcherId(Type):
 
 
 class ApplicationStatus(Type):
-    _toSchema = {'status': 'status', 'subordinate_to': 'subordinate-to', 'err': 'err', 'series': 'series', 'life': 'life', 'can_upgrade_to': 'can-upgrade-to', 'meter_statuses': 'meter-statuses', 'units': 'units', 'workload_version': 'workload-version', 'exposed': 'exposed', 'relations': 'relations', 'charm': 'charm'}
-    _toPy = {'status': 'status', 'can-upgrade-to': 'can_upgrade_to', 'err': 'err', 'series': 'series', 'life': 'life', 'exposed': 'exposed', 'subordinate-to': 'subordinate_to', 'units': 'units', 'workload-version': 'workload_version', 'meter-statuses': 'meter_statuses', 'relations': 'relations', 'charm': 'charm'}
+    _toSchema = {'can_upgrade_to': 'can-upgrade-to', 'subordinate_to': 'subordinate-to', 'workload_version': 'workload-version', 'life': 'life', 'charm': 'charm', 'status': 'status', 'units': 'units', 'meter_statuses': 'meter-statuses', 'series': 'series', 'err': 'err', 'relations': 'relations', 'exposed': 'exposed'}
+    _toPy = {'can-upgrade-to': 'can_upgrade_to', 'workload-version': 'workload_version', 'life': 'life', 'charm': 'charm', 'status': 'status', 'units': 'units', 'series': 'series', 'err': 'err', 'relations': 'relations', 'meter-statuses': 'meter_statuses', 'exposed': 'exposed', 'subordinate-to': 'subordinate_to'}
     def __init__(self, can_upgrade_to=None, charm=None, err=None, exposed=None, life=None, meter_statuses=None, relations=None, series=None, status=None, subordinate_to=None, units=None, workload_version=None):
         '''
         can_upgrade_to : str
         charm : str
-        err : typing.Mapping[str, typing.Any]
+        err : typing.Mapping<~KT, +VT_co>[str, typing.Any]
         exposed : bool
         life : str
-        meter_statuses : typing.Mapping[str, ~MeterStatus]
-        relations : typing.Sequence[str]
+        meter_statuses : typing.Mapping<~KT, +VT_co>[str, ~MeterStatus]<~MeterStatus>
+        relations : typing.Sequence<+T_co>[str]
         series : str
         status : DetailedStatus
-        subordinate_to : typing.Sequence[str]
-        units : typing.Mapping[str, ~UnitStatus]
+        subordinate_to : typing.Sequence<+T_co>[str]
+        units : typing.Mapping<~KT, +VT_co>[str, ~UnitStatus]<~UnitStatus>
         workload_version : str
         '''
         self.can_upgrade_to = can_upgrade_to
@@ -1423,18 +1483,18 @@ class ApplicationStatus(Type):
         self.err = err
         self.exposed = exposed
         self.life = life
-        self.meter_statuses = {k: MeterStatus.from_json(v) for k, v in (meter_statuses or dict()).items()}
+        self.meter_statuses = meter_statuses
         self.relations = relations
         self.series = series
         self.status = DetailedStatus.from_json(status) if status else None
         self.subordinate_to = subordinate_to
-        self.units = {k: UnitStatus.from_json(v) for k, v in (units or dict()).items()}
+        self.units = units
         self.workload_version = workload_version
 
 
 class Binary(Type):
-    _toSchema = {'series': 'Series', 'arch': 'Arch', 'number': 'Number'}
-    _toPy = {'Number': 'number', 'Arch': 'arch', 'Series': 'series'}
+    _toSchema = {'number': 'Number', 'series': 'Series', 'arch': 'Arch'}
+    _toPy = {'Series': 'series', 'Arch': 'arch', 'Number': 'number'}
     def __init__(self, arch=None, number=None, series=None):
         '''
         arch : str
@@ -1447,14 +1507,14 @@ class Binary(Type):
 
 
 class BundleChangesChange(Type):
-    _toSchema = {'args': 'args', 'id_': 'id', 'requires': 'requires', 'method': 'method'}
-    _toPy = {'args': 'args', 'requires': 'requires', 'id': 'id_', 'method': 'method'}
+    _toSchema = {'args': 'args', 'requires': 'requires', 'id_': 'id', 'method': 'method'}
+    _toPy = {'args': 'args', 'id': 'id_', 'requires': 'requires', 'method': 'method'}
     def __init__(self, args=None, id_=None, method=None, requires=None):
         '''
-        args : typing.Sequence[typing.Any]
+        args : typing.Sequence<+T_co>[typing.Any]
         id_ : str
         method : str
-        requires : typing.Sequence[str]
+        requires : typing.Sequence<+T_co>[str]
         '''
         self.args = args
         self.id_ = id_
@@ -1468,31 +1528,31 @@ class ConfigValue(Type):
     def __init__(self, source=None, value=None):
         '''
         source : str
-        value : typing.Mapping[str, typing.Any]
+        value : typing.Mapping<~KT, +VT_co>[str, typing.Any]
         '''
         self.source = source
         self.value = value
 
 
 class DestroyMachines(Type):
-    _toSchema = {'force': 'force', 'machine_names': 'machine-names'}
+    _toSchema = {'machine_names': 'machine-names', 'force': 'force'}
     _toPy = {'force': 'force', 'machine-names': 'machine_names'}
     def __init__(self, force=None, machine_names=None):
         '''
         force : bool
-        machine_names : typing.Sequence[str]
+        machine_names : typing.Sequence<+T_co>[str]
         '''
         self.force = force
         self.machine_names = machine_names
 
 
 class DetailedStatus(Type):
-    _toSchema = {'status': 'status', 'info': 'info', 'err': 'err', 'kind': 'kind', 'since': 'since', 'life': 'life', 'data': 'data', 'version': 'version'}
-    _toPy = {'status': 'status', 'info': 'info', 'err': 'err', 'kind': 'kind', 'since': 'since', 'life': 'life', 'data': 'data', 'version': 'version'}
+    _toSchema = {'info': 'info', 'data': 'data', 'kind': 'kind', 'since': 'since', 'err': 'err', 'life': 'life', 'status': 'status', 'version': 'version'}
+    _toPy = {'info': 'info', 'data': 'data', 'kind': 'kind', 'since': 'since', 'err': 'err', 'life': 'life', 'status': 'status', 'version': 'version'}
     def __init__(self, data=None, err=None, info=None, kind=None, life=None, since=None, status=None, version=None):
         '''
-        data : typing.Mapping[str, typing.Any]
-        err : typing.Mapping[str, typing.Any]
+        data : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        err : typing.Mapping<~KT, +VT_co>[str, typing.Any]
         info : str
         kind : str
         life : str
@@ -1511,8 +1571,8 @@ class DetailedStatus(Type):
 
 
 class EndpointStatus(Type):
-    _toSchema = {'name': 'name', 'role': 'role', 'subordinate': 'subordinate', 'application': 'application'}
-    _toPy = {'name': 'name', 'role': 'role', 'subordinate': 'subordinate', 'application': 'application'}
+    _toSchema = {'application': 'application', 'name': 'name', 'role': 'role', 'subordinate': 'subordinate'}
+    _toPy = {'application': 'application', 'name': 'name', 'role': 'role', 'subordinate': 'subordinate'}
     def __init__(self, application=None, name=None, role=None, subordinate=None):
         '''
         application : str
@@ -1527,11 +1587,11 @@ class EndpointStatus(Type):
 
 
 class EntityStatus(Type):
-    _toSchema = {'status': 'status', 'info': 'info', 'data': 'data', 'since': 'since'}
-    _toPy = {'status': 'status', 'info': 'info', 'data': 'data', 'since': 'since'}
+    _toSchema = {'info': 'info', 'data': 'data', 'status': 'status', 'since': 'since'}
+    _toPy = {'info': 'info', 'data': 'data', 'status': 'status', 'since': 'since'}
     def __init__(self, data=None, info=None, since=None, status=None):
         '''
-        data : typing.Mapping[str, typing.Any]
+        data : typing.Mapping<~KT, +VT_co>[str, typing.Any]
         info : str
         since : str
         status : str
@@ -1543,8 +1603,8 @@ class EntityStatus(Type):
 
 
 class FindToolsParams(Type):
-    _toSchema = {'number': 'number', 'arch': 'arch', 'major': 'major', 'series': 'series', 'minor': 'minor'}
-    _toPy = {'number': 'number', 'arch': 'arch', 'major': 'major', 'series': 'series', 'minor': 'minor'}
+    _toSchema = {'series': 'series', 'number': 'number', 'minor': 'minor', 'major': 'major', 'arch': 'arch'}
+    _toPy = {'series': 'series', 'number': 'number', 'minor': 'minor', 'major': 'major', 'arch': 'arch'}
     def __init__(self, arch=None, major=None, minor=None, number=None, series=None):
         '''
         arch : str
@@ -1561,29 +1621,29 @@ class FindToolsParams(Type):
 
 
 class FindToolsResult(Type):
-    _toSchema = {'error': 'error', 'list_': 'list'}
-    _toPy = {'error': 'error', 'list': 'list_'}
+    _toSchema = {'list_': 'list', 'error': 'error'}
+    _toPy = {'list': 'list_', 'error': 'error'}
     def __init__(self, error=None, list_=None):
         '''
         error : Error
-        list_ : typing.Sequence[~Tools]
+        list_ : typing.Sequence<+T_co>[~Tools]<~Tools>
         '''
         self.error = Error.from_json(error) if error else None
         self.list_ = [Tools.from_json(o) for o in list_ or []]
 
 
 class FullStatus(Type):
-    _toSchema = {'machines': 'machines', 'model': 'model', 'relations': 'relations', 'applications': 'applications'}
-    _toPy = {'machines': 'machines', 'model': 'model', 'relations': 'relations', 'applications': 'applications'}
+    _toSchema = {'relations': 'relations', 'machines': 'machines', 'applications': 'applications', 'model': 'model'}
+    _toPy = {'relations': 'relations', 'machines': 'machines', 'applications': 'applications', 'model': 'model'}
     def __init__(self, applications=None, machines=None, model=None, relations=None):
         '''
-        applications : typing.Mapping[str, ~ApplicationStatus]
-        machines : typing.Mapping[str, ~MachineStatus]
+        applications : typing.Mapping<~KT, +VT_co>[str, ~ApplicationStatus]<~ApplicationStatus>
+        machines : typing.Mapping<~KT, +VT_co>[str, ~MachineStatus]<~MachineStatus>
         model : ModelStatusInfo
-        relations : typing.Sequence[~RelationStatus]
+        relations : typing.Sequence<+T_co>[~RelationStatus]<~RelationStatus>
         '''
-        self.applications = {k: ApplicationStatus.from_json(v) for k, v in (applications or dict()).items()}
-        self.machines = {k: MachineStatus.from_json(v) for k, v in (machines or dict()).items()}
+        self.applications = applications
+        self.machines = machines
         self.model = ModelStatusInfo.from_json(model) if model else None
         self.relations = [RelationStatus.from_json(o) for o in relations or []]
 
@@ -1599,20 +1659,20 @@ class GetBundleChangesParams(Type):
 
 
 class GetBundleChangesResults(Type):
-    _toSchema = {'changes': 'changes', 'errors': 'errors'}
-    _toPy = {'changes': 'changes', 'errors': 'errors'}
+    _toSchema = {'errors': 'errors', 'changes': 'changes'}
+    _toPy = {'errors': 'errors', 'changes': 'changes'}
     def __init__(self, changes=None, errors=None):
         '''
-        changes : typing.Sequence[~BundleChangesChange]
-        errors : typing.Sequence[str]
+        changes : typing.Sequence<+T_co>[~BundleChangesChange]<~BundleChangesChange>
+        errors : typing.Sequence<+T_co>[str]
         '''
         self.changes = [BundleChangesChange.from_json(o) for o in changes or []]
         self.errors = errors
 
 
 class HardwareCharacteristics(Type):
-    _toSchema = {'tags': 'tags', 'cpu_cores': 'cpu-cores', 'arch': 'arch', 'root_disk': 'root-disk', 'mem': 'mem', 'cpu_power': 'cpu-power', 'availability_zone': 'availability-zone'}
-    _toPy = {'cpu-cores': 'cpu_cores', 'tags': 'tags', 'arch': 'arch', 'mem': 'mem', 'root-disk': 'root_disk', 'availability-zone': 'availability_zone', 'cpu-power': 'cpu_power'}
+    _toSchema = {'cpu_power': 'cpu-power', 'tags': 'tags', 'availability_zone': 'availability-zone', 'mem': 'mem', 'root_disk': 'root-disk', 'arch': 'arch', 'cpu_cores': 'cpu-cores'}
+    _toPy = {'cpu-power': 'cpu_power', 'tags': 'tags', 'arch': 'arch', 'mem': 'mem', 'availability-zone': 'availability_zone', 'cpu-cores': 'cpu_cores', 'root-disk': 'root_disk'}
     def __init__(self, arch=None, availability_zone=None, cpu_cores=None, cpu_power=None, mem=None, root_disk=None, tags=None):
         '''
         arch : str
@@ -1621,7 +1681,7 @@ class HardwareCharacteristics(Type):
         cpu_power : int
         mem : int
         root_disk : int
-        tags : typing.Sequence[str]
+        tags : typing.Sequence<+T_co>[str]
         '''
         self.arch = arch
         self.availability_zone = availability_zone
@@ -1633,19 +1693,19 @@ class HardwareCharacteristics(Type):
 
 
 class History(Type):
-    _toSchema = {'error': 'error', 'statuses': 'statuses'}
-    _toPy = {'error': 'error', 'statuses': 'statuses'}
+    _toSchema = {'statuses': 'statuses', 'error': 'error'}
+    _toPy = {'statuses': 'statuses', 'error': 'error'}
     def __init__(self, error=None, statuses=None):
         '''
         error : Error
-        statuses : typing.Sequence[~DetailedStatus]
+        statuses : typing.Sequence<+T_co>[~DetailedStatus]<~DetailedStatus>
         '''
         self.error = Error.from_json(error) if error else None
         self.statuses = [DetailedStatus.from_json(o) for o in statuses or []]
 
 
 class HostPort(Type):
-    _toSchema = {'address': 'Address', 'port': 'port'}
+    _toSchema = {'port': 'port', 'address': 'Address'}
     _toPy = {'Address': 'address', 'port': 'port'}
     def __init__(self, address=None, port=None):
         '''
@@ -1657,24 +1717,24 @@ class HostPort(Type):
 
 
 class MachineStatus(Type):
-    _toSchema = {'jobs': 'jobs', 'id_': 'id', 'instance_status': 'instance-status', 'instance_id': 'instance-id', 'series': 'series', 'has_vote': 'has-vote', 'hardware': 'hardware', 'agent_status': 'agent-status', 'dns_name': 'dns-name', 'containers': 'containers', 'wants_vote': 'wants-vote'}
-    _toPy = {'has-vote': 'has_vote', 'jobs': 'jobs', 'wants-vote': 'wants_vote', 'instance-status': 'instance_status', 'id': 'id_', 'hardware': 'hardware', 'agent-status': 'agent_status', 'instance-id': 'instance_id', 'dns-name': 'dns_name', 'containers': 'containers', 'series': 'series'}
+    _toSchema = {'dns_name': 'dns-name', 'jobs': 'jobs', 'id_': 'id', 'instance_id': 'instance-id', 'series': 'series', 'wants_vote': 'wants-vote', 'instance_status': 'instance-status', 'hardware': 'hardware', 'containers': 'containers', 'has_vote': 'has-vote', 'agent_status': 'agent-status'}
+    _toPy = {'has-vote': 'has_vote', 'instance-id': 'instance_id', 'instance-status': 'instance_status', 'series': 'series', 'dns-name': 'dns_name', 'wants-vote': 'wants_vote', 'id': 'id_', 'agent-status': 'agent_status', 'containers': 'containers', 'jobs': 'jobs', 'hardware': 'hardware'}
     def __init__(self, agent_status=None, containers=None, dns_name=None, hardware=None, has_vote=None, id_=None, instance_id=None, instance_status=None, jobs=None, series=None, wants_vote=None):
         '''
         agent_status : DetailedStatus
-        containers : typing.Mapping[str, ~MachineStatus]
+        containers : typing.Mapping<~KT, +VT_co>[str, ~MachineStatus]<~MachineStatus>
         dns_name : str
         hardware : str
         has_vote : bool
         id_ : str
         instance_id : str
         instance_status : DetailedStatus
-        jobs : typing.Sequence[str]
+        jobs : typing.Sequence<+T_co>[str]
         series : str
         wants_vote : bool
         '''
         self.agent_status = DetailedStatus.from_json(agent_status) if agent_status else None
-        self.containers = {k: MachineStatus.from_json(v) for k, v in (containers or dict()).items()}
+        self.containers = containers
         self.dns_name = dns_name
         self.hardware = hardware
         self.has_vote = has_vote
@@ -1687,8 +1747,8 @@ class MachineStatus(Type):
 
 
 class MeterStatus(Type):
-    _toSchema = {'message': 'message', 'color': 'color'}
-    _toPy = {'message': 'message', 'color': 'color'}
+    _toSchema = {'color': 'color', 'message': 'message'}
+    _toPy = {'color': 'color', 'message': 'message'}
     def __init__(self, color=None, message=None):
         '''
         color : str
@@ -1703,18 +1763,56 @@ class ModelConfigResults(Type):
     _toPy = {'config': 'config'}
     def __init__(self, config=None):
         '''
-        config : typing.Mapping[str, ~ConfigValue]
+        config : typing.Mapping<~KT, +VT_co>[str, ~ConfigValue]<~ConfigValue>
         '''
-        self.config = {k: ConfigValue.from_json(v) for k, v in (config or dict()).items()}
+        self.config = config
+
+
+class ModelDefaultValues(Type):
+    _toSchema = {'config': 'config', 'cloud_tag': 'cloud-tag', 'cloud_region': 'cloud-region'}
+    _toPy = {'config': 'config', 'cloud-tag': 'cloud_tag', 'cloud-region': 'cloud_region'}
+    def __init__(self, cloud_region=None, cloud_tag=None, config=None):
+        '''
+        cloud_region : str
+        cloud_tag : str
+        config : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        '''
+        self.cloud_region = cloud_region
+        self.cloud_tag = cloud_tag
+        self.config = config
+
+
+class ModelDefaults(Type):
+    _toSchema = {'controller': 'controller', 'default': 'default', 'regions': 'regions'}
+    _toPy = {'controller': 'controller', 'default': 'default', 'regions': 'regions'}
+    def __init__(self, controller=None, default=None, regions=None):
+        '''
+        controller : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        default : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        regions : typing.Sequence<+T_co>[~RegionDefaults]<~RegionDefaults>
+        '''
+        self.controller = controller
+        self.default = default
+        self.regions = [RegionDefaults.from_json(o) for o in regions or []]
+
+
+class ModelDefaultsResult(Type):
+    _toSchema = {'config': 'config'}
+    _toPy = {'config': 'config'}
+    def __init__(self, config=None):
+        '''
+        config : typing.Mapping<~KT, +VT_co>[str, ~ModelDefaults]<~ModelDefaults>
+        '''
+        self.config = config
 
 
 class ModelInfo(Type):
-    _toSchema = {'name': 'name', 'status': 'status', 'provider_type': 'provider-type', 'uuid': 'uuid', 'cloud': 'cloud', 'controller_uuid': 'controller-uuid', 'life': 'life', 'cloud_region': 'cloud-region', 'users': 'users', 'cloud_credential': 'cloud-credential', 'owner_tag': 'owner-tag', 'default_series': 'default-series'}
-    _toPy = {'name': 'name', 'status': 'status', 'users': 'users', 'cloud': 'cloud', 'provider-type': 'provider_type', 'uuid': 'uuid', 'controller-uuid': 'controller_uuid', 'owner-tag': 'owner_tag', 'cloud-credential': 'cloud_credential', 'default-series': 'default_series', 'life': 'life', 'cloud-region': 'cloud_region'}
-    def __init__(self, cloud=None, cloud_credential=None, cloud_region=None, controller_uuid=None, default_series=None, life=None, name=None, owner_tag=None, provider_type=None, status=None, users=None, uuid=None):
+    _toSchema = {'default_series': 'default-series', 'life': 'life', 'cloud_region': 'cloud-region', 'users': 'users', 'uuid': 'uuid', 'owner_tag': 'owner-tag', 'cloud': 'cloud', 'cloud_credential_tag': 'cloud-credential-tag', 'status': 'status', 'name': 'name', 'controller_uuid': 'controller-uuid', 'provider_type': 'provider-type'}
+    _toPy = {'controller-uuid': 'controller_uuid', 'life': 'life', 'owner-tag': 'owner_tag', 'provider-type': 'provider_type', 'users': 'users', 'uuid': 'uuid', 'default-series': 'default_series', 'cloud': 'cloud', 'cloud-credential-tag': 'cloud_credential_tag', 'status': 'status', 'name': 'name', 'cloud-region': 'cloud_region'}
+    def __init__(self, cloud=None, cloud_credential_tag=None, cloud_region=None, controller_uuid=None, default_series=None, life=None, name=None, owner_tag=None, provider_type=None, status=None, users=None, uuid=None):
         '''
         cloud : str
-        cloud_credential : str
+        cloud_credential_tag : str
         cloud_region : str
         controller_uuid : str
         default_series : str
@@ -1723,11 +1821,11 @@ class ModelInfo(Type):
         owner_tag : str
         provider_type : str
         status : EntityStatus
-        users : typing.Sequence[~ModelUserInfo]
+        users : typing.Sequence<+T_co>[~ModelUserInfo]<~ModelUserInfo>
         uuid : str
         '''
         self.cloud = cloud
-        self.cloud_credential = cloud_credential
+        self.cloud_credential_tag = cloud_credential_tag
         self.cloud_region = cloud_region
         self.controller_uuid = controller_uuid
         self.default_series = default_series
@@ -1745,24 +1843,26 @@ class ModelSet(Type):
     _toPy = {'config': 'config'}
     def __init__(self, config=None):
         '''
-        config : typing.Mapping[str, typing.Any]
+        config : typing.Mapping<~KT, +VT_co>[str, typing.Any]
         '''
         self.config = config
 
 
 class ModelStatusInfo(Type):
-    _toSchema = {'name': 'name', 'version': 'version', 'region': 'region', 'cloud': 'cloud', 'available_version': 'available-version'}
-    _toPy = {'name': 'name', 'available-version': 'available_version', 'region': 'region', 'cloud': 'cloud', 'version': 'version'}
-    def __init__(self, available_version=None, cloud=None, name=None, region=None, version=None):
+    _toSchema = {'cloud': 'cloud', 'name': 'name', 'migration': 'migration', 'region': 'region', 'available_version': 'available-version', 'version': 'version'}
+    _toPy = {'available-version': 'available_version', 'cloud': 'cloud', 'name': 'name', 'migration': 'migration', 'region': 'region', 'version': 'version'}
+    def __init__(self, available_version=None, cloud=None, migration=None, name=None, region=None, version=None):
         '''
         available_version : str
         cloud : str
+        migration : str
         name : str
         region : str
         version : str
         '''
         self.available_version = available_version
         self.cloud = cloud
+        self.migration = migration
         self.name = name
         self.region = region
         self.version = version
@@ -1773,14 +1873,28 @@ class ModelUnset(Type):
     _toPy = {'keys': 'keys'}
     def __init__(self, keys=None):
         '''
-        keys : typing.Sequence[str]
+        keys : typing.Sequence<+T_co>[str]
         '''
         self.keys = keys
 
 
+class ModelUnsetKeys(Type):
+    _toSchema = {'cloud_tag': 'cloud-tag', 'keys': 'keys', 'cloud_region': 'cloud-region'}
+    _toPy = {'cloud-tag': 'cloud_tag', 'cloud-region': 'cloud_region', 'keys': 'keys'}
+    def __init__(self, cloud_region=None, cloud_tag=None, keys=None):
+        '''
+        cloud_region : str
+        cloud_tag : str
+        keys : typing.Sequence<+T_co>[str]
+        '''
+        self.cloud_region = cloud_region
+        self.cloud_tag = cloud_tag
+        self.keys = keys
+
+
 class ModelUserInfo(Type):
-    _toSchema = {'access': 'access', 'display_name': 'display-name', 'last_connection': 'last-connection', 'user': 'user'}
-    _toPy = {'access': 'access', 'user': 'user', 'display-name': 'display_name', 'last-connection': 'last_connection'}
+    _toSchema = {'display_name': 'display-name', 'access': 'access', 'user': 'user', 'last_connection': 'last-connection'}
+    _toPy = {'last-connection': 'last_connection', 'access': 'access', 'user': 'user', 'display-name': 'display_name'}
     def __init__(self, access=None, display_name=None, last_connection=None, user=None):
         '''
         access : str
@@ -1795,8 +1909,8 @@ class ModelUserInfo(Type):
 
 
 class ModelUserInfoResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -1811,7 +1925,7 @@ class ModelUserInfoResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~ModelUserInfoResult]
+        results : typing.Sequence<+T_co>[~ModelUserInfoResult]<~ModelUserInfoResult>
         '''
         self.results = [ModelUserInfoResult.from_json(o) for o in results or []]
 
@@ -1837,8 +1951,8 @@ class PrivateAddressResults(Type):
 
 
 class ProvisioningScriptParams(Type):
-    _toSchema = {'nonce': 'nonce', 'disable_package_commands': 'disable-package-commands', 'machine_id': 'machine-id', 'data_dir': 'data-dir'}
-    _toPy = {'machine-id': 'machine_id', 'nonce': 'nonce', 'disable-package-commands': 'disable_package_commands', 'data-dir': 'data_dir'}
+    _toSchema = {'data_dir': 'data-dir', 'nonce': 'nonce', 'disable_package_commands': 'disable-package-commands', 'machine_id': 'machine-id'}
+    _toPy = {'machine-id': 'machine_id', 'data-dir': 'data_dir', 'nonce': 'nonce', 'disable-package-commands': 'disable_package_commands'}
     def __init__(self, data_dir=None, disable_package_commands=None, machine_id=None, nonce=None):
         '''
         data_dir : str
@@ -1882,12 +1996,24 @@ class PublicAddressResults(Type):
         self.public_address = public_address
 
 
+class RegionDefaults(Type):
+    _toSchema = {'value': 'value', 'region_name': 'region-name'}
+    _toPy = {'region-name': 'region_name', 'value': 'value'}
+    def __init__(self, region_name=None, value=None):
+        '''
+        region_name : str
+        value : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        '''
+        self.region_name = region_name
+        self.value = value
+
+
 class RelationStatus(Type):
-    _toSchema = {'id_': 'id', 'key': 'key', 'endpoints': 'endpoints', 'interface': 'interface', 'scope': 'scope'}
-    _toPy = {'id': 'id_', 'key': 'key', 'endpoints': 'endpoints', 'interface': 'interface', 'scope': 'scope'}
+    _toSchema = {'interface': 'interface', 'endpoints': 'endpoints', 'id_': 'id', 'key': 'key', 'scope': 'scope'}
+    _toPy = {'id': 'id_', 'interface': 'interface', 'endpoints': 'endpoints', 'scope': 'scope', 'key': 'key'}
     def __init__(self, endpoints=None, id_=None, interface=None, key=None, scope=None):
         '''
-        endpoints : typing.Sequence[~EndpointStatus]
+        endpoints : typing.Sequence<+T_co>[~EndpointStatus]<~EndpointStatus>
         id_ : int
         interface : str
         key : str
@@ -1901,8 +2027,8 @@ class RelationStatus(Type):
 
 
 class ResolveCharmResult(Type):
-    _toSchema = {'error': 'error', 'url': 'url'}
-    _toPy = {'error': 'error', 'url': 'url'}
+    _toSchema = {'url': 'url', 'error': 'error'}
+    _toPy = {'url': 'url', 'error': 'error'}
     def __init__(self, error=None, url=None):
         '''
         error : str
@@ -1917,7 +2043,7 @@ class ResolveCharmResults(Type):
     _toPy = {'urls': 'urls'}
     def __init__(self, urls=None):
         '''
-        urls : typing.Sequence[~ResolveCharmResult]
+        urls : typing.Sequence<+T_co>[~ResolveCharmResult]<~ResolveCharmResult>
         '''
         self.urls = [ResolveCharmResult.from_json(o) for o in urls or []]
 
@@ -1927,7 +2053,7 @@ class ResolveCharms(Type):
     _toPy = {'references': 'references'}
     def __init__(self, references=None):
         '''
-        references : typing.Sequence[str]
+        references : typing.Sequence<+T_co>[str]
         '''
         self.references = references
 
@@ -1945,8 +2071,8 @@ class Resolved(Type):
 
 
 class SetModelAgentVersion(Type):
-    _toSchema = {'patch': 'Patch', 'tag': 'Tag', 'major': 'Major', 'build': 'Build', 'minor': 'Minor'}
-    _toPy = {'Patch': 'patch', 'Major': 'major', 'Tag': 'tag', 'Minor': 'minor', 'Build': 'build'}
+    _toSchema = {'build': 'Build', 'patch': 'Patch', 'tag': 'Tag', 'minor': 'Minor', 'major': 'Major'}
+    _toPy = {'Tag': 'tag', 'Major': 'major', 'Patch': 'patch', 'Minor': 'minor', 'Build': 'build'}
     def __init__(self, build=None, major=None, minor=None, patch=None, tag=None):
         '''
         build : int
@@ -1962,9 +2088,19 @@ class SetModelAgentVersion(Type):
         self.tag = tag
 
 
+class SetModelDefaults(Type):
+    _toSchema = {'config': 'config'}
+    _toPy = {'config': 'config'}
+    def __init__(self, config=None):
+        '''
+        config : typing.Sequence<+T_co>[~ModelDefaultValues]<~ModelDefaultValues>
+        '''
+        self.config = [ModelDefaultValues.from_json(o) for o in config or []]
+
+
 class StatusHistoryFilter(Type):
-    _toSchema = {'size': 'size', 'delta': 'delta', 'date': 'date'}
-    _toPy = {'size': 'size', 'delta': 'delta', 'date': 'date'}
+    _toSchema = {'size': 'size', 'date': 'date', 'delta': 'delta'}
+    _toPy = {'size': 'size', 'date': 'date', 'delta': 'delta'}
     def __init__(self, date=None, delta=None, size=None):
         '''
         date : str
@@ -1977,8 +2113,8 @@ class StatusHistoryFilter(Type):
 
 
 class StatusHistoryRequest(Type):
-    _toSchema = {'size': 'size', 'historykind': 'historyKind', 'tag': 'tag', 'filter_': 'filter'}
-    _toPy = {'historyKind': 'historykind', 'tag': 'tag', 'size': 'size', 'filter': 'filter_'}
+    _toSchema = {'historykind': 'historyKind', 'tag': 'tag', 'size': 'size', 'filter_': 'filter'}
+    _toPy = {'filter': 'filter_', 'historyKind': 'historykind', 'tag': 'tag', 'size': 'size'}
     def __init__(self, filter_=None, historykind=None, size=None, tag=None):
         '''
         filter_ : StatusHistoryFilter
@@ -1997,14 +2133,14 @@ class StatusHistoryRequests(Type):
     _toPy = {'requests': 'requests'}
     def __init__(self, requests=None):
         '''
-        requests : typing.Sequence[~StatusHistoryRequest]
+        requests : typing.Sequence<+T_co>[~StatusHistoryRequest]<~StatusHistoryRequest>
         '''
         self.requests = [StatusHistoryRequest.from_json(o) for o in requests or []]
 
 
 class StatusHistoryResult(Type):
-    _toSchema = {'error': 'error', 'history': 'history'}
-    _toPy = {'error': 'error', 'history': 'history'}
+    _toSchema = {'history': 'history', 'error': 'error'}
+    _toPy = {'history': 'history', 'error': 'error'}
     def __init__(self, error=None, history=None):
         '''
         error : Error
@@ -2019,7 +2155,7 @@ class StatusHistoryResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~StatusHistoryResult]
+        results : typing.Sequence<+T_co>[~StatusHistoryResult]<~StatusHistoryResult>
         '''
         self.results = [StatusHistoryResult.from_json(o) for o in results or []]
 
@@ -2029,14 +2165,14 @@ class StatusParams(Type):
     _toPy = {'patterns': 'patterns'}
     def __init__(self, patterns=None):
         '''
-        patterns : typing.Sequence[str]
+        patterns : typing.Sequence<+T_co>[str]
         '''
         self.patterns = patterns
 
 
 class Tools(Type):
-    _toSchema = {'sha256': 'sha256', 'size': 'size', 'url': 'url', 'version': 'version'}
-    _toPy = {'sha256': 'sha256', 'size': 'size', 'url': 'url', 'version': 'version'}
+    _toSchema = {'version': 'version', 'sha256': 'sha256', 'size': 'size', 'url': 'url'}
+    _toPy = {'version': 'version', 'sha256': 'sha256', 'size': 'size', 'url': 'url'}
     def __init__(self, sha256=None, size=None, url=None, version=None):
         '''
         sha256 : str
@@ -2051,16 +2187,16 @@ class Tools(Type):
 
 
 class UnitStatus(Type):
-    _toSchema = {'workload_status': 'workload-status', 'workload_version': 'workload-version', 'machine': 'machine', 'opened_ports': 'opened-ports', 'public_address': 'public-address', 'agent_status': 'agent-status', 'subordinates': 'subordinates', 'charm': 'charm'}
-    _toPy = {'opened-ports': 'opened_ports', 'machine': 'machine', 'subordinates': 'subordinates', 'agent-status': 'agent_status', 'workload-version': 'workload_version', 'workload-status': 'workload_status', 'public-address': 'public_address', 'charm': 'charm'}
+    _toSchema = {'workload_status': 'workload-status', 'opened_ports': 'opened-ports', 'subordinates': 'subordinates', 'workload_version': 'workload-version', 'public_address': 'public-address', 'charm': 'charm', 'agent_status': 'agent-status', 'machine': 'machine'}
+    _toPy = {'public-address': 'public_address', 'workload-version': 'workload_version', 'subordinates': 'subordinates', 'opened-ports': 'opened_ports', 'charm': 'charm', 'workload-status': 'workload_status', 'machine': 'machine', 'agent-status': 'agent_status'}
     def __init__(self, agent_status=None, charm=None, machine=None, opened_ports=None, public_address=None, subordinates=None, workload_status=None, workload_version=None):
         '''
         agent_status : DetailedStatus
         charm : str
         machine : str
-        opened_ports : typing.Sequence[str]
+        opened_ports : typing.Sequence<+T_co>[str]
         public_address : str
-        subordinates : typing.Mapping[str, ~UnitStatus]
+        subordinates : typing.Mapping<~KT, +VT_co>[str, ~UnitStatus]<~UnitStatus>
         workload_status : DetailedStatus
         workload_version : str
         '''
@@ -2069,112 +2205,82 @@ class UnitStatus(Type):
         self.machine = machine
         self.opened_ports = opened_ports
         self.public_address = public_address
-        self.subordinates = {k: UnitStatus.from_json(v) for k, v in (subordinates or dict()).items()}
+        self.subordinates = subordinates
         self.workload_status = DetailedStatus.from_json(workload_status) if workload_status else None
         self.workload_version = workload_version
 
 
-class Cloud(Type):
-    _toSchema = {'auth_types': 'auth-types', 'regions': 'regions', 'type_': 'type', 'endpoint': 'endpoint'}
-    _toPy = {'type': 'type_', 'regions': 'regions', 'auth-types': 'auth_types', 'endpoint': 'endpoint'}
-    def __init__(self, auth_types=None, endpoint=None, regions=None, type_=None):
+class UnsetModelDefaults(Type):
+    _toSchema = {'keys': 'keys'}
+    _toPy = {'keys': 'keys'}
+    def __init__(self, keys=None):
         '''
-        auth_types : typing.Sequence[str]
+        keys : typing.Sequence<+T_co>[~ModelUnsetKeys]<~ModelUnsetKeys>
+        '''
+        self.keys = [ModelUnsetKeys.from_json(o) for o in keys or []]
+
+
+class Cloud(Type):
+    _toSchema = {'type_': 'type', 'identity_endpoint': 'identity-endpoint', 'storage_endpoint': 'storage-endpoint', 'regions': 'regions', 'auth_types': 'auth-types', 'endpoint': 'endpoint'}
+    _toPy = {'auth-types': 'auth_types', 'regions': 'regions', 'type': 'type_', 'identity-endpoint': 'identity_endpoint', 'endpoint': 'endpoint', 'storage-endpoint': 'storage_endpoint'}
+    def __init__(self, auth_types=None, endpoint=None, identity_endpoint=None, regions=None, storage_endpoint=None, type_=None):
+        '''
+        auth_types : typing.Sequence<+T_co>[str]
         endpoint : str
-        regions : typing.Sequence[~CloudRegion]
+        identity_endpoint : str
+        regions : typing.Sequence<+T_co>[~CloudRegion]<~CloudRegion>
+        storage_endpoint : str
         type_ : str
         '''
         self.auth_types = auth_types
         self.endpoint = endpoint
+        self.identity_endpoint = identity_endpoint
         self.regions = [CloudRegion.from_json(o) for o in regions or []]
+        self.storage_endpoint = storage_endpoint
         self.type_ = type_
 
 
-class CloudCredential(Type):
-    _toSchema = {'auth_type': 'auth-type', 'attrs': 'attrs'}
-    _toPy = {'auth-type': 'auth_type', 'attrs': 'attrs'}
-    def __init__(self, attrs=None, auth_type=None):
-        '''
-        attrs : typing.Mapping[str, str]
-        auth_type : str
-        '''
-        self.attrs = attrs
-        self.auth_type = auth_type
-
-
-class CloudCredentialsResult(Type):
-    _toSchema = {'credentials': 'credentials', 'error': 'error'}
-    _toPy = {'credentials': 'credentials', 'error': 'error'}
-    def __init__(self, credentials=None, error=None):
-        '''
-        credentials : typing.Mapping[str, ~CloudCredential]
-        error : Error
-        '''
-        self.credentials = {k: CloudCredential.from_json(v) for k, v in (credentials or dict()).items()}
-        self.error = Error.from_json(error) if error else None
-
-
-class CloudCredentialsResults(Type):
-    _toSchema = {'results': 'results'}
-    _toPy = {'results': 'results'}
-    def __init__(self, results=None):
-        '''
-        results : typing.Sequence[~CloudCredentialsResult]
-        '''
-        self.results = [CloudCredentialsResult.from_json(o) for o in results or []]
-
-
-class CloudDefaults(Type):
-    _toSchema = {'region': 'region', 'credential': 'credential', 'cloud_tag': 'cloud-tag'}
-    _toPy = {'region': 'region', 'credential': 'credential', 'cloud-tag': 'cloud_tag'}
-    def __init__(self, cloud_tag=None, credential=None, region=None):
-        '''
-        cloud_tag : str
-        credential : str
-        region : str
-        '''
-        self.cloud_tag = cloud_tag
-        self.credential = credential
-        self.region = region
-
-
-class CloudDefaultsResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+class CloudCredentialResult(Type):
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
-        result : CloudDefaults
+        result : CloudCredential
         '''
         self.error = Error.from_json(error) if error else None
-        self.result = CloudDefaults.from_json(result) if result else None
+        self.result = CloudCredential.from_json(result) if result else None
 
 
-class CloudDefaultsResults(Type):
+class CloudCredentialResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~CloudDefaultsResult]
+        results : typing.Sequence<+T_co>[~CloudCredentialResult]<~CloudCredentialResult>
         '''
-        self.results = [CloudDefaultsResult.from_json(o) for o in results or []]
+        self.results = [CloudCredentialResult.from_json(o) for o in results or []]
 
 
 class CloudRegion(Type):
-    _toSchema = {'name': 'name', 'endpoint': 'endpoint'}
-    _toPy = {'name': 'name', 'endpoint': 'endpoint'}
-    def __init__(self, endpoint=None, name=None):
+    _toSchema = {'name': 'name', 'endpoint': 'endpoint', 'storage_endpoint': 'storage-endpoint', 'identity_endpoint': 'identity-endpoint'}
+    _toPy = {'identity-endpoint': 'identity_endpoint', 'endpoint': 'endpoint', 'storage-endpoint': 'storage_endpoint', 'name': 'name'}
+    def __init__(self, endpoint=None, identity_endpoint=None, name=None, storage_endpoint=None):
         '''
         endpoint : str
+        identity_endpoint : str
         name : str
+        storage_endpoint : str
         '''
         self.endpoint = endpoint
+        self.identity_endpoint = identity_endpoint
         self.name = name
+        self.storage_endpoint = storage_endpoint
 
 
 class CloudResult(Type):
-    _toSchema = {'error': 'error', 'cloud': 'cloud'}
-    _toPy = {'error': 'error', 'cloud': 'cloud'}
+    _toSchema = {'cloud': 'cloud', 'error': 'error'}
+    _toPy = {'cloud': 'cloud', 'error': 'error'}
     def __init__(self, cloud=None, error=None):
         '''
         cloud : Cloud
@@ -2189,14 +2295,68 @@ class CloudResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~CloudResult]
+        results : typing.Sequence<+T_co>[~CloudResult]<~CloudResult>
         '''
         self.results = [CloudResult.from_json(o) for o in results or []]
 
 
+class CloudsResult(Type):
+    _toSchema = {'clouds': 'clouds'}
+    _toPy = {'clouds': 'clouds'}
+    def __init__(self, clouds=None):
+        '''
+        clouds : typing.Mapping<~KT, +VT_co>[str, ~Cloud]<~Cloud>
+        '''
+        self.clouds = clouds
+
+
+class StringsResult(Type):
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
+    def __init__(self, error=None, result=None):
+        '''
+        error : Error
+        result : typing.Sequence<+T_co>[str]
+        '''
+        self.error = Error.from_json(error) if error else None
+        self.result = result
+
+
+class StringsResults(Type):
+    _toSchema = {'results': 'results'}
+    _toPy = {'results': 'results'}
+    def __init__(self, results=None):
+        '''
+        results : typing.Sequence<+T_co>[~StringsResult]<~StringsResult>
+        '''
+        self.results = [StringsResult.from_json(o) for o in results or []]
+
+
+class UpdateCloudCredential(Type):
+    _toSchema = {'tag': 'tag', 'credential': 'credential'}
+    _toPy = {'tag': 'tag', 'credential': 'credential'}
+    def __init__(self, credential=None, tag=None):
+        '''
+        credential : CloudCredential
+        tag : str
+        '''
+        self.credential = CloudCredential.from_json(credential) if credential else None
+        self.tag = tag
+
+
+class UpdateCloudCredentials(Type):
+    _toSchema = {'credentials': 'credentials'}
+    _toPy = {'credentials': 'credentials'}
+    def __init__(self, credentials=None):
+        '''
+        credentials : typing.Sequence<+T_co>[~UpdateCloudCredential]<~UpdateCloudCredential>
+        '''
+        self.credentials = [UpdateCloudCredential.from_json(o) for o in credentials or []]
+
+
 class UserCloud(Type):
-    _toSchema = {'user_tag': 'user-tag', 'cloud_tag': 'cloud-tag'}
-    _toPy = {'user-tag': 'user_tag', 'cloud-tag': 'cloud_tag'}
+    _toSchema = {'cloud_tag': 'cloud-tag', 'user_tag': 'user-tag'}
+    _toPy = {'cloud-tag': 'cloud_tag', 'user-tag': 'user_tag'}
     def __init__(self, cloud_tag=None, user_tag=None):
         '''
         cloud_tag : str
@@ -2206,38 +2366,14 @@ class UserCloud(Type):
         self.user_tag = user_tag
 
 
-class UserCloudCredentials(Type):
-    _toSchema = {'credentials': 'credentials', 'user_tag': 'user-tag', 'cloud_tag': 'cloud-tag'}
-    _toPy = {'credentials': 'credentials', 'user-tag': 'user_tag', 'cloud-tag': 'cloud_tag'}
-    def __init__(self, cloud_tag=None, credentials=None, user_tag=None):
-        '''
-        cloud_tag : str
-        credentials : typing.Mapping[str, ~CloudCredential]
-        user_tag : str
-        '''
-        self.cloud_tag = cloud_tag
-        self.credentials = {k: CloudCredential.from_json(v) for k, v in (credentials or dict()).items()}
-        self.user_tag = user_tag
-
-
 class UserClouds(Type):
     _toSchema = {'user_clouds': 'user-clouds'}
     _toPy = {'user-clouds': 'user_clouds'}
     def __init__(self, user_clouds=None):
         '''
-        user_clouds : typing.Sequence[~UserCloud]
+        user_clouds : typing.Sequence<+T_co>[~UserCloud]<~UserCloud>
         '''
         self.user_clouds = [UserCloud.from_json(o) for o in user_clouds or []]
-
-
-class UsersCloudCredentials(Type):
-    _toSchema = {'users': 'users'}
-    _toPy = {'users': 'users'}
-    def __init__(self, users=None):
-        '''
-        users : typing.Sequence[~UserCloudCredentials]
-        '''
-        self.users = [UserCloudCredentials.from_json(o) for o in users or []]
 
 
 class DestroyControllerArgs(Type):
@@ -2250,43 +2386,75 @@ class DestroyControllerArgs(Type):
         self.destroy_models = destroy_models
 
 
-class InitiateModelMigrationArgs(Type):
+class InitiateMigrationArgs(Type):
     _toSchema = {'specs': 'specs'}
     _toPy = {'specs': 'specs'}
     def __init__(self, specs=None):
         '''
-        specs : typing.Sequence[~ModelMigrationSpec]
+        specs : typing.Sequence<+T_co>[~MigrationSpec]<~MigrationSpec>
         '''
-        self.specs = [ModelMigrationSpec.from_json(o) for o in specs or []]
+        self.specs = [MigrationSpec.from_json(o) for o in specs or []]
 
 
-class InitiateModelMigrationResult(Type):
-    _toSchema = {'error': 'error', 'model_tag': 'model-tag', 'id_': 'id'}
-    _toPy = {'error': 'error', 'id': 'id_', 'model-tag': 'model_tag'}
-    def __init__(self, error=None, id_=None, model_tag=None):
+class InitiateMigrationResult(Type):
+    _toSchema = {'model_tag': 'model-tag', 'migration_id': 'migration-id', 'error': 'error'}
+    _toPy = {'model-tag': 'model_tag', 'migration-id': 'migration_id', 'error': 'error'}
+    def __init__(self, error=None, migration_id=None, model_tag=None):
         '''
         error : Error
-        id_ : str
+        migration_id : str
         model_tag : str
         '''
         self.error = Error.from_json(error) if error else None
-        self.id_ = id_
+        self.migration_id = migration_id
         self.model_tag = model_tag
 
 
-class InitiateModelMigrationResults(Type):
+class InitiateMigrationResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~InitiateModelMigrationResult]
+        results : typing.Sequence<+T_co>[~InitiateMigrationResult]<~InitiateMigrationResult>
         '''
-        self.results = [InitiateModelMigrationResult.from_json(o) for o in results or []]
+        self.results = [InitiateMigrationResult.from_json(o) for o in results or []]
+
+
+class MigrationSpec(Type):
+    _toSchema = {'model_tag': 'model-tag', 'target_info': 'target-info'}
+    _toPy = {'model-tag': 'model_tag', 'target-info': 'target_info'}
+    def __init__(self, model_tag=None, target_info=None):
+        '''
+        model_tag : str
+        target_info : MigrationTargetInfo
+        '''
+        self.model_tag = model_tag
+        self.target_info = MigrationTargetInfo.from_json(target_info) if target_info else None
+
+
+class MigrationTargetInfo(Type):
+    _toSchema = {'password': 'password', 'controller_tag': 'controller-tag', 'addrs': 'addrs', 'ca_cert': 'ca-cert', 'macaroon': 'macaroon', 'auth_tag': 'auth-tag'}
+    _toPy = {'auth-tag': 'auth_tag', 'password': 'password', 'ca-cert': 'ca_cert', 'addrs': 'addrs', 'macaroon': 'macaroon', 'controller-tag': 'controller_tag'}
+    def __init__(self, addrs=None, auth_tag=None, ca_cert=None, controller_tag=None, macaroon=None, password=None):
+        '''
+        addrs : typing.Sequence<+T_co>[str]
+        auth_tag : str
+        ca_cert : str
+        controller_tag : str
+        macaroon : str
+        password : str
+        '''
+        self.addrs = addrs
+        self.auth_tag = auth_tag
+        self.ca_cert = ca_cert
+        self.controller_tag = controller_tag
+        self.macaroon = macaroon
+        self.password = password
 
 
 class Model(Type):
     _toSchema = {'name': 'name', 'uuid': 'uuid', 'owner_tag': 'owner-tag'}
-    _toPy = {'name': 'name', 'uuid': 'uuid', 'owner-tag': 'owner_tag'}
+    _toPy = {'name': 'name', 'owner-tag': 'owner_tag', 'uuid': 'uuid'}
     def __init__(self, name=None, owner_tag=None, uuid=None):
         '''
         name : str
@@ -2300,10 +2468,10 @@ class Model(Type):
 
 class ModelBlockInfo(Type):
     _toSchema = {'name': 'name', 'model_uuid': 'model-uuid', 'owner_tag': 'owner-tag', 'blocks': 'blocks'}
-    _toPy = {'name': 'name', 'owner-tag': 'owner_tag', 'blocks': 'blocks', 'model-uuid': 'model_uuid'}
+    _toPy = {'name': 'name', 'owner-tag': 'owner_tag', 'model-uuid': 'model_uuid', 'blocks': 'blocks'}
     def __init__(self, blocks=None, model_uuid=None, name=None, owner_tag=None):
         '''
-        blocks : typing.Sequence[str]
+        blocks : typing.Sequence<+T_co>[str]
         model_uuid : str
         name : str
         owner_tag : str
@@ -2319,44 +2487,14 @@ class ModelBlockInfoList(Type):
     _toPy = {'models': 'models'}
     def __init__(self, models=None):
         '''
-        models : typing.Sequence[~ModelBlockInfo]
+        models : typing.Sequence<+T_co>[~ModelBlockInfo]<~ModelBlockInfo>
         '''
         self.models = [ModelBlockInfo.from_json(o) for o in models or []]
 
 
-class ModelMigrationSpec(Type):
-    _toSchema = {'target_info': 'target-info', 'model_tag': 'model-tag'}
-    _toPy = {'model-tag': 'model_tag', 'target-info': 'target_info'}
-    def __init__(self, model_tag=None, target_info=None):
-        '''
-        model_tag : str
-        target_info : ModelMigrationTargetInfo
-        '''
-        self.model_tag = model_tag
-        self.target_info = ModelMigrationTargetInfo.from_json(target_info) if target_info else None
-
-
-class ModelMigrationTargetInfo(Type):
-    _toSchema = {'controller_tag': 'controller-tag', 'auth_tag': 'auth-tag', 'password': 'password', 'ca_cert': 'ca-cert', 'addrs': 'addrs'}
-    _toPy = {'password': 'password', 'auth-tag': 'auth_tag', 'ca-cert': 'ca_cert', 'addrs': 'addrs', 'controller-tag': 'controller_tag'}
-    def __init__(self, addrs=None, auth_tag=None, ca_cert=None, controller_tag=None, password=None):
-        '''
-        addrs : typing.Sequence[str]
-        auth_tag : str
-        ca_cert : str
-        controller_tag : str
-        password : str
-        '''
-        self.addrs = addrs
-        self.auth_tag = auth_tag
-        self.ca_cert = ca_cert
-        self.controller_tag = controller_tag
-        self.password = password
-
-
 class ModelStatus(Type):
-    _toSchema = {'hosted_machine_count': 'hosted-machine-count', 'life': 'life', 'application_count': 'application-count', 'model_tag': 'model-tag', 'owner_tag': 'owner-tag'}
-    _toPy = {'model-tag': 'model_tag', 'life': 'life', 'hosted-machine-count': 'hosted_machine_count', 'owner-tag': 'owner_tag', 'application-count': 'application_count'}
+    _toSchema = {'life': 'life', 'application_count': 'application-count', 'owner_tag': 'owner-tag', 'model_tag': 'model-tag', 'hosted_machine_count': 'hosted-machine-count'}
+    _toPy = {'life': 'life', 'model-tag': 'model_tag', 'owner-tag': 'owner_tag', 'hosted-machine-count': 'hosted_machine_count', 'application-count': 'application_count'}
     def __init__(self, application_count=None, hosted_machine_count=None, life=None, model_tag=None, owner_tag=None):
         '''
         application_count : int
@@ -2377,9 +2515,33 @@ class ModelStatusResults(Type):
     _toPy = {'models': 'models'}
     def __init__(self, models=None):
         '''
-        models : typing.Sequence[~ModelStatus]
+        models : typing.Sequence<+T_co>[~ModelStatus]<~ModelStatus>
         '''
         self.models = [ModelStatus.from_json(o) for o in models or []]
+
+
+class ModifyControllerAccess(Type):
+    _toSchema = {'access': 'access', 'action': 'action', 'user_tag': 'user-tag'}
+    _toPy = {'access': 'access', 'action': 'action', 'user-tag': 'user_tag'}
+    def __init__(self, access=None, action=None, user_tag=None):
+        '''
+        access : str
+        action : str
+        user_tag : str
+        '''
+        self.access = access
+        self.action = action
+        self.user_tag = user_tag
+
+
+class ModifyControllerAccessRequest(Type):
+    _toSchema = {'changes': 'changes'}
+    _toPy = {'changes': 'changes'}
+    def __init__(self, changes=None):
+        '''
+        changes : typing.Sequence<+T_co>[~ModifyControllerAccess]<~ModifyControllerAccess>
+        '''
+        self.changes = [ModifyControllerAccess.from_json(o) for o in changes or []]
 
 
 class RemoveBlocksArgs(Type):
@@ -2392,9 +2554,43 @@ class RemoveBlocksArgs(Type):
         self.all_ = all_
 
 
+class UserAccess(Type):
+    _toSchema = {'access': 'access', 'user_tag': 'user-tag'}
+    _toPy = {'access': 'access', 'user-tag': 'user_tag'}
+    def __init__(self, access=None, user_tag=None):
+        '''
+        access : str
+        user_tag : str
+        '''
+        self.access = access
+        self.user_tag = user_tag
+
+
+class UserAccessResult(Type):
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
+    def __init__(self, error=None, result=None):
+        '''
+        error : Error
+        result : UserAccess
+        '''
+        self.error = Error.from_json(error) if error else None
+        self.result = UserAccess.from_json(result) if result else None
+
+
+class UserAccessResults(Type):
+    _toSchema = {'results': 'results'}
+    _toPy = {'results': 'results'}
+    def __init__(self, results=None):
+        '''
+        results : typing.Sequence<+T_co>[~UserAccessResult]<~UserAccessResult>
+        '''
+        self.results = [UserAccessResult.from_json(o) for o in results or []]
+
+
 class UserModel(Type):
     _toSchema = {'last_connection': 'last-connection', 'model': 'model'}
-    _toPy = {'model': 'model', 'last-connection': 'last_connection'}
+    _toPy = {'last-connection': 'last_connection', 'model': 'model'}
     def __init__(self, last_connection=None, model=None):
         '''
         last_connection : str
@@ -2409,7 +2605,7 @@ class UserModelList(Type):
     _toPy = {'user-models': 'user_models'}
     def __init__(self, user_models=None):
         '''
-        user_models : typing.Sequence[~UserModel]
+        user_models : typing.Sequence<+T_co>[~UserModel]<~UserModel>
         '''
         self.user_models = [UserModel.from_json(o) for o in user_models or []]
 
@@ -2419,7 +2615,7 @@ class BytesResult(Type):
     _toPy = {'result': 'result'}
     def __init__(self, result=None):
         '''
-        result : typing.Sequence[int]
+        result : typing.Sequence<+T_co>[int]
         '''
         self.result = result
 
@@ -2429,16 +2625,16 @@ class DeployerConnectionValues(Type):
     _toPy = {'state-addresses': 'state_addresses', 'api-addresses': 'api_addresses'}
     def __init__(self, api_addresses=None, state_addresses=None):
         '''
-        api_addresses : typing.Sequence[str]
-        state_addresses : typing.Sequence[str]
+        api_addresses : typing.Sequence<+T_co>[str]
+        state_addresses : typing.Sequence<+T_co>[str]
         '''
         self.api_addresses = api_addresses
         self.state_addresses = state_addresses
 
 
 class LifeResult(Type):
-    _toSchema = {'error': 'error', 'life': 'life'}
-    _toPy = {'error': 'error', 'life': 'life'}
+    _toSchema = {'life': 'life', 'error': 'error'}
+    _toPy = {'life': 'life', 'error': 'error'}
     def __init__(self, error=None, life=None):
         '''
         error : Error
@@ -2453,21 +2649,9 @@ class LifeResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~LifeResult]
+        results : typing.Sequence<+T_co>[~LifeResult]<~LifeResult>
         '''
         self.results = [LifeResult.from_json(o) for o in results or []]
-
-
-class StringsResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
-    def __init__(self, error=None, result=None):
-        '''
-        error : Error
-        result : typing.Sequence[str]
-        '''
-        self.error = Error.from_json(error) if error else None
-        self.result = result
 
 
 class StringsWatchResults(Type):
@@ -2475,20 +2659,20 @@ class StringsWatchResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~StringsWatchResult]
+        results : typing.Sequence<+T_co>[~StringsWatchResult]<~StringsWatchResult>
         '''
         self.results = [StringsWatchResult.from_json(o) for o in results or []]
 
 
 class AddSubnetParams(Type):
-    _toSchema = {'space_tag': 'space-tag', 'subnet_provider_id': 'subnet-provider-id', 'subnet_tag': 'subnet-tag', 'zones': 'zones'}
-    _toPy = {'space-tag': 'space_tag', 'subnet-tag': 'subnet_tag', 'subnet-provider-id': 'subnet_provider_id', 'zones': 'zones'}
+    _toSchema = {'subnet_tag': 'subnet-tag', 'subnet_provider_id': 'subnet-provider-id', 'space_tag': 'space-tag', 'zones': 'zones'}
+    _toPy = {'subnet-tag': 'subnet_tag', 'subnet-provider-id': 'subnet_provider_id', 'zones': 'zones', 'space-tag': 'space_tag'}
     def __init__(self, space_tag=None, subnet_provider_id=None, subnet_tag=None, zones=None):
         '''
         space_tag : str
         subnet_provider_id : str
         subnet_tag : str
-        zones : typing.Sequence[str]
+        zones : typing.Sequence<+T_co>[str]
         '''
         self.space_tag = space_tag
         self.subnet_provider_id = subnet_provider_id
@@ -2501,20 +2685,20 @@ class AddSubnetsParams(Type):
     _toPy = {'subnets': 'subnets'}
     def __init__(self, subnets=None):
         '''
-        subnets : typing.Sequence[~AddSubnetParams]
+        subnets : typing.Sequence<+T_co>[~AddSubnetParams]<~AddSubnetParams>
         '''
         self.subnets = [AddSubnetParams.from_json(o) for o in subnets or []]
 
 
 class CreateSpaceParams(Type):
-    _toSchema = {'space_tag': 'space-tag', 'public': 'public', 'provider_id': 'provider-id', 'subnet_tags': 'subnet-tags'}
-    _toPy = {'space-tag': 'space_tag', 'provider-id': 'provider_id', 'subnet-tags': 'subnet_tags', 'public': 'public'}
+    _toSchema = {'provider_id': 'provider-id', 'space_tag': 'space-tag', 'subnet_tags': 'subnet-tags', 'public': 'public'}
+    _toPy = {'subnet-tags': 'subnet_tags', 'space-tag': 'space_tag', 'public': 'public', 'provider-id': 'provider_id'}
     def __init__(self, provider_id=None, public=None, space_tag=None, subnet_tags=None):
         '''
         provider_id : str
         public : bool
         space_tag : str
-        subnet_tags : typing.Sequence[str]
+        subnet_tags : typing.Sequence<+T_co>[str]
         '''
         self.provider_id = provider_id
         self.public = public
@@ -2527,7 +2711,7 @@ class CreateSpacesParams(Type):
     _toPy = {'spaces': 'spaces'}
     def __init__(self, spaces=None):
         '''
-        spaces : typing.Sequence[~CreateSpaceParams]
+        spaces : typing.Sequence<+T_co>[~CreateSpaceParams]<~CreateSpaceParams>
         '''
         self.spaces = [CreateSpaceParams.from_json(o) for o in spaces or []]
 
@@ -2537,7 +2721,7 @@ class DiscoverSpacesResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~ProviderSpace]
+        results : typing.Sequence<+T_co>[~ProviderSpace]<~ProviderSpace>
         '''
         self.results = [ProviderSpace.from_json(o) for o in results or []]
 
@@ -2547,20 +2731,20 @@ class ListSubnetsResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~Subnet]
+        results : typing.Sequence<+T_co>[~Subnet]<~Subnet>
         '''
         self.results = [Subnet.from_json(o) for o in results or []]
 
 
 class ProviderSpace(Type):
-    _toSchema = {'name': 'name', 'error': 'error', 'subnets': 'subnets', 'provider_id': 'provider-id'}
-    _toPy = {'name': 'name', 'error': 'error', 'subnets': 'subnets', 'provider-id': 'provider_id'}
+    _toSchema = {'name': 'name', 'provider_id': 'provider-id', 'subnets': 'subnets', 'error': 'error'}
+    _toPy = {'name': 'name', 'subnets': 'subnets', 'provider-id': 'provider_id', 'error': 'error'}
     def __init__(self, error=None, name=None, provider_id=None, subnets=None):
         '''
         error : Error
         name : str
         provider_id : str
-        subnets : typing.Sequence[~Subnet]
+        subnets : typing.Sequence<+T_co>[~Subnet]<~Subnet>
         '''
         self.error = Error.from_json(error) if error else None
         self.name = name
@@ -2569,8 +2753,8 @@ class ProviderSpace(Type):
 
 
 class Subnet(Type):
-    _toSchema = {'status': 'status', 'vlan_tag': 'vlan-tag', 'cidr': 'cidr', 'provider_id': 'provider-id', 'life': 'life', 'space_tag': 'space-tag', 'zones': 'zones'}
-    _toPy = {'space-tag': 'space_tag', 'status': 'status', 'cidr': 'cidr', 'vlan-tag': 'vlan_tag', 'provider-id': 'provider_id', 'life': 'life', 'zones': 'zones'}
+    _toSchema = {'status': 'status', 'provider_id': 'provider-id', 'space_tag': 'space-tag', 'vlan_tag': 'vlan-tag', 'zones': 'zones', 'life': 'life', 'cidr': 'cidr'}
+    _toPy = {'status': 'status', 'zones': 'zones', 'vlan-tag': 'vlan_tag', 'life': 'life', 'cidr': 'cidr', 'space-tag': 'space_tag', 'provider-id': 'provider_id'}
     def __init__(self, cidr=None, life=None, provider_id=None, space_tag=None, status=None, vlan_tag=None, zones=None):
         '''
         cidr : str
@@ -2579,7 +2763,7 @@ class Subnet(Type):
         space_tag : str
         status : str
         vlan_tag : int
-        zones : typing.Sequence[str]
+        zones : typing.Sequence<+T_co>[str]
         '''
         self.cidr = cidr
         self.life = life
@@ -2603,12 +2787,12 @@ class SubnetsFilters(Type):
 
 
 class BlockDevice(Type):
-    _toSchema = {'devicelinks': 'DeviceLinks', 'filesystemtype': 'FilesystemType', 'inuse': 'InUse', 'devicename': 'DeviceName', 'hardwareid': 'HardwareId', 'label': 'Label', 'uuid': 'UUID', 'size': 'Size', 'mountpoint': 'MountPoint', 'busaddress': 'BusAddress'}
-    _toPy = {'UUID': 'uuid', 'BusAddress': 'busaddress', 'HardwareId': 'hardwareid', 'DeviceName': 'devicename', 'DeviceLinks': 'devicelinks', 'InUse': 'inuse', 'MountPoint': 'mountpoint', 'Label': 'label', 'FilesystemType': 'filesystemtype', 'Size': 'size'}
+    _toSchema = {'uuid': 'UUID', 'busaddress': 'BusAddress', 'size': 'Size', 'hardwareid': 'HardwareId', 'filesystemtype': 'FilesystemType', 'label': 'Label', 'devicelinks': 'DeviceLinks', 'inuse': 'InUse', 'mountpoint': 'MountPoint', 'devicename': 'DeviceName'}
+    _toPy = {'InUse': 'inuse', 'Size': 'size', 'Label': 'label', 'DeviceName': 'devicename', 'BusAddress': 'busaddress', 'FilesystemType': 'filesystemtype', 'MountPoint': 'mountpoint', 'UUID': 'uuid', 'HardwareId': 'hardwareid', 'DeviceLinks': 'devicelinks'}
     def __init__(self, busaddress=None, devicelinks=None, devicename=None, filesystemtype=None, hardwareid=None, inuse=None, label=None, mountpoint=None, size=None, uuid=None):
         '''
         busaddress : str
-        devicelinks : typing.Sequence[str]
+        devicelinks : typing.Sequence<+T_co>[str]
         devicename : str
         filesystemtype : str
         hardwareid : str
@@ -2632,10 +2816,10 @@ class BlockDevice(Type):
 
 class MachineBlockDevices(Type):
     _toSchema = {'block_devices': 'block-devices', 'machine': 'machine'}
-    _toPy = {'machine': 'machine', 'block-devices': 'block_devices'}
+    _toPy = {'block-devices': 'block_devices', 'machine': 'machine'}
     def __init__(self, block_devices=None, machine=None):
         '''
-        block_devices : typing.Sequence[~BlockDevice]
+        block_devices : typing.Sequence<+T_co>[~BlockDevice]<~BlockDevice>
         machine : str
         '''
         self.block_devices = [BlockDevice.from_json(o) for o in block_devices or []]
@@ -2647,17 +2831,17 @@ class SetMachineBlockDevices(Type):
     _toPy = {'machine-block-devices': 'machine_block_devices'}
     def __init__(self, machine_block_devices=None):
         '''
-        machine_block_devices : typing.Sequence[~MachineBlockDevices]
+        machine_block_devices : typing.Sequence<+T_co>[~MachineBlockDevices]<~MachineBlockDevices>
         '''
         self.machine_block_devices = [MachineBlockDevices.from_json(o) for o in machine_block_devices or []]
 
 
 class EntitiesWatchResult(Type):
-    _toSchema = {'error': 'error', 'changes': 'changes', 'watcher_id': 'watcher-id'}
-    _toPy = {'error': 'error', 'changes': 'changes', 'watcher-id': 'watcher_id'}
+    _toSchema = {'changes': 'changes', 'watcher_id': 'watcher-id', 'error': 'error'}
+    _toPy = {'watcher-id': 'watcher_id', 'changes': 'changes', 'error': 'error'}
     def __init__(self, changes=None, error=None, watcher_id=None):
         '''
-        changes : typing.Sequence[str]
+        changes : typing.Sequence<+T_co>[str]
         error : Error
         watcher_id : str
         '''
@@ -2667,8 +2851,8 @@ class EntitiesWatchResult(Type):
 
 
 class MachineStorageId(Type):
-    _toSchema = {'attachment_tag': 'attachment-tag', 'machine_tag': 'machine-tag'}
-    _toPy = {'machine-tag': 'machine_tag', 'attachment-tag': 'attachment_tag'}
+    _toSchema = {'machine_tag': 'machine-tag', 'attachment_tag': 'attachment-tag'}
+    _toPy = {'attachment-tag': 'attachment_tag', 'machine-tag': 'machine_tag'}
     def __init__(self, attachment_tag=None, machine_tag=None):
         '''
         attachment_tag : str
@@ -2679,11 +2863,11 @@ class MachineStorageId(Type):
 
 
 class MachineStorageIdsWatchResult(Type):
-    _toSchema = {'error': 'error', 'changes': 'changes', 'watcher_id': 'watcher-id'}
-    _toPy = {'error': 'error', 'changes': 'changes', 'watcher-id': 'watcher_id'}
+    _toSchema = {'changes': 'changes', 'watcher_id': 'watcher-id', 'error': 'error'}
+    _toPy = {'watcher-id': 'watcher_id', 'changes': 'changes', 'error': 'error'}
     def __init__(self, changes=None, error=None, watcher_id=None):
         '''
-        changes : typing.Sequence[~MachineStorageId]
+        changes : typing.Sequence<+T_co>[~MachineStorageId]<~MachineStorageId>
         error : Error
         watcher_id : str
         '''
@@ -2693,8 +2877,8 @@ class MachineStorageIdsWatchResult(Type):
 
 
 class BoolResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -2709,14 +2893,14 @@ class BoolResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~BoolResult]
+        results : typing.Sequence<+T_co>[~BoolResult]<~BoolResult>
         '''
         self.results = [BoolResult.from_json(o) for o in results or []]
 
 
 class MachinePortRange(Type):
-    _toSchema = {'unit_tag': 'unit-tag', 'relation_tag': 'relation-tag', 'port_range': 'port-range'}
-    _toPy = {'unit-tag': 'unit_tag', 'port-range': 'port_range', 'relation-tag': 'relation_tag'}
+    _toSchema = {'relation_tag': 'relation-tag', 'port_range': 'port-range', 'unit_tag': 'unit-tag'}
+    _toPy = {'relation-tag': 'relation_tag', 'port-range': 'port_range', 'unit-tag': 'unit_tag'}
     def __init__(self, port_range=None, relation_tag=None, unit_tag=None):
         '''
         port_range : PortRange
@@ -2729,8 +2913,8 @@ class MachinePortRange(Type):
 
 
 class MachinePorts(Type):
-    _toSchema = {'machine_tag': 'machine-tag', 'subnet_tag': 'subnet-tag'}
-    _toPy = {'machine-tag': 'machine_tag', 'subnet-tag': 'subnet_tag'}
+    _toSchema = {'subnet_tag': 'subnet-tag', 'machine_tag': 'machine-tag'}
+    _toPy = {'subnet-tag': 'subnet_tag', 'machine-tag': 'machine_tag'}
     def __init__(self, machine_tag=None, subnet_tag=None):
         '''
         machine_tag : str
@@ -2745,18 +2929,18 @@ class MachinePortsParams(Type):
     _toPy = {'params': 'params'}
     def __init__(self, params=None):
         '''
-        params : typing.Sequence[~MachinePorts]
+        params : typing.Sequence<+T_co>[~MachinePorts]<~MachinePorts>
         '''
         self.params = [MachinePorts.from_json(o) for o in params or []]
 
 
 class MachinePortsResult(Type):
-    _toSchema = {'error': 'error', 'ports': 'ports'}
-    _toPy = {'error': 'error', 'ports': 'ports'}
+    _toSchema = {'ports': 'ports', 'error': 'error'}
+    _toPy = {'ports': 'ports', 'error': 'error'}
     def __init__(self, error=None, ports=None):
         '''
         error : Error
-        ports : typing.Sequence[~MachinePortRange]
+        ports : typing.Sequence<+T_co>[~MachinePortRange]<~MachinePortRange>
         '''
         self.error = Error.from_json(error) if error else None
         self.ports = [MachinePortRange.from_json(o) for o in ports or []]
@@ -2767,7 +2951,7 @@ class MachinePortsResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~MachinePortsResult]
+        results : typing.Sequence<+T_co>[~MachinePortsResult]<~MachinePortsResult>
         '''
         self.results = [MachinePortsResult.from_json(o) for o in results or []]
 
@@ -2777,14 +2961,14 @@ class NotifyWatchResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~NotifyWatchResult]
+        results : typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
         '''
         self.results = [NotifyWatchResult.from_json(o) for o in results or []]
 
 
 class PortRange(Type):
     _toSchema = {'from_port': 'from-port', 'to_port': 'to-port', 'protocol': 'protocol'}
-    _toPy = {'to-port': 'to_port', 'protocol': 'protocol', 'from-port': 'from_port'}
+    _toPy = {'from-port': 'from_port', 'protocol': 'protocol', 'to-port': 'to_port'}
     def __init__(self, from_port=None, protocol=None, to_port=None):
         '''
         from_port : int
@@ -2801,24 +2985,14 @@ class StringResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~StringResult]
+        results : typing.Sequence<+T_co>[~StringResult]<~StringResult>
         '''
         self.results = [StringResult.from_json(o) for o in results or []]
 
 
-class StringsResults(Type):
-    _toSchema = {'results': 'results'}
-    _toPy = {'results': 'results'}
-    def __init__(self, results=None):
-        '''
-        results : typing.Sequence[~StringsResult]
-        '''
-        self.results = [StringsResult.from_json(o) for o in results or []]
-
-
 class ControllersChangeResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -2833,22 +3007,22 @@ class ControllersChangeResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~ControllersChangeResult]
+        results : typing.Sequence<+T_co>[~ControllersChangeResult]<~ControllersChangeResult>
         '''
         self.results = [ControllersChangeResult.from_json(o) for o in results or []]
 
 
 class ControllersChanges(Type):
-    _toSchema = {'removed': 'removed', 'maintained': 'maintained', 'promoted': 'promoted', 'added': 'added', 'converted': 'converted', 'demoted': 'demoted'}
-    _toPy = {'removed': 'removed', 'maintained': 'maintained', 'promoted': 'promoted', 'added': 'added', 'converted': 'converted', 'demoted': 'demoted'}
+    _toSchema = {'removed': 'removed', 'demoted': 'demoted', 'added': 'added', 'maintained': 'maintained', 'converted': 'converted', 'promoted': 'promoted'}
+    _toPy = {'removed': 'removed', 'demoted': 'demoted', 'added': 'added', 'maintained': 'maintained', 'converted': 'converted', 'promoted': 'promoted'}
     def __init__(self, added=None, converted=None, demoted=None, maintained=None, promoted=None, removed=None):
         '''
-        added : typing.Sequence[str]
-        converted : typing.Sequence[str]
-        demoted : typing.Sequence[str]
-        maintained : typing.Sequence[str]
-        promoted : typing.Sequence[str]
-        removed : typing.Sequence[str]
+        added : typing.Sequence<+T_co>[str]
+        converted : typing.Sequence<+T_co>[str]
+        demoted : typing.Sequence<+T_co>[str]
+        maintained : typing.Sequence<+T_co>[str]
+        promoted : typing.Sequence<+T_co>[str]
+        removed : typing.Sequence<+T_co>[str]
         '''
         self.added = added
         self.converted = converted
@@ -2859,14 +3033,14 @@ class ControllersChanges(Type):
 
 
 class ControllersSpec(Type):
-    _toSchema = {'placement': 'placement', 'num_controllers': 'num-controllers', 'model_tag': 'model-tag', 'constraints': 'constraints', 'series': 'series'}
-    _toPy = {'model-tag': 'model_tag', 'num-controllers': 'num_controllers', 'series': 'series', 'constraints': 'constraints', 'placement': 'placement'}
+    _toSchema = {'model_tag': 'model-tag', 'num_controllers': 'num-controllers', 'series': 'series', 'constraints': 'constraints', 'placement': 'placement'}
+    _toPy = {'model-tag': 'model_tag', 'placement': 'placement', 'num-controllers': 'num_controllers', 'constraints': 'constraints', 'series': 'series'}
     def __init__(self, constraints=None, model_tag=None, num_controllers=None, placement=None, series=None):
         '''
         constraints : Value
         model_tag : str
         num_controllers : int
-        placement : typing.Sequence[str]
+        placement : typing.Sequence<+T_co>[str]
         series : str
         '''
         self.constraints = Value.from_json(constraints) if constraints else None
@@ -2881,14 +3055,14 @@ class ControllersSpecs(Type):
     _toPy = {'specs': 'specs'}
     def __init__(self, specs=None):
         '''
-        specs : typing.Sequence[~ControllersSpec]
+        specs : typing.Sequence<+T_co>[~ControllersSpec]<~ControllersSpec>
         '''
         self.specs = [ControllersSpec.from_json(o) for o in specs or []]
 
 
 class HAMember(Type):
-    _toSchema = {'series': 'series', 'tag': 'tag', 'public_address': 'public-address'}
-    _toPy = {'series': 'series', 'tag': 'tag', 'public-address': 'public_address'}
+    _toSchema = {'tag': 'tag', 'series': 'series', 'public_address': 'public-address'}
+    _toPy = {'public-address': 'public_address', 'tag': 'tag', 'series': 'series'}
     def __init__(self, public_address=None, series=None, tag=None):
         '''
         public_address : Address
@@ -2901,8 +3075,8 @@ class HAMember(Type):
 
 
 class Member(Type):
-    _toSchema = {'address': 'Address', 'hidden': 'Hidden', 'tags': 'Tags', 'arbiter': 'Arbiter', 'buildindexes': 'BuildIndexes', 'id_': 'Id', 'priority': 'Priority', 'votes': 'Votes', 'slavedelay': 'SlaveDelay'}
-    _toPy = {'SlaveDelay': 'slavedelay', 'Hidden': 'hidden', 'Address': 'address', 'Priority': 'priority', 'Votes': 'votes', 'Tags': 'tags', 'Arbiter': 'arbiter', 'BuildIndexes': 'buildindexes', 'Id': 'id_'}
+    _toSchema = {'votes': 'Votes', 'buildindexes': 'BuildIndexes', 'tags': 'Tags', 'arbiter': 'Arbiter', 'address': 'Address', 'priority': 'Priority', 'hidden': 'Hidden', 'id_': 'Id', 'slavedelay': 'SlaveDelay'}
+    _toPy = {'Id': 'id_', 'BuildIndexes': 'buildindexes', 'Address': 'address', 'SlaveDelay': 'slavedelay', 'Tags': 'tags', 'Votes': 'votes', 'Priority': 'priority', 'Hidden': 'hidden', 'Arbiter': 'arbiter'}
     def __init__(self, address=None, arbiter=None, buildindexes=None, hidden=None, id_=None, priority=None, slavedelay=None, tags=None, votes=None):
         '''
         address : str
@@ -2912,7 +3086,7 @@ class Member(Type):
         id_ : int
         priority : float
         slavedelay : int
-        tags : typing.Mapping[str, str]
+        tags : typing.Mapping<~KT, +VT_co>[str, str]
         votes : int
         '''
         self.address = address
@@ -2927,13 +3101,13 @@ class Member(Type):
 
 
 class MongoUpgradeResults(Type):
-    _toSchema = {'rs_members': 'rs-members', 'master': 'master', 'ha_members': 'ha-members'}
-    _toPy = {'rs-members': 'rs_members', 'master': 'master', 'ha-members': 'ha_members'}
+    _toSchema = {'rs_members': 'rs-members', 'ha_members': 'ha-members', 'master': 'master'}
+    _toPy = {'ha-members': 'ha_members', 'rs-members': 'rs_members', 'master': 'master'}
     def __init__(self, ha_members=None, master=None, rs_members=None):
         '''
-        ha_members : typing.Sequence[~HAMember]
+        ha_members : typing.Sequence<+T_co>[~HAMember]<~HAMember>
         master : HAMember
-        rs_members : typing.Sequence[~Member]
+        rs_members : typing.Sequence<+T_co>[~Member]<~Member>
         '''
         self.ha_members = [HAMember.from_json(o) for o in ha_members or []]
         self.master = HAMember.from_json(master) if master else None
@@ -2945,14 +3119,14 @@ class ResumeReplicationParams(Type):
     _toPy = {'members': 'members'}
     def __init__(self, members=None):
         '''
-        members : typing.Sequence[~Member]
+        members : typing.Sequence<+T_co>[~Member]<~Member>
         '''
         self.members = [Member.from_json(o) for o in members or []]
 
 
 class UpgradeMongoParams(Type):
-    _toSchema = {'patch': 'Patch', 'storageengine': 'StorageEngine', 'major': 'Major', 'minor': 'Minor'}
-    _toPy = {'Patch': 'patch', 'StorageEngine': 'storageengine', 'Major': 'major', 'Minor': 'minor'}
+    _toSchema = {'patch': 'Patch', 'minor': 'Minor', 'major': 'Major', 'storageengine': 'StorageEngine'}
+    _toPy = {'Major': 'major', 'Minor': 'minor', 'Patch': 'patch', 'StorageEngine': 'storageengine'}
     def __init__(self, major=None, minor=None, patch=None, storageengine=None):
         '''
         major : int
@@ -2967,8 +3141,8 @@ class UpgradeMongoParams(Type):
 
 
 class Version(Type):
-    _toSchema = {'patch': 'Patch', 'storageengine': 'StorageEngine', 'major': 'Major', 'minor': 'Minor'}
-    _toPy = {'Patch': 'patch', 'StorageEngine': 'storageengine', 'Major': 'major', 'Minor': 'minor'}
+    _toSchema = {'patch': 'Patch', 'minor': 'Minor', 'major': 'Major', 'storageengine': 'StorageEngine'}
+    _toPy = {'Major': 'major', 'Minor': 'minor', 'Patch': 'patch', 'StorageEngine': 'storageengine'}
     def __init__(self, major=None, minor=None, patch=None, storageengine=None):
         '''
         major : int
@@ -2987,17 +3161,17 @@ class SSHHostKeySet(Type):
     _toPy = {'entity-keys': 'entity_keys'}
     def __init__(self, entity_keys=None):
         '''
-        entity_keys : typing.Sequence[~SSHHostKeys]
+        entity_keys : typing.Sequence<+T_co>[~SSHHostKeys]<~SSHHostKeys>
         '''
         self.entity_keys = [SSHHostKeys.from_json(o) for o in entity_keys or []]
 
 
 class SSHHostKeys(Type):
-    _toSchema = {'public_keys': 'public-keys', 'tag': 'tag'}
+    _toSchema = {'tag': 'tag', 'public_keys': 'public-keys'}
     _toPy = {'tag': 'tag', 'public-keys': 'public_keys'}
     def __init__(self, public_keys=None, tag=None):
         '''
-        public_keys : typing.Sequence[str]
+        public_keys : typing.Sequence<+T_co>[str]
         tag : str
         '''
         self.public_keys = public_keys
@@ -3009,14 +3183,14 @@ class ImageFilterParams(Type):
     _toPy = {'images': 'images'}
     def __init__(self, images=None):
         '''
-        images : typing.Sequence[~ImageSpec]
+        images : typing.Sequence<+T_co>[~ImageSpec]<~ImageSpec>
         '''
         self.images = [ImageSpec.from_json(o) for o in images or []]
 
 
 class ImageMetadata(Type):
-    _toSchema = {'created': 'created', 'kind': 'kind', 'url': 'url', 'arch': 'arch', 'series': 'series'}
-    _toPy = {'created': 'created', 'kind': 'kind', 'url': 'url', 'arch': 'arch', 'series': 'series'}
+    _toSchema = {'kind': 'kind', 'created': 'created', 'url': 'url', 'series': 'series', 'arch': 'arch'}
+    _toPy = {'kind': 'kind', 'created': 'created', 'url': 'url', 'series': 'series', 'arch': 'arch'}
     def __init__(self, arch=None, created=None, kind=None, series=None, url=None):
         '''
         arch : str
@@ -3033,8 +3207,8 @@ class ImageMetadata(Type):
 
 
 class ImageSpec(Type):
-    _toSchema = {'series': 'series', 'kind': 'kind', 'arch': 'arch'}
-    _toPy = {'series': 'series', 'kind': 'kind', 'arch': 'arch'}
+    _toSchema = {'kind': 'kind', 'series': 'series', 'arch': 'arch'}
+    _toPy = {'kind': 'kind', 'series': 'series', 'arch': 'arch'}
     def __init__(self, arch=None, kind=None, series=None):
         '''
         arch : str
@@ -3051,14 +3225,14 @@ class ListImageResult(Type):
     _toPy = {'result': 'result'}
     def __init__(self, result=None):
         '''
-        result : typing.Sequence[~ImageMetadata]
+        result : typing.Sequence<+T_co>[~ImageMetadata]<~ImageMetadata>
         '''
         self.result = [ImageMetadata.from_json(o) for o in result or []]
 
 
 class CloudImageMetadata(Type):
-    _toSchema = {'root_storage_type': 'root-storage-type', 'root_storage_size': 'root-storage-size', 'arch': 'arch', 'version': 'version', 'series': 'series', 'image_id': 'image-id', 'priority': 'priority', 'source': 'source', 'region': 'region', 'virt_type': 'virt-type', 'stream': 'stream'}
-    _toPy = {'version': 'version', 'stream': 'stream', 'source': 'source', 'arch': 'arch', 'virt-type': 'virt_type', 'priority': 'priority', 'image-id': 'image_id', 'root-storage-size': 'root_storage_size', 'region': 'region', 'series': 'series', 'root-storage-type': 'root_storage_type'}
+    _toSchema = {'image_id': 'image-id', 'source': 'source', 'stream': 'stream', 'root_storage_type': 'root-storage-type', 'virt_type': 'virt-type', 'series': 'series', 'arch': 'arch', 'priority': 'priority', 'region': 'region', 'root_storage_size': 'root-storage-size', 'version': 'version'}
+    _toPy = {'source': 'source', 'stream': 'stream', 'series': 'series', 'root-storage-size': 'root_storage_size', 'image-id': 'image_id', 'virt-type': 'virt_type', 'priority': 'priority', 'arch': 'arch', 'region': 'region', 'root-storage-type': 'root_storage_type', 'version': 'version'}
     def __init__(self, arch=None, image_id=None, priority=None, region=None, root_storage_size=None, root_storage_type=None, series=None, source=None, stream=None, version=None, virt_type=None):
         '''
         arch : str
@@ -3091,20 +3265,20 @@ class CloudImageMetadataList(Type):
     _toPy = {'metadata': 'metadata'}
     def __init__(self, metadata=None):
         '''
-        metadata : typing.Sequence[~CloudImageMetadata]
+        metadata : typing.Sequence<+T_co>[~CloudImageMetadata]<~CloudImageMetadata>
         '''
         self.metadata = [CloudImageMetadata.from_json(o) for o in metadata or []]
 
 
 class ImageMetadataFilter(Type):
-    _toSchema = {'root_storage_type': 'root-storage-type', 'arches': 'arches', 'region': 'region', 'stream': 'stream', 'series': 'series', 'virt_type': 'virt-type'}
-    _toPy = {'arches': 'arches', 'region': 'region', 'virt-type': 'virt_type', 'stream': 'stream', 'series': 'series', 'root-storage-type': 'root_storage_type'}
+    _toSchema = {'stream': 'stream', 'root_storage_type': 'root-storage-type', 'virt_type': 'virt-type', 'series': 'series', 'region': 'region', 'arches': 'arches'}
+    _toPy = {'stream': 'stream', 'arches': 'arches', 'series': 'series', 'virt-type': 'virt_type', 'region': 'region', 'root-storage-type': 'root_storage_type'}
     def __init__(self, arches=None, region=None, root_storage_type=None, series=None, stream=None, virt_type=None):
         '''
-        arches : typing.Sequence[str]
+        arches : typing.Sequence<+T_co>[str]
         region : str
         root_storage_type : str
-        series : typing.Sequence[str]
+        series : typing.Sequence<+T_co>[str]
         stream : str
         virt_type : str
         '''
@@ -3121,7 +3295,7 @@ class ListCloudImageMetadataResult(Type):
     _toPy = {'result': 'result'}
     def __init__(self, result=None):
         '''
-        result : typing.Sequence[~CloudImageMetadata]
+        result : typing.Sequence<+T_co>[~CloudImageMetadata]<~CloudImageMetadata>
         '''
         self.result = [CloudImageMetadata.from_json(o) for o in result or []]
 
@@ -3131,7 +3305,7 @@ class MetadataImageIds(Type):
     _toPy = {'image-ids': 'image_ids'}
     def __init__(self, image_ids=None):
         '''
-        image_ids : typing.Sequence[str]
+        image_ids : typing.Sequence<+T_co>[str]
         '''
         self.image_ids = image_ids
 
@@ -3141,17 +3315,17 @@ class MetadataSaveParams(Type):
     _toPy = {'metadata': 'metadata'}
     def __init__(self, metadata=None):
         '''
-        metadata : typing.Sequence[~CloudImageMetadataList]
+        metadata : typing.Sequence<+T_co>[~CloudImageMetadataList]<~CloudImageMetadataList>
         '''
         self.metadata = [CloudImageMetadataList.from_json(o) for o in metadata or []]
 
 
 class EntityStatusArgs(Type):
-    _toSchema = {'status': 'status', 'info': 'info', 'tag': 'tag', 'data': 'data'}
-    _toPy = {'status': 'status', 'info': 'info', 'tag': 'tag', 'data': 'data'}
+    _toSchema = {'info': 'info', 'data': 'data', 'tag': 'tag', 'status': 'status'}
+    _toPy = {'info': 'info', 'data': 'data', 'tag': 'tag', 'status': 'status'}
     def __init__(self, data=None, info=None, status=None, tag=None):
         '''
-        data : typing.Mapping[str, typing.Any]
+        data : typing.Mapping<~KT, +VT_co>[str, typing.Any]
         info : str
         status : str
         tag : str
@@ -3163,11 +3337,11 @@ class EntityStatusArgs(Type):
 
 
 class MachineAddresses(Type):
-    _toSchema = {'tag': 'tag', 'addresses': 'addresses'}
-    _toPy = {'tag': 'tag', 'addresses': 'addresses'}
+    _toSchema = {'addresses': 'addresses', 'tag': 'tag'}
+    _toPy = {'addresses': 'addresses', 'tag': 'tag'}
     def __init__(self, addresses=None, tag=None):
         '''
-        addresses : typing.Sequence[~Address]
+        addresses : typing.Sequence<+T_co>[~Address]<~Address>
         tag : str
         '''
         self.addresses = [Address.from_json(o) for o in addresses or []]
@@ -3175,11 +3349,11 @@ class MachineAddresses(Type):
 
 
 class MachineAddressesResult(Type):
-    _toSchema = {'error': 'error', 'addresses': 'addresses'}
-    _toPy = {'error': 'error', 'addresses': 'addresses'}
+    _toSchema = {'addresses': 'addresses', 'error': 'error'}
+    _toPy = {'addresses': 'addresses', 'error': 'error'}
     def __init__(self, addresses=None, error=None):
         '''
-        addresses : typing.Sequence[~Address]
+        addresses : typing.Sequence<+T_co>[~Address]<~Address>
         error : Error
         '''
         self.addresses = [Address.from_json(o) for o in addresses or []]
@@ -3191,7 +3365,7 @@ class MachineAddressesResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~MachineAddressesResult]
+        results : typing.Sequence<+T_co>[~MachineAddressesResult]<~MachineAddressesResult>
         '''
         self.results = [MachineAddressesResult.from_json(o) for o in results or []]
 
@@ -3201,7 +3375,7 @@ class SetMachinesAddresses(Type):
     _toPy = {'machine-addresses': 'machine_addresses'}
     def __init__(self, machine_addresses=None):
         '''
-        machine_addresses : typing.Sequence[~MachineAddresses]
+        machine_addresses : typing.Sequence<+T_co>[~MachineAddresses]<~MachineAddresses>
         '''
         self.machine_addresses = [MachineAddresses.from_json(o) for o in machine_addresses or []]
 
@@ -3211,17 +3385,17 @@ class SetStatus(Type):
     _toPy = {'entities': 'entities'}
     def __init__(self, entities=None):
         '''
-        entities : typing.Sequence[~EntityStatusArgs]
+        entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
         '''
         self.entities = [EntityStatusArgs.from_json(o) for o in entities or []]
 
 
 class StatusResult(Type):
-    _toSchema = {'status': 'status', 'error': 'error', 'info': 'info', 'id_': 'id', 'life': 'life', 'since': 'since', 'data': 'data'}
-    _toPy = {'status': 'status', 'error': 'error', 'info': 'info', 'since': 'since', 'life': 'life', 'id': 'id_', 'data': 'data'}
+    _toSchema = {'info': 'info', 'data': 'data', 'since': 'since', 'error': 'error', 'life': 'life', 'status': 'status', 'id_': 'id'}
+    _toPy = {'info': 'info', 'data': 'data', 'since': 'since', 'error': 'error', 'life': 'life', 'status': 'status', 'id': 'id_'}
     def __init__(self, data=None, error=None, id_=None, info=None, life=None, since=None, status=None):
         '''
-        data : typing.Mapping[str, typing.Any]
+        data : typing.Mapping<~KT, +VT_co>[str, typing.Any]
         error : Error
         id_ : str
         info : str
@@ -3243,7 +3417,7 @@ class StatusResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~StatusResult]
+        results : typing.Sequence<+T_co>[~StatusResult]<~StatusResult>
         '''
         self.results = [StatusResult.from_json(o) for o in results or []]
 
@@ -3265,7 +3439,7 @@ class ModifyUserSSHKeys(Type):
     _toPy = {'user': 'user', 'ssh-keys': 'ssh_keys'}
     def __init__(self, ssh_keys=None, user=None):
         '''
-        ssh_keys : typing.Sequence[str]
+        ssh_keys : typing.Sequence<+T_co>[str]
         user : str
         '''
         self.ssh_keys = ssh_keys
@@ -3287,7 +3461,7 @@ class ClaimLeadershipBulkParams(Type):
     _toPy = {'params': 'params'}
     def __init__(self, params=None):
         '''
-        params : typing.Sequence[~ClaimLeadershipParams]
+        params : typing.Sequence<+T_co>[~ClaimLeadershipParams]<~ClaimLeadershipParams>
         '''
         self.params = [ClaimLeadershipParams.from_json(o) for o in params or []]
 
@@ -3297,14 +3471,14 @@ class ClaimLeadershipBulkResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~ErrorResult]
+        results : typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         self.results = [ErrorResult.from_json(o) for o in results or []]
 
 
 class ClaimLeadershipParams(Type):
     _toSchema = {'unit_tag': 'unit-tag', 'duration': 'duration', 'application_tag': 'application-tag'}
-    _toPy = {'unit-tag': 'unit_tag', 'duration': 'duration', 'application-tag': 'application_tag'}
+    _toPy = {'application-tag': 'application_tag', 'unit-tag': 'unit_tag', 'duration': 'duration'}
     def __init__(self, application_tag=None, duration=None, unit_tag=None):
         '''
         application_tag : str
@@ -3321,21 +3495,23 @@ class LogForwardingGetLastSentParams(Type):
     _toPy = {'ids': 'ids'}
     def __init__(self, ids=None):
         '''
-        ids : typing.Sequence[~LogForwardingID]
+        ids : typing.Sequence<+T_co>[~LogForwardingID]<~LogForwardingID>
         '''
         self.ids = [LogForwardingID.from_json(o) for o in ids or []]
 
 
 class LogForwardingGetLastSentResult(Type):
-    _toSchema = {'record_id': 'record-id', 'err': 'err'}
-    _toPy = {'record-id': 'record_id', 'err': 'err'}
-    def __init__(self, err=None, record_id=None):
+    _toSchema = {'record_id': 'record-id', 'record_timestamp': 'record-timestamp', 'err': 'err'}
+    _toPy = {'record-timestamp': 'record_timestamp', 'record-id': 'record_id', 'err': 'err'}
+    def __init__(self, err=None, record_id=None, record_timestamp=None):
         '''
         err : Error
         record_id : int
+        record_timestamp : int
         '''
         self.err = Error.from_json(err) if err else None
         self.record_id = record_id
+        self.record_timestamp = record_timestamp
 
 
 class LogForwardingGetLastSentResults(Type):
@@ -3343,14 +3519,14 @@ class LogForwardingGetLastSentResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~LogForwardingGetLastSentResult]
+        results : typing.Sequence<+T_co>[~LogForwardingGetLastSentResult]<~LogForwardingGetLastSentResult>
         '''
         self.results = [LogForwardingGetLastSentResult.from_json(o) for o in results or []]
 
 
 class LogForwardingID(Type):
-    _toSchema = {'sink': 'sink', 'model': 'model'}
-    _toPy = {'sink': 'sink', 'model': 'model'}
+    _toSchema = {'model': 'model', 'sink': 'sink'}
+    _toPy = {'model': 'model', 'sink': 'sink'}
     def __init__(self, model=None, sink=None):
         '''
         model : str
@@ -3361,15 +3537,17 @@ class LogForwardingID(Type):
 
 
 class LogForwardingSetLastSentParam(Type):
-    _toSchema = {'record_id': 'record-id', 'logforwardingid': 'LogForwardingID'}
-    _toPy = {'record-id': 'record_id', 'LogForwardingID': 'logforwardingid'}
-    def __init__(self, logforwardingid=None, record_id=None):
+    _toSchema = {'record_id': 'record-id', 'logforwardingid': 'LogForwardingID', 'record_timestamp': 'record-timestamp'}
+    _toPy = {'record-id': 'record_id', 'LogForwardingID': 'logforwardingid', 'record-timestamp': 'record_timestamp'}
+    def __init__(self, logforwardingid=None, record_id=None, record_timestamp=None):
         '''
         logforwardingid : LogForwardingID
         record_id : int
+        record_timestamp : int
         '''
         self.logforwardingid = LogForwardingID.from_json(logforwardingid) if logforwardingid else None
         self.record_id = record_id
+        self.record_timestamp = record_timestamp
 
 
 class LogForwardingSetLastSentParams(Type):
@@ -3377,19 +3555,19 @@ class LogForwardingSetLastSentParams(Type):
     _toPy = {'params': 'params'}
     def __init__(self, params=None):
         '''
-        params : typing.Sequence[~LogForwardingSetLastSentParam]
+        params : typing.Sequence<+T_co>[~LogForwardingSetLastSentParam]<~LogForwardingSetLastSentParam>
         '''
         self.params = [LogForwardingSetLastSentParam.from_json(o) for o in params or []]
 
 
 class ActionExecutionResult(Type):
     _toSchema = {'status': 'status', 'action_tag': 'action-tag', 'results': 'results', 'message': 'message'}
-    _toPy = {'status': 'status', 'results': 'results', 'message': 'message', 'action-tag': 'action_tag'}
+    _toPy = {'status': 'status', 'results': 'results', 'action-tag': 'action_tag', 'message': 'message'}
     def __init__(self, action_tag=None, message=None, results=None, status=None):
         '''
         action_tag : str
         message : str
-        results : typing.Mapping[str, typing.Any]
+        results : typing.Mapping<~KT, +VT_co>[str, typing.Any]
         status : str
         '''
         self.action_tag = action_tag
@@ -3403,9 +3581,69 @@ class ActionExecutionResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~ActionExecutionResult]
+        results : typing.Sequence<+T_co>[~ActionExecutionResult]<~ActionExecutionResult>
         '''
         self.results = [ActionExecutionResult.from_json(o) for o in results or []]
+
+
+class EntitiesResult(Type):
+    _toSchema = {'entities': 'entities', 'error': 'error'}
+    _toPy = {'entities': 'entities', 'error': 'error'}
+    def __init__(self, entities=None, error=None):
+        '''
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        error : Error
+        '''
+        self.entities = [Entity.from_json(o) for o in entities or []]
+        self.error = Error.from_json(error) if error else None
+
+
+class EntitiesResults(Type):
+    _toSchema = {'results': 'results'}
+    _toPy = {'results': 'results'}
+    def __init__(self, results=None):
+        '''
+        results : typing.Sequence<+T_co>[~EntitiesResult]<~EntitiesResult>
+        '''
+        self.results = [EntitiesResult.from_json(o) for o in results or []]
+
+
+class ProviderInterfaceInfo(Type):
+    _toSchema = {'provider_id': 'provider-id', 'mac_address': 'mac-address', 'interface_name': 'interface-name'}
+    _toPy = {'interface-name': 'interface_name', 'mac-address': 'mac_address', 'provider-id': 'provider_id'}
+    def __init__(self, interface_name=None, mac_address=None, provider_id=None):
+        '''
+        interface_name : str
+        mac_address : str
+        provider_id : str
+        '''
+        self.interface_name = interface_name
+        self.mac_address = mac_address
+        self.provider_id = provider_id
+
+
+class ProviderInterfaceInfoResult(Type):
+    _toSchema = {'interfaces': 'interfaces', 'machine_tag': 'machine-tag', 'error': 'error'}
+    _toPy = {'interfaces': 'interfaces', 'machine-tag': 'machine_tag', 'error': 'error'}
+    def __init__(self, error=None, interfaces=None, machine_tag=None):
+        '''
+        error : Error
+        interfaces : typing.Sequence<+T_co>[~ProviderInterfaceInfo]<~ProviderInterfaceInfo>
+        machine_tag : str
+        '''
+        self.error = Error.from_json(error) if error else None
+        self.interfaces = [ProviderInterfaceInfo.from_json(o) for o in interfaces or []]
+        self.machine_tag = machine_tag
+
+
+class ProviderInterfaceInfoResults(Type):
+    _toSchema = {'results': 'results'}
+    _toPy = {'results': 'results'}
+    def __init__(self, results=None):
+        '''
+        results : typing.Sequence<+T_co>[~ProviderInterfaceInfoResult]<~ProviderInterfaceInfoResult>
+        '''
+        self.results = [ProviderInterfaceInfoResult.from_json(o) for o in results or []]
 
 
 class JobsResult(Type):
@@ -3414,7 +3652,7 @@ class JobsResult(Type):
     def __init__(self, error=None, jobs=None):
         '''
         error : Error
-        jobs : typing.Sequence[str]
+        jobs : typing.Sequence<+T_co>[str]
         '''
         self.error = Error.from_json(error) if error else None
         self.jobs = jobs
@@ -3425,14 +3663,14 @@ class JobsResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~JobsResult]
+        results : typing.Sequence<+T_co>[~JobsResult]<~JobsResult>
         '''
         self.results = [JobsResult.from_json(o) for o in results or []]
 
 
 class NetworkConfig(Type):
-    _toSchema = {'vlan_tag': 'vlan-tag', 'address': 'address', 'provider_space_id': 'provider-space-id', 'no_auto_start': 'no-auto-start', 'config_type': 'config-type', 'interface_name': 'interface-name', 'parent_interface_name': 'parent-interface-name', 'provider_vlan_id': 'provider-vlan-id', 'provider_address_id': 'provider-address-id', 'device_index': 'device-index', 'mac_address': 'mac-address', 'provider_id': 'provider-id', 'cidr': 'cidr', 'mtu': 'mtu', 'dns_search_domains': 'dns-search-domains', 'interface_type': 'interface-type', 'provider_subnet_id': 'provider-subnet-id', 'gateway_address': 'gateway-address', 'disabled': 'disabled', 'dns_servers': 'dns-servers'}
-    _toPy = {'address': 'address', 'device-index': 'device_index', 'provider-vlan-id': 'provider_vlan_id', 'provider-space-id': 'provider_space_id', 'vlan-tag': 'vlan_tag', 'mac-address': 'mac_address', 'provider-id': 'provider_id', 'provider-subnet-id': 'provider_subnet_id', 'provider-address-id': 'provider_address_id', 'no-auto-start': 'no_auto_start', 'interface-name': 'interface_name', 'mtu': 'mtu', 'dns-search-domains': 'dns_search_domains', 'interface-type': 'interface_type', 'cidr': 'cidr', 'dns-servers': 'dns_servers', 'config-type': 'config_type', 'gateway-address': 'gateway_address', 'parent-interface-name': 'parent_interface_name', 'disabled': 'disabled'}
+    _toSchema = {'provider_address_id': 'provider-address-id', 'provider_id': 'provider-id', 'cidr': 'cidr', 'config_type': 'config-type', 'disabled': 'disabled', 'address': 'address', 'provider_vlan_id': 'provider-vlan-id', 'dns_servers': 'dns-servers', 'interface_type': 'interface-type', 'mac_address': 'mac-address', 'no_auto_start': 'no-auto-start', 'dns_search_domains': 'dns-search-domains', 'provider_subnet_id': 'provider-subnet-id', 'device_index': 'device-index', 'interface_name': 'interface-name', 'parent_interface_name': 'parent-interface-name', 'mtu': 'mtu', 'gateway_address': 'gateway-address', 'provider_space_id': 'provider-space-id', 'vlan_tag': 'vlan-tag'}
+    _toPy = {'provider-vlan-id': 'provider_vlan_id', 'interface-name': 'interface_name', 'gateway-address': 'gateway_address', 'no-auto-start': 'no_auto_start', 'address': 'address', 'parent-interface-name': 'parent_interface_name', 'provider-subnet-id': 'provider_subnet_id', 'dns-search-domains': 'dns_search_domains', 'dns-servers': 'dns_servers', 'interface-type': 'interface_type', 'provider-space-id': 'provider_space_id', 'mac-address': 'mac_address', 'device-index': 'device_index', 'disabled': 'disabled', 'config-type': 'config_type', 'provider-address-id': 'provider_address_id', 'mtu': 'mtu', 'cidr': 'cidr', 'vlan-tag': 'vlan_tag', 'provider-id': 'provider_id'}
     def __init__(self, address=None, cidr=None, config_type=None, device_index=None, disabled=None, dns_search_domains=None, dns_servers=None, gateway_address=None, interface_name=None, interface_type=None, mac_address=None, mtu=None, no_auto_start=None, parent_interface_name=None, provider_address_id=None, provider_id=None, provider_space_id=None, provider_subnet_id=None, provider_vlan_id=None, vlan_tag=None):
         '''
         address : str
@@ -3440,8 +3678,8 @@ class NetworkConfig(Type):
         config_type : str
         device_index : int
         disabled : bool
-        dns_search_domains : typing.Sequence[str]
-        dns_servers : typing.Sequence[str]
+        dns_search_domains : typing.Sequence<+T_co>[str]
+        dns_servers : typing.Sequence<+T_co>[str]
         gateway_address : str
         interface_name : str
         interface_type : str
@@ -3483,7 +3721,7 @@ class SetMachineNetworkConfig(Type):
     _toPy = {'config': 'config', 'tag': 'tag'}
     def __init__(self, config=None, tag=None):
         '''
-        config : typing.Sequence[~NetworkConfig]
+        config : typing.Sequence<+T_co>[~NetworkConfig]<~NetworkConfig>
         tag : str
         '''
         self.config = [NetworkConfig.from_json(o) for o in config or []]
@@ -3491,8 +3729,8 @@ class SetMachineNetworkConfig(Type):
 
 
 class MeterStatusResult(Type):
-    _toSchema = {'code': 'code', 'error': 'error', 'info': 'info'}
-    _toPy = {'code': 'code', 'error': 'error', 'info': 'info'}
+    _toSchema = {'info': 'info', 'code': 'code', 'error': 'error'}
+    _toPy = {'info': 'info', 'code': 'code', 'error': 'error'}
     def __init__(self, code=None, error=None, info=None):
         '''
         code : str
@@ -3509,14 +3747,14 @@ class MeterStatusResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~MeterStatusResult]
+        results : typing.Sequence<+T_co>[~MeterStatusResult]<~MeterStatusResult>
         '''
         self.results = [MeterStatusResult.from_json(o) for o in results or []]
 
 
 class Metric(Type):
-    _toSchema = {'key': 'key', 'time': 'time', 'value': 'value'}
-    _toPy = {'key': 'key', 'time': 'time', 'value': 'value'}
+    _toSchema = {'time': 'time', 'value': 'value', 'key': 'key'}
+    _toPy = {'time': 'time', 'value': 'value', 'key': 'key'}
     def __init__(self, key=None, time=None, value=None):
         '''
         key : str
@@ -3529,13 +3767,13 @@ class Metric(Type):
 
 
 class MetricBatch(Type):
-    _toSchema = {'created': 'created', 'uuid': 'uuid', 'charm_url': 'charm-url', 'metrics': 'metrics'}
-    _toPy = {'created': 'created', 'uuid': 'uuid', 'charm-url': 'charm_url', 'metrics': 'metrics'}
+    _toSchema = {'uuid': 'uuid', 'created': 'created', 'charm_url': 'charm-url', 'metrics': 'metrics'}
+    _toPy = {'uuid': 'uuid', 'charm-url': 'charm_url', 'created': 'created', 'metrics': 'metrics'}
     def __init__(self, charm_url=None, created=None, metrics=None, uuid=None):
         '''
         charm_url : str
         created : str
-        metrics : typing.Sequence[~Metric]
+        metrics : typing.Sequence<+T_co>[~Metric]<~Metric>
         uuid : str
         '''
         self.charm_url = charm_url
@@ -3561,26 +3799,26 @@ class MetricBatchParams(Type):
     _toPy = {'batches': 'batches'}
     def __init__(self, batches=None):
         '''
-        batches : typing.Sequence[~MetricBatchParam]
+        batches : typing.Sequence<+T_co>[~MetricBatchParam]<~MetricBatchParam>
         '''
         self.batches = [MetricBatchParam.from_json(o) for o in batches or []]
 
 
 class EntityMetrics(Type):
-    _toSchema = {'error': 'error', 'metrics': 'metrics'}
-    _toPy = {'error': 'error', 'metrics': 'metrics'}
+    _toSchema = {'metrics': 'metrics', 'error': 'error'}
+    _toPy = {'metrics': 'metrics', 'error': 'error'}
     def __init__(self, error=None, metrics=None):
         '''
         error : Error
-        metrics : typing.Sequence[~MetricResult]
+        metrics : typing.Sequence<+T_co>[~MetricResult]<~MetricResult>
         '''
         self.error = Error.from_json(error) if error else None
         self.metrics = [MetricResult.from_json(o) for o in metrics or []]
 
 
 class MeterStatusParam(Type):
-    _toSchema = {'code': 'code', 'info': 'info', 'tag': 'tag'}
-    _toPy = {'code': 'code', 'info': 'info', 'tag': 'tag'}
+    _toSchema = {'info': 'info', 'tag': 'tag', 'code': 'code'}
+    _toPy = {'info': 'info', 'tag': 'tag', 'code': 'code'}
     def __init__(self, code=None, info=None, tag=None):
         '''
         code : str
@@ -3597,14 +3835,14 @@ class MeterStatusParams(Type):
     _toPy = {'statues': 'statues'}
     def __init__(self, statues=None):
         '''
-        statues : typing.Sequence[~MeterStatusParam]
+        statues : typing.Sequence<+T_co>[~MeterStatusParam]<~MeterStatusParam>
         '''
         self.statues = [MeterStatusParam.from_json(o) for o in statues or []]
 
 
 class MetricResult(Type):
-    _toSchema = {'key': 'key', 'time': 'time', 'value': 'value'}
-    _toPy = {'key': 'key', 'time': 'time', 'value': 'value'}
+    _toSchema = {'time': 'time', 'value': 'value', 'key': 'key'}
+    _toPy = {'time': 'time', 'value': 'value', 'key': 'key'}
     def __init__(self, key=None, time=None, value=None):
         '''
         key : str
@@ -3621,14 +3859,14 @@ class MetricResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~EntityMetrics]
+        results : typing.Sequence<+T_co>[~EntityMetrics]<~EntityMetrics>
         '''
         self.results = [EntityMetrics.from_json(o) for o in results or []]
 
 
 class PhaseResult(Type):
-    _toSchema = {'error': 'error', 'phase': 'phase'}
-    _toPy = {'error': 'error', 'phase': 'phase'}
+    _toSchema = {'phase': 'phase', 'error': 'error'}
+    _toPy = {'phase': 'phase', 'error': 'error'}
     def __init__(self, error=None, phase=None):
         '''
         error : Error
@@ -3643,33 +3881,85 @@ class PhaseResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~PhaseResult]
+        results : typing.Sequence<+T_co>[~PhaseResult]<~PhaseResult>
         '''
         self.results = [PhaseResult.from_json(o) for o in results or []]
 
 
-class FullMigrationStatus(Type):
-    _toSchema = {'phase': 'phase', 'spec': 'spec', 'attempt': 'attempt'}
-    _toPy = {'phase': 'phase', 'spec': 'spec', 'attempt': 'attempt'}
-    def __init__(self, attempt=None, phase=None, spec=None):
+class MasterMigrationStatus(Type):
+    _toSchema = {'phase': 'phase', 'phase_changed_time': 'phase-changed-time', 'migration_id': 'migration-id', 'spec': 'spec'}
+    _toPy = {'phase': 'phase', 'phase-changed-time': 'phase_changed_time', 'migration-id': 'migration_id', 'spec': 'spec'}
+    def __init__(self, migration_id=None, phase=None, phase_changed_time=None, spec=None):
         '''
-        attempt : int
+        migration_id : str
         phase : str
-        spec : ModelMigrationSpec
+        phase_changed_time : str
+        spec : MigrationSpec
         '''
-        self.attempt = attempt
+        self.migration_id = migration_id
         self.phase = phase
-        self.spec = ModelMigrationSpec.from_json(spec) if spec else None
+        self.phase_changed_time = phase_changed_time
+        self.spec = MigrationSpec.from_json(spec) if spec else None
+
+
+class MigrationModelInfo(Type):
+    _toSchema = {'agent_version': 'agent-version', 'uuid': 'uuid', 'name': 'name'}
+    _toPy = {'name': 'name', 'uuid': 'uuid', 'agent-version': 'agent_version'}
+    def __init__(self, agent_version=None, name=None, uuid=None):
+        '''
+        agent_version : Number
+        name : str
+        uuid : str
+        '''
+        self.agent_version = Number.from_json(agent_version) if agent_version else None
+        self.name = name
+        self.uuid = uuid
+
+
+class MinionReports(Type):
+    _toSchema = {'unknown_sample': 'unknown-sample', 'phase': 'phase', 'failed': 'failed', 'success_count': 'success-count', 'migration_id': 'migration-id', 'unknown_count': 'unknown-count'}
+    _toPy = {'phase': 'phase', 'failed': 'failed', 'success-count': 'success_count', 'migration-id': 'migration_id', 'unknown-sample': 'unknown_sample', 'unknown-count': 'unknown_count'}
+    def __init__(self, failed=None, migration_id=None, phase=None, success_count=None, unknown_count=None, unknown_sample=None):
+        '''
+        failed : typing.Sequence<+T_co>[str]
+        migration_id : str
+        phase : str
+        success_count : int
+        unknown_count : int
+        unknown_sample : typing.Sequence<+T_co>[str]
+        '''
+        self.failed = failed
+        self.migration_id = migration_id
+        self.phase = phase
+        self.success_count = success_count
+        self.unknown_count = unknown_count
+        self.unknown_sample = unknown_sample
 
 
 class SerializedModel(Type):
-    _toSchema = {'bytes_': 'bytes'}
-    _toPy = {'bytes': 'bytes_'}
-    def __init__(self, bytes_=None):
+    _toSchema = {'charms': 'charms', 'bytes_': 'bytes', 'tools': 'tools'}
+    _toPy = {'charms': 'charms', 'tools': 'tools', 'bytes': 'bytes_'}
+    def __init__(self, bytes_=None, charms=None, tools=None):
         '''
-        bytes_ : typing.Sequence[int]
+        bytes_ : typing.Sequence<+T_co>[int]
+        charms : typing.Sequence<+T_co>[str]
+        tools : typing.Sequence<+T_co>[~SerializedModelTools]<~SerializedModelTools>
         '''
         self.bytes_ = bytes_
+        self.charms = charms
+        self.tools = [SerializedModelTools.from_json(o) for o in tools or []]
+
+
+class SerializedModelTools(Type):
+    _toSchema = {'uri': 'uri', 'version': 'version'}
+    _toPy = {'uri': 'uri', 'version': 'version'}
+    def __init__(self, uri=None, version=None):
+        '''
+        uri : str
+        version : str
+        '''
+        self.uri = uri
+        self.version = version
 
 
 class SetMigrationPhaseArgs(Type):
@@ -3682,19 +3972,45 @@ class SetMigrationPhaseArgs(Type):
         self.phase = phase
 
 
+class SetMigrationStatusMessageArgs(Type):
+    _toSchema = {'message': 'message'}
+    _toPy = {'message': 'message'}
+    def __init__(self, message=None):
+        '''
+        message : str
+        '''
+        self.message = message
+
+
+class MinionReport(Type):
+    _toSchema = {'success': 'success', 'phase': 'phase', 'migration_id': 'migration-id'}
+    _toPy = {'success': 'success', 'phase': 'phase', 'migration-id': 'migration_id'}
+    def __init__(self, migration_id=None, phase=None, success=None):
+        '''
+        migration_id : str
+        phase : str
+        success : bool
+        '''
+        self.migration_id = migration_id
+        self.phase = phase
+        self.success = success
+
+
 class MigrationStatus(Type):
-    _toSchema = {'target_ca_cert': 'target-ca-cert', 'source_ca_cert': 'source-ca-cert', 'phase': 'phase', 'source_api_addrs': 'source-api-addrs', 'target_api_addrs': 'target-api-addrs', 'attempt': 'attempt'}
-    _toPy = {'phase': 'phase', 'source-ca-cert': 'source_ca_cert', 'source-api-addrs': 'source_api_addrs', 'target-api-addrs': 'target_api_addrs', 'target-ca-cert': 'target_ca_cert', 'attempt': 'attempt'}
-    def __init__(self, attempt=None, phase=None, source_api_addrs=None, source_ca_cert=None, target_api_addrs=None, target_ca_cert=None):
+    _toSchema = {'target_ca_cert': 'target-ca-cert', 'phase': 'phase', 'target_api_addrs': 'target-api-addrs', 'source_api_addrs': 'source-api-addrs', 'attempt': 'attempt', 'migration_id': 'migration-id', 'source_ca_cert': 'source-ca-cert'}
+    _toPy = {'phase': 'phase', 'source-ca-cert': 'source_ca_cert', 'target-api-addrs': 'target_api_addrs', 'target-ca-cert': 'target_ca_cert', 'source-api-addrs': 'source_api_addrs', 'attempt': 'attempt', 'migration-id': 'migration_id'}
+    def __init__(self, attempt=None, migration_id=None, phase=None, source_api_addrs=None, source_ca_cert=None, target_api_addrs=None, target_ca_cert=None):
         '''
         attempt : int
+        migration_id : str
         phase : str
-        source_api_addrs : typing.Sequence[str]
+        source_api_addrs : typing.Sequence<+T_co>[str]
         source_ca_cert : str
-        target_api_addrs : typing.Sequence[str]
+        target_api_addrs : typing.Sequence<+T_co>[str]
         target_ca_cert : str
         '''
         self.attempt = attempt
+        self.migration_id = migration_id
         self.phase = phase
         self.source_api_addrs = source_api_addrs
         self.source_ca_cert = source_ca_cert
@@ -3712,17 +4028,59 @@ class ModelArgs(Type):
         self.model_tag = model_tag
 
 
-class ModelCreateArgs(Type):
-    _toSchema = {'name': 'name', 'region': 'region', 'owner_tag': 'owner-tag', 'credential': 'credential', 'config': 'config'}
-    _toPy = {'name': 'name', 'region': 'region', 'owner-tag': 'owner_tag', 'credential': 'credential', 'config': 'config'}
-    def __init__(self, config=None, credential=None, name=None, owner_tag=None, region=None):
+class TargetPrechecksArgs(Type):
+    _toSchema = {'build': 'Build', 'patch': 'Patch', 'tag': 'Tag', 'minor': 'Minor', 'major': 'Major'}
+    _toPy = {'Tag': 'tag', 'Major': 'major', 'Patch': 'patch', 'Minor': 'minor', 'Build': 'build'}
+    def __init__(self, build=None, major=None, minor=None, patch=None, tag=None):
         '''
-        config : typing.Mapping[str, typing.Any]
+        build : int
+        major : int
+        minor : int
+        patch : int
+        tag : str
+        '''
+        self.build = build
+        self.major = major
+        self.minor = minor
+        self.patch = patch
+        self.tag = tag
+
+
+class MapResult(Type):
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
+    def __init__(self, error=None, result=None):
+        '''
+        error : Error
+        result : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        '''
+        self.error = Error.from_json(error) if error else None
+        self.result = result
+
+
+class MapResults(Type):
+    _toSchema = {'results': 'results'}
+    _toPy = {'results': 'results'}
+    def __init__(self, results=None):
+        '''
+        results : typing.Sequence<+T_co>[~MapResult]<~MapResult>
+        '''
+        self.results = [MapResult.from_json(o) for o in results or []]
+
+
+class ModelCreateArgs(Type):
+    _toSchema = {'config': 'config', 'cloud_tag': 'cloud-tag', 'owner_tag': 'owner-tag', 'region': 'region', 'name': 'name', 'credential': 'credential'}
+    _toPy = {'config': 'config', 'region': 'region', 'name': 'name', 'owner-tag': 'owner_tag', 'cloud-tag': 'cloud_tag', 'credential': 'credential'}
+    def __init__(self, cloud_tag=None, config=None, credential=None, name=None, owner_tag=None, region=None):
+        '''
+        cloud_tag : str
+        config : typing.Mapping<~KT, +VT_co>[str, typing.Any]
         credential : str
         name : str
         owner_tag : str
         region : str
         '''
+        self.cloud_tag = cloud_tag
         self.config = config
         self.credential = credential
         self.name = name
@@ -3731,8 +4089,8 @@ class ModelCreateArgs(Type):
 
 
 class ModelInfoResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -3747,14 +4105,14 @@ class ModelInfoResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~ModelInfoResult]
+        results : typing.Sequence<+T_co>[~ModelInfoResult]<~ModelInfoResult>
         '''
         self.results = [ModelInfoResult.from_json(o) for o in results or []]
 
 
 class ModifyModelAccess(Type):
-    _toSchema = {'access': 'access', 'user_tag': 'user-tag', 'model_tag': 'model-tag', 'action': 'action'}
-    _toPy = {'access': 'access', 'model-tag': 'model_tag', 'action': 'action', 'user-tag': 'user_tag'}
+    _toSchema = {'model_tag': 'model-tag', 'access': 'access', 'action': 'action', 'user_tag': 'user-tag'}
+    _toPy = {'model-tag': 'model_tag', 'access': 'access', 'action': 'action', 'user-tag': 'user_tag'}
     def __init__(self, access=None, action=None, model_tag=None, user_tag=None):
         '''
         access : str
@@ -3773,14 +4131,14 @@ class ModifyModelAccessRequest(Type):
     _toPy = {'changes': 'changes'}
     def __init__(self, changes=None):
         '''
-        changes : typing.Sequence[~ModifyModelAccess]
+        changes : typing.Sequence<+T_co>[~ModifyModelAccess]<~ModifyModelAccess>
         '''
         self.changes = [ModifyModelAccess.from_json(o) for o in changes or []]
 
 
 class ConstraintsResult(Type):
-    _toSchema = {'error': 'error', 'constraints': 'constraints'}
-    _toPy = {'error': 'error', 'constraints': 'constraints'}
+    _toSchema = {'constraints': 'constraints', 'error': 'error'}
+    _toPy = {'constraints': 'constraints', 'error': 'error'}
     def __init__(self, constraints=None, error=None):
         '''
         constraints : Value
@@ -3795,14 +4153,14 @@ class ConstraintsResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~ConstraintsResult]
+        results : typing.Sequence<+T_co>[~ConstraintsResult]<~ConstraintsResult>
         '''
         self.results = [ConstraintsResult.from_json(o) for o in results or []]
 
 
 class ContainerConfig(Type):
-    _toSchema = {'apt_proxy': 'apt-proxy', 'updatebehavior': 'UpdateBehavior', 'proxy': 'proxy', 'provider_type': 'provider-type', 'apt_mirror': 'apt-mirror', 'ssl_hostname_verification': 'ssl-hostname-verification', 'authorized_keys': 'authorized-keys'}
-    _toPy = {'proxy': 'proxy', 'UpdateBehavior': 'updatebehavior', 'provider-type': 'provider_type', 'authorized-keys': 'authorized_keys', 'ssl-hostname-verification': 'ssl_hostname_verification', 'apt-proxy': 'apt_proxy', 'apt-mirror': 'apt_mirror'}
+    _toSchema = {'updatebehavior': 'UpdateBehavior', 'authorized_keys': 'authorized-keys', 'apt_mirror': 'apt-mirror', 'proxy': 'proxy', 'ssl_hostname_verification': 'ssl-hostname-verification', 'provider_type': 'provider-type', 'apt_proxy': 'apt-proxy'}
+    _toPy = {'ssl-hostname-verification': 'ssl_hostname_verification', 'apt-proxy': 'apt_proxy', 'proxy': 'proxy', 'apt-mirror': 'apt_mirror', 'UpdateBehavior': 'updatebehavior', 'authorized-keys': 'authorized_keys', 'provider-type': 'provider_type'}
     def __init__(self, updatebehavior=None, apt_mirror=None, apt_proxy=None, authorized_keys=None, provider_type=None, proxy=None, ssl_hostname_verification=None):
         '''
         updatebehavior : UpdateBehavior
@@ -3827,7 +4185,7 @@ class ContainerManagerConfig(Type):
     _toPy = {'config': 'config'}
     def __init__(self, config=None):
         '''
-        config : typing.Mapping[str, str]
+        config : typing.Mapping<~KT, +VT_co>[str, str]
         '''
         self.config = config
 
@@ -3843,12 +4201,12 @@ class ContainerManagerConfigParams(Type):
 
 
 class DistributionGroupResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
-        result : typing.Sequence[str]
+        result : typing.Sequence<+T_co>[str]
         '''
         self.error = Error.from_json(error) if error else None
         self.result = result
@@ -3859,30 +4217,30 @@ class DistributionGroupResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~DistributionGroupResult]
+        results : typing.Sequence<+T_co>[~DistributionGroupResult]<~DistributionGroupResult>
         '''
         self.results = [DistributionGroupResult.from_json(o) for o in results or []]
 
 
 class InstanceInfo(Type):
-    _toSchema = {'network_config': 'network-config', 'volume_attachments': 'volume-attachments', 'nonce': 'nonce', 'tag': 'tag', 'characteristics': 'characteristics', 'volumes': 'volumes', 'instance_id': 'instance-id'}
-    _toPy = {'nonce': 'nonce', 'tag': 'tag', 'network-config': 'network_config', 'characteristics': 'characteristics', 'instance-id': 'instance_id', 'volume-attachments': 'volume_attachments', 'volumes': 'volumes'}
+    _toSchema = {'volumes': 'volumes', 'nonce': 'nonce', 'characteristics': 'characteristics', 'instance_id': 'instance-id', 'network_config': 'network-config', 'tag': 'tag', 'volume_attachments': 'volume-attachments'}
+    _toPy = {'network-config': 'network_config', 'nonce': 'nonce', 'characteristics': 'characteristics', 'instance-id': 'instance_id', 'tag': 'tag', 'volumes': 'volumes', 'volume-attachments': 'volume_attachments'}
     def __init__(self, characteristics=None, instance_id=None, network_config=None, nonce=None, tag=None, volume_attachments=None, volumes=None):
         '''
         characteristics : HardwareCharacteristics
         instance_id : str
-        network_config : typing.Sequence[~NetworkConfig]
+        network_config : typing.Sequence<+T_co>[~NetworkConfig]<~NetworkConfig>
         nonce : str
         tag : str
-        volume_attachments : typing.Mapping[str, ~VolumeAttachmentInfo]
-        volumes : typing.Sequence[~Volume]
+        volume_attachments : typing.Mapping<~KT, +VT_co>[str, ~VolumeAttachmentInfo]<~VolumeAttachmentInfo>
+        volumes : typing.Sequence<+T_co>[~Volume]<~Volume>
         '''
         self.characteristics = HardwareCharacteristics.from_json(characteristics) if characteristics else None
         self.instance_id = instance_id
         self.network_config = [NetworkConfig.from_json(o) for o in network_config or []]
         self.nonce = nonce
         self.tag = tag
-        self.volume_attachments = {k: VolumeAttachmentInfo.from_json(v) for k, v in (volume_attachments or dict()).items()}
+        self.volume_attachments = volume_attachments
         self.volumes = [Volume.from_json(o) for o in volumes or []]
 
 
@@ -3891,7 +4249,7 @@ class InstancesInfo(Type):
     _toPy = {'machines': 'machines'}
     def __init__(self, machines=None):
         '''
-        machines : typing.Sequence[~InstanceInfo]
+        machines : typing.Sequence<+T_co>[~InstanceInfo]<~InstanceInfo>
         '''
         self.machines = [InstanceInfo.from_json(o) for o in machines or []]
 
@@ -3901,7 +4259,7 @@ class MachineContainers(Type):
     _toPy = {'machine-tag': 'machine_tag', 'container-types': 'container_types'}
     def __init__(self, container_types=None, machine_tag=None):
         '''
-        container_types : typing.Sequence[str]
+        container_types : typing.Sequence<+T_co>[str]
         machine_tag : str
         '''
         self.container_types = container_types
@@ -3913,18 +4271,18 @@ class MachineContainersParams(Type):
     _toPy = {'params': 'params'}
     def __init__(self, params=None):
         '''
-        params : typing.Sequence[~MachineContainers]
+        params : typing.Sequence<+T_co>[~MachineContainers]<~MachineContainers>
         '''
         self.params = [MachineContainers.from_json(o) for o in params or []]
 
 
 class MachineNetworkConfigResult(Type):
-    _toSchema = {'error': 'error', 'info': 'info'}
-    _toPy = {'error': 'error', 'info': 'info'}
+    _toSchema = {'info': 'info', 'error': 'error'}
+    _toPy = {'info': 'info', 'error': 'error'}
     def __init__(self, error=None, info=None):
         '''
         error : Error
-        info : typing.Sequence[~NetworkConfig]
+        info : typing.Sequence<+T_co>[~NetworkConfig]<~NetworkConfig>
         '''
         self.error = Error.from_json(error) if error else None
         self.info = [NetworkConfig.from_json(o) for o in info or []]
@@ -3935,26 +4293,26 @@ class MachineNetworkConfigResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~MachineNetworkConfigResult]
+        results : typing.Sequence<+T_co>[~MachineNetworkConfigResult]<~MachineNetworkConfigResult>
         '''
         self.results = [MachineNetworkConfigResult.from_json(o) for o in results or []]
 
 
 class ProvisioningInfo(Type):
-    _toSchema = {'image_metadata': 'image-metadata', 'jobs': 'jobs', 'tags': 'tags', 'constraints': 'constraints', 'placement': 'placement', 'volumes': 'volumes', 'series': 'series', 'subnets_to_zones': 'subnets-to-zones', 'controller_config': 'controller-config', 'endpoint_bindings': 'endpoint-bindings'}
-    _toPy = {'jobs': 'jobs', 'placement': 'placement', 'tags': 'tags', 'subnets-to-zones': 'subnets_to_zones', 'constraints': 'constraints', 'endpoint-bindings': 'endpoint_bindings', 'image-metadata': 'image_metadata', 'controller-config': 'controller_config', 'series': 'series', 'volumes': 'volumes'}
+    _toSchema = {'tags': 'tags', 'volumes': 'volumes', 'controller_config': 'controller-config', 'constraints': 'constraints', 'series': 'series', 'placement': 'placement', 'endpoint_bindings': 'endpoint-bindings', 'subnets_to_zones': 'subnets-to-zones', 'image_metadata': 'image-metadata', 'jobs': 'jobs'}
+    _toPy = {'image-metadata': 'image_metadata', 'volumes': 'volumes', 'constraints': 'constraints', 'series': 'series', 'subnets-to-zones': 'subnets_to_zones', 'placement': 'placement', 'controller-config': 'controller_config', 'endpoint-bindings': 'endpoint_bindings', 'jobs': 'jobs', 'tags': 'tags'}
     def __init__(self, constraints=None, controller_config=None, endpoint_bindings=None, image_metadata=None, jobs=None, placement=None, series=None, subnets_to_zones=None, tags=None, volumes=None):
         '''
         constraints : Value
-        controller_config : typing.Mapping[str, typing.Any]
-        endpoint_bindings : typing.Mapping[str, str]
-        image_metadata : typing.Sequence[~CloudImageMetadata]
-        jobs : typing.Sequence[str]
+        controller_config : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        endpoint_bindings : typing.Mapping<~KT, +VT_co>[str, str]
+        image_metadata : typing.Sequence<+T_co>[~CloudImageMetadata]<~CloudImageMetadata>
+        jobs : typing.Sequence<+T_co>[str]
         placement : str
         series : str
-        subnets_to_zones : typing.Sequence[str]
-        tags : typing.Mapping[str, str]
-        volumes : typing.Sequence[~VolumeParams]
+        subnets_to_zones : typing.Sequence<+T_co>[str]
+        tags : typing.Mapping<~KT, +VT_co>[str, str]
+        volumes : typing.Sequence<+T_co>[~VolumeParams]<~VolumeParams>
         '''
         self.constraints = Value.from_json(constraints) if constraints else None
         self.controller_config = controller_config
@@ -3969,8 +4327,8 @@ class ProvisioningInfo(Type):
 
 
 class ProvisioningInfoResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -3985,14 +4343,14 @@ class ProvisioningInfoResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~ProvisioningInfoResult]
+        results : typing.Sequence<+T_co>[~ProvisioningInfoResult]<~ProvisioningInfoResult>
         '''
         self.results = [ProvisioningInfoResult.from_json(o) for o in results or []]
 
 
 class Settings(Type):
-    _toSchema = {'ftp': 'Ftp', 'https': 'Https', 'http': 'Http', 'noproxy': 'NoProxy'}
-    _toPy = {'Ftp': 'ftp', 'Http': 'http', 'Https': 'https', 'NoProxy': 'noproxy'}
+    _toSchema = {'https': 'Https', 'ftp': 'Ftp', 'noproxy': 'NoProxy', 'http': 'Http'}
+    _toPy = {'Http': 'http', 'Https': 'https', 'Ftp': 'ftp', 'NoProxy': 'noproxy'}
     def __init__(self, ftp=None, http=None, https=None, noproxy=None):
         '''
         ftp : str
@@ -4007,13 +4365,13 @@ class Settings(Type):
 
 
 class ToolsResult(Type):
-    _toSchema = {'tools': 'tools', 'disable_ssl_hostname_verification': 'disable-ssl-hostname-verification', 'error': 'error'}
-    _toPy = {'disable-ssl-hostname-verification': 'disable_ssl_hostname_verification', 'error': 'error', 'tools': 'tools'}
+    _toSchema = {'disable_ssl_hostname_verification': 'disable-ssl-hostname-verification', 'tools': 'tools', 'error': 'error'}
+    _toPy = {'disable-ssl-hostname-verification': 'disable_ssl_hostname_verification', 'tools': 'tools', 'error': 'error'}
     def __init__(self, disable_ssl_hostname_verification=None, error=None, tools=None):
         '''
         disable_ssl_hostname_verification : bool
         error : Error
-        tools : typing.Sequence[~Tools]
+        tools : typing.Sequence<+T_co>[~Tools]<~Tools>
         '''
         self.disable_ssl_hostname_verification = disable_ssl_hostname_verification
         self.error = Error.from_json(error) if error else None
@@ -4025,14 +4383,14 @@ class ToolsResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~ToolsResult]
+        results : typing.Sequence<+T_co>[~ToolsResult]<~ToolsResult>
         '''
         self.results = [ToolsResult.from_json(o) for o in results or []]
 
 
 class UpdateBehavior(Type):
     _toSchema = {'enable_os_upgrade': 'enable-os-upgrade', 'enable_os_refresh_update': 'enable-os-refresh-update'}
-    _toPy = {'enable-os-upgrade': 'enable_os_upgrade', 'enable-os-refresh-update': 'enable_os_refresh_update'}
+    _toPy = {'enable-os-refresh-update': 'enable_os_refresh_update', 'enable-os-upgrade': 'enable_os_upgrade'}
     def __init__(self, enable_os_refresh_update=None, enable_os_upgrade=None):
         '''
         enable_os_refresh_update : bool
@@ -4044,7 +4402,7 @@ class UpdateBehavior(Type):
 
 class Volume(Type):
     _toSchema = {'info': 'info', 'volume_tag': 'volume-tag'}
-    _toPy = {'volume-tag': 'volume_tag', 'info': 'info'}
+    _toPy = {'info': 'info', 'volume-tag': 'volume_tag'}
     def __init__(self, info=None, volume_tag=None):
         '''
         info : VolumeInfo
@@ -4055,8 +4413,8 @@ class Volume(Type):
 
 
 class VolumeAttachmentInfo(Type):
-    _toSchema = {'bus_address': 'bus-address', 'device_link': 'device-link', 'read_only': 'read-only', 'device_name': 'device-name'}
-    _toPy = {'device-link': 'device_link', 'bus-address': 'bus_address', 'device-name': 'device_name', 'read-only': 'read_only'}
+    _toSchema = {'bus_address': 'bus-address', 'device_name': 'device-name', 'device_link': 'device-link', 'read_only': 'read-only'}
+    _toPy = {'device-link': 'device_link', 'read-only': 'read_only', 'device-name': 'device_name', 'bus-address': 'bus_address'}
     def __init__(self, bus_address=None, device_link=None, device_name=None, read_only=None):
         '''
         bus_address : str
@@ -4071,8 +4429,8 @@ class VolumeAttachmentInfo(Type):
 
 
 class VolumeAttachmentParams(Type):
-    _toSchema = {'volume_id': 'volume-id', 'machine_tag': 'machine-tag', 'instance_id': 'instance-id', 'provider': 'provider', 'volume_tag': 'volume-tag', 'read_only': 'read-only'}
-    _toPy = {'machine-tag': 'machine_tag', 'volume-tag': 'volume_tag', 'volume-id': 'volume_id', 'provider': 'provider', 'read-only': 'read_only', 'instance-id': 'instance_id'}
+    _toSchema = {'read_only': 'read-only', 'volume_id': 'volume-id', 'instance_id': 'instance-id', 'provider': 'provider', 'volume_tag': 'volume-tag', 'machine_tag': 'machine-tag'}
+    _toPy = {'instance-id': 'instance_id', 'volume-id': 'volume_id', 'read-only': 'read_only', 'machine-tag': 'machine_tag', 'provider': 'provider', 'volume-tag': 'volume_tag'}
     def __init__(self, instance_id=None, machine_tag=None, provider=None, read_only=None, volume_id=None, volume_tag=None):
         '''
         instance_id : str
@@ -4091,8 +4449,8 @@ class VolumeAttachmentParams(Type):
 
 
 class VolumeInfo(Type):
-    _toSchema = {'volume_id': 'volume-id', 'persistent': 'persistent', 'size': 'size', 'hardware_id': 'hardware-id'}
-    _toPy = {'hardware-id': 'hardware_id', 'persistent': 'persistent', 'size': 'size', 'volume-id': 'volume_id'}
+    _toSchema = {'hardware_id': 'hardware-id', 'persistent': 'persistent', 'volume_id': 'volume-id', 'size': 'size'}
+    _toPy = {'persistent': 'persistent', 'size': 'size', 'volume-id': 'volume_id', 'hardware-id': 'hardware_id'}
     def __init__(self, hardware_id=None, persistent=None, size=None, volume_id=None):
         '''
         hardware_id : str
@@ -4107,15 +4465,15 @@ class VolumeInfo(Type):
 
 
 class VolumeParams(Type):
-    _toSchema = {'tags': 'tags', 'provider': 'provider', 'size': 'size', 'attachment': 'attachment', 'attributes': 'attributes', 'volume_tag': 'volume-tag'}
-    _toPy = {'volume-tag': 'volume_tag', 'tags': 'tags', 'provider': 'provider', 'size': 'size', 'attachment': 'attachment', 'attributes': 'attributes'}
+    _toSchema = {'attachment': 'attachment', 'size': 'size', 'tags': 'tags', 'attributes': 'attributes', 'provider': 'provider', 'volume_tag': 'volume-tag'}
+    _toPy = {'attachment': 'attachment', 'size': 'size', 'tags': 'tags', 'attributes': 'attributes', 'provider': 'provider', 'volume-tag': 'volume_tag'}
     def __init__(self, attachment=None, attributes=None, provider=None, size=None, tags=None, volume_tag=None):
         '''
         attachment : VolumeAttachmentParams
-        attributes : typing.Mapping[str, typing.Any]
+        attributes : typing.Mapping<~KT, +VT_co>[str, typing.Any]
         provider : str
         size : int
-        tags : typing.Mapping[str, str]
+        tags : typing.Mapping<~KT, +VT_co>[str, str]
         volume_tag : str
         '''
         self.attachment = VolumeAttachmentParams.from_json(attachment) if attachment else None
@@ -4143,14 +4501,14 @@ class WatchContainers(Type):
     _toPy = {'params': 'params'}
     def __init__(self, params=None):
         '''
-        params : typing.Sequence[~WatchContainer]
+        params : typing.Sequence<+T_co>[~WatchContainer]<~WatchContainer>
         '''
         self.params = [WatchContainer.from_json(o) for o in params or []]
 
 
 class ProxyConfig(Type):
-    _toSchema = {'ftp': 'ftp', 'no_proxy': 'no-proxy', 'https': 'https', 'http': 'http'}
-    _toPy = {'ftp': 'ftp', 'no-proxy': 'no_proxy', 'https': 'https', 'http': 'http'}
+    _toSchema = {'https': 'https', 'ftp': 'ftp', 'no_proxy': 'no-proxy', 'http': 'http'}
+    _toPy = {'https': 'https', 'ftp': 'ftp', 'no-proxy': 'no_proxy', 'http': 'http'}
     def __init__(self, ftp=None, http=None, https=None, no_proxy=None):
         '''
         ftp : str
@@ -4165,7 +4523,7 @@ class ProxyConfig(Type):
 
 
 class ProxyConfigResult(Type):
-    _toSchema = {'error': 'error', 'proxy_settings': 'proxy-settings', 'apt_proxy_settings': 'apt-proxy-settings'}
+    _toSchema = {'proxy_settings': 'proxy-settings', 'apt_proxy_settings': 'apt-proxy-settings', 'error': 'error'}
     _toPy = {'proxy-settings': 'proxy_settings', 'error': 'error', 'apt-proxy-settings': 'apt_proxy_settings'}
     def __init__(self, apt_proxy_settings=None, error=None, proxy_settings=None):
         '''
@@ -4183,14 +4541,14 @@ class ProxyConfigResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~ProxyConfigResult]
+        results : typing.Sequence<+T_co>[~ProxyConfigResult]<~ProxyConfigResult>
         '''
         self.results = [ProxyConfigResult.from_json(o) for o in results or []]
 
 
 class RebootActionResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -4205,26 +4563,26 @@ class RebootActionResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~RebootActionResult]
+        results : typing.Sequence<+T_co>[~RebootActionResult]<~RebootActionResult>
         '''
         self.results = [RebootActionResult.from_json(o) for o in results or []]
 
 
 class RelationUnitsChange(Type):
-    _toSchema = {'changed': 'changed', 'departed': 'departed'}
-    _toPy = {'changed': 'changed', 'departed': 'departed'}
+    _toSchema = {'departed': 'departed', 'changed': 'changed'}
+    _toPy = {'departed': 'departed', 'changed': 'changed'}
     def __init__(self, changed=None, departed=None):
         '''
-        changed : typing.Mapping[str, ~UnitSettings]
-        departed : typing.Sequence[str]
+        changed : typing.Mapping<~KT, +VT_co>[str, ~UnitSettings]<~UnitSettings>
+        departed : typing.Sequence<+T_co>[str]
         '''
-        self.changed = {k: UnitSettings.from_json(v) for k, v in (changed or dict()).items()}
+        self.changed = changed
         self.departed = departed
 
 
 class RelationUnitsWatchResult(Type):
-    _toSchema = {'error': 'error', 'changes': 'changes', 'watcher_id': 'watcher-id'}
-    _toPy = {'error': 'error', 'changes': 'changes', 'watcher-id': 'watcher_id'}
+    _toSchema = {'changes': 'changes', 'watcher_id': 'watcher-id', 'error': 'error'}
+    _toPy = {'watcher-id': 'watcher_id', 'changes': 'changes', 'error': 'error'}
     def __init__(self, changes=None, error=None, watcher_id=None):
         '''
         changes : RelationUnitsChange
@@ -4247,8 +4605,8 @@ class UnitSettings(Type):
 
 
 class RetryStrategy(Type):
-    _toSchema = {'min_retry_time': 'min-retry-time', 'should_retry': 'should-retry', 'retry_time_factor': 'retry-time-factor', 'max_retry_time': 'max-retry-time', 'jitter_retry_time': 'jitter-retry-time'}
-    _toPy = {'retry-time-factor': 'retry_time_factor', 'min-retry-time': 'min_retry_time', 'jitter-retry-time': 'jitter_retry_time', 'should-retry': 'should_retry', 'max-retry-time': 'max_retry_time'}
+    _toSchema = {'max_retry_time': 'max-retry-time', 'should_retry': 'should-retry', 'jitter_retry_time': 'jitter-retry-time', 'min_retry_time': 'min-retry-time', 'retry_time_factor': 'retry-time-factor'}
+    _toPy = {'max-retry-time': 'max_retry_time', 'min-retry-time': 'min_retry_time', 'jitter-retry-time': 'jitter_retry_time', 'should-retry': 'should_retry', 'retry-time-factor': 'retry_time_factor'}
     def __init__(self, jitter_retry_time=None, max_retry_time=None, min_retry_time=None, retry_time_factor=None, should_retry=None):
         '''
         jitter_retry_time : bool
@@ -4265,8 +4623,8 @@ class RetryStrategy(Type):
 
 
 class RetryStrategyResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -4281,14 +4639,14 @@ class RetryStrategyResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~RetryStrategyResult]
+        results : typing.Sequence<+T_co>[~RetryStrategyResult]<~RetryStrategyResult>
         '''
         self.results = [RetryStrategyResult.from_json(o) for o in results or []]
 
 
 class SSHAddressResult(Type):
-    _toSchema = {'address': 'address', 'error': 'error'}
-    _toPy = {'address': 'address', 'error': 'error'}
+    _toSchema = {'error': 'error', 'address': 'address'}
+    _toPy = {'error': 'error', 'address': 'address'}
     def __init__(self, address=None, error=None):
         '''
         address : str
@@ -4303,7 +4661,7 @@ class SSHAddressResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~SSHAddressResult]
+        results : typing.Sequence<+T_co>[~SSHAddressResult]<~SSHAddressResult>
         '''
         self.results = [SSHAddressResult.from_json(o) for o in results or []]
 
@@ -4319,12 +4677,12 @@ class SSHProxyResult(Type):
 
 
 class SSHPublicKeysResult(Type):
-    _toSchema = {'error': 'error', 'public_keys': 'public-keys'}
-    _toPy = {'error': 'error', 'public-keys': 'public_keys'}
+    _toSchema = {'public_keys': 'public-keys', 'error': 'error'}
+    _toPy = {'public-keys': 'public_keys', 'error': 'error'}
     def __init__(self, error=None, public_keys=None):
         '''
         error : Error
-        public_keys : typing.Sequence[str]
+        public_keys : typing.Sequence<+T_co>[str]
         '''
         self.error = Error.from_json(error) if error else None
         self.public_keys = public_keys
@@ -4335,14 +4693,14 @@ class SSHPublicKeysResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~SSHPublicKeysResult]
+        results : typing.Sequence<+T_co>[~SSHPublicKeysResult]<~SSHPublicKeysResult>
         '''
         self.results = [SSHPublicKeysResult.from_json(o) for o in results or []]
 
 
 class SingularClaim(Type):
     _toSchema = {'model_tag': 'model-tag', 'duration': 'duration', 'controller_tag': 'controller-tag'}
-    _toPy = {'model-tag': 'model_tag', 'duration': 'duration', 'controller-tag': 'controller_tag'}
+    _toPy = {'model-tag': 'model_tag', 'controller-tag': 'controller_tag', 'duration': 'duration'}
     def __init__(self, controller_tag=None, duration=None, model_tag=None):
         '''
         controller_tag : str
@@ -4359,7 +4717,7 @@ class SingularClaims(Type):
     _toPy = {'claims': 'claims'}
     def __init__(self, claims=None):
         '''
-        claims : typing.Sequence[~SingularClaim]
+        claims : typing.Sequence<+T_co>[~SingularClaim]<~SingularClaim>
         '''
         self.claims = [SingularClaim.from_json(o) for o in claims or []]
 
@@ -4369,19 +4727,19 @@ class ListSpacesResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~Space]
+        results : typing.Sequence<+T_co>[~Space]<~Space>
         '''
         self.results = [Space.from_json(o) for o in results or []]
 
 
 class Space(Type):
-    _toSchema = {'name': 'name', 'error': 'error', 'subnets': 'subnets'}
-    _toPy = {'name': 'name', 'error': 'error', 'subnets': 'subnets'}
+    _toSchema = {'name': 'name', 'subnets': 'subnets', 'error': 'error'}
+    _toPy = {'name': 'name', 'subnets': 'subnets', 'error': 'error'}
     def __init__(self, error=None, name=None, subnets=None):
         '''
         error : Error
         name : str
-        subnets : typing.Sequence[~Subnet]
+        subnets : typing.Sequence<+T_co>[~Subnet]<~Subnet>
         '''
         self.error = Error.from_json(error) if error else None
         self.name = name
@@ -4389,7 +4747,7 @@ class Space(Type):
 
 
 class StatusHistoryPruneArgs(Type):
-    _toSchema = {'max_history_mb': 'max-history-mb', 'max_history_time': 'max-history-time'}
+    _toSchema = {'max_history_time': 'max-history-time', 'max_history_mb': 'max-history-mb'}
     _toPy = {'max-history-mb': 'max_history_mb', 'max-history-time': 'max_history_time'}
     def __init__(self, max_history_mb=None, max_history_time=None):
         '''
@@ -4401,7 +4759,7 @@ class StatusHistoryPruneArgs(Type):
 
 
 class FilesystemAttachmentInfo(Type):
-    _toSchema = {'mount_point': 'mount-point', 'read_only': 'read-only'}
+    _toSchema = {'read_only': 'read-only', 'mount_point': 'mount-point'}
     _toPy = {'read-only': 'read_only', 'mount-point': 'mount_point'}
     def __init__(self, mount_point=None, read_only=None):
         '''
@@ -4413,32 +4771,32 @@ class FilesystemAttachmentInfo(Type):
 
 
 class FilesystemDetails(Type):
-    _toSchema = {'status': 'status', 'filesystem_tag': 'filesystem-tag', 'info': 'info', 'storage': 'storage', 'machine_attachments': 'machine-attachments', 'volume_tag': 'volume-tag'}
-    _toPy = {'status': 'status', 'volume-tag': 'volume_tag', 'info': 'info', 'filesystem-tag': 'filesystem_tag', 'machine-attachments': 'machine_attachments', 'storage': 'storage'}
+    _toSchema = {'info': 'info', 'machine_attachments': 'machine-attachments', 'status': 'status', 'storage': 'storage', 'filesystem_tag': 'filesystem-tag', 'volume_tag': 'volume-tag'}
+    _toPy = {'info': 'info', 'status': 'status', 'storage': 'storage', 'machine-attachments': 'machine_attachments', 'volume-tag': 'volume_tag', 'filesystem-tag': 'filesystem_tag'}
     def __init__(self, filesystem_tag=None, info=None, machine_attachments=None, status=None, storage=None, volume_tag=None):
         '''
         filesystem_tag : str
         info : FilesystemInfo
-        machine_attachments : typing.Mapping[str, ~FilesystemAttachmentInfo]
+        machine_attachments : typing.Mapping<~KT, +VT_co>[str, ~FilesystemAttachmentInfo]<~FilesystemAttachmentInfo>
         status : EntityStatus
         storage : StorageDetails
         volume_tag : str
         '''
         self.filesystem_tag = filesystem_tag
         self.info = FilesystemInfo.from_json(info) if info else None
-        self.machine_attachments = {k: FilesystemAttachmentInfo.from_json(v) for k, v in (machine_attachments or dict()).items()}
+        self.machine_attachments = machine_attachments
         self.status = EntityStatus.from_json(status) if status else None
         self.storage = StorageDetails.from_json(storage) if storage else None
         self.volume_tag = volume_tag
 
 
 class FilesystemDetailsListResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
-        result : typing.Sequence[~FilesystemDetails]
+        result : typing.Sequence<+T_co>[~FilesystemDetails]<~FilesystemDetails>
         '''
         self.error = Error.from_json(error) if error else None
         self.result = [FilesystemDetails.from_json(o) for o in result or []]
@@ -4449,7 +4807,7 @@ class FilesystemDetailsListResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~FilesystemDetailsListResult]
+        results : typing.Sequence<+T_co>[~FilesystemDetailsListResult]<~FilesystemDetailsListResult>
         '''
         self.results = [FilesystemDetailsListResult.from_json(o) for o in results or []]
 
@@ -4459,7 +4817,7 @@ class FilesystemFilter(Type):
     _toPy = {'machines': 'machines'}
     def __init__(self, machines=None):
         '''
-        machines : typing.Sequence[str]
+        machines : typing.Sequence<+T_co>[str]
         '''
         self.machines = machines
 
@@ -4469,14 +4827,14 @@ class FilesystemFilters(Type):
     _toPy = {'filters': 'filters'}
     def __init__(self, filters=None):
         '''
-        filters : typing.Sequence[~FilesystemFilter]
+        filters : typing.Sequence<+T_co>[~FilesystemFilter]<~FilesystemFilter>
         '''
         self.filters = [FilesystemFilter.from_json(o) for o in filters or []]
 
 
 class FilesystemInfo(Type):
-    _toSchema = {'filesystem_id': 'filesystem-id', 'size': 'size'}
-    _toPy = {'filesystem-id': 'filesystem_id', 'size': 'size'}
+    _toSchema = {'size': 'size', 'filesystem_id': 'filesystem-id'}
+    _toPy = {'size': 'size', 'filesystem-id': 'filesystem_id'}
     def __init__(self, filesystem_id=None, size=None):
         '''
         filesystem_id : str
@@ -4501,8 +4859,8 @@ class StorageAddParams(Type):
 
 
 class StorageAttachmentDetails(Type):
-    _toSchema = {'storage_tag': 'storage-tag', 'location': 'location', 'unit_tag': 'unit-tag', 'machine_tag': 'machine-tag'}
-    _toPy = {'machine-tag': 'machine_tag', 'location': 'location', 'storage-tag': 'storage_tag', 'unit-tag': 'unit_tag'}
+    _toSchema = {'unit_tag': 'unit-tag', 'machine_tag': 'machine-tag', 'storage_tag': 'storage-tag', 'location': 'location'}
+    _toPy = {'unit-tag': 'unit_tag', 'machine-tag': 'machine_tag', 'storage-tag': 'storage_tag', 'location': 'location'}
     def __init__(self, location=None, machine_tag=None, storage_tag=None, unit_tag=None):
         '''
         location : str
@@ -4517,8 +4875,8 @@ class StorageAttachmentDetails(Type):
 
 
 class StorageConstraints(Type):
-    _toSchema = {'size': 'size', 'count': 'count', 'pool': 'pool'}
-    _toPy = {'size': 'size', 'count': 'count', 'pool': 'pool'}
+    _toSchema = {'size': 'size', 'pool': 'pool', 'count': 'count'}
+    _toPy = {'size': 'size', 'pool': 'pool', 'count': 'count'}
     def __init__(self, count=None, pool=None, size=None):
         '''
         count : int
@@ -4531,18 +4889,18 @@ class StorageConstraints(Type):
 
 
 class StorageDetails(Type):
-    _toSchema = {'status': 'status', 'persistent': 'persistent', 'storage_tag': 'storage-tag', 'kind': 'kind', 'owner_tag': 'owner-tag', 'attachments': 'attachments'}
-    _toPy = {'status': 'status', 'persistent': 'persistent', 'storage-tag': 'storage_tag', 'kind': 'kind', 'owner-tag': 'owner_tag', 'attachments': 'attachments'}
+    _toSchema = {'kind': 'kind', 'owner_tag': 'owner-tag', 'status': 'status', 'persistent': 'persistent', 'storage_tag': 'storage-tag', 'attachments': 'attachments'}
+    _toPy = {'kind': 'kind', 'storage-tag': 'storage_tag', 'status': 'status', 'owner-tag': 'owner_tag', 'persistent': 'persistent', 'attachments': 'attachments'}
     def __init__(self, attachments=None, kind=None, owner_tag=None, persistent=None, status=None, storage_tag=None):
         '''
-        attachments : typing.Mapping[str, ~StorageAttachmentDetails]
+        attachments : typing.Mapping<~KT, +VT_co>[str, ~StorageAttachmentDetails]<~StorageAttachmentDetails>
         kind : int
         owner_tag : str
         persistent : bool
         status : EntityStatus
         storage_tag : str
         '''
-        self.attachments = {k: StorageAttachmentDetails.from_json(v) for k, v in (attachments or dict()).items()}
+        self.attachments = attachments
         self.kind = kind
         self.owner_tag = owner_tag
         self.persistent = persistent
@@ -4551,12 +4909,12 @@ class StorageDetails(Type):
 
 
 class StorageDetailsListResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
-        result : typing.Sequence[~StorageDetails]
+        result : typing.Sequence<+T_co>[~StorageDetails]<~StorageDetails>
         '''
         self.error = Error.from_json(error) if error else None
         self.result = [StorageDetails.from_json(o) for o in result or []]
@@ -4567,14 +4925,14 @@ class StorageDetailsListResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~StorageDetailsListResult]
+        results : typing.Sequence<+T_co>[~StorageDetailsListResult]<~StorageDetailsListResult>
         '''
         self.results = [StorageDetailsListResult.from_json(o) for o in results or []]
 
 
 class StorageDetailsResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -4589,7 +4947,7 @@ class StorageDetailsResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~StorageDetailsResult]
+        results : typing.Sequence<+T_co>[~StorageDetailsResult]<~StorageDetailsResult>
         '''
         self.results = [StorageDetailsResult.from_json(o) for o in results or []]
 
@@ -4609,17 +4967,17 @@ class StorageFilters(Type):
     _toPy = {'filters': 'filters'}
     def __init__(self, filters=None):
         '''
-        filters : typing.Sequence[~StorageFilter]
+        filters : typing.Sequence<+T_co>[~StorageFilter]<~StorageFilter>
         '''
         self.filters = [StorageFilter.from_json(o) for o in filters or []]
 
 
 class StoragePool(Type):
-    _toSchema = {'name': 'name', 'provider': 'provider', 'attrs': 'attrs'}
-    _toPy = {'name': 'name', 'provider': 'provider', 'attrs': 'attrs'}
+    _toSchema = {'name': 'name', 'attrs': 'attrs', 'provider': 'provider'}
+    _toPy = {'name': 'name', 'attrs': 'attrs', 'provider': 'provider'}
     def __init__(self, attrs=None, name=None, provider=None):
         '''
-        attrs : typing.Mapping[str, typing.Any]
+        attrs : typing.Mapping<~KT, +VT_co>[str, typing.Any]
         name : str
         provider : str
         '''
@@ -4633,8 +4991,8 @@ class StoragePoolFilter(Type):
     _toPy = {'names': 'names', 'providers': 'providers'}
     def __init__(self, names=None, providers=None):
         '''
-        names : typing.Sequence[str]
-        providers : typing.Sequence[str]
+        names : typing.Sequence<+T_co>[str]
+        providers : typing.Sequence<+T_co>[str]
         '''
         self.names = names
         self.providers = providers
@@ -4645,18 +5003,18 @@ class StoragePoolFilters(Type):
     _toPy = {'filters': 'filters'}
     def __init__(self, filters=None):
         '''
-        filters : typing.Sequence[~StoragePoolFilter]
+        filters : typing.Sequence<+T_co>[~StoragePoolFilter]<~StoragePoolFilter>
         '''
         self.filters = [StoragePoolFilter.from_json(o) for o in filters or []]
 
 
 class StoragePoolsResult(Type):
-    _toSchema = {'error': 'error', 'storage_pools': 'storage-pools'}
-    _toPy = {'error': 'error', 'storage-pools': 'storage_pools'}
+    _toSchema = {'storage_pools': 'storage-pools', 'error': 'error'}
+    _toPy = {'storage-pools': 'storage_pools', 'error': 'error'}
     def __init__(self, error=None, storage_pools=None):
         '''
         error : Error
-        storage_pools : typing.Sequence[~StoragePool]
+        storage_pools : typing.Sequence<+T_co>[~StoragePool]<~StoragePool>
         '''
         self.error = Error.from_json(error) if error else None
         self.storage_pools = [StoragePool.from_json(o) for o in storage_pools or []]
@@ -4667,7 +5025,7 @@ class StoragePoolsResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~StoragePoolsResult]
+        results : typing.Sequence<+T_co>[~StoragePoolsResult]<~StoragePoolsResult>
         '''
         self.results = [StoragePoolsResult.from_json(o) for o in results or []]
 
@@ -4677,36 +5035,36 @@ class StoragesAddParams(Type):
     _toPy = {'storages': 'storages'}
     def __init__(self, storages=None):
         '''
-        storages : typing.Sequence[~StorageAddParams]
+        storages : typing.Sequence<+T_co>[~StorageAddParams]<~StorageAddParams>
         '''
         self.storages = [StorageAddParams.from_json(o) for o in storages or []]
 
 
 class VolumeDetails(Type):
-    _toSchema = {'status': 'status', 'storage': 'storage', 'info': 'info', 'machine_attachments': 'machine-attachments', 'volume_tag': 'volume-tag'}
-    _toPy = {'status': 'status', 'volume-tag': 'volume_tag', 'info': 'info', 'storage': 'storage', 'machine-attachments': 'machine_attachments'}
+    _toSchema = {'info': 'info', 'machine_attachments': 'machine-attachments', 'volume_tag': 'volume-tag', 'status': 'status', 'storage': 'storage'}
+    _toPy = {'info': 'info', 'status': 'status', 'machine-attachments': 'machine_attachments', 'volume-tag': 'volume_tag', 'storage': 'storage'}
     def __init__(self, info=None, machine_attachments=None, status=None, storage=None, volume_tag=None):
         '''
         info : VolumeInfo
-        machine_attachments : typing.Mapping[str, ~VolumeAttachmentInfo]
+        machine_attachments : typing.Mapping<~KT, +VT_co>[str, ~VolumeAttachmentInfo]<~VolumeAttachmentInfo>
         status : EntityStatus
         storage : StorageDetails
         volume_tag : str
         '''
         self.info = VolumeInfo.from_json(info) if info else None
-        self.machine_attachments = {k: VolumeAttachmentInfo.from_json(v) for k, v in (machine_attachments or dict()).items()}
+        self.machine_attachments = machine_attachments
         self.status = EntityStatus.from_json(status) if status else None
         self.storage = StorageDetails.from_json(storage) if storage else None
         self.volume_tag = volume_tag
 
 
 class VolumeDetailsListResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
-        result : typing.Sequence[~VolumeDetails]
+        result : typing.Sequence<+T_co>[~VolumeDetails]<~VolumeDetails>
         '''
         self.error = Error.from_json(error) if error else None
         self.result = [VolumeDetails.from_json(o) for o in result or []]
@@ -4717,7 +5075,7 @@ class VolumeDetailsListResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~VolumeDetailsListResult]
+        results : typing.Sequence<+T_co>[~VolumeDetailsListResult]<~VolumeDetailsListResult>
         '''
         self.results = [VolumeDetailsListResult.from_json(o) for o in results or []]
 
@@ -4727,7 +5085,7 @@ class VolumeFilter(Type):
     _toPy = {'machines': 'machines'}
     def __init__(self, machines=None):
         '''
-        machines : typing.Sequence[str]
+        machines : typing.Sequence<+T_co>[str]
         '''
         self.machines = machines
 
@@ -4737,14 +5095,14 @@ class VolumeFilters(Type):
     _toPy = {'filters': 'filters'}
     def __init__(self, filters=None):
         '''
-        filters : typing.Sequence[~VolumeFilter]
+        filters : typing.Sequence<+T_co>[~VolumeFilter]<~VolumeFilter>
         '''
         self.filters = [VolumeFilter.from_json(o) for o in filters or []]
 
 
 class BlockDeviceResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -4759,14 +5117,14 @@ class BlockDeviceResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~BlockDeviceResult]
+        results : typing.Sequence<+T_co>[~BlockDeviceResult]<~BlockDeviceResult>
         '''
         self.results = [BlockDeviceResult.from_json(o) for o in results or []]
 
 
 class Filesystem(Type):
-    _toSchema = {'filesystem_tag': 'filesystem-tag', 'info': 'info', 'volume_tag': 'volume-tag'}
-    _toPy = {'volume-tag': 'volume_tag', 'info': 'info', 'filesystem-tag': 'filesystem_tag'}
+    _toSchema = {'info': 'info', 'filesystem_tag': 'filesystem-tag', 'volume_tag': 'volume-tag'}
+    _toPy = {'info': 'info', 'volume-tag': 'volume_tag', 'filesystem-tag': 'filesystem_tag'}
     def __init__(self, filesystem_tag=None, info=None, volume_tag=None):
         '''
         filesystem_tag : str
@@ -4779,8 +5137,8 @@ class Filesystem(Type):
 
 
 class FilesystemAttachment(Type):
-    _toSchema = {'filesystem_tag': 'filesystem-tag', 'info': 'info', 'machine_tag': 'machine-tag'}
-    _toPy = {'machine-tag': 'machine_tag', 'info': 'info', 'filesystem-tag': 'filesystem_tag'}
+    _toSchema = {'info': 'info', 'filesystem_tag': 'filesystem-tag', 'machine_tag': 'machine-tag'}
+    _toPy = {'info': 'info', 'machine-tag': 'machine_tag', 'filesystem-tag': 'filesystem_tag'}
     def __init__(self, filesystem_tag=None, info=None, machine_tag=None):
         '''
         filesystem_tag : str
@@ -4793,8 +5151,8 @@ class FilesystemAttachment(Type):
 
 
 class FilesystemAttachmentParams(Type):
-    _toSchema = {'mount_point': 'mount-point', 'filesystem_tag': 'filesystem-tag', 'machine_tag': 'machine-tag', 'instance_id': 'instance-id', 'provider': 'provider', 'filesystem_id': 'filesystem-id', 'read_only': 'read-only'}
-    _toPy = {'machine-tag': 'machine_tag', 'filesystem-id': 'filesystem_id', 'provider': 'provider', 'filesystem-tag': 'filesystem_tag', 'mount-point': 'mount_point', 'instance-id': 'instance_id', 'read-only': 'read_only'}
+    _toSchema = {'read_only': 'read-only', 'machine_tag': 'machine-tag', 'instance_id': 'instance-id', 'filesystem_id': 'filesystem-id', 'filesystem_tag': 'filesystem-tag', 'mount_point': 'mount-point', 'provider': 'provider'}
+    _toPy = {'instance-id': 'instance_id', 'provider': 'provider', 'read-only': 'read_only', 'machine-tag': 'machine_tag', 'filesystem-id': 'filesystem_id', 'mount-point': 'mount_point', 'filesystem-tag': 'filesystem_tag'}
     def __init__(self, filesystem_id=None, filesystem_tag=None, instance_id=None, machine_tag=None, mount_point=None, provider=None, read_only=None):
         '''
         filesystem_id : str
@@ -4815,8 +5173,8 @@ class FilesystemAttachmentParams(Type):
 
 
 class FilesystemAttachmentParamsResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -4831,14 +5189,14 @@ class FilesystemAttachmentParamsResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~FilesystemAttachmentParamsResult]
+        results : typing.Sequence<+T_co>[~FilesystemAttachmentParamsResult]<~FilesystemAttachmentParamsResult>
         '''
         self.results = [FilesystemAttachmentParamsResult.from_json(o) for o in results or []]
 
 
 class FilesystemAttachmentResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -4853,7 +5211,7 @@ class FilesystemAttachmentResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~FilesystemAttachmentResult]
+        results : typing.Sequence<+T_co>[~FilesystemAttachmentResult]<~FilesystemAttachmentResult>
         '''
         self.results = [FilesystemAttachmentResult.from_json(o) for o in results or []]
 
@@ -4863,22 +5221,22 @@ class FilesystemAttachments(Type):
     _toPy = {'filesystem-attachments': 'filesystem_attachments'}
     def __init__(self, filesystem_attachments=None):
         '''
-        filesystem_attachments : typing.Sequence[~FilesystemAttachment]
+        filesystem_attachments : typing.Sequence<+T_co>[~FilesystemAttachment]<~FilesystemAttachment>
         '''
         self.filesystem_attachments = [FilesystemAttachment.from_json(o) for o in filesystem_attachments or []]
 
 
 class FilesystemParams(Type):
-    _toSchema = {'filesystem_tag': 'filesystem-tag', 'tags': 'tags', 'provider': 'provider', 'size': 'size', 'attachment': 'attachment', 'attributes': 'attributes', 'volume_tag': 'volume-tag'}
-    _toPy = {'volume-tag': 'volume_tag', 'tags': 'tags', 'filesystem-tag': 'filesystem_tag', 'provider': 'provider', 'size': 'size', 'attachment': 'attachment', 'attributes': 'attributes'}
+    _toSchema = {'attachment': 'attachment', 'size': 'size', 'tags': 'tags', 'attributes': 'attributes', 'filesystem_tag': 'filesystem-tag', 'volume_tag': 'volume-tag', 'provider': 'provider'}
+    _toPy = {'attachment': 'attachment', 'size': 'size', 'tags': 'tags', 'attributes': 'attributes', 'provider': 'provider', 'volume-tag': 'volume_tag', 'filesystem-tag': 'filesystem_tag'}
     def __init__(self, attachment=None, attributes=None, filesystem_tag=None, provider=None, size=None, tags=None, volume_tag=None):
         '''
         attachment : FilesystemAttachmentParams
-        attributes : typing.Mapping[str, typing.Any]
+        attributes : typing.Mapping<~KT, +VT_co>[str, typing.Any]
         filesystem_tag : str
         provider : str
         size : int
-        tags : typing.Mapping[str, str]
+        tags : typing.Mapping<~KT, +VT_co>[str, str]
         volume_tag : str
         '''
         self.attachment = FilesystemAttachmentParams.from_json(attachment) if attachment else None
@@ -4891,8 +5249,8 @@ class FilesystemParams(Type):
 
 
 class FilesystemParamsResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -4907,14 +5265,14 @@ class FilesystemParamsResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~FilesystemParamsResult]
+        results : typing.Sequence<+T_co>[~FilesystemParamsResult]<~FilesystemParamsResult>
         '''
         self.results = [FilesystemParamsResult.from_json(o) for o in results or []]
 
 
 class FilesystemResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -4929,7 +5287,7 @@ class FilesystemResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~FilesystemResult]
+        results : typing.Sequence<+T_co>[~FilesystemResult]<~FilesystemResult>
         '''
         self.results = [FilesystemResult.from_json(o) for o in results or []]
 
@@ -4939,7 +5297,7 @@ class Filesystems(Type):
     _toPy = {'filesystems': 'filesystems'}
     def __init__(self, filesystems=None):
         '''
-        filesystems : typing.Sequence[~Filesystem]
+        filesystems : typing.Sequence<+T_co>[~Filesystem]<~Filesystem>
         '''
         self.filesystems = [Filesystem.from_json(o) for o in filesystems or []]
 
@@ -4949,7 +5307,7 @@ class MachineStorageIds(Type):
     _toPy = {'ids': 'ids'}
     def __init__(self, ids=None):
         '''
-        ids : typing.Sequence[~MachineStorageId]
+        ids : typing.Sequence<+T_co>[~MachineStorageId]<~MachineStorageId>
         '''
         self.ids = [MachineStorageId.from_json(o) for o in ids or []]
 
@@ -4959,14 +5317,14 @@ class MachineStorageIdsWatchResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~MachineStorageIdsWatchResult]
+        results : typing.Sequence<+T_co>[~MachineStorageIdsWatchResult]<~MachineStorageIdsWatchResult>
         '''
         self.results = [MachineStorageIdsWatchResult.from_json(o) for o in results or []]
 
 
 class VolumeAttachment(Type):
     _toSchema = {'info': 'info', 'machine_tag': 'machine-tag', 'volume_tag': 'volume-tag'}
-    _toPy = {'machine-tag': 'machine_tag', 'volume-tag': 'volume_tag', 'info': 'info'}
+    _toPy = {'info': 'info', 'machine-tag': 'machine_tag', 'volume-tag': 'volume_tag'}
     def __init__(self, info=None, machine_tag=None, volume_tag=None):
         '''
         info : VolumeAttachmentInfo
@@ -4979,8 +5337,8 @@ class VolumeAttachment(Type):
 
 
 class VolumeAttachmentParamsResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -4995,14 +5353,14 @@ class VolumeAttachmentParamsResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~VolumeAttachmentParamsResult]
+        results : typing.Sequence<+T_co>[~VolumeAttachmentParamsResult]<~VolumeAttachmentParamsResult>
         '''
         self.results = [VolumeAttachmentParamsResult.from_json(o) for o in results or []]
 
 
 class VolumeAttachmentResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -5017,7 +5375,7 @@ class VolumeAttachmentResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~VolumeAttachmentResult]
+        results : typing.Sequence<+T_co>[~VolumeAttachmentResult]<~VolumeAttachmentResult>
         '''
         self.results = [VolumeAttachmentResult.from_json(o) for o in results or []]
 
@@ -5027,14 +5385,14 @@ class VolumeAttachments(Type):
     _toPy = {'volume-attachments': 'volume_attachments'}
     def __init__(self, volume_attachments=None):
         '''
-        volume_attachments : typing.Sequence[~VolumeAttachment]
+        volume_attachments : typing.Sequence<+T_co>[~VolumeAttachment]<~VolumeAttachment>
         '''
         self.volume_attachments = [VolumeAttachment.from_json(o) for o in volume_attachments or []]
 
 
 class VolumeParamsResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -5049,14 +5407,14 @@ class VolumeParamsResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~VolumeParamsResult]
+        results : typing.Sequence<+T_co>[~VolumeParamsResult]<~VolumeParamsResult>
         '''
         self.results = [VolumeParamsResult.from_json(o) for o in results or []]
 
 
 class VolumeResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -5071,7 +5429,7 @@ class VolumeResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~VolumeResult]
+        results : typing.Sequence<+T_co>[~VolumeResult]<~VolumeResult>
         '''
         self.results = [VolumeResult.from_json(o) for o in results or []]
 
@@ -5081,14 +5439,14 @@ class Volumes(Type):
     _toPy = {'volumes': 'volumes'}
     def __init__(self, volumes=None):
         '''
-        volumes : typing.Sequence[~Volume]
+        volumes : typing.Sequence<+T_co>[~Volume]<~Volume>
         '''
         self.volumes = [Volume.from_json(o) for o in volumes or []]
 
 
 class SpaceResult(Type):
-    _toSchema = {'error': 'error', 'tag': 'tag'}
-    _toPy = {'error': 'error', 'tag': 'tag'}
+    _toSchema = {'tag': 'tag', 'error': 'error'}
+    _toPy = {'tag': 'tag', 'error': 'error'}
     def __init__(self, error=None, tag=None):
         '''
         error : Error
@@ -5103,7 +5461,7 @@ class SpaceResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~SpaceResult]
+        results : typing.Sequence<+T_co>[~SpaceResult]<~SpaceResult>
         '''
         self.results = [SpaceResult.from_json(o) for o in results or []]
 
@@ -5127,14 +5485,14 @@ class ZoneResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~ZoneResult]
+        results : typing.Sequence<+T_co>[~ZoneResult]<~ZoneResult>
         '''
         self.results = [ZoneResult.from_json(o) for o in results or []]
 
 
 class UndertakerModelInfo(Type):
-    _toSchema = {'name': 'name', 'uuid': 'uuid', 'is_system': 'is-system', 'global_name': 'global-name', 'life': 'life'}
-    _toPy = {'name': 'name', 'is-system': 'is_system', 'life': 'life', 'global-name': 'global_name', 'uuid': 'uuid'}
+    _toSchema = {'is_system': 'is-system', 'life': 'life', 'uuid': 'uuid', 'global_name': 'global-name', 'name': 'name'}
+    _toPy = {'global-name': 'global_name', 'is-system': 'is_system', 'uuid': 'uuid', 'life': 'life', 'name': 'name'}
     def __init__(self, global_name=None, is_system=None, life=None, name=None, uuid=None):
         '''
         global_name : str
@@ -5151,8 +5509,8 @@ class UndertakerModelInfo(Type):
 
 
 class UndertakerModelInfoResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -5163,17 +5521,17 @@ class UndertakerModelInfoResult(Type):
 
 
 class ApplicationStatusResult(Type):
-    _toSchema = {'error': 'error', 'units': 'units', 'application': 'application'}
-    _toPy = {'error': 'error', 'units': 'units', 'application': 'application'}
+    _toSchema = {'application': 'application', 'units': 'units', 'error': 'error'}
+    _toPy = {'application': 'application', 'units': 'units', 'error': 'error'}
     def __init__(self, application=None, error=None, units=None):
         '''
         application : StatusResult
         error : Error
-        units : typing.Mapping[str, ~StatusResult]
+        units : typing.Mapping<~KT, +VT_co>[str, ~StatusResult]<~StatusResult>
         '''
         self.application = StatusResult.from_json(application) if application else None
         self.error = Error.from_json(error) if error else None
-        self.units = {k: StatusResult.from_json(v) for k, v in (units or dict()).items()}
+        self.units = units
 
 
 class ApplicationStatusResults(Type):
@@ -5181,7 +5539,7 @@ class ApplicationStatusResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~ApplicationStatusResult]
+        results : typing.Sequence<+T_co>[~ApplicationStatusResult]<~ApplicationStatusResult>
         '''
         self.results = [ApplicationStatusResult.from_json(o) for o in results or []]
 
@@ -5191,18 +5549,18 @@ class CharmURLs(Type):
     _toPy = {'urls': 'urls'}
     def __init__(self, urls=None):
         '''
-        urls : typing.Sequence[~CharmURL]
+        urls : typing.Sequence<+T_co>[~CharmURL]<~CharmURL>
         '''
         self.urls = [CharmURL.from_json(o) for o in urls or []]
 
 
 class ConfigSettingsResult(Type):
-    _toSchema = {'error': 'error', 'settings': 'settings'}
-    _toPy = {'error': 'error', 'settings': 'settings'}
+    _toSchema = {'settings': 'settings', 'error': 'error'}
+    _toPy = {'settings': 'settings', 'error': 'error'}
     def __init__(self, error=None, settings=None):
         '''
         error : Error
-        settings : typing.Mapping[str, typing.Any]
+        settings : typing.Mapping<~KT, +VT_co>[str, typing.Any]
         '''
         self.error = Error.from_json(error) if error else None
         self.settings = settings
@@ -5213,7 +5571,7 @@ class ConfigSettingsResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~ConfigSettingsResult]
+        results : typing.Sequence<+T_co>[~ConfigSettingsResult]<~ConfigSettingsResult>
         '''
         self.results = [ConfigSettingsResult.from_json(o) for o in results or []]
 
@@ -5235,7 +5593,7 @@ class EntitiesCharmURL(Type):
     _toPy = {'entities': 'entities'}
     def __init__(self, entities=None):
         '''
-        entities : typing.Sequence[~EntityCharmURL]
+        entities : typing.Sequence<+T_co>[~EntityCharmURL]<~EntityCharmURL>
         '''
         self.entities = [EntityCharmURL.from_json(o) for o in entities or []]
 
@@ -5245,7 +5603,7 @@ class EntitiesPortRanges(Type):
     _toPy = {'entities': 'entities'}
     def __init__(self, entities=None):
         '''
-        entities : typing.Sequence[~EntityPortRange]
+        entities : typing.Sequence<+T_co>[~EntityPortRange]<~EntityPortRange>
         '''
         self.entities = [EntityPortRange.from_json(o) for o in entities or []]
 
@@ -5264,7 +5622,7 @@ class EntityCharmURL(Type):
 
 class EntityPortRange(Type):
     _toSchema = {'from_port': 'from-port', 'to_port': 'to-port', 'tag': 'tag', 'protocol': 'protocol'}
-    _toPy = {'to-port': 'to_port', 'protocol': 'protocol', 'tag': 'tag', 'from-port': 'from_port'}
+    _toPy = {'from-port': 'from_port', 'tag': 'tag', 'protocol': 'protocol', 'to-port': 'to_port'}
     def __init__(self, from_port=None, protocol=None, tag=None, to_port=None):
         '''
         from_port : int
@@ -5295,7 +5653,7 @@ class EntityWorkloadVersions(Type):
     _toPy = {'entities': 'entities'}
     def __init__(self, entities=None):
         '''
-        entities : typing.Sequence[~EntityWorkloadVersion]
+        entities : typing.Sequence<+T_co>[~EntityWorkloadVersion]<~EntityWorkloadVersion>
         '''
         self.entities = [EntityWorkloadVersion.from_json(o) for o in entities or []]
 
@@ -5305,26 +5663,26 @@ class GetLeadershipSettingsBulkResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~GetLeadershipSettingsResult]
+        results : typing.Sequence<+T_co>[~GetLeadershipSettingsResult]<~GetLeadershipSettingsResult>
         '''
         self.results = [GetLeadershipSettingsResult.from_json(o) for o in results or []]
 
 
 class GetLeadershipSettingsResult(Type):
-    _toSchema = {'error': 'error', 'settings': 'settings'}
-    _toPy = {'error': 'error', 'settings': 'settings'}
+    _toSchema = {'settings': 'settings', 'error': 'error'}
+    _toPy = {'settings': 'settings', 'error': 'error'}
     def __init__(self, error=None, settings=None):
         '''
         error : Error
-        settings : typing.Mapping[str, str]
+        settings : typing.Mapping<~KT, +VT_co>[str, str]
         '''
         self.error = Error.from_json(error) if error else None
         self.settings = settings
 
 
 class IntResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -5339,7 +5697,7 @@ class IntResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~IntResult]
+        results : typing.Sequence<+T_co>[~IntResult]<~IntResult>
         '''
         self.results = [IntResult.from_json(o) for o in results or []]
 
@@ -5349,26 +5707,26 @@ class MergeLeadershipSettingsBulkParams(Type):
     _toPy = {'params': 'params'}
     def __init__(self, params=None):
         '''
-        params : typing.Sequence[~MergeLeadershipSettingsParam]
+        params : typing.Sequence<+T_co>[~MergeLeadershipSettingsParam]<~MergeLeadershipSettingsParam>
         '''
         self.params = [MergeLeadershipSettingsParam.from_json(o) for o in params or []]
 
 
 class MergeLeadershipSettingsParam(Type):
-    _toSchema = {'application_tag': 'application-tag', 'settings': 'settings'}
-    _toPy = {'settings': 'settings', 'application-tag': 'application_tag'}
+    _toSchema = {'settings': 'settings', 'application_tag': 'application-tag'}
+    _toPy = {'application-tag': 'application_tag', 'settings': 'settings'}
     def __init__(self, application_tag=None, settings=None):
         '''
         application_tag : str
-        settings : typing.Mapping[str, str]
+        settings : typing.Mapping<~KT, +VT_co>[str, str]
         '''
         self.application_tag = application_tag
         self.settings = settings
 
 
 class ModelResult(Type):
-    _toSchema = {'name': 'name', 'error': 'error', 'uuid': 'uuid'}
-    _toPy = {'name': 'name', 'error': 'error', 'uuid': 'uuid'}
+    _toSchema = {'name': 'name', 'uuid': 'uuid', 'error': 'error'}
+    _toPy = {'name': 'name', 'uuid': 'uuid', 'error': 'error'}
     def __init__(self, error=None, name=None, uuid=None):
         '''
         error : Error
@@ -5385,14 +5743,14 @@ class RelationIds(Type):
     _toPy = {'relation-ids': 'relation_ids'}
     def __init__(self, relation_ids=None):
         '''
-        relation_ids : typing.Sequence[int]
+        relation_ids : typing.Sequence<+T_co>[int]
         '''
         self.relation_ids = relation_ids
 
 
 class RelationResult(Type):
-    _toSchema = {'error': 'error', 'life': 'life', 'key': 'key', 'endpoint': 'endpoint', 'id_': 'id'}
-    _toPy = {'error': 'error', 'life': 'life', 'key': 'key', 'id': 'id_', 'endpoint': 'endpoint'}
+    _toSchema = {'life': 'life', 'endpoint': 'endpoint', 'id_': 'id', 'key': 'key', 'error': 'error'}
+    _toPy = {'life': 'life', 'endpoint': 'endpoint', 'id': 'id_', 'key': 'key', 'error': 'error'}
     def __init__(self, endpoint=None, error=None, id_=None, key=None, life=None):
         '''
         endpoint : Endpoint
@@ -5413,7 +5771,7 @@ class RelationResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~RelationResult]
+        results : typing.Sequence<+T_co>[~RelationResult]<~RelationResult>
         '''
         self.results = [RelationResult.from_json(o) for o in results or []]
 
@@ -5431,8 +5789,8 @@ class RelationUnit(Type):
 
 
 class RelationUnitPair(Type):
-    _toSchema = {'remote_unit': 'remote-unit', 'local_unit': 'local-unit', 'relation': 'relation'}
-    _toPy = {'relation': 'relation', 'local-unit': 'local_unit', 'remote-unit': 'remote_unit'}
+    _toSchema = {'relation': 'relation', 'local_unit': 'local-unit', 'remote_unit': 'remote-unit'}
+    _toPy = {'remote-unit': 'remote_unit', 'local-unit': 'local_unit', 'relation': 'relation'}
     def __init__(self, local_unit=None, relation=None, remote_unit=None):
         '''
         local_unit : str
@@ -5449,18 +5807,18 @@ class RelationUnitPairs(Type):
     _toPy = {'relation-unit-pairs': 'relation_unit_pairs'}
     def __init__(self, relation_unit_pairs=None):
         '''
-        relation_unit_pairs : typing.Sequence[~RelationUnitPair]
+        relation_unit_pairs : typing.Sequence<+T_co>[~RelationUnitPair]<~RelationUnitPair>
         '''
         self.relation_unit_pairs = [RelationUnitPair.from_json(o) for o in relation_unit_pairs or []]
 
 
 class RelationUnitSettings(Type):
-    _toSchema = {'relation': 'relation', 'unit': 'unit', 'settings': 'settings'}
-    _toPy = {'relation': 'relation', 'unit': 'unit', 'settings': 'settings'}
+    _toSchema = {'relation': 'relation', 'settings': 'settings', 'unit': 'unit'}
+    _toPy = {'relation': 'relation', 'settings': 'settings', 'unit': 'unit'}
     def __init__(self, relation=None, settings=None, unit=None):
         '''
         relation : str
-        settings : typing.Mapping[str, str]
+        settings : typing.Mapping<~KT, +VT_co>[str, str]
         unit : str
         '''
         self.relation = relation
@@ -5473,7 +5831,7 @@ class RelationUnits(Type):
     _toPy = {'relation-units': 'relation_units'}
     def __init__(self, relation_units=None):
         '''
-        relation_units : typing.Sequence[~RelationUnit]
+        relation_units : typing.Sequence<+T_co>[~RelationUnit]<~RelationUnit>
         '''
         self.relation_units = [RelationUnit.from_json(o) for o in relation_units or []]
 
@@ -5483,7 +5841,7 @@ class RelationUnitsSettings(Type):
     _toPy = {'relation-units': 'relation_units'}
     def __init__(self, relation_units=None):
         '''
-        relation_units : typing.Sequence[~RelationUnitSettings]
+        relation_units : typing.Sequence<+T_co>[~RelationUnitSettings]<~RelationUnitSettings>
         '''
         self.relation_units = [RelationUnitSettings.from_json(o) for o in relation_units or []]
 
@@ -5493,14 +5851,14 @@ class RelationUnitsWatchResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~RelationUnitsWatchResult]
+        results : typing.Sequence<+T_co>[~RelationUnitsWatchResult]<~RelationUnitsWatchResult>
         '''
         self.results = [RelationUnitsWatchResult.from_json(o) for o in results or []]
 
 
 class ResolvedModeResult(Type):
-    _toSchema = {'error': 'error', 'mode': 'mode'}
-    _toPy = {'error': 'error', 'mode': 'mode'}
+    _toSchema = {'mode': 'mode', 'error': 'error'}
+    _toPy = {'mode': 'mode', 'error': 'error'}
     def __init__(self, error=None, mode=None):
         '''
         error : Error
@@ -5515,18 +5873,18 @@ class ResolvedModeResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~ResolvedModeResult]
+        results : typing.Sequence<+T_co>[~ResolvedModeResult]<~ResolvedModeResult>
         '''
         self.results = [ResolvedModeResult.from_json(o) for o in results or []]
 
 
 class SettingsResult(Type):
-    _toSchema = {'error': 'error', 'settings': 'settings'}
-    _toPy = {'error': 'error', 'settings': 'settings'}
+    _toSchema = {'settings': 'settings', 'error': 'error'}
+    _toPy = {'settings': 'settings', 'error': 'error'}
     def __init__(self, error=None, settings=None):
         '''
         error : Error
-        settings : typing.Mapping[str, str]
+        settings : typing.Mapping<~KT, +VT_co>[str, str]
         '''
         self.error = Error.from_json(error) if error else None
         self.settings = settings
@@ -5537,14 +5895,14 @@ class SettingsResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~SettingsResult]
+        results : typing.Sequence<+T_co>[~SettingsResult]<~SettingsResult>
         '''
         self.results = [SettingsResult.from_json(o) for o in results or []]
 
 
 class StorageAttachment(Type):
-    _toSchema = {'unit_tag': 'unit-tag', 'location': 'location', 'storage_tag': 'storage-tag', 'kind': 'kind', 'owner_tag': 'owner-tag', 'life': 'life'}
-    _toPy = {'location': 'location', 'owner-tag': 'owner_tag', 'storage-tag': 'storage_tag', 'unit-tag': 'unit_tag', 'kind': 'kind', 'life': 'life'}
+    _toSchema = {'kind': 'kind', 'owner_tag': 'owner-tag', 'location': 'location', 'life': 'life', 'storage_tag': 'storage-tag', 'unit_tag': 'unit-tag'}
+    _toPy = {'kind': 'kind', 'storage-tag': 'storage_tag', 'location': 'location', 'life': 'life', 'owner-tag': 'owner_tag', 'unit-tag': 'unit_tag'}
     def __init__(self, kind=None, life=None, location=None, owner_tag=None, storage_tag=None, unit_tag=None):
         '''
         kind : int
@@ -5579,14 +5937,14 @@ class StorageAttachmentIds(Type):
     _toPy = {'ids': 'ids'}
     def __init__(self, ids=None):
         '''
-        ids : typing.Sequence[~StorageAttachmentId]
+        ids : typing.Sequence<+T_co>[~StorageAttachmentId]<~StorageAttachmentId>
         '''
         self.ids = [StorageAttachmentId.from_json(o) for o in ids or []]
 
 
 class StorageAttachmentIdsResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -5601,14 +5959,14 @@ class StorageAttachmentIdsResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~StorageAttachmentIdsResult]
+        results : typing.Sequence<+T_co>[~StorageAttachmentIdsResult]<~StorageAttachmentIdsResult>
         '''
         self.results = [StorageAttachmentIdsResult.from_json(o) for o in results or []]
 
 
 class StorageAttachmentResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -5623,14 +5981,14 @@ class StorageAttachmentResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~StorageAttachmentResult]
+        results : typing.Sequence<+T_co>[~StorageAttachmentResult]<~StorageAttachmentResult>
         '''
         self.results = [StorageAttachmentResult.from_json(o) for o in results or []]
 
 
 class StringBoolResult(Type):
-    _toSchema = {'ok': 'ok', 'error': 'error', 'result': 'result'}
-    _toPy = {'ok': 'ok', 'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'ok': 'ok', 'error': 'error'}
+    _toPy = {'result': 'result', 'ok': 'ok', 'error': 'error'}
     def __init__(self, error=None, ok=None, result=None):
         '''
         error : Error
@@ -5647,14 +6005,14 @@ class StringBoolResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~StringBoolResult]
+        results : typing.Sequence<+T_co>[~StringBoolResult]<~StringBoolResult>
         '''
         self.results = [StringBoolResult.from_json(o) for o in results or []]
 
 
 class UnitNetworkConfig(Type):
-    _toSchema = {'unit_tag': 'unit-tag', 'binding_name': 'binding-name'}
-    _toPy = {'unit-tag': 'unit_tag', 'binding-name': 'binding_name'}
+    _toSchema = {'binding_name': 'binding-name', 'unit_tag': 'unit-tag'}
+    _toPy = {'binding-name': 'binding_name', 'unit-tag': 'unit_tag'}
     def __init__(self, binding_name=None, unit_tag=None):
         '''
         binding_name : str
@@ -5665,12 +6023,12 @@ class UnitNetworkConfig(Type):
 
 
 class UnitNetworkConfigResult(Type):
-    _toSchema = {'error': 'error', 'info': 'info'}
-    _toPy = {'error': 'error', 'info': 'info'}
+    _toSchema = {'info': 'info', 'error': 'error'}
+    _toPy = {'info': 'info', 'error': 'error'}
     def __init__(self, error=None, info=None):
         '''
         error : Error
-        info : typing.Sequence[~NetworkConfig]
+        info : typing.Sequence<+T_co>[~NetworkConfig]<~NetworkConfig>
         '''
         self.error = Error.from_json(error) if error else None
         self.info = [NetworkConfig.from_json(o) for o in info or []]
@@ -5681,7 +6039,7 @@ class UnitNetworkConfigResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~UnitNetworkConfigResult]
+        results : typing.Sequence<+T_co>[~UnitNetworkConfigResult]<~UnitNetworkConfigResult>
         '''
         self.results = [UnitNetworkConfigResult.from_json(o) for o in results or []]
 
@@ -5691,7 +6049,7 @@ class UnitsNetworkConfig(Type):
     _toPy = {'args': 'args'}
     def __init__(self, args=None):
         '''
-        args : typing.Sequence[~UnitNetworkConfig]
+        args : typing.Sequence<+T_co>[~UnitNetworkConfig]<~UnitNetworkConfig>
         '''
         self.args = [UnitNetworkConfig.from_json(o) for o in args or []]
 
@@ -5701,14 +6059,14 @@ class EntitiesVersion(Type):
     _toPy = {'agent-tools': 'agent_tools'}
     def __init__(self, agent_tools=None):
         '''
-        agent_tools : typing.Sequence[~EntityVersion]
+        agent_tools : typing.Sequence<+T_co>[~EntityVersion]<~EntityVersion>
         '''
         self.agent_tools = [EntityVersion.from_json(o) for o in agent_tools or []]
 
 
 class EntityVersion(Type):
-    _toSchema = {'tools': 'tools', 'tag': 'tag'}
-    _toPy = {'tools': 'tools', 'tag': 'tag'}
+    _toSchema = {'tag': 'tag', 'tools': 'tools'}
+    _toPy = {'tag': 'tag', 'tools': 'tools'}
     def __init__(self, tag=None, tools=None):
         '''
         tag : str
@@ -5719,8 +6077,8 @@ class EntityVersion(Type):
 
 
 class VersionResult(Type):
-    _toSchema = {'error': 'error', 'version': 'version'}
-    _toPy = {'error': 'error', 'version': 'version'}
+    _toSchema = {'version': 'version', 'error': 'error'}
+    _toPy = {'version': 'version', 'error': 'error'}
     def __init__(self, error=None, version=None):
         '''
         error : Error
@@ -5735,36 +6093,32 @@ class VersionResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~VersionResult]
+        results : typing.Sequence<+T_co>[~VersionResult]<~VersionResult>
         '''
         self.results = [VersionResult.from_json(o) for o in results or []]
 
 
 class AddUser(Type):
-    _toSchema = {'display_name': 'display-name', 'shared_model_tags': 'shared-model-tags', 'password': 'password', 'model_access_permission': 'model-access-permission', 'username': 'username'}
-    _toPy = {'username': 'username', 'display-name': 'display_name', 'password': 'password', 'model-access-permission': 'model_access_permission', 'shared-model-tags': 'shared_model_tags'}
-    def __init__(self, display_name=None, model_access_permission=None, password=None, shared_model_tags=None, username=None):
+    _toSchema = {'display_name': 'display-name', 'username': 'username', 'password': 'password'}
+    _toPy = {'display-name': 'display_name', 'password': 'password', 'username': 'username'}
+    def __init__(self, display_name=None, password=None, username=None):
         '''
         display_name : str
-        model_access_permission : str
         password : str
-        shared_model_tags : typing.Sequence[str]
         username : str
         '''
         self.display_name = display_name
-        self.model_access_permission = model_access_permission
         self.password = password
-        self.shared_model_tags = shared_model_tags
         self.username = username
 
 
 class AddUserResult(Type):
-    _toSchema = {'error': 'error', 'secret_key': 'secret-key', 'tag': 'tag'}
-    _toPy = {'error': 'error', 'tag': 'tag', 'secret-key': 'secret_key'}
+    _toSchema = {'secret_key': 'secret-key', 'tag': 'tag', 'error': 'error'}
+    _toPy = {'tag': 'tag', 'secret-key': 'secret_key', 'error': 'error'}
     def __init__(self, error=None, secret_key=None, tag=None):
         '''
         error : Error
-        secret_key : typing.Sequence[int]
+        secret_key : typing.Sequence<+T_co>[int]
         tag : str
         '''
         self.error = Error.from_json(error) if error else None
@@ -5777,7 +6131,7 @@ class AddUserResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~AddUserResult]
+        results : typing.Sequence<+T_co>[~AddUserResult]<~AddUserResult>
         '''
         self.results = [AddUserResult.from_json(o) for o in results or []]
 
@@ -5787,14 +6141,14 @@ class AddUsers(Type):
     _toPy = {'users': 'users'}
     def __init__(self, users=None):
         '''
-        users : typing.Sequence[~AddUser]
+        users : typing.Sequence<+T_co>[~AddUser]<~AddUser>
         '''
         self.users = [AddUser.from_json(o) for o in users or []]
 
 
 class MacaroonResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -5809,16 +6163,17 @@ class MacaroonResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~MacaroonResult]
+        results : typing.Sequence<+T_co>[~MacaroonResult]<~MacaroonResult>
         '''
         self.results = [MacaroonResult.from_json(o) for o in results or []]
 
 
 class UserInfo(Type):
-    _toSchema = {'display_name': 'display-name', 'username': 'username', 'date_created': 'date-created', 'created_by': 'created-by', 'last_connection': 'last-connection', 'disabled': 'disabled'}
-    _toPy = {'username': 'username', 'display-name': 'display_name', 'created-by': 'created_by', 'last-connection': 'last_connection', 'disabled': 'disabled', 'date-created': 'date_created'}
-    def __init__(self, created_by=None, date_created=None, disabled=None, display_name=None, last_connection=None, username=None):
+    _toSchema = {'display_name': 'display-name', 'username': 'username', 'last_connection': 'last-connection', 'disabled': 'disabled', 'access': 'access', 'created_by': 'created-by', 'date_created': 'date-created'}
+    _toPy = {'last-connection': 'last_connection', 'username': 'username', 'disabled': 'disabled', 'date-created': 'date_created', 'created-by': 'created_by', 'access': 'access', 'display-name': 'display_name'}
+    def __init__(self, access=None, created_by=None, date_created=None, disabled=None, display_name=None, last_connection=None, username=None):
         '''
+        access : str
         created_by : str
         date_created : str
         disabled : bool
@@ -5826,6 +6181,7 @@ class UserInfo(Type):
         last_connection : str
         username : str
         '''
+        self.access = access
         self.created_by = created_by
         self.date_created = date_created
         self.disabled = disabled
@@ -5835,11 +6191,11 @@ class UserInfo(Type):
 
 
 class UserInfoRequest(Type):
-    _toSchema = {'entities': 'entities', 'include_disabled': 'include-disabled'}
+    _toSchema = {'include_disabled': 'include-disabled', 'entities': 'entities'}
     _toPy = {'entities': 'entities', 'include-disabled': 'include_disabled'}
     def __init__(self, entities=None, include_disabled=None):
         '''
-        entities : typing.Sequence[~Entity]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         include_disabled : bool
         '''
         self.entities = [Entity.from_json(o) for o in entities or []]
@@ -5847,8 +6203,8 @@ class UserInfoRequest(Type):
 
 
 class UserInfoResult(Type):
-    _toSchema = {'error': 'error', 'result': 'result'}
-    _toPy = {'error': 'error', 'result': 'result'}
+    _toSchema = {'result': 'result', 'error': 'error'}
+    _toPy = {'result': 'result', 'error': 'error'}
     def __init__(self, error=None, result=None):
         '''
         error : Error
@@ -5863,7 +6219,7 @@ class UserInfoResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None):
         '''
-        results : typing.Sequence[~UserInfoResult]
+        results : typing.Sequence<+T_co>[~UserInfoResult]<~UserInfoResult>
         '''
         self.results = [UserInfoResult.from_json(o) for o in results or []]
 
@@ -6028,12 +6384,12 @@ class ActionFacade(Type):
     @ReturnMapping(ActionResults)
     async def Actions(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ActionResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ActionResult]<~ActionResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Action', Request='Actions', Version=2, Params=params)
+        msg = dict(type='Action', request='Actions', version=2, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -6043,12 +6399,12 @@ class ActionFacade(Type):
     @ReturnMapping(ApplicationsCharmActionsResults)
     async def ApplicationsCharmsActions(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ApplicationCharmActionsResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ApplicationCharmActionsResult]<~ApplicationCharmActionsResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Action', Request='ApplicationsCharmsActions', Version=2, Params=params)
+        msg = dict(type='Action', request='ApplicationsCharmsActions', version=2, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -6058,12 +6414,12 @@ class ActionFacade(Type):
     @ReturnMapping(ActionResults)
     async def Cancel(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ActionResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ActionResult]<~ActionResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Action', Request='Cancel', Version=2, Params=params)
+        msg = dict(type='Action', request='Cancel', version=2, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -6073,12 +6429,12 @@ class ActionFacade(Type):
     @ReturnMapping(ActionResults)
     async def Enqueue(self, actions):
         '''
-        actions : typing.Sequence[~Action]
-        Returns -> typing.Sequence[~ActionResult]
+        actions : typing.Sequence<+T_co>[~Action]<~Action>
+        Returns -> typing.Sequence<+T_co>[~ActionResult]<~ActionResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Action', Request='Enqueue', Version=2, Params=params)
+        msg = dict(type='Action', request='Enqueue', version=2, params=params)
         params['actions'] = actions
         reply = await self.rpc(msg)
         return reply
@@ -6088,12 +6444,12 @@ class ActionFacade(Type):
     @ReturnMapping(FindTagsResults)
     async def FindActionTagsByPrefix(self, prefixes):
         '''
-        prefixes : typing.Sequence[str]
-        Returns -> typing.Sequence[~Entity]
+        prefixes : typing.Sequence<+T_co>[str]
+        Returns -> typing.Sequence<+T_co>[~Entity]<~Entity>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Action', Request='FindActionTagsByPrefix', Version=2, Params=params)
+        msg = dict(type='Action', request='FindActionTagsByPrefix', version=2, params=params)
         params['prefixes'] = prefixes
         reply = await self.rpc(msg)
         return reply
@@ -6103,12 +6459,12 @@ class ActionFacade(Type):
     @ReturnMapping(ActionsByNames)
     async def FindActionsByNames(self, names):
         '''
-        names : typing.Sequence[str]
-        Returns -> typing.Sequence[~ActionsByName]
+        names : typing.Sequence<+T_co>[str]
+        Returns -> typing.Sequence<+T_co>[~ActionsByName]<~ActionsByName>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Action', Request='FindActionsByNames', Version=2, Params=params)
+        msg = dict(type='Action', request='FindActionsByNames', version=2, params=params)
         params['names'] = names
         reply = await self.rpc(msg)
         return reply
@@ -6118,12 +6474,12 @@ class ActionFacade(Type):
     @ReturnMapping(ActionsByReceivers)
     async def ListAll(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ActionsByReceiver]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ActionsByReceiver]<~ActionsByReceiver>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Action', Request='ListAll', Version=2, Params=params)
+        msg = dict(type='Action', request='ListAll', version=2, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -6133,12 +6489,12 @@ class ActionFacade(Type):
     @ReturnMapping(ActionsByReceivers)
     async def ListCompleted(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ActionsByReceiver]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ActionsByReceiver]<~ActionsByReceiver>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Action', Request='ListCompleted', Version=2, Params=params)
+        msg = dict(type='Action', request='ListCompleted', version=2, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -6148,12 +6504,12 @@ class ActionFacade(Type):
     @ReturnMapping(ActionsByReceivers)
     async def ListPending(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ActionsByReceiver]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ActionsByReceiver]<~ActionsByReceiver>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Action', Request='ListPending', Version=2, Params=params)
+        msg = dict(type='Action', request='ListPending', version=2, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -6163,12 +6519,12 @@ class ActionFacade(Type):
     @ReturnMapping(ActionsByReceivers)
     async def ListRunning(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ActionsByReceiver]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ActionsByReceiver]<~ActionsByReceiver>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Action', Request='ListRunning', Version=2, Params=params)
+        msg = dict(type='Action', request='ListRunning', version=2, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -6178,16 +6534,16 @@ class ActionFacade(Type):
     @ReturnMapping(ActionResults)
     async def Run(self, applications, commands, machines, timeout, units):
         '''
-        applications : typing.Sequence[str]
+        applications : typing.Sequence<+T_co>[str]
         commands : str
-        machines : typing.Sequence[str]
+        machines : typing.Sequence<+T_co>[str]
         timeout : int
-        units : typing.Sequence[str]
-        Returns -> typing.Sequence[~ActionResult]
+        units : typing.Sequence<+T_co>[str]
+        Returns -> typing.Sequence<+T_co>[~ActionResult]<~ActionResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Action', Request='Run', Version=2, Params=params)
+        msg = dict(type='Action', request='Run', version=2, params=params)
         params['applications'] = applications
         params['commands'] = commands
         params['machines'] = machines
@@ -6201,16 +6557,16 @@ class ActionFacade(Type):
     @ReturnMapping(ActionResults)
     async def RunOnAllMachines(self, applications, commands, machines, timeout, units):
         '''
-        applications : typing.Sequence[str]
+        applications : typing.Sequence<+T_co>[str]
         commands : str
-        machines : typing.Sequence[str]
+        machines : typing.Sequence<+T_co>[str]
         timeout : int
-        units : typing.Sequence[str]
-        Returns -> typing.Sequence[~ActionResult]
+        units : typing.Sequence<+T_co>[str]
+        Returns -> typing.Sequence<+T_co>[~ActionResult]<~ActionResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Action', Request='RunOnAllMachines', Version=2, Params=params)
+        msg = dict(type='Action', request='RunOnAllMachines', version=2, params=params)
         params['applications'] = applications
         params['commands'] = commands
         params['machines'] = machines
@@ -6238,6 +6594,32 @@ class AgentFacade(Type):
                                                                              'type': 'array'}},
                                                  'required': ['entities'],
                                                  'type': 'object'},
+                     'CloudCredential': {'additionalProperties': False,
+                                         'properties': {'attrs': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                  'type': 'object'},
+                                                        'auth-type': {'type': 'string'},
+                                                        'redacted': {'items': {'type': 'string'},
+                                                                     'type': 'array'}},
+                                         'required': ['auth-type'],
+                                         'type': 'object'},
+                     'CloudSpec': {'additionalProperties': False,
+                                   'properties': {'credential': {'$ref': '#/definitions/CloudCredential'},
+                                                  'endpoint': {'type': 'string'},
+                                                  'identity-endpoint': {'type': 'string'},
+                                                  'name': {'type': 'string'},
+                                                  'region': {'type': 'string'},
+                                                  'storage-endpoint': {'type': 'string'},
+                                                  'type': {'type': 'string'}},
+                                   'required': ['type', 'name'],
+                                   'type': 'object'},
+                     'CloudSpecResult': {'additionalProperties': False,
+                                         'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                        'result': {'$ref': '#/definitions/CloudSpec'}},
+                                         'type': 'object'},
+                     'CloudSpecResults': {'additionalProperties': False,
+                                          'properties': {'results': {'items': {'$ref': '#/definitions/CloudSpecResult'},
+                                                                     'type': 'array'}},
+                                          'type': 'object'},
                      'ControllerConfigResult': {'additionalProperties': False,
                                                 'properties': {'config': {'patternProperties': {'.*': {'additionalProperties': True,
                                                                                                        'type': 'object'}},
@@ -6316,6 +6698,9 @@ class AgentFacade(Type):
      'properties': {'ClearReboot': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                    'Result': {'$ref': '#/definitions/ErrorResults'}},
                                     'type': 'object'},
+                    'CloudSpec': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                 'Result': {'$ref': '#/definitions/CloudSpecResults'}},
+                                  'type': 'object'},
                     'ControllerConfig': {'properties': {'Result': {'$ref': '#/definitions/ControllerConfigResult'}},
                                          'type': 'object'},
                     'GetEntities': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
@@ -6338,12 +6723,27 @@ class AgentFacade(Type):
     @ReturnMapping(ErrorResults)
     async def ClearReboot(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Agent', Request='ClearReboot', Version=2, Params=params)
+        msg = dict(type='Agent', request='ClearReboot', version=2, params=params)
+        params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CloudSpecResults)
+    async def CloudSpec(self, entities):
+        '''
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~CloudSpecResult]<~CloudSpecResult>
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(type='Agent', request='CloudSpec', version=2, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -6354,11 +6754,11 @@ class AgentFacade(Type):
     async def ControllerConfig(self):
         '''
 
-        Returns -> typing.Mapping[str, typing.Any]
+        Returns -> typing.Mapping<~KT, +VT_co>[str, typing.Any]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Agent', Request='ControllerConfig', Version=2, Params=params)
+        msg = dict(type='Agent', request='ControllerConfig', version=2, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -6368,12 +6768,12 @@ class AgentFacade(Type):
     @ReturnMapping(AgentGetEntitiesResults)
     async def GetEntities(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~AgentGetEntitiesResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~AgentGetEntitiesResult]<~AgentGetEntitiesResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Agent', Request='GetEntities', Version=2, Params=params)
+        msg = dict(type='Agent', request='GetEntities', version=2, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -6388,7 +6788,7 @@ class AgentFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Agent', Request='IsMaster', Version=2, Params=params)
+        msg = dict(type='Agent', request='IsMaster', version=2, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -6399,11 +6799,11 @@ class AgentFacade(Type):
     async def ModelConfig(self):
         '''
 
-        Returns -> typing.Mapping[str, typing.Any]
+        Returns -> typing.Mapping<~KT, +VT_co>[str, typing.Any]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Agent', Request='ModelConfig', Version=2, Params=params)
+        msg = dict(type='Agent', request='ModelConfig', version=2, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -6413,12 +6813,12 @@ class AgentFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetPasswords(self, changes):
         '''
-        changes : typing.Sequence[~EntityPassword]
-        Returns -> typing.Sequence[~ErrorResult]
+        changes : typing.Sequence<+T_co>[~EntityPassword]<~EntityPassword>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Agent', Request='SetPasswords', Version=2, Params=params)
+        msg = dict(type='Agent', request='SetPasswords', version=2, params=params)
         params['changes'] = changes
         reply = await self.rpc(msg)
         return reply
@@ -6433,7 +6833,7 @@ class AgentFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Agent', Request='StateServingInfo', Version=2, Params=params)
+        msg = dict(type='Agent', request='StateServingInfo', version=2, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -6448,7 +6848,7 @@ class AgentFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Agent', Request='WatchForModelConfigChanges', Version=2, Params=params)
+        msg = dict(type='Agent', request='WatchForModelConfigChanges', version=2, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -6468,7 +6868,7 @@ class AgentToolsFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='AgentTools', Request='UpdateToolsAvailable', Version=1, Params=params)
+        msg = dict(type='AgentTools', request='UpdateToolsAvailable', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -6498,11 +6898,11 @@ class AllModelWatcherFacade(Type):
     async def Next(self):
         '''
 
-        Returns -> typing.Sequence[~Delta]
+        Returns -> typing.Sequence<+T_co>[~Delta]<~Delta>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='AllModelWatcher', Request='Next', Version=2, Params=params)
+        msg = dict(type='AllModelWatcher', request='Next', version=2, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -6517,7 +6917,7 @@ class AllModelWatcherFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='AllModelWatcher', Request='Stop', Version=2, Params=params)
+        msg = dict(type='AllModelWatcher', request='Stop', version=2, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -6547,11 +6947,11 @@ class AllWatcherFacade(Type):
     async def Next(self):
         '''
 
-        Returns -> typing.Sequence[~Delta]
+        Returns -> typing.Sequence<+T_co>[~Delta]<~Delta>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='AllWatcher', Request='Next', Version=1, Params=params)
+        msg = dict(type='AllWatcher', request='Next', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -6566,7 +6966,7 @@ class AllWatcherFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='AllWatcher', Request='Stop', Version=1, Params=params)
+        msg = dict(type='AllWatcher', request='Stop', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -6638,12 +7038,12 @@ class AnnotationsFacade(Type):
     @ReturnMapping(AnnotationsGetResults)
     async def Get(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~AnnotationsGetResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~AnnotationsGetResult]<~AnnotationsGetResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Annotations', Request='Get', Version=2, Params=params)
+        msg = dict(type='Annotations', request='Get', version=2, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -6653,12 +7053,12 @@ class AnnotationsFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Set(self, annotations):
         '''
-        annotations : typing.Sequence[~EntityAnnotations]
-        Returns -> typing.Sequence[~ErrorResult]
+        annotations : typing.Sequence<+T_co>[~EntityAnnotations]<~EntityAnnotations>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Annotations', Request='Set', Version=2, Params=params)
+        msg = dict(type='Annotations', request='Set', version=2, params=params)
         params['annotations'] = annotations
         reply = await self.rpc(msg)
         return reply
@@ -6744,11 +7144,13 @@ class ApplicationFacade(Type):
                                                               'config': {'patternProperties': {'.*': {'additionalProperties': True,
                                                                                                       'type': 'object'}},
                                                                          'type': 'object'},
-                                                              'constraints': {'$ref': '#/definitions/Value'}},
+                                                              'constraints': {'$ref': '#/definitions/Value'},
+                                                              'series': {'type': 'string'}},
                                                'required': ['application',
                                                             'charm',
                                                             'config',
-                                                            'constraints'],
+                                                            'constraints',
+                                                            'series'],
                                                'type': 'object'},
                      'ApplicationMetricCredential': {'additionalProperties': False,
                                                      'properties': {'application': {'type': 'string'},
@@ -6949,12 +7351,12 @@ class ApplicationFacade(Type):
     @ReturnMapping(AddRelationResults)
     async def AddRelation(self, endpoints):
         '''
-        endpoints : typing.Sequence[str]
-        Returns -> typing.Mapping[str, ~CharmRelation]
+        endpoints : typing.Sequence<+T_co>[str]
+        Returns -> typing.Mapping<~KT, +VT_co>[str, ~CharmRelation]<~CharmRelation>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Application', Request='AddRelation', Version=1, Params=params)
+        msg = dict(type='Application', request='AddRelation', version=1, params=params)
         params['endpoints'] = endpoints
         reply = await self.rpc(msg)
         return reply
@@ -6966,12 +7368,12 @@ class ApplicationFacade(Type):
         '''
         application : str
         num_units : int
-        placement : typing.Sequence[~Placement]
-        Returns -> typing.Sequence[str]
+        placement : typing.Sequence<+T_co>[~Placement]<~Placement>
+        Returns -> typing.Sequence<+T_co>[str]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Application', Request='AddUnits', Version=1, Params=params)
+        msg = dict(type='Application', request='AddUnits', version=1, params=params)
         params['application'] = application
         params['num-units'] = num_units
         params['placement'] = placement
@@ -6984,11 +7386,11 @@ class ApplicationFacade(Type):
     async def CharmRelations(self, application):
         '''
         application : str
-        Returns -> typing.Sequence[str]
+        Returns -> typing.Sequence<+T_co>[str]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Application', Request='CharmRelations', Version=1, Params=params)
+        msg = dict(type='Application', request='CharmRelations', version=1, params=params)
         params['application'] = application
         reply = await self.rpc(msg)
         return reply
@@ -6998,12 +7400,12 @@ class ApplicationFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Deploy(self, applications):
         '''
-        applications : typing.Sequence[~ApplicationDeploy]
-        Returns -> typing.Sequence[~ErrorResult]
+        applications : typing.Sequence<+T_co>[~ApplicationDeploy]<~ApplicationDeploy>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Application', Request='Deploy', Version=1, Params=params)
+        msg = dict(type='Application', request='Deploy', version=1, params=params)
         params['applications'] = applications
         reply = await self.rpc(msg)
         return reply
@@ -7018,7 +7420,7 @@ class ApplicationFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Application', Request='Destroy', Version=1, Params=params)
+        msg = dict(type='Application', request='Destroy', version=1, params=params)
         params['application'] = application
         reply = await self.rpc(msg)
         return reply
@@ -7028,12 +7430,12 @@ class ApplicationFacade(Type):
     @ReturnMapping(None)
     async def DestroyRelation(self, endpoints):
         '''
-        endpoints : typing.Sequence[str]
+        endpoints : typing.Sequence<+T_co>[str]
         Returns -> None
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Application', Request='DestroyRelation', Version=1, Params=params)
+        msg = dict(type='Application', request='DestroyRelation', version=1, params=params)
         params['endpoints'] = endpoints
         reply = await self.rpc(msg)
         return reply
@@ -7043,12 +7445,12 @@ class ApplicationFacade(Type):
     @ReturnMapping(None)
     async def DestroyUnits(self, unit_names):
         '''
-        unit_names : typing.Sequence[str]
+        unit_names : typing.Sequence<+T_co>[str]
         Returns -> None
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Application', Request='DestroyUnits', Version=1, Params=params)
+        msg = dict(type='Application', request='DestroyUnits', version=1, params=params)
         params['unit-names'] = unit_names
         reply = await self.rpc(msg)
         return reply
@@ -7063,7 +7465,7 @@ class ApplicationFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Application', Request='Expose', Version=1, Params=params)
+        msg = dict(type='Application', request='Expose', version=1, params=params)
         params['application'] = application
         reply = await self.rpc(msg)
         return reply
@@ -7074,11 +7476,11 @@ class ApplicationFacade(Type):
     async def Get(self, application):
         '''
         application : str
-        Returns -> typing.Union[str, typing.Mapping[str, typing.Any], _ForwardRef('Value')]
+        Returns -> typing.Union[str, typing.Mapping<~KT, +VT_co>[str, typing.Any], _ForwardRef('Value')]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Application', Request='Get', Version=1, Params=params)
+        msg = dict(type='Application', request='Get', version=1, params=params)
         params['application'] = application
         reply = await self.rpc(msg)
         return reply
@@ -7093,7 +7495,7 @@ class ApplicationFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Application', Request='GetCharmURL', Version=1, Params=params)
+        msg = dict(type='Application', request='GetCharmURL', version=1, params=params)
         params['application'] = application
         reply = await self.rpc(msg)
         return reply
@@ -7108,7 +7510,7 @@ class ApplicationFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Application', Request='GetConstraints', Version=1, Params=params)
+        msg = dict(type='Application', request='GetConstraints', version=1, params=params)
         params['application'] = application
         reply = await self.rpc(msg)
         return reply
@@ -7119,12 +7521,12 @@ class ApplicationFacade(Type):
     async def Set(self, application, options):
         '''
         application : str
-        options : typing.Mapping[str, str]
+        options : typing.Mapping<~KT, +VT_co>[str, str]
         Returns -> None
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Application', Request='Set', Version=1, Params=params)
+        msg = dict(type='Application', request='Set', version=1, params=params)
         params['application'] = application
         params['options'] = options
         reply = await self.rpc(msg)
@@ -7140,12 +7542,12 @@ class ApplicationFacade(Type):
         charm_url : str
         force_series : bool
         force_units : bool
-        resource_ids : typing.Mapping[str, str]
+        resource_ids : typing.Mapping<~KT, +VT_co>[str, str]
         Returns -> None
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Application', Request='SetCharm', Version=1, Params=params)
+        msg = dict(type='Application', request='SetCharm', version=1, params=params)
         params['application'] = application
         params['channel'] = channel
         params['charm-url'] = charm_url
@@ -7166,7 +7568,7 @@ class ApplicationFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Application', Request='SetConstraints', Version=1, Params=params)
+        msg = dict(type='Application', request='SetConstraints', version=1, params=params)
         params['application'] = application
         params['constraints'] = constraints
         reply = await self.rpc(msg)
@@ -7177,12 +7579,12 @@ class ApplicationFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetMetricCredentials(self, creds):
         '''
-        creds : typing.Sequence[~ApplicationMetricCredential]
-        Returns -> typing.Sequence[~ErrorResult]
+        creds : typing.Sequence<+T_co>[~ApplicationMetricCredential]<~ApplicationMetricCredential>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Application', Request='SetMetricCredentials', Version=1, Params=params)
+        msg = dict(type='Application', request='SetMetricCredentials', version=1, params=params)
         params['creds'] = creds
         reply = await self.rpc(msg)
         return reply
@@ -7197,7 +7599,7 @@ class ApplicationFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Application', Request='Unexpose', Version=1, Params=params)
+        msg = dict(type='Application', request='Unexpose', version=1, params=params)
         params['application'] = application
         reply = await self.rpc(msg)
         return reply
@@ -7208,12 +7610,12 @@ class ApplicationFacade(Type):
     async def Unset(self, application, options):
         '''
         application : str
-        options : typing.Sequence[str]
+        options : typing.Sequence<+T_co>[str]
         Returns -> None
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Application', Request='Unset', Version=1, Params=params)
+        msg = dict(type='Application', request='Unset', version=1, params=params)
         params['application'] = application
         params['options'] = options
         reply = await self.rpc(msg)
@@ -7230,13 +7632,13 @@ class ApplicationFacade(Type):
         force_charm_url : bool
         force_series : bool
         min_units : int
-        settings : typing.Mapping[str, str]
+        settings : typing.Mapping<~KT, +VT_co>[str, str]
         settings_yaml : str
         Returns -> None
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Application', Request='Update', Version=1, Params=params)
+        msg = dict(type='Application', request='Update', version=1, params=params)
         params['application'] = application
         params['charm-url'] = charm_url
         params['constraints'] = constraints
@@ -7298,12 +7700,12 @@ class ApplicationScalerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Rescale(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='ApplicationScaler', Request='Rescale', Version=1, Params=params)
+        msg = dict(type='ApplicationScaler', request='Rescale', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -7314,11 +7716,11 @@ class ApplicationScalerFacade(Type):
     async def Watch(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error')]
+        Returns -> typing.Union[typing.Sequence<+T_co>[str], _ForwardRef('Error')]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='ApplicationScaler', Request='Watch', Version=1, Params=params)
+        msg = dict(type='ApplicationScaler', request='Watch', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -7423,7 +7825,7 @@ class BackupsFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Backups', Request='Create', Version=1, Params=params)
+        msg = dict(type='Backups', request='Create', version=1, params=params)
         params['notes'] = notes
         reply = await self.rpc(msg)
         return reply
@@ -7438,7 +7840,7 @@ class BackupsFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Backups', Request='FinishRestore', Version=1, Params=params)
+        msg = dict(type='Backups', request='FinishRestore', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -7453,7 +7855,7 @@ class BackupsFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Backups', Request='Info', Version=1, Params=params)
+        msg = dict(type='Backups', request='Info', version=1, params=params)
         params['id'] = id_
         reply = await self.rpc(msg)
         return reply
@@ -7464,11 +7866,11 @@ class BackupsFacade(Type):
     async def List(self):
         '''
 
-        Returns -> typing.Sequence[~BackupsMetadataResult]
+        Returns -> typing.Sequence<+T_co>[~BackupsMetadataResult]<~BackupsMetadataResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Backups', Request='List', Version=1, Params=params)
+        msg = dict(type='Backups', request='List', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -7483,7 +7885,7 @@ class BackupsFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Backups', Request='PrepareRestore', Version=1, Params=params)
+        msg = dict(type='Backups', request='PrepareRestore', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -7498,7 +7900,7 @@ class BackupsFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Backups', Request='Remove', Version=1, Params=params)
+        msg = dict(type='Backups', request='Remove', version=1, params=params)
         params['id'] = id_
         reply = await self.rpc(msg)
         return reply
@@ -7513,7 +7915,7 @@ class BackupsFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Backups', Request='Restore', Version=1, Params=params)
+        msg = dict(type='Backups', request='Restore', version=1, params=params)
         params['backup-id'] = backup_id
         reply = await self.rpc(msg)
         return reply
@@ -7572,11 +7974,11 @@ class BlockFacade(Type):
     async def List(self):
         '''
 
-        Returns -> typing.Sequence[~BlockResult]
+        Returns -> typing.Sequence<+T_co>[~BlockResult]<~BlockResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Block', Request='List', Version=2, Params=params)
+        msg = dict(type='Block', request='List', version=2, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -7592,7 +7994,7 @@ class BlockFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Block', Request='SwitchBlockOff', Version=2, Params=params)
+        msg = dict(type='Block', request='SwitchBlockOff', version=2, params=params)
         params['message'] = message
         params['type'] = type_
         reply = await self.rpc(msg)
@@ -7609,7 +8011,7 @@ class BlockFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Block', Request='SwitchBlockOn', Version=2, Params=params)
+        msg = dict(type='Block', request='SwitchBlockOn', version=2, params=params)
         params['message'] = message
         params['type'] = type_
         reply = await self.rpc(msg)
@@ -7646,7 +8048,7 @@ class CharmRevisionUpdaterFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='CharmRevisionUpdater', Request='UpdateLatestRevisions', Version=2, Params=params)
+        msg = dict(type='CharmRevisionUpdater', request='UpdateLatestRevisions', version=2, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -7810,11 +8212,11 @@ class CharmsFacade(Type):
     async def CharmInfo(self, url):
         '''
         url : str
-        Returns -> typing.Union[_ForwardRef('CharmActions'), typing.Mapping[str, ~CharmOption], _ForwardRef('CharmMeta'), _ForwardRef('CharmMetrics'), int, str]
+        Returns -> typing.Union[_ForwardRef('CharmActions'), typing.Mapping<~KT, +VT_co>[str, ~CharmOption]<~CharmOption>, _ForwardRef('CharmMeta'), _ForwardRef('CharmMetrics'), int, str]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Charms', Request='CharmInfo', Version=2, Params=params)
+        msg = dict(type='Charms', request='CharmInfo', version=2, params=params)
         params['url'] = url
         reply = await self.rpc(msg)
         return reply
@@ -7829,7 +8231,7 @@ class CharmsFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Charms', Request='IsMetered', Version=2, Params=params)
+        msg = dict(type='Charms', request='IsMetered', version=2, params=params)
         params['url'] = url
         reply = await self.rpc(msg)
         return reply
@@ -7839,12 +8241,12 @@ class CharmsFacade(Type):
     @ReturnMapping(CharmsListResult)
     async def List(self, names):
         '''
-        names : typing.Sequence[str]
-        Returns -> typing.Sequence[str]
+        names : typing.Sequence<+T_co>[str]
+        Returns -> typing.Sequence<+T_co>[str]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Charms', Request='List', Version=2, Params=params)
+        msg = dict(type='Charms', request='List', version=2, params=params)
         params['names'] = names
         reply = await self.rpc(msg)
         return reply
@@ -7883,7 +8285,7 @@ class CleanerFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Cleaner', Request='Cleanup', Version=2, Params=params)
+        msg = dict(type='Cleaner', request='Cleanup', version=2, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -7898,7 +8300,7 @@ class CleanerFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Cleaner', Request='WatchCleanups', Version=2, Params=params)
+        msg = dict(type='Cleaner', request='WatchCleanups', version=2, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -8220,9 +8622,30 @@ class ClientFacade(Type):
                                                                       'type': 'object'}},
                                             'required': ['config'],
                                             'type': 'object'},
+                     'ModelDefaultValues': {'additionalProperties': False,
+                                            'properties': {'cloud-region': {'type': 'string'},
+                                                           'cloud-tag': {'type': 'string'},
+                                                           'config': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                   'type': 'object'}},
+                                                                      'type': 'object'}},
+                                            'required': ['config'],
+                                            'type': 'object'},
+                     'ModelDefaults': {'additionalProperties': False,
+                                       'properties': {'controller': {'additionalProperties': True,
+                                                                     'type': 'object'},
+                                                      'default': {'additionalProperties': True,
+                                                                  'type': 'object'},
+                                                      'regions': {'items': {'$ref': '#/definitions/RegionDefaults'},
+                                                                  'type': 'array'}},
+                                       'type': 'object'},
+                     'ModelDefaultsResult': {'additionalProperties': False,
+                                             'properties': {'config': {'patternProperties': {'.*': {'$ref': '#/definitions/ModelDefaults'}},
+                                                                       'type': 'object'}},
+                                             'required': ['config'],
+                                             'type': 'object'},
                      'ModelInfo': {'additionalProperties': False,
                                    'properties': {'cloud': {'type': 'string'},
-                                                  'cloud-credential': {'type': 'string'},
+                                                  'cloud-credential-tag': {'type': 'string'},
                                                   'cloud-region': {'type': 'string'},
                                                   'controller-uuid': {'type': 'string'},
                                                   'default-series': {'type': 'string'},
@@ -8254,6 +8677,7 @@ class ClientFacade(Type):
                      'ModelStatusInfo': {'additionalProperties': False,
                                          'properties': {'available-version': {'type': 'string'},
                                                         'cloud': {'type': 'string'},
+                                                        'migration': {'type': 'string'},
                                                         'name': {'type': 'string'},
                                                         'region': {'type': 'string'},
                                                         'version': {'type': 'string'}},
@@ -8267,6 +8691,13 @@ class ClientFacade(Type):
                                                             'type': 'array'}},
                                     'required': ['keys'],
                                     'type': 'object'},
+                     'ModelUnsetKeys': {'additionalProperties': False,
+                                        'properties': {'cloud-region': {'type': 'string'},
+                                                       'cloud-tag': {'type': 'string'},
+                                                       'keys': {'items': {'type': 'string'},
+                                                                'type': 'array'}},
+                                        'required': ['keys'],
+                                        'type': 'object'},
                      'ModelUserInfo': {'additionalProperties': False,
                                        'properties': {'access': {'type': 'string'},
                                                       'display-name': {'type': 'string'},
@@ -8334,6 +8765,12 @@ class ClientFacade(Type):
                                               'properties': {'public-address': {'type': 'string'}},
                                               'required': ['public-address'],
                                               'type': 'object'},
+                     'RegionDefaults': {'additionalProperties': False,
+                                        'properties': {'region-name': {'type': 'string'},
+                                                       'value': {'additionalProperties': True,
+                                                                 'type': 'object'}},
+                                        'required': ['region-name', 'value'],
+                                        'type': 'object'},
                      'RelationStatus': {'additionalProperties': False,
                                         'properties': {'endpoints': {'items': {'$ref': '#/definitions/EndpointStatus'},
                                                                      'type': 'array'},
@@ -8375,6 +8812,11 @@ class ClientFacade(Type):
                                               'properties': {'version': {'$ref': '#/definitions/Number'}},
                                               'required': ['version'],
                                               'type': 'object'},
+                     'SetModelDefaults': {'additionalProperties': False,
+                                          'properties': {'config': {'items': {'$ref': '#/definitions/ModelDefaultValues'},
+                                                                    'type': 'array'}},
+                                          'required': ['config'],
+                                          'type': 'object'},
                      'StatusHistoryFilter': {'additionalProperties': False,
                                              'properties': {'date': {'format': 'date-time',
                                                                      'type': 'string'},
@@ -8439,6 +8881,11 @@ class ClientFacade(Type):
                                                  'charm',
                                                  'subordinates'],
                                     'type': 'object'},
+                     'UnsetModelDefaults': {'additionalProperties': False,
+                                            'properties': {'keys': {'items': {'$ref': '#/definitions/ModelUnsetKeys'},
+                                                                    'type': 'array'}},
+                                            'required': ['keys'],
+                                            'type': 'object'},
                      'Value': {'additionalProperties': False,
                                'properties': {'arch': {'type': 'string'},
                                               'container': {'type': 'string'},
@@ -8484,6 +8931,8 @@ class ClientFacade(Type):
                     'InjectMachines': {'properties': {'Params': {'$ref': '#/definitions/AddMachines'},
                                                       'Result': {'$ref': '#/definitions/AddMachinesResults'}},
                                        'type': 'object'},
+                    'ModelDefaults': {'properties': {'Result': {'$ref': '#/definitions/ModelDefaultsResult'}},
+                                      'type': 'object'},
                     'ModelGet': {'properties': {'Result': {'$ref': '#/definitions/ModelConfigResults'}},
                                  'type': 'object'},
                     'ModelInfo': {'properties': {'Result': {'$ref': '#/definitions/ModelInfo'}},
@@ -8515,9 +8964,15 @@ class ClientFacade(Type):
                                              'type': 'object'},
                     'SetModelConstraints': {'properties': {'Params': {'$ref': '#/definitions/SetConstraints'}},
                                             'type': 'object'},
+                    'SetModelDefaults': {'properties': {'Params': {'$ref': '#/definitions/SetModelDefaults'},
+                                                        'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                         'type': 'object'},
                     'StatusHistory': {'properties': {'Params': {'$ref': '#/definitions/StatusHistoryRequests'},
                                                      'Result': {'$ref': '#/definitions/StatusHistoryResults'}},
                                       'type': 'object'},
+                    'UnsetModelDefaults': {'properties': {'Params': {'$ref': '#/definitions/UnsetModelDefaults'},
+                                                          'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                           'type': 'object'},
                     'WatchAll': {'properties': {'Result': {'$ref': '#/definitions/AllWatcherId'}},
                                  'type': 'object'}},
      'type': 'object'}
@@ -8527,11 +8982,11 @@ class ClientFacade(Type):
     async def APIHostPorts(self):
         '''
 
-        Returns -> typing.Sequence[~HostPort]
+        Returns -> typing.Sequence<+T_co>[~HostPort]<~HostPort>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Client', Request='APIHostPorts', Version=1, Params=params)
+        msg = dict(type='Client', request='APIHostPorts', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -8546,7 +9001,7 @@ class ClientFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Client', Request='AbortCurrentUpgrade', Version=1, Params=params)
+        msg = dict(type='Client', request='AbortCurrentUpgrade', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -8562,7 +9017,7 @@ class ClientFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Client', Request='AddCharm', Version=1, Params=params)
+        msg = dict(type='Client', request='AddCharm', version=1, params=params)
         params['channel'] = channel
         params['url'] = url
         reply = await self.rpc(msg)
@@ -8580,7 +9035,7 @@ class ClientFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Client', Request='AddCharmWithAuthorization', Version=1, Params=params)
+        msg = dict(type='Client', request='AddCharmWithAuthorization', version=1, params=params)
         params['channel'] = channel
         params['macaroon'] = macaroon
         params['url'] = url
@@ -8592,12 +9047,12 @@ class ClientFacade(Type):
     @ReturnMapping(AddMachinesResults)
     async def AddMachines(self, params):
         '''
-        params : typing.Sequence[~AddMachineParams]
-        Returns -> typing.Sequence[~AddMachinesResult]
+        params : typing.Sequence<+T_co>[~AddMachineParams]<~AddMachineParams>
+        Returns -> typing.Sequence<+T_co>[~AddMachinesResult]<~AddMachinesResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Client', Request='AddMachines', Version=1, Params=params)
+        msg = dict(type='Client', request='AddMachines', version=1, params=params)
         params['params'] = params
         reply = await self.rpc(msg)
         return reply
@@ -8607,12 +9062,12 @@ class ClientFacade(Type):
     @ReturnMapping(AddMachinesResults)
     async def AddMachinesV2(self, params):
         '''
-        params : typing.Sequence[~AddMachineParams]
-        Returns -> typing.Sequence[~AddMachinesResult]
+        params : typing.Sequence<+T_co>[~AddMachineParams]<~AddMachineParams>
+        Returns -> typing.Sequence<+T_co>[~AddMachinesResult]<~AddMachinesResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Client', Request='AddMachinesV2', Version=1, Params=params)
+        msg = dict(type='Client', request='AddMachinesV2', version=1, params=params)
         params['params'] = params
         reply = await self.rpc(msg)
         return reply
@@ -8627,7 +9082,7 @@ class ClientFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Client', Request='AgentVersion', Version=1, Params=params)
+        msg = dict(type='Client', request='AgentVersion', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -8638,12 +9093,12 @@ class ClientFacade(Type):
     async def DestroyMachines(self, force, machine_names):
         '''
         force : bool
-        machine_names : typing.Sequence[str]
+        machine_names : typing.Sequence<+T_co>[str]
         Returns -> None
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Client', Request='DestroyMachines', Version=1, Params=params)
+        msg = dict(type='Client', request='DestroyMachines', version=1, params=params)
         params['force'] = force
         params['machine-names'] = machine_names
         reply = await self.rpc(msg)
@@ -8659,11 +9114,11 @@ class ClientFacade(Type):
         minor : int
         number : Number
         series : str
-        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence[~Tools]]
+        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence<+T_co>[~Tools]<~Tools>]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Client', Request='FindTools', Version=1, Params=params)
+        msg = dict(type='Client', request='FindTools', version=1, params=params)
         params['arch'] = arch
         params['major'] = major
         params['minor'] = minor
@@ -8677,12 +9132,12 @@ class ClientFacade(Type):
     @ReturnMapping(FullStatus)
     async def FullStatus(self, patterns):
         '''
-        patterns : typing.Sequence[str]
-        Returns -> typing.Union[typing.Mapping[str, ~MachineStatus], _ForwardRef('ModelStatusInfo'), typing.Sequence[~RelationStatus]]
+        patterns : typing.Sequence<+T_co>[str]
+        Returns -> typing.Union[typing.Mapping<~KT, +VT_co>[str, ~MachineStatus]<~MachineStatus>, _ForwardRef('ModelStatusInfo'), typing.Sequence<+T_co>[~RelationStatus]<~RelationStatus>]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Client', Request='FullStatus', Version=1, Params=params)
+        msg = dict(type='Client', request='FullStatus', version=1, params=params)
         params['patterns'] = patterns
         reply = await self.rpc(msg)
         return reply
@@ -8693,11 +9148,11 @@ class ClientFacade(Type):
     async def GetBundleChanges(self, yaml):
         '''
         yaml : str
-        Returns -> typing.Sequence[~BundleChangesChange]
+        Returns -> typing.Sequence<+T_co>[~BundleChangesChange]<~BundleChangesChange>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Client', Request='GetBundleChanges', Version=1, Params=params)
+        msg = dict(type='Client', request='GetBundleChanges', version=1, params=params)
         params['yaml'] = yaml
         reply = await self.rpc(msg)
         return reply
@@ -8712,7 +9167,7 @@ class ClientFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Client', Request='GetModelConstraints', Version=1, Params=params)
+        msg = dict(type='Client', request='GetModelConstraints', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -8722,13 +9177,28 @@ class ClientFacade(Type):
     @ReturnMapping(AddMachinesResults)
     async def InjectMachines(self, params):
         '''
-        params : typing.Sequence[~AddMachineParams]
-        Returns -> typing.Sequence[~AddMachinesResult]
+        params : typing.Sequence<+T_co>[~AddMachineParams]<~AddMachineParams>
+        Returns -> typing.Sequence<+T_co>[~AddMachinesResult]<~AddMachinesResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Client', Request='InjectMachines', Version=1, Params=params)
+        msg = dict(type='Client', request='InjectMachines', version=1, params=params)
         params['params'] = params
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ModelDefaultsResult)
+    async def ModelDefaults(self):
+        '''
+
+        Returns -> typing.Mapping<~KT, +VT_co>[str, ~ModelDefaults]<~ModelDefaults>
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(type='Client', request='ModelDefaults', version=1, params=params)
+
         reply = await self.rpc(msg)
         return reply
 
@@ -8738,11 +9208,11 @@ class ClientFacade(Type):
     async def ModelGet(self):
         '''
 
-        Returns -> typing.Mapping[str, ~ConfigValue]
+        Returns -> typing.Mapping<~KT, +VT_co>[str, ~ConfigValue]<~ConfigValue>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Client', Request='ModelGet', Version=1, Params=params)
+        msg = dict(type='Client', request='ModelGet', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -8753,11 +9223,11 @@ class ClientFacade(Type):
     async def ModelInfo(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('EntityStatus'), typing.Sequence[~ModelUserInfo]]
+        Returns -> typing.Union[_ForwardRef('EntityStatus'), typing.Sequence<+T_co>[~ModelUserInfo]<~ModelUserInfo>]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Client', Request='ModelInfo', Version=1, Params=params)
+        msg = dict(type='Client', request='ModelInfo', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -8767,12 +9237,12 @@ class ClientFacade(Type):
     @ReturnMapping(None)
     async def ModelSet(self, config):
         '''
-        config : typing.Mapping[str, typing.Any]
+        config : typing.Mapping<~KT, +VT_co>[str, typing.Any]
         Returns -> None
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Client', Request='ModelSet', Version=1, Params=params)
+        msg = dict(type='Client', request='ModelSet', version=1, params=params)
         params['config'] = config
         reply = await self.rpc(msg)
         return reply
@@ -8782,12 +9252,12 @@ class ClientFacade(Type):
     @ReturnMapping(None)
     async def ModelUnset(self, keys):
         '''
-        keys : typing.Sequence[str]
+        keys : typing.Sequence<+T_co>[str]
         Returns -> None
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Client', Request='ModelUnset', Version=1, Params=params)
+        msg = dict(type='Client', request='ModelUnset', version=1, params=params)
         params['keys'] = keys
         reply = await self.rpc(msg)
         return reply
@@ -8798,11 +9268,11 @@ class ClientFacade(Type):
     async def ModelUserInfo(self):
         '''
 
-        Returns -> typing.Sequence[~ModelUserInfoResult]
+        Returns -> typing.Sequence<+T_co>[~ModelUserInfoResult]<~ModelUserInfoResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Client', Request='ModelUserInfo', Version=1, Params=params)
+        msg = dict(type='Client', request='ModelUserInfo', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -8817,7 +9287,7 @@ class ClientFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Client', Request='PrivateAddress', Version=1, Params=params)
+        msg = dict(type='Client', request='PrivateAddress', version=1, params=params)
         params['target'] = target
         reply = await self.rpc(msg)
         return reply
@@ -8835,7 +9305,7 @@ class ClientFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Client', Request='ProvisioningScript', Version=1, Params=params)
+        msg = dict(type='Client', request='ProvisioningScript', version=1, params=params)
         params['data-dir'] = data_dir
         params['disable-package-commands'] = disable_package_commands
         params['machine-id'] = machine_id
@@ -8853,7 +9323,7 @@ class ClientFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Client', Request='PublicAddress', Version=1, Params=params)
+        msg = dict(type='Client', request='PublicAddress', version=1, params=params)
         params['target'] = target
         reply = await self.rpc(msg)
         return reply
@@ -8863,12 +9333,12 @@ class ClientFacade(Type):
     @ReturnMapping(ResolveCharmResults)
     async def ResolveCharms(self, references):
         '''
-        references : typing.Sequence[str]
-        Returns -> typing.Sequence[~ResolveCharmResult]
+        references : typing.Sequence<+T_co>[str]
+        Returns -> typing.Sequence<+T_co>[~ResolveCharmResult]<~ResolveCharmResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Client', Request='ResolveCharms', Version=1, Params=params)
+        msg = dict(type='Client', request='ResolveCharms', version=1, params=params)
         params['references'] = references
         reply = await self.rpc(msg)
         return reply
@@ -8884,7 +9354,7 @@ class ClientFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Client', Request='Resolved', Version=1, Params=params)
+        msg = dict(type='Client', request='Resolved', version=1, params=params)
         params['retry'] = retry
         params['unit-name'] = unit_name
         reply = await self.rpc(msg)
@@ -8895,12 +9365,12 @@ class ClientFacade(Type):
     @ReturnMapping(ErrorResults)
     async def RetryProvisioning(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Client', Request='RetryProvisioning', Version=1, Params=params)
+        msg = dict(type='Client', request='RetryProvisioning', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -8919,7 +9389,7 @@ class ClientFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Client', Request='SetModelAgentVersion', Version=1, Params=params)
+        msg = dict(type='Client', request='SetModelAgentVersion', version=1, params=params)
         params['Build'] = build
         params['Major'] = major
         params['Minor'] = minor
@@ -8939,9 +9409,24 @@ class ClientFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Client', Request='SetModelConstraints', Version=1, Params=params)
+        msg = dict(type='Client', request='SetModelConstraints', version=1, params=params)
         params['application'] = application
         params['constraints'] = constraints
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def SetModelDefaults(self, config):
+        '''
+        config : typing.Sequence<+T_co>[~ModelDefaultValues]<~ModelDefaultValues>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(type='Client', request='SetModelDefaults', version=1, params=params)
+        params['config'] = config
         reply = await self.rpc(msg)
         return reply
 
@@ -8950,13 +9435,28 @@ class ClientFacade(Type):
     @ReturnMapping(StatusHistoryResults)
     async def StatusHistory(self, requests):
         '''
-        requests : typing.Sequence[~StatusHistoryRequest]
-        Returns -> typing.Sequence[~StatusHistoryResult]
+        requests : typing.Sequence<+T_co>[~StatusHistoryRequest]<~StatusHistoryRequest>
+        Returns -> typing.Sequence<+T_co>[~StatusHistoryResult]<~StatusHistoryResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Client', Request='StatusHistory', Version=1, Params=params)
+        msg = dict(type='Client', request='StatusHistory', version=1, params=params)
         params['requests'] = requests
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def UnsetModelDefaults(self, keys):
+        '''
+        keys : typing.Sequence<+T_co>[~ModelUnsetKeys]<~ModelUnsetKeys>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(type='Client', request='UnsetModelDefaults', version=1, params=params)
+        params['keys'] = keys
         reply = await self.rpc(msg)
         return reply
 
@@ -8970,7 +9470,7 @@ class ClientFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Client', Request='WatchAll', Version=1, Params=params)
+        msg = dict(type='Client', request='WatchAll', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -8983,44 +9483,34 @@ class CloudFacade(Type):
                                'properties': {'auth-types': {'items': {'type': 'string'},
                                                              'type': 'array'},
                                               'endpoint': {'type': 'string'},
+                                              'identity-endpoint': {'type': 'string'},
                                               'regions': {'items': {'$ref': '#/definitions/CloudRegion'},
                                                           'type': 'array'},
+                                              'storage-endpoint': {'type': 'string'},
                                               'type': {'type': 'string'}},
                                'required': ['type'],
                                'type': 'object'},
                      'CloudCredential': {'additionalProperties': False,
                                          'properties': {'attrs': {'patternProperties': {'.*': {'type': 'string'}},
                                                                   'type': 'object'},
-                                                        'auth-type': {'type': 'string'}},
+                                                        'auth-type': {'type': 'string'},
+                                                        'redacted': {'items': {'type': 'string'},
+                                                                     'type': 'array'}},
                                          'required': ['auth-type'],
                                          'type': 'object'},
-                     'CloudCredentialsResult': {'additionalProperties': False,
-                                                'properties': {'credentials': {'patternProperties': {'.*': {'$ref': '#/definitions/CloudCredential'}},
-                                                                               'type': 'object'},
-                                                               'error': {'$ref': '#/definitions/Error'}},
+                     'CloudCredentialResult': {'additionalProperties': False,
+                                               'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                              'result': {'$ref': '#/definitions/CloudCredential'}},
+                                               'type': 'object'},
+                     'CloudCredentialResults': {'additionalProperties': False,
+                                                'properties': {'results': {'items': {'$ref': '#/definitions/CloudCredentialResult'},
+                                                                           'type': 'array'}},
                                                 'type': 'object'},
-                     'CloudCredentialsResults': {'additionalProperties': False,
-                                                 'properties': {'results': {'items': {'$ref': '#/definitions/CloudCredentialsResult'},
-                                                                            'type': 'array'}},
-                                                 'type': 'object'},
-                     'CloudDefaults': {'additionalProperties': False,
-                                       'properties': {'cloud-tag': {'type': 'string'},
-                                                      'credential': {'type': 'string'},
-                                                      'region': {'type': 'string'}},
-                                       'required': ['cloud-tag'],
-                                       'type': 'object'},
-                     'CloudDefaultsResult': {'additionalProperties': False,
-                                             'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                            'result': {'$ref': '#/definitions/CloudDefaults'}},
-                                             'required': ['error'],
-                                             'type': 'object'},
-                     'CloudDefaultsResults': {'additionalProperties': False,
-                                              'properties': {'results': {'items': {'$ref': '#/definitions/CloudDefaultsResult'},
-                                                                         'type': 'array'}},
-                                              'type': 'object'},
                      'CloudRegion': {'additionalProperties': False,
                                      'properties': {'endpoint': {'type': 'string'},
-                                                    'name': {'type': 'string'}},
+                                                    'identity-endpoint': {'type': 'string'},
+                                                    'name': {'type': 'string'},
+                                                    'storage-endpoint': {'type': 'string'}},
                                      'required': ['name'],
                                      'type': 'object'},
                      'CloudResult': {'additionalProperties': False,
@@ -9030,6 +9520,10 @@ class CloudFacade(Type):
                      'CloudResults': {'additionalProperties': False,
                                       'properties': {'results': {'items': {'$ref': '#/definitions/CloudResult'},
                                                                  'type': 'array'}},
+                                      'type': 'object'},
+                     'CloudsResult': {'additionalProperties': False,
+                                      'properties': {'clouds': {'patternProperties': {'.*': {'$ref': '#/definitions/Cloud'}},
+                                                                'type': 'object'}},
                                       'type': 'object'},
                      'Entities': {'additionalProperties': False,
                                   'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
@@ -9059,99 +9553,161 @@ class CloudFacade(Type):
                                       'required': ['results'],
                                       'type': 'object'},
                      'Macaroon': {'additionalProperties': False, 'type': 'object'},
+                     'StringResult': {'additionalProperties': False,
+                                      'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                     'result': {'type': 'string'}},
+                                      'required': ['result'],
+                                      'type': 'object'},
+                     'StringsResult': {'additionalProperties': False,
+                                       'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                      'result': {'items': {'type': 'string'},
+                                                                 'type': 'array'}},
+                                       'type': 'object'},
+                     'StringsResults': {'additionalProperties': False,
+                                        'properties': {'results': {'items': {'$ref': '#/definitions/StringsResult'},
+                                                                   'type': 'array'}},
+                                        'required': ['results'],
+                                        'type': 'object'},
+                     'UpdateCloudCredential': {'additionalProperties': False,
+                                               'properties': {'credential': {'$ref': '#/definitions/CloudCredential'},
+                                                              'tag': {'type': 'string'}},
+                                               'required': ['tag', 'credential'],
+                                               'type': 'object'},
+                     'UpdateCloudCredentials': {'additionalProperties': False,
+                                                'properties': {'credentials': {'items': {'$ref': '#/definitions/UpdateCloudCredential'},
+                                                                               'type': 'array'}},
+                                                'type': 'object'},
                      'UserCloud': {'additionalProperties': False,
                                    'properties': {'cloud-tag': {'type': 'string'},
                                                   'user-tag': {'type': 'string'}},
                                    'required': ['user-tag', 'cloud-tag'],
                                    'type': 'object'},
-                     'UserCloudCredentials': {'additionalProperties': False,
-                                              'properties': {'cloud-tag': {'type': 'string'},
-                                                             'credentials': {'patternProperties': {'.*': {'$ref': '#/definitions/CloudCredential'}},
-                                                                             'type': 'object'},
-                                                             'user-tag': {'type': 'string'}},
-                                              'required': ['user-tag',
-                                                           'cloud-tag',
-                                                           'credentials'],
-                                              'type': 'object'},
                      'UserClouds': {'additionalProperties': False,
                                     'properties': {'user-clouds': {'items': {'$ref': '#/definitions/UserCloud'},
                                                                    'type': 'array'}},
-                                    'type': 'object'},
-                     'UsersCloudCredentials': {'additionalProperties': False,
-                                               'properties': {'users': {'items': {'$ref': '#/definitions/UserCloudCredentials'},
-                                                                        'type': 'array'}},
-                                               'required': ['users'],
-                                               'type': 'object'}},
+                                    'type': 'object'}},
      'properties': {'Cloud': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                              'Result': {'$ref': '#/definitions/CloudResults'}},
                               'type': 'object'},
-                    'CloudDefaults': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                     'Result': {'$ref': '#/definitions/CloudDefaultsResults'}},
-                                      'type': 'object'},
-                    'Credentials': {'properties': {'Params': {'$ref': '#/definitions/UserClouds'},
-                                                   'Result': {'$ref': '#/definitions/CloudCredentialsResults'}},
-                                    'type': 'object'},
-                    'UpdateCredentials': {'properties': {'Params': {'$ref': '#/definitions/UsersCloudCredentials'},
+                    'Clouds': {'properties': {'Result': {'$ref': '#/definitions/CloudsResult'}},
+                               'type': 'object'},
+                    'Credential': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                  'Result': {'$ref': '#/definitions/CloudCredentialResults'}},
+                                   'type': 'object'},
+                    'DefaultCloud': {'properties': {'Result': {'$ref': '#/definitions/StringResult'}},
+                                     'type': 'object'},
+                    'RevokeCredentials': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                          'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                          'type': 'object'}},
+                                          'type': 'object'},
+                    'UpdateCredentials': {'properties': {'Params': {'$ref': '#/definitions/UpdateCloudCredentials'},
+                                                         'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                          'type': 'object'},
+                    'UserCredentials': {'properties': {'Params': {'$ref': '#/definitions/UserClouds'},
+                                                       'Result': {'$ref': '#/definitions/StringsResults'}},
+                                        'type': 'object'}},
      'type': 'object'}
     
 
     @ReturnMapping(CloudResults)
     async def Cloud(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~CloudResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~CloudResult]<~CloudResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Cloud', Request='Cloud', Version=1, Params=params)
+        msg = dict(type='Cloud', request='Cloud', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(CloudDefaultsResults)
-    async def CloudDefaults(self, entities):
+    @ReturnMapping(CloudsResult)
+    async def Clouds(self):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~CloudDefaultsResult]
+
+        Returns -> typing.Mapping<~KT, +VT_co>[str, ~Cloud]<~Cloud>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Cloud', Request='CloudDefaults', Version=1, Params=params)
+        msg = dict(type='Cloud', request='Clouds', version=1, params=params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CloudCredentialResults)
+    async def Credential(self, entities):
+        '''
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~CloudCredentialResult]<~CloudCredentialResult>
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(type='Cloud', request='Credential', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(CloudCredentialsResults)
-    async def Credentials(self, user_clouds):
+    @ReturnMapping(StringResult)
+    async def DefaultCloud(self):
         '''
-        user_clouds : typing.Sequence[~UserCloud]
-        Returns -> typing.Sequence[~CloudCredentialsResult]
+
+        Returns -> typing.Union[_ForwardRef('Error'), str]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Cloud', Request='Credentials', Version=1, Params=params)
-        params['user-clouds'] = user_clouds
+        msg = dict(type='Cloud', request='DefaultCloud', version=1, params=params)
+
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def UpdateCredentials(self, users):
+    async def RevokeCredentials(self, entities):
         '''
-        users : typing.Sequence[~UserCloudCredentials]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Cloud', Request='UpdateCredentials', Version=1, Params=params)
-        params['users'] = users
+        msg = dict(type='Cloud', request='RevokeCredentials', version=1, params=params)
+        params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def UpdateCredentials(self, credentials):
+        '''
+        credentials : typing.Sequence<+T_co>[~UpdateCloudCredential]<~UpdateCloudCredential>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(type='Cloud', request='UpdateCredentials', version=1, params=params)
+        params['credentials'] = credentials
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsResults)
+    async def UserCredentials(self, user_clouds):
+        '''
+        user_clouds : typing.Sequence<+T_co>[~UserCloud]<~UserCloud>
+        Returns -> typing.Sequence<+T_co>[~StringsResult]<~StringsResult>
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(type='Cloud', request='UserCredentials', version=1, params=params)
+        params['user-clouds'] = user_clouds
         reply = await self.rpc(msg)
         return reply
 
@@ -9163,6 +9719,32 @@ class ControllerFacade(Type):
                                       'properties': {'watcher-id': {'type': 'string'}},
                                       'required': ['watcher-id'],
                                       'type': 'object'},
+                     'CloudCredential': {'additionalProperties': False,
+                                         'properties': {'attrs': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                  'type': 'object'},
+                                                        'auth-type': {'type': 'string'},
+                                                        'redacted': {'items': {'type': 'string'},
+                                                                     'type': 'array'}},
+                                         'required': ['auth-type'],
+                                         'type': 'object'},
+                     'CloudSpec': {'additionalProperties': False,
+                                   'properties': {'credential': {'$ref': '#/definitions/CloudCredential'},
+                                                  'endpoint': {'type': 'string'},
+                                                  'identity-endpoint': {'type': 'string'},
+                                                  'name': {'type': 'string'},
+                                                  'region': {'type': 'string'},
+                                                  'storage-endpoint': {'type': 'string'},
+                                                  'type': {'type': 'string'}},
+                                   'required': ['type', 'name'],
+                                   'type': 'object'},
+                     'CloudSpecResult': {'additionalProperties': False,
+                                         'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                        'result': {'$ref': '#/definitions/CloudSpec'}},
+                                         'type': 'object'},
+                     'CloudSpecResults': {'additionalProperties': False,
+                                          'properties': {'results': {'items': {'$ref': '#/definitions/CloudSpecResult'},
+                                                                     'type': 'array'}},
+                                          'type': 'object'},
                      'ConfigValue': {'additionalProperties': False,
                                      'properties': {'source': {'type': 'string'},
                                                     'value': {'additionalProperties': True,
@@ -9198,24 +9780,50 @@ class ControllerFacade(Type):
                                    'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
                                                   'macaroon-path': {'type': 'string'}},
                                    'type': 'object'},
-                     'InitiateModelMigrationArgs': {'additionalProperties': False,
-                                                    'properties': {'specs': {'items': {'$ref': '#/definitions/ModelMigrationSpec'},
+                     'ErrorResult': {'additionalProperties': False,
+                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
+                                     'type': 'object'},
+                     'ErrorResults': {'additionalProperties': False,
+                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
+                                                                 'type': 'array'}},
+                                      'required': ['results'],
+                                      'type': 'object'},
+                     'InitiateMigrationArgs': {'additionalProperties': False,
+                                               'properties': {'specs': {'items': {'$ref': '#/definitions/MigrationSpec'},
+                                                                        'type': 'array'}},
+                                               'required': ['specs'],
+                                               'type': 'object'},
+                     'InitiateMigrationResult': {'additionalProperties': False,
+                                                 'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                                'migration-id': {'type': 'string'},
+                                                                'model-tag': {'type': 'string'}},
+                                                 'required': ['model-tag',
+                                                              'migration-id'],
+                                                 'type': 'object'},
+                     'InitiateMigrationResults': {'additionalProperties': False,
+                                                  'properties': {'results': {'items': {'$ref': '#/definitions/InitiateMigrationResult'},
                                                                              'type': 'array'}},
-                                                    'required': ['specs'],
-                                                    'type': 'object'},
-                     'InitiateModelMigrationResult': {'additionalProperties': False,
-                                                      'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                                     'id': {'type': 'string'},
-                                                                     'model-tag': {'type': 'string'}},
-                                                      'required': ['model-tag',
-                                                                   'id'],
-                                                      'type': 'object'},
-                     'InitiateModelMigrationResults': {'additionalProperties': False,
-                                                       'properties': {'results': {'items': {'$ref': '#/definitions/InitiateModelMigrationResult'},
-                                                                                  'type': 'array'}},
-                                                       'required': ['results'],
-                                                       'type': 'object'},
+                                                  'required': ['results'],
+                                                  'type': 'object'},
                      'Macaroon': {'additionalProperties': False, 'type': 'object'},
+                     'MigrationSpec': {'additionalProperties': False,
+                                       'properties': {'model-tag': {'type': 'string'},
+                                                      'target-info': {'$ref': '#/definitions/MigrationTargetInfo'}},
+                                       'required': ['model-tag', 'target-info'],
+                                       'type': 'object'},
+                     'MigrationTargetInfo': {'additionalProperties': False,
+                                             'properties': {'addrs': {'items': {'type': 'string'},
+                                                                      'type': 'array'},
+                                                            'auth-tag': {'type': 'string'},
+                                                            'ca-cert': {'type': 'string'},
+                                                            'controller-tag': {'type': 'string'},
+                                                            'macaroon': {'type': 'string'},
+                                                            'password': {'type': 'string'}},
+                                             'required': ['controller-tag',
+                                                          'addrs',
+                                                          'ca-cert',
+                                                          'auth-tag'],
+                                             'type': 'object'},
                      'Model': {'additionalProperties': False,
                                'properties': {'name': {'type': 'string'},
                                               'owner-tag': {'type': 'string'},
@@ -9242,25 +9850,6 @@ class ControllerFacade(Type):
                                                                       'type': 'object'}},
                                             'required': ['config'],
                                             'type': 'object'},
-                     'ModelMigrationSpec': {'additionalProperties': False,
-                                            'properties': {'model-tag': {'type': 'string'},
-                                                           'target-info': {'$ref': '#/definitions/ModelMigrationTargetInfo'}},
-                                            'required': ['model-tag',
-                                                         'target-info'],
-                                            'type': 'object'},
-                     'ModelMigrationTargetInfo': {'additionalProperties': False,
-                                                  'properties': {'addrs': {'items': {'type': 'string'},
-                                                                           'type': 'array'},
-                                                                 'auth-tag': {'type': 'string'},
-                                                                 'ca-cert': {'type': 'string'},
-                                                                 'controller-tag': {'type': 'string'},
-                                                                 'password': {'type': 'string'}},
-                                                  'required': ['controller-tag',
-                                                               'addrs',
-                                                               'ca-cert',
-                                                               'auth-tag',
-                                                               'password'],
-                                                  'type': 'object'},
                      'ModelStatus': {'additionalProperties': False,
                                      'properties': {'application-count': {'type': 'integer'},
                                                     'hosted-machine-count': {'type': 'integer'},
@@ -9278,10 +9867,36 @@ class ControllerFacade(Type):
                                                                       'type': 'array'}},
                                             'required': ['models'],
                                             'type': 'object'},
+                     'ModifyControllerAccess': {'additionalProperties': False,
+                                                'properties': {'access': {'type': 'string'},
+                                                               'action': {'type': 'string'},
+                                                               'user-tag': {'type': 'string'}},
+                                                'required': ['user-tag',
+                                                             'action',
+                                                             'access'],
+                                                'type': 'object'},
+                     'ModifyControllerAccessRequest': {'additionalProperties': False,
+                                                       'properties': {'changes': {'items': {'$ref': '#/definitions/ModifyControllerAccess'},
+                                                                                  'type': 'array'}},
+                                                       'required': ['changes'],
+                                                       'type': 'object'},
                      'RemoveBlocksArgs': {'additionalProperties': False,
                                           'properties': {'all': {'type': 'boolean'}},
                                           'required': ['all'],
                                           'type': 'object'},
+                     'UserAccess': {'additionalProperties': False,
+                                    'properties': {'access': {'type': 'string'},
+                                                   'user-tag': {'type': 'string'}},
+                                    'required': ['user-tag', 'access'],
+                                    'type': 'object'},
+                     'UserAccessResult': {'additionalProperties': False,
+                                          'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                         'result': {'$ref': '#/definitions/UserAccess'}},
+                                          'type': 'object'},
+                     'UserAccessResults': {'additionalProperties': False,
+                                           'properties': {'results': {'items': {'$ref': '#/definitions/UserAccessResult'},
+                                                                      'type': 'array'}},
+                                           'type': 'object'},
                      'UserModel': {'additionalProperties': False,
                                    'properties': {'last-connection': {'format': 'date-time',
                                                                       'type': 'string'},
@@ -9295,13 +9910,19 @@ class ControllerFacade(Type):
                                        'type': 'object'}},
      'properties': {'AllModels': {'properties': {'Result': {'$ref': '#/definitions/UserModelList'}},
                                   'type': 'object'},
+                    'CloudSpec': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                 'Result': {'$ref': '#/definitions/CloudSpecResults'}},
+                                  'type': 'object'},
                     'ControllerConfig': {'properties': {'Result': {'$ref': '#/definitions/ControllerConfigResult'}},
                                          'type': 'object'},
                     'DestroyController': {'properties': {'Params': {'$ref': '#/definitions/DestroyControllerArgs'}},
                                           'type': 'object'},
-                    'InitiateModelMigration': {'properties': {'Params': {'$ref': '#/definitions/InitiateModelMigrationArgs'},
-                                                              'Result': {'$ref': '#/definitions/InitiateModelMigrationResults'}},
-                                               'type': 'object'},
+                    'GetControllerAccess': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                           'Result': {'$ref': '#/definitions/UserAccessResults'}},
+                                            'type': 'object'},
+                    'InitiateMigration': {'properties': {'Params': {'$ref': '#/definitions/InitiateMigrationArgs'},
+                                                         'Result': {'$ref': '#/definitions/InitiateMigrationResults'}},
+                                          'type': 'object'},
                     'ListBlockedModels': {'properties': {'Result': {'$ref': '#/definitions/ModelBlockInfoList'}},
                                           'type': 'object'},
                     'ModelConfig': {'properties': {'Result': {'$ref': '#/definitions/ModelConfigResults'}},
@@ -9309,6 +9930,9 @@ class ControllerFacade(Type):
                     'ModelStatus': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                    'Result': {'$ref': '#/definitions/ModelStatusResults'}},
                                     'type': 'object'},
+                    'ModifyControllerAccess': {'properties': {'Params': {'$ref': '#/definitions/ModifyControllerAccessRequest'},
+                                                              'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                               'type': 'object'},
                     'RemoveBlocks': {'properties': {'Params': {'$ref': '#/definitions/RemoveBlocksArgs'}},
                                      'type': 'object'},
                     'WatchAllModels': {'properties': {'Result': {'$ref': '#/definitions/AllWatcherId'}},
@@ -9320,12 +9944,27 @@ class ControllerFacade(Type):
     async def AllModels(self):
         '''
 
-        Returns -> typing.Sequence[~UserModel]
+        Returns -> typing.Sequence<+T_co>[~UserModel]<~UserModel>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Controller', Request='AllModels', Version=3, Params=params)
+        msg = dict(type='Controller', request='AllModels', version=3, params=params)
 
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CloudSpecResults)
+    async def CloudSpec(self, entities):
+        '''
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~CloudSpecResult]<~CloudSpecResult>
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(type='Controller', request='CloudSpec', version=3, params=params)
+        params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
@@ -9335,11 +9974,11 @@ class ControllerFacade(Type):
     async def ControllerConfig(self):
         '''
 
-        Returns -> typing.Mapping[str, typing.Any]
+        Returns -> typing.Mapping<~KT, +VT_co>[str, typing.Any]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Controller', Request='ControllerConfig', Version=3, Params=params)
+        msg = dict(type='Controller', request='ControllerConfig', version=3, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -9354,22 +9993,37 @@ class ControllerFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Controller', Request='DestroyController', Version=3, Params=params)
+        msg = dict(type='Controller', request='DestroyController', version=3, params=params)
         params['destroy-models'] = destroy_models
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(InitiateModelMigrationResults)
-    async def InitiateModelMigration(self, specs):
+    @ReturnMapping(UserAccessResults)
+    async def GetControllerAccess(self, entities):
         '''
-        specs : typing.Sequence[~ModelMigrationSpec]
-        Returns -> typing.Sequence[~InitiateModelMigrationResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~UserAccessResult]<~UserAccessResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Controller', Request='InitiateModelMigration', Version=3, Params=params)
+        msg = dict(type='Controller', request='GetControllerAccess', version=3, params=params)
+        params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(InitiateMigrationResults)
+    async def InitiateMigration(self, specs):
+        '''
+        specs : typing.Sequence<+T_co>[~MigrationSpec]<~MigrationSpec>
+        Returns -> typing.Sequence<+T_co>[~InitiateMigrationResult]<~InitiateMigrationResult>
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(type='Controller', request='InitiateMigration', version=3, params=params)
         params['specs'] = specs
         reply = await self.rpc(msg)
         return reply
@@ -9380,11 +10034,11 @@ class ControllerFacade(Type):
     async def ListBlockedModels(self):
         '''
 
-        Returns -> typing.Sequence[~ModelBlockInfo]
+        Returns -> typing.Sequence<+T_co>[~ModelBlockInfo]<~ModelBlockInfo>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Controller', Request='ListBlockedModels', Version=3, Params=params)
+        msg = dict(type='Controller', request='ListBlockedModels', version=3, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -9395,11 +10049,11 @@ class ControllerFacade(Type):
     async def ModelConfig(self):
         '''
 
-        Returns -> typing.Mapping[str, ~ConfigValue]
+        Returns -> typing.Mapping<~KT, +VT_co>[str, ~ConfigValue]<~ConfigValue>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Controller', Request='ModelConfig', Version=3, Params=params)
+        msg = dict(type='Controller', request='ModelConfig', version=3, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -9409,13 +10063,28 @@ class ControllerFacade(Type):
     @ReturnMapping(ModelStatusResults)
     async def ModelStatus(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ModelStatus]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ModelStatus]<~ModelStatus>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Controller', Request='ModelStatus', Version=3, Params=params)
+        msg = dict(type='Controller', request='ModelStatus', version=3, params=params)
         params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def ModifyControllerAccess(self, changes):
+        '''
+        changes : typing.Sequence<+T_co>[~ModifyControllerAccess]<~ModifyControllerAccess>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(type='Controller', request='ModifyControllerAccess', version=3, params=params)
+        params['changes'] = changes
         reply = await self.rpc(msg)
         return reply
 
@@ -9429,7 +10098,7 @@ class ControllerFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Controller', Request='RemoveBlocks', Version=3, Params=params)
+        msg = dict(type='Controller', request='RemoveBlocks', version=3, params=params)
         params['all'] = all_
         reply = await self.rpc(msg)
         return reply
@@ -9444,7 +10113,7 @@ class ControllerFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Controller', Request='WatchAllModels', Version=3, Params=params)
+        msg = dict(type='Controller', request='WatchAllModels', version=3, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -9592,11 +10261,11 @@ class DeployerFacade(Type):
     async def APIAddresses(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence[str]]
+        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence<+T_co>[str]]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Deployer', Request='APIAddresses', Version=1, Params=params)
+        msg = dict(type='Deployer', request='APIAddresses', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -9607,11 +10276,11 @@ class DeployerFacade(Type):
     async def APIHostPorts(self):
         '''
 
-        Returns -> typing.Sequence[~HostPort]
+        Returns -> typing.Sequence<+T_co>[~HostPort]<~HostPort>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Deployer', Request='APIHostPorts', Version=1, Params=params)
+        msg = dict(type='Deployer', request='APIHostPorts', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -9622,11 +10291,11 @@ class DeployerFacade(Type):
     async def CACert(self):
         '''
 
-        Returns -> typing.Sequence[int]
+        Returns -> typing.Sequence<+T_co>[int]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Deployer', Request='CACert', Version=1, Params=params)
+        msg = dict(type='Deployer', request='CACert', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -9637,11 +10306,11 @@ class DeployerFacade(Type):
     async def ConnectionInfo(self):
         '''
 
-        Returns -> typing.Sequence[str]
+        Returns -> typing.Sequence<+T_co>[str]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Deployer', Request='ConnectionInfo', Version=1, Params=params)
+        msg = dict(type='Deployer', request='ConnectionInfo', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -9651,12 +10320,12 @@ class DeployerFacade(Type):
     @ReturnMapping(LifeResults)
     async def Life(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~LifeResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~LifeResult]<~LifeResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Deployer', Request='Life', Version=1, Params=params)
+        msg = dict(type='Deployer', request='Life', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -9671,7 +10340,7 @@ class DeployerFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Deployer', Request='ModelUUID', Version=1, Params=params)
+        msg = dict(type='Deployer', request='ModelUUID', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -9681,12 +10350,12 @@ class DeployerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Remove(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Deployer', Request='Remove', Version=1, Params=params)
+        msg = dict(type='Deployer', request='Remove', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -9696,12 +10365,12 @@ class DeployerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetPasswords(self, changes):
         '''
-        changes : typing.Sequence[~EntityPassword]
-        Returns -> typing.Sequence[~ErrorResult]
+        changes : typing.Sequence<+T_co>[~EntityPassword]<~EntityPassword>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Deployer', Request='SetPasswords', Version=1, Params=params)
+        msg = dict(type='Deployer', request='SetPasswords', version=1, params=params)
         params['changes'] = changes
         reply = await self.rpc(msg)
         return reply
@@ -9712,11 +10381,11 @@ class DeployerFacade(Type):
     async def StateAddresses(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence[str]]
+        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence<+T_co>[str]]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Deployer', Request='StateAddresses', Version=1, Params=params)
+        msg = dict(type='Deployer', request='StateAddresses', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -9731,7 +10400,7 @@ class DeployerFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Deployer', Request='WatchAPIHostPorts', Version=1, Params=params)
+        msg = dict(type='Deployer', request='WatchAPIHostPorts', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -9741,12 +10410,12 @@ class DeployerFacade(Type):
     @ReturnMapping(StringsWatchResults)
     async def WatchUnits(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~StringsWatchResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~StringsWatchResult]<~StringsWatchResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Deployer', Request='WatchUnits', Version=1, Params=params)
+        msg = dict(type='Deployer', request='WatchUnits', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -9866,12 +10535,12 @@ class DiscoverSpacesFacade(Type):
     @ReturnMapping(ErrorResults)
     async def AddSubnets(self, subnets):
         '''
-        subnets : typing.Sequence[~AddSubnetParams]
-        Returns -> typing.Sequence[~ErrorResult]
+        subnets : typing.Sequence<+T_co>[~AddSubnetParams]<~AddSubnetParams>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='DiscoverSpaces', Request='AddSubnets', Version=2, Params=params)
+        msg = dict(type='DiscoverSpaces', request='AddSubnets', version=2, params=params)
         params['subnets'] = subnets
         reply = await self.rpc(msg)
         return reply
@@ -9881,12 +10550,12 @@ class DiscoverSpacesFacade(Type):
     @ReturnMapping(ErrorResults)
     async def CreateSpaces(self, spaces):
         '''
-        spaces : typing.Sequence[~CreateSpaceParams]
-        Returns -> typing.Sequence[~ErrorResult]
+        spaces : typing.Sequence<+T_co>[~CreateSpaceParams]<~CreateSpaceParams>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='DiscoverSpaces', Request='CreateSpaces', Version=2, Params=params)
+        msg = dict(type='DiscoverSpaces', request='CreateSpaces', version=2, params=params)
         params['spaces'] = spaces
         reply = await self.rpc(msg)
         return reply
@@ -9897,11 +10566,11 @@ class DiscoverSpacesFacade(Type):
     async def ListSpaces(self):
         '''
 
-        Returns -> typing.Sequence[~ProviderSpace]
+        Returns -> typing.Sequence<+T_co>[~ProviderSpace]<~ProviderSpace>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='DiscoverSpaces', Request='ListSpaces', Version=2, Params=params)
+        msg = dict(type='DiscoverSpaces', request='ListSpaces', version=2, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -9913,11 +10582,11 @@ class DiscoverSpacesFacade(Type):
         '''
         space_tag : str
         zone : str
-        Returns -> typing.Sequence[~Subnet]
+        Returns -> typing.Sequence<+T_co>[~Subnet]<~Subnet>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='DiscoverSpaces', Request='ListSubnets', Version=2, Params=params)
+        msg = dict(type='DiscoverSpaces', request='ListSubnets', version=2, params=params)
         params['space-tag'] = space_tag
         params['zone'] = zone
         reply = await self.rpc(msg)
@@ -9929,11 +10598,11 @@ class DiscoverSpacesFacade(Type):
     async def ModelConfig(self):
         '''
 
-        Returns -> typing.Mapping[str, typing.Any]
+        Returns -> typing.Mapping<~KT, +VT_co>[str, typing.Any]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='DiscoverSpaces', Request='ModelConfig', Version=2, Params=params)
+        msg = dict(type='DiscoverSpaces', request='ModelConfig', version=2, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -10004,12 +10673,12 @@ class DiskManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetMachineBlockDevices(self, machine_block_devices):
         '''
-        machine_block_devices : typing.Sequence[~MachineBlockDevices]
-        Returns -> typing.Sequence[~ErrorResult]
+        machine_block_devices : typing.Sequence<+T_co>[~MachineBlockDevices]<~MachineBlockDevices>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='DiskManager', Request='SetMachineBlockDevices', Version=2, Params=params)
+        msg = dict(type='DiskManager', request='SetMachineBlockDevices', version=2, params=params)
         params['machine-block-devices'] = machine_block_devices
         reply = await self.rpc(msg)
         return reply
@@ -10046,11 +10715,11 @@ class EntityWatcherFacade(Type):
     async def Next(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error')]
+        Returns -> typing.Union[typing.Sequence<+T_co>[str], _ForwardRef('Error')]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='EntityWatcher', Request='Next', Version=2, Params=params)
+        msg = dict(type='EntityWatcher', request='Next', version=2, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -10065,7 +10734,7 @@ class EntityWatcherFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='EntityWatcher', Request='Stop', Version=2, Params=params)
+        msg = dict(type='EntityWatcher', request='Stop', version=2, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -10109,11 +10778,11 @@ class FilesystemAttachmentsWatcherFacade(Type):
     async def Next(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence[~MachineStorageId], _ForwardRef('Error')]
+        Returns -> typing.Union[typing.Sequence<+T_co>[~MachineStorageId]<~MachineStorageId>, _ForwardRef('Error')]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='FilesystemAttachmentsWatcher', Request='Next', Version=2, Params=params)
+        msg = dict(type='FilesystemAttachmentsWatcher', request='Next', version=2, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -10128,7 +10797,7 @@ class FilesystemAttachmentsWatcherFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='FilesystemAttachmentsWatcher', Request='Stop', Version=2, Params=params)
+        msg = dict(type='FilesystemAttachmentsWatcher', request='Stop', version=2, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -10147,6 +10816,32 @@ class FirewallerFacade(Type):
                                                                 'type': 'array'}},
                                      'required': ['results'],
                                      'type': 'object'},
+                     'CloudCredential': {'additionalProperties': False,
+                                         'properties': {'attrs': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                  'type': 'object'},
+                                                        'auth-type': {'type': 'string'},
+                                                        'redacted': {'items': {'type': 'string'},
+                                                                     'type': 'array'}},
+                                         'required': ['auth-type'],
+                                         'type': 'object'},
+                     'CloudSpec': {'additionalProperties': False,
+                                   'properties': {'credential': {'$ref': '#/definitions/CloudCredential'},
+                                                  'endpoint': {'type': 'string'},
+                                                  'identity-endpoint': {'type': 'string'},
+                                                  'name': {'type': 'string'},
+                                                  'region': {'type': 'string'},
+                                                  'storage-endpoint': {'type': 'string'},
+                                                  'type': {'type': 'string'}},
+                                   'required': ['type', 'name'],
+                                   'type': 'object'},
+                     'CloudSpecResult': {'additionalProperties': False,
+                                         'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                        'result': {'$ref': '#/definitions/CloudSpec'}},
+                                         'type': 'object'},
+                     'CloudSpecResults': {'additionalProperties': False,
+                                          'properties': {'results': {'items': {'$ref': '#/definitions/CloudSpecResult'},
+                                                                     'type': 'array'}},
+                                          'type': 'object'},
                      'Entities': {'additionalProperties': False,
                                   'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
                                                               'type': 'array'}},
@@ -10260,7 +10955,10 @@ class FirewallerFacade(Type):
                                                                         'type': 'array'}},
                                              'required': ['results'],
                                              'type': 'object'}},
-     'properties': {'GetAssignedMachine': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+     'properties': {'CloudSpec': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                 'Result': {'$ref': '#/definitions/CloudSpecResults'}},
+                                  'type': 'object'},
+                    'GetAssignedMachine': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                           'Result': {'$ref': '#/definitions/StringResults'}},
                                            'type': 'object'},
                     'GetExposed': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
@@ -10296,15 +10994,30 @@ class FirewallerFacade(Type):
      'type': 'object'}
     
 
-    @ReturnMapping(StringResults)
-    async def GetAssignedMachine(self, entities):
+    @ReturnMapping(CloudSpecResults)
+    async def CloudSpec(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~StringResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~CloudSpecResult]<~CloudSpecResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Firewaller', Request='GetAssignedMachine', Version=3, Params=params)
+        msg = dict(type='Firewaller', request='CloudSpec', version=3, params=params)
+        params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResults)
+    async def GetAssignedMachine(self, entities):
+        '''
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~StringResult]<~StringResult>
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(type='Firewaller', request='GetAssignedMachine', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -10314,12 +11027,12 @@ class FirewallerFacade(Type):
     @ReturnMapping(BoolResults)
     async def GetExposed(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~BoolResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~BoolResult]<~BoolResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Firewaller', Request='GetExposed', Version=3, Params=params)
+        msg = dict(type='Firewaller', request='GetExposed', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -10329,12 +11042,12 @@ class FirewallerFacade(Type):
     @ReturnMapping(StringsResults)
     async def GetMachineActiveSubnets(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~StringsResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~StringsResult]<~StringsResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Firewaller', Request='GetMachineActiveSubnets', Version=3, Params=params)
+        msg = dict(type='Firewaller', request='GetMachineActiveSubnets', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -10344,12 +11057,12 @@ class FirewallerFacade(Type):
     @ReturnMapping(MachinePortsResults)
     async def GetMachinePorts(self, params):
         '''
-        params : typing.Sequence[~MachinePorts]
-        Returns -> typing.Sequence[~MachinePortsResult]
+        params : typing.Sequence<+T_co>[~MachinePorts]<~MachinePorts>
+        Returns -> typing.Sequence<+T_co>[~MachinePortsResult]<~MachinePortsResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Firewaller', Request='GetMachinePorts', Version=3, Params=params)
+        msg = dict(type='Firewaller', request='GetMachinePorts', version=3, params=params)
         params['params'] = params
         reply = await self.rpc(msg)
         return reply
@@ -10359,12 +11072,12 @@ class FirewallerFacade(Type):
     @ReturnMapping(StringResults)
     async def InstanceId(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~StringResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~StringResult]<~StringResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Firewaller', Request='InstanceId', Version=3, Params=params)
+        msg = dict(type='Firewaller', request='InstanceId', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -10374,12 +11087,12 @@ class FirewallerFacade(Type):
     @ReturnMapping(LifeResults)
     async def Life(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~LifeResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~LifeResult]<~LifeResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Firewaller', Request='Life', Version=3, Params=params)
+        msg = dict(type='Firewaller', request='Life', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -10390,11 +11103,11 @@ class FirewallerFacade(Type):
     async def ModelConfig(self):
         '''
 
-        Returns -> typing.Mapping[str, typing.Any]
+        Returns -> typing.Mapping<~KT, +VT_co>[str, typing.Any]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Firewaller', Request='ModelConfig', Version=3, Params=params)
+        msg = dict(type='Firewaller', request='ModelConfig', version=3, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -10404,12 +11117,12 @@ class FirewallerFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def Watch(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~NotifyWatchResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Firewaller', Request='Watch', Version=3, Params=params)
+        msg = dict(type='Firewaller', request='Watch', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -10424,7 +11137,7 @@ class FirewallerFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Firewaller', Request='WatchForModelConfigChanges', Version=3, Params=params)
+        msg = dict(type='Firewaller', request='WatchForModelConfigChanges', version=3, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -10435,11 +11148,11 @@ class FirewallerFacade(Type):
     async def WatchModelMachines(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error')]
+        Returns -> typing.Union[typing.Sequence<+T_co>[str], _ForwardRef('Error')]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Firewaller', Request='WatchModelMachines', Version=3, Params=params)
+        msg = dict(type='Firewaller', request='WatchModelMachines', version=3, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -10449,12 +11162,12 @@ class FirewallerFacade(Type):
     @ReturnMapping(StringsWatchResults)
     async def WatchOpenedPorts(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~StringsWatchResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~StringsWatchResult]<~StringsWatchResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Firewaller', Request='WatchOpenedPorts', Version=3, Params=params)
+        msg = dict(type='Firewaller', request='WatchOpenedPorts', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -10464,12 +11177,12 @@ class FirewallerFacade(Type):
     @ReturnMapping(StringsWatchResults)
     async def WatchUnits(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~StringsWatchResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~StringsWatchResult]<~StringsWatchResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Firewaller', Request='WatchUnits', Version=3, Params=params)
+        msg = dict(type='Firewaller', request='WatchUnits', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -10624,12 +11337,12 @@ class HighAvailabilityFacade(Type):
     @ReturnMapping(ControllersChangeResults)
     async def EnableHA(self, specs):
         '''
-        specs : typing.Sequence[~ControllersSpec]
-        Returns -> typing.Sequence[~ControllersChangeResult]
+        specs : typing.Sequence<+T_co>[~ControllersSpec]<~ControllersSpec>
+        Returns -> typing.Sequence<+T_co>[~ControllersChangeResult]<~ControllersChangeResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='HighAvailability', Request='EnableHA', Version=2, Params=params)
+        msg = dict(type='HighAvailability', request='EnableHA', version=2, params=params)
         params['specs'] = specs
         reply = await self.rpc(msg)
         return reply
@@ -10639,12 +11352,12 @@ class HighAvailabilityFacade(Type):
     @ReturnMapping(None)
     async def ResumeHAReplicationAfterUpgrade(self, members):
         '''
-        members : typing.Sequence[~Member]
+        members : typing.Sequence<+T_co>[~Member]<~Member>
         Returns -> None
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='HighAvailability', Request='ResumeHAReplicationAfterUpgrade', Version=2, Params=params)
+        msg = dict(type='HighAvailability', request='ResumeHAReplicationAfterUpgrade', version=2, params=params)
         params['members'] = members
         reply = await self.rpc(msg)
         return reply
@@ -10658,11 +11371,11 @@ class HighAvailabilityFacade(Type):
         minor : int
         patch : str
         storageengine : str
-        Returns -> typing.Union[_ForwardRef('HAMember'), typing.Sequence[~Member]]
+        Returns -> typing.Union[_ForwardRef('HAMember'), typing.Sequence<+T_co>[~Member]<~Member>]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='HighAvailability', Request='StopHAReplicationForUpgrade', Version=2, Params=params)
+        msg = dict(type='HighAvailability', request='StopHAReplicationForUpgrade', version=2, params=params)
         params['Major'] = major
         params['Minor'] = minor
         params['Patch'] = patch
@@ -10713,12 +11426,12 @@ class HostKeyReporterFacade(Type):
     @ReturnMapping(ErrorResults)
     async def ReportKeys(self, entity_keys):
         '''
-        entity_keys : typing.Sequence[~SSHHostKeys]
-        Returns -> typing.Sequence[~ErrorResult]
+        entity_keys : typing.Sequence<+T_co>[~SSHHostKeys]<~SSHHostKeys>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='HostKeyReporter', Request='ReportKeys', Version=1, Params=params)
+        msg = dict(type='HostKeyReporter', request='ReportKeys', version=1, params=params)
         params['entity-keys'] = entity_keys
         reply = await self.rpc(msg)
         return reply
@@ -10787,12 +11500,12 @@ class ImageManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def DeleteImages(self, images):
         '''
-        images : typing.Sequence[~ImageSpec]
-        Returns -> typing.Sequence[~ErrorResult]
+        images : typing.Sequence<+T_co>[~ImageSpec]<~ImageSpec>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='ImageManager', Request='DeleteImages', Version=2, Params=params)
+        msg = dict(type='ImageManager', request='DeleteImages', version=2, params=params)
         params['images'] = images
         reply = await self.rpc(msg)
         return reply
@@ -10802,12 +11515,12 @@ class ImageManagerFacade(Type):
     @ReturnMapping(ListImageResult)
     async def ListImages(self, images):
         '''
-        images : typing.Sequence[~ImageSpec]
-        Returns -> typing.Sequence[~ImageMetadata]
+        images : typing.Sequence<+T_co>[~ImageSpec]<~ImageSpec>
+        Returns -> typing.Sequence<+T_co>[~ImageMetadata]<~ImageMetadata>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='ImageManager', Request='ListImages', Version=2, Params=params)
+        msg = dict(type='ImageManager', request='ListImages', version=2, params=params)
         params['images'] = images
         reply = await self.rpc(msg)
         return reply
@@ -10899,12 +11612,12 @@ class ImageMetadataFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Delete(self, image_ids):
         '''
-        image_ids : typing.Sequence[str]
-        Returns -> typing.Sequence[~ErrorResult]
+        image_ids : typing.Sequence<+T_co>[str]
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='ImageMetadata', Request='Delete', Version=2, Params=params)
+        msg = dict(type='ImageMetadata', request='Delete', version=2, params=params)
         params['image-ids'] = image_ids
         reply = await self.rpc(msg)
         return reply
@@ -10914,17 +11627,17 @@ class ImageMetadataFacade(Type):
     @ReturnMapping(ListCloudImageMetadataResult)
     async def List(self, arches, region, root_storage_type, series, stream, virt_type):
         '''
-        arches : typing.Sequence[str]
+        arches : typing.Sequence<+T_co>[str]
         region : str
         root_storage_type : str
-        series : typing.Sequence[str]
+        series : typing.Sequence<+T_co>[str]
         stream : str
         virt_type : str
-        Returns -> typing.Sequence[~CloudImageMetadata]
+        Returns -> typing.Sequence<+T_co>[~CloudImageMetadata]<~CloudImageMetadata>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='ImageMetadata', Request='List', Version=2, Params=params)
+        msg = dict(type='ImageMetadata', request='List', version=2, params=params)
         params['arches'] = arches
         params['region'] = region
         params['root-storage-type'] = root_storage_type
@@ -10939,12 +11652,12 @@ class ImageMetadataFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Save(self, metadata):
         '''
-        metadata : typing.Sequence[~CloudImageMetadataList]
-        Returns -> typing.Sequence[~ErrorResult]
+        metadata : typing.Sequence<+T_co>[~CloudImageMetadataList]<~CloudImageMetadataList>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='ImageMetadata', Request='Save', Version=2, Params=params)
+        msg = dict(type='ImageMetadata', request='Save', version=2, params=params)
         params['metadata'] = metadata
         reply = await self.rpc(msg)
         return reply
@@ -10959,7 +11672,7 @@ class ImageMetadataFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='ImageMetadata', Request='UpdateFromPublishedImages', Version=2, Params=params)
+        msg = dict(type='ImageMetadata', request='UpdateFromPublishedImages', version=2, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -11149,12 +11862,12 @@ class InstancePollerFacade(Type):
     @ReturnMapping(BoolResults)
     async def AreManuallyProvisioned(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~BoolResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~BoolResult]<~BoolResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='InstancePoller', Request='AreManuallyProvisioned', Version=3, Params=params)
+        msg = dict(type='InstancePoller', request='AreManuallyProvisioned', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -11164,12 +11877,12 @@ class InstancePollerFacade(Type):
     @ReturnMapping(StringResults)
     async def InstanceId(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~StringResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~StringResult]<~StringResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='InstancePoller', Request='InstanceId', Version=3, Params=params)
+        msg = dict(type='InstancePoller', request='InstanceId', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -11179,12 +11892,12 @@ class InstancePollerFacade(Type):
     @ReturnMapping(StatusResults)
     async def InstanceStatus(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~StatusResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~StatusResult]<~StatusResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='InstancePoller', Request='InstanceStatus', Version=3, Params=params)
+        msg = dict(type='InstancePoller', request='InstanceStatus', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -11194,12 +11907,12 @@ class InstancePollerFacade(Type):
     @ReturnMapping(LifeResults)
     async def Life(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~LifeResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~LifeResult]<~LifeResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='InstancePoller', Request='Life', Version=3, Params=params)
+        msg = dict(type='InstancePoller', request='Life', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -11210,11 +11923,11 @@ class InstancePollerFacade(Type):
     async def ModelConfig(self):
         '''
 
-        Returns -> typing.Mapping[str, typing.Any]
+        Returns -> typing.Mapping<~KT, +VT_co>[str, typing.Any]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='InstancePoller', Request='ModelConfig', Version=3, Params=params)
+        msg = dict(type='InstancePoller', request='ModelConfig', version=3, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -11224,12 +11937,12 @@ class InstancePollerFacade(Type):
     @ReturnMapping(MachineAddressesResults)
     async def ProviderAddresses(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~MachineAddressesResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~MachineAddressesResult]<~MachineAddressesResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='InstancePoller', Request='ProviderAddresses', Version=3, Params=params)
+        msg = dict(type='InstancePoller', request='ProviderAddresses', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -11239,12 +11952,12 @@ class InstancePollerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetInstanceStatus(self, entities):
         '''
-        entities : typing.Sequence[~EntityStatusArgs]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='InstancePoller', Request='SetInstanceStatus', Version=3, Params=params)
+        msg = dict(type='InstancePoller', request='SetInstanceStatus', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -11254,12 +11967,12 @@ class InstancePollerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetProviderAddresses(self, machine_addresses):
         '''
-        machine_addresses : typing.Sequence[~MachineAddresses]
-        Returns -> typing.Sequence[~ErrorResult]
+        machine_addresses : typing.Sequence<+T_co>[~MachineAddresses]<~MachineAddresses>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='InstancePoller', Request='SetProviderAddresses', Version=3, Params=params)
+        msg = dict(type='InstancePoller', request='SetProviderAddresses', version=3, params=params)
         params['machine-addresses'] = machine_addresses
         reply = await self.rpc(msg)
         return reply
@@ -11269,12 +11982,12 @@ class InstancePollerFacade(Type):
     @ReturnMapping(StatusResults)
     async def Status(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~StatusResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~StatusResult]<~StatusResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='InstancePoller', Request='Status', Version=3, Params=params)
+        msg = dict(type='InstancePoller', request='Status', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -11289,7 +12002,7 @@ class InstancePollerFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='InstancePoller', Request='WatchForModelConfigChanges', Version=3, Params=params)
+        msg = dict(type='InstancePoller', request='WatchForModelConfigChanges', version=3, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -11300,11 +12013,11 @@ class InstancePollerFacade(Type):
     async def WatchModelMachines(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error')]
+        Returns -> typing.Union[typing.Sequence<+T_co>[str], _ForwardRef('Error')]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='InstancePoller', Request='WatchModelMachines', Version=3, Params=params)
+        msg = dict(type='InstancePoller', request='WatchModelMachines', version=3, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -11380,13 +12093,13 @@ class KeyManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def AddKeys(self, ssh_keys, user):
         '''
-        ssh_keys : typing.Sequence[str]
+        ssh_keys : typing.Sequence<+T_co>[str]
         user : str
-        Returns -> typing.Sequence[~ErrorResult]
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='KeyManager', Request='AddKeys', Version=1, Params=params)
+        msg = dict(type='KeyManager', request='AddKeys', version=1, params=params)
         params['ssh-keys'] = ssh_keys
         params['user'] = user
         reply = await self.rpc(msg)
@@ -11397,13 +12110,13 @@ class KeyManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def DeleteKeys(self, ssh_keys, user):
         '''
-        ssh_keys : typing.Sequence[str]
+        ssh_keys : typing.Sequence<+T_co>[str]
         user : str
-        Returns -> typing.Sequence[~ErrorResult]
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='KeyManager', Request='DeleteKeys', Version=1, Params=params)
+        msg = dict(type='KeyManager', request='DeleteKeys', version=1, params=params)
         params['ssh-keys'] = ssh_keys
         params['user'] = user
         reply = await self.rpc(msg)
@@ -11414,13 +12127,13 @@ class KeyManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def ImportKeys(self, ssh_keys, user):
         '''
-        ssh_keys : typing.Sequence[str]
+        ssh_keys : typing.Sequence<+T_co>[str]
         user : str
-        Returns -> typing.Sequence[~ErrorResult]
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='KeyManager', Request='ImportKeys', Version=1, Params=params)
+        msg = dict(type='KeyManager', request='ImportKeys', version=1, params=params)
         params['ssh-keys'] = ssh_keys
         params['user'] = user
         reply = await self.rpc(msg)
@@ -11433,11 +12146,11 @@ class KeyManagerFacade(Type):
         '''
         entities : Entities
         mode : bool
-        Returns -> typing.Sequence[~StringsResult]
+        Returns -> typing.Sequence<+T_co>[~StringsResult]<~StringsResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='KeyManager', Request='ListKeys', Version=1, Params=params)
+        msg = dict(type='KeyManager', request='ListKeys', version=1, params=params)
         params['entities'] = entities
         params['mode'] = mode
         reply = await self.rpc(msg)
@@ -11499,12 +12212,12 @@ class KeyUpdaterFacade(Type):
     @ReturnMapping(StringsResults)
     async def AuthorisedKeys(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~StringsResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~StringsResult]<~StringsResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='KeyUpdater', Request='AuthorisedKeys', Version=1, Params=params)
+        msg = dict(type='KeyUpdater', request='AuthorisedKeys', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -11514,12 +12227,12 @@ class KeyUpdaterFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def WatchAuthorisedKeys(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~NotifyWatchResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='KeyUpdater', Request='WatchAuthorisedKeys', Version=1, Params=params)
+        msg = dict(type='KeyUpdater', request='WatchAuthorisedKeys', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -11581,7 +12294,7 @@ class LeadershipServiceFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='LeadershipService', Request='BlockUntilLeadershipReleased', Version=2, Params=params)
+        msg = dict(type='LeadershipService', request='BlockUntilLeadershipReleased', version=2, params=params)
         params['Name'] = name
         reply = await self.rpc(msg)
         return reply
@@ -11591,12 +12304,12 @@ class LeadershipServiceFacade(Type):
     @ReturnMapping(ClaimLeadershipBulkResults)
     async def ClaimLeadership(self, params):
         '''
-        params : typing.Sequence[~ClaimLeadershipParams]
-        Returns -> typing.Sequence[~ErrorResult]
+        params : typing.Sequence<+T_co>[~ClaimLeadershipParams]<~ClaimLeadershipParams>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='LeadershipService', Request='ClaimLeadership', Version=2, Params=params)
+        msg = dict(type='LeadershipService', request='ClaimLeadership', version=2, params=params)
         params['params'] = params
         reply = await self.rpc(msg)
         return reply
@@ -11657,12 +12370,12 @@ class LifeFlagFacade(Type):
     @ReturnMapping(LifeResults)
     async def Life(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~LifeResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~LifeResult]<~LifeResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='LifeFlag', Request='Life', Version=1, Params=params)
+        msg = dict(type='LifeFlag', request='Life', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -11672,12 +12385,12 @@ class LifeFlagFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def Watch(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~NotifyWatchResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='LifeFlag', Request='Watch', Version=1, Params=params)
+        msg = dict(type='LifeFlag', request='Watch', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -11711,8 +12424,10 @@ class LogForwardingFacade(Type):
                                                         'type': 'object'},
                      'LogForwardingGetLastSentResult': {'additionalProperties': False,
                                                         'properties': {'err': {'$ref': '#/definitions/Error'},
-                                                                       'record-id': {'type': 'integer'}},
+                                                                       'record-id': {'type': 'integer'},
+                                                                       'record-timestamp': {'type': 'integer'}},
                                                         'required': ['record-id',
+                                                                     'record-timestamp',
                                                                      'err'],
                                                         'type': 'object'},
                      'LogForwardingGetLastSentResults': {'additionalProperties': False,
@@ -11727,9 +12442,11 @@ class LogForwardingFacade(Type):
                                          'type': 'object'},
                      'LogForwardingSetLastSentParam': {'additionalProperties': False,
                                                        'properties': {'LogForwardingID': {'$ref': '#/definitions/LogForwardingID'},
-                                                                      'record-id': {'type': 'integer'}},
+                                                                      'record-id': {'type': 'integer'},
+                                                                      'record-timestamp': {'type': 'integer'}},
                                                        'required': ['LogForwardingID',
-                                                                    'record-id'],
+                                                                    'record-id',
+                                                                    'record-timestamp'],
                                                        'type': 'object'},
                      'LogForwardingSetLastSentParams': {'additionalProperties': False,
                                                         'properties': {'params': {'items': {'$ref': '#/definitions/LogForwardingSetLastSentParam'},
@@ -11749,12 +12466,12 @@ class LogForwardingFacade(Type):
     @ReturnMapping(LogForwardingGetLastSentResults)
     async def GetLastSent(self, ids):
         '''
-        ids : typing.Sequence[~LogForwardingID]
-        Returns -> typing.Sequence[~LogForwardingGetLastSentResult]
+        ids : typing.Sequence<+T_co>[~LogForwardingID]<~LogForwardingID>
+        Returns -> typing.Sequence<+T_co>[~LogForwardingGetLastSentResult]<~LogForwardingGetLastSentResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='LogForwarding', Request='GetLastSent', Version=1, Params=params)
+        msg = dict(type='LogForwarding', request='GetLastSent', version=1, params=params)
         params['ids'] = ids
         reply = await self.rpc(msg)
         return reply
@@ -11764,12 +12481,12 @@ class LogForwardingFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetLastSent(self, params):
         '''
-        params : typing.Sequence[~LogForwardingSetLastSentParam]
-        Returns -> typing.Sequence[~ErrorResult]
+        params : typing.Sequence<+T_co>[~LogForwardingSetLastSentParam]<~LogForwardingSetLastSentParam>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='LogForwarding', Request='SetLastSent', Version=1, Params=params)
+        msg = dict(type='LogForwarding', request='SetLastSent', version=1, params=params)
         params['params'] = params
         reply = await self.rpc(msg)
         return reply
@@ -11830,12 +12547,12 @@ class LoggerFacade(Type):
     @ReturnMapping(StringResults)
     async def LoggingConfig(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~StringResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~StringResult]<~StringResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Logger', Request='LoggingConfig', Version=1, Params=params)
+        msg = dict(type='Logger', request='LoggingConfig', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -11845,12 +12562,12 @@ class LoggerFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def WatchLoggingConfig(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~NotifyWatchResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Logger', Request='WatchLoggingConfig', Version=1, Params=params)
+        msg = dict(type='Logger', request='WatchLoggingConfig', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -11971,12 +12688,12 @@ class MachineActionsFacade(Type):
     @ReturnMapping(ActionResults)
     async def Actions(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ActionResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ActionResult]<~ActionResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='MachineActions', Request='Actions', Version=1, Params=params)
+        msg = dict(type='MachineActions', request='Actions', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -11986,12 +12703,12 @@ class MachineActionsFacade(Type):
     @ReturnMapping(ErrorResults)
     async def BeginActions(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='MachineActions', Request='BeginActions', Version=1, Params=params)
+        msg = dict(type='MachineActions', request='BeginActions', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -12001,12 +12718,12 @@ class MachineActionsFacade(Type):
     @ReturnMapping(ErrorResults)
     async def FinishActions(self, results):
         '''
-        results : typing.Sequence[~ActionExecutionResult]
-        Returns -> typing.Sequence[~ErrorResult]
+        results : typing.Sequence<+T_co>[~ActionExecutionResult]<~ActionExecutionResult>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='MachineActions', Request='FinishActions', Version=1, Params=params)
+        msg = dict(type='MachineActions', request='FinishActions', version=1, params=params)
         params['results'] = results
         reply = await self.rpc(msg)
         return reply
@@ -12016,12 +12733,12 @@ class MachineActionsFacade(Type):
     @ReturnMapping(ActionsByReceivers)
     async def RunningActions(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ActionsByReceiver]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ActionsByReceiver]<~ActionsByReceiver>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='MachineActions', Request='RunningActions', Version=1, Params=params)
+        msg = dict(type='MachineActions', request='RunningActions', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -12031,12 +12748,12 @@ class MachineActionsFacade(Type):
     @ReturnMapping(StringsWatchResults)
     async def WatchActionNotifications(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~StringsWatchResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~StringsWatchResult]<~StringsWatchResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='MachineActions', Request='WatchActionNotifications', Version=1, Params=params)
+        msg = dict(type='MachineActions', request='WatchActionNotifications', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -12147,13 +12864,151 @@ class MachineManagerFacade(Type):
     @ReturnMapping(AddMachinesResults)
     async def AddMachines(self, params):
         '''
-        params : typing.Sequence[~AddMachineParams]
-        Returns -> typing.Sequence[~AddMachinesResult]
+        params : typing.Sequence<+T_co>[~AddMachineParams]<~AddMachineParams>
+        Returns -> typing.Sequence<+T_co>[~AddMachinesResult]<~AddMachinesResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='MachineManager', Request='AddMachines', Version=2, Params=params)
+        msg = dict(type='MachineManager', request='AddMachines', version=2, params=params)
         params['params'] = params
+        reply = await self.rpc(msg)
+        return reply
+
+
+class MachineUndertakerFacade(Type):
+    name = 'MachineUndertaker'
+    version = 1
+    schema =     {'definitions': {'Entities': {'additionalProperties': False,
+                                  'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
+                                                              'type': 'array'}},
+                                  'required': ['entities'],
+                                  'type': 'object'},
+                     'EntitiesResult': {'additionalProperties': False,
+                                        'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
+                                                                    'type': 'array'},
+                                                       'error': {'$ref': '#/definitions/Error'}},
+                                        'required': ['entities'],
+                                        'type': 'object'},
+                     'EntitiesResults': {'additionalProperties': False,
+                                         'properties': {'results': {'items': {'$ref': '#/definitions/EntitiesResult'},
+                                                                    'type': 'array'}},
+                                         'required': ['results'],
+                                         'type': 'object'},
+                     'Entity': {'additionalProperties': False,
+                                'properties': {'tag': {'type': 'string'}},
+                                'required': ['tag'],
+                                'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'$ref': '#/definitions/ErrorInfo'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ErrorInfo': {'additionalProperties': False,
+                                   'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
+                                                  'macaroon-path': {'type': 'string'}},
+                                   'type': 'object'},
+                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
+                     'NotifyWatchResult': {'additionalProperties': False,
+                                           'properties': {'NotifyWatcherId': {'type': 'string'},
+                                                          'error': {'$ref': '#/definitions/Error'}},
+                                           'required': ['NotifyWatcherId'],
+                                           'type': 'object'},
+                     'NotifyWatchResults': {'additionalProperties': False,
+                                            'properties': {'results': {'items': {'$ref': '#/definitions/NotifyWatchResult'},
+                                                                       'type': 'array'}},
+                                            'required': ['results'],
+                                            'type': 'object'},
+                     'ProviderInterfaceInfo': {'additionalProperties': False,
+                                               'properties': {'interface-name': {'type': 'string'},
+                                                              'mac-address': {'type': 'string'},
+                                                              'provider-id': {'type': 'string'}},
+                                               'required': ['interface-name',
+                                                            'mac-address',
+                                                            'provider-id'],
+                                               'type': 'object'},
+                     'ProviderInterfaceInfoResult': {'additionalProperties': False,
+                                                     'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                                    'interfaces': {'items': {'$ref': '#/definitions/ProviderInterfaceInfo'},
+                                                                                   'type': 'array'},
+                                                                    'machine-tag': {'type': 'string'}},
+                                                     'required': ['machine-tag',
+                                                                  'interfaces'],
+                                                     'type': 'object'},
+                     'ProviderInterfaceInfoResults': {'additionalProperties': False,
+                                                      'properties': {'results': {'items': {'$ref': '#/definitions/ProviderInterfaceInfoResult'},
+                                                                                 'type': 'array'}},
+                                                      'required': ['results'],
+                                                      'type': 'object'}},
+     'properties': {'AllMachineRemovals': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                          'Result': {'$ref': '#/definitions/EntitiesResults'}},
+                                           'type': 'object'},
+                    'CompleteMachineRemovals': {'properties': {'Params': {'$ref': '#/definitions/Entities'}},
+                                                'type': 'object'},
+                    'GetMachineProviderInterfaceInfo': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                                       'Result': {'$ref': '#/definitions/ProviderInterfaceInfoResults'}},
+                                                        'type': 'object'},
+                    'WatchMachineRemovals': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                            'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
+                                             'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(EntitiesResults)
+    async def AllMachineRemovals(self, entities):
+        '''
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~EntitiesResult]<~EntitiesResult>
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(type='MachineUndertaker', request='AllMachineRemovals', version=1, params=params)
+        params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def CompleteMachineRemovals(self, entities):
+        '''
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> None
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(type='MachineUndertaker', request='CompleteMachineRemovals', version=1, params=params)
+        params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ProviderInterfaceInfoResults)
+    async def GetMachineProviderInterfaceInfo(self, entities):
+        '''
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ProviderInterfaceInfoResult]<~ProviderInterfaceInfoResult>
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(type='MachineUndertaker', request='GetMachineProviderInterfaceInfo', version=1, params=params)
+        params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResults)
+    async def WatchMachineRemovals(self, entities):
+        '''
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(type='MachineUndertaker', request='WatchMachineRemovals', version=1, params=params)
+        params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
@@ -12368,11 +13223,11 @@ class MachinerFacade(Type):
     async def APIAddresses(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence[str]]
+        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence<+T_co>[str]]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Machiner', Request='APIAddresses', Version=1, Params=params)
+        msg = dict(type='Machiner', request='APIAddresses', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -12383,11 +13238,11 @@ class MachinerFacade(Type):
     async def APIHostPorts(self):
         '''
 
-        Returns -> typing.Sequence[~HostPort]
+        Returns -> typing.Sequence<+T_co>[~HostPort]<~HostPort>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Machiner', Request='APIHostPorts', Version=1, Params=params)
+        msg = dict(type='Machiner', request='APIHostPorts', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -12398,11 +13253,11 @@ class MachinerFacade(Type):
     async def CACert(self):
         '''
 
-        Returns -> typing.Sequence[int]
+        Returns -> typing.Sequence<+T_co>[int]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Machiner', Request='CACert', Version=1, Params=params)
+        msg = dict(type='Machiner', request='CACert', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -12412,12 +13267,12 @@ class MachinerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def EnsureDead(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Machiner', Request='EnsureDead', Version=1, Params=params)
+        msg = dict(type='Machiner', request='EnsureDead', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -12427,12 +13282,12 @@ class MachinerFacade(Type):
     @ReturnMapping(JobsResults)
     async def Jobs(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~JobsResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~JobsResult]<~JobsResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Machiner', Request='Jobs', Version=1, Params=params)
+        msg = dict(type='Machiner', request='Jobs', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -12442,12 +13297,12 @@ class MachinerFacade(Type):
     @ReturnMapping(LifeResults)
     async def Life(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~LifeResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~LifeResult]<~LifeResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Machiner', Request='Life', Version=1, Params=params)
+        msg = dict(type='Machiner', request='Life', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -12462,7 +13317,7 @@ class MachinerFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Machiner', Request='ModelUUID', Version=1, Params=params)
+        msg = dict(type='Machiner', request='ModelUUID', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -12472,12 +13327,12 @@ class MachinerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetMachineAddresses(self, machine_addresses):
         '''
-        machine_addresses : typing.Sequence[~MachineAddresses]
-        Returns -> typing.Sequence[~ErrorResult]
+        machine_addresses : typing.Sequence<+T_co>[~MachineAddresses]<~MachineAddresses>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Machiner', Request='SetMachineAddresses', Version=1, Params=params)
+        msg = dict(type='Machiner', request='SetMachineAddresses', version=1, params=params)
         params['machine-addresses'] = machine_addresses
         reply = await self.rpc(msg)
         return reply
@@ -12487,13 +13342,13 @@ class MachinerFacade(Type):
     @ReturnMapping(None)
     async def SetObservedNetworkConfig(self, config, tag):
         '''
-        config : typing.Sequence[~NetworkConfig]
+        config : typing.Sequence<+T_co>[~NetworkConfig]<~NetworkConfig>
         tag : str
         Returns -> None
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Machiner', Request='SetObservedNetworkConfig', Version=1, Params=params)
+        msg = dict(type='Machiner', request='SetObservedNetworkConfig', version=1, params=params)
         params['config'] = config
         params['tag'] = tag
         reply = await self.rpc(msg)
@@ -12504,12 +13359,12 @@ class MachinerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetProviderNetworkConfig(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Machiner', Request='SetProviderNetworkConfig', Version=1, Params=params)
+        msg = dict(type='Machiner', request='SetProviderNetworkConfig', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -12519,12 +13374,12 @@ class MachinerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetStatus(self, entities):
         '''
-        entities : typing.Sequence[~EntityStatusArgs]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Machiner', Request='SetStatus', Version=1, Params=params)
+        msg = dict(type='Machiner', request='SetStatus', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -12534,12 +13389,12 @@ class MachinerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def UpdateStatus(self, entities):
         '''
-        entities : typing.Sequence[~EntityStatusArgs]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Machiner', Request='UpdateStatus', Version=1, Params=params)
+        msg = dict(type='Machiner', request='UpdateStatus', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -12549,12 +13404,12 @@ class MachinerFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def Watch(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~NotifyWatchResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Machiner', Request='Watch', Version=1, Params=params)
+        msg = dict(type='Machiner', request='Watch', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -12569,7 +13424,7 @@ class MachinerFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Machiner', Request='WatchAPIHostPorts', Version=1, Params=params)
+        msg = dict(type='Machiner', request='WatchAPIHostPorts', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -12631,12 +13486,12 @@ class MeterStatusFacade(Type):
     @ReturnMapping(MeterStatusResults)
     async def GetMeterStatus(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~MeterStatusResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~MeterStatusResult]<~MeterStatusResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='MeterStatus', Request='GetMeterStatus', Version=1, Params=params)
+        msg = dict(type='MeterStatus', request='GetMeterStatus', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -12646,12 +13501,12 @@ class MeterStatusFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def WatchMeterStatus(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~NotifyWatchResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='MeterStatus', Request='WatchMeterStatus', Version=1, Params=params)
+        msg = dict(type='MeterStatus', request='WatchMeterStatus', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -12717,12 +13572,12 @@ class MetricsAdderFacade(Type):
     @ReturnMapping(ErrorResults)
     async def AddMetricBatches(self, batches):
         '''
-        batches : typing.Sequence[~MetricBatchParam]
-        Returns -> typing.Sequence[~ErrorResult]
+        batches : typing.Sequence<+T_co>[~MetricBatchParam]<~MetricBatchParam>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='MetricsAdder', Request='AddMetricBatches', Version=2, Params=params)
+        msg = dict(type='MetricsAdder', request='AddMetricBatches', version=2, params=params)
         params['batches'] = batches
         reply = await self.rpc(msg)
         return reply
@@ -12799,12 +13654,12 @@ class MetricsDebugFacade(Type):
     @ReturnMapping(MetricResults)
     async def GetMetrics(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~EntityMetrics]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~EntityMetrics]<~EntityMetrics>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='MetricsDebug', Request='GetMetrics', Version=2, Params=params)
+        msg = dict(type='MetricsDebug', request='GetMetrics', version=2, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -12814,12 +13669,12 @@ class MetricsDebugFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetMeterStatus(self, statues):
         '''
-        statues : typing.Sequence[~MeterStatusParam]
-        Returns -> typing.Sequence[~ErrorResult]
+        statues : typing.Sequence<+T_co>[~MeterStatusParam]<~MeterStatusParam>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='MetricsDebug', Request='SetMeterStatus', Version=2, Params=params)
+        msg = dict(type='MetricsDebug', request='SetMeterStatus', version=2, params=params)
         params['statues'] = statues
         reply = await self.rpc(msg)
         return reply
@@ -12868,12 +13723,12 @@ class MetricsManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def CleanupOldMetrics(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='MetricsManager', Request='CleanupOldMetrics', Version=1, Params=params)
+        msg = dict(type='MetricsManager', request='CleanupOldMetrics', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -12883,12 +13738,12 @@ class MetricsManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SendMetrics(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='MetricsManager', Request='SendMetrics', Version=1, Params=params)
+        msg = dict(type='MetricsManager', request='SendMetrics', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -12930,7 +13785,6 @@ class MigrationFlagFacade(Type):
                      'PhaseResult': {'additionalProperties': False,
                                      'properties': {'error': {'$ref': '#/definitions/Error'},
                                                     'phase': {'type': 'string'}},
-                                     'required': ['phase'],
                                      'type': 'object'},
                      'PhaseResults': {'additionalProperties': False,
                                       'properties': {'results': {'items': {'$ref': '#/definitions/PhaseResult'},
@@ -12949,12 +13803,12 @@ class MigrationFlagFacade(Type):
     @ReturnMapping(PhaseResults)
     async def Phase(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~PhaseResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~PhaseResult]<~PhaseResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='MigrationFlag', Request='Phase', Version=1, Params=params)
+        msg = dict(type='MigrationFlag', request='Phase', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -12964,12 +13818,12 @@ class MigrationFlagFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def Watch(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~NotifyWatchResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='MigrationFlag', Request='Watch', Version=1, Params=params)
+        msg = dict(type='MigrationFlag', request='Watch', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -12988,56 +13842,117 @@ class MigrationMasterFacade(Type):
                                    'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
                                                   'macaroon-path': {'type': 'string'}},
                                    'type': 'object'},
-                     'FullMigrationStatus': {'additionalProperties': False,
-                                             'properties': {'attempt': {'type': 'integer'},
-                                                            'phase': {'type': 'string'},
-                                                            'spec': {'$ref': '#/definitions/ModelMigrationSpec'}},
-                                             'required': ['spec',
-                                                          'attempt',
-                                                          'phase'],
-                                             'type': 'object'},
                      'Macaroon': {'additionalProperties': False, 'type': 'object'},
-                     'ModelMigrationSpec': {'additionalProperties': False,
-                                            'properties': {'model-tag': {'type': 'string'},
-                                                           'target-info': {'$ref': '#/definitions/ModelMigrationTargetInfo'}},
-                                            'required': ['model-tag',
-                                                         'target-info'],
+                     'MasterMigrationStatus': {'additionalProperties': False,
+                                               'properties': {'migration-id': {'type': 'string'},
+                                                              'phase': {'type': 'string'},
+                                                              'phase-changed-time': {'format': 'date-time',
+                                                                                     'type': 'string'},
+                                                              'spec': {'$ref': '#/definitions/MigrationSpec'}},
+                                               'required': ['spec',
+                                                            'migration-id',
+                                                            'phase',
+                                                            'phase-changed-time'],
+                                               'type': 'object'},
+                     'MigrationModelInfo': {'additionalProperties': False,
+                                            'properties': {'agent-version': {'$ref': '#/definitions/Number'},
+                                                           'name': {'type': 'string'},
+                                                           'uuid': {'type': 'string'}},
+                                            'required': ['uuid',
+                                                         'name',
+                                                         'agent-version'],
                                             'type': 'object'},
-                     'ModelMigrationTargetInfo': {'additionalProperties': False,
-                                                  'properties': {'addrs': {'items': {'type': 'string'},
-                                                                           'type': 'array'},
-                                                                 'auth-tag': {'type': 'string'},
-                                                                 'ca-cert': {'type': 'string'},
-                                                                 'controller-tag': {'type': 'string'},
-                                                                 'password': {'type': 'string'}},
-                                                  'required': ['controller-tag',
-                                                               'addrs',
-                                                               'ca-cert',
-                                                               'auth-tag',
-                                                               'password'],
-                                                  'type': 'object'},
+                     'MigrationSpec': {'additionalProperties': False,
+                                       'properties': {'model-tag': {'type': 'string'},
+                                                      'target-info': {'$ref': '#/definitions/MigrationTargetInfo'}},
+                                       'required': ['model-tag', 'target-info'],
+                                       'type': 'object'},
+                     'MigrationTargetInfo': {'additionalProperties': False,
+                                             'properties': {'addrs': {'items': {'type': 'string'},
+                                                                      'type': 'array'},
+                                                            'auth-tag': {'type': 'string'},
+                                                            'ca-cert': {'type': 'string'},
+                                                            'controller-tag': {'type': 'string'},
+                                                            'macaroon': {'type': 'string'},
+                                                            'password': {'type': 'string'}},
+                                             'required': ['controller-tag',
+                                                          'addrs',
+                                                          'ca-cert',
+                                                          'auth-tag'],
+                                             'type': 'object'},
+                     'MinionReports': {'additionalProperties': False,
+                                       'properties': {'failed': {'items': {'type': 'string'},
+                                                                 'type': 'array'},
+                                                      'migration-id': {'type': 'string'},
+                                                      'phase': {'type': 'string'},
+                                                      'success-count': {'type': 'integer'},
+                                                      'unknown-count': {'type': 'integer'},
+                                                      'unknown-sample': {'items': {'type': 'string'},
+                                                                         'type': 'array'}},
+                                       'required': ['migration-id',
+                                                    'phase',
+                                                    'success-count',
+                                                    'unknown-count',
+                                                    'unknown-sample',
+                                                    'failed'],
+                                       'type': 'object'},
                      'NotifyWatchResult': {'additionalProperties': False,
                                            'properties': {'NotifyWatcherId': {'type': 'string'},
                                                           'error': {'$ref': '#/definitions/Error'}},
                                            'required': ['NotifyWatcherId'],
                                            'type': 'object'},
+                     'Number': {'additionalProperties': False,
+                                'properties': {'Build': {'type': 'integer'},
+                                               'Major': {'type': 'integer'},
+                                               'Minor': {'type': 'integer'},
+                                               'Patch': {'type': 'integer'},
+                                               'Tag': {'type': 'string'}},
+                                'required': ['Major',
+                                             'Minor',
+                                             'Tag',
+                                             'Patch',
+                                             'Build'],
+                                'type': 'object'},
                      'SerializedModel': {'additionalProperties': False,
                                          'properties': {'bytes': {'items': {'type': 'integer'},
+                                                                  'type': 'array'},
+                                                        'charms': {'items': {'type': 'string'},
+                                                                   'type': 'array'},
+                                                        'tools': {'items': {'$ref': '#/definitions/SerializedModelTools'},
                                                                   'type': 'array'}},
-                                         'required': ['bytes'],
+                                         'required': ['bytes', 'charms', 'tools'],
                                          'type': 'object'},
+                     'SerializedModelTools': {'additionalProperties': False,
+                                              'properties': {'uri': {'type': 'string'},
+                                                             'version': {'type': 'string'}},
+                                              'required': ['version', 'uri'],
+                                              'type': 'object'},
                      'SetMigrationPhaseArgs': {'additionalProperties': False,
                                                'properties': {'phase': {'type': 'string'}},
                                                'required': ['phase'],
-                                               'type': 'object'}},
+                                               'type': 'object'},
+                     'SetMigrationStatusMessageArgs': {'additionalProperties': False,
+                                                       'properties': {'message': {'type': 'string'}},
+                                                       'required': ['message'],
+                                                       'type': 'object'}},
      'properties': {'Export': {'properties': {'Result': {'$ref': '#/definitions/SerializedModel'}},
                                'type': 'object'},
-                    'GetMigrationStatus': {'properties': {'Result': {'$ref': '#/definitions/FullMigrationStatus'}},
-                                           'type': 'object'},
+                    'MigrationStatus': {'properties': {'Result': {'$ref': '#/definitions/MasterMigrationStatus'}},
+                                        'type': 'object'},
+                    'MinionReports': {'properties': {'Result': {'$ref': '#/definitions/MinionReports'}},
+                                      'type': 'object'},
+                    'ModelInfo': {'properties': {'Result': {'$ref': '#/definitions/MigrationModelInfo'}},
+                                  'type': 'object'},
+                    'Prechecks': {'type': 'object'},
+                    'Reap': {'type': 'object'},
                     'SetPhase': {'properties': {'Params': {'$ref': '#/definitions/SetMigrationPhaseArgs'}},
                                  'type': 'object'},
+                    'SetStatusMessage': {'properties': {'Params': {'$ref': '#/definitions/SetMigrationStatusMessageArgs'}},
+                                         'type': 'object'},
                     'Watch': {'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
-                              'type': 'object'}},
+                              'type': 'object'},
+                    'WatchMinionReports': {'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
+                                           'type': 'object'}},
      'type': 'object'}
     
 
@@ -13045,26 +13960,86 @@ class MigrationMasterFacade(Type):
     async def Export(self):
         '''
 
-        Returns -> typing.Sequence[int]
+        Returns -> typing.Sequence<+T_co>[~SerializedModelTools]<~SerializedModelTools>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='MigrationMaster', Request='Export', Version=1, Params=params)
+        msg = dict(type='MigrationMaster', request='Export', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(FullMigrationStatus)
-    async def GetMigrationStatus(self):
+    @ReturnMapping(MasterMigrationStatus)
+    async def MigrationStatus(self):
         '''
 
-        Returns -> typing.Union[int, str, _ForwardRef('ModelMigrationSpec')]
+        Returns -> typing.Union[str, _ForwardRef('MigrationSpec')]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='MigrationMaster', Request='GetMigrationStatus', Version=1, Params=params)
+        msg = dict(type='MigrationMaster', request='MigrationStatus', version=1, params=params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(MinionReports)
+    async def MinionReports(self):
+        '''
+
+        Returns -> typing.Union[typing.Sequence<+T_co>[str], int]
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(type='MigrationMaster', request='MinionReports', version=1, params=params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(MigrationModelInfo)
+    async def ModelInfo(self):
+        '''
+
+        Returns -> typing.Union[_ForwardRef('Number'), str]
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(type='MigrationMaster', request='ModelInfo', version=1, params=params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def Prechecks(self):
+        '''
+
+        Returns -> None
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(type='MigrationMaster', request='Prechecks', version=1, params=params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def Reap(self):
+        '''
+
+        Returns -> None
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(type='MigrationMaster', request='Reap', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -13079,8 +14054,23 @@ class MigrationMasterFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='MigrationMaster', Request='SetPhase', Version=1, Params=params)
+        msg = dict(type='MigrationMaster', request='SetPhase', version=1, params=params)
         params['phase'] = phase
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def SetStatusMessage(self, message):
+        '''
+        message : str
+        Returns -> None
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(type='MigrationMaster', request='SetStatusMessage', version=1, params=params)
+        params['message'] = message
         reply = await self.rpc(msg)
         return reply
 
@@ -13094,7 +14084,22 @@ class MigrationMasterFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='MigrationMaster', Request='Watch', Version=1, Params=params)
+        msg = dict(type='MigrationMaster', request='Watch', version=1, params=params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResult)
+    async def WatchMinionReports(self):
+        '''
+
+        Returns -> typing.Union[str, _ForwardRef('Error')]
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(type='MigrationMaster', request='WatchMinionReports', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -13114,15 +14119,44 @@ class MigrationMinionFacade(Type):
                                                   'macaroon-path': {'type': 'string'}},
                                    'type': 'object'},
                      'Macaroon': {'additionalProperties': False, 'type': 'object'},
+                     'MinionReport': {'additionalProperties': False,
+                                      'properties': {'migration-id': {'type': 'string'},
+                                                     'phase': {'type': 'string'},
+                                                     'success': {'type': 'boolean'}},
+                                      'required': ['migration-id',
+                                                   'phase',
+                                                   'success'],
+                                      'type': 'object'},
                      'NotifyWatchResult': {'additionalProperties': False,
                                            'properties': {'NotifyWatcherId': {'type': 'string'},
                                                           'error': {'$ref': '#/definitions/Error'}},
                                            'required': ['NotifyWatcherId'],
                                            'type': 'object'}},
-     'properties': {'Watch': {'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
+     'properties': {'Report': {'properties': {'Params': {'$ref': '#/definitions/MinionReport'}},
+                               'type': 'object'},
+                    'Watch': {'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
                               'type': 'object'}},
      'type': 'object'}
     
+
+    @ReturnMapping(None)
+    async def Report(self, migration_id, phase, success):
+        '''
+        migration_id : str
+        phase : str
+        success : bool
+        Returns -> None
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(type='MigrationMinion', request='Report', version=1, params=params)
+        params['migration-id'] = migration_id
+        params['phase'] = phase
+        params['success'] = success
+        reply = await self.rpc(msg)
+        return reply
+
+
 
     @ReturnMapping(NotifyWatchResult)
     async def Watch(self):
@@ -13132,7 +14166,7 @@ class MigrationMinionFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='MigrationMinion', Request='Watch', Version=1, Params=params)
+        msg = dict(type='MigrationMinion', request='Watch', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -13143,6 +14177,7 @@ class MigrationStatusWatcherFacade(Type):
     version = 1
     schema =     {'definitions': {'MigrationStatus': {'additionalProperties': False,
                                          'properties': {'attempt': {'type': 'integer'},
+                                                        'migration-id': {'type': 'string'},
                                                         'phase': {'type': 'string'},
                                                         'source-api-addrs': {'items': {'type': 'string'},
                                                                              'type': 'array'},
@@ -13150,7 +14185,8 @@ class MigrationStatusWatcherFacade(Type):
                                                         'target-api-addrs': {'items': {'type': 'string'},
                                                                              'type': 'array'},
                                                         'target-ca-cert': {'type': 'string'}},
-                                         'required': ['attempt',
+                                         'required': ['migration-id',
+                                                      'attempt',
                                                       'phase',
                                                       'source-api-addrs',
                                                       'source-ca-cert',
@@ -13167,11 +14203,11 @@ class MigrationStatusWatcherFacade(Type):
     async def Next(self):
         '''
 
-        Returns -> typing.Union[int, typing.Sequence[str]]
+        Returns -> typing.Union[int, typing.Sequence<+T_co>[str]]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='MigrationStatusWatcher', Request='Next', Version=1, Params=params)
+        msg = dict(type='MigrationStatusWatcher', request='Next', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -13186,7 +14222,7 @@ class MigrationStatusWatcherFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='MigrationStatusWatcher', Request='Stop', Version=1, Params=params)
+        msg = dict(type='MigrationStatusWatcher', request='Stop', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -13199,17 +14235,44 @@ class MigrationTargetFacade(Type):
                                    'properties': {'model-tag': {'type': 'string'}},
                                    'required': ['model-tag'],
                                    'type': 'object'},
+                     'Number': {'additionalProperties': False,
+                                'properties': {'Build': {'type': 'integer'},
+                                               'Major': {'type': 'integer'},
+                                               'Minor': {'type': 'integer'},
+                                               'Patch': {'type': 'integer'},
+                                               'Tag': {'type': 'string'}},
+                                'required': ['Major',
+                                             'Minor',
+                                             'Tag',
+                                             'Patch',
+                                             'Build'],
+                                'type': 'object'},
                      'SerializedModel': {'additionalProperties': False,
                                          'properties': {'bytes': {'items': {'type': 'integer'},
+                                                                  'type': 'array'},
+                                                        'charms': {'items': {'type': 'string'},
+                                                                   'type': 'array'},
+                                                        'tools': {'items': {'$ref': '#/definitions/SerializedModelTools'},
                                                                   'type': 'array'}},
-                                         'required': ['bytes'],
-                                         'type': 'object'}},
+                                         'required': ['bytes', 'charms', 'tools'],
+                                         'type': 'object'},
+                     'SerializedModelTools': {'additionalProperties': False,
+                                              'properties': {'uri': {'type': 'string'},
+                                                             'version': {'type': 'string'}},
+                                              'required': ['version', 'uri'],
+                                              'type': 'object'},
+                     'TargetPrechecksArgs': {'additionalProperties': False,
+                                             'properties': {'agent-version': {'$ref': '#/definitions/Number'}},
+                                             'required': ['agent-version'],
+                                             'type': 'object'}},
      'properties': {'Abort': {'properties': {'Params': {'$ref': '#/definitions/ModelArgs'}},
                               'type': 'object'},
                     'Activate': {'properties': {'Params': {'$ref': '#/definitions/ModelArgs'}},
                                  'type': 'object'},
                     'Import': {'properties': {'Params': {'$ref': '#/definitions/SerializedModel'}},
-                               'type': 'object'}},
+                               'type': 'object'},
+                    'Prechecks': {'properties': {'Params': {'$ref': '#/definitions/TargetPrechecksArgs'}},
+                                  'type': 'object'}},
      'type': 'object'}
     
 
@@ -13221,7 +14284,7 @@ class MigrationTargetFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='MigrationTarget', Request='Abort', Version=1, Params=params)
+        msg = dict(type='MigrationTarget', request='Abort', version=1, params=params)
         params['model-tag'] = model_tag
         reply = await self.rpc(msg)
         return reply
@@ -13236,7 +14299,7 @@ class MigrationTargetFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='MigrationTarget', Request='Activate', Version=1, Params=params)
+        msg = dict(type='MigrationTarget', request='Activate', version=1, params=params)
         params['model-tag'] = model_tag
         reply = await self.rpc(msg)
         return reply
@@ -13244,15 +14307,236 @@ class MigrationTargetFacade(Type):
 
 
     @ReturnMapping(None)
-    async def Import(self, bytes_):
+    async def Import(self, bytes_, charms, tools):
         '''
-        bytes_ : typing.Sequence[int]
+        bytes_ : typing.Sequence<+T_co>[int]
+        charms : typing.Sequence<+T_co>[str]
+        tools : typing.Sequence<+T_co>[~SerializedModelTools]<~SerializedModelTools>
         Returns -> None
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='MigrationTarget', Request='Import', Version=1, Params=params)
+        msg = dict(type='MigrationTarget', request='Import', version=1, params=params)
         params['bytes'] = bytes_
+        params['charms'] = charms
+        params['tools'] = tools
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def Prechecks(self, build, major, minor, patch, tag):
+        '''
+        build : int
+        major : int
+        minor : int
+        patch : int
+        tag : str
+        Returns -> None
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(type='MigrationTarget', request='Prechecks', version=1, params=params)
+        params['Build'] = build
+        params['Major'] = major
+        params['Minor'] = minor
+        params['Patch'] = patch
+        params['Tag'] = tag
+        reply = await self.rpc(msg)
+        return reply
+
+
+class ModelConfigFacade(Type):
+    name = 'ModelConfig'
+    version = 1
+    schema =     {'definitions': {'ConfigValue': {'additionalProperties': False,
+                                     'properties': {'source': {'type': 'string'},
+                                                    'value': {'additionalProperties': True,
+                                                              'type': 'object'}},
+                                     'required': ['value', 'source'],
+                                     'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'$ref': '#/definitions/ErrorInfo'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ErrorInfo': {'additionalProperties': False,
+                                   'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
+                                                  'macaroon-path': {'type': 'string'}},
+                                   'type': 'object'},
+                     'ErrorResult': {'additionalProperties': False,
+                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
+                                     'type': 'object'},
+                     'ErrorResults': {'additionalProperties': False,
+                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
+                                                                 'type': 'array'}},
+                                      'required': ['results'],
+                                      'type': 'object'},
+                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
+                     'ModelConfigResults': {'additionalProperties': False,
+                                            'properties': {'config': {'patternProperties': {'.*': {'$ref': '#/definitions/ConfigValue'}},
+                                                                      'type': 'object'}},
+                                            'required': ['config'],
+                                            'type': 'object'},
+                     'ModelDefaultValues': {'additionalProperties': False,
+                                            'properties': {'cloud-region': {'type': 'string'},
+                                                           'cloud-tag': {'type': 'string'},
+                                                           'config': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                   'type': 'object'}},
+                                                                      'type': 'object'}},
+                                            'required': ['config'],
+                                            'type': 'object'},
+                     'ModelDefaults': {'additionalProperties': False,
+                                       'properties': {'controller': {'additionalProperties': True,
+                                                                     'type': 'object'},
+                                                      'default': {'additionalProperties': True,
+                                                                  'type': 'object'},
+                                                      'regions': {'items': {'$ref': '#/definitions/RegionDefaults'},
+                                                                  'type': 'array'}},
+                                       'type': 'object'},
+                     'ModelDefaultsResult': {'additionalProperties': False,
+                                             'properties': {'config': {'patternProperties': {'.*': {'$ref': '#/definitions/ModelDefaults'}},
+                                                                       'type': 'object'}},
+                                             'required': ['config'],
+                                             'type': 'object'},
+                     'ModelSet': {'additionalProperties': False,
+                                  'properties': {'config': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                         'type': 'object'}},
+                                                            'type': 'object'}},
+                                  'required': ['config'],
+                                  'type': 'object'},
+                     'ModelUnset': {'additionalProperties': False,
+                                    'properties': {'keys': {'items': {'type': 'string'},
+                                                            'type': 'array'}},
+                                    'required': ['keys'],
+                                    'type': 'object'},
+                     'ModelUnsetKeys': {'additionalProperties': False,
+                                        'properties': {'cloud-region': {'type': 'string'},
+                                                       'cloud-tag': {'type': 'string'},
+                                                       'keys': {'items': {'type': 'string'},
+                                                                'type': 'array'}},
+                                        'required': ['keys'],
+                                        'type': 'object'},
+                     'RegionDefaults': {'additionalProperties': False,
+                                        'properties': {'region-name': {'type': 'string'},
+                                                       'value': {'additionalProperties': True,
+                                                                 'type': 'object'}},
+                                        'required': ['region-name', 'value'],
+                                        'type': 'object'},
+                     'SetModelDefaults': {'additionalProperties': False,
+                                          'properties': {'config': {'items': {'$ref': '#/definitions/ModelDefaultValues'},
+                                                                    'type': 'array'}},
+                                          'required': ['config'],
+                                          'type': 'object'},
+                     'UnsetModelDefaults': {'additionalProperties': False,
+                                            'properties': {'keys': {'items': {'$ref': '#/definitions/ModelUnsetKeys'},
+                                                                    'type': 'array'}},
+                                            'required': ['keys'],
+                                            'type': 'object'}},
+     'properties': {'ModelDefaults': {'properties': {'Result': {'$ref': '#/definitions/ModelDefaultsResult'}},
+                                      'type': 'object'},
+                    'ModelGet': {'properties': {'Result': {'$ref': '#/definitions/ModelConfigResults'}},
+                                 'type': 'object'},
+                    'ModelSet': {'properties': {'Params': {'$ref': '#/definitions/ModelSet'}},
+                                 'type': 'object'},
+                    'ModelUnset': {'properties': {'Params': {'$ref': '#/definitions/ModelUnset'}},
+                                   'type': 'object'},
+                    'SetModelDefaults': {'properties': {'Params': {'$ref': '#/definitions/SetModelDefaults'},
+                                                        'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                         'type': 'object'},
+                    'UnsetModelDefaults': {'properties': {'Params': {'$ref': '#/definitions/UnsetModelDefaults'},
+                                                          'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                           'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(ModelDefaultsResult)
+    async def ModelDefaults(self):
+        '''
+
+        Returns -> typing.Mapping<~KT, +VT_co>[str, ~ModelDefaults]<~ModelDefaults>
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(type='ModelConfig', request='ModelDefaults', version=1, params=params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ModelConfigResults)
+    async def ModelGet(self):
+        '''
+
+        Returns -> typing.Mapping<~KT, +VT_co>[str, ~ConfigValue]<~ConfigValue>
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(type='ModelConfig', request='ModelGet', version=1, params=params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def ModelSet(self, config):
+        '''
+        config : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        Returns -> None
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(type='ModelConfig', request='ModelSet', version=1, params=params)
+        params['config'] = config
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def ModelUnset(self, keys):
+        '''
+        keys : typing.Sequence<+T_co>[str]
+        Returns -> None
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(type='ModelConfig', request='ModelUnset', version=1, params=params)
+        params['keys'] = keys
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def SetModelDefaults(self, config):
+        '''
+        config : typing.Sequence<+T_co>[~ModelDefaultValues]<~ModelDefaultValues>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(type='ModelConfig', request='SetModelDefaults', version=1, params=params)
+        params['config'] = config
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def UnsetModelDefaults(self, keys):
+        '''
+        keys : typing.Sequence<+T_co>[~ModelUnsetKeys]<~ModelUnsetKeys>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(type='ModelConfig', request='UnsetModelDefaults', version=1, params=params)
+        params['keys'] = keys
         reply = await self.rpc(msg)
         return reply
 
@@ -13298,6 +14582,18 @@ class ModelManagerFacade(Type):
                                       'required': ['results'],
                                       'type': 'object'},
                      'Macaroon': {'additionalProperties': False, 'type': 'object'},
+                     'MapResult': {'additionalProperties': False,
+                                   'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                  'result': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                          'type': 'object'}},
+                                                             'type': 'object'}},
+                                   'required': ['result'],
+                                   'type': 'object'},
+                     'MapResults': {'additionalProperties': False,
+                                    'properties': {'results': {'items': {'$ref': '#/definitions/MapResult'},
+                                                               'type': 'array'}},
+                                    'required': ['results'],
+                                    'type': 'object'},
                      'Model': {'additionalProperties': False,
                                'properties': {'name': {'type': 'string'},
                                               'owner-tag': {'type': 'string'},
@@ -13305,7 +14601,8 @@ class ModelManagerFacade(Type):
                                'required': ['name', 'uuid', 'owner-tag'],
                                'type': 'object'},
                      'ModelCreateArgs': {'additionalProperties': False,
-                                         'properties': {'config': {'patternProperties': {'.*': {'additionalProperties': True,
+                                         'properties': {'cloud-tag': {'type': 'string'},
+                                                        'config': {'patternProperties': {'.*': {'additionalProperties': True,
                                                                                                 'type': 'object'}},
                                                                    'type': 'object'},
                                                         'credential': {'type': 'string'},
@@ -13316,7 +14613,7 @@ class ModelManagerFacade(Type):
                                          'type': 'object'},
                      'ModelInfo': {'additionalProperties': False,
                                    'properties': {'cloud': {'type': 'string'},
-                                                  'cloud-credential': {'type': 'string'},
+                                                  'cloud-credential-tag': {'type': 'string'},
                                                   'cloud-region': {'type': 'string'},
                                                   'controller-uuid': {'type': 'string'},
                                                   'default-series': {'type': 'string'},
@@ -13389,6 +14686,15 @@ class ModelManagerFacade(Type):
                                                    'Result': {'$ref': '#/definitions/ModelInfo'}},
                                     'type': 'object'},
                     'DestroyModel': {'type': 'object'},
+                    'DestroyModels': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                     'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                      'type': 'object'},
+                    'DumpModels': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                  'Result': {'$ref': '#/definitions/MapResults'}},
+                                   'type': 'object'},
+                    'DumpModelsDB': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                    'Result': {'$ref': '#/definitions/MapResults'}},
+                                     'type': 'object'},
                     'ListModels': {'properties': {'Params': {'$ref': '#/definitions/Entity'},
                                                   'Result': {'$ref': '#/definitions/UserModelList'}},
                                    'type': 'object'},
@@ -13402,18 +14708,20 @@ class ModelManagerFacade(Type):
     
 
     @ReturnMapping(ModelInfo)
-    async def CreateModel(self, config, credential, name, owner_tag, region):
+    async def CreateModel(self, cloud_tag, config, credential, name, owner_tag, region):
         '''
-        config : typing.Mapping[str, typing.Any]
+        cloud_tag : str
+        config : typing.Mapping<~KT, +VT_co>[str, typing.Any]
         credential : str
         name : str
         owner_tag : str
         region : str
-        Returns -> typing.Union[_ForwardRef('EntityStatus'), typing.Sequence[~ModelUserInfo]]
+        Returns -> typing.Union[_ForwardRef('EntityStatus'), typing.Sequence<+T_co>[~ModelUserInfo]<~ModelUserInfo>]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='ModelManager', Request='CreateModel', Version=2, Params=params)
+        msg = dict(type='ModelManager', request='CreateModel', version=2, params=params)
+        params['cloud-tag'] = cloud_tag
         params['config'] = config
         params['credential'] = credential
         params['name'] = name
@@ -13432,8 +14740,53 @@ class ModelManagerFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='ModelManager', Request='DestroyModel', Version=2, Params=params)
+        msg = dict(type='ModelManager', request='DestroyModel', version=2, params=params)
 
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def DestroyModels(self, entities):
+        '''
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(type='ModelManager', request='DestroyModels', version=2, params=params)
+        params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(MapResults)
+    async def DumpModels(self, entities):
+        '''
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~MapResult]<~MapResult>
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(type='ModelManager', request='DumpModels', version=2, params=params)
+        params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(MapResults)
+    async def DumpModelsDB(self, entities):
+        '''
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~MapResult]<~MapResult>
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(type='ModelManager', request='DumpModelsDB', version=2, params=params)
+        params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
@@ -13443,11 +14796,11 @@ class ModelManagerFacade(Type):
     async def ListModels(self, tag):
         '''
         tag : str
-        Returns -> typing.Sequence[~UserModel]
+        Returns -> typing.Sequence<+T_co>[~UserModel]<~UserModel>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='ModelManager', Request='ListModels', Version=2, Params=params)
+        msg = dict(type='ModelManager', request='ListModels', version=2, params=params)
         params['tag'] = tag
         reply = await self.rpc(msg)
         return reply
@@ -13457,12 +14810,12 @@ class ModelManagerFacade(Type):
     @ReturnMapping(ModelInfoResults)
     async def ModelInfo(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ModelInfoResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ModelInfoResult]<~ModelInfoResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='ModelManager', Request='ModelInfo', Version=2, Params=params)
+        msg = dict(type='ModelManager', request='ModelInfo', version=2, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -13472,12 +14825,12 @@ class ModelManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def ModifyModelAccess(self, changes):
         '''
-        changes : typing.Sequence[~ModifyModelAccess]
-        Returns -> typing.Sequence[~ErrorResult]
+        changes : typing.Sequence<+T_co>[~ModifyModelAccess]<~ModifyModelAccess>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='ModelManager', Request='ModifyModelAccess', Version=2, Params=params)
+        msg = dict(type='ModelManager', request='ModifyModelAccess', version=2, params=params)
         params['changes'] = changes
         reply = await self.rpc(msg)
         return reply
@@ -13498,7 +14851,7 @@ class NotifyWatcherFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='NotifyWatcher', Request='Next', Version=1, Params=params)
+        msg = dict(type='NotifyWatcher', request='Next', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -13513,7 +14866,7 @@ class NotifyWatcherFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='NotifyWatcher', Request='Stop', Version=1, Params=params)
+        msg = dict(type='NotifyWatcher', request='Stop', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -13534,7 +14887,7 @@ class PingerFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Pinger', Request='Ping', Version=1, Params=params)
+        msg = dict(type='Pinger', request='Ping', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -13549,7 +14902,7 @@ class PingerFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Pinger', Request='Stop', Version=1, Params=params)
+        msg = dict(type='Pinger', request='Stop', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -14085,6 +15438,9 @@ class ProvisionerFacade(Type):
                              'type': 'object'},
                     'MachinesWithTransientErrors': {'properties': {'Result': {'$ref': '#/definitions/StatusResults'}},
                                                     'type': 'object'},
+                    'MarkMachinesForRemoval': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                              'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                               'type': 'object'},
                     'ModelConfig': {'properties': {'Result': {'$ref': '#/definitions/ModelConfigResult'}},
                                     'type': 'object'},
                     'ModelUUID': {'properties': {'Result': {'$ref': '#/definitions/StringResult'}},
@@ -14151,11 +15507,11 @@ class ProvisionerFacade(Type):
     async def APIAddresses(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence[str]]
+        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence<+T_co>[str]]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='APIAddresses', Version=3, Params=params)
+        msg = dict(type='Provisioner', request='APIAddresses', version=3, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -14166,11 +15522,11 @@ class ProvisionerFacade(Type):
     async def APIHostPorts(self):
         '''
 
-        Returns -> typing.Sequence[~HostPort]
+        Returns -> typing.Sequence<+T_co>[~HostPort]<~HostPort>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='APIHostPorts', Version=3, Params=params)
+        msg = dict(type='Provisioner', request='APIHostPorts', version=3, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -14181,11 +15537,11 @@ class ProvisionerFacade(Type):
     async def CACert(self):
         '''
 
-        Returns -> typing.Sequence[int]
+        Returns -> typing.Sequence<+T_co>[int]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='CACert', Version=3, Params=params)
+        msg = dict(type='Provisioner', request='CACert', version=3, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -14195,12 +15551,12 @@ class ProvisionerFacade(Type):
     @ReturnMapping(ConstraintsResults)
     async def Constraints(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ConstraintsResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ConstraintsResult]<~ConstraintsResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='Constraints', Version=3, Params=params)
+        msg = dict(type='Provisioner', request='Constraints', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -14215,7 +15571,7 @@ class ProvisionerFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='ContainerConfig', Version=3, Params=params)
+        msg = dict(type='Provisioner', request='ContainerConfig', version=3, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -14226,11 +15582,11 @@ class ProvisionerFacade(Type):
     async def ContainerManagerConfig(self, type_):
         '''
         type_ : str
-        Returns -> typing.Mapping[str, str]
+        Returns -> typing.Mapping<~KT, +VT_co>[str, str]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='ContainerManagerConfig', Version=3, Params=params)
+        msg = dict(type='Provisioner', request='ContainerManagerConfig', version=3, params=params)
         params['type'] = type_
         reply = await self.rpc(msg)
         return reply
@@ -14241,11 +15597,11 @@ class ProvisionerFacade(Type):
     async def ControllerConfig(self):
         '''
 
-        Returns -> typing.Mapping[str, typing.Any]
+        Returns -> typing.Mapping<~KT, +VT_co>[str, typing.Any]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='ControllerConfig', Version=3, Params=params)
+        msg = dict(type='Provisioner', request='ControllerConfig', version=3, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -14255,12 +15611,12 @@ class ProvisionerFacade(Type):
     @ReturnMapping(DistributionGroupResults)
     async def DistributionGroup(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~DistributionGroupResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~DistributionGroupResult]<~DistributionGroupResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='DistributionGroup', Version=3, Params=params)
+        msg = dict(type='Provisioner', request='DistributionGroup', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -14270,12 +15626,12 @@ class ProvisionerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def EnsureDead(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='EnsureDead', Version=3, Params=params)
+        msg = dict(type='Provisioner', request='EnsureDead', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -14290,11 +15646,11 @@ class ProvisionerFacade(Type):
         minor : int
         number : Number
         series : str
-        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence[~Tools]]
+        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence<+T_co>[~Tools]<~Tools>]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='FindTools', Version=3, Params=params)
+        msg = dict(type='Provisioner', request='FindTools', version=3, params=params)
         params['arch'] = arch
         params['major'] = major
         params['minor'] = minor
@@ -14308,12 +15664,12 @@ class ProvisionerFacade(Type):
     @ReturnMapping(MachineNetworkConfigResults)
     async def GetContainerInterfaceInfo(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~MachineNetworkConfigResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~MachineNetworkConfigResult]<~MachineNetworkConfigResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='GetContainerInterfaceInfo', Version=3, Params=params)
+        msg = dict(type='Provisioner', request='GetContainerInterfaceInfo', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -14323,12 +15679,12 @@ class ProvisionerFacade(Type):
     @ReturnMapping(StringResults)
     async def InstanceId(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~StringResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~StringResult]<~StringResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='InstanceId', Version=3, Params=params)
+        msg = dict(type='Provisioner', request='InstanceId', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -14338,12 +15694,12 @@ class ProvisionerFacade(Type):
     @ReturnMapping(StatusResults)
     async def InstanceStatus(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~StatusResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~StatusResult]<~StatusResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='InstanceStatus', Version=3, Params=params)
+        msg = dict(type='Provisioner', request='InstanceStatus', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -14353,12 +15709,12 @@ class ProvisionerFacade(Type):
     @ReturnMapping(LifeResults)
     async def Life(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~LifeResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~LifeResult]<~LifeResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='Life', Version=3, Params=params)
+        msg = dict(type='Provisioner', request='Life', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -14369,12 +15725,27 @@ class ProvisionerFacade(Type):
     async def MachinesWithTransientErrors(self):
         '''
 
-        Returns -> typing.Sequence[~StatusResult]
+        Returns -> typing.Sequence<+T_co>[~StatusResult]<~StatusResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='MachinesWithTransientErrors', Version=3, Params=params)
+        msg = dict(type='Provisioner', request='MachinesWithTransientErrors', version=3, params=params)
 
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def MarkMachinesForRemoval(self, entities):
+        '''
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(type='Provisioner', request='MarkMachinesForRemoval', version=3, params=params)
+        params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
@@ -14384,11 +15755,11 @@ class ProvisionerFacade(Type):
     async def ModelConfig(self):
         '''
 
-        Returns -> typing.Mapping[str, typing.Any]
+        Returns -> typing.Mapping<~KT, +VT_co>[str, typing.Any]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='ModelConfig', Version=3, Params=params)
+        msg = dict(type='Provisioner', request='ModelConfig', version=3, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -14403,7 +15774,7 @@ class ProvisionerFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='ModelUUID', Version=3, Params=params)
+        msg = dict(type='Provisioner', request='ModelUUID', version=3, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -14413,12 +15784,12 @@ class ProvisionerFacade(Type):
     @ReturnMapping(MachineNetworkConfigResults)
     async def PrepareContainerInterfaceInfo(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~MachineNetworkConfigResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~MachineNetworkConfigResult]<~MachineNetworkConfigResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='PrepareContainerInterfaceInfo', Version=3, Params=params)
+        msg = dict(type='Provisioner', request='PrepareContainerInterfaceInfo', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -14428,12 +15799,12 @@ class ProvisionerFacade(Type):
     @ReturnMapping(ProvisioningInfoResults)
     async def ProvisioningInfo(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ProvisioningInfoResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ProvisioningInfoResult]<~ProvisioningInfoResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='ProvisioningInfo', Version=3, Params=params)
+        msg = dict(type='Provisioner', request='ProvisioningInfo', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -14443,12 +15814,12 @@ class ProvisionerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def ReleaseContainerAddresses(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='ReleaseContainerAddresses', Version=3, Params=params)
+        msg = dict(type='Provisioner', request='ReleaseContainerAddresses', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -14458,12 +15829,12 @@ class ProvisionerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Remove(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='Remove', Version=3, Params=params)
+        msg = dict(type='Provisioner', request='Remove', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -14473,12 +15844,12 @@ class ProvisionerFacade(Type):
     @ReturnMapping(StringResults)
     async def Series(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~StringResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~StringResult]<~StringResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='Series', Version=3, Params=params)
+        msg = dict(type='Provisioner', request='Series', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -14488,12 +15859,12 @@ class ProvisionerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetInstanceInfo(self, machines):
         '''
-        machines : typing.Sequence[~InstanceInfo]
-        Returns -> typing.Sequence[~ErrorResult]
+        machines : typing.Sequence<+T_co>[~InstanceInfo]<~InstanceInfo>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='SetInstanceInfo', Version=3, Params=params)
+        msg = dict(type='Provisioner', request='SetInstanceInfo', version=3, params=params)
         params['machines'] = machines
         reply = await self.rpc(msg)
         return reply
@@ -14503,12 +15874,12 @@ class ProvisionerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetInstanceStatus(self, entities):
         '''
-        entities : typing.Sequence[~EntityStatusArgs]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='SetInstanceStatus', Version=3, Params=params)
+        msg = dict(type='Provisioner', request='SetInstanceStatus', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -14518,12 +15889,12 @@ class ProvisionerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetPasswords(self, changes):
         '''
-        changes : typing.Sequence[~EntityPassword]
-        Returns -> typing.Sequence[~ErrorResult]
+        changes : typing.Sequence<+T_co>[~EntityPassword]<~EntityPassword>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='SetPasswords', Version=3, Params=params)
+        msg = dict(type='Provisioner', request='SetPasswords', version=3, params=params)
         params['changes'] = changes
         reply = await self.rpc(msg)
         return reply
@@ -14533,12 +15904,12 @@ class ProvisionerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetStatus(self, entities):
         '''
-        entities : typing.Sequence[~EntityStatusArgs]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='SetStatus', Version=3, Params=params)
+        msg = dict(type='Provisioner', request='SetStatus', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -14548,12 +15919,12 @@ class ProvisionerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetSupportedContainers(self, params):
         '''
-        params : typing.Sequence[~MachineContainers]
-        Returns -> typing.Sequence[~ErrorResult]
+        params : typing.Sequence<+T_co>[~MachineContainers]<~MachineContainers>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='SetSupportedContainers', Version=3, Params=params)
+        msg = dict(type='Provisioner', request='SetSupportedContainers', version=3, params=params)
         params['params'] = params
         reply = await self.rpc(msg)
         return reply
@@ -14564,11 +15935,11 @@ class ProvisionerFacade(Type):
     async def StateAddresses(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence[str]]
+        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence<+T_co>[str]]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='StateAddresses', Version=3, Params=params)
+        msg = dict(type='Provisioner', request='StateAddresses', version=3, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -14578,12 +15949,12 @@ class ProvisionerFacade(Type):
     @ReturnMapping(StatusResults)
     async def Status(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~StatusResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~StatusResult]<~StatusResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='Status', Version=3, Params=params)
+        msg = dict(type='Provisioner', request='Status', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -14593,12 +15964,12 @@ class ProvisionerFacade(Type):
     @ReturnMapping(ToolsResults)
     async def Tools(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ToolsResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ToolsResult]<~ToolsResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='Tools', Version=3, Params=params)
+        msg = dict(type='Provisioner', request='Tools', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -14608,12 +15979,12 @@ class ProvisionerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def UpdateStatus(self, entities):
         '''
-        entities : typing.Sequence[~EntityStatusArgs]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='UpdateStatus', Version=3, Params=params)
+        msg = dict(type='Provisioner', request='UpdateStatus', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -14628,7 +15999,7 @@ class ProvisionerFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='WatchAPIHostPorts', Version=3, Params=params)
+        msg = dict(type='Provisioner', request='WatchAPIHostPorts', version=3, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -14638,12 +16009,12 @@ class ProvisionerFacade(Type):
     @ReturnMapping(StringsWatchResults)
     async def WatchAllContainers(self, params):
         '''
-        params : typing.Sequence[~WatchContainer]
-        Returns -> typing.Sequence[~StringsWatchResult]
+        params : typing.Sequence<+T_co>[~WatchContainer]<~WatchContainer>
+        Returns -> typing.Sequence<+T_co>[~StringsWatchResult]<~StringsWatchResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='WatchAllContainers', Version=3, Params=params)
+        msg = dict(type='Provisioner', request='WatchAllContainers', version=3, params=params)
         params['params'] = params
         reply = await self.rpc(msg)
         return reply
@@ -14653,12 +16024,12 @@ class ProvisionerFacade(Type):
     @ReturnMapping(StringsWatchResults)
     async def WatchContainers(self, params):
         '''
-        params : typing.Sequence[~WatchContainer]
-        Returns -> typing.Sequence[~StringsWatchResult]
+        params : typing.Sequence<+T_co>[~WatchContainer]<~WatchContainer>
+        Returns -> typing.Sequence<+T_co>[~StringsWatchResult]<~StringsWatchResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='WatchContainers', Version=3, Params=params)
+        msg = dict(type='Provisioner', request='WatchContainers', version=3, params=params)
         params['params'] = params
         reply = await self.rpc(msg)
         return reply
@@ -14673,7 +16044,7 @@ class ProvisionerFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='WatchForModelConfigChanges', Version=3, Params=params)
+        msg = dict(type='Provisioner', request='WatchForModelConfigChanges', version=3, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -14688,7 +16059,7 @@ class ProvisionerFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='WatchMachineErrorRetry', Version=3, Params=params)
+        msg = dict(type='Provisioner', request='WatchMachineErrorRetry', version=3, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -14699,11 +16070,11 @@ class ProvisionerFacade(Type):
     async def WatchModelMachines(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error')]
+        Returns -> typing.Union[typing.Sequence<+T_co>[str], _ForwardRef('Error')]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Provisioner', Request='WatchModelMachines', Version=3, Params=params)
+        msg = dict(type='Provisioner', request='WatchModelMachines', version=3, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -14776,12 +16147,12 @@ class ProxyUpdaterFacade(Type):
     @ReturnMapping(ProxyConfigResults)
     async def ProxyConfig(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ProxyConfigResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ProxyConfigResult]<~ProxyConfigResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='ProxyUpdater', Request='ProxyConfig', Version=1, Params=params)
+        msg = dict(type='ProxyUpdater', request='ProxyConfig', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -14791,12 +16162,12 @@ class ProxyUpdaterFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def WatchForProxyConfigAndAPIHostPortChanges(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~NotifyWatchResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='ProxyUpdater', Request='WatchForProxyConfigAndAPIHostPortChanges', Version=1, Params=params)
+        msg = dict(type='ProxyUpdater', request='WatchForProxyConfigAndAPIHostPortChanges', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -14863,12 +16234,12 @@ class RebootFacade(Type):
     @ReturnMapping(ErrorResults)
     async def ClearReboot(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Reboot', Request='ClearReboot', Version=2, Params=params)
+        msg = dict(type='Reboot', request='ClearReboot', version=2, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -14878,12 +16249,12 @@ class RebootFacade(Type):
     @ReturnMapping(RebootActionResults)
     async def GetRebootAction(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~RebootActionResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~RebootActionResult]<~RebootActionResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Reboot', Request='GetRebootAction', Version=2, Params=params)
+        msg = dict(type='Reboot', request='GetRebootAction', version=2, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -14893,12 +16264,12 @@ class RebootFacade(Type):
     @ReturnMapping(ErrorResults)
     async def RequestReboot(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Reboot', Request='RequestReboot', Version=2, Params=params)
+        msg = dict(type='Reboot', request='RequestReboot', version=2, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -14913,7 +16284,7 @@ class RebootFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Reboot', Request='WatchForRebootEvent', Version=2, Params=params)
+        msg = dict(type='Reboot', request='WatchForRebootEvent', version=2, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -14965,7 +16336,7 @@ class RelationUnitsWatcherFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='RelationUnitsWatcher', Request='Next', Version=1, Params=params)
+        msg = dict(type='RelationUnitsWatcher', request='Next', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -14980,7 +16351,7 @@ class RelationUnitsWatcherFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='RelationUnitsWatcher', Request='Stop', Version=1, Params=params)
+        msg = dict(type='RelationUnitsWatcher', request='Stop', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -15000,7 +16371,7 @@ class ResumerFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Resumer', Request='ResumeTransactions', Version=2, Params=params)
+        msg = dict(type='Resumer', request='ResumeTransactions', version=2, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -15072,12 +16443,12 @@ class RetryStrategyFacade(Type):
     @ReturnMapping(RetryStrategyResults)
     async def RetryStrategy(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~RetryStrategyResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~RetryStrategyResult]<~RetryStrategyResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='RetryStrategy', Request='RetryStrategy', Version=1, Params=params)
+        msg = dict(type='RetryStrategy', request='RetryStrategy', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -15087,12 +16458,12 @@ class RetryStrategyFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def WatchRetryStrategy(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~NotifyWatchResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='RetryStrategy', Request='WatchRetryStrategy', Version=1, Params=params)
+        msg = dict(type='RetryStrategy', request='WatchRetryStrategy', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -15161,12 +16532,12 @@ class SSHClientFacade(Type):
     @ReturnMapping(SSHAddressResults)
     async def PrivateAddress(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~SSHAddressResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~SSHAddressResult]<~SSHAddressResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='SSHClient', Request='PrivateAddress', Version=1, Params=params)
+        msg = dict(type='SSHClient', request='PrivateAddress', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -15181,7 +16552,7 @@ class SSHClientFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='SSHClient', Request='Proxy', Version=1, Params=params)
+        msg = dict(type='SSHClient', request='Proxy', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -15191,12 +16562,12 @@ class SSHClientFacade(Type):
     @ReturnMapping(SSHAddressResults)
     async def PublicAddress(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~SSHAddressResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~SSHAddressResult]<~SSHAddressResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='SSHClient', Request='PublicAddress', Version=1, Params=params)
+        msg = dict(type='SSHClient', request='PublicAddress', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -15206,12 +16577,12 @@ class SSHClientFacade(Type):
     @ReturnMapping(SSHPublicKeysResults)
     async def PublicKeys(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~SSHPublicKeysResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~SSHPublicKeysResult]<~SSHPublicKeysResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='SSHClient', Request='PublicKeys', Version=1, Params=params)
+        msg = dict(type='SSHClient', request='PublicKeys', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -15273,12 +16644,12 @@ class SingularFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Claim(self, claims):
         '''
-        claims : typing.Sequence[~SingularClaim]
-        Returns -> typing.Sequence[~ErrorResult]
+        claims : typing.Sequence<+T_co>[~SingularClaim]<~SingularClaim>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Singular', Request='Claim', Version=1, Params=params)
+        msg = dict(type='Singular', request='Claim', version=1, params=params)
         params['claims'] = claims
         reply = await self.rpc(msg)
         return reply
@@ -15288,12 +16659,12 @@ class SingularFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Wait(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Singular', Request='Wait', Version=1, Params=params)
+        msg = dict(type='Singular', request='Wait', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -15374,12 +16745,12 @@ class SpacesFacade(Type):
     @ReturnMapping(ErrorResults)
     async def CreateSpaces(self, spaces):
         '''
-        spaces : typing.Sequence[~CreateSpaceParams]
-        Returns -> typing.Sequence[~ErrorResult]
+        spaces : typing.Sequence<+T_co>[~CreateSpaceParams]<~CreateSpaceParams>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Spaces', Request='CreateSpaces', Version=2, Params=params)
+        msg = dict(type='Spaces', request='CreateSpaces', version=2, params=params)
         params['spaces'] = spaces
         reply = await self.rpc(msg)
         return reply
@@ -15390,11 +16761,11 @@ class SpacesFacade(Type):
     async def ListSpaces(self):
         '''
 
-        Returns -> typing.Sequence[~Space]
+        Returns -> typing.Sequence<+T_co>[~Space]<~Space>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Spaces', Request='ListSpaces', Version=2, Params=params)
+        msg = dict(type='Spaces', request='ListSpaces', version=2, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -15423,7 +16794,7 @@ class StatusHistoryFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='StatusHistory', Request='Prune', Version=2, Params=params)
+        msg = dict(type='StatusHistory', request='Prune', version=2, params=params)
         params['max-history-mb'] = max_history_mb
         params['max-history-time'] = max_history_time
         reply = await self.rpc(msg)
@@ -15432,7 +16803,7 @@ class StatusHistoryFacade(Type):
 
 class StorageFacade(Type):
     name = 'Storage'
-    version = 2
+    version = 3
     schema =     {'definitions': {'Entities': {'additionalProperties': False,
                                   'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
                                                               'type': 'array'}},
@@ -15663,12 +17034,12 @@ class StorageFacade(Type):
     @ReturnMapping(ErrorResults)
     async def AddToUnit(self, storages):
         '''
-        storages : typing.Sequence[~StorageAddParams]
-        Returns -> typing.Sequence[~ErrorResult]
+        storages : typing.Sequence<+T_co>[~StorageAddParams]<~StorageAddParams>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Storage', Request='AddToUnit', Version=2, Params=params)
+        msg = dict(type='Storage', request='AddToUnit', version=3, params=params)
         params['storages'] = storages
         reply = await self.rpc(msg)
         return reply
@@ -15678,14 +17049,14 @@ class StorageFacade(Type):
     @ReturnMapping(None)
     async def CreatePool(self, attrs, name, provider):
         '''
-        attrs : typing.Mapping[str, typing.Any]
+        attrs : typing.Mapping<~KT, +VT_co>[str, typing.Any]
         name : str
         provider : str
         Returns -> None
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Storage', Request='CreatePool', Version=2, Params=params)
+        msg = dict(type='Storage', request='CreatePool', version=3, params=params)
         params['attrs'] = attrs
         params['name'] = name
         params['provider'] = provider
@@ -15697,12 +17068,12 @@ class StorageFacade(Type):
     @ReturnMapping(FilesystemDetailsListResults)
     async def ListFilesystems(self, filters):
         '''
-        filters : typing.Sequence[~FilesystemFilter]
-        Returns -> typing.Sequence[~FilesystemDetailsListResult]
+        filters : typing.Sequence<+T_co>[~FilesystemFilter]<~FilesystemFilter>
+        Returns -> typing.Sequence<+T_co>[~FilesystemDetailsListResult]<~FilesystemDetailsListResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Storage', Request='ListFilesystems', Version=2, Params=params)
+        msg = dict(type='Storage', request='ListFilesystems', version=3, params=params)
         params['filters'] = filters
         reply = await self.rpc(msg)
         return reply
@@ -15712,12 +17083,12 @@ class StorageFacade(Type):
     @ReturnMapping(StoragePoolsResults)
     async def ListPools(self, filters):
         '''
-        filters : typing.Sequence[~StoragePoolFilter]
-        Returns -> typing.Sequence[~StoragePoolsResult]
+        filters : typing.Sequence<+T_co>[~StoragePoolFilter]<~StoragePoolFilter>
+        Returns -> typing.Sequence<+T_co>[~StoragePoolsResult]<~StoragePoolsResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Storage', Request='ListPools', Version=2, Params=params)
+        msg = dict(type='Storage', request='ListPools', version=3, params=params)
         params['filters'] = filters
         reply = await self.rpc(msg)
         return reply
@@ -15727,12 +17098,12 @@ class StorageFacade(Type):
     @ReturnMapping(StorageDetailsListResults)
     async def ListStorageDetails(self, filters):
         '''
-        filters : typing.Sequence[~StorageFilter]
-        Returns -> typing.Sequence[~StorageDetailsListResult]
+        filters : typing.Sequence<+T_co>[~StorageFilter]<~StorageFilter>
+        Returns -> typing.Sequence<+T_co>[~StorageDetailsListResult]<~StorageDetailsListResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Storage', Request='ListStorageDetails', Version=2, Params=params)
+        msg = dict(type='Storage', request='ListStorageDetails', version=3, params=params)
         params['filters'] = filters
         reply = await self.rpc(msg)
         return reply
@@ -15742,12 +17113,12 @@ class StorageFacade(Type):
     @ReturnMapping(VolumeDetailsListResults)
     async def ListVolumes(self, filters):
         '''
-        filters : typing.Sequence[~VolumeFilter]
-        Returns -> typing.Sequence[~VolumeDetailsListResult]
+        filters : typing.Sequence<+T_co>[~VolumeFilter]<~VolumeFilter>
+        Returns -> typing.Sequence<+T_co>[~VolumeDetailsListResult]<~VolumeDetailsListResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Storage', Request='ListVolumes', Version=2, Params=params)
+        msg = dict(type='Storage', request='ListVolumes', version=3, params=params)
         params['filters'] = filters
         reply = await self.rpc(msg)
         return reply
@@ -15757,12 +17128,12 @@ class StorageFacade(Type):
     @ReturnMapping(StorageDetailsResults)
     async def StorageDetails(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~StorageDetailsResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~StorageDetailsResult]<~StorageDetailsResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Storage', Request='StorageDetails', Version=2, Params=params)
+        msg = dict(type='Storage', request='StorageDetails', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -15770,7 +17141,7 @@ class StorageFacade(Type):
 
 class StorageProvisionerFacade(Type):
     name = 'StorageProvisioner'
-    version = 2
+    version = 3
     schema =     {'definitions': {'BlockDevice': {'additionalProperties': False,
                                      'properties': {'BusAddress': {'type': 'string'},
                                                     'DeviceLinks': {'items': {'type': 'string'},
@@ -15973,12 +17344,6 @@ class StorageProvisionerFacade(Type):
                                                                                   'type': 'array'}},
                                                        'required': ['results'],
                                                        'type': 'object'},
-                     'ModelConfigResult': {'additionalProperties': False,
-                                           'properties': {'config': {'patternProperties': {'.*': {'additionalProperties': True,
-                                                                                                  'type': 'object'}},
-                                                                     'type': 'object'}},
-                                           'required': ['config'],
-                                           'type': 'object'},
                      'NotifyWatchResult': {'additionalProperties': False,
                                            'properties': {'NotifyWatcherId': {'type': 'string'},
                                                           'error': {'$ref': '#/definitions/Error'}},
@@ -16137,8 +17502,6 @@ class StorageProvisionerFacade(Type):
                     'Life': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                             'Result': {'$ref': '#/definitions/LifeResults'}},
                              'type': 'object'},
-                    'ModelConfig': {'properties': {'Result': {'$ref': '#/definitions/ModelConfigResult'}},
-                                    'type': 'object'},
                     'Remove': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                               'Result': {'$ref': '#/definitions/ErrorResults'}},
                                'type': 'object'},
@@ -16187,8 +17550,6 @@ class StorageProvisionerFacade(Type):
                     'WatchFilesystems': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                         'Result': {'$ref': '#/definitions/StringsWatchResults'}},
                                          'type': 'object'},
-                    'WatchForModelConfigChanges': {'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
-                                                   'type': 'object'},
                     'WatchMachines': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                      'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
                                       'type': 'object'},
@@ -16204,12 +17565,12 @@ class StorageProvisionerFacade(Type):
     @ReturnMapping(LifeResults)
     async def AttachmentLife(self, ids):
         '''
-        ids : typing.Sequence[~MachineStorageId]
-        Returns -> typing.Sequence[~LifeResult]
+        ids : typing.Sequence<+T_co>[~MachineStorageId]<~MachineStorageId>
+        Returns -> typing.Sequence<+T_co>[~LifeResult]<~LifeResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='StorageProvisioner', Request='AttachmentLife', Version=2, Params=params)
+        msg = dict(type='StorageProvisioner', request='AttachmentLife', version=3, params=params)
         params['ids'] = ids
         reply = await self.rpc(msg)
         return reply
@@ -16219,12 +17580,12 @@ class StorageProvisionerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def EnsureDead(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='StorageProvisioner', Request='EnsureDead', Version=2, Params=params)
+        msg = dict(type='StorageProvisioner', request='EnsureDead', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -16234,12 +17595,12 @@ class StorageProvisionerFacade(Type):
     @ReturnMapping(FilesystemAttachmentParamsResults)
     async def FilesystemAttachmentParams(self, ids):
         '''
-        ids : typing.Sequence[~MachineStorageId]
-        Returns -> typing.Sequence[~FilesystemAttachmentParamsResult]
+        ids : typing.Sequence<+T_co>[~MachineStorageId]<~MachineStorageId>
+        Returns -> typing.Sequence<+T_co>[~FilesystemAttachmentParamsResult]<~FilesystemAttachmentParamsResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='StorageProvisioner', Request='FilesystemAttachmentParams', Version=2, Params=params)
+        msg = dict(type='StorageProvisioner', request='FilesystemAttachmentParams', version=3, params=params)
         params['ids'] = ids
         reply = await self.rpc(msg)
         return reply
@@ -16249,12 +17610,12 @@ class StorageProvisionerFacade(Type):
     @ReturnMapping(FilesystemAttachmentResults)
     async def FilesystemAttachments(self, ids):
         '''
-        ids : typing.Sequence[~MachineStorageId]
-        Returns -> typing.Sequence[~FilesystemAttachmentResult]
+        ids : typing.Sequence<+T_co>[~MachineStorageId]<~MachineStorageId>
+        Returns -> typing.Sequence<+T_co>[~FilesystemAttachmentResult]<~FilesystemAttachmentResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='StorageProvisioner', Request='FilesystemAttachments', Version=2, Params=params)
+        msg = dict(type='StorageProvisioner', request='FilesystemAttachments', version=3, params=params)
         params['ids'] = ids
         reply = await self.rpc(msg)
         return reply
@@ -16264,12 +17625,12 @@ class StorageProvisionerFacade(Type):
     @ReturnMapping(FilesystemParamsResults)
     async def FilesystemParams(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~FilesystemParamsResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~FilesystemParamsResult]<~FilesystemParamsResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='StorageProvisioner', Request='FilesystemParams', Version=2, Params=params)
+        msg = dict(type='StorageProvisioner', request='FilesystemParams', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -16279,12 +17640,12 @@ class StorageProvisionerFacade(Type):
     @ReturnMapping(FilesystemResults)
     async def Filesystems(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~FilesystemResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~FilesystemResult]<~FilesystemResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='StorageProvisioner', Request='Filesystems', Version=2, Params=params)
+        msg = dict(type='StorageProvisioner', request='Filesystems', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -16294,12 +17655,12 @@ class StorageProvisionerFacade(Type):
     @ReturnMapping(StringResults)
     async def InstanceId(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~StringResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~StringResult]<~StringResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='StorageProvisioner', Request='InstanceId', Version=2, Params=params)
+        msg = dict(type='StorageProvisioner', request='InstanceId', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -16309,28 +17670,13 @@ class StorageProvisionerFacade(Type):
     @ReturnMapping(LifeResults)
     async def Life(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~LifeResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~LifeResult]<~LifeResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='StorageProvisioner', Request='Life', Version=2, Params=params)
+        msg = dict(type='StorageProvisioner', request='Life', version=3, params=params)
         params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ModelConfigResult)
-    async def ModelConfig(self):
-        '''
-
-        Returns -> typing.Mapping[str, typing.Any]
-        '''
-        # map input types to rpc msg
-        params = dict()
-        msg = dict(Type='StorageProvisioner', Request='ModelConfig', Version=2, Params=params)
-
         reply = await self.rpc(msg)
         return reply
 
@@ -16339,12 +17685,12 @@ class StorageProvisionerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Remove(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='StorageProvisioner', Request='Remove', Version=2, Params=params)
+        msg = dict(type='StorageProvisioner', request='Remove', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -16354,12 +17700,12 @@ class StorageProvisionerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def RemoveAttachment(self, ids):
         '''
-        ids : typing.Sequence[~MachineStorageId]
-        Returns -> typing.Sequence[~ErrorResult]
+        ids : typing.Sequence<+T_co>[~MachineStorageId]<~MachineStorageId>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='StorageProvisioner', Request='RemoveAttachment', Version=2, Params=params)
+        msg = dict(type='StorageProvisioner', request='RemoveAttachment', version=3, params=params)
         params['ids'] = ids
         reply = await self.rpc(msg)
         return reply
@@ -16369,12 +17715,12 @@ class StorageProvisionerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetFilesystemAttachmentInfo(self, filesystem_attachments):
         '''
-        filesystem_attachments : typing.Sequence[~FilesystemAttachment]
-        Returns -> typing.Sequence[~ErrorResult]
+        filesystem_attachments : typing.Sequence<+T_co>[~FilesystemAttachment]<~FilesystemAttachment>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='StorageProvisioner', Request='SetFilesystemAttachmentInfo', Version=2, Params=params)
+        msg = dict(type='StorageProvisioner', request='SetFilesystemAttachmentInfo', version=3, params=params)
         params['filesystem-attachments'] = filesystem_attachments
         reply = await self.rpc(msg)
         return reply
@@ -16384,12 +17730,12 @@ class StorageProvisionerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetFilesystemInfo(self, filesystems):
         '''
-        filesystems : typing.Sequence[~Filesystem]
-        Returns -> typing.Sequence[~ErrorResult]
+        filesystems : typing.Sequence<+T_co>[~Filesystem]<~Filesystem>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='StorageProvisioner', Request='SetFilesystemInfo', Version=2, Params=params)
+        msg = dict(type='StorageProvisioner', request='SetFilesystemInfo', version=3, params=params)
         params['filesystems'] = filesystems
         reply = await self.rpc(msg)
         return reply
@@ -16399,12 +17745,12 @@ class StorageProvisionerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetStatus(self, entities):
         '''
-        entities : typing.Sequence[~EntityStatusArgs]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='StorageProvisioner', Request='SetStatus', Version=2, Params=params)
+        msg = dict(type='StorageProvisioner', request='SetStatus', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -16414,12 +17760,12 @@ class StorageProvisionerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetVolumeAttachmentInfo(self, volume_attachments):
         '''
-        volume_attachments : typing.Sequence[~VolumeAttachment]
-        Returns -> typing.Sequence[~ErrorResult]
+        volume_attachments : typing.Sequence<+T_co>[~VolumeAttachment]<~VolumeAttachment>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='StorageProvisioner', Request='SetVolumeAttachmentInfo', Version=2, Params=params)
+        msg = dict(type='StorageProvisioner', request='SetVolumeAttachmentInfo', version=3, params=params)
         params['volume-attachments'] = volume_attachments
         reply = await self.rpc(msg)
         return reply
@@ -16429,12 +17775,12 @@ class StorageProvisionerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetVolumeInfo(self, volumes):
         '''
-        volumes : typing.Sequence[~Volume]
-        Returns -> typing.Sequence[~ErrorResult]
+        volumes : typing.Sequence<+T_co>[~Volume]<~Volume>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='StorageProvisioner', Request='SetVolumeInfo', Version=2, Params=params)
+        msg = dict(type='StorageProvisioner', request='SetVolumeInfo', version=3, params=params)
         params['volumes'] = volumes
         reply = await self.rpc(msg)
         return reply
@@ -16444,12 +17790,12 @@ class StorageProvisionerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def UpdateStatus(self, entities):
         '''
-        entities : typing.Sequence[~EntityStatusArgs]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='StorageProvisioner', Request='UpdateStatus', Version=2, Params=params)
+        msg = dict(type='StorageProvisioner', request='UpdateStatus', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -16459,12 +17805,12 @@ class StorageProvisionerFacade(Type):
     @ReturnMapping(VolumeAttachmentParamsResults)
     async def VolumeAttachmentParams(self, ids):
         '''
-        ids : typing.Sequence[~MachineStorageId]
-        Returns -> typing.Sequence[~VolumeAttachmentParamsResult]
+        ids : typing.Sequence<+T_co>[~MachineStorageId]<~MachineStorageId>
+        Returns -> typing.Sequence<+T_co>[~VolumeAttachmentParamsResult]<~VolumeAttachmentParamsResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='StorageProvisioner', Request='VolumeAttachmentParams', Version=2, Params=params)
+        msg = dict(type='StorageProvisioner', request='VolumeAttachmentParams', version=3, params=params)
         params['ids'] = ids
         reply = await self.rpc(msg)
         return reply
@@ -16474,12 +17820,12 @@ class StorageProvisionerFacade(Type):
     @ReturnMapping(VolumeAttachmentResults)
     async def VolumeAttachments(self, ids):
         '''
-        ids : typing.Sequence[~MachineStorageId]
-        Returns -> typing.Sequence[~VolumeAttachmentResult]
+        ids : typing.Sequence<+T_co>[~MachineStorageId]<~MachineStorageId>
+        Returns -> typing.Sequence<+T_co>[~VolumeAttachmentResult]<~VolumeAttachmentResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='StorageProvisioner', Request='VolumeAttachments', Version=2, Params=params)
+        msg = dict(type='StorageProvisioner', request='VolumeAttachments', version=3, params=params)
         params['ids'] = ids
         reply = await self.rpc(msg)
         return reply
@@ -16489,12 +17835,12 @@ class StorageProvisionerFacade(Type):
     @ReturnMapping(BlockDeviceResults)
     async def VolumeBlockDevices(self, ids):
         '''
-        ids : typing.Sequence[~MachineStorageId]
-        Returns -> typing.Sequence[~BlockDeviceResult]
+        ids : typing.Sequence<+T_co>[~MachineStorageId]<~MachineStorageId>
+        Returns -> typing.Sequence<+T_co>[~BlockDeviceResult]<~BlockDeviceResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='StorageProvisioner', Request='VolumeBlockDevices', Version=2, Params=params)
+        msg = dict(type='StorageProvisioner', request='VolumeBlockDevices', version=3, params=params)
         params['ids'] = ids
         reply = await self.rpc(msg)
         return reply
@@ -16504,12 +17850,12 @@ class StorageProvisionerFacade(Type):
     @ReturnMapping(VolumeParamsResults)
     async def VolumeParams(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~VolumeParamsResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~VolumeParamsResult]<~VolumeParamsResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='StorageProvisioner', Request='VolumeParams', Version=2, Params=params)
+        msg = dict(type='StorageProvisioner', request='VolumeParams', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -16519,12 +17865,12 @@ class StorageProvisionerFacade(Type):
     @ReturnMapping(VolumeResults)
     async def Volumes(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~VolumeResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~VolumeResult]<~VolumeResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='StorageProvisioner', Request='Volumes', Version=2, Params=params)
+        msg = dict(type='StorageProvisioner', request='Volumes', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -16534,12 +17880,12 @@ class StorageProvisionerFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def WatchBlockDevices(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~NotifyWatchResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='StorageProvisioner', Request='WatchBlockDevices', Version=2, Params=params)
+        msg = dict(type='StorageProvisioner', request='WatchBlockDevices', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -16549,12 +17895,12 @@ class StorageProvisionerFacade(Type):
     @ReturnMapping(MachineStorageIdsWatchResults)
     async def WatchFilesystemAttachments(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~MachineStorageIdsWatchResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~MachineStorageIdsWatchResult]<~MachineStorageIdsWatchResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='StorageProvisioner', Request='WatchFilesystemAttachments', Version=2, Params=params)
+        msg = dict(type='StorageProvisioner', request='WatchFilesystemAttachments', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -16564,28 +17910,13 @@ class StorageProvisionerFacade(Type):
     @ReturnMapping(StringsWatchResults)
     async def WatchFilesystems(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~StringsWatchResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~StringsWatchResult]<~StringsWatchResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='StorageProvisioner', Request='WatchFilesystems', Version=2, Params=params)
+        msg = dict(type='StorageProvisioner', request='WatchFilesystems', version=3, params=params)
         params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(NotifyWatchResult)
-    async def WatchForModelConfigChanges(self):
-        '''
-
-        Returns -> typing.Union[str, _ForwardRef('Error')]
-        '''
-        # map input types to rpc msg
-        params = dict()
-        msg = dict(Type='StorageProvisioner', Request='WatchForModelConfigChanges', Version=2, Params=params)
-
         reply = await self.rpc(msg)
         return reply
 
@@ -16594,12 +17925,12 @@ class StorageProvisionerFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def WatchMachines(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~NotifyWatchResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='StorageProvisioner', Request='WatchMachines', Version=2, Params=params)
+        msg = dict(type='StorageProvisioner', request='WatchMachines', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -16609,12 +17940,12 @@ class StorageProvisionerFacade(Type):
     @ReturnMapping(MachineStorageIdsWatchResults)
     async def WatchVolumeAttachments(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~MachineStorageIdsWatchResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~MachineStorageIdsWatchResult]<~MachineStorageIdsWatchResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='StorageProvisioner', Request='WatchVolumeAttachments', Version=2, Params=params)
+        msg = dict(type='StorageProvisioner', request='WatchVolumeAttachments', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -16624,12 +17955,12 @@ class StorageProvisionerFacade(Type):
     @ReturnMapping(StringsWatchResults)
     async def WatchVolumes(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~StringsWatchResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~StringsWatchResult]<~StringsWatchResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='StorageProvisioner', Request='WatchVolumes', Version=2, Params=params)
+        msg = dict(type='StorageProvisioner', request='WatchVolumes', version=3, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -16666,11 +17997,11 @@ class StringsWatcherFacade(Type):
     async def Next(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error')]
+        Returns -> typing.Union[typing.Sequence<+T_co>[str], _ForwardRef('Error')]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='StringsWatcher', Request='Next', Version=1, Params=params)
+        msg = dict(type='StringsWatcher', request='Next', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -16685,7 +18016,7 @@ class StringsWatcherFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='StringsWatcher', Request='Stop', Version=1, Params=params)
+        msg = dict(type='StringsWatcher', request='Stop', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -16787,12 +18118,12 @@ class SubnetsFacade(Type):
     @ReturnMapping(ErrorResults)
     async def AddSubnets(self, subnets):
         '''
-        subnets : typing.Sequence[~AddSubnetParams]
-        Returns -> typing.Sequence[~ErrorResult]
+        subnets : typing.Sequence<+T_co>[~AddSubnetParams]<~AddSubnetParams>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Subnets', Request='AddSubnets', Version=2, Params=params)
+        msg = dict(type='Subnets', request='AddSubnets', version=2, params=params)
         params['subnets'] = subnets
         reply = await self.rpc(msg)
         return reply
@@ -16803,11 +18134,11 @@ class SubnetsFacade(Type):
     async def AllSpaces(self):
         '''
 
-        Returns -> typing.Sequence[~SpaceResult]
+        Returns -> typing.Sequence<+T_co>[~SpaceResult]<~SpaceResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Subnets', Request='AllSpaces', Version=2, Params=params)
+        msg = dict(type='Subnets', request='AllSpaces', version=2, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -16818,11 +18149,11 @@ class SubnetsFacade(Type):
     async def AllZones(self):
         '''
 
-        Returns -> typing.Sequence[~ZoneResult]
+        Returns -> typing.Sequence<+T_co>[~ZoneResult]<~ZoneResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Subnets', Request='AllZones', Version=2, Params=params)
+        msg = dict(type='Subnets', request='AllZones', version=2, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -16834,11 +18165,11 @@ class SubnetsFacade(Type):
         '''
         space_tag : str
         zone : str
-        Returns -> typing.Sequence[~Subnet]
+        Returns -> typing.Sequence<+T_co>[~Subnet]<~Subnet>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Subnets', Request='ListSubnets', Version=2, Params=params)
+        msg = dict(type='Subnets', request='ListSubnets', version=2, params=params)
         params['space-tag'] = space_tag
         params['zone'] = zone
         reply = await self.rpc(msg)
@@ -16938,11 +18269,11 @@ class UndertakerFacade(Type):
     async def ModelConfig(self):
         '''
 
-        Returns -> typing.Mapping[str, typing.Any]
+        Returns -> typing.Mapping<~KT, +VT_co>[str, typing.Any]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Undertaker', Request='ModelConfig', Version=1, Params=params)
+        msg = dict(type='Undertaker', request='ModelConfig', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -16957,7 +18288,7 @@ class UndertakerFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Undertaker', Request='ModelInfo', Version=1, Params=params)
+        msg = dict(type='Undertaker', request='ModelInfo', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -16972,7 +18303,7 @@ class UndertakerFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Undertaker', Request='ProcessDyingModel', Version=1, Params=params)
+        msg = dict(type='Undertaker', request='ProcessDyingModel', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -16987,7 +18318,7 @@ class UndertakerFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Undertaker', Request='RemoveModel', Version=1, Params=params)
+        msg = dict(type='Undertaker', request='RemoveModel', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -16997,12 +18328,12 @@ class UndertakerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetStatus(self, entities):
         '''
-        entities : typing.Sequence[~EntityStatusArgs]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Undertaker', Request='SetStatus', Version=1, Params=params)
+        msg = dict(type='Undertaker', request='SetStatus', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -17012,12 +18343,12 @@ class UndertakerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def UpdateStatus(self, entities):
         '''
-        entities : typing.Sequence[~EntityStatusArgs]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Undertaker', Request='UpdateStatus', Version=1, Params=params)
+        msg = dict(type='Undertaker', request='UpdateStatus', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -17028,11 +18359,11 @@ class UndertakerFacade(Type):
     async def WatchModelResources(self):
         '''
 
-        Returns -> typing.Sequence[~NotifyWatchResult]
+        Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Undertaker', Request='WatchModelResources', Version=1, Params=params)
+        msg = dict(type='Undertaker', request='WatchModelResources', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -17107,12 +18438,12 @@ class UnitAssignerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def AssignUnits(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='UnitAssigner', Request='AssignUnits', Version=1, Params=params)
+        msg = dict(type='UnitAssigner', request='AssignUnits', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -17122,12 +18453,12 @@ class UnitAssignerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetAgentStatus(self, entities):
         '''
-        entities : typing.Sequence[~EntityStatusArgs]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='UnitAssigner', Request='SetAgentStatus', Version=1, Params=params)
+        msg = dict(type='UnitAssigner', request='SetAgentStatus', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -17138,11 +18469,11 @@ class UnitAssignerFacade(Type):
     async def WatchUnitAssignments(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error')]
+        Returns -> typing.Union[typing.Sequence<+T_co>[str], _ForwardRef('Error')]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='UnitAssigner', Request='WatchUnitAssignments', Version=1, Params=params)
+        msg = dict(type='UnitAssigner', request='WatchUnitAssignments', version=1, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -17983,11 +19314,11 @@ class UniterFacade(Type):
     async def APIAddresses(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence[str]]
+        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence<+T_co>[str]]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='APIAddresses', Version=4, Params=params)
+        msg = dict(type='Uniter', request='APIAddresses', version=4, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -17998,11 +19329,11 @@ class UniterFacade(Type):
     async def APIHostPorts(self):
         '''
 
-        Returns -> typing.Sequence[~HostPort]
+        Returns -> typing.Sequence<+T_co>[~HostPort]<~HostPort>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='APIHostPorts', Version=4, Params=params)
+        msg = dict(type='Uniter', request='APIHostPorts', version=4, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -18012,12 +19343,12 @@ class UniterFacade(Type):
     @ReturnMapping(ActionResults)
     async def Actions(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ActionResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ActionResult]<~ActionResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='Actions', Version=4, Params=params)
+        msg = dict(type='Uniter', request='Actions', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18027,12 +19358,12 @@ class UniterFacade(Type):
     @ReturnMapping(ErrorResults)
     async def AddMetricBatches(self, batches):
         '''
-        batches : typing.Sequence[~MetricBatchParam]
-        Returns -> typing.Sequence[~ErrorResult]
+        batches : typing.Sequence<+T_co>[~MetricBatchParam]<~MetricBatchParam>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='AddMetricBatches', Version=4, Params=params)
+        msg = dict(type='Uniter', request='AddMetricBatches', version=4, params=params)
         params['batches'] = batches
         reply = await self.rpc(msg)
         return reply
@@ -18042,12 +19373,12 @@ class UniterFacade(Type):
     @ReturnMapping(ErrorResults)
     async def AddUnitStorage(self, storages):
         '''
-        storages : typing.Sequence[~StorageAddParams]
-        Returns -> typing.Sequence[~ErrorResult]
+        storages : typing.Sequence<+T_co>[~StorageAddParams]<~StorageAddParams>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='AddUnitStorage', Version=4, Params=params)
+        msg = dict(type='Uniter', request='AddUnitStorage', version=4, params=params)
         params['storages'] = storages
         reply = await self.rpc(msg)
         return reply
@@ -18057,12 +19388,12 @@ class UniterFacade(Type):
     @ReturnMapping(MachinePortsResults)
     async def AllMachinePorts(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~MachinePortsResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~MachinePortsResult]<~MachinePortsResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='AllMachinePorts', Version=4, Params=params)
+        msg = dict(type='Uniter', request='AllMachinePorts', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18072,12 +19403,12 @@ class UniterFacade(Type):
     @ReturnMapping(ApplicationStatusResults)
     async def ApplicationStatus(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ApplicationStatusResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ApplicationStatusResult]<~ApplicationStatusResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='ApplicationStatus', Version=4, Params=params)
+        msg = dict(type='Uniter', request='ApplicationStatus', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18087,12 +19418,12 @@ class UniterFacade(Type):
     @ReturnMapping(StringResults)
     async def AssignedMachine(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~StringResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~StringResult]<~StringResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='AssignedMachine', Version=4, Params=params)
+        msg = dict(type='Uniter', request='AssignedMachine', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18102,12 +19433,12 @@ class UniterFacade(Type):
     @ReturnMapping(StringResults)
     async def AvailabilityZone(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~StringResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~StringResult]<~StringResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='AvailabilityZone', Version=4, Params=params)
+        msg = dict(type='Uniter', request='AvailabilityZone', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18117,12 +19448,12 @@ class UniterFacade(Type):
     @ReturnMapping(ErrorResults)
     async def BeginActions(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='BeginActions', Version=4, Params=params)
+        msg = dict(type='Uniter', request='BeginActions', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18133,11 +19464,11 @@ class UniterFacade(Type):
     async def CACert(self):
         '''
 
-        Returns -> typing.Sequence[int]
+        Returns -> typing.Sequence<+T_co>[int]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='CACert', Version=4, Params=params)
+        msg = dict(type='Uniter', request='CACert', version=4, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -18147,12 +19478,12 @@ class UniterFacade(Type):
     @ReturnMapping(StringResults)
     async def CharmArchiveSha256(self, urls):
         '''
-        urls : typing.Sequence[~CharmURL]
-        Returns -> typing.Sequence[~StringResult]
+        urls : typing.Sequence<+T_co>[~CharmURL]<~CharmURL>
+        Returns -> typing.Sequence<+T_co>[~StringResult]<~StringResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='CharmArchiveSha256', Version=4, Params=params)
+        msg = dict(type='Uniter', request='CharmArchiveSha256', version=4, params=params)
         params['urls'] = urls
         reply = await self.rpc(msg)
         return reply
@@ -18162,12 +19493,12 @@ class UniterFacade(Type):
     @ReturnMapping(IntResults)
     async def CharmModifiedVersion(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~IntResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~IntResult]<~IntResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='CharmModifiedVersion', Version=4, Params=params)
+        msg = dict(type='Uniter', request='CharmModifiedVersion', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18177,12 +19508,12 @@ class UniterFacade(Type):
     @ReturnMapping(StringBoolResults)
     async def CharmURL(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~StringBoolResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~StringBoolResult]<~StringBoolResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='CharmURL', Version=4, Params=params)
+        msg = dict(type='Uniter', request='CharmURL', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18192,12 +19523,12 @@ class UniterFacade(Type):
     @ReturnMapping(ErrorResults)
     async def ClearResolved(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='ClearResolved', Version=4, Params=params)
+        msg = dict(type='Uniter', request='ClearResolved', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18207,12 +19538,12 @@ class UniterFacade(Type):
     @ReturnMapping(ErrorResults)
     async def ClosePorts(self, entities):
         '''
-        entities : typing.Sequence[~EntityPortRange]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~EntityPortRange]<~EntityPortRange>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='ClosePorts', Version=4, Params=params)
+        msg = dict(type='Uniter', request='ClosePorts', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18222,12 +19553,12 @@ class UniterFacade(Type):
     @ReturnMapping(ConfigSettingsResults)
     async def ConfigSettings(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ConfigSettingsResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ConfigSettingsResult]<~ConfigSettingsResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='ConfigSettings', Version=4, Params=params)
+        msg = dict(type='Uniter', request='ConfigSettings', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18242,7 +19573,7 @@ class UniterFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='CurrentModel', Version=4, Params=params)
+        msg = dict(type='Uniter', request='CurrentModel', version=4, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -18252,12 +19583,12 @@ class UniterFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Destroy(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='Destroy', Version=4, Params=params)
+        msg = dict(type='Uniter', request='Destroy', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18267,12 +19598,12 @@ class UniterFacade(Type):
     @ReturnMapping(ErrorResults)
     async def DestroyAllSubordinates(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='DestroyAllSubordinates', Version=4, Params=params)
+        msg = dict(type='Uniter', request='DestroyAllSubordinates', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18282,12 +19613,12 @@ class UniterFacade(Type):
     @ReturnMapping(ErrorResults)
     async def DestroyUnitStorageAttachments(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='DestroyUnitStorageAttachments', Version=4, Params=params)
+        msg = dict(type='Uniter', request='DestroyUnitStorageAttachments', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18297,12 +19628,12 @@ class UniterFacade(Type):
     @ReturnMapping(ErrorResults)
     async def EnsureDead(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='EnsureDead', Version=4, Params=params)
+        msg = dict(type='Uniter', request='EnsureDead', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18312,12 +19643,12 @@ class UniterFacade(Type):
     @ReturnMapping(ErrorResults)
     async def EnterScope(self, relation_units):
         '''
-        relation_units : typing.Sequence[~RelationUnit]
-        Returns -> typing.Sequence[~ErrorResult]
+        relation_units : typing.Sequence<+T_co>[~RelationUnit]<~RelationUnit>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='EnterScope', Version=4, Params=params)
+        msg = dict(type='Uniter', request='EnterScope', version=4, params=params)
         params['relation-units'] = relation_units
         reply = await self.rpc(msg)
         return reply
@@ -18327,12 +19658,12 @@ class UniterFacade(Type):
     @ReturnMapping(ErrorResults)
     async def FinishActions(self, results):
         '''
-        results : typing.Sequence[~ActionExecutionResult]
-        Returns -> typing.Sequence[~ErrorResult]
+        results : typing.Sequence<+T_co>[~ActionExecutionResult]<~ActionExecutionResult>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='FinishActions', Version=4, Params=params)
+        msg = dict(type='Uniter', request='FinishActions', version=4, params=params)
         params['results'] = results
         reply = await self.rpc(msg)
         return reply
@@ -18342,12 +19673,12 @@ class UniterFacade(Type):
     @ReturnMapping(MeterStatusResults)
     async def GetMeterStatus(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~MeterStatusResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~MeterStatusResult]<~MeterStatusResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='GetMeterStatus', Version=4, Params=params)
+        msg = dict(type='Uniter', request='GetMeterStatus', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18357,12 +19688,12 @@ class UniterFacade(Type):
     @ReturnMapping(StringBoolResults)
     async def GetPrincipal(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~StringBoolResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~StringBoolResult]<~StringBoolResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='GetPrincipal', Version=4, Params=params)
+        msg = dict(type='Uniter', request='GetPrincipal', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18372,12 +19703,12 @@ class UniterFacade(Type):
     @ReturnMapping(BoolResults)
     async def HasSubordinates(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~BoolResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~BoolResult]<~BoolResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='HasSubordinates', Version=4, Params=params)
+        msg = dict(type='Uniter', request='HasSubordinates', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18387,12 +19718,12 @@ class UniterFacade(Type):
     @ReturnMapping(StringsResults)
     async def JoinedRelations(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~StringsResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~StringsResult]<~StringsResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='JoinedRelations', Version=4, Params=params)
+        msg = dict(type='Uniter', request='JoinedRelations', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18402,12 +19733,12 @@ class UniterFacade(Type):
     @ReturnMapping(ErrorResults)
     async def LeaveScope(self, relation_units):
         '''
-        relation_units : typing.Sequence[~RelationUnit]
-        Returns -> typing.Sequence[~ErrorResult]
+        relation_units : typing.Sequence<+T_co>[~RelationUnit]<~RelationUnit>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='LeaveScope', Version=4, Params=params)
+        msg = dict(type='Uniter', request='LeaveScope', version=4, params=params)
         params['relation-units'] = relation_units
         reply = await self.rpc(msg)
         return reply
@@ -18417,12 +19748,12 @@ class UniterFacade(Type):
     @ReturnMapping(LifeResults)
     async def Life(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~LifeResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~LifeResult]<~LifeResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='Life', Version=4, Params=params)
+        msg = dict(type='Uniter', request='Life', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18432,12 +19763,12 @@ class UniterFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Merge(self, params):
         '''
-        params : typing.Sequence[~MergeLeadershipSettingsParam]
-        Returns -> typing.Sequence[~ErrorResult]
+        params : typing.Sequence<+T_co>[~MergeLeadershipSettingsParam]<~MergeLeadershipSettingsParam>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='Merge', Version=4, Params=params)
+        msg = dict(type='Uniter', request='Merge', version=4, params=params)
         params['params'] = params
         reply = await self.rpc(msg)
         return reply
@@ -18448,11 +19779,11 @@ class UniterFacade(Type):
     async def ModelConfig(self):
         '''
 
-        Returns -> typing.Mapping[str, typing.Any]
+        Returns -> typing.Mapping<~KT, +VT_co>[str, typing.Any]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='ModelConfig', Version=4, Params=params)
+        msg = dict(type='Uniter', request='ModelConfig', version=4, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -18467,7 +19798,7 @@ class UniterFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='ModelUUID', Version=4, Params=params)
+        msg = dict(type='Uniter', request='ModelUUID', version=4, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -18477,12 +19808,12 @@ class UniterFacade(Type):
     @ReturnMapping(UnitNetworkConfigResults)
     async def NetworkConfig(self, args):
         '''
-        args : typing.Sequence[~UnitNetworkConfig]
-        Returns -> typing.Sequence[~UnitNetworkConfigResult]
+        args : typing.Sequence<+T_co>[~UnitNetworkConfig]<~UnitNetworkConfig>
+        Returns -> typing.Sequence<+T_co>[~UnitNetworkConfigResult]<~UnitNetworkConfigResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='NetworkConfig', Version=4, Params=params)
+        msg = dict(type='Uniter', request='NetworkConfig', version=4, params=params)
         params['args'] = args
         reply = await self.rpc(msg)
         return reply
@@ -18492,12 +19823,12 @@ class UniterFacade(Type):
     @ReturnMapping(ErrorResults)
     async def OpenPorts(self, entities):
         '''
-        entities : typing.Sequence[~EntityPortRange]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~EntityPortRange]<~EntityPortRange>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='OpenPorts', Version=4, Params=params)
+        msg = dict(type='Uniter', request='OpenPorts', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18507,12 +19838,12 @@ class UniterFacade(Type):
     @ReturnMapping(StringResults)
     async def PrivateAddress(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~StringResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~StringResult]<~StringResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='PrivateAddress', Version=4, Params=params)
+        msg = dict(type='Uniter', request='PrivateAddress', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18527,7 +19858,7 @@ class UniterFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='ProviderType', Version=4, Params=params)
+        msg = dict(type='Uniter', request='ProviderType', version=4, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -18537,12 +19868,12 @@ class UniterFacade(Type):
     @ReturnMapping(StringResults)
     async def PublicAddress(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~StringResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~StringResult]<~StringResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='PublicAddress', Version=4, Params=params)
+        msg = dict(type='Uniter', request='PublicAddress', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18552,12 +19883,12 @@ class UniterFacade(Type):
     @ReturnMapping(GetLeadershipSettingsBulkResults)
     async def Read(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~GetLeadershipSettingsResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~GetLeadershipSettingsResult]<~GetLeadershipSettingsResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='Read', Version=4, Params=params)
+        msg = dict(type='Uniter', request='Read', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18567,12 +19898,12 @@ class UniterFacade(Type):
     @ReturnMapping(SettingsResults)
     async def ReadRemoteSettings(self, relation_unit_pairs):
         '''
-        relation_unit_pairs : typing.Sequence[~RelationUnitPair]
-        Returns -> typing.Sequence[~SettingsResult]
+        relation_unit_pairs : typing.Sequence<+T_co>[~RelationUnitPair]<~RelationUnitPair>
+        Returns -> typing.Sequence<+T_co>[~SettingsResult]<~SettingsResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='ReadRemoteSettings', Version=4, Params=params)
+        msg = dict(type='Uniter', request='ReadRemoteSettings', version=4, params=params)
         params['relation-unit-pairs'] = relation_unit_pairs
         reply = await self.rpc(msg)
         return reply
@@ -18582,12 +19913,12 @@ class UniterFacade(Type):
     @ReturnMapping(SettingsResults)
     async def ReadSettings(self, relation_units):
         '''
-        relation_units : typing.Sequence[~RelationUnit]
-        Returns -> typing.Sequence[~SettingsResult]
+        relation_units : typing.Sequence<+T_co>[~RelationUnit]<~RelationUnit>
+        Returns -> typing.Sequence<+T_co>[~SettingsResult]<~SettingsResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='ReadSettings', Version=4, Params=params)
+        msg = dict(type='Uniter', request='ReadSettings', version=4, params=params)
         params['relation-units'] = relation_units
         reply = await self.rpc(msg)
         return reply
@@ -18597,12 +19928,12 @@ class UniterFacade(Type):
     @ReturnMapping(RelationResults)
     async def Relation(self, relation_units):
         '''
-        relation_units : typing.Sequence[~RelationUnit]
-        Returns -> typing.Sequence[~RelationResult]
+        relation_units : typing.Sequence<+T_co>[~RelationUnit]<~RelationUnit>
+        Returns -> typing.Sequence<+T_co>[~RelationResult]<~RelationResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='Relation', Version=4, Params=params)
+        msg = dict(type='Uniter', request='Relation', version=4, params=params)
         params['relation-units'] = relation_units
         reply = await self.rpc(msg)
         return reply
@@ -18612,12 +19943,12 @@ class UniterFacade(Type):
     @ReturnMapping(RelationResults)
     async def RelationById(self, relation_ids):
         '''
-        relation_ids : typing.Sequence[int]
-        Returns -> typing.Sequence[~RelationResult]
+        relation_ids : typing.Sequence<+T_co>[int]
+        Returns -> typing.Sequence<+T_co>[~RelationResult]<~RelationResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='RelationById', Version=4, Params=params)
+        msg = dict(type='Uniter', request='RelationById', version=4, params=params)
         params['relation-ids'] = relation_ids
         reply = await self.rpc(msg)
         return reply
@@ -18627,12 +19958,12 @@ class UniterFacade(Type):
     @ReturnMapping(ErrorResults)
     async def RemoveStorageAttachments(self, ids):
         '''
-        ids : typing.Sequence[~StorageAttachmentId]
-        Returns -> typing.Sequence[~ErrorResult]
+        ids : typing.Sequence<+T_co>[~StorageAttachmentId]<~StorageAttachmentId>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='RemoveStorageAttachments', Version=4, Params=params)
+        msg = dict(type='Uniter', request='RemoveStorageAttachments', version=4, params=params)
         params['ids'] = ids
         reply = await self.rpc(msg)
         return reply
@@ -18642,12 +19973,12 @@ class UniterFacade(Type):
     @ReturnMapping(ErrorResults)
     async def RequestReboot(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='RequestReboot', Version=4, Params=params)
+        msg = dict(type='Uniter', request='RequestReboot', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18657,12 +19988,12 @@ class UniterFacade(Type):
     @ReturnMapping(ResolvedModeResults)
     async def Resolved(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ResolvedModeResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ResolvedModeResult]<~ResolvedModeResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='Resolved', Version=4, Params=params)
+        msg = dict(type='Uniter', request='Resolved', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18672,12 +20003,12 @@ class UniterFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetAgentStatus(self, entities):
         '''
-        entities : typing.Sequence[~EntityStatusArgs]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='SetAgentStatus', Version=4, Params=params)
+        msg = dict(type='Uniter', request='SetAgentStatus', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18687,12 +20018,12 @@ class UniterFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetApplicationStatus(self, entities):
         '''
-        entities : typing.Sequence[~EntityStatusArgs]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='SetApplicationStatus', Version=4, Params=params)
+        msg = dict(type='Uniter', request='SetApplicationStatus', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18702,12 +20033,12 @@ class UniterFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetCharmURL(self, entities):
         '''
-        entities : typing.Sequence[~EntityCharmURL]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~EntityCharmURL]<~EntityCharmURL>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='SetCharmURL', Version=4, Params=params)
+        msg = dict(type='Uniter', request='SetCharmURL', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18717,12 +20048,12 @@ class UniterFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetStatus(self, entities):
         '''
-        entities : typing.Sequence[~EntityStatusArgs]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='SetStatus', Version=4, Params=params)
+        msg = dict(type='Uniter', request='SetStatus', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18732,12 +20063,12 @@ class UniterFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetUnitStatus(self, entities):
         '''
-        entities : typing.Sequence[~EntityStatusArgs]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='SetUnitStatus', Version=4, Params=params)
+        msg = dict(type='Uniter', request='SetUnitStatus', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18747,12 +20078,12 @@ class UniterFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetWorkloadVersion(self, entities):
         '''
-        entities : typing.Sequence[~EntityWorkloadVersion]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~EntityWorkloadVersion]<~EntityWorkloadVersion>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='SetWorkloadVersion', Version=4, Params=params)
+        msg = dict(type='Uniter', request='SetWorkloadVersion', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18762,12 +20093,12 @@ class UniterFacade(Type):
     @ReturnMapping(LifeResults)
     async def StorageAttachmentLife(self, ids):
         '''
-        ids : typing.Sequence[~StorageAttachmentId]
-        Returns -> typing.Sequence[~LifeResult]
+        ids : typing.Sequence<+T_co>[~StorageAttachmentId]<~StorageAttachmentId>
+        Returns -> typing.Sequence<+T_co>[~LifeResult]<~LifeResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='StorageAttachmentLife', Version=4, Params=params)
+        msg = dict(type='Uniter', request='StorageAttachmentLife', version=4, params=params)
         params['ids'] = ids
         reply = await self.rpc(msg)
         return reply
@@ -18777,12 +20108,12 @@ class UniterFacade(Type):
     @ReturnMapping(StorageAttachmentResults)
     async def StorageAttachments(self, ids):
         '''
-        ids : typing.Sequence[~StorageAttachmentId]
-        Returns -> typing.Sequence[~StorageAttachmentResult]
+        ids : typing.Sequence<+T_co>[~StorageAttachmentId]<~StorageAttachmentId>
+        Returns -> typing.Sequence<+T_co>[~StorageAttachmentResult]<~StorageAttachmentResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='StorageAttachments', Version=4, Params=params)
+        msg = dict(type='Uniter', request='StorageAttachments', version=4, params=params)
         params['ids'] = ids
         reply = await self.rpc(msg)
         return reply
@@ -18792,12 +20123,12 @@ class UniterFacade(Type):
     @ReturnMapping(StatusResults)
     async def UnitStatus(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~StatusResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~StatusResult]<~StatusResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='UnitStatus', Version=4, Params=params)
+        msg = dict(type='Uniter', request='UnitStatus', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18807,12 +20138,12 @@ class UniterFacade(Type):
     @ReturnMapping(StorageAttachmentIdsResults)
     async def UnitStorageAttachments(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~StorageAttachmentIdsResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~StorageAttachmentIdsResult]<~StorageAttachmentIdsResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='UnitStorageAttachments', Version=4, Params=params)
+        msg = dict(type='Uniter', request='UnitStorageAttachments', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18822,12 +20153,12 @@ class UniterFacade(Type):
     @ReturnMapping(ErrorResults)
     async def UpdateSettings(self, relation_units):
         '''
-        relation_units : typing.Sequence[~RelationUnitSettings]
-        Returns -> typing.Sequence[~ErrorResult]
+        relation_units : typing.Sequence<+T_co>[~RelationUnitSettings]<~RelationUnitSettings>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='UpdateSettings', Version=4, Params=params)
+        msg = dict(type='Uniter', request='UpdateSettings', version=4, params=params)
         params['relation-units'] = relation_units
         reply = await self.rpc(msg)
         return reply
@@ -18837,12 +20168,12 @@ class UniterFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def Watch(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~NotifyWatchResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='Watch', Version=4, Params=params)
+        msg = dict(type='Uniter', request='Watch', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18857,7 +20188,7 @@ class UniterFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='WatchAPIHostPorts', Version=4, Params=params)
+        msg = dict(type='Uniter', request='WatchAPIHostPorts', version=4, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -18867,12 +20198,12 @@ class UniterFacade(Type):
     @ReturnMapping(StringsWatchResults)
     async def WatchActionNotifications(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~StringsWatchResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~StringsWatchResult]<~StringsWatchResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='WatchActionNotifications', Version=4, Params=params)
+        msg = dict(type='Uniter', request='WatchActionNotifications', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18882,12 +20213,12 @@ class UniterFacade(Type):
     @ReturnMapping(StringsWatchResults)
     async def WatchApplicationRelations(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~StringsWatchResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~StringsWatchResult]<~StringsWatchResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='WatchApplicationRelations', Version=4, Params=params)
+        msg = dict(type='Uniter', request='WatchApplicationRelations', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18897,12 +20228,12 @@ class UniterFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def WatchConfigSettings(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~NotifyWatchResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='WatchConfigSettings', Version=4, Params=params)
+        msg = dict(type='Uniter', request='WatchConfigSettings', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18917,7 +20248,7 @@ class UniterFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='WatchForModelConfigChanges', Version=4, Params=params)
+        msg = dict(type='Uniter', request='WatchForModelConfigChanges', version=4, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -18927,12 +20258,12 @@ class UniterFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def WatchLeadershipSettings(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~NotifyWatchResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='WatchLeadershipSettings', Version=4, Params=params)
+        msg = dict(type='Uniter', request='WatchLeadershipSettings', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18942,12 +20273,12 @@ class UniterFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def WatchMeterStatus(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~NotifyWatchResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='WatchMeterStatus', Version=4, Params=params)
+        msg = dict(type='Uniter', request='WatchMeterStatus', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -18957,12 +20288,12 @@ class UniterFacade(Type):
     @ReturnMapping(RelationUnitsWatchResults)
     async def WatchRelationUnits(self, relation_units):
         '''
-        relation_units : typing.Sequence[~RelationUnit]
-        Returns -> typing.Sequence[~RelationUnitsWatchResult]
+        relation_units : typing.Sequence<+T_co>[~RelationUnit]<~RelationUnit>
+        Returns -> typing.Sequence<+T_co>[~RelationUnitsWatchResult]<~RelationUnitsWatchResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='WatchRelationUnits', Version=4, Params=params)
+        msg = dict(type='Uniter', request='WatchRelationUnits', version=4, params=params)
         params['relation-units'] = relation_units
         reply = await self.rpc(msg)
         return reply
@@ -18972,12 +20303,12 @@ class UniterFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def WatchStorageAttachments(self, ids):
         '''
-        ids : typing.Sequence[~StorageAttachmentId]
-        Returns -> typing.Sequence[~NotifyWatchResult]
+        ids : typing.Sequence<+T_co>[~StorageAttachmentId]<~StorageAttachmentId>
+        Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='WatchStorageAttachments', Version=4, Params=params)
+        msg = dict(type='Uniter', request='WatchStorageAttachments', version=4, params=params)
         params['ids'] = ids
         reply = await self.rpc(msg)
         return reply
@@ -18987,12 +20318,12 @@ class UniterFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def WatchUnitAddresses(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~NotifyWatchResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='WatchUnitAddresses', Version=4, Params=params)
+        msg = dict(type='Uniter', request='WatchUnitAddresses', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -19002,12 +20333,12 @@ class UniterFacade(Type):
     @ReturnMapping(StringsWatchResults)
     async def WatchUnitStorageAttachments(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~StringsWatchResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~StringsWatchResult]<~StringsWatchResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='WatchUnitStorageAttachments', Version=4, Params=params)
+        msg = dict(type='Uniter', request='WatchUnitStorageAttachments', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -19017,12 +20348,12 @@ class UniterFacade(Type):
     @ReturnMapping(StringResults)
     async def WorkloadVersion(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~StringResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~StringResult]<~StringResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Uniter', Request='WorkloadVersion', Version=4, Params=params)
+        msg = dict(type='Uniter', request='WorkloadVersion', version=4, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -19148,12 +20479,12 @@ class UpgraderFacade(Type):
     @ReturnMapping(VersionResults)
     async def DesiredVersion(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~VersionResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~VersionResult]<~VersionResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Upgrader', Request='DesiredVersion', Version=1, Params=params)
+        msg = dict(type='Upgrader', request='DesiredVersion', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -19163,12 +20494,12 @@ class UpgraderFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetTools(self, agent_tools):
         '''
-        agent_tools : typing.Sequence[~EntityVersion]
-        Returns -> typing.Sequence[~ErrorResult]
+        agent_tools : typing.Sequence<+T_co>[~EntityVersion]<~EntityVersion>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Upgrader', Request='SetTools', Version=1, Params=params)
+        msg = dict(type='Upgrader', request='SetTools', version=1, params=params)
         params['agent-tools'] = agent_tools
         reply = await self.rpc(msg)
         return reply
@@ -19178,12 +20509,12 @@ class UpgraderFacade(Type):
     @ReturnMapping(ToolsResults)
     async def Tools(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ToolsResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ToolsResult]<~ToolsResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Upgrader', Request='Tools', Version=1, Params=params)
+        msg = dict(type='Upgrader', request='Tools', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -19193,12 +20524,12 @@ class UpgraderFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def WatchAPIVersion(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~NotifyWatchResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='Upgrader', Request='WatchAPIVersion', Version=1, Params=params)
+        msg = dict(type='Upgrader', request='WatchAPIVersion', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -19209,14 +20540,9 @@ class UserManagerFacade(Type):
     version = 1
     schema =     {'definitions': {'AddUser': {'additionalProperties': False,
                                  'properties': {'display-name': {'type': 'string'},
-                                                'model-access-permission': {'type': 'string'},
                                                 'password': {'type': 'string'},
-                                                'shared-model-tags': {'items': {'type': 'string'},
-                                                                      'type': 'array'},
                                                 'username': {'type': 'string'}},
-                                 'required': ['username',
-                                              'display-name',
-                                              'shared-model-tags'],
+                                 'required': ['username', 'display-name'],
                                  'type': 'object'},
                      'AddUserResult': {'additionalProperties': False,
                                        'properties': {'error': {'$ref': '#/definitions/Error'},
@@ -19282,7 +20608,8 @@ class UserManagerFacade(Type):
                                          'required': ['results'],
                                          'type': 'object'},
                      'UserInfo': {'additionalProperties': False,
-                                  'properties': {'created-by': {'type': 'string'},
+                                  'properties': {'access': {'type': 'string'},
+                                                 'created-by': {'type': 'string'},
                                                  'date-created': {'format': 'date-time',
                                                                   'type': 'string'},
                                                  'disabled': {'type': 'boolean'},
@@ -19292,6 +20619,7 @@ class UserManagerFacade(Type):
                                                  'username': {'type': 'string'}},
                                   'required': ['username',
                                                'display-name',
+                                               'access',
                                                'created-by',
                                                'date-created',
                                                'disabled'],
@@ -19324,6 +20652,9 @@ class UserManagerFacade(Type):
                     'EnableUser': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                   'Result': {'$ref': '#/definitions/ErrorResults'}},
                                    'type': 'object'},
+                    'RemoveUser': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                  'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                   'type': 'object'},
                     'SetPassword': {'properties': {'Params': {'$ref': '#/definitions/EntityPasswords'},
                                                    'Result': {'$ref': '#/definitions/ErrorResults'}},
                                     'type': 'object'},
@@ -19336,12 +20667,12 @@ class UserManagerFacade(Type):
     @ReturnMapping(AddUserResults)
     async def AddUser(self, users):
         '''
-        users : typing.Sequence[~AddUser]
-        Returns -> typing.Sequence[~AddUserResult]
+        users : typing.Sequence<+T_co>[~AddUser]<~AddUser>
+        Returns -> typing.Sequence<+T_co>[~AddUserResult]<~AddUserResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='UserManager', Request='AddUser', Version=1, Params=params)
+        msg = dict(type='UserManager', request='AddUser', version=1, params=params)
         params['users'] = users
         reply = await self.rpc(msg)
         return reply
@@ -19351,12 +20682,12 @@ class UserManagerFacade(Type):
     @ReturnMapping(MacaroonResults)
     async def CreateLocalLoginMacaroon(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~MacaroonResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~MacaroonResult]<~MacaroonResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='UserManager', Request='CreateLocalLoginMacaroon', Version=1, Params=params)
+        msg = dict(type='UserManager', request='CreateLocalLoginMacaroon', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -19366,12 +20697,12 @@ class UserManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def DisableUser(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='UserManager', Request='DisableUser', Version=1, Params=params)
+        msg = dict(type='UserManager', request='DisableUser', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -19381,12 +20712,27 @@ class UserManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def EnableUser(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='UserManager', Request='EnableUser', Version=1, Params=params)
+        msg = dict(type='UserManager', request='EnableUser', version=1, params=params)
+        params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def RemoveUser(self, entities):
+        '''
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        '''
+        # map input types to rpc msg
+        params = dict()
+        msg = dict(type='UserManager', request='RemoveUser', version=1, params=params)
         params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
@@ -19396,12 +20742,12 @@ class UserManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetPassword(self, changes):
         '''
-        changes : typing.Sequence[~EntityPassword]
-        Returns -> typing.Sequence[~ErrorResult]
+        changes : typing.Sequence<+T_co>[~EntityPassword]<~EntityPassword>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='UserManager', Request='SetPassword', Version=1, Params=params)
+        msg = dict(type='UserManager', request='SetPassword', version=1, params=params)
         params['changes'] = changes
         reply = await self.rpc(msg)
         return reply
@@ -19411,13 +20757,13 @@ class UserManagerFacade(Type):
     @ReturnMapping(UserInfoResults)
     async def UserInfo(self, entities, include_disabled):
         '''
-        entities : typing.Sequence[~Entity]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         include_disabled : bool
-        Returns -> typing.Sequence[~UserInfoResult]
+        Returns -> typing.Sequence<+T_co>[~UserInfoResult]<~UserInfoResult>
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='UserManager', Request='UserInfo', Version=1, Params=params)
+        msg = dict(type='UserManager', request='UserInfo', version=1, params=params)
         params['entities'] = entities
         params['include-disabled'] = include_disabled
         reply = await self.rpc(msg)
@@ -19462,11 +20808,11 @@ class VolumeAttachmentsWatcherFacade(Type):
     async def Next(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence[~MachineStorageId], _ForwardRef('Error')]
+        Returns -> typing.Union[typing.Sequence<+T_co>[~MachineStorageId]<~MachineStorageId>, _ForwardRef('Error')]
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='VolumeAttachmentsWatcher', Request='Next', Version=2, Params=params)
+        msg = dict(type='VolumeAttachmentsWatcher', request='Next', version=2, params=params)
 
         reply = await self.rpc(msg)
         return reply
@@ -19481,7 +20827,7 @@ class VolumeAttachmentsWatcherFacade(Type):
         '''
         # map input types to rpc msg
         params = dict()
-        msg = dict(Type='VolumeAttachmentsWatcher', Request='Stop', Version=2, Params=params)
+        msg = dict(type='VolumeAttachmentsWatcher', request='Stop', version=2, params=params)
 
         reply = await self.rpc(msg)
         return reply

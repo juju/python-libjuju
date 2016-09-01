@@ -218,14 +218,22 @@ class {}(Type):
                 if arg_type in basic_types:
                     source.append("{}self.{} = {}".format(INDENT * 2, arg_name, arg_name))
                 elif issubclass(arg_type, typing.Sequence):
-                    value_type = arg_type_name.__parameters__[0]
+                    value_type = (
+                        arg_type_name.__parameters__[0]
+                        if len(arg_type_name.__parameters__)
+                        else None
+                    )
                     if type(value_type) is typing.TypeVar:
                         source.append("{}self.{} = [{}.from_json(o) for o in {} or []]".format(
                             INDENT * 2, arg_name, strcast(value_type), arg_name))
                     else:
                         source.append("{}self.{} = {}".format(INDENT * 2, arg_name, arg_name))
                 elif issubclass(arg_type, typing.Mapping):
-                    value_type = arg_type_name.__parameters__[1]
+                    value_type = (
+                        arg_type_name.__parameters__[1]
+                        if len(arg_type_name.__parameters__) > 1
+                        else None
+                    )
                     if type(value_type) is typing.TypeVar:
                         source.append("{}self.{} = {{k: {}.from_json(v) for k, v in ({} or dict()).items()}}".format(
                             INDENT * 2, arg_name, strcast(value_type), arg_name))
@@ -344,7 +352,7 @@ def makeFunc(cls, name, params, result, async=True):
     '''
     # map input types to rpc msg
     params = dict()
-    msg = dict(Type='{cls.name}', Request='{name}', Version={cls.version}, Params=params)
+    msg = dict(type='{cls.name}', request='{name}', version={cls.version}, params=params)
 {assignments}
     reply = {await}self.rpc(msg)
     return reply
