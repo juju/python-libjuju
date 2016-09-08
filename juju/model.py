@@ -53,7 +53,6 @@ class Model(object):
         self.connection = connection
         self.observers = set()
         self.state = dict()
-        self._watching = False
 
     @property
     def applications(self):
@@ -62,10 +61,6 @@ class Model(object):
     @property
     def units(self):
         return self.state.get('unit', {})
-
-    def stop_watching(self):
-        self.connection.cancel()
-        self._watching = False
 
     def add_observer(self, callable_):
         """Register an "on-model-change" callback
@@ -101,7 +96,7 @@ class Model(object):
         self._watching = True
         allwatcher = watcher.AllWatcher()
         allwatcher.connect(await self.connection.clone())
-        while self._watching:
+        while True:
             results = await allwatcher.Next()
             for delta in results.deltas:
                 delta = get_entity_delta(delta)

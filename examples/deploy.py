@@ -1,5 +1,5 @@
 """
-Run this one against a model that has at least one unit deployed.
+Deploy a charm, wait until it's idle, then destroy the unit and application.
 
 """
 import asyncio
@@ -7,11 +7,6 @@ import logging
 
 from juju.model import Model, ModelObserver
 from juju.client.connection import Connection
-
-
-loop = asyncio.get_event_loop()
-conn = loop.run_until_complete(Connection.connect_current())
-model = Model(conn)
 
 
 class MyModelObserver(ModelObserver):
@@ -39,6 +34,8 @@ class MyModelObserver(ModelObserver):
 
 
 async def run():
+    conn = await Connection.connect_current()
+    model = Model(conn)
     model.add_observer(MyModelObserver())
     await model.deploy(
         'ubuntu-0',
@@ -48,6 +45,7 @@ async def run():
     )
     await model.watch()
 
+
 logging.basicConfig(level=logging.INFO)
-loop.create_task(run())
-loop.run_forever()
+loop = asyncio.get_event_loop()
+loop.run_until_complete(run())
