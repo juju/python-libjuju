@@ -7,9 +7,6 @@ log = logging.getLogger(__name__)
 
 
 class Unit(model.ModelEntity):
-    def _get_tag(self):
-        return 'unit-{}'.format(self.data['name'].replace('/', '-'))
-
     def add_storage(self, name, constraints=None):
         """Add unit storage dynamically.
 
@@ -26,11 +23,17 @@ class Unit(model.ModelEntity):
         """
         pass
 
-    def destroy(self):
+    async def destroy(self):
         """Destroy this unit.
 
         """
-        pass
+        app_facade = client.ApplicationFacade()
+        app_facade.connect(self.connection)
+
+        log.debug(
+            'Destroying %s', self.name)
+
+        return await app_facade.DestroyUnits([self.name])
     remove = destroy
 
     def get_resources(self, details=False):
@@ -58,8 +61,7 @@ class Unit(model.ModelEntity):
 
         """
         action = client.ActionFacade()
-        conn = await self.model.connection.clone()
-        action.connect(conn)
+        action.connect(self.connection)
 
         log.debug(
             'Running `%s` on %s', command, self.name)

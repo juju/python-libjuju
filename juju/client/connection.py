@@ -73,7 +73,8 @@ class Connection:
         outgoing = json.dumps(msg, indent=2, cls=encoder)
         await self.ws.send(outgoing)
         result = await self.recv()
-        log.debug("send %s got %s", msg, result)
+        #log.debug("Send: %s", outgoing)
+        #log.debug("Recv: %s", result)
         if result and 'error' in result:
             raise RuntimeError(result)
         return result

@@ -1,7 +1,19 @@
+import logging
+
 from . import model
+from .client import client
+
+log = logging.getLogger(__name__)
 
 
 class Application(model.ModelEntity):
+    @property
+    def units(self):
+        return [
+            unit for unit in self.model.units.values()
+            if unit.application == self.name
+        ]
+
     def add_relation(self, local_relation, remote_relation):
         """Add a relation to another service.
 
@@ -62,11 +74,17 @@ class Application(model.ModelEntity):
         pass
     remove_relation = destroy_relation
 
-    def destroy(self):
+    async def destroy(self):
         """Remove this service from the model.
 
         """
-        pass
+        app_facade = client.ApplicationFacade()
+        app_facade.connect(self.connection)
+
+        log.debug(
+            'Destroying %s', self.name)
+
+        return await app_facade.Destroy(self.name)
     remove = destroy
 
     def expose(self):

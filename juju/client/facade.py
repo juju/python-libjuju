@@ -124,7 +124,7 @@ class Args(list):
                     self.append((name, rtype))
 
     def do_explode(self, kind):
-        if kind in basic_types:
+        if kind in basic_types or type(kind) is typing.TypeVar:
             return False
         if not issubclass(kind, (typing.Sequence,
                                  typing.Mapping)):
@@ -188,9 +188,9 @@ def buildTypes(schema, capture):
     for kind in sorted((k for k in _types if not isinstance(k, str)),
                        key=lambda x: str(x)):
         name = _types[kind]
-        args = Args(kind)
         if name in classes:
             continue
+        args = Args(kind)
         source = ["""
 class {}(Type):
     _toSchema = {}
@@ -323,6 +323,13 @@ def ReturnMapping(cls):
                 item_cls = cls.__parameters__[0]
                 for item in reply:
                     result.append(item_cls.from_json(item))
+                    """
+                    if 'error' in item:
+                        cls = classes['Error']
+                    else:
+                        cls = item_cls
+                    result.append(cls.from_json(item))
+                    """
             else:
                 result = cls.from_json(reply['response'])
 
@@ -439,7 +446,6 @@ class Type:
         try:
             return cls(**d)
         except TypeError:
-            print(cls)
             raise
 
     def serialize(self):

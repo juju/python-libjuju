@@ -4,6 +4,7 @@ from .client import client
 def get_entity_delta(d):
     _delta_types = {
         'application': ApplicationDelta,
+        'annotation': AnnotationDelta,
         'machine': MachineDelta,
         'unit': UnitDelta,
         'action': ActionDelta,
@@ -27,6 +28,15 @@ class ApplicationDelta(EntityDelta):
     def get_entity_class(self):
         from .application import Application
         return Application
+
+
+class AnnotationDelta(EntityDelta):
+    def get_id(self):
+        return self.data['tag']
+
+    def get_entity_class(self):
+        from .annotation import Annotation
+        return Annotation
 
 
 class MachineDelta(EntityDelta):

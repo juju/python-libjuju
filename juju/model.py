@@ -1,5 +1,27 @@
+import logging
+
+from .client import client
 from .client import watcher
 from .delta import get_entity_delta
+
+log = logging.getLogger(__name__)
+
+
+class ModelObserver(object):
+    def __call__(self, delta, old, new, model):
+        if old is None and new is not None:
+            type_ = 'add'
+        else:
+            type_ = delta.type
+        handler_name = 'on_{}_{}'.format(delta.entity, type_)
+        method = getattr(self, handler_name, self.on_change)
+        log.debug(
+            'Model changed: %s %s %s',
+            delta.entity, delta.type, delta.get_id())
+        method(delta, old, new, model)
+
+    def on_change(self, delta, old, new, model):
+        pass
 
 
 class ModelEntity(object):
@@ -15,6 +37,7 @@ class ModelEntity(object):
         """
         self.data = data
         self.model = model
+        self.connection = model.connection
 
     def __getattr__(self, name):
         return self.data[name]
@@ -30,6 +53,19 @@ class Model(object):
         self.connection = connection
         self.observers = set()
         self.state = dict()
+        self._watching = False
+
+    @property
+    def applications(self):
+        return self.state.get('application', {})
+
+    @property
+    def units(self):
+        return self.state.get('unit', {})
+
+    def stop_watching(self):
+        self.connection.cancel()
+        self._watching = False
 
     def add_observer(self, callable_):
         """Register an "on-model-change" callback
@@ -62,9 +98,10 @@ class Model(object):
         See :meth:`add_observer` to register an onchange callback.
 
         """
+        self._watching = True
         allwatcher = watcher.AllWatcher()
-        allwatcher.connect(self.connection)
-        while True:
+        allwatcher.connect(await self.connection.clone())
+        while self._watching:
             results = await allwatcher.Next()
             for delta in results.deltas:
                 delta = get_entity_delta(delta)
@@ -80,8 +117,8 @@ class Model(object):
         old_obj may be None if the delta is for the creation of a new object,
         e.g. a new application or unit is deployed.
 
-        new_obj may be if no object was created or updated, or if an object
-        was deleted as a result of the delta being applied.
+        new_obj may be None if no object was created or updated, or if an
+        object was deleted as a result of the delta being applied.
 
         """
         old_obj, new_obj = None, None
@@ -265,10 +302,10 @@ class Model(object):
         """
         pass
 
-    def deploy(
+    async def deploy(
             self, entity_url, service_name=None, bind=None, budget=None,
             channel=None, config=None, constraints=None, force=False,
-            num_units=1, plan=None, resource=None, series=None, storage=None,
+            num_units=1, plan=None, resources=None, series=None, storage=None,
             to=None):
         """Deploy a new service or bundle.
 
@@ -285,7 +322,7 @@ class Model(object):
             an unsupported series
         :param int num_units: Number of units to deploy
         :param str plan: Plan under which to deploy charm
-        :param dict resource: <resource name>:<file path> pairs
+        :param dict resources: <resource name>:<file path> pairs
         :param str series: Series on which to deploy
         :param dict storage: Storage constraints TODO how do these look?
         :param str to: Placement directive, e.g.::
@@ -296,8 +333,56 @@ class Model(object):
 
             If None, a new machine is provisioned.
 
+
+        TODO::
+
+            - entity_url must have a revision; look up latest automatically if
+              not provided by caller
+            - service_name is required; fill this in automatically if not
+              provided by caller
+            - series is required; how do we pick a default?
+
         """
-        pass
+        if constraints:
+            constraints = client.Value(**constraints)
+
+        if to:
+            placement = [
+                client.Placement(**p) for p in to
+            ]
+        else:
+            placement = []
+
+        if storage:
+            storage = {
+                k: client.Constraints(**v)
+                for k, v in storage.items()
+            }
+
+        app_facade = client.ApplicationFacade()
+        client_facade = client.ClientFacade()
+        app_facade.connect(self.connection)
+        client_facade.connect(self.connection)
+
+        log.debug(
+            'Deploying %s', entity_url)
+
+        await client_facade.AddCharm(channel, entity_url)
+        app = client.ApplicationDeploy(
+            application=service_name,
+            channel=channel,
+            charm_url=entity_url,
+            config=config,
+            constraints=constraints,
+            endpoint_bindings=bind,
+            num_units=num_units,
+            placement=placement,
+            resources=resources,
+            series=series,
+            storage=storage,
+        )
+
+        return await app_facade.Deploy([app])
 
     def destroy(self):
         """Terminate all machines and resources for this model.

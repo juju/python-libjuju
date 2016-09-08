@@ -2917,11 +2917,15 @@
                   "$ref": "#/definitions/CharmMetric"
                 }
               }
+            },
+            "plan": {
+              "$ref": "#/definitions/CharmPlan"
             }
           },
           "additionalProperties": false,
           "required": [
-            "metrics"
+            "metrics",
+            "plan"
           ]
         },
         "CharmOption": {
@@ -2957,6 +2961,18 @@
           "required": [
             "name",
             "type"
+          ]
+        },
+        "CharmPlan": {
+          "type": "object",
+          "properties": {
+            "required": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "required"
           ]
         },
         "CharmRelation": {
@@ -4251,6 +4267,36 @@
           "type": "object",
           "additionalProperties": false
         },
+        "MachineHardware": {
+          "type": "object",
+          "properties": {
+            "arch": {
+              "type": "string"
+            },
+            "availability-zone": {
+              "type": "string"
+            },
+            "cores": {
+              "type": "integer"
+            },
+            "cpu-power": {
+              "type": "integer"
+            },
+            "mem": {
+              "type": "integer"
+            },
+            "root-disk": {
+              "type": "integer"
+            },
+            "tags": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
         "MachineStatus": {
           "type": "object",
           "properties": {
@@ -4426,6 +4472,12 @@
             "life": {
               "type": "string"
             },
+            "machines": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ModelMachineInfo"
+              }
+            },
             "name": {
               "type": "string"
             },
@@ -4459,7 +4511,23 @@
             "owner-tag",
             "life",
             "status",
-            "users"
+            "users",
+            "machines"
+          ]
+        },
+        "ModelMachineInfo": {
+          "type": "object",
+          "properties": {
+            "hardware": {
+              "$ref": "#/definitions/MachineHardware"
+            },
+            "id": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "id"
           ]
         },
         "ModelSet": {
@@ -5916,9 +5984,42 @@
           "type": "object",
           "additionalProperties": false
         },
+        "MachineHardware": {
+          "type": "object",
+          "properties": {
+            "arch": {
+              "type": "string"
+            },
+            "availability-zone": {
+              "type": "string"
+            },
+            "cores": {
+              "type": "integer"
+            },
+            "cpu-power": {
+              "type": "integer"
+            },
+            "mem": {
+              "type": "integer"
+            },
+            "root-disk": {
+              "type": "integer"
+            },
+            "tags": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
         "MigrationSpec": {
           "type": "object",
           "properties": {
+            "external-control": {
+              "type": "boolean"
+            },
             "model-tag": {
               "type": "string"
             },
@@ -5929,7 +6030,8 @@
           "additionalProperties": false,
           "required": [
             "model-tag",
-            "target-info"
+            "target-info",
+            "external-control"
           ]
         },
         "MigrationTargetInfo": {
@@ -5950,7 +6052,7 @@
             "controller-tag": {
               "type": "string"
             },
-            "macaroon": {
+            "macaroons": {
               "type": "string"
             },
             "password": {
@@ -6041,6 +6143,21 @@
             "config"
           ]
         },
+        "ModelMachineInfo": {
+          "type": "object",
+          "properties": {
+            "hardware": {
+              "$ref": "#/definitions/MachineHardware"
+            },
+            "id": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "id"
+          ]
+        },
         "ModelStatus": {
           "type": "object",
           "properties": {
@@ -6052,6 +6169,12 @@
             },
             "life": {
               "type": "string"
+            },
+            "machines": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ModelMachineInfo"
+              }
             },
             "model-tag": {
               "type": "string"
@@ -8206,6 +8329,30 @@
             "ha-members"
           ]
         },
+        "MongoVersion": {
+          "type": "object",
+          "properties": {
+            "engine": {
+              "type": "string"
+            },
+            "major": {
+              "type": "integer"
+            },
+            "minor": {
+              "type": "integer"
+            },
+            "patch": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "major",
+            "minor",
+            "patch",
+            "engine"
+          ]
+        },
         "ResumeReplicationParams": {
           "type": "object",
           "properties": {
@@ -8225,7 +8372,7 @@
           "type": "object",
           "properties": {
             "target": {
-              "$ref": "#/definitions/Version"
+              "$ref": "#/definitions/MongoVersion"
             }
           },
           "additionalProperties": false,
@@ -8274,30 +8421,6 @@
             }
           },
           "additionalProperties": false
-        },
-        "Version": {
-          "type": "object",
-          "properties": {
-            "Major": {
-              "type": "integer"
-            },
-            "Minor": {
-              "type": "integer"
-            },
-            "Patch": {
-              "type": "string"
-            },
-            "StorageEngine": {
-              "type": "string"
-            }
-          },
-          "additionalProperties": false,
-          "required": [
-            "Major",
-            "Minor",
-            "Patch",
-            "StorageEngine"
-          ]
         }
       }
     }
@@ -12348,6 +12471,9 @@
               "type": "string",
               "format": "date-time"
             },
+            "unit": {
+              "type": "string"
+            },
             "value": {
               "type": "string"
             }
@@ -12356,7 +12482,8 @@
           "required": [
             "time",
             "key",
-            "value"
+            "value",
+            "unit"
           ]
         },
         "MetricResults": {
@@ -12795,6 +12922,9 @@
             "name": {
               "type": "string"
             },
+            "owner-tag": {
+              "type": "string"
+            },
             "uuid": {
               "type": "string"
             }
@@ -12803,12 +12933,16 @@
           "required": [
             "uuid",
             "name",
+            "owner-tag",
             "agent-version"
           ]
         },
         "MigrationSpec": {
           "type": "object",
           "properties": {
+            "external-control": {
+              "type": "boolean"
+            },
             "model-tag": {
               "type": "string"
             },
@@ -12819,7 +12953,8 @@
           "additionalProperties": false,
           "required": [
             "model-tag",
-            "target-info"
+            "target-info",
+            "external-control"
           ]
         },
         "MigrationTargetInfo": {
@@ -12840,7 +12975,7 @@
             "controller-tag": {
               "type": "string"
             },
-            "macaroon": {
+            "macaroons": {
               "type": "string"
             },
             "password": {
@@ -13203,12 +13338,36 @@
           "type": "object",
           "properties": {
             "Params": {
-              "$ref": "#/definitions/TargetPrechecksArgs"
+              "$ref": "#/definitions/MigrationModelInfo"
             }
           }
         }
       },
       "definitions": {
+        "MigrationModelInfo": {
+          "type": "object",
+          "properties": {
+            "agent-version": {
+              "$ref": "#/definitions/Number"
+            },
+            "name": {
+              "type": "string"
+            },
+            "owner-tag": {
+              "type": "string"
+            },
+            "uuid": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "uuid",
+            "name",
+            "owner-tag",
+            "agent-version"
+          ]
+        },
         "ModelArgs": {
           "type": "object",
           "properties": {
@@ -13292,18 +13451,6 @@
           "required": [
             "version",
             "uri"
-          ]
-        },
-        "TargetPrechecksArgs": {
-          "type": "object",
-          "properties": {
-            "agent-version": {
-              "$ref": "#/definitions/Number"
-            }
-          },
-          "additionalProperties": false,
-          "required": [
-            "agent-version"
           ]
         }
       }
@@ -13833,6 +13980,36 @@
           "type": "object",
           "additionalProperties": false
         },
+        "MachineHardware": {
+          "type": "object",
+          "properties": {
+            "arch": {
+              "type": "string"
+            },
+            "availability-zone": {
+              "type": "string"
+            },
+            "cores": {
+              "type": "integer"
+            },
+            "cpu-power": {
+              "type": "integer"
+            },
+            "mem": {
+              "type": "integer"
+            },
+            "root-disk": {
+              "type": "integer"
+            },
+            "tags": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
         "MapResult": {
           "type": "object",
           "properties": {
@@ -13944,6 +14121,12 @@
             "life": {
               "type": "string"
             },
+            "machines": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ModelMachineInfo"
+              }
+            },
             "name": {
               "type": "string"
             },
@@ -13977,7 +14160,8 @@
             "owner-tag",
             "life",
             "status",
-            "users"
+            "users",
+            "machines"
           ]
         },
         "ModelInfoResult": {
@@ -14005,6 +14189,21 @@
           "additionalProperties": false,
           "required": [
             "results"
+          ]
+        },
+        "ModelMachineInfo": {
+          "type": "object",
+          "properties": {
+            "hardware": {
+              "$ref": "#/definitions/MachineHardware"
+            },
+            "id": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "id"
           ]
         },
         "ModelUserInfo": {
