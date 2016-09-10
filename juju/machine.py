@@ -1,7 +1,25 @@
+import logging
+
 from . import model
+from .client import client
+
+log = logging.getLogger(__name__)
 
 
 class Machine(model.ModelEntity):
+    async def destroy(self, force=False):
+        """Remove this machine from the model.
+
+        """
+        facade = client.ClientFacade()
+        facade.connect(self.connection)
+
+        log.debug(
+            'Destroying machine %s', self.id)
+
+        return await facade.DestroyMachines(force, [self.id])
+    remove = destroy
+
     def run(self, command, timeout=None):
         """Run command on this machine.
 

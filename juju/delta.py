@@ -3,11 +3,12 @@ from .client import client
 
 def get_entity_delta(d):
     _delta_types = {
+        'action': ActionDelta,
         'application': ApplicationDelta,
         'annotation': AnnotationDelta,
         'machine': MachineDelta,
         'unit': UnitDelta,
-        'action': ActionDelta,
+        'relation': RelationDelta,
     }
 
     return _delta_types[d.entity](d.deltas)
@@ -19,6 +20,12 @@ class EntityDelta(client.Delta):
 
     def get_entity_class(self):
         return None
+
+
+class ActionDelta(EntityDelta):
+    def get_entity_class(self):
+        from .action import Action
+        return Action
 
 
 class ApplicationDelta(EntityDelta):
@@ -54,7 +61,7 @@ class UnitDelta(EntityDelta):
         return Unit
 
 
-class ActionDelta(EntityDelta):
+class RelationDelta(EntityDelta):
     def get_entity_class(self):
-        from .action import Action
-        return Action
+        from .relation import Relation
+        return Relation

@@ -1,4 +1,3 @@
-import asyncio
 import io
 import json
 import logging
@@ -41,6 +40,12 @@ class Connection:
         self.addr = None
         self.ws = None
         self.facades = {}
+
+    @property
+    def is_open(self):
+        if self.ws:
+            return self.ws.open
+        return False
 
     def _get_ssl(self, cert):
         return ssl.create_default_context(
