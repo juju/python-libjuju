@@ -9,11 +9,11 @@ from juju.model import Model, ModelObserver
 
 
 class MyModelObserver(ModelObserver):
-    def on_change(self, delta, old, new, model):
+    async def on_change(self, delta, old, new, model):
         if model.all_units_idle():
             logging.debug('All units idle, disconnecting')
-            task = model.loop.create_task(model.disconnect())
-            task.add_done_callback(lambda fut: model.loop.stop())
+            await model.disconnect()
+            model.loop.stop()
 
 
 async def run():
@@ -21,9 +21,6 @@ async def run():
     await model.connect_current()
 
     await model.reset(force=True)
-    await model.block_until(
-        lambda: len(model.machines) == 0
-    )
     model.add_observer(MyModelObserver())
 
     await model.deploy(
@@ -44,10 +41,10 @@ async def run():
         'nrpe',
     )
 
-
 logging.basicConfig(level=logging.DEBUG)
 ws_logger = logging.getLogger('websockets.protocol')
 ws_logger.setLevel(logging.INFO)
 loop = asyncio.get_event_loop()
+loop.set_debug(False)
 loop.create_task(run())
 loop.run_forever()
