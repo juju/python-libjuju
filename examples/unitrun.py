@@ -1,49 +1,60 @@
 """
-Run this one against a model that has at least one unit deployed.
+This example:
+
+1. Connects to current model and resets it.
+2. Deploys one ubuntu unit.
+3. Runs an action against the unit.
+4. Waits for the action results to come back, then exits.
 
 """
 import asyncio
-import functools
 import logging
 
-from juju.model import Model
-from juju.unit import Unit
-from juju.client.connection import Connection
-
-
-loop = asyncio.get_event_loop()
-conn = loop.run_until_complete(Connection.connect_current())
-
-_seen_units = set()
+from juju.model import Model, ModelObserver
 
 
 async def run_stuff_on_unit(unit):
-    if unit.name in _seen_units:
-        return
-
     print('Running command on unit', unit.name)
+
     # unit.run() returns a client.ActionResults instance
     action_results = await unit.run('unit-get public-address')
-    _seen_units.add(unit.name)
     action_result = action_results.results[0]
 
     print('Results from unit', unit.name)
     print(action_result.__dict__)
 
 
-def on_model_change(delta, old, new, model):
-    if isinstance(new, Unit):
-        task = loop.create_task(run_stuff_on_unit(new))
+class MyModelObserver(ModelObserver):
+    async def on_unit_add(self, delta, old, new, model):
+        loop.create_task(run_stuff_on_unit(new))
 
-    if delta.entity == 'action':
+    async def on_action_change(self, delta, old, new, model):
         print(delta.data)
-        print(new)
+
+        action = new
+        if action.status == 'completed':
+            await action.model.disconnect()
+            action.model.loop.stop()
 
 
-async def watch_model():
-    model = Model(conn)
-    model.add_observer(on_model_change)
-    await model.watch()
+async def run():
+    model = Model()
+    await model.connect_current()
+    await model.reset(force=True)
+    model.add_observer(MyModelObserver())
 
-logging.basicConfig(level=logging.INFO)
-loop.run_until_complete(watch_model())
+    await model.deploy(
+        'ubuntu-0',
+        service_name='ubuntu',
+        series='trusty',
+        channel='stable',
+    )
+
+
+logging.basicConfig(level=logging.DEBUG)
+ws_logger = logging.getLogger('websockets.protocol')
+ws_logger.setLevel(logging.INFO)
+loop = asyncio.get_event_loop()
+loop.set_debug(False)
+loop.create_task(run())
+loop.run_forever()
