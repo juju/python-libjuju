@@ -41,6 +41,11 @@ See the `examples/` directory for some simple working examples.
 ## Simple bootstrap/deploy
 
 ```python
+"""
+This doesn't work yet! It's an example of what usage might
+look like in the future.
+
+"""
 from juju import Juju
 
 juju = Juju()
@@ -51,7 +56,7 @@ model = controller.get_model('default')
 # We might want an async and blocking version of deploy()?
 model.deploy('mediawiki-single')
 
-mediawiki = model.get_service('mediawiki')
+mediawiki = model.get_application('mediawiki')
 mediawiki.expose()
 
 ```

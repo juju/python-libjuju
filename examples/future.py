@@ -1,39 +1,27 @@
 """
-This example:
-
-1. Connects to the current model
-2. Resets it
-3. Deploys two charms and relates them
-4. Waits for units to be idle, then exits
+This example doesn't work - it demonstrates features that don't exist yet.
 
 """
 import asyncio
 import logging
 
-from juju.model import Model, ModelObserver
-
-
-class MyModelObserver(ModelObserver):
-    async def on_change(self, delta, old, new, model):
-        if model.all_units_idle():
-            logging.debug('All units idle, disconnecting')
-            await model.disconnect()
-            model.loop.stop()
+from juju.model import Model
 
 
 async def run():
     model = Model()
     await model.connect_current()
-
     await model.reset(force=True)
-    model.add_observer(MyModelObserver())
 
-    await model.deploy(
+    goal_state = Model.from_yaml('bundle-like-thing')
+    ubuntu_app = await model.deploy(
         'ubuntu-0',
         service_name='ubuntu',
         series='trusty',
         channel='stable',
     )
+    ubuntu_app.on_unit_added(callback=lambda unit: True)
+
     await model.deploy(
         'nrpe-11',
         service_name='nrpe',
@@ -46,10 +34,15 @@ async def run():
         'nrpe',
     )
 
+    result, ok = await model.block_until(
+        lambda: model.matches(goal_state),
+        timeout=600
+    )
+
+
 logging.basicConfig(level=logging.DEBUG)
 ws_logger = logging.getLogger('websockets.protocol')
 ws_logger.setLevel(logging.INFO)
 loop = asyncio.get_event_loop()
-loop.set_debug(False)
 loop.create_task(run())
 loop.run_forever()
