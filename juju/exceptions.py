@@ -1,0 +1,2 @@
+class DeadEntityException(Exception):
+    pass

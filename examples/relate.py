@@ -13,6 +13,19 @@ import logging
 from juju.model import Model, ModelObserver
 
 
+class MyRemoveObserver(ModelObserver):
+    async def on_change(self, delta, old, new, model):
+        if delta.type == 'remove':
+            assert(new.latest() == new)
+            assert(new.next() is None)
+            assert(new.dead)
+            assert(new.current)
+            assert(new.connected)
+            assert(new.previous().dead)
+            assert(not new.previous().current)
+            assert(not new.previous().connected)
+
+
 class MyModelObserver(ModelObserver):
     async def on_change(self, delta, old, new, model):
         if model.all_units_idle():
@@ -25,6 +38,7 @@ async def run():
     model = Model()
     await model.connect_current()
 
+    model.add_observer(MyRemoveObserver())
     await model.reset(force=True)
     model.add_observer(MyModelObserver())
 
