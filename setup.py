@@ -24,6 +24,7 @@ setup(
     install_requires=[
         'websockets',
         'pyyaml',
+        'theblues',
     ],
     include_package_data=True,
     maintainer='Juju Ecosystem Engineering',

@@ -11,6 +11,8 @@ import websockets
 
 import yaml
 
+from juju.errors import JujuAPIError
+
 log = logging.getLogger("websocket")
 
 
@@ -81,7 +83,7 @@ class Connection:
         #log.debug("Send: %s", outgoing)
         #log.debug("Recv: %s", result)
         if result and 'error' in result:
-            raise RuntimeError(result)
+            raise JujuAPIError(result)
         return result
 
     async def clone(self):
