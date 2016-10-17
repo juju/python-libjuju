@@ -30,7 +30,7 @@ class MyModelObserver(ModelObserver):
     _shutting_down = False
 
     async def on_change(self, delta, old, new, model):
-        if model.all_units_idle() and not self._shutting_down:
+        if model.units and model.all_units_idle() and not self._shutting_down:
             self._shutting_down = True
             logging.debug('All units idle, disconnecting')
             await model.reset(force=True)
@@ -47,7 +47,7 @@ async def run():
     model.add_observer(MyModelObserver())
 
     ubuntu_app = await model.deploy(
-        'ubuntu-0',
+        'ubuntu',
         service_name='ubuntu',
         series='trusty',
         channel='stable',
@@ -69,16 +69,20 @@ async def run():
             print('Unit removed: {}'.format(old_unit.entity_id))
     ))
     await model.deploy(
-        'nrpe-11',
+        'nrpe',
         service_name='nrpe',
         series='trusty',
         channel='stable',
         num_units=0,
     )
-    await model.add_relation(
+    my_relation = await model.add_relation(
         'ubuntu',
         'nrpe',
     )
+    my_relation.on_remove(asyncio.coroutine(
+        lambda delta, old_rel, new_rel, model:
+            print('Relation removed: {}'.format(old_rel.endpoints))
+    ))
 
 logging.basicConfig(level=logging.DEBUG)
 ws_logger = logging.getLogger('websockets.protocol')
