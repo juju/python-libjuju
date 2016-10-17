@@ -27,9 +27,13 @@ class MyRemoveObserver(ModelObserver):
 
 
 class MyModelObserver(ModelObserver):
+    _shutting_down = False
+
     async def on_change(self, delta, old, new, model):
-        if model.all_units_idle():
+        if model.all_units_idle() and not self._shutting_down:
+            self._shutting_down = True
             logging.debug('All units idle, disconnecting')
+            await model.reset(force=True)
             await model.disconnect()
             model.loop.stop()
 
@@ -42,12 +46,28 @@ async def run():
     await model.reset(force=True)
     model.add_observer(MyModelObserver())
 
-    await model.deploy(
+    ubuntu_app = await model.deploy(
         'ubuntu-0',
         service_name='ubuntu',
         series='trusty',
         channel='stable',
     )
+    ubuntu_app.on_change(asyncio.coroutine(
+        lambda delta, old_app, new_app, model:
+            print('App changed: {}'.format(new_app.entity_id))
+    ))
+    ubuntu_app.on_remove(asyncio.coroutine(
+        lambda delta, old_app, new_app, model:
+            print('App removed: {}'.format(old_app.entity_id))
+    ))
+    ubuntu_app.on_unit_add(asyncio.coroutine(
+        lambda delta, old_unit, new_unit, model:
+            print('Unit added: {}'.format(new_unit.entity_id))
+    ))
+    ubuntu_app.on_unit_remove(asyncio.coroutine(
+        lambda delta, old_unit, new_unit, model:
+            print('Unit removed: {}'.format(old_unit.entity_id))
+    ))
     await model.deploy(
         'nrpe-11',
         service_name='nrpe',

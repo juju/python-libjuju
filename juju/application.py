@@ -8,6 +8,26 @@ log = logging.getLogger(__name__)
 
 class Application(model.ModelEntity):
     @property
+    def _unit_match_pattern(self):
+        return r'^{}.*$'.format(self.entity_id)
+
+    def on_unit_add(self, callable_):
+        """Add a "unit added" observer to this entity, which will be called
+        whenever a unit is added to this application.
+
+        """
+        self.model.add_observer(
+            callable_, 'unit', 'add', self._unit_match_pattern)
+
+    def on_unit_remove(self, callable_):
+        """Add a "unit removed" observer to this entity, which will be called
+        whenever a unit is removed from this application.
+
+        """
+        self.model.add_observer(
+            callable_, 'unit', 'remove', self._unit_match_pattern)
+
+    @property
     def units(self):
         return [
             unit for unit in self.model.units.values()

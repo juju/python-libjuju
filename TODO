@@ -1,28 +1,5 @@
 TODO
 ====
 
-Model as state history of immutable objects
--------------------------------------------
-
-1. Model gets delta from AllWatcher
-2. Entity type+id in the delta uniquely identifies an entity in the model
-3. The model keeps a history deque for each of these entities
-4. The new delta is appended to the deque for this entity
-5. When a new python object is created for this entitiy, it:
-   a. Registers an observer with the model so it'll get change callbacks
-   b. Gets its state from a pointer back to the last item in the model's
-      history deque for this entity
-   c. Has a previous() method that returns a copy of the object at its previous
-      frame of history (or None if no previous history exists). This object
-      would be disconnected (would not receive live updates from the model).
-
-
-Make model-changing methods (like deploy()) return the appropriate object
--------------------------------------------------------------------------
-For objects being added (newly created), this will require that the method
-doesn't return until the AllWatcher returns a delta containing an id for
-the newly created thing.
-
-
-Add a LogWatcher coroutine that yields from debug-log api
----------------------------------------------------------
+- Add a LogWatcher coroutine that yields from debug-log api
+- Add a way to exit the event loop when a Model matches a bundle yaml
