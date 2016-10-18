@@ -107,11 +107,17 @@ class Application(model.ModelEntity):
         return await app_facade.Destroy(self.name)
     remove = destroy
 
-    def expose(self):
+    async def expose(self):
         """Make this service publicly available over the network.
 
         """
-        pass
+        app_facade = client.ApplicationFacade()
+        app_facade.connect(self.connection)
+
+        log.debug(
+            'Exposing %s', self.name)
+
+        return await app_facade.Expose(self.name)
 
     def get_config(self):
         """Return the configuration settings for this service.
