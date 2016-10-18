@@ -1,3 +1,4 @@
+import asyncio
 import logging
 
 from . import model
@@ -44,7 +45,7 @@ class Application(model.ModelEntity):
         """
         pass
 
-    def add_unit(self, count=1, to=None):
+    async def add_unit(self, count=1, to=None):
         """Add one or more units to this service.
 
         :param int count: Number of units to add
@@ -56,7 +57,24 @@ class Application(model.ModelEntity):
             If None, a new machine is provisioned.
 
         """
-        pass
+        app_facade = client.ApplicationFacade()
+        app_facade.connect(self.connection)
+
+        log.debug(
+            'Adding %s unit%s to %s',
+            count, '' if count == 1 else 's', self.name)
+
+        result = await app_facade.AddUnits(
+            application=self.name,
+            placement=to,
+            num_units=count,
+        )
+
+        return await asyncio.gather(*[
+            asyncio.ensure_future(self.model._wait_for_new('unit', unit_id))
+            for unit_id in result.units
+        ])
+
     add_units = add_unit
 
     def allocate(self, budget, value):

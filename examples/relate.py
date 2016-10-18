@@ -68,6 +68,11 @@ async def run():
         lambda delta, old_unit, new_unit, model:
             print('Unit removed: {}'.format(old_unit.entity_id))
     ))
+    unit_a, unit_b = await ubuntu_app.add_units(count=2)
+    unit_a.on_change(asyncio.coroutine(
+        lambda delta, old_unit, new_unit, model:
+            print('Unit changed: {}'.format(new_unit.entity_id))
+    ))
     await model.deploy(
         'nrpe',
         service_name='nrpe',
