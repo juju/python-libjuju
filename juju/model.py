@@ -1325,7 +1325,10 @@ class BundleHandler(object):
             Annotations holds the annotations as key/value pairs.
         """
         entity_id = self.resolve(id_)
-        entity = self.model.state.get_entity(entity_type, entity_id)
+        try:
+            entity = self.model.state.get_entity(entity_type, entity_id)
+        except KeyError:
+            entity = await self._wait_for_new(entity_type, entity_id)
         return await entity.set_annotations(annotations)
 
 
