@@ -39,7 +39,7 @@ class Machine(model.ModelEntity):
         log.debug('Updating annotations on machine %s', self.id)
 
         self.ann_facade = client.AnnotationsFacade()
-        self.ann_facade.connect(model.connection)
+        self.ann_facade.connect(self.connection)
 
         ann = client.EntityAnnotations(
             entity=self.id,

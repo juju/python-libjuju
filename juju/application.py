@@ -185,7 +185,7 @@ class Application(model.ModelEntity):
         log.debug('Updating annotations on application %s', self.name)
 
         self.ann_facade = client.AnnotationsFacade()
-        self.ann_facade.connect(model.connection)
+        self.ann_facade.connect(self.connection)
 
         ann = client.EntityAnnotations(
             entity=self.name,
