@@ -1325,13 +1325,8 @@ class BundleHandler(object):
             Annotations holds the annotations as key/value pairs.
         """
         entity_id = self.resolve(id_)
-        log.debug('Updating annotations of %s', entity_id)
-        ann = client.EntityAnnotations(
-            entity=entity_id,
-            annotations=annotations,
-        )
-        await self.ann_facade.Set([ann])
-        return None
+        entity = self.model.state.get_entity(entity_type, entity_id)
+        return await entity.set_annotations(annotations)
 
 
 class CharmStore(object):

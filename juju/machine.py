@@ -29,6 +29,24 @@ class Machine(model.ModelEntity):
         """
         pass
 
+    async def set_annotations(self, annotations):
+        """Set annotations on this machine.
+
+        :param annotations map[string]string: the annotations as key/value
+            pairs.
+
+        """
+        log.debug('Updating annotations on machine %s', self.id)
+
+        self.ann_facade = client.AnnotationsFacade()
+        self.ann_facade.connect(model.connection)
+
+        ann = client.EntityAnnotations(
+            entity=self.id,
+            annotations=annotations,
+        )
+        return await self.ann_facade.Set([ann])
+
     def scp(
             self, source_path, user=None, destination_path=None, proxy=False,
             scp_opts=None):
