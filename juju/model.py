@@ -6,6 +6,7 @@ import weakref
 from concurrent.futures import CancelledError
 from functools import partial
 
+import yaml
 from theblues import charmstore
 
 from .client import client
@@ -785,6 +786,15 @@ class Model(object):
             handler = BundleHandler(self)
             await handler.fetch_plan(entity_id)
             await handler.execute_plan()
+            extant_apps = {app for app in self.applications}
+            pending_apps = set(handler.applications) - extant_apps
+            if pending_apps:
+                # new apps will usually be in the model by now, but if some
+                # haven't made it yet we'll need to wait on them to be added
+                await asyncio.wait([self._wait_for_new('application', app_name)
+                                    for app_name in pending_apps])
+            return [app for name, app in self.applications.items()
+                    if name in handler.applications]
         else:
             log.debug(
                 'Deploying %s', entity_id)
@@ -805,7 +815,7 @@ class Model(object):
             )
 
             await app_facade.Deploy([app])
-            return await self._wait_for_new('application', service_name)
+            return [await self._wait_for_new('application', service_name)]
 
     def destroy(self):
         """Terminate all machines and resources for this model.
@@ -1148,16 +1158,21 @@ class BundleHandler(object):
         self.ann_facade.connect(model.connection)
 
     async def fetch_plan(self, entity_id):
-        yaml = await self.charmstore.files(entity_id,
-                                           filename='bundle.yaml',
-                                           read_file=True)
-        self.plan = await self.client_facade.GetBundleChanges(yaml)
+        bundle_yaml = await self.charmstore.files(entity_id,
+                                                  filename='bundle.yaml',
+                                                  read_file=True)
+        self.bundle = yaml.safe_load(bundle_yaml)
+        self.plan = await self.client_facade.GetBundleChanges(bundle_yaml)
 
     async def execute_plan(self):
         for step in self.plan.changes:
             method = getattr(self, step.method)
             result = await method(*step.args)
             self.references[step.id_] = result
+
+    @property
+    def applications(self):
+        return list(self.bundle['services'].keys())
 
     def resolve(self, reference):
         if reference and reference.startswith('$'):
@@ -1224,6 +1239,7 @@ class BundleHandler(object):
             parts[0] = self.resolve(parts[0])
             endpoints[i] = ':'.join(parts)
 
+        log.info('Relating %s <-> %s', *endpoints)
         return await self.model.add_relation(*endpoints)
 
     async def deploy(self, charm, series, application, options, constraints,
@@ -1272,7 +1288,7 @@ class BundleHandler(object):
             resources=resources,
         )
         # do the do
-        log.debug('Deploying %s', charm)
+        log.info('Deploying %s', charm)
         await self.app_facade.Deploy([app])
         return application
 
@@ -1297,6 +1313,8 @@ class BundleHandler(object):
             log.debug('Reusing unit %s for %s', unit_name, application)
             return self.model.units[unit_name]
 
+        log.debug('Adding new unit for %s%s', application,
+                  ' to %s' % placement if placement else '')
         return await self.model.applications[application].add_unit(
             count=1,
             to=placement,
@@ -1309,6 +1327,7 @@ class BundleHandler(object):
             be exposed.
         """
         application = self.resolve(application)
+        log.info('Exposing %s', application)
         return await self.model.applications[application].expose()
 
     async def setAnnotations(self, id_, entity_type, annotations):
@@ -1328,7 +1347,7 @@ class BundleHandler(object):
         try:
             entity = self.model.state.get_entity(entity_type, entity_id)
         except KeyError:
-            entity = await self._wait_for_new(entity_type, entity_id)
+            entity = await self.model._wait_for_new(entity_type, entity_id)
         return await entity.set_annotations(annotations)
 
 
