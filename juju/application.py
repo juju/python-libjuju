@@ -35,6 +35,18 @@ class Application(model.ModelEntity):
             if unit.application == self.name
         ]
 
+    @property
+    def status(self):
+        """Get the application status, as set by the charm's leader.
+        """
+        return self.data['status']['current']
+
+    @property
+    def status_message(self):
+        """Get the application status message, as set by the charm's leader.
+        """
+        return self.data['status']['message']
+
     def add_relation(self, local_relation, remote_relation):
         """Add a relation to another application.
 
