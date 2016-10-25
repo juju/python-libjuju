@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 
 from . import model
 from .client import client
@@ -7,6 +8,54 @@ log = logging.getLogger(__name__)
 
 
 class Unit(model.ModelEntity):
+    @property
+    def agent_status(self):
+        """Returns the current agent status string.
+
+        """
+        return self.data['agent-status']['current']
+
+    @property
+    def agent_status_since(self):
+        """Get the time when the `agent_status` was last updated.
+
+        """
+        since = self.data['agent-status']['since']
+        # Juju gives us nanoseconds, but Python only supports microseconds
+        since = since[:26]
+        return datetime.strptime(since, "%Y-%m-%dT%H:%M:%S.%f")
+
+    @property
+    def agent_status_message(self):
+        """Get the agent status message.
+
+        """
+        return self.data['agent-status']['message']
+
+    @property
+    def workload_status(self):
+        """Returns the current workload status string.
+
+        """
+        return self.data['workload-status']['current']
+
+    @property
+    def workload_status_since(self):
+        """Get the time when the `workload_status` was last updated.
+
+        """
+        since = self.data['workload-status']['since']
+        # Juju gives us nanoseconds, but Python only supports microseconds
+        since = since[:26]
+        return datetime.strptime(since, "%Y-%m-%dT%H:%M:%S.%f")
+
+    @property
+    def workload_status_message(self):
+        """Get the workload status message.
+
+        """
+        return self.data['workload-status']['message']
+
     def add_storage(self, name, constraints=None):
         """Add unit storage dynamically.
 
