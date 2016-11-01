@@ -115,6 +115,7 @@ class Unit(model.ModelEntity):
         log.debug(
             'Running `%s` on %s', command, self.name)
 
+        # TODO this should return an Action
         return await action.Run(
             [],
             command,

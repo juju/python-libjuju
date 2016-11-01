@@ -213,14 +213,27 @@ class Application(model.ModelEntity):
         """
         pass
 
-    def run(self, command, timeout=None):
+    async def run(self, command, timeout=None):
         """Run command on all units for this application.
 
         :param str command: The command to run
         :param int timeout: Time to wait before command is considered failed
 
         """
-        pass
+        action = client.ActionFacade()
+        action.connect(self.connection)
+
+        log.debug(
+            'Running `%s` on all units of %s', command, self.name)
+
+        # TODO this should return a list of Actions
+        return await action.Run(
+            [self.name],
+            command,
+            [],
+            timeout,
+            [],
+        )
 
     async def set_annotations(self, annotations):
         """Set annotations on this application.
