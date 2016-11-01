@@ -78,7 +78,7 @@ async def run():
         service_name='nrpe',
         series='trusty',
         channel='stable',
-        num_units=0,
+        num_units=1,
     )
     my_relation = await model.add_relation(
         'ubuntu',

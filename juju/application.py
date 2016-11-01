@@ -38,16 +38,18 @@ class Application(model.ModelEntity):
     @property
     def status(self):
         """Get the application status, as set by the charm's leader.
+
         """
         return self.data['status']['current']
 
     @property
     def status_message(self):
         """Get the application status message, as set by the charm's leader.
+
         """
         return self.data['status']['message']
 
-    def add_relation(self, local_relation, remote_relation):
+    async def add_relation(self, local_relation, remote_relation):
         """Add a relation to another application.
 
         :param str local_relation: Name of relation on this application
@@ -55,7 +57,10 @@ class Application(model.ModelEntity):
             application in the form '<application>[:<relation_name>]'
 
         """
-        pass
+        if ':' not in local_relation:
+            local_relation = '{}:{}'.format(self.name, local_relation)
+
+        return await self.model.add_relation(local_relation, remote_relation)
 
     async def add_unit(self, count=1, to=None):
         """Add one or more units to this application.
@@ -113,7 +118,7 @@ class Application(model.ModelEntity):
         """
         pass
 
-    def destroy_relation(self, local_relation, remote_relation):
+    async def destroy_relation(self, local_relation, remote_relation):
         """Remove a relation to another application.
 
         :param str local_relation: Name of relation on this application
@@ -121,8 +126,25 @@ class Application(model.ModelEntity):
             application in the form '<application>[:<relation_name>]'
 
         """
-        pass
+        if ':' not in local_relation:
+            local_relation = '{}:{}'.format(self.name, local_relation)
+
+        app_facade = client.ApplicationFacade()
+        app_facade.connect(self.connection)
+
+        log.debug(
+            'Destroying relation %s <-> %s', local_relation, remote_relation)
+
+        return await app_facade.DestroyRelation([
+            local_relation, remote_relation])
     remove_relation = destroy_relation
+
+    async def destroy_unit(self, *unit_names):
+        """Destroy units by name.
+
+        """
+        return await self.model.destroy_units(*unit_names)
+    destroy_units = destroy_unit
 
     async def destroy(self):
         """Remove this application from the model.
@@ -239,11 +261,17 @@ class Application(model.ModelEntity):
         """
         pass
 
-    def unexpose(self):
+    async def unexpose(self):
         """Remove public availability over the network for this application.
 
         """
-        pass
+        app_facade = client.ApplicationFacade()
+        app_facade.connect(self.connection)
+
+        log.debug(
+            'Unexposing %s', self.name)
+
+        return await app_facade.Unexpose(self.name)
 
     def update_allocation(self, allocation):
         """Update existing allocation for this application.
