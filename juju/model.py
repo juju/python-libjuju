@@ -791,8 +791,11 @@ class Model(object):
             if pending_apps:
                 # new apps will usually be in the model by now, but if some
                 # haven't made it yet we'll need to wait on them to be added
-                await asyncio.wait([self._wait_for_new('application', app_name)
-                                    for app_name in pending_apps])
+                await asyncio.gather(*[
+                    asyncio.ensure_future(
+                        self.model._wait_for_new('application', app_name))
+                    for app_name in pending_apps
+                ])
             return [app for name, app in self.applications.items()
                     if name in handler.applications]
         else:
