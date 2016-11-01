@@ -171,17 +171,29 @@ class Application(model.ModelEntity):
 
         return await app_facade.Expose(self.name)
 
-    def get_config(self):
-        """Return the configuration settings for this application.
+    async def get_config(self):
+        """Return the configuration settings dict for this application.
 
         """
-        pass
+        app_facade = client.ApplicationFacade()
+        app_facade.connect(self.connection)
 
-    def get_constraints(self):
-        """Return the machine constraints for this application.
+        log.debug(
+            'Getting config for %s', self.name)
+
+        return (await app_facade.Get(self.name)).config
+
+    async def get_constraints(self):
+        """Return the machine constraints dict for this application.
 
         """
-        pass
+        app_facade = client.ApplicationFacade()
+        app_facade.connect(self.connection)
+
+        log.debug(
+            'Getting constraints for %s', self.name)
+
+        return vars((await app_facade.Get(self.name)).constraints)
 
     def get_actions(self, schema=False):
         """Get actions defined for this application.
