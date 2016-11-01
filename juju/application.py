@@ -193,7 +193,8 @@ class Application(model.ModelEntity):
         log.debug(
             'Getting constraints for %s', self.name)
 
-        return vars((await app_facade.Get(self.name)).constraints)
+        result = (await app_facade.Get(self.name)).constraints
+        return vars(result) if result else result
 
     def get_actions(self, schema=False):
         """Get actions defined for this application.
@@ -239,22 +240,34 @@ class Application(model.ModelEntity):
         )
         return await self.ann_facade.Set([ann])
 
-    def set_config(self, to_default=False, **config):
+    async def set_config(self, config, to_default=False):
         """Set configuration options for this application.
 
+        :param config: Dict of configuration to set
         :param bool to_default: Set application options to default values
-        :param \*\*config: Config key/values
 
         """
-        pass
+        app_facade = client.ApplicationFacade()
+        app_facade.connect(self.connection)
 
-    def set_constraints(self, constraints):
+        log.debug(
+            'Setting config for %s: %s', self.name, config)
+
+        return await app_facade.Set(self.name, config)
+
+    async def set_constraints(self, constraints):
         """Set machine constraints for this application.
 
-        :param :class:`juju.Constraints` constraints: Machine constraints
+        :param dict constraints: Dict of machine constraints
 
         """
-        pass
+        app_facade = client.ApplicationFacade()
+        app_facade.connect(self.connection)
+
+        log.debug(
+            'Setting constraints for %s: %s', self.name, constraints)
+
+        return await app_facade.SetConstraints(self.name, constraints)
 
     def set_meter_status(self, status, info=None):
         """Set the meter status on this status.
