@@ -818,7 +818,7 @@ class Model(object):
             )
 
             await app_facade.Deploy([app])
-            return [await self._wait_for_new('application', service_name)]
+            return await self._wait_for_new('application', service_name)
 
     def destroy(self):
         """Terminate all machines and resources for this model.
