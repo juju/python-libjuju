@@ -567,7 +567,7 @@ class Model(object):
         This coroutine blocks until the new object appears in the model.
 
         """
-        return await self._wait(entity_type, entity_id, predicate)
+        return await self._wait(entity_type, entity_id, 'add', predicate)
 
     async def wait_for_action(self, action_id):
         """Given an action, wait for it to complete."""
