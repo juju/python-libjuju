@@ -12,29 +12,22 @@ import logging
 
 from juju.model import Model, ModelObserver
 
-
 async def run_stuff_on_unit(unit):
     print('Running command on unit', unit.name)
 
     # unit.run() returns a client.ActionResults instance
-    action_results = await unit.run('unit-get public-address')
-    action_result = action_results.results[0]
+    action = await unit.run('unit-get public-address')
 
-    print('Results from unit', unit.name)
-    print(action_result.__dict__)
+    print("Action results: {}".format(action.results))
+
+    # Inform asyncio that we're done.
+    await unit.model.disconnect()
+    unit.model.loop.stop()
 
 
 class MyModelObserver(ModelObserver):
     async def on_unit_add(self, delta, old, new, model):
         loop.create_task(run_stuff_on_unit(new))
-
-    async def on_action_change(self, delta, old, new, model):
-        print(delta.data)
-
-        action = new
-        if action.status == 'completed':
-            await action.model.disconnect()
-            action.model.loop.stop()
 
 
 async def run():

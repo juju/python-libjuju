@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from datetime import datetime
 
@@ -108,6 +109,9 @@ class Unit(model.ModelEntity):
         :param str command: The command to run
         :param int timeout: Time to wait before command is considered failed
 
+        Returns a tuple containing the stdout, stderr, and return code
+        from the command.
+
         """
         action = client.ActionFacade()
         action.connect(self.connection)
@@ -115,14 +119,14 @@ class Unit(model.ModelEntity):
         log.debug(
             'Running `%s` on %s', command, self.name)
 
-        # TODO this should return an Action
-        return await action.Run(
+        res = await action.Run(
             [],
             command,
             [],
             timeout,
             [self.name],
         )
+        return await self.model.wait_for_action(res.results[0].action.tag)
 
     def run_action(self, action_name, **params):
         """Run action on this unit.
