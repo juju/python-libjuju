@@ -16,9 +16,9 @@ async def run_stuff_on_unit(unit):
     print('Running command on unit', unit.name)
 
     # unit.run() returns a client.ActionResults instance
-    stdout, stderr, code = await unit.run('unit-get public-address')
+    action = await unit.run('unit-get public-address')
 
-    print('Unit public address is', stdout)
+    print("Action results: {}".format(action.results))
 
     # Inform asyncio that we're done.
     await unit.model.disconnect()
