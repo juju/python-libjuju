@@ -578,7 +578,7 @@ class Model(object):
             action_id = action_id[7:]
 
         def predicate(delta):
-            return delta.data['status'] in ('completed', 'error')
+            return delta.data['status'] in ('completed', 'failed')
 
         return await self._wait('action', action_id, 'change', predicate)
 
