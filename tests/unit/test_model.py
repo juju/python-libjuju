@@ -1,14 +1,20 @@
 import unittest
 
+import mock
+
+
+def _make_delta(entity, type_, data=None):
+    from juju.client.client import Delta
+    from juju.delta import get_entity_delta
+
+    delta = Delta([entity, type_, data])
+    return get_entity_delta(delta)
+
 
 class TestObserver(unittest.TestCase):
     def _make_observer(self, *args):
         from juju.model import _Observer
         return _Observer(*args)
-
-    def _make_delta(self, entity, type_, data=None):
-        from juju.delta import ApplicationDelta
-        return ApplicationDelta([entity, type_, data])
 
     def test_cares_about_id(self):
         id_ = 'foo'
@@ -16,7 +22,7 @@ class TestObserver(unittest.TestCase):
         o = self._make_observer(
             None, None, None, id_, None)
 
-        delta = self._make_delta(
+        delta = _make_delta(
             'application', 'change', dict(name=id_))
 
         self.assertTrue(o.cares_about(delta))
@@ -27,7 +33,7 @@ class TestObserver(unittest.TestCase):
         o = self._make_observer(
             None, type_, None, None, None)
 
-        delta = self._make_delta(
+        delta = _make_delta(
             type_, 'change', dict(name='foo'))
 
         self.assertTrue(o.cares_about(delta))
@@ -38,7 +44,7 @@ class TestObserver(unittest.TestCase):
         o = self._make_observer(
             None, None, action, None, None)
 
-        delta = self._make_delta(
+        delta = _make_delta(
             'application', action, dict(name='foo'))
 
         self.assertTrue(o.cares_about(delta))
@@ -50,7 +56,39 @@ class TestObserver(unittest.TestCase):
         o = self._make_observer(
             None, None, None, None, predicate)
 
-        delta = self._make_delta(
+        delta = _make_delta(
             'application', 'change', dict(fizz='bang'))
 
         self.assertTrue(o.cares_about(delta))
+
+
+class TestModelState(unittest.TestCase):
+    def test_apply_delta(self):
+        from juju.model import Model
+        from juju.application import Application
+
+        loop = mock.MagicMock()
+        model = Model(loop=loop)
+        delta = _make_delta('application', 'add', dict(name='foo'))
+
+        # test add
+        prev, new = model.state.apply_delta(delta)
+        self.assertEqual(
+            len(model.state.state[delta.entity][delta.get_id()]), 1)
+        self.assertIsNone(prev)
+        self.assertIsInstance(new, Application)
+
+        # test remove
+        delta.type = 'remove'
+        prev, new = model.state.apply_delta(delta)
+        # length of the entity history deque is now 3:
+        # - 1 for the first delta
+        # - 1 for the second delta
+        # - 1 for the None sentinel appended after the 'remove'
+        self.assertEqual(
+            len(model.state.state[delta.entity][delta.get_id()]), 3)
+        self.assertIsInstance(new, Application)
+        # new object is falsy because its data is None
+        self.assertFalse(new)
+        self.assertIsInstance(prev, Application)
+        self.assertTrue(prev)
