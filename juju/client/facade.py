@@ -344,9 +344,9 @@ def makeFunc(cls, name, params, result, async=True):
     assignments = []
     toschema = args.PyToSchemaMapping()
     for arg in args._get_arg_str(False, False):
-        assignments.append("{}params[\'{}\'] = {}".format(INDENT,
-                                                          toschema[arg],
-                                                          arg))
+        assignments.append("{}_params[\'{}\'] = {}".format(INDENT,
+                                                           toschema[arg],
+                                                           arg))
     assignments = "\n".join(assignments)
     res = retspec(result)
     source = """
@@ -358,8 +358,8 @@ def makeFunc(cls, name, params, result, async=True):
     Returns -> {res}
     '''
     # map input types to rpc msg
-    params = dict()
-    msg = dict(type='{cls.name}', request='{name}', version={cls.version}, params=params)
+    _params = dict()
+    msg = dict(type='{cls.name}', request='{name}', version={cls.version}, params=_params)
 {assignments}
     reply = {await}self.rpc(msg)
     return reply
