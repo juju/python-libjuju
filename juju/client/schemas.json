@@ -527,6 +527,17 @@
             }
           }
         },
+        "GetCloudSpec": {
+          "type": "object",
+          "properties": {
+            "Params": {
+              "$ref": "#/definitions/ModelTag"
+            },
+            "Result": {
+              "$ref": "#/definitions/CloudSpecResult"
+            }
+          }
+        },
         "GetEntities": {
           "type": "object",
           "properties": {
@@ -570,6 +581,17 @@
           "properties": {
             "Result": {
               "$ref": "#/definitions/StateServingInfo"
+            }
+          }
+        },
+        "WatchCredentials": {
+          "type": "object",
+          "properties": {
+            "Params": {
+              "$ref": "#/definitions/Entities"
+            },
+            "Result": {
+              "$ref": "#/definitions/NotifyWatchResults"
             }
           }
         },
@@ -870,6 +892,10 @@
             "config"
           ]
         },
+        "ModelTag": {
+          "type": "object",
+          "additionalProperties": false
+        },
         "NotifyWatchResult": {
           "type": "object",
           "properties": {
@@ -883,6 +909,21 @@
           "additionalProperties": false,
           "required": [
             "NotifyWatcherId"
+          ]
+        },
+        "NotifyWatchResults": {
+          "type": "object",
+          "properties": {
+            "results": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/NotifyWatchResult"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "results"
           ]
         },
         "StateServingInfo": {
@@ -1240,7 +1281,7 @@
   },
   {
     "Name": "Application",
-    "Version": 1,
+    "Version": 3,
     "Schema": {
       "type": "object",
       "properties": {
@@ -1722,6 +1763,17 @@
             "charm-url": {
               "type": "string"
             },
+            "config-settings": {
+              "type": "object",
+              "patternProperties": {
+                ".*": {
+                  "type": "string"
+                }
+              }
+            },
+            "config-settings-yaml": {
+              "type": "string"
+            },
             "force-series": {
               "type": "boolean"
             },
@@ -1733,6 +1785,14 @@
               "patternProperties": {
                 ".*": {
                   "type": "string"
+                }
+              }
+            },
+            "storage-constraints": {
+              "type": "object",
+              "patternProperties": {
+                ".*": {
+                  "$ref": "#/definitions/StorageConstraints"
                 }
               }
             }
@@ -2031,6 +2091,21 @@
             "constraints"
           ]
         },
+        "StorageConstraints": {
+          "type": "object",
+          "properties": {
+            "count": {
+              "type": "integer"
+            },
+            "pool": {
+              "type": "string"
+            },
+            "size": {
+              "type": "integer"
+            }
+          },
+          "additionalProperties": false
+        },
         "StringResult": {
           "type": "object",
           "properties": {
@@ -2055,7 +2130,7 @@
             "container": {
               "type": "string"
             },
-            "cpu-cores": {
+            "cores": {
               "type": "integer"
             },
             "cpu-power": {
@@ -2084,6 +2159,144 @@
             },
             "virt-type": {
               "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  {
+    "Name": "ApplicationRelationsWatcher",
+    "Version": 1,
+    "Schema": {
+      "type": "object",
+      "properties": {
+        "Next": {
+          "type": "object",
+          "properties": {
+            "Result": {
+              "$ref": "#/definitions/ApplicationRelationsWatchResult"
+            }
+          }
+        },
+        "Stop": {
+          "type": "object"
+        }
+      },
+      "definitions": {
+        "ApplicationRelationsChange": {
+          "type": "object",
+          "properties": {
+            "changed": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/RelationChange"
+              }
+            },
+            "removed": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "ApplicationRelationsWatchResult": {
+          "type": "object",
+          "properties": {
+            "ApplicationRelationsWatcherId": {
+              "type": "string"
+            },
+            "changes": {
+              "$ref": "#/definitions/ApplicationRelationsChange"
+            },
+            "error": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "ApplicationRelationsWatcherId"
+          ]
+        },
+        "Error": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string"
+            },
+            "info": {
+              "$ref": "#/definitions/ErrorInfo"
+            },
+            "message": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "message",
+            "code"
+          ]
+        },
+        "ErrorInfo": {
+          "type": "object",
+          "properties": {
+            "macaroon": {
+              "$ref": "#/definitions/Macaroon"
+            },
+            "macaroon-path": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "Macaroon": {
+          "type": "object",
+          "additionalProperties": false
+        },
+        "RelationChange": {
+          "type": "object",
+          "properties": {
+            "changedunits": {
+              "type": "object",
+              "patternProperties": {
+                ".*": {
+                  "$ref": "#/definitions/RelationUnitChange"
+                }
+              }
+            },
+            "departedunits": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "id": {
+              "type": "integer"
+            },
+            "life": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "life"
+          ]
+        },
+        "RelationUnitChange": {
+          "type": "object",
+          "properties": {
+            "settings": {
+              "type": "object",
+              "patternProperties": {
+                ".*": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
             }
           },
           "additionalProperties": false
@@ -2605,6 +2818,89 @@
         },
         "Macaroon": {
           "type": "object",
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  {
+    "Name": "Bundle",
+    "Version": 1,
+    "Schema": {
+      "type": "object",
+      "properties": {
+        "GetChanges": {
+          "type": "object",
+          "properties": {
+            "Params": {
+              "$ref": "#/definitions/BundleChangesParams"
+            },
+            "Result": {
+              "$ref": "#/definitions/BundleChangesResults"
+            }
+          }
+        }
+      },
+      "definitions": {
+        "BundleChange": {
+          "type": "object",
+          "properties": {
+            "args": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            },
+            "id": {
+              "type": "string"
+            },
+            "method": {
+              "type": "string"
+            },
+            "requires": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "method",
+            "args",
+            "requires"
+          ]
+        },
+        "BundleChangesParams": {
+          "type": "object",
+          "properties": {
+            "yaml": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "yaml"
+          ]
+        },
+        "BundleChangesResults": {
+          "type": "object",
+          "properties": {
+            "changes": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/BundleChange"
+              }
+            },
+            "errors": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
           "additionalProperties": false
         }
       }
@@ -3306,10 +3602,10 @@
           "type": "object",
           "properties": {
             "Params": {
-              "$ref": "#/definitions/GetBundleChangesParams"
+              "$ref": "#/definitions/BundleChangesParams"
             },
             "Result": {
-              "$ref": "#/definitions/GetBundleChangesResults"
+              "$ref": "#/definitions/BundleChangesResults"
             }
           }
         },
@@ -3329,14 +3625,6 @@
             },
             "Result": {
               "$ref": "#/definitions/AddMachinesResults"
-            }
-          }
-        },
-        "ModelDefaults": {
-          "type": "object",
-          "properties": {
-            "Result": {
-              "$ref": "#/definitions/ModelDefaultsResult"
             }
           }
         },
@@ -3459,17 +3747,6 @@
             }
           }
         },
-        "SetModelDefaults": {
-          "type": "object",
-          "properties": {
-            "Params": {
-              "$ref": "#/definitions/SetModelDefaults"
-            },
-            "Result": {
-              "$ref": "#/definitions/ErrorResults"
-            }
-          }
-        },
         "StatusHistory": {
           "type": "object",
           "properties": {
@@ -3478,17 +3755,6 @@
             },
             "Result": {
               "$ref": "#/definitions/StatusHistoryResults"
-            }
-          }
-        },
-        "UnsetModelDefaults": {
-          "type": "object",
-          "properties": {
-            "Params": {
-              "$ref": "#/definitions/UnsetModelDefaults"
-            },
-            "Result": {
-              "$ref": "#/definitions/ErrorResults"
             }
           }
         },
@@ -3804,7 +4070,7 @@
             "Arch"
           ]
         },
-        "BundleChangesChange": {
+        "BundleChange": {
           "type": "object",
           "properties": {
             "args": {
@@ -3834,6 +4100,36 @@
             "args",
             "requires"
           ]
+        },
+        "BundleChangesParams": {
+          "type": "object",
+          "properties": {
+            "yaml": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "yaml"
+          ]
+        },
+        "BundleChangesResults": {
+          "type": "object",
+          "properties": {
+            "changes": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/BundleChange"
+              }
+            },
+            "errors": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
         },
         "ConfigValue": {
           "type": "object",
@@ -4147,6 +4443,14 @@
               "items": {
                 "$ref": "#/definitions/RelationStatus"
               }
+            },
+            "remote-applications": {
+              "type": "object",
+              "patternProperties": {
+                ".*": {
+                  "$ref": "#/definitions/RemoteApplicationStatus"
+                }
+              }
             }
           },
           "additionalProperties": false,
@@ -4154,38 +4458,9 @@
             "model",
             "machines",
             "applications",
+            "remote-applications",
             "relations"
           ]
-        },
-        "GetBundleChangesParams": {
-          "type": "object",
-          "properties": {
-            "yaml": {
-              "type": "string"
-            }
-          },
-          "additionalProperties": false,
-          "required": [
-            "yaml"
-          ]
-        },
-        "GetBundleChangesResults": {
-          "type": "object",
-          "properties": {
-            "changes": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/BundleChangesChange"
-              }
-            },
-            "errors": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          },
-          "additionalProperties": false
         },
         "GetConstraintsResults": {
           "type": "object",
@@ -4329,6 +4604,12 @@
             "instance-status": {
               "$ref": "#/definitions/DetailedStatus"
             },
+            "ip-addresses": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
             "jobs": {
               "type": "array",
               "items": {
@@ -4347,6 +4628,7 @@
             "agent-status",
             "instance-status",
             "dns-name",
+            "ip-addresses",
             "instance-id",
             "series",
             "id",
@@ -4390,77 +4672,16 @@
             "config"
           ]
         },
-        "ModelDefaultValues": {
-          "type": "object",
-          "properties": {
-            "cloud-region": {
-              "type": "string"
-            },
-            "cloud-tag": {
-              "type": "string"
-            },
-            "config": {
-              "type": "object",
-              "patternProperties": {
-                ".*": {
-                  "type": "object",
-                  "additionalProperties": true
-                }
-              }
-            }
-          },
-          "additionalProperties": false,
-          "required": [
-            "config"
-          ]
-        },
-        "ModelDefaults": {
-          "type": "object",
-          "properties": {
-            "controller": {
-              "type": "object",
-              "additionalProperties": true
-            },
-            "default": {
-              "type": "object",
-              "additionalProperties": true
-            },
-            "regions": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/RegionDefaults"
-              }
-            }
-          },
-          "additionalProperties": false
-        },
-        "ModelDefaultsResult": {
-          "type": "object",
-          "properties": {
-            "config": {
-              "type": "object",
-              "patternProperties": {
-                ".*": {
-                  "$ref": "#/definitions/ModelDefaults"
-                }
-              }
-            }
-          },
-          "additionalProperties": false,
-          "required": [
-            "config"
-          ]
-        },
         "ModelInfo": {
           "type": "object",
           "properties": {
-            "cloud": {
-              "type": "string"
-            },
             "cloud-credential-tag": {
               "type": "string"
             },
             "cloud-region": {
+              "type": "string"
+            },
+            "cloud-tag": {
               "type": "string"
             },
             "controller-uuid": {
@@ -4507,7 +4728,7 @@
             "controller-uuid",
             "provider-type",
             "default-series",
-            "cloud",
+            "cloud-tag",
             "owner-tag",
             "life",
             "status",
@@ -4521,8 +4742,20 @@
             "hardware": {
               "$ref": "#/definitions/MachineHardware"
             },
+            "has-vote": {
+              "type": "boolean"
+            },
             "id": {
               "type": "string"
+            },
+            "instance-id": {
+              "type": "string"
+            },
+            "status": {
+              "type": "string"
+            },
+            "wants-vote": {
+              "type": "boolean"
             }
           },
           "additionalProperties": false,
@@ -4554,7 +4787,7 @@
             "available-version": {
               "type": "string"
             },
-            "cloud": {
+            "cloud-tag": {
               "type": "string"
             },
             "migration": {
@@ -4573,7 +4806,7 @@
           "additionalProperties": false,
           "required": [
             "name",
-            "cloud",
+            "cloud-tag",
             "version",
             "available-version"
           ]
@@ -4581,27 +4814,6 @@
         "ModelUnset": {
           "type": "object",
           "properties": {
-            "keys": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          },
-          "additionalProperties": false,
-          "required": [
-            "keys"
-          ]
-        },
-        "ModelUnsetKeys": {
-          "type": "object",
-          "properties": {
-            "cloud-region": {
-              "type": "string"
-            },
-            "cloud-tag": {
-              "type": "string"
-            },
             "keys": {
               "type": "array",
               "items": {
@@ -4794,23 +5006,6 @@
             "public-address"
           ]
         },
-        "RegionDefaults": {
-          "type": "object",
-          "properties": {
-            "region-name": {
-              "type": "string"
-            },
-            "value": {
-              "type": "object",
-              "additionalProperties": true
-            }
-          },
-          "additionalProperties": false,
-          "required": [
-            "region-name",
-            "value"
-          ]
-        },
         "RelationStatus": {
           "type": "object",
           "properties": {
@@ -4840,6 +5035,81 @@
             "interface",
             "scope",
             "endpoints"
+          ]
+        },
+        "RemoteApplicationStatus": {
+          "type": "object",
+          "properties": {
+            "application-name": {
+              "type": "string"
+            },
+            "application-url": {
+              "type": "string"
+            },
+            "endpoints": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/RemoteEndpoint"
+              }
+            },
+            "err": {
+              "type": "object",
+              "additionalProperties": true
+            },
+            "life": {
+              "type": "string"
+            },
+            "relations": {
+              "type": "object",
+              "patternProperties": {
+                ".*": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "status": {
+              "$ref": "#/definitions/DetailedStatus"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "application-url",
+            "application-name",
+            "endpoints",
+            "life",
+            "relations",
+            "status"
+          ]
+        },
+        "RemoteEndpoint": {
+          "type": "object",
+          "properties": {
+            "interface": {
+              "type": "string"
+            },
+            "limit": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "role": {
+              "type": "string"
+            },
+            "scope": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "role",
+            "interface",
+            "limit",
+            "scope"
           ]
         },
         "ResolveCharmResult": {
@@ -4926,21 +5196,6 @@
           "additionalProperties": false,
           "required": [
             "version"
-          ]
-        },
-        "SetModelDefaults": {
-          "type": "object",
-          "properties": {
-            "config": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/ModelDefaultValues"
-              }
-            }
-          },
-          "additionalProperties": false,
-          "required": [
-            "config"
           ]
         },
         "StatusHistoryFilter": {
@@ -5080,6 +5335,9 @@
             "charm": {
               "type": "string"
             },
+            "leader": {
+              "type": "boolean"
+            },
             "machine": {
               "type": "string"
             },
@@ -5119,21 +5377,6 @@
             "subordinates"
           ]
         },
-        "UnsetModelDefaults": {
-          "type": "object",
-          "properties": {
-            "keys": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/ModelUnsetKeys"
-              }
-            }
-          },
-          "additionalProperties": false,
-          "required": [
-            "keys"
-          ]
-        },
         "Value": {
           "type": "object",
           "properties": {
@@ -5143,7 +5386,7 @@
             "container": {
               "type": "string"
             },
-            "cpu-cores": {
+            "cores": {
               "type": "integer"
             },
             "cpu-power": {
@@ -5631,6 +5874,17 @@
             }
           }
         },
+        "GetCloudSpec": {
+          "type": "object",
+          "properties": {
+            "Params": {
+              "$ref": "#/definitions/ModelTag"
+            },
+            "Result": {
+              "$ref": "#/definitions/CloudSpecResult"
+            }
+          }
+        },
         "GetControllerAccess": {
           "type": "object",
           "properties": {
@@ -5639,6 +5893,14 @@
             },
             "Result": {
               "$ref": "#/definitions/UserAccessResults"
+            }
+          }
+        },
+        "HostedModelConfigs": {
+          "type": "object",
+          "properties": {
+            "Result": {
+              "$ref": "#/definitions/HostedModelConfigsResults"
             }
           }
         },
@@ -5931,6 +6193,52 @@
             "results"
           ]
         },
+        "HostedModelConfig": {
+          "type": "object",
+          "properties": {
+            "cloud-spec": {
+              "$ref": "#/definitions/CloudSpec"
+            },
+            "config": {
+              "type": "object",
+              "patternProperties": {
+                ".*": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            },
+            "error": {
+              "$ref": "#/definitions/Error"
+            },
+            "name": {
+              "type": "string"
+            },
+            "owner": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "owner"
+          ]
+        },
+        "HostedModelConfigsResults": {
+          "type": "object",
+          "properties": {
+            "models": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/HostedModelConfig"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "models"
+          ]
+        },
         "InitiateMigrationArgs": {
           "type": "object",
           "properties": {
@@ -6023,6 +6331,9 @@
             "model-tag": {
               "type": "string"
             },
+            "skip-initial-prechecks": {
+              "type": "boolean"
+            },
             "target-info": {
               "$ref": "#/definitions/MigrationTargetInfo"
             }
@@ -6031,7 +6342,8 @@
           "required": [
             "model-tag",
             "target-info",
-            "external-control"
+            "external-control",
+            "skip-initial-prechecks"
           ]
         },
         "MigrationTargetInfo": {
@@ -6149,8 +6461,20 @@
             "hardware": {
               "$ref": "#/definitions/MachineHardware"
             },
+            "has-vote": {
+              "type": "boolean"
+            },
             "id": {
               "type": "string"
+            },
+            "instance-id": {
+              "type": "string"
+            },
+            "status": {
+              "type": "string"
+            },
+            "wants-vote": {
+              "type": "boolean"
             }
           },
           "additionalProperties": false,
@@ -6206,6 +6530,10 @@
           "required": [
             "models"
           ]
+        },
+        "ModelTag": {
+          "type": "object",
+          "additionalProperties": false
         },
         "ModifyControllerAccess": {
           "type": "object",
@@ -6408,11 +6736,33 @@
             }
           }
         },
+        "SetStatus": {
+          "type": "object",
+          "properties": {
+            "Params": {
+              "$ref": "#/definitions/SetStatus"
+            },
+            "Result": {
+              "$ref": "#/definitions/ErrorResults"
+            }
+          }
+        },
         "StateAddresses": {
           "type": "object",
           "properties": {
             "Result": {
               "$ref": "#/definitions/StringsResult"
+            }
+          }
+        },
+        "UpdateStatus": {
+          "type": "object",
+          "properties": {
+            "Params": {
+              "$ref": "#/definitions/SetStatus"
+            },
+            "Result": {
+              "$ref": "#/definitions/ErrorResults"
             }
           }
         },
@@ -6573,6 +6923,36 @@
             "changes"
           ]
         },
+        "EntityStatusArgs": {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "object",
+              "patternProperties": {
+                ".*": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            },
+            "info": {
+              "type": "string"
+            },
+            "status": {
+              "type": "string"
+            },
+            "tag": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "tag",
+            "status",
+            "info",
+            "data"
+          ]
+        },
         "Error": {
           "type": "object",
           "properties": {
@@ -6691,6 +7071,21 @@
           "additionalProperties": false,
           "required": [
             "NotifyWatcherId"
+          ]
+        },
+        "SetStatus": {
+          "type": "object",
+          "properties": {
+            "entities": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/EntityStatusArgs"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "entities"
           ]
         },
         "StringResult": {
@@ -7450,6 +7845,17 @@
             }
           }
         },
+        "GetCloudSpec": {
+          "type": "object",
+          "properties": {
+            "Params": {
+              "$ref": "#/definitions/ModelTag"
+            },
+            "Result": {
+              "$ref": "#/definitions/CloudSpecResult"
+            }
+          }
+        },
         "GetExposed": {
           "type": "object",
           "properties": {
@@ -7869,6 +8275,10 @@
             "config"
           ]
         },
+        "ModelTag": {
+          "type": "object",
+          "additionalProperties": false
+        },
         "NotifyWatchResult": {
           "type": "object",
           "properties": {
@@ -8162,9 +8572,6 @@
             "constraints": {
               "$ref": "#/definitions/Value"
             },
-            "model-tag": {
-              "type": "string"
-            },
             "num-controllers": {
               "type": "integer"
             },
@@ -8180,7 +8587,6 @@
           },
           "additionalProperties": false,
           "required": [
-            "model-tag",
             "num-controllers"
           ]
         },
@@ -8389,7 +8795,7 @@
             "container": {
               "type": "string"
             },
-            "cpu-cores": {
+            "cores": {
               "type": "integer"
             },
             "cpu-power": {
@@ -11091,7 +11497,7 @@
             "container": {
               "type": "string"
             },
-            "cpu-cores": {
+            "cores": {
               "type": "integer"
             },
             "cpu-power": {
@@ -12946,6 +13352,9 @@
             "model-tag": {
               "type": "string"
             },
+            "skip-initial-prechecks": {
+              "type": "boolean"
+            },
             "target-info": {
               "$ref": "#/definitions/MigrationTargetInfo"
             }
@@ -12954,7 +13363,8 @@
           "required": [
             "model-tag",
             "target-info",
-            "external-control"
+            "external-control",
+            "skip-initial-prechecks"
           ]
         },
         "MigrationTargetInfo": {
@@ -13265,6 +13675,9 @@
             "attempt": {
               "type": "integer"
             },
+            "external-control": {
+              "type": "boolean"
+            },
             "migration-id": {
               "type": "string"
             },
@@ -13295,6 +13708,7 @@
             "migration-id",
             "attempt",
             "phase",
+            "external-control",
             "source-api-addrs",
             "source-ca-cert",
             "target-api-addrs",
@@ -13462,14 +13876,6 @@
     "Schema": {
       "type": "object",
       "properties": {
-        "ModelDefaults": {
-          "type": "object",
-          "properties": {
-            "Result": {
-              "$ref": "#/definitions/ModelDefaultsResult"
-            }
-          }
-        },
         "ModelGet": {
           "type": "object",
           "properties": {
@@ -13493,28 +13899,6 @@
               "$ref": "#/definitions/ModelUnset"
             }
           }
-        },
-        "SetModelDefaults": {
-          "type": "object",
-          "properties": {
-            "Params": {
-              "$ref": "#/definitions/SetModelDefaults"
-            },
-            "Result": {
-              "$ref": "#/definitions/ErrorResults"
-            }
-          }
-        },
-        "UnsetModelDefaults": {
-          "type": "object",
-          "properties": {
-            "Params": {
-              "$ref": "#/definitions/UnsetModelDefaults"
-            },
-            "Result": {
-              "$ref": "#/definitions/ErrorResults"
-            }
-          }
         }
       },
       "definitions": {
@@ -13535,65 +13919,6 @@
             "source"
           ]
         },
-        "Error": {
-          "type": "object",
-          "properties": {
-            "code": {
-              "type": "string"
-            },
-            "info": {
-              "$ref": "#/definitions/ErrorInfo"
-            },
-            "message": {
-              "type": "string"
-            }
-          },
-          "additionalProperties": false,
-          "required": [
-            "message",
-            "code"
-          ]
-        },
-        "ErrorInfo": {
-          "type": "object",
-          "properties": {
-            "macaroon": {
-              "$ref": "#/definitions/Macaroon"
-            },
-            "macaroon-path": {
-              "type": "string"
-            }
-          },
-          "additionalProperties": false
-        },
-        "ErrorResult": {
-          "type": "object",
-          "properties": {
-            "error": {
-              "$ref": "#/definitions/Error"
-            }
-          },
-          "additionalProperties": false
-        },
-        "ErrorResults": {
-          "type": "object",
-          "properties": {
-            "results": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/ErrorResult"
-              }
-            }
-          },
-          "additionalProperties": false,
-          "required": [
-            "results"
-          ]
-        },
-        "Macaroon": {
-          "type": "object",
-          "additionalProperties": false
-        },
         "ModelConfigResults": {
           "type": "object",
           "properties": {
@@ -13602,67 +13927,6 @@
               "patternProperties": {
                 ".*": {
                   "$ref": "#/definitions/ConfigValue"
-                }
-              }
-            }
-          },
-          "additionalProperties": false,
-          "required": [
-            "config"
-          ]
-        },
-        "ModelDefaultValues": {
-          "type": "object",
-          "properties": {
-            "cloud-region": {
-              "type": "string"
-            },
-            "cloud-tag": {
-              "type": "string"
-            },
-            "config": {
-              "type": "object",
-              "patternProperties": {
-                ".*": {
-                  "type": "object",
-                  "additionalProperties": true
-                }
-              }
-            }
-          },
-          "additionalProperties": false,
-          "required": [
-            "config"
-          ]
-        },
-        "ModelDefaults": {
-          "type": "object",
-          "properties": {
-            "controller": {
-              "type": "object",
-              "additionalProperties": true
-            },
-            "default": {
-              "type": "object",
-              "additionalProperties": true
-            },
-            "regions": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/RegionDefaults"
-              }
-            }
-          },
-          "additionalProperties": false
-        },
-        "ModelDefaultsResult": {
-          "type": "object",
-          "properties": {
-            "config": {
-              "type": "object",
-              "patternProperties": {
-                ".*": {
-                  "$ref": "#/definitions/ModelDefaults"
                 }
               }
             }
@@ -13697,74 +13961,6 @@
               "type": "array",
               "items": {
                 "type": "string"
-              }
-            }
-          },
-          "additionalProperties": false,
-          "required": [
-            "keys"
-          ]
-        },
-        "ModelUnsetKeys": {
-          "type": "object",
-          "properties": {
-            "cloud-region": {
-              "type": "string"
-            },
-            "cloud-tag": {
-              "type": "string"
-            },
-            "keys": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          },
-          "additionalProperties": false,
-          "required": [
-            "keys"
-          ]
-        },
-        "RegionDefaults": {
-          "type": "object",
-          "properties": {
-            "region-name": {
-              "type": "string"
-            },
-            "value": {
-              "type": "object",
-              "additionalProperties": true
-            }
-          },
-          "additionalProperties": false,
-          "required": [
-            "region-name",
-            "value"
-          ]
-        },
-        "SetModelDefaults": {
-          "type": "object",
-          "properties": {
-            "config": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/ModelDefaultValues"
-              }
-            }
-          },
-          "additionalProperties": false,
-          "required": [
-            "config"
-          ]
-        },
-        "UnsetModelDefaults": {
-          "type": "object",
-          "properties": {
-            "keys": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/ModelUnsetKeys"
               }
             }
           },
@@ -13792,9 +13988,6 @@
               "$ref": "#/definitions/ModelInfo"
             }
           }
-        },
-        "DestroyModel": {
-          "type": "object"
         },
         "DestroyModels": {
           "type": "object",
@@ -13840,6 +14033,14 @@
             }
           }
         },
+        "ModelDefaults": {
+          "type": "object",
+          "properties": {
+            "Result": {
+              "$ref": "#/definitions/ModelDefaultsResult"
+            }
+          }
+        },
         "ModelInfo": {
           "type": "object",
           "properties": {
@@ -13851,11 +14052,44 @@
             }
           }
         },
+        "ModelStatus": {
+          "type": "object",
+          "properties": {
+            "Params": {
+              "$ref": "#/definitions/Entities"
+            },
+            "Result": {
+              "$ref": "#/definitions/ModelStatusResults"
+            }
+          }
+        },
         "ModifyModelAccess": {
           "type": "object",
           "properties": {
             "Params": {
               "$ref": "#/definitions/ModifyModelAccessRequest"
+            },
+            "Result": {
+              "$ref": "#/definitions/ErrorResults"
+            }
+          }
+        },
+        "SetModelDefaults": {
+          "type": "object",
+          "properties": {
+            "Params": {
+              "$ref": "#/definitions/SetModelDefaults"
+            },
+            "Result": {
+              "$ref": "#/definitions/ErrorResults"
+            }
+          }
+        },
+        "UnsetModelDefaults": {
+          "type": "object",
+          "properties": {
+            "Params": {
+              "$ref": "#/definitions/UnsetModelDefaults"
             },
             "Result": {
               "$ref": "#/definitions/ErrorResults"
@@ -14100,16 +14334,77 @@
             "owner-tag"
           ]
         },
+        "ModelDefaultValues": {
+          "type": "object",
+          "properties": {
+            "cloud-region": {
+              "type": "string"
+            },
+            "cloud-tag": {
+              "type": "string"
+            },
+            "config": {
+              "type": "object",
+              "patternProperties": {
+                ".*": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "config"
+          ]
+        },
+        "ModelDefaults": {
+          "type": "object",
+          "properties": {
+            "controller": {
+              "type": "object",
+              "additionalProperties": true
+            },
+            "default": {
+              "type": "object",
+              "additionalProperties": true
+            },
+            "regions": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/RegionDefaults"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "ModelDefaultsResult": {
+          "type": "object",
+          "properties": {
+            "config": {
+              "type": "object",
+              "patternProperties": {
+                ".*": {
+                  "$ref": "#/definitions/ModelDefaults"
+                }
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "config"
+          ]
+        },
         "ModelInfo": {
           "type": "object",
           "properties": {
-            "cloud": {
-              "type": "string"
-            },
             "cloud-credential-tag": {
               "type": "string"
             },
             "cloud-region": {
+              "type": "string"
+            },
+            "cloud-tag": {
               "type": "string"
             },
             "controller-uuid": {
@@ -14156,7 +14451,7 @@
             "controller-uuid",
             "provider-type",
             "default-series",
-            "cloud",
+            "cloud-tag",
             "owner-tag",
             "life",
             "status",
@@ -14197,13 +14492,95 @@
             "hardware": {
               "$ref": "#/definitions/MachineHardware"
             },
+            "has-vote": {
+              "type": "boolean"
+            },
             "id": {
               "type": "string"
+            },
+            "instance-id": {
+              "type": "string"
+            },
+            "status": {
+              "type": "string"
+            },
+            "wants-vote": {
+              "type": "boolean"
             }
           },
           "additionalProperties": false,
           "required": [
             "id"
+          ]
+        },
+        "ModelStatus": {
+          "type": "object",
+          "properties": {
+            "application-count": {
+              "type": "integer"
+            },
+            "hosted-machine-count": {
+              "type": "integer"
+            },
+            "life": {
+              "type": "string"
+            },
+            "machines": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ModelMachineInfo"
+              }
+            },
+            "model-tag": {
+              "type": "string"
+            },
+            "owner-tag": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "model-tag",
+            "life",
+            "hosted-machine-count",
+            "application-count",
+            "owner-tag"
+          ]
+        },
+        "ModelStatusResults": {
+          "type": "object",
+          "properties": {
+            "models": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ModelStatus"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "models"
+          ]
+        },
+        "ModelUnsetKeys": {
+          "type": "object",
+          "properties": {
+            "cloud-region": {
+              "type": "string"
+            },
+            "cloud-tag": {
+              "type": "string"
+            },
+            "keys": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "keys"
           ]
         },
         "ModelUserInfo": {
@@ -14268,6 +14645,53 @@
           "additionalProperties": false,
           "required": [
             "changes"
+          ]
+        },
+        "RegionDefaults": {
+          "type": "object",
+          "properties": {
+            "region-name": {
+              "type": "string"
+            },
+            "value": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "region-name",
+            "value"
+          ]
+        },
+        "SetModelDefaults": {
+          "type": "object",
+          "properties": {
+            "config": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ModelDefaultValues"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "config"
+          ]
+        },
+        "UnsetModelDefaults": {
+          "type": "object",
+          "properties": {
+            "keys": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ModelUnsetKeys"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "keys"
           ]
         },
         "UserModel": {
@@ -15906,7 +16330,7 @@
             "container": {
               "type": "string"
             },
-            "cpu-cores": {
+            "cores": {
               "type": "integer"
             },
             "cpu-power": {
@@ -16764,10 +17188,21 @@
   },
   {
     "Name": "SSHClient",
-    "Version": 1,
+    "Version": 2,
     "Schema": {
       "type": "object",
       "properties": {
+        "AllAddresses": {
+          "type": "object",
+          "properties": {
+            "Params": {
+              "$ref": "#/definitions/Entities"
+            },
+            "Result": {
+              "$ref": "#/definitions/SSHAddressesResults"
+            }
+          }
+        },
         "PrivateAddress": {
           "type": "object",
           "properties": {
@@ -16892,6 +17327,39 @@
               "type": "array",
               "items": {
                 "$ref": "#/definitions/SSHAddressResult"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "results"
+          ]
+        },
+        "SSHAddressesResult": {
+          "type": "object",
+          "properties": {
+            "addresses": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "error": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "addresses"
+          ]
+        },
+        "SSHAddressesResults": {
+          "type": "object",
+          "properties": {
+            "results": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/SSHAddressesResult"
               }
             }
           },
@@ -23025,17 +23493,6 @@
             }
           }
         },
-        "CreateLocalLoginMacaroon": {
-          "type": "object",
-          "properties": {
-            "Params": {
-              "$ref": "#/definitions/Entities"
-            },
-            "Result": {
-              "$ref": "#/definitions/MacaroonResults"
-            }
-          }
-        },
         "DisableUser": {
           "type": "object",
           "properties": {
@@ -23276,33 +23733,6 @@
         "Macaroon": {
           "type": "object",
           "additionalProperties": false
-        },
-        "MacaroonResult": {
-          "type": "object",
-          "properties": {
-            "error": {
-              "$ref": "#/definitions/Error"
-            },
-            "result": {
-              "$ref": "#/definitions/Macaroon"
-            }
-          },
-          "additionalProperties": false
-        },
-        "MacaroonResults": {
-          "type": "object",
-          "properties": {
-            "results": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/MacaroonResult"
-              }
-            }
-          },
-          "additionalProperties": false,
-          "required": [
-            "results"
-          ]
         },
         "UserInfo": {
           "type": "object",

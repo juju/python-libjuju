@@ -200,8 +200,9 @@ class {}(Type):
 {}
         '''""".format(
             name,
-            args.PyToSchemaMapping(),
-            args.SchemaToPyMapping(),
+            # pprint these to get stable ordering across regens
+            pprint.pformat(args.PyToSchemaMapping(), width=999),
+            pprint.pformat(args.SchemaToPyMapping(), width=999),
             ", " if args else "",
             args.as_kwargs(),
             textwrap.indent(args.get_doc(), INDENT * 2))
