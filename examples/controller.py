@@ -24,7 +24,7 @@ async def run():
     model = await controller.add_model(
         'libjuju-test',
         'cloud-aws',
-        'cloudcred-aws_tvansteenburgh@external_aws-tim',
+        'cloudcred-aws_tvansteenburgh_external_aws-tim',
     )
     await model.deploy(
         'ubuntu-0',
