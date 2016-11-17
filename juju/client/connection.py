@@ -135,8 +135,7 @@ class Connection:
 
         redirect_info = await client.redirect_info()
         if not redirect_info:
-            server_info = await client.login(username, password, macaroons)
-            client.build_facades(server_info['facades'])
+            await client.login(username, password, macaroons)
             return client
 
         await client.close()
@@ -153,7 +152,6 @@ class Connection:
                 result = await client.login(username, password, macaroons)
                 if 'discharge-required-error' in result:
                     continue
-                client.build_facades(result['facades'])
                 return client
             except Exception as e:
                 await client.close()
@@ -174,6 +172,33 @@ class Connection:
 
         return await cls.connect_model(
             '{}:{}'.format(controller_name, model_name))
+
+    @classmethod
+    async def connect_current_controller(cls):
+        """Connect to the currently active controller.
+
+        """
+        jujudata = JujuData()
+        controller_name = jujudata.current_controller()
+
+        return await cls.connect_controller(controller_name)
+
+    @classmethod
+    async def connect_controller(cls, controller_name):
+        """Connect to a controller by name.
+
+        """
+        jujudata = JujuData()
+        controller = jujudata.controllers()[controller_name]
+        endpoint = controller['api-endpoints'][0]
+        cacert = controller.get('ca-cert')
+        accounts = jujudata.accounts()[controller_name]
+        username = accounts['user']
+        password = accounts.get('password')
+        macaroons = get_macaroons() if not password else None
+
+        return await cls.connect(
+            endpoint, None, username, password, cacert, macaroons)
 
     @classmethod
     async def connect_model(cls, model):
@@ -221,7 +246,10 @@ class Connection:
                 "nonce": "".join(random.sample(string.printable, 12)),
                 "macaroons": macaroons or []
             }})
-        return result['response']
+        response = result['response']
+        self.build_facades(response['facades'])
+        self.info = response.copy()
+        return response
 
     async def redirect_info(self):
         try:

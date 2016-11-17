@@ -1,5 +1,34 @@
+import asyncio
+import logging
+
+from .client import client
+from .client import connection
+from .client import watcher
+from .model import Model
+
+log = logging.getLogger(__name__)
+
+
 class Controller(object):
-    def add_model(self, name, config=None, credential=None, owner=None):
+    async def connect_current(self):
+        """Connect to the current Juju controller.
+
+        """
+        self.connection = (
+            await connection.Connection.connect_current_controller())
+
+    async def disconnect(self):
+        """Shut down the watcher task and close websockets.
+
+        """
+        if self.connection and self.connection.is_open:
+            log.debug('Closing controller connection')
+            await self.connection.close()
+            self.connection = None
+
+    async def add_model(
+            self, name, cloud, credential, owner=None,
+            config=None, region=None):
         """Add a model to this controller.
 
         :param str name: Name of the model
@@ -8,7 +37,31 @@ class Controller(object):
         :param str owner: Owner username
 
         """
-        pass
+        model_facade = client.ModelManagerFacade()
+        model_facade.connect(self.connection)
+
+        log.debug('Creating model %s', name)
+
+        model_info = await model_facade.CreateModel(
+            cloud,
+            config,
+            credential,
+            name,
+            owner or self.connection.info['user-info']['identity'],
+            region,
+        )
+
+        model = Model()
+        await model.connect(
+            self.connection.endpoint,
+            model_info.uuid,
+            self.connection.username,
+            self.connection.password,
+            self.connection.cacert,
+            self.connection.macaroons,
+        )
+
+        return model
 
     def add_user(self, username, display_name=None, acl=None, models=None):
         """Add a user to this controller.
