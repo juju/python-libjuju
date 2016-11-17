@@ -367,6 +367,15 @@ class Model(object):
         self._watch()
         await self._watch_received.wait()
 
+    async def connect_model(self, arg):
+        """Connect to a specific Juju model.
+        :param arg:  <controller>:<user/model>
+
+        """
+        self.connection = await connection.Connection.connect_model(arg)
+        self._watch()
+        await self._watch_received.wait()
+
     async def disconnect(self):
         """Shut down the watcher task and close websockets.
 
