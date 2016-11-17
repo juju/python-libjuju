@@ -349,6 +349,16 @@ class Model(object):
         self._watch_received = asyncio.Event(loop=loop)
         self._charmstore = CharmStore(self.loop)
 
+    async def connect(self, *args, **kw):
+        """Connect to an arbitrary Juju model.
+
+        args and kw are passed through to Connection.connect()
+
+        """
+        self.connection = await connection.Connection.connect(*args, **kw)
+        self._watch()
+        await self._watch_received.wait()
+
     async def connect_current(self):
         """Connect to the current Juju model.
 
