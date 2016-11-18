@@ -5,6 +5,9 @@ This example:
 2. Creates a new model.
 3. Deploys an application on the new model.
 
+Note: 'cloudcred' format to add a model should be:
+cloudcred-<cloudname>_<user>_<credentialname>
+
 """
 import asyncio
 import logging
@@ -24,7 +27,7 @@ async def run():
     model = await controller.add_model(
         'libjuju-test',
         'cloud-aws',
-        'cloudcred-aws_tvansteenburgh_external_aws-tim',
+        'cloudcred-aws_tvansteenburgh_external@aws-tim',
     )
     await model.deploy(
         'ubuntu-0',
