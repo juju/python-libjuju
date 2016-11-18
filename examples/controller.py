@@ -5,6 +5,9 @@ This example:
 2. Creates a new model.
 3. Deploys an application on the new model.
 
+Note: 'cloudcred' format to add a model should be:
+cloudcred-<cloudname>_<user>_<credentialname>
+
 """
 import asyncio
 import logging
