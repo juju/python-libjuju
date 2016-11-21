@@ -1,4 +1,3 @@
-import asyncio
 import logging
 from datetime import datetime
 
@@ -56,6 +55,10 @@ class Unit(model.ModelEntity):
 
         """
         return self.data['workload-status']['message']
+
+    @property
+    def tag(self):
+        return 'unit-%s' % self.name.replace('/', '-')
 
     def add_storage(self, name, constraints=None):
         """Add unit storage dynamically.
@@ -128,14 +131,39 @@ class Unit(model.ModelEntity):
         )
         return await self.model.wait_for_action(res.results[0].action.tag)
 
-    def run_action(self, action_name, **params):
-        """Run action on this unit.
+    async def run_action(self, action_name, **params):
+        """Run an action on this unit.
 
         :param str action_name: Name of action to run
         :param \*\*params: Action parameters
+        :returns: An `juju.action.Action` instance.
 
+        Note that this only enqueues the action.  You will need to call
+        ``action.wait()`` on the resulting `Action` instance if you wish
+        to block until the action is complete.
         """
-        pass
+        action_facade = client.ActionFacade()
+        action_facade.connect(self.connection)
+
+        log.debug('Starting action `%s` on %s', action_name, self.name)
+
+        res = await action_facade.Enqueue([client.Action(
+            name=action_name,
+            parameters=params,
+            receiver=self.tag,
+        )])
+        action = res.results[0].action
+        error = res.results[0].error
+        if error and error.code == 'not found':
+            raise ValueError('Action `%s` not found on %s' % (action_name,
+                                                              self.name))
+        elif error:
+            raise Exception('Unknown action error: %s' % error.serialize())
+        action_id = action.tag[len('action-'):]
+        log.debug('Action started as %s', action_id)
+        # we can't use wait_for_new here because we don't
+        # consistently (ever?) get an "add" delta for the action
+        return await self.model._wait('action', action_id, None)
 
     def scp(
             self, source_path, user=None, destination_path=None, proxy=False,
