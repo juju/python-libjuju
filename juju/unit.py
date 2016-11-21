@@ -178,3 +178,26 @@ class Unit(model.ModelEntity):
 
         """
         pass
+
+    async def is_leader_from_status(self):
+        """
+        Check to see if this unit is the leader. Returns True if so, and
+        False if it is not, or if leadership does not make sense
+        (e.g., there is no leader in this application.)
+
+        This method is a kluge that calls FullStatus in the
+        ClientFacade to get its information. Once
+        https://bugs.launchpad.net/juju/+bug/1643691 is resolved, we
+        should add a simple .is_leader property, and deprecate this
+        method.
+
+        """
+        app = self.name.split("/")[0]
+
+        c = client.ClientFacade()
+        c.connect(self.model.connection)
+
+        status = await c.FullStatus(None)
+
+        return status.applications[app]['units'][self.name].get(
+            'leader', False)
