@@ -576,15 +576,24 @@ class Model(object):
         entity_id = await q.get()
         return self.state._live_entity_map(entity_type)[entity_id]
 
-    async def _wait_for_new(self, entity_type, entity_id, predicate=None):
+    async def _wait_for_new(self, entity_type, entity_id=None, predicate=None):
         """Wait for a new object to appear in the Model and return it.
 
         Waits for an object of type ``entity_type`` with id ``entity_id``.
+        If ``entity_id`` is ``None``, it will wait for the first new entity
+        of the correct type.
 
         This coroutine blocks until the new object appears in the model.
 
         """
-        return await self._wait(entity_type, entity_id, 'add', predicate)
+        # if the entity is already in the model, just return it
+        if entity_id in self.state._live_entity_map(entity_type):
+            return self.state._live_entity_map(entity_type)[entity_id]
+        # if we know the entity_id, we can trigger on any action that puts
+        # the enitty into the model; otherwise, we have to watch for the
+        # next "add" action on that entity_type
+        action = 'add' if entity_id is None else None
+        return await self._wait(entity_type, entity_id, action, predicate)
 
     async def wait_for_action(self, action_id):
         """Given an action, wait for it to complete."""
@@ -1352,6 +1361,8 @@ class BundleHandler(object):
         # do the do
         log.info('Deploying %s', charm)
         await self.app_facade.Deploy([app])
+        # ensure the app is in the model for future operations
+        await self.model._wait_for_new('application', application)
         return application
 
     async def addUnit(self, application, to):
