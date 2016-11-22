@@ -227,5 +227,14 @@ class Unit(model.ModelEntity):
 
         status = await c.FullStatus(None)
 
-        return status.applications[app]['units'][self.name].get(
-            'leader', False)
+        try:
+            return status.applications[app]['units'][self.name].get(
+                'leader', False)
+        except KeyError:
+            # FullStatus may be more up-to-date than the model
+            # referenced by this class. If this unit has been
+            # destroyed between the time the class was created and the
+            # time that we call this method, we'll get a KeyError. In
+            # that case, we simply return False, as a destroyed unit
+            # is not a leader.
+            return False
