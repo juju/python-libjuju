@@ -161,9 +161,9 @@ class Unit(model.ModelEntity):
             raise Exception('Unknown action error: %s' % error.serialize())
         action_id = action.tag[len('action-'):]
         log.debug('Action started as %s', action_id)
-        # we can't use wait_for_new here because we don't
-        # consistently (ever?) get an "add" delta for the action
-        return await self.model._wait('action', action_id, None)
+        # we mustn't use wait_for_action because that blocks until the
+        # action is complete, rather than just being in the model
+        return await self.model._wait_for_new('action', action_id)
 
     def scp(
             self, source_path, user=None, destination_path=None, proxy=False,
