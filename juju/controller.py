@@ -63,6 +63,20 @@ class Controller(object):
 
         return model
 
+    async def destroy_models(self, *args):
+
+        """Destroy a model to this controller.
+
+        :param str : model-<UUID>
+
+        """
+        model_facade = client.ModelManagerFacade()
+        model_facade.connect(self.connection)
+
+        for arg in args:
+            log.debug('Destroying Model %s', arg)
+            await model_facade.DestroyModels([client.Entity(arg)])
+
     def add_user(self, username, display_name=None, acl=None, models=None):
         """Add a user to this controller.
 
