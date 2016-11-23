@@ -67,15 +67,27 @@ class Controller(object):
 
         """Destroy a model to this controller.
 
-        :param str : model-<UUID>
+        :param str : <UUID> of the Model
+        param accepts string of <UUID> only OR `model-<UUID>`
+
 
         """
         model_facade = client.ModelManagerFacade()
         model_facade.connect(self.connection)
 
-        for arg in args:
+        #Generate list of args, pre-pend 'model-'
+        prependarg = list(args)
+        for index, item in enumerate(prependarg):
+            if not item.startswith('model-'):
+                prependarg[index]="model-%s" % item
+
+        #Create list of objects to pass to DestroyModels()
+        arglist = []
+        for arg in prependarg:
+            arglist.append(client.Entity(arg))
             log.debug('Destroying Model %s', arg)
-            await model_facade.DestroyModels([client.Entity(arg)])
+
+        await model_facade.DestroyModels(arglist)
 
     def add_user(self, username, display_name=None, acl=None, models=None):
         """Add a user to this controller.
