@@ -238,3 +238,7 @@ class Unit(model.ModelEntity):
             # that case, we simply return False, as a destroyed unit
             # is not a leader.
             return False
+
+    async def get_metrics(self):
+        metrics = await self.model.get_metrics(self.tag)
+        return metrics[self.name]
