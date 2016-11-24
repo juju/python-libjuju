@@ -49,6 +49,10 @@ class Application(model.ModelEntity):
         """
         return self.data['status']['message']
 
+    @property
+    def tag(self):
+        return 'application-%s' % self.name
+
     async def add_relation(self, local_relation, remote_relation):
         """Add a relation to another application.
 
@@ -337,3 +341,6 @@ class Application(model.ModelEntity):
 
         """
         pass
+
+    async def get_metrics(self):
+        return await self.model.get_metrics(self.tag)
