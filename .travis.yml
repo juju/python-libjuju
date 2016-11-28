@@ -8,7 +8,8 @@ before_install:
   - sudo add-apt-repository ppa:juju/daily -y
   - sudo apt-get update -q
   - sudo apt-get install lxd juju -y
-  - sudo newgrp lxd
+  - sudo usermod -a -G lxd $USER
+  - newgrp lxd
   - groups
   - sudo lxd init --auto
 install: pip install tox-travis
