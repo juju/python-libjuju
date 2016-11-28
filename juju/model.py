@@ -1266,7 +1266,7 @@ class BundleHandler(object):
             constraints: string holding machine constraints, if any. We'll
                 parse this into the json friendly dict that the juju api
                 expects.
-            Container_type: string holding the type of the container (for
+            container_type: string holding the type of the container (for
                 instance ""lxc" or kvm"). It is not specified for top level
                 machines.
             parent_id: string holding a placeholder pointing to another
