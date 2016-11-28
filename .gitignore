@@ -1,8 +1,10 @@
 *.sw[mnop]
 .venv/
 *.pyc
+*.py~
 docs/_build/
 __pycache__/
 .tox/
 *.egg-info/
 .cache/
+.\#*

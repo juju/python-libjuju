@@ -3,6 +3,7 @@ import logging
 
 from . import model
 from .client import client
+from .placement import parse as parse_placement
 
 log = logging.getLogger(__name__)
 
@@ -83,7 +84,7 @@ class Application(model.ModelEntity):
 
         result = await app_facade.AddUnits(
             application=self.name,
-            placement=to,
+            placement=[parse_placement(to)],
             num_units=count,
         )
 
