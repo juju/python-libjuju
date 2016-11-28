@@ -9,12 +9,10 @@ before_install:
   - sudo apt-get update -q
   - sudo apt-get install lxd juju -y
   - sudo usermod -a -G lxd $USER
-  - newgrp lxd
-  - groups
-  - sudo lxd init --auto
+  - sudo -E sudo -u $USER -E bash -c "lxd init --auto"
 install: pip install tox-travis
 before_script:
-  - juju bootstrap localhost test
+  - sudo -E sudo -u $USER -E bash -c "juju bootstrap localhost test"
 script: tox
 after_script:
-  - juju destroy-controller --destroy-all-models -y test
+  - sudo -E sudo -u $USER -E bash -c "juju destroy-controller --destroy-all-models -y test"
