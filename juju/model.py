@@ -1258,22 +1258,20 @@ class BundleHandler(object):
 
     async def addMachines(self, params):
         """
-        :param series string:
-            Series holds the optional machine OS series.
+        :param params dict:
+            Dictionary specifying the machine to add. Keys include:
 
-        :param constraints string:
-            Constraints holds the optional machine constraints.
-
-        :param Container_type string:
-            ContainerType optionally holds the type of the container (for
-            instance ""lxc" or kvm"). It is not specified for top level
-            machines.
-
-        :param parent_id string:
-            ParentId optionally holds a placeholder pointing to another machine
-            change or to a unit change. This value is only specified in the
-            case this machine is a container, in which case also ContainerType
-            is set.
+            series: string specifying the machine OS series.
+            constraints: string holding optional machine constraints. We'll
+                parse this into the json friendly dict that the juju api
+                expects.
+            Container_type: string holding the type of the container (for
+                instance ""lxc" or kvm"). It is not specified for top level
+                machines.
+            parent_id: string holding a placeholder pointing to another
+                machine change or to a unit change. This value is only
+                specified in the case this machine is a container, in
+                which case also ContainerType is set.
         """
         if 'parent_id' in params:
             params['parent_id'] = self.resolve(params['parent_id'])

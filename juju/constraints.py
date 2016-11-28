@@ -1,5 +1,5 @@
 #
-# Library to parse constraints
+# Module that parses constraints
 #
 # The current version of juju core expects the client to take
 # constraints given in the form "mem=10G foo=bar" and parse them into
