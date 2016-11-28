@@ -11,6 +11,9 @@
 # constraints keys are valid, and that we can successfully dump the
 # constraints dict to json.
 #
+# Once https://bugs.launchpad.net/juju/+bug/1645402 is addressed, this
+# module should be deprecated.
+#
 
 import re
 
@@ -33,6 +36,10 @@ def parse(constraints):
     """
     if constraints is None:
         return None
+
+    if type(constraints) is dict:
+        # Fowards compatibilty: already parsed
+        return constraints
 
     constraints = {
         normalize_key(k): normalize_value(v) for k, v in [
