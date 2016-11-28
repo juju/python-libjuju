@@ -1256,13 +1256,14 @@ class BundleHandler(object):
         await self.client_facade.AddCharm(None, entity_id)
         return entity_id
 
-    async def addMachines(self, params):
+    async def addMachines(self, params=None):
         """
         :param params dict:
-            Dictionary specifying the machine to add. Keys include:
+            Dictionary specifying the machine to add. All keys are optional.
+            Keys include:
 
             series: string specifying the machine OS series.
-            constraints: string holding optional machine constraints. We'll
+            constraints: string holding machine constraints, if any. We'll
                 parse this into the json friendly dict that the juju api
                 expects.
             Container_type: string holding the type of the container (for
@@ -1273,6 +1274,8 @@ class BundleHandler(object):
                 specified in the case this machine is a container, in
                 which case also ContainerType is set.
         """
+        params = params or {}
+
         if 'parent_id' in params:
             params['parent_id'] = self.resolve(params['parent_id'])
 
