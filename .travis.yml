@@ -9,7 +9,7 @@ before_install:
   - sudo apt-get update -q
   - sudo apt-get install lxd juju -y
   - sudo usermod -a -G lxd $USER
-  - sudo -E sudo -u $USER -E bash -c "lxd init --auto"
+  - sudo lxd init --auto
 install: pip install tox-travis
 before_script:
   - sudo -E sudo -u $USER -E bash -c "juju bootstrap localhost test"
