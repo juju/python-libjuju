@@ -1,10 +1,12 @@
 import asyncio
 import collections
 import logging
+import os
 import re
 import weakref
 from concurrent.futures import CancelledError
 from functools import partial
+from pathlib import Path
 
 import yaml
 from theblues import charmstore
@@ -857,14 +859,21 @@ class Model(object):
                 for k, v in storage.items()
             }
 
-        entity_id = await self.charmstore.entityId(entity_url)
+        is_local = not entity_url.startswith('cs:') and \
+            os.path.isdir(entity_url)
+        entity_id = await self.charmstore.entityId(entity_url) \
+            if not is_local else entity_url
 
         app_facade = client.ApplicationFacade()
         client_facade = client.ClientFacade()
         app_facade.connect(self.connection)
         client_facade.connect(self.connection)
 
-        if 'bundle/' in entity_id:
+        is_bundle = ((is_local and
+                      (Path(entity_id) / 'bundle.yaml').exists()) or
+                     (not is_local and 'bundle/' in entity_id))
+
+        if is_bundle:
             handler = BundleHandler(self)
             await handler.fetch_plan(entity_id)
             await handler.execute_plan()
@@ -1288,9 +1297,13 @@ class BundleHandler(object):
         self.ann_facade.connect(model.connection)
 
     async def fetch_plan(self, entity_id):
-        bundle_yaml = await self.charmstore.files(entity_id,
-                                                  filename='bundle.yaml',
-                                                  read_file=True)
+        is_local = not entity_id.startswith('cs:') and os.path.isdir(entity_id)
+        if is_local:
+            bundle_yaml = (Path(entity_id) / "bundle.yaml").read_text()
+        else:
+            bundle_yaml = await self.charmstore.files(entity_id,
+                                                      filename='bundle.yaml',
+                                                      read_file=True)
         self.bundle = yaml.safe_load(bundle_yaml)
         self.plan = await self.client_facade.GetBundleChanges(bundle_yaml)
 
