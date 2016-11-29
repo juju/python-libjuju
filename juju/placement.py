@@ -6,9 +6,10 @@
 # module should be deprecated.
 #
 
+from .client import client
+
 MACHINE_SCOPE = "#"
 
-from .client import client
 
 def parse(directive):
     """
@@ -17,7 +18,7 @@ def parse(directive):
     back over the websocket API.
 
     """
-    if directive == "":
+    if not directive:
         # Handle null case
         return None
 
