@@ -345,6 +345,7 @@ class Model(object):
         self.connection = None
         self.observers = weakref.WeakValueDictionary()
         self.state = ModelState(self)
+        self.info = None
         self._watcher_task = None
         self._watch_shutdown = asyncio.Event(loop=loop)
         self._watch_received = asyncio.Event(loop=loop)
@@ -357,25 +358,31 @@ class Model(object):
 
         """
         self.connection = await connection.Connection.connect(*args, **kw)
-        self._watch()
-        await self._watch_received.wait()
+        await self._after_connect()
 
     async def connect_current(self):
         """Connect to the current Juju model.
 
         """
         self.connection = await connection.Connection.connect_current()
-        self._watch()
-        await self._watch_received.wait()
+        await self._after_connect()
 
-    async def connect_model(self, arg):
-        """Connect to a specific Juju model.
-        :param arg:  <controller>:<user/model>
+    async def connect_model(self, model_name):
+        """Connect to a specific Juju model by name.
+
+        :param model_name:  Format [controller:][user/]model
 
         """
-        self.connection = await connection.Connection.connect_model(arg)
+        self.connection = await connection.Connection.connect_model(model_name)
+        await self._after_connect()
+
+    async def _after_connect(self):
+        """Run initialization steps after connecting to websocket.
+
+        """
         self._watch()
         await self._watch_received.wait()
+        await self.get_info()
 
     async def disconnect(self):
         """Shut down the watcher task and close websockets.
@@ -448,6 +455,27 @@ class Model(object):
 
         """
         return self.state.units
+
+    async def get_info(self):
+        """Return a client.ModelInfo object for this Model.
+
+        Retrieves latest info for this Model from the api server. The
+        return value is cached on the Model.info attribute so that the
+        valued may be accessed again without another api call, if
+        desired.
+
+        This method is called automatically when the Model is connected,
+        resulting in Model.info being initialized without requiring an
+        explicit call to this method.
+
+        """
+        facade = client.ClientFacade()
+        facade.connect(self.connection)
+
+        self.info = await facade.ModelInfo()
+        log.debug('Got ModelInfo: %s', vars(self.info))
+
+        return self.info
 
     def add_observer(
             self, callable_, entity_type=None, action=None, entity_id=None,
