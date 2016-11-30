@@ -1,8 +1,39 @@
 juju package
 ============
 
+Subpackages
+-----------
+
+.. toctree::
+
+    juju.client
+
 Submodules
 ----------
+
+juju.action module
+------------------
+
+.. automodule:: juju.action
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+juju.annotation module
+----------------------
+
+.. automodule:: juju.annotation
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+juju.application module
+-----------------------
+
+.. automodule:: juju.application
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
 juju.cloud module
 -----------------
@@ -12,10 +43,42 @@ juju.cloud module
     :undoc-members:
     :show-inheritance:
 
+juju.constraints module
+-----------------------
+
+.. automodule:: juju.constraints
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 juju.controller module
 ----------------------
 
 .. automodule:: juju.controller
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+juju.delta module
+-----------------
+
+.. automodule:: juju.delta
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+juju.errors module
+------------------
+
+.. automodule:: juju.errors
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+juju.exceptions module
+----------------------
+
+.. automodule:: juju.exceptions
     :members:
     :undoc-members:
     :show-inheritance:
@@ -44,10 +107,18 @@ juju.model module
     :undoc-members:
     :show-inheritance:
 
-juju.service module
--------------------
+juju.placement module
+---------------------
 
-.. automodule:: juju.service
+.. automodule:: juju.placement
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+juju.relation module
+--------------------
+
+.. automodule:: juju.relation
     :members:
     :undoc-members:
     :show-inheritance:

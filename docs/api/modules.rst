@@ -1,5 +1,5 @@
-API Docs
-========
+juju
+====
 
 .. toctree::
    :maxdepth: 4
