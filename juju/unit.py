@@ -227,17 +227,23 @@ class Unit(model.ModelEntity):
 
         status = await c.FullStatus(None)
 
-        try:
-            return status.applications[app]['units'][self.name].get(
-                'leader', False)
-        except KeyError:
-            # FullStatus may be more up-to-date than the model
-            # referenced by this class. If this unit has been
-            # destroyed between the time the class was created and the
-            # time that we call this method, we'll get a KeyError. In
-            # that case, we simply return False, as a destroyed unit
-            # is not a leader.
+        # FullStatus may be more up to date than our model, and the
+        # unit may have gone away, or we may be doing something silly,
+        # like trying to fetch leadership for a subordinate, which
+        # will not be filed where we expect in the model. In those
+        # cases, we may simply return False, as a nonexistent or
+        # subordinate unit is not a leader.
+        if not status.applications.get(app):
             return False
+
+        if not status.applications[app].get('units'):
+            return False
+
+        if not status.applications[app]['units'].get(self.name):
+            return False
+
+        return status.applications[app]['units'][self.name].get('leader', False)
+
 
     async def get_metrics(self):
         metrics = await self.model.get_metrics(self.tag)
