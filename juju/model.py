@@ -1261,7 +1261,7 @@ class Model(object):
                     raise Exception(error.message)
 
             for metric in entity_metrics.metrics:
-                metrics[metric.unit].append(metric.to_json())
+                metrics[metric.unit].append(vars(metric))
 
         return metrics
 
