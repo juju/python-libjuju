@@ -485,7 +485,7 @@ class Model(object):
         """Register an "on-model-change" callback
 
         Once the model is connected, ``callable_``
-        will be called each time the model changes. callable_ should
+        will be called each time the model changes. ``callable_`` should
         be Awaitable and accept the following positional arguments:
 
             delta - An instance of :class:`juju.delta.EntityDelta`
@@ -504,14 +504,15 @@ class Model(object):
             model - The :class:`Model` itself.
 
         Events for which ``callable_`` is called can be specified by passing
-        entity_type, action, and/or id_ filter criteria, e.g.:
+        entity_type, action, and/or entitiy_id filter criteria, e.g.::
 
             add_observer(
-                myfunc, entity_type='application', action='add', id_='ubuntu')
+                myfunc,
+                entity_type='application', action='add', entity_id='ubuntu')
 
         For more complex filtering conditions, pass a predicate function. It
         will be called with a delta as its only argument. If the predicate
-        function returns True, the callable_ will be called.
+        function returns True, the ``callable_`` will be called.
 
         """
         observer = _Observer(
@@ -1343,16 +1344,20 @@ class BundleHandler(object):
             Keys include:
 
             series: string specifying the machine OS series.
+
             constraints: string holding machine constraints, if any. We'll
                 parse this into the json friendly dict that the juju api
                 expects.
+
             container_type: string holding the type of the container (for
                 instance ""lxc" or kvm"). It is not specified for top level
                 machines.
+
             parent_id: string holding a placeholder pointing to another
                 machine change or to a unit change. This value is only
                 specified in the case this machine is a container, in
                 which case also ContainerType is set.
+
         """
         params = params or {}
 
