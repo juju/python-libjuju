@@ -6,58 +6,115 @@
 A Python library for Juju
 =========================
 
-Front Matter
+NOTE: This is pre-release software. The implementation is usable but
+not complete.
+
+Please report bugs at https://github.com/juju/python-libjuju/issues.
+
+
+Requirements
 ------------
 
-NOTE: There is no implementation here yet. It is simply a mocked out
-design of what this library might look like. The design itself is not
-complete. Comments on the design, good or bad, are welcomed. Use cases
-are also appreciated as they will shape the design.
+* Python 3.5+
+* Juju 2.0+
 
-The goal is to end up with a feature-full and officially supported
-python library for Juju.
 
-The focus right now is on Juju 2+ only.
-
-Design Ideas
+Design Notes
 ------------
 
-* Present an object-oriented interface to all the features of the Juju
-  CLI
-* Do as much as possible through the API so that the library can be used
-  without actually installing Juju
+* Asynchronous - uses asyncio and async/await features of python 3.5
+* Websocket-level bindings are programmatically generated (indirectly) from the
+  Juju golang code, ensuring full api coverage
+* Provides an OO layer which encapsulates much of the websocket api and
+  provides familiar nouns and verbs (e.g. Model.deploy(), Application.add_unit(),
+  etc.)
 
-Example Use Cases
------------------
 
-Please add more!
+Installation
+------------
 
-Simple bootstrap/deploy
-+++++++++++++++++++++++
+    git clone https://github.com/juju/python-libjuju.git
+    cd python-libjuju
+    python setup.py install  # make sure python is 3.5+
+
+
+Quickstart
+----------
+Here's a simple example that shows basic usage of the library. The example
+connects to the currently active Juju model, deploys a single unit of the
+ubuntu charm, then exits.
+
+More examples can be found in the `examples/` directory of the source tree,
+and in the documentation.
+
 
 .. code:: python
 
-  from juju import Juju
+  #!/usr/bin/python3.5
 
-  juju = Juju()
-  lxd = juju.get_cloud('lxd')
-  controller = lxd.bootstrap('lxd-test')
-  model = controller.get_model('default')
+  import asyncio
+  import logging
 
-  # We might want an async and blocking version of deploy()?
-  model.deploy('mediawiki-single')
+  from juju.model import Model
 
-  mediawiki = model.get_service('mediawiki')
-  mediawiki.expose()
+
+  async def run():
+      # Create a Model instance. We need to connect our Model to a Juju api
+      # server before we can use it.
+      model = Model()
+
+      # Connect to the currently active Juju model
+      await model.connect_current()
+
+      # Deploy a single unit of the ubuntu charm, using revision 0 from the
+      # stable channel of the Charm Store.
+      ubuntu_app = await model.deploy(
+          'ubuntu-0',
+          service_name='ubuntu',
+          series='xenial',
+          channel='stable',
+      )
+
+      # Disconnect from the api server and cleanup.
+      model.disconnect()
+
+      # Stop the asyncio event loop.
+      model.loop.stop()
+
+
+  def main():
+      # Set logging level to debug so we can see verbose output from the
+      # juju library.
+      logging.basicConfig(level=logging.DEBUG)
+
+      # Quiet logging from the websocket library. If you want to see
+      # everything sent over the wire, set this to DEBUG.
+      ws_logger = logging.getLogger('websockets.protocol')
+      ws_logger.setLevel(logging.INFO)
+
+      # Create the asyncio event loop
+      loop = asyncio.get_event_loop()
+
+      # Queue up our `run()` coroutine for execution
+      loop.create_task(run())
+
+      # Start the event loop
+      loop.run_forever()
+
+
+  if __name__ == '__main__':
+      main()
 
 
 Table of Contents
 -----------------
 
 .. toctree::
-   :maxdepth: 2
+   :glob:
+   :maxdepth: 3
 
-   api/modules
+   narrative/index
+   API Docs <api/modules>
 
 
 
