@@ -10,12 +10,39 @@ log = logging.getLogger(__name__)
 
 
 class Controller(object):
+    def __init__(self, loop=None):
+        """Instantiate a new Controller.
+
+        One of the connect_* methods will need to be called before this
+        object can be used for anything interesting.
+
+        :param loop: an asyncio event loop
+
+        """
+        self.loop = loop or asyncio.get_event_loop()
+        self.connection = None
+
+    async def connect(
+            self, endpoint, username, password, cacert=None, macaroons=None):
+        """Connect to an arbitrary Juju controller.
+
+        """
+        self.connection = await connection.Connection.connect(
+            endpoint, None, username, password, cacert, macaroons)
+
     async def connect_current(self):
         """Connect to the current Juju controller.
 
         """
         self.connection = (
             await connection.Connection.connect_current_controller())
+
+    async def connect_controller(self, controller_name):
+        """Connect to a Juju controller by name.
+
+        """
+        self.connection = (
+            await connection.Connection.connect_controller(controller_name))
 
     async def disconnect(self):
         """Shut down the watcher task and close websockets.
@@ -75,13 +102,13 @@ class Controller(object):
         model_facade = client.ModelManagerFacade()
         model_facade.connect(self.connection)
 
-        #Generate list of args, pre-pend 'model-'
+        # Generate list of args, pre-pend 'model-'
         prependarg = list(args)
         for index, item in enumerate(prependarg):
             if not item.startswith('model-'):
-                prependarg[index]="model-%s" % item
+                prependarg[index] = "model-%s" % item
 
-        #Create list of objects to pass to DestroyModels()
+        # Create list of objects to pass to DestroyModels()
         arglist = []
         for arg in prependarg:
             arglist.append(client.Entity(arg))
