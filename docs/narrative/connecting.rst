@@ -64,3 +64,40 @@ CLI client to be installed.
       password,
       cacert,
   )
+
+
+To an API Endpoint with Macaroon Authentication
+-----------------------------------------------
+To connect to a shared model, or a model an a shared controller, you'll need
+to use macaroon authentication. The simplest example is shown below, and uses
+already-discharged macaroons from the local filesystem. This will work if you
+have the Juju CLI installed.
+
+.. note::
+
+  The library does not yet contain support for fetching and discharging
+  macaroons. Until it does, if you want to use macaroon auth, you'll need
+  to supply already-discharged macaroons yourself.
+
+.. code:: python
+
+  from juju.client.connection import get_macaroons()
+  from juju.model import Model
+
+  model = Model()
+
+  controller_endpoint = '10.0.4.171:17070'
+  model_uuid = 'e8399ac7-078c-4817-8e5e-32316d55b083'
+  username = None
+  password = None
+  cacert = None
+  macaroons = get_macaroons()
+
+  await model.connect(
+      controller_endpoint,
+      model_uuid,
+      username,
+      password,
+      cacert,
+      macaroons,
+  )
