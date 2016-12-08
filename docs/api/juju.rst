@@ -123,6 +123,14 @@ juju.relation module
     :undoc-members:
     :show-inheritance:
 
+juju.tag module
+---------------
+
+.. automodule:: juju.tag
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 juju.unit module
 ----------------
 

@@ -247,7 +247,7 @@ class Connection:
                 "macaroons": macaroons or []
             }})
         response = result['response']
-        self.build_facades(response['facades'])
+        self.build_facades(response.get('facades', {}))
         self.info = response.copy()
         return response
 

@@ -1,6 +1,7 @@
 import asyncio
 import logging
 
+from . import tag
 from .client import client
 from .client import connection
 from .client import watcher
@@ -54,27 +55,41 @@ class Controller(object):
             self.connection = None
 
     async def add_model(
-            self, name, cloud, credential, owner=None,
-            config=None, region=None):
+            self, model_name, cloud_name, credential_name,
+            owner=None, config=None, region=None):
         """Add a model to this controller.
 
-        :param str name: Name of the model
-        :param dict config: Model configuration
-        :param str credential: e.g. '<cloud>:<credential>'
-        :param str owner: Owner username
+        :param str model_name: Name to give the new model.
+        :param str cloud_name: Name of the cloud in which to create the
+            model, e.g. 'aws'.
+        :param str credential_name: Name of the credential to use when
+            creating the model.
+        :param str owner: Username that will own the model. Defaults to
+            the current user.
+        :param dict config: Model configuration.
+        :param str region: Region in which to create the model.
 
         """
+        # XXX: We can probably obviate the cloud_name param by getting it
+        # from the controller itself.
+
         model_facade = client.ModelManagerFacade()
         model_facade.connect(self.connection)
 
-        log.debug('Creating model %s', name)
+        owner = owner or self.connection.info['user-info']['identity']
+
+        log.debug('Creating model %s', model_name)
 
         model_info = await model_facade.CreateModel(
-            cloud,
+            tag.cloud(cloud_name),
             config,
-            credential,
-            name,
-            owner or self.connection.info['user-info']['identity'],
+            tag.credential(
+                cloud_name,
+                tag.untag('user-', owner),
+                credential_name
+            ),
+            model_name,
+            owner,
             region,
         )
 
@@ -90,31 +105,26 @@ class Controller(object):
 
         return model
 
-    async def destroy_models(self, *args):
+    async def destroy_models(self, *uuids):
+        """Destroy one or more models.
 
-        """Destroy a model to this controller.
-
-        :param str : <UUID> of the Model
-        param accepts string of <UUID> only OR `model-<UUID>`
-
+        :param str \*uuids: UUIDs of models to destroy
 
         """
         model_facade = client.ModelManagerFacade()
         model_facade.connect(self.connection)
 
-        # Generate list of args, pre-pend 'model-'
-        prependarg = list(args)
-        for index, item in enumerate(prependarg):
-            if not item.startswith('model-'):
-                prependarg[index] = "model-%s" % item
+        log.debug(
+            'Destroying model%s %s',
+            '' if len(uuids) == 1 else 's',
+            ', '.join(uuids)
+        )
 
-        # Create list of objects to pass to DestroyModels()
-        arglist = []
-        for arg in prependarg:
-            arglist.append(client.Entity(arg))
-            log.debug('Destroying Model %s', arg)
-
-        await model_facade.DestroyModels(arglist)
+        await model_facade.DestroyModels([
+            client.Entity(tag.model(uuid))
+            for uuid in uuids
+        ])
+    destroy_model = destroy_models
 
     def add_user(self, username, display_name=None, acl=None, models=None):
         """Add a user to this controller.

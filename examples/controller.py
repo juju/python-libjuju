@@ -4,30 +4,23 @@ This example:
 1. Connects to current controller.
 2. Creates a new model.
 3. Deploys an application on the new model.
-
-Note: 'cloudcred' format to add a model should be:
-cloudcred-<cloudname>_<user>_<credentialname>
+4. Disconnects from the model
+5. Destroys the model
 
 """
 import asyncio
 import logging
 
-from juju.model import Model, ModelObserver
 from juju.controller import Controller
-
-
-class MyModelObserver(ModelObserver):
-    async def on_change(self, delta, old, new, model):
-        pass
 
 
 async def run():
     controller = Controller()
     await controller.connect_current()
     model = await controller.add_model(
-        'libjuju-test',
-        'cloud-aws',
-        'cloudcred-aws_tvansteenburgh@external_aws-tim',
+        'my-test-model',
+        'aws',
+        'aws-tim',
     )
     await model.deploy(
         'ubuntu-0',
@@ -36,6 +29,7 @@ async def run():
         channel='stable',
     )
     await model.disconnect()
+    await controller.destroy_model(model.info.uuid)
     await controller.disconnect()
     model.loop.stop()
 
