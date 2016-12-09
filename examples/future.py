@@ -16,7 +16,7 @@ async def run():
     goal_state = Model.from_yaml('bundle-like-thing')
     ubuntu_app = await model.deploy(
         'ubuntu-0',
-        service_name='ubuntu',
+        application_name='ubuntu',
         series='trusty',
         channel='stable',
     )
@@ -24,7 +24,7 @@ async def run():
 
     await model.deploy(
         'nrpe-11',
-        service_name='nrpe',
+        application_name='nrpe',
         series='trusty',
         channel='stable',
         num_units=0,

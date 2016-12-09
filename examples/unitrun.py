@@ -38,7 +38,7 @@ async def run():
 
     await model.deploy(
         'ubuntu-0',
-        service_name='ubuntu',
+        application_name='ubuntu',
         series='trusty',
         channel='stable',
     )

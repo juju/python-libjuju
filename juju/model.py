@@ -809,14 +809,14 @@ class Model(object):
         pass
 
     async def deploy(
-            self, entity_url, service_name=None, bind=None, budget=None,
+            self, entity_url, application_name=None, bind=None, budget=None,
             channel=None, config=None, constraints=None, force=False,
             num_units=1, plan=None, resources=None, series=None, storage=None,
             to=None):
         """Deploy a new service or bundle.
 
         :param str entity_url: Charm or bundle url
-        :param str service_name: Name to give the service
+        :param str application_name: Name to give the service
         :param dict bind: <charm endpoint>:<network space> pairs
         :param dict budget: <budget name>:<limit> pairs
         :param str channel: Charm store channel from which to retrieve
@@ -842,7 +842,7 @@ class Model(object):
 
         TODO::
 
-            - service_name is required; fill this in automatically if not
+            - application_name is required; fill this in automatically if not
               provided by caller
             - series is required; how do we pick a default?
 
@@ -896,7 +896,7 @@ class Model(object):
 
             await client_facade.AddCharm(channel, entity_id)
             app = client.ApplicationDeploy(
-                application=service_name,
+                application=application_name,
                 channel=channel,
                 charm_url=entity_id,
                 config=config,
@@ -910,7 +910,7 @@ class Model(object):
             )
 
             await app_facade.Deploy([app])
-            return await self._wait_for_new('application', service_name)
+            return await self._wait_for_new('application', application_name)
 
     def destroy(self):
         """Terminate all machines and resources for this model.

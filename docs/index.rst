@@ -70,7 +70,7 @@ and in the documentation.
       # stable channel of the Charm Store.
       ubuntu_app = await model.deploy(
           'ubuntu-0',
-          service_name='ubuntu',
+          application_name='ubuntu',
           series='xenial',
           channel='stable',
       )

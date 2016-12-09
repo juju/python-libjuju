@@ -48,7 +48,7 @@ async def run():
 
     ubuntu_app = await model.deploy(
         'ubuntu',
-        service_name='ubuntu',
+        application_name='ubuntu',
         series='trusty',
         channel='stable',
     )
@@ -75,7 +75,7 @@ async def run():
     ))
     await model.deploy(
         'nrpe',
-        service_name='nrpe',
+        application_name='nrpe',
         series='trusty',
         channel='stable',
         num_units=1,

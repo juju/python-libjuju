@@ -22,7 +22,7 @@ async def run():
 
     ubuntu_app = await model.deploy(
         'mysql',
-        service_name='mysql',
+        application_name='mysql',
         series='trusty',
         channel='stable',
         config={
