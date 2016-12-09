@@ -1,11 +1,11 @@
 def _prefix(prefix, s):
-    if not s.startswith(prefix):
+    if s and not s.startswith(prefix):
         return '{}{}'.format(prefix, s)
     return s
 
 
 def untag(prefix, s):
-    if s.startswith(prefix):
+    if s and s.startswith(prefix):
         return s[len(prefix):]
     return s
 

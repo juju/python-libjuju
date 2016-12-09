@@ -55,39 +55,46 @@ class Controller(object):
             self.connection = None
 
     async def add_model(
-            self, model_name, cloud_name, credential_name,
+            self, model_name, cloud_name=None, credential_name=None,
             owner=None, config=None, region=None):
         """Add a model to this controller.
 
         :param str model_name: Name to give the new model.
         :param str cloud_name: Name of the cloud in which to create the
-            model, e.g. 'aws'.
+            model, e.g. 'aws'. Defaults to same cloud as controller.
         :param str credential_name: Name of the credential to use when
-            creating the model.
+            creating the model. Defaults to current credential. If you
+            pass a credential_name, you must also pass a cloud_name,
+            even if it's the default cloud.
         :param str owner: Username that will own the model. Defaults to
             the current user.
         :param dict config: Model configuration.
         :param str region: Region in which to create the model.
 
         """
-        # XXX: We can probably obviate the cloud_name param by getting it
-        # from the controller itself.
-
         model_facade = client.ModelManagerFacade()
         model_facade.connect(self.connection)
 
         owner = owner or self.connection.info['user-info']['identity']
+
+        # XXX: We should be able to accept a credential_name without
+        # a cloud_name, and just get the cloud_name from the controller.
+        if credential_name and cloud_name:
+            credential = tag.credential(
+                cloud_name,
+                tag.untag('user-', owner),
+                credential_name
+            )
+        else:
+            credential = None
+
 
         log.debug('Creating model %s', model_name)
 
         model_info = await model_facade.CreateModel(
             tag.cloud(cloud_name),
             config,
-            tag.credential(
-                cloud_name,
-                tag.untag('user-', owner),
-                credential_name
-            ),
+            credential,
             model_name,
             owner,
             region,

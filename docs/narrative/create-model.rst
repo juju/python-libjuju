@@ -1,6 +1,8 @@
 Creating and Destroying a Model
 ===============================
-Example of creating a new model and then destroying it.
+Example of creating a new model and then destroying it. See
+:meth:`juju.controller.Controller.add_model` and
+:meth:`juju.controller.Controller.destroy_model` for more info.
 
 .. code:: python
 
@@ -12,8 +14,6 @@ Example of creating a new model and then destroying it.
   # Create our new model
   model = await controller.add_model(
       'mymodel',  # name of your new model
-      'aws',      # name of the cloud to use
-      'aws-tim',  # name of the credential to use
   )
 
   # Do stuff with our model...
