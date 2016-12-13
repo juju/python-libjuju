@@ -6,4 +6,6 @@ log = logging.getLogger(__name__)
 
 
 class Relation(model.ModelEntity):
-    pass
+    async def destroy(self):
+        pass
+        # TODO: destroy a relation

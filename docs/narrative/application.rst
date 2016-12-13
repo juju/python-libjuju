@@ -70,3 +70,46 @@ application. The `mysql_app` object is an instance of
   constraints = await mysql_app.get_constraints()
 
   assert(constraints['mem'] == 512 * MB)
+
+
+Adding and Removing Relations
+-----------------------------
+The :meth:`juju.application.Application.add_relation` method returns a
+:class:`juju.relation.Relation` instance.
+
+.. code:: python
+
+  from juju.model import Model
+
+  model = Model()
+  await model.connect_current()
+
+  # Deploy mysql-master application
+  mysql_master = await model.deploy(
+      'cs:mysql-55',
+      application_name='mysql-master',
+      series='trusty',
+      channel='stable',
+  )
+
+  # Deploy mysql-slave application
+  mysql_slave = await model.deploy(
+      'cs:mysql-55',
+      application_name='mysql-slave',
+      series='trusty',
+      channel='stable',
+  )
+
+  # Add the master-slave relation
+  relation = await mysql_master.add_relation(
+      # Name of the relation on the local (mysql-master) side
+      'master',
+      # Name of the app:relation on the remote side
+      'mysql-slave:slave',
+  )
+
+  # Remove the relation
+  await mysql_master.remove_relation(
+      'master',
+      'mysql-slave:slave',
+  )
