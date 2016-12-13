@@ -1,3 +1,4 @@
 # until https://github.com/juju/theblues/pull/46 and https://github.com/juju/theblues/pull/47
 # are merged, this depends on the following fork:
 git+https://github.com/johnsca/theblues@libjuju#egg=theblues
+python-dateutil==2.6.0
