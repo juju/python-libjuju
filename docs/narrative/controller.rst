@@ -1,16 +1,16 @@
-Connecting to a Controller
-==========================
+Controllers
+===========
 A Juju controller provides websocket endpoints for itself and each of its
 models. In order to do anything useful, the juju lib must connect to one of
 these endpoints.
 
 Connecting to the controller endpoint is useful if you want to programmatically
 create a new model. If the model you want to use already exists, you can
-connect directly to it (see :doc:`connect-model`).
+connect directly to it (see :doc:`model`).
 
 
-To the Current Controller
--------------------------
+Connecting to the Current Controller
+------------------------------------
 Connect to the currently active Juju controller (the one returned by
 `juju switch`). This only works if you have the Juju CLI client installed.
 
@@ -22,8 +22,8 @@ Connect to the currently active Juju controller (the one returned by
   await controller.connect_current()
 
 
-To a Named Controller
----------------------
+Connecting to a Named Controller
+--------------------------------
 Connect to a controller by name.
 
 .. code:: python
@@ -34,8 +34,8 @@ Connect to a controller by name.
   await controller.connect_controller('mycontroller')
 
 
-To an API Endpoint with Username/Password Authentication
---------------------------------------------------------
+Connecting with Username/Password Authentication
+------------------------------------------------
 The most flexible, but also most verbose, way to connect is using the API
 endpoint url and credentials directly. This method does NOT require the Juju
 CLI client to be installed.
@@ -63,8 +63,8 @@ CLI client to be installed.
   )
 
 
-To an API Endpoint with Macaroon Authentication
------------------------------------------------
+Connecting with Macaroon Authentication
+---------------------------------------
 To connect to a shared controller, you'll need
 to use macaroon authentication. The simplest example is shown below, and uses
 already-discharged macaroons from the local filesystem. This will work if you

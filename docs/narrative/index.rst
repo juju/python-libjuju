@@ -5,4 +5,6 @@ Narrative Docs
    :glob:
    :maxdepth: 2
 
-   *
+   controller
+   model
+   application

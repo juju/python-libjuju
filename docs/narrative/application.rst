@@ -1,0 +1,72 @@
+Applications
+============
+
+
+Deploying
+---------
+To deploy a new application, connect a model and then call its
+:meth:`~juju.model.Model.deploy` method. An
+:class:`~juju.application.Application` instance is returned.
+
+.. code:: python
+
+  from juju.model import Model
+
+  model = Model()
+  await model.connect_current()
+
+  mysql_app = await model.deploy(
+      # If a revision number is not included in the charm url,
+      # the latest revision from the Charm Store will be used.
+      'cs:mysql-55',
+      application_name='mysql',
+      series='trusty',
+      channel='stable',
+      config={
+          'tuning-level': 'safest',
+      },
+      constraints={
+          'mem': 256 * MB,
+      },
+  )
+
+
+Adding Units
+------------
+To add units to a deployed application, use the
+:meth:`juju.application.Application.add_units` method. A list of the newly
+added units (:class:`~juju.unit.Unit` objects) is returned.
+
+.. code:: python
+
+    ubuntu_app = await model.deploy(
+        'ubuntu',
+        application_name='ubuntu',
+        series='trusty',
+        channel='stable',
+    )
+
+    unit_a, unit_b = await ubuntu_app.add_units(count=2)
+
+
+Updating Config and Constraints
+-------------------------------
+Example showing how to update configuration and constraints on a deployed
+application. The `mysql_app` object is an instance of
+:class:`juju.application.Application`.
+
+.. code:: python
+
+  MB = 1024 * 1024
+
+  # Update and check app config
+  await mysql_app.set_config({'tuning-level': 'fast'})
+  config = await mysql_app.get_config()
+
+  assert(config['tuning-level']['value'] == 'fast')
+
+  # update and check app constraints
+  await mysql_app.set_constraints({'mem': 512 * MB})
+  constraints = await mysql_app.get_constraints()
+
+  assert(constraints['mem'] == 512 * MB)
