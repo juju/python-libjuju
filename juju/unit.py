@@ -1,5 +1,6 @@
 import logging
-from datetime import datetime
+
+from dateutil.parser import parser as parse_date
 
 from . import model
 from .client import client
@@ -20,10 +21,7 @@ class Unit(model.ModelEntity):
         """Get the time when the `agent_status` was last updated.
 
         """
-        since = self.data['agent-status']['since']
-        # Juju gives us nanoseconds, but Python only supports microseconds
-        since = since[:26]
-        return datetime.strptime(since, "%Y-%m-%dT%H:%M:%S.%f")
+        return parse_date(self.data['agent-status']['since'])
 
     @property
     def agent_status_message(self):
@@ -44,10 +42,7 @@ class Unit(model.ModelEntity):
         """Get the time when the `workload_status` was last updated.
 
         """
-        since = self.data['workload-status']['since']
-        # Juju gives us nanoseconds, but Python only supports microseconds
-        since = since[:26]
-        return datetime.strptime(since, "%Y-%m-%dT%H:%M:%S.%f")
+        return parse_date(self.data['workload-status']['since'])
 
     @property
     def workload_status_message(self):

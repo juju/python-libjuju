@@ -25,6 +25,7 @@ setup(
         'websockets',
         'pyyaml',
         'theblues',
+        'python-dateutil'
     ],
     include_package_data=True,
     maintainer='Juju Ecosystem Engineering',
