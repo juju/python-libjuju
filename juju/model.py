@@ -885,7 +885,7 @@ class Model(object):
                 # haven't made it yet we'll need to wait on them to be added
                 await asyncio.gather(*[
                     asyncio.ensure_future(
-                        self.model._wait_for_new('application', app_name))
+                        self._wait_for_new('application', app_name))
                     for app_name in pending_apps
                 ])
             return [app for name, app in self.applications.items()
