@@ -41,14 +41,14 @@ class Application(model.ModelEntity):
         """Get the application status, as set by the charm's leader.
 
         """
-        return self.data['status']['current']
+        return self.safe_data['status']['current']
 
     @property
     def status_message(self):
         """Get the application status message, as set by the charm's leader.
 
         """
-        return self.data['status']['message']
+        return self.safe_data['status']['message']
 
     @property
     def tag(self):

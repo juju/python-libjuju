@@ -14,42 +14,42 @@ class Unit(model.ModelEntity):
         """Returns the current agent status string.
 
         """
-        return self.data['agent-status']['current']
+        return self.safe_data['agent-status']['current']
 
     @property
     def agent_status_since(self):
         """Get the time when the `agent_status` was last updated.
 
         """
-        return parse_date(self.data['agent-status']['since'])
+        return parse_date(self.safe_data['agent-status']['since'])
 
     @property
     def agent_status_message(self):
         """Get the agent status message.
 
         """
-        return self.data['agent-status']['message']
+        return self.safe_data['agent-status']['message']
 
     @property
     def workload_status(self):
         """Returns the current workload status string.
 
         """
-        return self.data['workload-status']['current']
+        return self.safe_data['workload-status']['current']
 
     @property
     def workload_status_since(self):
         """Get the time when the `workload_status` was last updated.
 
         """
-        return parse_date(self.data['workload-status']['since'])
+        return parse_date(self.safe_data['workload-status']['since'])
 
     @property
     def workload_status_message(self):
         """Get the workload status message.
 
         """
-        return self.data['workload-status']['message']
+        return self.safe_data['workload-status']['message']
 
     @property
     def tag(self):
@@ -237,8 +237,8 @@ class Unit(model.ModelEntity):
         if not status.applications[app]['units'].get(self.name):
             return False
 
-        return status.applications[app]['units'][self.name].get('leader', False)
-
+        return status.applications[app]['units'][self.name].get('leader',
+                                                                False)
 
     async def get_metrics(self):
         metrics = await self.model.get_metrics(self.tag)
