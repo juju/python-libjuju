@@ -39,14 +39,14 @@ added units (:class:`~juju.unit.Unit` objects) is returned.
 
 .. code:: python
 
-    ubuntu_app = await model.deploy(
-        'ubuntu',
-        application_name='ubuntu',
-        series='trusty',
-        channel='stable',
-    )
+  ubuntu_app = await model.deploy(
+      'ubuntu',
+      application_name='ubuntu',
+      series='trusty',
+      channel='stable',
+  )
 
-    unit_a, unit_b = await ubuntu_app.add_units(count=2)
+  unit_a, unit_b = await ubuntu_app.add_units(count=2)
 
 
 Updating Config and Constraints

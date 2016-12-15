@@ -10,38 +10,34 @@ This example:
 import asyncio
 import logging
 
-from juju.model import Model, ModelObserver
+from juju.model import Model
 
-async def run_stuff_on_unit(unit):
-    print('Running command on unit', unit.name)
 
-    # unit.run() returns a client.ActionResults instance
+async def run_command(unit):
+    logging.debug('Running command on unit %s', unit.name)
+
+    # unit.run() returns a juju.action.Action instance
     action = await unit.run('unit-get public-address')
-
-    print("Action results: {}".format(action.results))
-
-    # Inform asyncio that we're done.
-    await unit.model.disconnect()
-    unit.model.loop.stop()
-
-
-class MyModelObserver(ModelObserver):
-    async def on_unit_add(self, delta, old, new, model):
-        loop.create_task(run_stuff_on_unit(new))
+    logging.debug("Action results: %s", action.results)
 
 
 async def run():
     model = Model()
     await model.connect_current()
     await model.reset(force=True)
-    model.add_observer(MyModelObserver())
 
-    await model.deploy(
+    app = await model.deploy(
         'ubuntu-0',
         application_name='ubuntu',
         series='trusty',
         channel='stable',
     )
+
+    for unit in app.units:
+        await run_command(unit)
+
+    await model.disconnect()
+    model.loop.stop()
 
 
 logging.basicConfig(level=logging.DEBUG)

@@ -106,6 +106,7 @@ class Unit(model.ModelEntity):
 
         :param str command: The command to run
         :param int timeout: Time to wait before command is considered failed
+        :returns: A :class:`juju.action.Action` instance.
 
         Returns a tuple containing the stdout, stderr, and return code
         from the command.
@@ -131,11 +132,12 @@ class Unit(model.ModelEntity):
 
         :param str action_name: Name of action to run
         :param \*\*params: Action parameters
-        :returns: An `juju.action.Action` instance.
+        :returns: A :class:`juju.action.Action` instance.
 
         Note that this only enqueues the action.  You will need to call
         ``action.wait()`` on the resulting `Action` instance if you wish
         to block until the action is complete.
+
         """
         action_facade = client.ActionFacade()
         action_facade.connect(self.connection)

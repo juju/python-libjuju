@@ -8,3 +8,4 @@ Narrative Docs
    controller
    model
    application
+   unit
