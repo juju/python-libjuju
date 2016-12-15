@@ -108,9 +108,6 @@ class Unit(model.ModelEntity):
         :param int timeout: Time to wait before command is considered failed
         :returns: A :class:`juju.action.Action` instance.
 
-        Returns a tuple containing the stdout, stderr, and return code
-        from the command.
-
         """
         action = client.ActionFacade()
         action.connect(self.connection)
