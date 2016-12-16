@@ -88,7 +88,7 @@ class Application(model.ModelEntity):
 
         result = await app_facade.AddUnits(
             application=self.name,
-            placement=[parse_placement(to)] if to else None,
+            placement=parse_placement(to) if to else None,
             num_units=count,
         )
 

@@ -28,6 +28,9 @@ FACTORS = {
     "P": 1024 * 1024 * 1024
 }
 
+SNAKE1 = re.compile(r'(.)([A-Z][a-z]+)')
+SNAKE2 = re.compile('([a-z0-9])([A-Z])')
+
 def parse(constraints):
     """
     Constraints must be expressed as a string containing only spaces
@@ -35,6 +38,9 @@ def parse(constraints):
 
     """
     if constraints is None:
+        return None
+
+    if constraints == "":
         return None
 
     if type(constraints) is dict:
@@ -52,6 +58,11 @@ def normalize_key(key):
     key = key.strip()
 
     key = key.replace("-", "_")  # Our _client lib wants "_" in place of "-"
+
+    # Convert camelCase to snake_case
+    key = SNAKE1.sub(r'\1_\2', key)
+    key = SNAKE2.sub(r'\1_\2', key).lower()
+
     return key
 
 
@@ -67,5 +78,8 @@ def normalize_value(value):
         values = value.split(",")
         values = [normalize_value(v) for v in values]
         return values
+
+    if value.isdigit():
+        return int(value)
 
     return value
