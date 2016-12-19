@@ -22,13 +22,15 @@ class TestConstraints(unittest.TestCase):
         self.assertEqual(_("test-key"), "test_key")
         self.assertEqual(_("test-key  "), "test_key")
         self.assertEqual(_("  test-key"), "test_key")
+        self.assertEqual(_("TestKey"), "test_key")
+        self.assertEqual(_("testKey"), "test_key")
 
     def test_normalize_val(self):
         _ = constraints.normalize_value
 
         self.assertEqual(_("10G"), 10 * 1024)
         self.assertEqual(_("10M"), 10)
-        self.assertEqual(_("10"), "10")
+        self.assertEqual(_("10"), 10)
         self.assertEqual(_("foo,bar"), ["foo", "bar"])
 
     def test_parse_constraints(self):

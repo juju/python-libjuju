@@ -14,7 +14,7 @@ from theblues import charmstore
 from .client import client
 from .client import watcher
 from .client import connection
-from .constraints import parse as parse_constraints
+from .constraints import parse as parse_constraints, normalize_key
 from .delta import get_entity_delta
 from .delta import get_entity_class
 from .exceptions import DeadEntityException
@@ -914,7 +914,7 @@ class Model(object):
                 channel=channel,
                 charm_url=entity_id,
                 config=config,
-                constraints=constraints,
+                constraints=parse_constraints(constraints),
                 endpoint_bindings=bind,
                 num_units=num_units,
                 placement=placement,
@@ -1364,7 +1364,7 @@ class BundleHandler(object):
                 expects.
 
             container_type: string holding the type of the container (for
-                instance ""lxc" or kvm"). It is not specified for top level
+                instance ""lxd" or kvm"). It is not specified for top level
                 machines.
 
             parent_id: string holding a placeholder pointing to another
@@ -1375,6 +1375,10 @@ class BundleHandler(object):
         """
         params = params or {}
 
+        # Normalize keys
+        params = {normalize_key(k): params[k] for k in params.keys()}
+
+        # Fix up values, as necessary.
         if 'parent_id' in params:
             params['parent_id'] = self.resolve(params['parent_id'])
 
@@ -1382,6 +1386,12 @@ class BundleHandler(object):
             params.get('constraints'))
         params['jobs'] = params.get('jobs', ['JobHostUnits'])
 
+        if params.get('container_type') == 'lxc':
+            log.warning('Juju 2.0 does not support lxc containers. '
+                        'Converting containers to lxd.')
+            params['container_type'] = 'lxd'
+
+        # Submit the request.
         params = client.AddMachineParams(**params)
         results = await self.client_facade.AddMachines([params])
         error = results.machines[0].error
@@ -1450,7 +1460,7 @@ class BundleHandler(object):
             series=series,
             application=application,
             config=options,
-            constraints=constraints,
+            constraints=parse_constraints(constraints),
             storage=storage,
             endpoint_bindings=endpoint_bindings,
             resources=resources,
