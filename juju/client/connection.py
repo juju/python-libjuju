@@ -161,11 +161,11 @@ class Connection:
             "Couldn't authenticate to %s", endpoint)
 
     @classmethod
-    async def connect_current(cls):
+    async def connect_current(cls, juju_bin_path=None):
         """Connect to the currently active model.
 
         """
-        jujudata = JujuData()
+        jujudata = JujuData(juju_bin_path=juju_bin_path)
         controller_name = jujudata.current_controller()
         models = jujudata.models()[controller_name]
         model_name = models['current-model']
@@ -266,12 +266,14 @@ class Connection:
 
 
 class JujuData:
-    def __init__(self):
+    def __init__(self, juju_bin_path=None):
         self.path = os.environ.get('JUJU_DATA') or '~/.local/share/juju'
         self.path = os.path.abspath(os.path.expanduser(self.path))
+        self.juju_bin_path = juju_bin_path or 'juju'
 
     def current_controller(self):
-        cmd = shlex.split('juju show-controller --format yaml')
+        cmd = shlex.split(
+            '{} show-controller --format yaml'.format(self.juju_bin_path))
         output = subprocess.check_output(cmd)
         output = yaml.safe_load(output)
         return list(output.keys())[0]
