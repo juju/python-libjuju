@@ -29,8 +29,9 @@ setup(
     ],
     include_package_data=True,
     maintainer='Juju Ecosystem Engineering',
-    maintainer_email='juju@lists.ubunut.com',
+    maintainer_email='juju@lists.ubuntu.com',
     description=('Python library for Juju'),
+    url='https://github.com/juju/python-libjuju',
     license='Apache 2',
     classifiers=[
         "Development Status :: 3 - Alpha",
