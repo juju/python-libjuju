@@ -12,9 +12,11 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 
-
+from pathlib import Path
 from setuptools import setup, find_packages
 
+here = Path(__file__).absolute().parent
+readme = here / 'docs' / 'readme.rst'
 
 setup(
     name='juju',
@@ -31,6 +33,7 @@ setup(
     maintainer='Juju Ecosystem Engineering',
     maintainer_email='juju@lists.ubuntu.com',
     description=('Python library for Juju'),
+    long_description=readme.read_text(),
     url='https://github.com/juju/python-libjuju',
     license='Apache 2',
     classifiers=[
