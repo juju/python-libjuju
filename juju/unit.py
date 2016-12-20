@@ -240,5 +240,10 @@ class Unit(model.ModelEntity):
                                                                 False)
 
     async def get_metrics(self):
+        """Get metrics for the unit.
+
+        :return: Dictionary of metrics for this unit.
+
+        """
         metrics = await self.model.get_metrics(self.tag)
         return metrics[self.name]

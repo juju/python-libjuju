@@ -1264,6 +1264,8 @@ class Model(object):
 
         :param str \*tags: Tags of entities from which to retrieve metrics.
             No tags retrieves the metrics of all units in the model.
+        :return: Dictionary of unit_name:metrics
+
         """
         log.debug("Retrieving metrics for %s",
                   ', '.join(tags) if tags else "all units")

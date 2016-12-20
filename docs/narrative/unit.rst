@@ -1,5 +1,7 @@
 Units
 =====
+For api docs, see :class:`juju.unit.Unit`.
+
 
 Running Commands
 ----------------

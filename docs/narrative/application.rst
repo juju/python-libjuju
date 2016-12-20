@@ -1,5 +1,6 @@
 Applications
 ============
+For api docs, see :class:`juju.application.Application`.
 
 
 Deploying

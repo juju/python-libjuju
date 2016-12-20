@@ -344,4 +344,9 @@ class Application(model.ModelEntity):
         pass
 
     async def get_metrics(self):
+        """Get metrics for this application's units.
+
+        :return: Dictionary of unit_name:metrics
+
+        """
         return await self.model.get_metrics(self.tag)

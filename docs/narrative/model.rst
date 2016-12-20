@@ -4,6 +4,8 @@ A Juju controller provides websocket endpoints for each of its
 models. In order to do anything useful with a model, the juju lib must
 connect to one of these endpoints. There are several ways to do this.
 
+For api docs, see :class:`juju.model.Model`.
+
 
 Connecting to the Current Model
 -------------------------------
