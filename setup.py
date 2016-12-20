@@ -17,10 +17,11 @@ from setuptools import setup, find_packages
 
 here = Path(__file__).absolute().parent
 readme = here / 'docs' / 'readme.rst'
+version = here / 'VERSION'
 
 setup(
     name='juju',
-    version="0.0.1",
+    version=version.read_text().strip(),
     packages=find_packages(
         exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
     install_requires=[

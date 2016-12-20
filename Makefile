@@ -22,4 +22,7 @@ docs: .tox
 	$(BIN)/sphinx-apidoc -o docs/api/ juju/
 	$(BIN)/sphinx-build -b html docs/  docs/_build/
 
-.PHONY: clean client test docs
+upload: docs
+	$(PY) setup.py sdist upload upload_docs --upload-dir=docs/_build
+
+.PHONY: clean client test docs upload
