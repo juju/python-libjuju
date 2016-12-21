@@ -74,6 +74,14 @@ class ModelObserver(object):
         await method(delta, old, new, model)
 
     async def on_change(self, delta, old, new, model):
+        """Generic model-change handler.
+
+        :param delta: :class:`juju.client.overrides.Delta`
+        :param old: :class:`juju.model.ModelEntity`
+        :param new: :class:`juju.model.ModelEntity`
+        :param model: :class:`juju.model.Model`
+
+        """
         pass
 
 

@@ -129,3 +129,98 @@ Example of creating a new model and then destroying it. See
   await model.disconnect()
   await controller.destroy_model(model.info.uuid)
   model = None
+
+
+Reacting to Changes in a Model
+------------------------------
+To watch for and respond to changes in a model, register an observer with the
+model. The easiest way to do this is by creating a
+:class:`juju.model.ModelObserver` subclass.
+
+.. code:: python
+
+  from juju.model import Model, ModelObserver
+
+  class MyModelObserver(ModelObserver):
+      async def on_change(self, delta, old, new, model):
+          # The raw change data (dict) from the websocket.
+          print(delta.data)
+
+          # The entity type (str) affected by this change.
+          # One of ('action', 'application', 'annotation', 'machine',
+          # 'unit', 'relation')
+          print(delta.entity)
+
+          # The type (str) of change.
+          # One of ('add', 'change', 'remove')
+          print(delta.type)
+
+          # The 'old' and 'new' parameters are juju.model.ModelEntity
+          # instances which represent an entity in the model both before
+          # this change was applied (old) and after (new).
+
+          # If an entity is being added to the model, the 'old' param
+          # will be None.
+          if delta.type == 'add':
+              assert(old is None)
+
+          # If an entity is being removed from the model, the 'new' param
+          # will be None.
+          if delta.type == 'remove':
+              assert(new is None)
+
+          # The 'old' and 'new' parameters, when not None, will be instances
+          # of a juju.model.ModelEntity subclass. The type of the subclass
+          # depends on the value of 'delta.entity', for example:
+          #
+          # delta.entity     type
+          # ------------     ----
+          # 'action'      -> juju.action.Action
+          # 'application' -> juju.application.Application
+          # 'annotation'  -> juju.annotation.Annotation
+          # 'machine'     -> juju.machine.Machine
+          # 'unit'        -> juju.unit.Unit
+          # 'relation'    -> juju.relation.Relation
+
+          # Finally, the 'model' parameter is a reference to the
+          # juju.model.Model instance to which this observer is attached.
+          print(id(model))
+
+
+  model = Model()
+  await model.connect_current()
+
+  model.add_observer(MyModelObserver())
+
+
+Every change in the model will result in a call to the `on_change()`
+method of your observer(s).
+
+To target your code more precisely, define method names that correspond
+to the entity and type of change that you wish to handle.
+
+.. code:: python
+
+  from juju.model import Model, ModelObserver
+
+  class MyModelObserver(ModelObserver):
+      async def on_application_change(self, delta, old, new, model):
+          # Both 'old' and 'new' params will be instances of
+          # juju.application.Application
+          pass
+
+      async def on_unit_remove(self, delta, old, new, model):
+          # Since a unit is being removed, the 'new' param will always
+          # be None in this handler. The 'old' param will be an instance
+          # of juju.unit.Unit - the state of the unit before it was removed.
+          pass
+
+      async def on_machine_add(self, delta, old, new, model):
+          # Since a machine is being added, the 'old' param will always be
+          # None in this handler. The 'new' param will be an instance of
+          # juju.machine.Machine.
+          pass
+
+      async def on_change(self, delta, old, new, model):
+          # The catch-all handler - will be called whenever a more
+          # specific handler method is not defined.
