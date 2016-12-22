@@ -1,0 +1,4 @@
+include *.py CONTRIBUTORS LICENSE README.rst VERSION
+recursive-include juju *.py
+recursive-include examples *.py
+exclude Makefile
