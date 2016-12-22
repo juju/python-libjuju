@@ -12,7 +12,7 @@ import websockets
 
 import yaml
 
-from juju.errors import JujuAPIError
+from juju.errors import JujuAPIError, JujuConnectionError
 
 log = logging.getLogger("websocket")
 
@@ -180,6 +180,8 @@ class Connection:
         """
         jujudata = JujuData()
         controller_name = jujudata.current_controller()
+        if not controller_name:
+            raise JujuConnectionError('No current controller')
 
         return await cls.connect_controller(controller_name)
 
@@ -271,10 +273,10 @@ class JujuData:
         self.path = os.path.abspath(os.path.expanduser(self.path))
 
     def current_controller(self):
-        cmd = shlex.split('juju show-controller --format yaml')
+        cmd = shlex.split('juju list-controllers --format yaml')
         output = subprocess.check_output(cmd)
         output = yaml.safe_load(output)
-        return list(output.keys())[0]
+        return output.get('current-controller', '')
 
     def controllers(self):
         return self._load_yaml('controllers.yaml', 'controllers')
