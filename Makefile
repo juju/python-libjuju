@@ -17,7 +17,7 @@ test:
 	tox
 
 docs: .tox
-	$(PIP) list | grep Sphinx || $(PIP) install -U sphinx
+	$(PIP) install -r docs/requirements.txt
 	rm -rf docs/api/* docs/_build/
 	$(BIN)/sphinx-apidoc -o docs/api/ juju/
 	$(BIN)/sphinx-build -b html docs/  docs/_build/

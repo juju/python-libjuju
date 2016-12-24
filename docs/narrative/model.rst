@@ -224,3 +224,26 @@ to the entity and type of change that you wish to handle.
       async def on_change(self, delta, old, new, model):
           # The catch-all handler - will be called whenever a more
           # specific handler method is not defined.
+
+
+Any :class:`juju.model.ModelEntity` object can be observed directly by
+registering callbacks on the object itself.
+
+.. code:: python
+
+  import logging
+
+  async def on_app_change(delta, old, new, model):
+      logging.debug('App changed: %r', new)
+
+  async def on_app_remove(delta, old, new, model):
+      logging.debug('App removed: %r', old)
+
+  ubuntu_app = await model.deploy(
+      'ubuntu',
+      application_name='ubuntu',
+      series='trusty',
+      channel='stable',
+  )
+  ubuntu_app.on_change(on_app_change)
+  ubuntu_app.on_remove(on_app_remove)
