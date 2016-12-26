@@ -18,6 +18,8 @@ Table of Contents
    API Docs <api/modules>
 
 
+.. include:: changelog.rst
+
 
 Indices and tables
 ==================

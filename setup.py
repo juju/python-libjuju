@@ -17,6 +17,11 @@ from setuptools import setup, find_packages
 
 here = Path(__file__).absolute().parent
 readme = here / 'docs' / 'readme.rst'
+changelog = here / 'docs' / 'changelog.rst'
+long_description = '{}\n\n{}'.format(
+    readme.read_text(),
+    changelog.read_text()
+)
 version = here / 'VERSION'
 
 setup(
@@ -34,7 +39,7 @@ setup(
     maintainer='Juju Ecosystem Engineering',
     maintainer_email='juju@lists.ubuntu.com',
     description=('Python library for Juju'),
-    long_description=readme.read_text(),
+    long_description=long_description,
     url='https://github.com/juju/python-libjuju',
     license='Apache 2',
     classifiers=[
