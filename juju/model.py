@@ -18,7 +18,7 @@ from .constraints import parse as parse_constraints, normalize_key
 from .delta import get_entity_delta
 from .delta import get_entity_class
 from .exceptions import DeadEntityException
-from .errors import JujuAPIError
+from .errors import JujuError, JujuAPIError
 
 log = logging.getLogger(__name__)
 
@@ -1331,6 +1331,9 @@ class BundleHandler(object):
                                                       read_file=True)
         self.bundle = yaml.safe_load(bundle_yaml)
         self.plan = await self.client_facade.GetBundleChanges(bundle_yaml)
+
+        if self.plan.errors:
+            raise JujuError('\n'.join(self.plan.errors))
 
     async def execute_plan(self):
         for step in self.plan.changes:
