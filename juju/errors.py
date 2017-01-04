@@ -1,5 +1,8 @@
+class JujuError(Exception):
+    pass
 
-class JujuAPIError(Exception):
+
+class JujuAPIError(JujuError):
     def __init__(self, result):
         self.message = result['error']
         self.response = result['response']
@@ -7,5 +10,5 @@ class JujuAPIError(Exception):
         super().__init__(self.message)
 
 
-class JujuConnectionError(ConnectionError):
+class JujuConnectionError(ConnectionError, JujuError):
     pass
