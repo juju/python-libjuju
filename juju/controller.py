@@ -76,10 +76,9 @@ class Controller(object):
         model_facade.connect(self.connection)
 
         owner = owner or self.connection.info['user-info']['identity']
+        cloud_name = cloud_name or await self.get_cloud()
 
-        # XXX: We should be able to accept a credential_name without
-        # a cloud_name, and just get the cloud_name from the controller.
-        if credential_name and cloud_name:
+        if credential_name:
             credential = tag.credential(
                 cloud_name,
                 tag.untag('user-', owner),
@@ -87,7 +86,6 @@ class Controller(object):
             )
         else:
             credential = None
-
 
         log.debug('Creating model %s', model_name)
 
@@ -182,6 +180,17 @@ class Controller(object):
 
         """
         pass
+
+    async def get_cloud(self):
+        """
+        Get the name of the cloud that this controller lives on.
+        """
+        cloud_facade = client.CloudFacade()
+        cloud_facade.connect(self.connection)
+
+        result = await cloud_facade.Clouds()
+        cloud = list(result.clouds.keys())[0]  # only lives on one cloud
+        return tag.untag('cloud-', cloud)
 
     def get_models(self, all_=False, username=None):
         """Return list of available models on this controller.
