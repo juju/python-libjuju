@@ -931,7 +931,10 @@ class Model(object):
                 storage=storage,
             )
 
-            await app_facade.Deploy([app])
+            result = await app_facade.Deploy([app])
+            errors = [r.error.message for r in result.results if r.error]
+            if errors:
+                raise JujuError('\n'.join(errors))
             return await self._wait_for_new('application', application_name)
 
     def destroy(self):
