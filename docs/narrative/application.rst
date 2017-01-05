@@ -32,6 +32,30 @@ To deploy a new application, connect a model and then call its
   )
 
 
+Deploying a Local Charm
+-----------------------
+To deploy a local charm, first upload it to the model, then
+deploy it using the returned charm url.
+
+.. code:: python
+
+  from juju.model import Model
+
+  model = Model()
+  await model.connect_current()
+
+  # Upload local charm to the model.
+  # The returned 'local:' url can be used to deploy the charm.
+  charm_url = await model.add_local_charm_dir(
+      '/home/tvansteenburgh/src/charms/ubuntu', 'trusty')
+
+  # Deploy the charm using the 'local:' charm.
+  await model.deploy(
+      charm_url,
+      application_name='ubuntu',
+  )
+
+
 Adding Units
 ------------
 To add units to a deployed application, use the
