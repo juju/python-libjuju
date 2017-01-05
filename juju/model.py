@@ -952,7 +952,7 @@ class Model(object):
             's' if len(unit_names) == 1 else '',
             ' '.join(unit_names))
 
-        return await app_facade.Destroy(self.name)
+        return await app_facade.DestroyUnits(list(unit_names))
     destroy_units = destroy_unit
 
     def get_backup(self, archive_id):
