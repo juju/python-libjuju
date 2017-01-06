@@ -977,6 +977,18 @@ class Model(object):
 
             if not is_local:
                 await client_facade.AddCharm(channel, entity_id)
+            elif not entity_id.startswith('local:'):
+                # We have a local charm dir that needs to be uploaded
+                charm_dir = os.path.abspath(
+                    os.path.expanduser(entity_id))
+                series = series or get_charm_series(charm_dir)
+                if not series:
+                    raise JujuError(
+                        "Couldn't determine series for charm at {}. "
+                        "Pass a 'series' kwarg to Model.deploy().".format(
+                            charm_dir))
+                entity_id = await self.add_local_charm_dir(charm_dir, series)
+
             app = client.ApplicationDeploy(
                 application=application_name,
                 channel=channel,
@@ -1438,7 +1450,7 @@ class BundleHandler(object):
             # If we have apps to update, spawn all the coroutines concurrently
             # and wait for them to finish.
             charm_urls = await asyncio.gather(*[
-                asyncio.ensure_future(self.model.add_local_charm_dir(*params))
+                self.model.add_local_charm_dir(*params)
                 for params in args
             ])
             # Update the 'charm:' entry for each app with the new 'local:' url.

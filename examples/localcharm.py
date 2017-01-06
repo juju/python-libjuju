@@ -16,15 +16,11 @@ async def run():
     model = Model()
     await model.connect_current()
 
-    # Upload local charm to the model.
-    # The returned 'local:' url can be used to deploy the charm.
-    charm_url = await model.add_local_charm_dir(
-        '/home/tvansteenburgh/src/charms/ubuntu', 'trusty')
-
-    # Deploy the charm using the 'local:' charm.
+    # Deploy a local charm using a path to the charm directory
     await model.deploy(
-        charm_url,
+        '/home/tvansteenburgh/src/charms/ubuntu',
         application_name='ubuntu',
+        series='trusty',
     )
 
     await model.disconnect()
