@@ -21,3 +21,7 @@ def credential(cloud, user, credential_name):
 
 def model(cloud_name):
     return _prefix('model-', cloud_name)
+
+
+def user(username):
+    return _prefix('user-', username)

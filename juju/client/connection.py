@@ -9,9 +9,11 @@ import ssl
 import string
 import subprocess
 import websockets
+from http.client import HTTPSConnection
 
 import yaml
 
+from juju import tag
 from juju.errors import JujuAPIError, JujuConnectionError
 
 log = logging.getLogger("websocket")
@@ -92,6 +94,52 @@ class Connection:
         if result and 'error' in result:
             raise JujuAPIError(result)
         return result
+
+    def http_headers(self):
+        """Return dictionary of http headers necessary for making an http
+        connection to the endpoint of this Connection.
+
+        :return: Dictionary of headers
+
+        """
+        if not self.username:
+            return {}
+
+        creds = u'{}:{}'.format(
+            tag.user(self.username),
+            self.password or ''
+        )
+        token = base64.b64encode(creds.encode())
+        return {
+            'Authorization': 'Basic {}'.format(token.decode())
+        }
+
+    def https_connection(self):
+        """Return an https connection to this Connection's endpoint.
+
+        Returns a 3-tuple containing::
+
+            1. The :class:`HTTPSConnection` instance
+            2. Dictionary of auth headers to be used with the connection
+            3. The root url path (str) to be used for requests.
+
+        """
+        endpoint = self.endpoint
+        host, remainder = endpoint.split(':', 1)
+        port = remainder
+        if '/' in remainder:
+            port, _ = remainder.split('/', 1)
+
+        conn = HTTPSConnection(
+            host, int(port),
+            context=self._get_ssl(self.cacert),
+        )
+
+        path = (
+            "/model/{}".format(self.uuid)
+            if self.uuid else ""
+        )
+        return conn, self.http_headers(), path
 
     async def clone(self):
         """Return a new Connection, connected to the same websocket endpoint
