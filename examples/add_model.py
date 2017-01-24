@@ -1,0 +1,56 @@
+"""
+This example:
+
+1. Creates a model on the current controller
+2. Deploys a charm to it.
+3. Attempts to ssh into the charm
+
+"""
+from juju import loop
+from juju import utils
+from juju.controller import Controller
+import asyncio
+from logging import getLogger
+
+LOG = getLogger(__name__)
+
+
+async def main():
+    controller = Controller()
+    print("Connecting to controller")
+    await controller.connect_current()
+
+    try:
+        model = await controller.add_model("quux")
+
+        print('Deploying ubuntu')
+        application = await model.deploy(
+            'ubuntu-10',
+            application_name='ubuntu',
+            series='trusty',
+            channel='stable',
+        )
+
+        print('Waiting for active')
+        await asyncio.sleep(10)
+        await model.block_until(
+            lambda: all(unit.workload_status == 'active'
+                        for unit in application.units))
+
+        print("Verifying that we can ssh into the created model")
+        ret = utils.execute_process('juju', 'ssh', 'ls /', log=LOG)
+        assert ret
+
+        print('Removing ubuntu')
+        await application.remove()
+
+        print("Destroying model")
+        await controller.destroy_model(model.info.uuid)
+
+    finally:
+        print('Disconnecting from controller')
+        await model.disconnect()
+        await controller.disconnect()
+
+
+loop.run(main())
