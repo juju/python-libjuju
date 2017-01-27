@@ -21,7 +21,8 @@ async def main():
     await controller.connect_current()
 
     try:
-        model = await controller.add_model("quux")
+        model_name = "quux"
+        model = await controller.add_model(model_name)
 
         print('Deploying ubuntu')
         application = await model.deploy(
@@ -38,7 +39,8 @@ async def main():
                         for unit in application.units))
 
         print("Verifying that we can ssh into the created model")
-        ret = utils.execute_process('juju', 'ssh', 'ls /', log=LOG)
+        ret = await utils.execute_process(
+            'juju', 'ssh', '-m', model_name, 'ubuntu/0', 'ls /', log=LOG)
         assert ret
 
         print('Removing ubuntu')
