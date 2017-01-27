@@ -11,6 +11,7 @@ from juju import utils
 from juju.controller import Controller
 import asyncio
 from logging import getLogger
+import uuid
 
 LOG = getLogger(__name__)
 
@@ -21,7 +22,8 @@ async def main():
     await controller.connect_current()
 
     try:
-        model_name = "quux"
+        model_name = "addmodeltest-{}".format(uuid.uuid4())
+        print("Adding model {}".format(model_name))
         model = await controller.add_model(model_name)
 
         print('Deploying ubuntu')
@@ -48,6 +50,10 @@ async def main():
 
         print("Destroying model")
         await controller.destroy_model(model.info.uuid)
+
+    except Exception as e:
+        LOG.exception(
+            "Test failed! Model {} may not be cleaned up".format(model_name))
 
     finally:
         print('Disconnecting from controller')
