@@ -1,5 +1,4 @@
 import asyncio
-import concurrent.futures
 import os
 from pathlib import Path
 
@@ -45,8 +44,4 @@ async def read_ssh_key(loop):
     can be passed on to a model.
 
     '''
-    ssh_key = await loop.run_in_executor(
-        concurrent.futures.ThreadPoolExecutor(),
-        _read_ssh_key
-    )
-    return ssh_key
+    return await loop.run_in_executor(None, _read_ssh_key)
