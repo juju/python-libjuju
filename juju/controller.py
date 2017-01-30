@@ -2,6 +2,7 @@ import asyncio
 import logging
 
 from . import tag
+from . import utils
 from .client import client
 from .client import connection
 from .client import watcher
@@ -97,6 +98,19 @@ class Controller(object):
             owner,
             region,
         )
+
+        # Add our ssh key to the model, to work around
+        # https://bugs.launchpad.net/juju/+bug/1643076
+        try:
+            ssh_key = await utils.read_ssh_key(loop=self.loop)
+            await utils.execute_process(
+                'juju', 'add-ssh-key', '-m', model_name, ssh_key, log=log)
+        except Exception as e:
+            log.exception(
+                "Could not add ssh key to model. You will not be able "
+                "to ssh into machines in this model. "
+                "Manually running `juju add-ssh-key <key>` in the cli "
+                "may fix this problem.")
 
         model = Model()
         await model.connect(
