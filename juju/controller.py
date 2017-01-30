@@ -1,5 +1,4 @@
 import asyncio
-import concurrent.futures
 import logging
 
 from . import tag
@@ -103,10 +102,7 @@ class Controller(object):
         # Add our ssh key to the model, to work around
         # https://bugs.launchpad.net/juju/+bug/1643076
         try:
-            ssh_key = await self.loop.run_in_executor(
-                concurrent.futures.ThreadPoolExecutor(),
-                utils.read_ssh_key
-            )
+            ssh_key = await utils.read_ssh_key(loop=self.loop)
             await utils.execute_process(
                 'juju', 'add-ssh-key', '-m', model_name, ssh_key, log=log)
         except Exception as e:

@@ -1,4 +1,5 @@
 import asyncio
+import concurrent.futures
 import os
 from pathlib import Path
 
@@ -24,10 +25,10 @@ async def execute_process(*cmd, log=None):
     return p.returncode == 0
 
 
-def read_ssh_key():
+def _read_ssh_key():
     '''
-    Attempt to read the local juju admin's public ssh key, so that it
-    can be passed on to a model.
+    Inner function for read_ssh_key, suitable for passing to our
+    Executor.
 
     '''
     default_data_dir = Path(Path.home(), ".local", "share", "juju")
@@ -37,3 +38,15 @@ def read_ssh_key():
         ssh_key = ssh_key_file.readlines()[0].strip()
     return ssh_key
 
+
+async def read_ssh_key(loop):
+    '''
+    Attempt to read the local juju admin's public ssh key, so that it
+    can be passed on to a model.
+
+    '''
+    ssh_key = await loop.run_in_executor(
+        concurrent.futures.ThreadPoolExecutor(),
+        _read_ssh_key
+    )
+    return ssh_key
