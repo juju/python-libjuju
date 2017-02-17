@@ -910,11 +910,14 @@ class Model(object):
         :param dict resources: <resource name>:<file path> pairs
         :param str series: Series on which to deploy
         :param dict storage: Storage constraints TODO how do these look?
-        :param str to: Placement directive, e.g.::
+        :param to: Placement directive. Use placement.parse to generate it.
+            For example:
 
-            '23' - machine 23
-            'lxc:7' - new lxc container on machine 7
-            '24/lxc/3' - lxc container 3 or machine 24
+            from juju import placement
+
+            placement.parse('23') - place on machine 23
+            placement.parse('lxc:7') - place in new lxc container on machine 7
+            placement.parse('24/lxc/3') - place in container 3 on machine 24
 
             If None, a new machine is provisioned.
 
