@@ -23,6 +23,7 @@ from .delta import get_entity_delta
 from .delta import get_entity_class
 from .exceptions import DeadEntityException
 from .errors import JujuError, JujuAPIError
+from .placement import parse as parse_placement
 
 log = logging.getLogger(__name__)
 
@@ -719,9 +720,8 @@ class Model(object):
 
         return await self._wait('action', action_id, 'change', predicate)
 
-    def add_machine(
-            self, spec=None, constraints=None, disks=None, series=None,
-            count=1):
+    async def add_machine(
+            self, spec=None, constraints=None, disks=None, series=None):
         """Start a new, empty machine and optionally a container, or add a
         container to a machine.
 
@@ -729,25 +729,64 @@ class Model(object):
             Examples::
 
                 (None) - starts a new machine
-                'lxc' - starts a new machine with on lxc container
-                'lxc:4' - starts a new lxc container on machine 4
+                'lxd' - starts a new machine with one lxd container
+                'lxd:4' - starts a new lxd container on machine 4
                 'ssh:user@10.10.0.3' - manually provisions a machine with ssh
                 'zone=us-east-1a' - starts a machine in zone us-east-1s on AWS
                 'maas2.name' - acquire machine maas2.name on MAAS
-        :param constraints: Machine constraints
-        :type constraints: :class:`juju.Constraints`
-        :param list disks: List of disk :class:`constraints <juju.Constraints>`
-        :param str series: Series
-        :param int count: Number of machines to deploy
 
-        Supported container types are: lxc, lxd, kvm
+        :param dict constraints: Machine constraints
+            Example::
+
+                constraints={
+                    'mem': 256 * MB,
+                }
+
+        :param list disks: List of disk constraint dictionaries
+            Example::
+
+                disks=[{
+                    'pool': 'rootfs',
+                    'size': 10 * GB,
+                    'count': 1,
+                }]
+
+        :param str series: Series, e.g. 'xenial'
+
+        Supported container types are: lxd, kvm
 
         When deploying a container to an existing machine, constraints cannot
         be used.
 
         """
-        pass
-    add_machines = add_machine
+        params = client.AddMachineParams()
+        params.jobs = ['JobHostUnits']
+
+        if spec:
+            placement = parse_placement(spec)
+            if placement:
+                params.placement = placement[0]
+
+        if constraints:
+            params.constraints = client.Value.from_json(constraints)
+
+        if disks:
+            params.disks = [
+                client.Constraints.from_json(o) for o in disks]
+
+        if series:
+            params.series = series
+
+        # Submit the request.
+        client_facade = client.ClientFacade()
+        client_facade.connect(self.connection)
+        results = await client_facade.AddMachines([params])
+        error = results.machines[0].error
+        if error:
+            raise ValueError("Error adding machine: %s", error.message)
+        machine_id = results.machines[0].machine
+        log.debug('Added new machine %s', machine_id)
+        return await self._wait_for_new('machine', machine_id)
 
     async def add_relation(self, relation1, relation2):
         """Add a relation between two applications.
@@ -910,14 +949,11 @@ class Model(object):
         :param dict resources: <resource name>:<file path> pairs
         :param str series: Series on which to deploy
         :param dict storage: Storage constraints TODO how do these look?
-        :param to: Placement directive. Use placement.parse to generate it.
-            For example:
+        :param to: Placement directive as a string. For example:
 
-            from juju import placement
-
-            placement.parse('23') - place on machine 23
-            placement.parse('lxc:7') - place in new lxc container on machine 7
-            placement.parse('24/lxc/3') - place in container 3 on machine 24
+            '23' - place on machine 23
+            'lxd:7' - place in new lxd container on machine 7
+            '24/lxd/3' - place in container 3 on machine 24
 
             If None, a new machine is provisioned.
 
@@ -930,9 +966,7 @@ class Model(object):
 
         """
         if to:
-            placement = [
-                client.Placement(**p) for p in to
-            ]
+            placement = parse_placement(to)
         else:
             placement = []
 
@@ -1000,11 +1034,11 @@ class Model(object):
                 constraints=parse_constraints(constraints),
                 endpoint_bindings=bind,
                 num_units=num_units,
-                placement=placement,
                 resources=resources,
                 series=series,
                 storage=storage,
             )
+            app.placement = placement
 
             result = await app_facade.Deploy([app])
             errors = [r.error.message for r in result.results if r.error]
