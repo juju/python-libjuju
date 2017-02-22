@@ -13,8 +13,8 @@ import logging
 from juju import loop
 from juju.model import Model
 
-MB = 1024 * 1024
-GB = MB * 1024
+MB = 1
+GB = 1024
 
 
 async def main():
