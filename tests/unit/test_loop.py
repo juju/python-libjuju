@@ -1,9 +1,20 @@
+import asyncio
 import unittest
 import juju.loop
 
 
 class TestLoop(unittest.TestCase):
+    def setUp(self):
+        # new event loop for each test
+        policy = asyncio.get_event_loop_policy()
+        self.loop = policy.new_event_loop()
+        policy.set_event_loop(self.loop)
+
+    def tearDown(self):
+        self.loop.close()
+
     def test_run(self):
+        assert asyncio.get_event_loop() == self.loop
         async def _test():
             return 'success'
         self.assertEqual(juju.loop.run(_test()), 'success')
