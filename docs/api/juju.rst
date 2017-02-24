@@ -91,6 +91,14 @@ juju.juju module
     :undoc-members:
     :show-inheritance:
 
+juju.loop module
+----------------
+
+.. automodule:: juju.loop
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 juju.machine module
 -------------------
 
@@ -135,6 +143,14 @@ juju.unit module
 ----------------
 
 .. automodule:: juju.unit
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+juju.utils module
+-----------------
+
+.. automodule:: juju.utils
     :members:
     :undoc-members:
     :show-inheritance:

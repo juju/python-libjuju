@@ -41,10 +41,10 @@ def parse(directive):
         return [client.Placement(scope=MACHINE_SCOPE, directive=directive)]
 
     if "/" in directive:
-        machine, container, container_num = directive.split("/")
+        # e.g. "0/lxd/0"
+        # https://github.com/juju/juju/blob/master/instance/placement_test.go#L29
         return [
-            client.Placement(scope=MACHINE_SCOPE, directive=machine),
-            client.Placement(scope=container, directive=container_num)
+            client.Placement(scope=MACHINE_SCOPE, directive=directive),
         ]
 
     # Planner has probably given us a container type. Leave it up to

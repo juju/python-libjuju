@@ -1,26 +1,22 @@
-import asyncio
-import unittest
+import pytest
 
-from juju.client.connection import Connection
 from juju.client import client
 
-from ..base import bootstrapped
+from .. import base
 
 
-@bootstrapped
-class UserManagerTest(unittest.TestCase):
-    def test_user_info(self):
-        loop = asyncio.get_event_loop()
-        conn = loop.run_until_complete(
-            Connection.connect_current())
-        conn = loop.run_until_complete(
-            conn.controller())
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_user_info(event_loop):
+    async with base.CleanModel() as model:
+        controller_conn = await model.connection.controller()
 
         um = client.UserManagerFacade()
-        um.connect(conn)
-        result = loop.run_until_complete(
-            um.UserInfo([client.Entity('user-admin')], True))
+        um.connect(controller_conn)
+        result = await um.UserInfo(
+            [client.Entity('user-admin')], True)
+        await controller_conn.close()
 
-        self.assertIsInstance(result, client.UserInfoResults)
+        assert isinstance(result, client.UserInfoResults)
         for r in result.results:
-            self.assertIsInstance(r, client.UserInfoResult)
+            assert isinstance(r, client.UserInfoResult)

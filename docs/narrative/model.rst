@@ -131,6 +131,50 @@ Example of creating a new model and then destroying it. See
   model = None
 
 
+Adding Machines and Containers
+------------------------------
+To add a machine or container, connect to a model and then call its
+:meth:`~juju.model.Model.add_machine` method. A
+:class:`~juju.machine.Machine` instance is returned. The machine id
+can be used to deploy a charm to a specific machine or container.
+
+.. code:: python
+
+  from juju.model import Model
+
+  model = Model()
+  await model.connect_current()
+
+  # add a new default machine
+  machine1 = await model.add_machine()
+
+  # add a machine with constraints, disks, and series specified
+  machine2 = await model.add_machine(
+      constraints={
+          'mem': 256 * MB,
+      },
+      disks=[{
+          'pool': 'rootfs',
+          'size': 10 * GB,
+          'count': 1,
+      }],
+      series='xenial',
+  )
+
+  # add a lxd container to machine2
+  machine3 = await model.add_machine(
+      'lxd:{}'.format(machine2.id))
+
+  # deploy charm to the lxd container
+  application = await model.deploy(
+      'ubuntu-10',
+      application_name='ubuntu',
+      series='xenial',
+      channel='stable',
+      to=machine3.id
+  )
+
+
 Reacting to Changes in a Model
 ------------------------------
 To watch for and respond to changes in a model, register an observer with the

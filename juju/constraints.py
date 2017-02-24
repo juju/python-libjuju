@@ -21,6 +21,7 @@ import re
 MEM = re.compile('^[1-9][0-9]*[MGTP]$')
 
 # Multiplication factors to get Megabytes
+# https://github.com/juju/juju/blob/master/constraints/constraints.go#L666
 FACTORS = {
     "M": 1,
     "G": 1024,
@@ -30,6 +31,7 @@ FACTORS = {
 
 SNAKE1 = re.compile(r'(.)([A-Z][a-z]+)')
 SNAKE2 = re.compile('([a-z0-9])([A-Z])')
+
 
 def parse(constraints):
     """
