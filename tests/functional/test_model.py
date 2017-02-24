@@ -1,41 +1,17 @@
-import uuid
-
 import pytest
 
-from juju.controller import Controller
-
-from ..base import bootstrapped
+from .. import base
 
 MB = 1
 GB = 1024
 
 
-class CleanModel():
-    def __init__(self):
-        self.controller = None
-        self.model = None
-
-    async def __aenter__(self):
-        self.controller = Controller()
-        await self.controller.connect_current()
-
-        model_name = 'model-{}'.format(uuid.uuid4())
-        self.model = await self.controller.add_model(model_name)
-
-        return self.model
-
-    async def __aexit__(self, exc_type, exc, tb):
-        await self.model.disconnect()
-        await self.controller.destroy_model(self.model.info.uuid)
-        await self.controller.disconnect()
-
-
-@bootstrapped
+@base.bootstrapped
 @pytest.mark.asyncio
 async def test_add_machine(event_loop):
     from juju.machine import Machine
 
-    async with CleanModel() as model:
+    async with base.CleanModel() as model:
         # add a new default machine
         machine1 = await model.add_machine()
 
@@ -60,3 +36,10 @@ async def test_add_machine(event_loop):
             assert isinstance(m, Machine)
 
         assert len(model.machines) == 3
+
+        await machine3.destroy(force=True)
+        await machine2.destroy(force=True)
+        res = await machine1.destroy(force=True)
+
+        assert res is None
+        assert len(model.machines) == 0

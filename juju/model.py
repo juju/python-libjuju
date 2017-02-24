@@ -671,7 +671,7 @@ class Model(object):
 
         :param entity_type: The entity's type.
         :param entity_id: The entity's id.
-        :param action: the type of action (e.g., 'add' or 'change')
+        :param action: the type of action (e.g., 'add', 'change', or 'remove')
         :param predicate: optional callable that must take as an
             argument a delta, and must return a boolean, indicating
             whether the delta contains the specific action we're looking
@@ -686,7 +686,9 @@ class Model(object):
 
         self.add_observer(callback, entity_type, action, entity_id, predicate)
         entity_id = await q.get()
-        return self.state._live_entity_map(entity_type)[entity_id]
+        # object might not be in the entity_map if we were waiting for a
+        # 'remove' action
+        return self.state._live_entity_map(entity_type).get(entity_id)
 
     async def _wait_for_new(self, entity_type, entity_id=None, predicate=None):
         """Wait for a new object to appear in the Model and return it.

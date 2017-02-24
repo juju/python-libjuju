@@ -10,6 +10,8 @@ class Machine(model.ModelEntity):
     async def destroy(self, force=False):
         """Remove this machine from the model.
 
+        Blocks until the machine is actually removed.
+
         """
         facade = client.ClientFacade()
         facade.connect(self.connection)
@@ -17,7 +19,9 @@ class Machine(model.ModelEntity):
         log.debug(
             'Destroying machine %s', self.id)
 
-        return await facade.DestroyMachines(force, [self.id])
+        await facade.DestroyMachines(force, [self.id])
+        return await self.model._wait(
+            'machine', self.id, 'remove')
     remove = destroy
 
     def run(self, command, timeout=None):

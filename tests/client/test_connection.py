@@ -1,13 +1,14 @@
 import pytest
 
 from juju.client.connection import Connection
-from ..base import bootstrapped
+from .. import base
 
 
-@bootstrapped
+@base.bootstrapped
 @pytest.mark.asyncio
 async def test_connect_current(event_loop):
-    conn = await Connection.connect_current()
+    async with base.CleanModel():
+        conn = await Connection.connect_current()
 
-    assert isinstance(conn, Connection)
-    await conn.close()
+        assert isinstance(conn, Connection)
+        await conn.close()

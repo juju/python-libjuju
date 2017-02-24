@@ -54,9 +54,10 @@ async def main():
                         for unit in application.units))
 
         await application.remove()
-        await machine3.destroy()
-        await machine2.destroy()
-        await machine1.destroy()
+
+        await machine3.destroy(force=True)
+        await machine2.destroy(force=True)
+        await machine1.destroy(force=True)
     finally:
         await model.disconnect()
 
