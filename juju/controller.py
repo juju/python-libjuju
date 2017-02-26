@@ -206,7 +206,7 @@ class Controller(object):
         cloud = list(result.clouds.keys())[0]  # only lives on one cloud
         return tag.untag('cloud-', cloud)
 
-    def get_models(self, all_=False, username=None):
+    async def list_models(self, all_=False, username=None):
         """Return list of available models on this controller.
 
         :param bool all_: List all models, regardless of user accessibilty
@@ -214,7 +214,13 @@ class Controller(object):
         :param str username: User for which to list models (admin use only)
 
         """
-        pass
+        model_facade = client.ModelManagerFacade()
+        model_facade.connect(self.connection)
+        username = username or self.connection.info['user-info']['identity']
+
+        results = await model_facade.ListModels(tag.user(username))
+        models = results.user_models
+        return [(m.model.name, m.model.uuid) for m in models]
 
     def get_payloads(self, *patterns):
         """Return list of known payloads.
@@ -257,13 +263,20 @@ class Controller(object):
         """
         pass
 
-    def get_model(self, name):
+    async def get_model(self, uuid):
         """Get a model by name.
 
         :param str name: Model name
 
         """
-        pass
+        model_facade = client.ModelManagerFacade()
+        model_facade.connect(self.connection)
+        results = await model_facade.ModelInfo([client.Entity(tag.model(uuid))])
+        if results and results.results and results.results[0].result:
+            return results.results[0].result
+        else:
+            log.debug('No result found for model: ', uuid)
+            return None
 
     def get_user(self, username):
         """Get a user by name.
