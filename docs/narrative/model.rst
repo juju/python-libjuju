@@ -142,6 +142,10 @@ can be used to deploy a charm to a specific machine or container.
 
   from juju.model import Model
 
+  MB = 1
+  GB = 1024
+
+
   model = Model()
   await model.connect_current()
 
@@ -173,6 +177,15 @@ can be used to deploy a charm to a specific machine or container.
       channel='stable',
       to=machine3.id
   )
+
+  # remove application
+  await application.remove()
+
+  # destroy machines - note that machine3 must be destroyed before machine2
+  # since it's a container on machine2
+  await machine3.destroy(force=True)
+  await machine2.destroy(force=True)
+  await machine1.destroy(force=True)
 
 
 Reacting to Changes in a Model
