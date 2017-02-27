@@ -5,7 +5,6 @@ from . import tag
 from . import utils
 from .client import client
 from .client import connection
-from .client import watcher
 from .model import Model
 
 log = logging.getLogger(__name__)
@@ -154,7 +153,7 @@ class Controller(object):
         :param list models: Models to which the user is granted access
 
         """
-        pass
+        raise NotImplementedError()
 
     def change_user_password(self, username, password):
         """Change the password for a user in this controller.
@@ -163,7 +162,7 @@ class Controller(object):
         :param str password: New password
 
         """
-        pass
+        raise NotImplementedError()
 
     def destroy(self, destroy_all_models=False):
         """Destroy this controller.
@@ -172,7 +171,7 @@ class Controller(object):
             controller.
 
         """
-        pass
+        raise NotImplementedError()
 
     def disable_user(self, username):
         """Disable a user.
@@ -180,20 +179,20 @@ class Controller(object):
         :param str username: Username
 
         """
-        pass
+        raise NotImplementedError()
 
     def enable_user(self):
         """Re-enable a previously disabled user.
 
         """
-        pass
+        raise NotImplementedError()
 
     def kill(self):
         """Forcibly terminate all machines and other associated resources for
         this controller.
 
         """
-        pass
+        raise NotImplementedError()
 
     async def get_cloud(self):
         """
@@ -214,7 +213,7 @@ class Controller(object):
         :param str username: User for which to list models (admin use only)
 
         """
-        pass
+        raise NotImplementedError()
 
     def get_payloads(self, *patterns):
         """Return list of known payloads.
@@ -232,7 +231,7 @@ class Controller(object):
             - payload status
 
         """
-        pass
+        raise NotImplementedError()
 
     def get_users(self, all_=False):
         """Return list of users that can connect to this controller.
@@ -240,13 +239,13 @@ class Controller(object):
         :param bool all_: Include disabled users
 
         """
-        pass
+        raise NotImplementedError()
 
     def login(self):
         """Log in to this controller.
 
         """
-        pass
+        raise NotImplementedError()
 
     def logout(self, force=False):
         """Log out of this controller.
@@ -255,7 +254,7 @@ class Controller(object):
             with a password
 
         """
-        pass
+        raise NotImplementedError()
 
     def get_model(self, name):
         """Get a model by name.
@@ -263,7 +262,7 @@ class Controller(object):
         :param str name: Model name
 
         """
-        pass
+        raise NotImplementedError()
 
     def get_user(self, username):
         """Get a user by name.
@@ -271,4 +270,4 @@ class Controller(object):
         :param str username: Username
 
         """
-        pass
+        raise NotImplementedError()

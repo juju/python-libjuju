@@ -832,7 +832,7 @@ class Model(object):
         :param \*cidrs: Optional list of existing subnet CIDRs
 
         """
-        pass
+        raise NotImplementedError()
 
     def add_ssh_key(self, key):
         """Add a public SSH key to this model.
@@ -840,7 +840,7 @@ class Model(object):
         :param str key: The public ssh key
 
         """
-        pass
+        raise NotImplementedError()
     add_ssh_keys = add_ssh_key
 
     def add_subnet(self, cidr_or_id, space, *zones):
@@ -851,13 +851,13 @@ class Model(object):
         :param str \*zones: Zone(s) in which the subnet resides
 
         """
-        pass
+        raise NotImplementedError()
 
     def get_backups(self):
         """Retrieve metadata for backups in this model.
 
         """
-        pass
+        raise NotImplementedError()
 
     def block(self, *commands):
         """Add a new block to this model.
@@ -866,13 +866,13 @@ class Model(object):
             'all-changes', 'destroy-model', 'remove-object'
 
         """
-        pass
+        raise NotImplementedError()
 
     def get_blocks(self):
         """List blocks for this model.
 
         """
-        pass
+        raise NotImplementedError()
 
     def get_cached_images(self, arch=None, kind=None, series=None):
         """Return a list of cached OS images.
@@ -882,7 +882,7 @@ class Model(object):
         :param str series: Filter by image series, e.g. 'xenial'
 
         """
-        pass
+        raise NotImplementedError()
 
     def create_backup(self, note=None, no_download=False):
         """Create a backup of this model.
@@ -892,7 +892,7 @@ class Model(object):
         :return str: Path to downloaded archive
 
         """
-        pass
+        raise NotImplementedError()
 
     def create_storage_pool(self, name, provider_type, **pool_config):
         """Create or define a storage pool.
@@ -902,7 +902,7 @@ class Model(object):
         :param \*\*pool_config: key/value pool configuration pairs
 
         """
-        pass
+        raise NotImplementedError()
 
     def debug_log(
             self, no_tail=False, exclude_module=None, include_module=None,
@@ -926,7 +926,7 @@ class Model(object):
         :param list exclude: Do not show log messages for these entities
 
         """
-        pass
+        raise NotImplementedError()
 
     async def deploy(
             self, entity_url, application_name=None, bind=None, budget=None,
@@ -1052,7 +1052,7 @@ class Model(object):
         """Terminate all machines and resources for this model.
 
         """
-        pass
+        raise NotImplementedError()
 
     async def destroy_unit(self, *unit_names):
         """Destroy units by name.
@@ -1076,7 +1076,7 @@ class Model(object):
         :return str: Path to the archive file
 
         """
-        pass
+        raise NotImplementedError()
 
     def enable_ha(
             self, num_controllers=0, constraints=None, series=None, to=None):
@@ -1095,19 +1095,19 @@ class Model(object):
             If None, a new machine is provisioned.
 
         """
-        pass
+        raise NotImplementedError()
 
     def get_config(self):
         """Return the configuration settings for this model.
 
         """
-        pass
+        raise NotImplementedError()
 
     def get_constraints(self):
         """Return the machine constraints for this model.
 
         """
-        pass
+        raise NotImplementedError()
 
     def grant(self, username, acl='read'):
         """Grant a user access to this model.
@@ -1116,7 +1116,7 @@ class Model(object):
         :param str acl: Access control ('read' or 'write')
 
         """
-        pass
+        raise NotImplementedError()
 
     def import_ssh_key(self, identity):
         """Add a public SSH key from a trusted indentity source to this model.
@@ -1124,7 +1124,7 @@ class Model(object):
         :param str identity: User identity in the form <lp|gh>:<username>
 
         """
-        pass
+        raise NotImplementedError()
     import_ssh_keys = import_ssh_key
 
     def get_machines(self, machine, utc=False):
@@ -1134,25 +1134,25 @@ class Model(object):
         :param bool utc: Display time as UTC in RFC3339 format
 
         """
-        pass
+        raise NotImplementedError()
 
     def get_shares(self):
         """Return list of all users with access to this model.
 
         """
-        pass
+        raise NotImplementedError()
 
     def get_spaces(self):
         """Return list of all known spaces, including associated subnets.
 
         """
-        pass
+        raise NotImplementedError()
 
     def get_ssh_key(self):
         """Return known SSH keys for this model.
 
         """
-        pass
+        raise NotImplementedError()
     get_ssh_keys = get_ssh_key
 
     def get_storage(self, filesystem=False, volume=False):
@@ -1162,7 +1162,7 @@ class Model(object):
         :param bool volume: Include volume storage
 
         """
-        pass
+        raise NotImplementedError()
 
     def get_storage_pools(self, names=None, providers=None):
         """Return list of storage pools.
@@ -1171,7 +1171,7 @@ class Model(object):
         :param list providers: Only include pools for these providers
 
         """
-        pass
+        raise NotImplementedError()
 
     def get_subnets(self, space=None, zone=None):
         """Return list of known subnets.
@@ -1180,13 +1180,13 @@ class Model(object):
         :param str zone: Only include subnets in this zone
 
         """
-        pass
+        raise NotImplementedError()
 
     def remove_blocks(self):
         """Remove all blocks from this model.
 
         """
-        pass
+        raise NotImplementedError()
 
     def remove_backup(self, backup_id):
         """Delete a backup.
@@ -1194,7 +1194,7 @@ class Model(object):
         :param str backup_id: The id of the backup to remove
 
         """
-        pass
+        raise NotImplementedError()
 
     def remove_cached_images(self, arch=None, kind=None, series=None):
         """Remove cached OS images.
@@ -1204,7 +1204,7 @@ class Model(object):
         :param str series: Image series to remove, e.g. 'xenial'
 
         """
-        pass
+        raise NotImplementedError()
 
     def remove_machine(self, *machine_ids):
         """Remove a machine from this model.
@@ -1212,7 +1212,7 @@ class Model(object):
         :param str \*machine_ids: Ids of the machines to remove
 
         """
-        pass
+        raise NotImplementedError()
     remove_machines = remove_machine
 
     def remove_ssh_key(self, *keys):
@@ -1221,7 +1221,7 @@ class Model(object):
         :param str \*keys: Keys to remove
 
         """
-        pass
+        raise NotImplementedError()
     remove_ssh_keys = remove_ssh_key
 
     def restore_backup(
@@ -1237,13 +1237,13 @@ class Model(object):
         :param bool upload_tools: Upload tools if bootstrapping a new machine
 
         """
-        pass
+        raise NotImplementedError()
 
     def retry_provisioning(self):
         """Retry provisioning for failed machines.
 
         """
-        pass
+        raise NotImplementedError()
 
     def revoke(self, username, acl='read'):
         """Revoke a user's access to this model.
@@ -1252,7 +1252,7 @@ class Model(object):
         :param str acl: Access control ('read' or 'write')
 
         """
-        pass
+        raise NotImplementedError()
 
     def run(self, command, timeout=None):
         """Run command on all machines in this model.
@@ -1261,7 +1261,7 @@ class Model(object):
         :param int timeout: Time to wait before command is considered failed
 
         """
-        pass
+        raise NotImplementedError()
 
     def set_config(self, **config):
         """Set configuration keys on this model.
@@ -1269,7 +1269,7 @@ class Model(object):
         :param \*\*config: Config key/values
 
         """
-        pass
+        raise NotImplementedError()
 
     def set_constraints(self, constraints):
         """Set machine constraints on this model.
@@ -1277,7 +1277,7 @@ class Model(object):
         :param :class:`juju.Constraints` constraints: Machine constraints
 
         """
-        pass
+        raise NotImplementedError()
 
     def get_action_output(self, action_uuid, wait=-1):
         """Get the results of an action by ID.
@@ -1286,7 +1286,7 @@ class Model(object):
         :param int wait: Time in seconds to wait for action to complete
 
         """
-        pass
+        raise NotImplementedError()
 
     def get_action_status(self, uuid_or_prefix=None, name=None):
         """Get the status of all actions, filtered by ID, ID prefix, or action name.
@@ -1295,7 +1295,7 @@ class Model(object):
         :param str name: Filter by action name
 
         """
-        pass
+        raise NotImplementedError()
 
     def get_budget(self, budget_name):
         """Get budget usage info.
@@ -1303,7 +1303,7 @@ class Model(object):
         :param str budget_name: Name of budget
 
         """
-        pass
+        raise NotImplementedError()
 
     def get_status(self, filter_=None, utc=False):
         """Return the status of the model.
@@ -1312,7 +1312,7 @@ class Model(object):
         :param bool utc: Display time as UTC in RFC3339 format
 
         """
-        pass
+        raise NotImplementedError()
     status = get_status
 
     def sync_tools(
@@ -1330,7 +1330,7 @@ class Model(object):
         :param str version: Copy a specific major.minor version
 
         """
-        pass
+        raise NotImplementedError()
 
     def unblock(self, *commands):
         """Unblock an operation that would alter this model.
@@ -1339,7 +1339,7 @@ class Model(object):
             'all-changes', 'destroy-model', 'remove-object'
 
         """
-        pass
+        raise NotImplementedError()
 
     def unset_config(self, *keys):
         """Unset configuration on this model.
@@ -1347,13 +1347,13 @@ class Model(object):
         :param str \*keys: The keys to unset
 
         """
-        pass
+        raise NotImplementedError()
 
     def upgrade_gui(self):
         """Upgrade the Juju GUI for this model.
 
         """
-        pass
+        raise NotImplementedError()
 
     def upgrade_juju(
             self, dry_run=False, reset_previous_upgrade=False,
@@ -1367,7 +1367,7 @@ class Model(object):
         :param str version: Upgrade to a specific version
 
         """
-        pass
+        raise NotImplementedError()
 
     def upload_backup(self, archive_path):
         """Store a backup archive remotely in Juju.
@@ -1375,7 +1375,7 @@ class Model(object):
         :param str archive_path: Path to local archive
 
         """
-        pass
+        raise NotImplementedError()
 
     @property
     def charmstore(self):

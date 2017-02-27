@@ -7,5 +7,5 @@ log = logging.getLogger(__name__)
 
 class Relation(model.ModelEntity):
     async def destroy(self):
-        pass
+        raise NotImplementedError()
         # TODO: destroy a relation

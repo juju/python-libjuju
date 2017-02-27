@@ -63,13 +63,13 @@ class Unit(model.ModelEntity):
             form 'POOL,COUNT,SIZE'
 
         """
-        pass
+        raise NotImplementedError()
 
     def collect_metrics(self):
         """Collect metrics on this unit.
 
         """
-        pass
+        raise NotImplementedError()
 
     async def destroy(self):
         """Destroy this unit.
@@ -91,7 +91,7 @@ class Unit(model.ModelEntity):
             unit
 
         """
-        pass
+        raise NotImplementedError()
 
     def resolved(self, retry=False):
         """Mark unit errors resolved.
@@ -99,7 +99,7 @@ class Unit(model.ModelEntity):
         :param bool retry: Re-execute failed hooks
 
         """
-        pass
+        raise NotImplementedError()
 
     async def run(self, command, timeout=None):
         """Run command on this unit.
@@ -172,13 +172,13 @@ class Unit(model.ModelEntity):
         :param str scp_opts: Additional options to the `scp` command
 
         """
-        pass
+        raise NotImplementedError()
 
     def set_meter_status(self):
         """Set the meter status on this unit.
 
         """
-        pass
+        raise NotImplementedError()
 
     def ssh(
             self, command, user=None, proxy=False, ssh_opts=None):
@@ -190,7 +190,7 @@ class Unit(model.ModelEntity):
         :param str ssh_opts: Additional options to the `ssh` command
 
         """
-        pass
+        raise NotImplementedError()
 
     def status_history(self, num=20, utc=False):
         """Get status history for this unit.
@@ -199,7 +199,7 @@ class Unit(model.ModelEntity):
         :param bool utc: Display time as UTC in RFC3339 format
 
         """
-        pass
+        raise NotImplementedError()
 
     async def is_leader_from_status(self):
         """
