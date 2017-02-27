@@ -31,7 +31,7 @@ class Machine(model.ModelEntity):
         :param int timeout: Time to wait before command is considered failed
 
         """
-        pass
+        raise NotImplementedError()
 
     async def set_annotations(self, annotations):
         """Set annotations on this machine.
@@ -64,7 +64,7 @@ class Machine(model.ModelEntity):
         :param str scp_opts: Additional options to the `scp` command
 
         """
-        pass
+        raise NotImplementedError()
 
     def ssh(
             self, command, user=None, proxy=False, ssh_opts=None):
@@ -76,7 +76,7 @@ class Machine(model.ModelEntity):
         :param str ssh_opts: Additional options to the `ssh` command
 
         """
-        pass
+        raise NotImplementedError()
 
     def status_history(self, num=20, utc=False):
         """Get status history for this machine.
@@ -85,4 +85,4 @@ class Machine(model.ModelEntity):
         :param bool utc: Display time as UTC in RFC3339 format
 
         """
-        pass
+        raise NotImplementedError()

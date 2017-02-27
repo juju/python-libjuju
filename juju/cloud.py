@@ -10,13 +10,13 @@ class Cloud(object):
         :param `juju.Credential` credential: The Credential to add
 
         """
-        pass
+        raise NotImplementedError()
 
     def get_credentials(self):
         """Return list of all credentials for this cloud.
 
         """
-        pass
+        raise NotImplementedError()
 
     def remove_credential(self, credential_name):
         """Remove a credential for this cloud.
@@ -24,7 +24,7 @@ class Cloud(object):
         :param str credential_name: Name of the credential to remove
 
         """
-        pass
+        raise NotImplementedError()
 
     def bootstrap(
             self, controller_name, region=None, agent_version=None,
@@ -62,7 +62,7 @@ class Cloud(object):
             bootstrapping
 
         """
-        pass
+        raise NotImplementedError()
 
     def set_default_credential(self, credential_name):
         """Set the default credentials for this cloud.
@@ -70,7 +70,7 @@ class Cloud(object):
         :param str credential_name: Credential to make default
 
         """
-        pass
+        raise NotImplementedError()
 
     def set_default_region(self, region):
         """Set the default region for this cloud.
@@ -78,4 +78,4 @@ class Cloud(object):
         :param str region: Name of region to make default
 
         """
-        pass
+        raise NotImplementedError()

@@ -106,7 +106,7 @@ class Application(model.ModelEntity):
         :param int value: Budget limit
 
         """
-        pass
+        raise NotImplementedError()
 
     def attach(self, resource_name, file_path):
         """Upload a file as a resource for this application.
@@ -115,13 +115,13 @@ class Application(model.ModelEntity):
         :param str file_path: Path to the file to upload
 
         """
-        pass
+        raise NotImplementedError()
 
     def collect_metrics(self):
         """Collect metrics on this application.
 
         """
-        pass
+        raise NotImplementedError()
 
     async def destroy_relation(self, local_relation, remote_relation):
         """Remove a relation to another application.
@@ -207,7 +207,7 @@ class Application(model.ModelEntity):
         :param bool schema: Return the full action schema
 
         """
-        pass
+        raise NotImplementedError()
 
     def get_resources(self, details=False):
         """Return resources for this application.
@@ -216,7 +216,7 @@ class Application(model.ModelEntity):
             unit
 
         """
-        pass
+        raise NotImplementedError()
 
     async def run(self, command, timeout=None):
         """Run command on all units for this application.
@@ -294,7 +294,7 @@ class Application(model.ModelEntity):
         :param str info: Extra info message
 
         """
-        pass
+        raise NotImplementedError()
 
     def set_plan(self, plan_name):
         """Set the plan for this application, effective immediately.
@@ -302,7 +302,7 @@ class Application(model.ModelEntity):
         :param str plan_name: Name of plan
 
         """
-        pass
+        raise NotImplementedError()
 
     async def unexpose(self):
         """Remove public availability over the network for this application.
@@ -322,7 +322,7 @@ class Application(model.ModelEntity):
         :param int allocation: The allocation to set
 
         """
-        pass
+        raise NotImplementedError()
 
     def upgrade_charm(
             self, channel=None, force_series=False, force_units=False,
@@ -341,7 +341,7 @@ class Application(model.ModelEntity):
         :param str switch: Crossgrade charm url
 
         """
-        pass
+        raise NotImplementedError()
 
     async def get_metrics(self):
         """Get metrics for this application's units.

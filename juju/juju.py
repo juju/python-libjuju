@@ -14,7 +14,7 @@ class Juju(object):
                 endpoint: https://london.mycloud.com:35574/v3.0/
 
         """
-        pass
+        raise NotImplementedError()
 
     def agree(self, *terms):
         """Agree to the terms of a charm.
@@ -22,45 +22,45 @@ class Juju(object):
         :param str \*terms: Terms to agree to
 
         """
-        pass
+        raise NotImplementedError()
 
     def autoload_credentials(self):
         """Finds cloud credentials and caches them for use by Juju when
         bootstrapping.
 
         """
-        pass
+        raise NotImplementedError()
 
     def create_budget(self):
         """Create a new budget.
 
         """
-        pass
+        raise NotImplementedError()
 
     def get_agreements(self):
         """Return list of terms to which the current user has agreed.
 
         """
-        pass
+        raise NotImplementedError()
 
     def get_budgets(self):
         """Return list of available budgets.
 
         """
-        pass
+        raise NotImplementedError()
 
     def get_clouds(self):
         """Return list of all available clouds.
 
         """
-        pass
+        raise NotImplementedError()
 
     def get_controllers(self):
         """Return list of all available controllers.
 
         (maybe move this to Cloud?)
         """
-        pass
+        raise NotImplementedError()
 
     def get_plans(self, charm_url):
         """Return list of plans available for the specified charm.
@@ -68,7 +68,7 @@ class Juju(object):
         :param str charm_url: Charm url
 
         """
-        pass
+        raise NotImplementedError()
 
     def register(self, registration_string):
         """Register a user to a controller.
@@ -76,7 +76,7 @@ class Juju(object):
         :param str registration_string: The registration string
 
         """
-        pass
+        raise NotImplementedError()
 
     def set_budget(self, name, limit):
         """Set a monthly budget limit.
@@ -85,7 +85,7 @@ class Juju(object):
         :param int limit: Monthly limit
 
         """
-        pass
+        raise NotImplementedError()
 
     def get_cloud(self, name):
         """Get a cloud by name.
@@ -93,7 +93,7 @@ class Juju(object):
         :param str name: Name of cloud
 
         """
-        pass
+        raise NotImplementedError()
 
     def get_controller(self, name, include_passwords=False):
         """Get a controller by name.
@@ -103,16 +103,16 @@ class Juju(object):
 
         (maybe move this to Cloud?)
         """
-        pass
+        raise NotImplementedError()
 
     def update_clouds(self):
         """Update public cloud info available to Juju.
 
         """
-        pass
+        raise NotImplementedError()
 
     def version(self):
         """Return the Juju version.
 
         """
-        pass
+        raise NotImplementedError()
