@@ -13,7 +13,8 @@ from juju.model import Model
 
 log = logging.getLogger(__name__)
 
-MB = 1024 * 1024
+MB = 1
+
 
 async def run():
     model = Model()

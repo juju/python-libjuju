@@ -13,6 +13,6 @@ before_install:
 install: pip install tox-travis
 before_script:
   - sudo -E sudo -u $USER -E bash -c "juju bootstrap localhost test"
-script: tox
+script: tox -e py35,integration
 after_script:
   - sudo -E sudo -u $USER -E bash -c "juju destroy-controller --destroy-all-models -y test"
