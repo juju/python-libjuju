@@ -267,6 +267,7 @@ class Connection:
         username = accounts['user']
         password = accounts.get('password')
         models = jujudata.models()[controller_name]
+        model_name = '{}/{}'.format(username, model_name)
         model_uuid = models['models'][model_name]['uuid']
         macaroons = get_macaroons() if not password else None
 
@@ -349,7 +350,7 @@ def get_macaroons():
         cookie_file = os.path.expanduser('~/.go-cookies')
         with open(cookie_file, 'r') as f:
             cookies = json.load(f)
-    except (OSError, ValueError) as e:
+    except (OSError, ValueError):
         log.warn("Couldn't load macaroons from %s", cookie_file)
         return []
 
