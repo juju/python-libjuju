@@ -1022,6 +1022,18 @@ class Model(object):
                 'Deploying %s', entity_id)
 
             if not is_local:
+                parts = entity_id[3:].split('/')
+                if parts[0].startswith('~'):
+                    parts.pop(0)
+                if not application_name:
+                    application_name = parts[-1].split('-')[0]
+                if not series:
+                    if len(parts) > 1:
+                        series = parts[0]
+                    else:
+                        entity = await self.charmstore.entity(entity_id)
+                        ss = entity['Meta']['supported-series']
+                        series = ss['SupportedSeries'][0]
                 await client_facade.AddCharm(channel, entity_id)
             elif not entity_id.startswith('local:'):
                 # We have a local charm dir that needs to be uploaded
