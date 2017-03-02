@@ -78,7 +78,8 @@ async def run():
         application_name='nrpe',
         series='trusty',
         channel='stable',
-        num_units=1,
+        # subordinates must be deployed without units
+        num_units=0,
     )
     my_relation = await model.add_relation(
         'ubuntu',

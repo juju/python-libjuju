@@ -1,0 +1,28 @@
+series: xenial
+services:
+  wordpress:
+    charm: "cs:trusty/wordpress-2"
+    num_units: 1
+    annotations:
+      "gui-x": "339.5"
+      "gui-y": "-171"
+    to:
+      - "0"
+  mysql:
+    charm: "cs:trusty/mysql-26"
+    num_units: 1
+    annotations:
+      "gui-x": "79.5"
+      "gui-y": "-142"
+    to:
+      - "1"
+relations:
+  - - "wordpress:db"
+    - "mysql:db"
+machines:
+  "0":
+    series: trusty
+    constraints: "arch=amd64 cores=1 cpu-power=100 mem=1740 root-disk=8192"
+  "1":
+    series: trusty
+    constraints: "arch=amd64 cores=1 cpu-power=100 mem=1740 root-disk=8192"
