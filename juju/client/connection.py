@@ -273,7 +273,8 @@ class Connection:
         username = accounts['user']
         password = accounts.get('password')
         models = jujudata.models()[controller_name]
-        model_name = '{}/{}'.format(username, model_name)
+        if '/' not in model_name:
+            model_name = '{}/{}'.format(username, model_name)
         model_uuid = models['models'][model_name]['uuid']
         macaroons = get_macaroons() if not password else None
 
