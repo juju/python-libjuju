@@ -1650,14 +1650,18 @@ class BundleHandler(object):
         """
         # resolve indirect references
         charm = self.resolve(charm)
-        # stringify all config values for API
+        # stringify all config values for API, and convert to YAML
         options = {k: str(v) for k, v in options.items()}
+        options = yaml.dump({application: options}, default_flow_style=False)
         # build param object
         app = client.ApplicationDeploy(
             charm_url=charm,
             series=series,
             application=application,
-            config=options,
+            # Pass options to config-yaml rather than config, as
+            # config-yaml invokes a newer codepath that better handles
+            # empty strings in the options values.
+            config_yaml=options,
             constraints=parse_constraints(constraints),
             storage=storage,
             endpoint_bindings=endpoint_bindings,
