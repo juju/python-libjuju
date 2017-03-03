@@ -974,11 +974,6 @@ class Model(object):
             - series is required; how do we pick a default?
 
         """
-        if to:
-            placement = parse_placement(to)
-        else:
-            placement = []
-
         if storage:
             storage = {
                 k: client.Constraints(**v)
@@ -992,9 +987,7 @@ class Model(object):
         entity_id = await self.charmstore.entityId(entity_url) \
             if not is_local else entity_url
 
-        app_facade = client.ApplicationFacade()
         client_facade = client.ClientFacade()
-        app_facade.connect(self.connection)
         client_facade.connect(self.connection)
 
         is_bundle = ((is_local and
@@ -1019,9 +1012,6 @@ class Model(object):
             return [app for name, app in self.applications.items()
                     if name in handler.applications]
         else:
-            log.debug(
-                'Deploying %s', entity_id)
-
             if not is_local:
                 parts = entity_id[3:].split('/')
                 if parts[0].startswith('~'):
@@ -1047,26 +1037,52 @@ class Model(object):
                         "Pass a 'series' kwarg to Model.deploy().".format(
                             charm_dir))
                 entity_id = await self.add_local_charm_dir(charm_dir, series)
+            return await self._deploy(
+                charm_url=entity_id,
+                application=application_name,
+                series=series,
+                config=config or {},
+                constraints=constraints,
+                endpoint_bindings=bind,
+                resources=resources,
+                storage=storage,
+                channel=channel,
+                num_units=num_units,
+                placement=parse_placement(to),
+            )
+
+    async def _deploy(self, charm_url, application, series, config,
+                      constraints, endpoint_bindings, resources, storage,
+                      channel=None, num_units=None, placement=None):
+            log.info('Deploying %s', charm_url)
+
+            # stringify all config values for API, and convert to YAML
+            config = {k: str(v) for k, v in config.items()}
+            config = yaml.dump({application: config},
+                               default_flow_style=False)
+
+            app_facade = client.ApplicationFacade()
+            app_facade.connect(self.connection)
 
             app = client.ApplicationDeploy(
-                application=application_name,
+                charm_url=charm_url,
+                application=application,
+                series=series,
                 channel=channel,
-                charm_url=entity_id,
-                config=config,
+                config_yaml=config,
                 constraints=parse_constraints(constraints),
-                endpoint_bindings=bind,
+                endpoint_bindings=endpoint_bindings,
                 num_units=num_units,
                 resources=resources,
-                series=series,
                 storage=storage,
+                placement=placement,
             )
-            app.placement = placement
 
             result = await app_facade.Deploy([app])
             errors = [r.error.message for r in result.results if r.error]
             if errors:
                 raise JujuError('\n'.join(errors))
-            return await self._wait_for_new('application', application_name)
+            return await self._wait_for_new('application', application)
 
     def destroy(self):
         """Terminate all machines and resources for this model.
@@ -1672,28 +1688,16 @@ class BundleHandler(object):
         """
         # resolve indirect references
         charm = self.resolve(charm)
-        # stringify all config values for API, and convert to YAML
-        options = {k: str(v) for k, v in options.items()}
-        options = yaml.dump({application: options}, default_flow_style=False)
-        # build param object
-        app = client.ApplicationDeploy(
+        await self.model._deploy(
             charm_url=charm,
-            series=series,
             application=application,
-            # Pass options to config-yaml rather than config, as
-            # config-yaml invokes a newer codepath that better handles
-            # empty strings in the options values.
-            config_yaml=options,
-            constraints=parse_constraints(constraints),
-            storage=storage,
+            series=series,
+            config=options,
+            constraints=constraints,
             endpoint_bindings=endpoint_bindings,
             resources=resources,
+            storage=storage,
         )
-        # do the do
-        log.info('Deploying %s', charm)
-        await self.app_facade.Deploy([app])
-        # ensure the app is in the model for future operations
-        await self.model._wait_for_new('application', application)
         return application
 
     async def addUnit(self, application, to):

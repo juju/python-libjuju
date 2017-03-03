@@ -15,7 +15,7 @@ import asyncio
 import yaml
 
 from juju import tag
-from juju.errors import JujuAPIError, JujuConnectionError
+from juju.errors import JujuError, JujuAPIError, JujuConnectionError
 
 log = logging.getLogger("websocket")
 
@@ -221,8 +221,7 @@ class Connection:
         """
         jujudata = JujuData()
         controller_name = jujudata.current_controller()
-        models = jujudata.models()[controller_name]
-        model_name = models['current-model']
+        model_name = jujudata.current_model()
 
         return await cls.connect_model(
             '{}:{}'.format(controller_name, model_name), loop)
@@ -338,6 +337,12 @@ class JujuData:
         output = subprocess.check_output(cmd)
         output = yaml.safe_load(output)
         return output.get('current-controller', '')
+
+    def current_model(self, controller_name=None):
+        models = self.models()[controller_name or self.current_controller()]
+        if 'current-model' not in models:
+            raise JujuError('No current model')
+        return models['current-model']
 
     def controllers(self):
         return self._load_yaml('controllers.yaml', 'controllers')
