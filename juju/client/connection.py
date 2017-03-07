@@ -84,14 +84,22 @@ class Connection:
         await self.ws.close()
 
     async def recv(self, request_id):
+        if not self.is_open:
+            raise websockets.exceptions.ConnectionClosed(0, 'websocket closed')
         return await self.messages.get(request_id)
 
     async def receiver(self):
         while self.is_open:
-            result = await self.ws.recv()
-            if result is not None:
-                result = json.loads(result)
-                await self.messages.put(result['request-id'], result)
+            try:
+                result = await self.ws.recv()
+                if result is not None:
+                    result = json.loads(result)
+                    await self.messages.put(result['request-id'], result)
+            except Exception as e:
+                await self.messages.put_all(e)
+                raise
+        await self.messages.put_all(websockets.exceptions.ConnectionClosed(
+            0, 'websocket closed'))
 
     async def rpc(self, msg, encoder=None):
         self.__request_id__ += 1
@@ -111,7 +119,7 @@ class Connection:
             # API Error Response
             raise JujuAPIError(result)
 
-        if not 'response' in result:
+        if 'response' not in result:
             # This may never happen
             return result
 

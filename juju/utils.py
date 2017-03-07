@@ -59,7 +59,13 @@ class IdQueue:
     async def get(self, id):
         value = await self._queues[id].get()
         del self._queues[id]
+        if isinstance(value, Exception):
+            raise value
         return value
 
     async def put(self, id, value):
         await self._queues[id].put(value)
+
+    async def put_all(self, value):
+        for queue in self._queues.values():
+            await queue.put(value)

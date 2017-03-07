@@ -3,6 +3,8 @@ import mock
 import pytest
 from collections import deque
 
+from websockets.exceptions import ConnectionClosed
+
 from .. import base
 from juju.client.connection import Connection
 
@@ -17,6 +19,8 @@ class WebsocketMock:
         pass
 
     async def recv(self):
+        if not self.responses:
+            raise ConnectionClosed(0, 'no reason')
         return json.dumps(self.responses.popleft())
 
     async def close(self):
