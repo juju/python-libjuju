@@ -40,7 +40,6 @@ async def test_juju_error_in_results_list(event_loop):
     from juju.client import client
 
     async with base.CleanModel() as model:
-        # Replicate
         ann_facade = client.AnnotationsFacade()
         ann_facade.connect(model.connection)
 
@@ -59,7 +58,13 @@ async def test_juju_error_in_result(event_loop):
     Verify that we raise a JujuError when appropraite when we are
     looking at a single result coming back.
 
-    # TODO: write this!
-
     '''
-    pass
+    from juju.errors import JujuError    
+    from juju.client import client
+
+    async with base.CleanModel() as model:
+        app_facade = client.ApplicationFacade()
+        app_facade.connect(model.connection)
+
+        with pytest.raises(JujuError):
+            return await app_facade.GetCharmURL('foo')
