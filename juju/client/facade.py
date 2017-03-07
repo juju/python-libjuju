@@ -438,6 +438,8 @@ class Type:
 
     @classmethod
     def from_json(cls, data):
+        if isinstance(data, cls):
+            return data
         if isinstance(data, str):
             data = json.loads(data)
         d = {}

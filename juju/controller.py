@@ -103,8 +103,9 @@ class Controller(object):
         try:
             ssh_key = await utils.read_ssh_key(loop=self.loop)
             await utils.execute_process(
-                'juju', 'add-ssh-key', '-m', model_name, ssh_key, log=log)
-        except Exception as e:
+                'juju', 'add-ssh-key', '-m', model_name, ssh_key, log=log,
+                loop=self.loop)
+        except Exception:
             log.exception(
                 "Could not add ssh key to model. You will not be able "
                 "to ssh into machines in this model. "
@@ -119,6 +120,7 @@ class Controller(object):
             self.connection.password,
             self.connection.cacert,
             self.connection.macaroons,
+            loop=self.loop,
         )
 
         return model
