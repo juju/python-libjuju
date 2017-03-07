@@ -253,7 +253,7 @@ class Application(model.ModelEntity):
         self.ann_facade.connect(self.connection)
 
         ann = client.EntityAnnotations(
-            entity=self.name,
+            entity=self.tag,
             annotations=annotations,
         )
         return await self.ann_facade.Set([ann])

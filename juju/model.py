@@ -1042,10 +1042,7 @@ class Model(object):
             )
             app.placement = placement
 
-            result = await app_facade.Deploy([app])
-            errors = [r.error.message for r in result.results if r.error]
-            if errors:
-                raise JujuError('\n'.join(errors))
+            await app_facade.Deploy([app])
             return await self._wait_for_new('application', application_name)
 
     def destroy(self):
@@ -1511,9 +1508,6 @@ class BundleHandler(object):
 
         self.plan = await self.client_facade.GetBundleChanges(
             yaml.dump(self.bundle))
-
-        if self.plan.errors:
-            raise JujuError('\n'.join(self.plan.errors))
 
     async def execute_plan(self):
         for step in self.plan.changes:
