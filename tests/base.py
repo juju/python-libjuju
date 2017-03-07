@@ -44,3 +44,8 @@ class CleanModel():
         await self.model.disconnect()
         await self.controller.destroy_model(self.model.info.uuid)
         await self.controller.disconnect()
+
+
+class AsyncMock(mock.MagicMock):
+    async def __call__(self, *args, **kwargs):
+        return super().__call__(*args, **kwargs)

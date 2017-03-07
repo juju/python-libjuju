@@ -76,6 +76,7 @@ class Connection:
         kw['loop'] = self.loop
         self.addr = url
         self.ws = await websockets.connect(url, **kw)
+        self.loop.create_task(self.receiver())
         log.info("Driver connected to juju %s", url)
         return self
 
@@ -216,7 +217,6 @@ class Connection:
         client = cls(endpoint, uuid, username, password, cacert, macaroons,
                      loop)
         await client.open()
-        client.loop.create_task(client.receiver)
 
         redirect_info = await client.redirect_info()
         if not redirect_info:
