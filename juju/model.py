@@ -1565,9 +1565,6 @@ class BundleHandler(object):
         self.plan = await self.client_facade.GetBundleChanges(
             yaml.dump(self.bundle))
 
-        if self.plan.errors:
-            raise JujuError('\n'.join(self.plan.errors))
-
     async def execute_plan(self):
         for step in self.plan.changes:
             method = getattr(self, step.method)

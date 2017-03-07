@@ -96,8 +96,30 @@ class Connection:
         outgoing = json.dumps(msg, indent=2, cls=encoder)
         await self.ws.send(outgoing)
         result = await self.recv()
-        if result and 'error' in result:
+
+        if not result:
+            return result
+
+        if 'error' in result:
+            # API Error Response
             raise JujuAPIError(result)
+
+        if not 'response' in result:
+            # This may never happen
+            return result
+
+        if 'results' in result['response']:
+            # Check for errors in a result list.
+            errors = []
+            for res in result['response']['results']:
+                if res.get('error', {}).get('message'):
+                    errors.append(res['error']['message'])
+            if errors:
+                raise JujuError(errors)
+
+        elif result['response'].get('error', {}).get('message'):
+            raise JujuError(result['response']['error']['message'])
+
         return result
 
     def http_headers(self):
