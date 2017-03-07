@@ -39,10 +39,7 @@ def parse(constraints):
     and key value pairs joined by an '='.
 
     """
-    if constraints is None:
-        return None
-
-    if constraints == "":
+    if not constraints:
         return None
 
     if type(constraints) is dict:
