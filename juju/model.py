@@ -935,6 +935,22 @@ class Model(object):
         """
         raise NotImplementedError()
 
+    def _get_series(self, entity_url, entity):
+        # try to get the series from the provided charm URL
+        if entity_url.startswith('cs:'):
+            parts = entity_url[3:].split('/')
+        else:
+            parts = entity_url.split('/')
+        if parts[0].startswith('~'):
+            parts.pop(0)
+        if len(parts) > 1:
+            # series was specified in the URL
+            return parts[0]
+        # series was not supplied at all, so use the newest
+        # supported series according to the charm store
+        ss = entity['Meta']['supported-series']
+        return ss['SupportedSeries'][0]
+
     async def deploy(
             self, entity_url, application_name=None, bind=None, budget=None,
             channel=None, config=None, constraints=None, force=False,
@@ -1018,22 +1034,8 @@ class Model(object):
             if not is_local:
                 if not application_name:
                     application_name = entity['Meta']['charm-metadata']['Name']
-                if not series and '/' in entity_url:
-                    # try to get the series from the provided charm URL
-                    if entity_url.startswith('cs:'):
-                        parts = entity_url[3:].split('/')
-                    else:
-                        parts = entity_url.split('/')
-                    if parts[0].startswith('~'):
-                        parts.pop(0)
-                    if len(parts) > 1:
-                        # series was specified in the URL
-                        series = parts[0]
                 if not series:
-                    # series was not supplied at all, so use the newest
-                    # supported series according to the charm store
-                    ss = entity['Meta']['supported-series']
-                    series = ss['SupportedSeries'][0]
+                    series = self._get_series(entity_url, entity)
                 if not channel:
                     channel = 'stable'
                 await client_facade.AddCharm(channel, entity_id)
