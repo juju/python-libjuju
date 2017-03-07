@@ -984,8 +984,11 @@ class Model(object):
             entity_url.startswith('local:') or
             os.path.isdir(entity_url)
         )
-        entity_id = await self.charmstore.entityId(entity_url) \
-            if not is_local else entity_url
+        if is_local:
+            entity_id = entity_url
+        else:
+            entity = await self.charmstore.entity(entity_url)
+            entity_id = entity['Id']
 
         client_facade = client.ClientFacade()
         client_facade.connect(self.connection)
@@ -1013,20 +1016,28 @@ class Model(object):
                     if name in handler.applications]
         else:
             if not is_local:
-                parts = entity_id[3:].split('/')
-                if parts[0].startswith('~'):
-                    parts.pop(0)
                 if not application_name:
-                    application_name = parts[-1].split('-')[0]
-                if not series:
-                    if len(parts) > 1:
-                        series = parts[0]
+                    application_name = entity['Meta']['charm-metadata']['Name']
+                if not series and '/' in entity_url:
+                    # try to get the series from the provided charm URL
+                    if entity_url.startswith('cs:'):
+                        parts = entity_url[3:].split('/')
                     else:
-                        entity = await self.charmstore.entity(entity_id)
-                        ss = entity['Meta']['supported-series']
-                        series = ss['SupportedSeries'][0]
+                        parts = entity_url.split('/')
+                    if parts[0].startswith('~'):
+                        parts.pop(0)
+                    if len(parts) > 1:
+                        # series was specified in the URL
+                        series = parts[0]
+                if not series:
+                    # series was not supplied at all, so use the newest
+                    # supported series according to the charm store
+                    ss = entity['Meta']['supported-series']
+                    series = ss['SupportedSeries'][0]
+                if not channel:
+                    channel = 'stable'
                 await client_facade.AddCharm(channel, entity_id)
-            elif not entity_id.startswith('local:'):
+            else:
                 # We have a local charm dir that needs to be uploaded
                 charm_dir = os.path.abspath(
                     os.path.expanduser(entity_id))
@@ -1054,35 +1065,37 @@ class Model(object):
     async def _deploy(self, charm_url, application, series, config,
                       constraints, endpoint_bindings, resources, storage,
                       channel=None, num_units=None, placement=None):
-            log.info('Deploying %s', charm_url)
+        """Logic shared between `Model.deploy` and `BundleHandler.deploy`.
+        """
+        log.info('Deploying %s', charm_url)
 
-            # stringify all config values for API, and convert to YAML
-            config = {k: str(v) for k, v in config.items()}
-            config = yaml.dump({application: config},
-                               default_flow_style=False)
+        # stringify all config values for API, and convert to YAML
+        config = {k: str(v) for k, v in config.items()}
+        config = yaml.dump({application: config},
+                           default_flow_style=False)
 
-            app_facade = client.ApplicationFacade()
-            app_facade.connect(self.connection)
+        app_facade = client.ApplicationFacade()
+        app_facade.connect(self.connection)
 
-            app = client.ApplicationDeploy(
-                charm_url=charm_url,
-                application=application,
-                series=series,
-                channel=channel,
-                config_yaml=config,
-                constraints=parse_constraints(constraints),
-                endpoint_bindings=endpoint_bindings,
-                num_units=num_units,
-                resources=resources,
-                storage=storage,
-                placement=placement,
-            )
+        app = client.ApplicationDeploy(
+            charm_url=charm_url,
+            application=application,
+            series=series,
+            channel=channel,
+            config_yaml=config,
+            constraints=parse_constraints(constraints),
+            endpoint_bindings=endpoint_bindings,
+            num_units=num_units,
+            resources=resources,
+            storage=storage,
+            placement=placement,
+        )
 
-            result = await app_facade.Deploy([app])
-            errors = [r.error.message for r in result.results if r.error]
-            if errors:
-                raise JujuError('\n'.join(errors))
-            return await self._wait_for_new('application', application)
+        result = await app_facade.Deploy([app])
+        errors = [r.error.message for r in result.results if r.error]
+        if errors:
+            raise JujuError('\n'.join(errors))
+        return await self._wait_for_new('application', application)
 
     def destroy(self):
         """Terminate all machines and resources for this model.

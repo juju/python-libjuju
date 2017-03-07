@@ -34,6 +34,8 @@ class Connection:
         # Connect to the currently active model
         client = await Connection.connect_current()
 
+    Note: Any connection method or constructor can accept an optional `loop`
+    argument to override the default event loop from `asyncio.get_event_loop`.
     """
     def __init__(
             self, endpoint, uuid, username, password, cacert=None,
@@ -265,20 +267,24 @@ class Connection:
         jujudata = JujuData()
 
         if ':' in model:
+            # explicit controller given
             controller_name, model_name = model.split(':')
         else:
+            # use the current controller if one isn't explicitly given
             controller_name = jujudata.current_controller()
             model_name = model
+
+        accounts = jujudata.accounts()[controller_name]
+        username = accounts['user']
+        # model name must include a user prefix, so add it if it doesn't
+        if '/' not in model_name:
+            model_name = '{}/{}'.format(username, model_name)
 
         controller = jujudata.controllers()[controller_name]
         endpoint = controller['api-endpoints'][0]
         cacert = controller.get('ca-cert')
-        accounts = jujudata.accounts()[controller_name]
-        username = accounts['user']
         password = accounts.get('password')
         models = jujudata.models()[controller_name]
-        if '/' not in model_name:
-            model_name = '{}/{}'.format(username, model_name)
         model_uuid = models['models'][model_name]['uuid']
         macaroons = get_macaroons() if not password else None
 
@@ -339,7 +345,9 @@ class JujuData:
         return output.get('current-controller', '')
 
     def current_model(self, controller_name=None):
-        models = self.models()[controller_name or self.current_controller()]
+        if not controller_name:
+            controller_name = self.current_controller()
+        models = self.models()[controller_name]
         if 'current-model' not in models:
             raise JujuError('No current model')
         return models['current-model']
