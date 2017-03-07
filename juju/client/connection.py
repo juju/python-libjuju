@@ -16,6 +16,7 @@ import yaml
 
 from juju import tag
 from juju.errors import JujuError, JujuAPIError, JujuConnectionError
+from juju.utils import IdQueue
 
 log = logging.getLogger("websocket")
 
@@ -52,7 +53,7 @@ class Connection:
         self.addr = None
         self.ws = None
         self.facades = {}
-        self.messages = {}
+        self.messages = IdQueue(loop=self.loop)
 
     @property
     def is_open(self):
@@ -82,20 +83,14 @@ class Connection:
         await self.ws.close()
 
     async def recv(self, request_id):
-        while not self.messages.get(request_id):
-            await asyncio.sleep(0)
-
-        result = self.messages[request_id]
-
-        del self.messages[request_id]
-        return result
+        return await self.messages.get(request_id)
 
     async def receiver(self):
         while self.is_open:
             result = await self.ws.recv()
             if result is not None:
                 result = json.loads(result)
-                self.messages[result['request-id']] = result
+                await self.messages.put(result['request-id'], result)
 
     async def rpc(self, msg, encoder=None):
         self.__request_id__ += 1
@@ -221,7 +216,7 @@ class Connection:
         client = cls(endpoint, uuid, username, password, cacert, macaroons,
                      loop)
         await client.open()
-        self.loop.create_task(self.receiver)
+        client.loop.create_task(client.receiver)
 
         redirect_info = await client.redirect_info()
         if not redirect_info:
