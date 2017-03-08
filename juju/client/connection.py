@@ -97,9 +97,11 @@ class Connection:
                     await self.messages.put(result['request-id'], result)
             except Exception as e:
                 await self.messages.put_all(e)
+                if isinstance(e, websockets.ConnectionClosed):
+                    # ConnectionClosed is not really exceptional for us,
+                    # but it may be for any pending message listeners
+                    return
                 raise
-        await self.messages.put_all(websockets.exceptions.ConnectionClosed(
-            0, 'websocket closed'))
 
     async def rpc(self, msg, encoder=None):
         self.__request_id__ += 1
