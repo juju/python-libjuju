@@ -9,6 +9,7 @@ This example:
 import asyncio
 
 from juju.model import Model
+from juju import loop
 
 async def report_leadership():
     model = Model()
@@ -22,5 +23,6 @@ async def report_leadership():
 
     await model.disconnect()
 
-loop = asyncio.get_event_loop()
-loop.run_until_complete(report_leadership())
+
+if __name__ == '__main__':
+    loop.run(report_leadership())

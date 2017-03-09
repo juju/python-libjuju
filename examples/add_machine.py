@@ -62,8 +62,9 @@ async def main():
         await model.disconnect()
 
 
-logging.basicConfig(level=logging.DEBUG)
-ws_logger = logging.getLogger('websockets.protocol')
-ws_logger.setLevel(logging.INFO)
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.DEBUG)
+    ws_logger = logging.getLogger('websockets.protocol')
+    ws_logger.setLevel(logging.INFO)
 
-loop.run(main())
+    loop.run(main())

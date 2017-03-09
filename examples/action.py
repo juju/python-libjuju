@@ -10,6 +10,7 @@ This example:
 import asyncio
 import logging
 
+from juju import loop
 from juju.model import Model
 
 
@@ -24,7 +25,7 @@ async def run_action(unit):
     logging.debug("Action results: %s", action.results)
 
 
-async def run():
+async def main():
     model = Model()
     await model.connect_current()
     await model.reset(force=True)
@@ -40,13 +41,10 @@ async def run():
         await run_action(unit)
 
     await model.disconnect()
-    model.loop.stop()
 
 
-logging.basicConfig(level=logging.DEBUG)
-ws_logger = logging.getLogger('websockets.protocol')
-ws_logger.setLevel(logging.INFO)
-loop = asyncio.get_event_loop()
-loop.set_debug(False)
-loop.create_task(run())
-loop.run_forever()
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.DEBUG)
+    ws_logger = logging.getLogger('websockets.protocol')
+    ws_logger.setLevel(logging.INFO)
+    loop.run(main())

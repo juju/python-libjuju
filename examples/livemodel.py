@@ -9,6 +9,7 @@ This example:
 import asyncio
 
 from juju.model import Model
+from juju import loop
 
 
 async def on_model_change(delta, old, new, model):
@@ -25,6 +26,7 @@ async def watch_model():
     model.add_observer(on_model_change)
 
 
-loop = asyncio.get_event_loop()
-loop.create_task(watch_model())
-loop.run_forever()
+if __name__ == '__main__':
+    # Run loop until the process is manually stopped (watch_model will loop
+    # forever).
+    loop.run(watch_model())
