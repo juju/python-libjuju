@@ -264,6 +264,8 @@ def retspec(defs):
     # Error or the expected Type
     if not defs:
         return None
+    if defs in basic_types:
+        return strcast(defs, False)
     rtypes = _registry.getObj(_types[defs])
     if not rtypes:
         return None
@@ -402,7 +404,10 @@ def _buildMethod(cls, name):
             params = _types.get(spec['$ref'])
         spec = prop.get('Result')
         if spec:
-            result = _types.get(spec['$ref'])
+            if '$ref' in spec:
+                result = _types.get(spec['$ref'])
+            else:
+                result = SCHEMA_TO_PYTHON[spec['type']]
     return makeFunc(cls, name, params, result)
 
 
@@ -618,7 +623,6 @@ def main():
     capture = generate_facacdes(options)
     with open(options.output, "w") as fp:
         print(capture, file=fp)
-
 
 
 if __name__ == '__main__':
