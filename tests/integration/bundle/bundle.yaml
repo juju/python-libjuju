@@ -1,0 +1,12 @@
+series: xenial
+services:
+  ghost:
+    charm: "cs:ghost-18"
+    num_units: 1
+  mysql:
+    charm: "cs:trusty/mysql-57"
+    num_units: 1
+  test:
+    charm: "./tests/integration/charm"
+relations:
+  - ["ghost", "mysql"]
