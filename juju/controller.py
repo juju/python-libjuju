@@ -146,7 +146,7 @@ class Controller(object):
         ])
     destroy_model = destroy_models
 
-    def add_user(self, username, password=None, display_name=None):
+    async def add_user(self, username, password=None, display_name=None):
         """Add a user to this controller.
 
         :param str username: Username
@@ -162,9 +162,9 @@ class Controller(object):
         users = [{'display_name': display_name,
                   'password': password,
                   'username': username}]
-        return user_facade.AddUser(users)
+        return await user_facade.AddUser(users)
 
-    def change_user_password(self, username, password):
+    async def change_user_password(self, username, password):
         """Change the password for a user in this controller.
 
         :param str username: Username
@@ -174,9 +174,9 @@ class Controller(object):
         user_facade = client.UserManagerFacade()
         user_facade.connect(self.connection)
         entity = client.EntityPassword(password, tag.user(username))
-        return user_facade.SetPassword([entity])
+        return await user_facade.SetPassword([entity])
 
-    def destroy(self, destroy_all_models=False):
+    async def destroy(self, destroy_all_models=False):
         """Destroy this controller.
 
         :param bool destroy_all_models: Destroy all hosted models in the
@@ -185,9 +185,9 @@ class Controller(object):
         """
         controller_facade = client.ControllerFacade()
         controller_facade.connect(self.connection)
-        return controller_facade.DestroyController(destroy_all_models)
+        return await controller_facade.DestroyController(destroy_all_models)
 
-    def disable_user(self, username):
+    async def disable_user(self, username):
         """Disable a user.
 
         :param str username: Username
@@ -196,16 +196,16 @@ class Controller(object):
         user_facade = client.UserManagerFacade()
         user_facade.connect(self.connection)
         entity = client.Entity(tag.user(username))
-        return user_facade.DisableUser([entity])
+        return await user_facade.DisableUser([entity])
 
-    def enable_user(self, username):
+    async def enable_user(self, username):
         """Re-enable a previously disabled user.
 
         """
         user_facade = client.UserManagerFacade()
         user_facade.connect(self.connection)
         entity = client.Entity(tag.user(username))
-        return user_facade.EnableUser([entity])
+        return await user_facade.EnableUser([entity])
 
     def kill(self):
         """Forcibly terminate all machines and other associated resources for
@@ -225,7 +225,7 @@ class Controller(object):
         cloud = list(result.clouds.keys())[0]  # only lives on one cloud
         return tag.untag('cloud-', cloud)
 
-    def get_models(self, all_=False, username=None):
+    async def get_models(self, all_=False, username=None):
         """Return list of available models on this controller.
 
         :param bool all_: List all models, regardless of user accessibilty
@@ -235,7 +235,7 @@ class Controller(object):
         """
         controller_facade = client.ControllerFacade()
         controller_facade.connect(self.connection)
-        return controller_facade.AllModels()
+        return await controller_facade.AllModels()
 
 
     def get_payloads(self, *patterns):
@@ -287,7 +287,7 @@ class Controller(object):
         """
         raise NotImplementedError()
 
-    def get_user(self, username, include_disabled=False):
+    async def get_user(self, username, include_disabled=False):
         """Get a user by name.
 
         :param str username: Username
@@ -296,4 +296,4 @@ class Controller(object):
         client_facade = client.UserManagerFacade()
         client_facade.connect(self.connection)
         user = tag.user(username)
-        return client_facade.UserInfo([client.Entity(user)], include_disabled)
+        return await client_facade.UserInfo([client.Entity(user)], include_disabled)
