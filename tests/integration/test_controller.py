@@ -16,6 +16,8 @@ async def test_add_user(event_loop):
         assert res_ser['result'] is not None
 
 
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_disable_enable_user(event_loop):
     async with base.CleanController() as controller:
         await controller.add_user('test-disable')
