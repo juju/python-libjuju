@@ -19,6 +19,19 @@ bootstrapped = pytest.mark.skipif(
     reason='bootstrapped Juju environment required')
 
 
+class CleanController():
+    def __init__(self):
+        self.controller = None
+
+    async def __aenter__(self):
+        self.controller = Controller()
+        await self.controller.connect_current()
+        return self.controller
+
+    async def __aexit__(self, exc_type, exc, tb):
+        await self.controller.disconnect()
+
+
 class CleanModel():
     def __init__(self):
         self.controller = None
