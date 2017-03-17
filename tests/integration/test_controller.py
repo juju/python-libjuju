@@ -21,11 +21,11 @@ async def test_add_user(event_loop):
 async def test_disable_enable_user(event_loop):
     async with base.CleanController() as controller:
         await controller.add_user('test-disable')
-        await controller.disable_user('test2')
-        result = await controller.get_user('test2')
+        await controller.disable_user('test-disable')
+        result = await controller.get_user('test-disable')
         res_ser = result.serialize()['results'][0].serialize()
         assert res_ser['result'] is None
-        await controller.enable_user('test2')
-        result = await controller.get_user('test2')
+        await controller.enable_user('test-disable')
+        result = await controller.get_user('test-disable')
         res_ser = result.serialize()['results'][0].serialize()
         assert res_ser['result'] is not None
