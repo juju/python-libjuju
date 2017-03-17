@@ -24,8 +24,8 @@ async def test_disable_enable_user(event_loop):
         await controller.disable_user('test-disable')
         result = await controller.get_user('test-disable')
         res_ser = result.serialize()['results'][0].serialize()
-        assert res_ser['result'] is None
+        assert res_ser['result'].serialize()['disabled'] is True
         await controller.enable_user('test-disable')
         result = await controller.get_user('test-disable')
         res_ser = result.serialize()['results'][0].serialize()
-        assert res_ser['result'] is not None
+        assert res_ser['result'].serialize()['disabled'] is False
