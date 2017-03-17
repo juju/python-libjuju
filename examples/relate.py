@@ -11,6 +11,7 @@ import asyncio
 import logging
 
 from juju.model import Model, ModelObserver
+from juju import loop
 
 
 class MyRemoveObserver(ModelObserver):
@@ -35,10 +36,9 @@ class MyModelObserver(ModelObserver):
             logging.debug('All units idle, disconnecting')
             await model.reset(force=True)
             await model.disconnect()
-            model.loop.stop()
 
 
-async def run():
+async def main():
     model = Model()
     await model.connect_current()
 
@@ -90,10 +90,9 @@ async def run():
             print('Relation removed: {}'.format(old_rel.endpoints))
     ))
 
-logging.basicConfig(level=logging.DEBUG)
-ws_logger = logging.getLogger('websockets.protocol')
-ws_logger.setLevel(logging.INFO)
-loop = asyncio.get_event_loop()
-loop.set_debug(True)
-loop.create_task(run())
-loop.run_forever()
+
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.DEBUG)
+    ws_logger = logging.getLogger('websockets.protocol')
+    ws_logger.setLevel(logging.INFO)
+    loop.run(main())

@@ -12,9 +12,10 @@ import asyncio
 import logging
 
 from juju.controller import Controller
+from juju import loop
 
 
-async def run():
+async def main():
     controller = Controller()
     await controller.connect_current()
     model = await controller.add_model(
@@ -31,13 +32,10 @@ async def run():
     await model.disconnect()
     await controller.destroy_model(model.info.uuid)
     await controller.disconnect()
-    model.loop.stop()
 
 
-logging.basicConfig(level=logging.DEBUG)
-ws_logger = logging.getLogger('websockets.protocol')
-ws_logger.setLevel(logging.INFO)
-loop = asyncio.get_event_loop()
-loop.set_debug(False)
-loop.create_task(run())
-loop.run_forever()
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.DEBUG)
+    ws_logger = logging.getLogger('websockets.protocol')
+    ws_logger.setLevel(logging.INFO)
+    loop.run(main())

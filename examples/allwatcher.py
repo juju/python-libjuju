@@ -12,10 +12,12 @@ import logging
 
 from juju.client.connection import Connection
 from juju.client import watcher
+from juju import loop
 
 
 async def watch():
     allwatcher = watcher.AllWatcher()
+    conn = await Connection.connect_current()
     allwatcher.connect(conn)
     while True:
         change = await allwatcher.Next()
@@ -23,7 +25,8 @@ async def watch():
             print(delta.deltas)
 
 
-logging.basicConfig(level=logging.DEBUG)
-loop = asyncio.get_event_loop()
-conn = loop.run_until_complete(Connection.connect_current())
-loop.run_until_complete(watch())
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.DEBUG)
+    # Run loop until the process is manually stopped (watch will loop
+    # forever).
+    loop.run(watch())
