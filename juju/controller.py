@@ -297,3 +297,29 @@ class Controller(object):
         client_facade.connect(self.connection)
         user = tag.user(username)
         return await client_facade.UserInfo([client.Entity(user)], include_disabled)
+
+    async def grant(self, username, acl='login'):
+        """Set access level of the given user on the controller
+
+        :param str username: Username
+        :param str acl: Access control ('login', 'add-model' or 'superuser')
+
+        """
+        controller_facade = client.ControllerFacade()
+        controller_facade.connect(self.connection)
+        user = tag.user(username)
+        await self.revoke(username)
+        changes = client.ModifyControllerAccess(acl, 'grant', user)
+        return await controller_facade.ModifyControllerAccess([changes])
+
+    async def revoke(self, username):
+        """Removes all access from a controller
+
+        :param str username: username
+
+        """
+        controller_facade = client.ControllerFacade()
+        controller_facade.connect(self.connection)
+        user = tag.user(username)
+        changes = client.ModifyControllerAccess('login', 'revoke', user)
+        return await controller_facade.ModifyControllerAccess([changes])

@@ -16,6 +16,7 @@ import yaml
 import theblues.charmstore
 import theblues.errors
 
+from . import tag
 from .client import client
 from .client import watcher
 from .client import connection
@@ -841,13 +842,16 @@ class Model(object):
         """
         raise NotImplementedError()
 
-    def add_ssh_key(self, key):
+    async def add_ssh_key(self, user, key):
         """Add a public SSH key to this model.
 
+        :param str user: The username of the user
         :param str key: The public ssh key
 
         """
-        raise NotImplementedError()
+        key_facade = client.KeyManagerFacade()
+        key_facade.connect(self.connection)
+        return await key_facade.AddKeys([key], user)
     add_ssh_keys = add_ssh_key
 
     def add_subnet(self, cidr_or_id, space, *zones):
@@ -1099,9 +1103,9 @@ class Model(object):
             raise JujuError('\n'.join(errors))
         return await self._wait_for_new('application', application)
 
-    def destroy(self):
+    async def destroy(self):
         """Terminate all machines and resources for this model.
-
+            Is already implemented in controller.py.
         """
         raise NotImplementedError()
 
@@ -1160,14 +1164,22 @@ class Model(object):
         """
         raise NotImplementedError()
 
-    def grant(self, username, acl='read'):
-        """Grant a user access to this model.
+    async def grant(self, username, acl='read'):
+         """Grant a user access to this model.
 
         :param str username: Username
         :param str acl: Access control ('read' or 'write')
 
         """
-        raise NotImplementedError()
+        model_facade = client.ModelManagerFacade()
+        controller_conn = await self.connection.controller()
+        model_facade.connect(controller_conn)
+        user = tag.user(username)
+        model = tag.model(self.info.uuid)
+        changes = client.ModifyModelAccess(acl, 'revoke', model, user)
+        await model_facade.ModifyModelAccess([changes])
+        changes.action = 'grant'
+        return await model_facade.ModifyModelAccess([changes])
 
     def import_ssh_key(self, identity):
         """Add a public SSH key from a trusted indentity source to this model.
@@ -1178,14 +1190,13 @@ class Model(object):
         raise NotImplementedError()
     import_ssh_keys = import_ssh_key
 
-    def get_machines(self, machine, utc=False):
+    async def get_machines(self):
         """Return list of machines in this model.
 
-        :param str machine: Machine id, e.g. '0'
-        :param bool utc: Display time as UTC in RFC3339 format
-
         """
-        raise NotImplementedError()
+        model_facade = client.ModelManagerFacade()
+        model_facade.connect(self.connection)
+        return await self.state.machines.keys()
 
     def get_shares(self):
         """Return list of all users with access to this model.
@@ -1199,11 +1210,16 @@ class Model(object):
         """
         raise NotImplementedError()
 
-    def get_ssh_key(self):
+    async def get_ssh_key(self, raw_ssh=False):
         """Return known SSH keys for this model.
+        :param bool raw_ssh: if True, returns the raw ssh key, else it's fingerprint
 
         """
-        raise NotImplementedError()
+        key_facade = client.KeyManagerFacade()
+        key_facade.connect(self.connection)
+        entity = {'tag': tag.model(self.info.uuid)}
+        entities = client.Entities([entity])
+        return await key_facade.ListKeys(entities, raw_ssh)
     get_ssh_keys = get_ssh_key
 
     def get_storage(self, filesystem=False, volume=False):
@@ -1266,13 +1282,18 @@ class Model(object):
         raise NotImplementedError()
     remove_machines = remove_machine
 
-    def remove_ssh_key(self, *keys):
+    async def remove_ssh_key(self, *keys):
         """Remove a public SSH key(s) from this model.
 
-        :param str \*keys: Keys to remove
+        :param str \*keys: Keys to remove. Keys must be given in the
+                           [fingerprint] (user@host) format
 
         """
-        raise NotImplementedError()
+        key_facade = client.KeyManagerFacade()
+        key_facade.connect(self.connection)
+        for key in keys:
+            k_h = key.split(' ')
+            await key_facade.DeleteKeys([k_h[0]], k_h[1])
     remove_ssh_keys = remove_ssh_key
 
     def restore_backup(
