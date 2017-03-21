@@ -48,7 +48,7 @@ async def test_change_user_password(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def grant test_grant(event_loop):
+async def test_grant(event_loop):
     async with base.CleanController() as controller:
         await controller.add_user('test-grant')
         await controller.grant('test-grant', 'superuser')
