@@ -1316,7 +1316,7 @@ class Model(object):
         """
         raise NotImplementedError()
 
-    def revoke(self, username):
+    async def revoke(self, username):
         """Revoke a user's access to this model.
 
         :param str username: Username to revoke
