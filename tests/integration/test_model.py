@@ -139,7 +139,7 @@ async def test_explicit_loop_threaded(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_ssh_key(event_loop)
+async def test_ssh_key(event_loop):
     async with base.CleanModel() as model:
         await model.add_ssh_key('admin', SSH_KEY)
         result = await model.get_ssh_key(True)
