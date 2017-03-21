@@ -1165,7 +1165,7 @@ class Model(object):
         raise NotImplementedError()
 
     async def grant(self, username, acl='read'):
-         """Grant a user access to this model.
+        """Grant a user access to this model.
 
         :param str username: Username
         :param str acl: Access control ('read' or 'write')
