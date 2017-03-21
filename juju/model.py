@@ -1176,9 +1176,8 @@ class Model(object):
         model_facade.connect(controller_conn)
         user = tag.user(username)
         model = tag.model(self.info.uuid)
-        changes = client.ModifyModelAccess(acl, 'revoke', model, user)
-        await model_facade.ModifyModelAccess([changes])
-        changes.action = 'grant'
+        changes = client.ModifyModelAccess(acl, 'grant', model, user)
+        await self.revoke(username)
         return await model_facade.ModifyModelAccess([changes])
 
     def import_ssh_key(self, identity):
@@ -1317,14 +1316,20 @@ class Model(object):
         """
         raise NotImplementedError()
 
-    def revoke(self, username, acl='read'):
+    def revoke(self, username):
         """Revoke a user's access to this model.
 
         :param str username: Username to revoke
         :param str acl: Access control ('read' or 'write')
 
         """
-        raise NotImplementedError()
+        model_facade = client.ModelManagerFacade()
+        controller_conn = await self.connection.controller()
+        model_facade.connect(controller_conn)
+        user = tag.user(username)
+        model = tag.model(self.info.uuid)
+        changes = client.ModifyModelAccess('read', 'revoke', model, user)
+        return await model_facade.ModifyModelAccess([changes])
 
     def run(self, command, timeout=None):
         """Run command on all machines in this model.
