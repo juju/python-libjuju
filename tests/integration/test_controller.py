@@ -37,7 +37,7 @@ async def test_disable_enable_user(event_loop):
 async def test_change_user_password(event_loop):
     async with base.CleanController() as controller:
         await controller.add_user('test-password')
-        await controller.change_user_assword('test-password', 'password')
+        await controller.change_user_password('test-password', 'password')
         try:
             con = await controller.connect(controller.connection.endpoint, 'test-password', 'password')
             result = True
