@@ -1320,7 +1320,6 @@ class Model(object):
         """Revoke a user's access to this model.
 
         :param str username: Username to revoke
-        :param str acl: Access control ('read' or 'write')
 
         """
         model_facade = client.ModelManagerFacade()
