@@ -1067,7 +1067,7 @@ class Model(object):
                 storage=storage,
                 channel=channel,
                 num_units=num_units,
-                placement=parse_placement(to),
+                placement=parse_placement(to)
             )
 
     async def _deploy(self, charm_url, application, series, config,
@@ -1096,7 +1096,7 @@ class Model(object):
             num_units=num_units,
             resources=resources,
             storage=storage,
-            placement=placement,
+            placement=placement
         )
 
         result = await app_facade.Deploy([app])
