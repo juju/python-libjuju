@@ -143,11 +143,11 @@ async def test_ssh_key(event_loop):
     async with base.CleanModel() as model:
         await model.add_ssh_key('admin', SSH_KEY)
         result = await model.get_ssh_key(True)
-        result = res.serialize()['results'][0].serialize()['result']
+        result = result.serialize()['results'][0].serialize()['result']
         assert SSH_KEY in result
         await model.remove_ssh_key('admin', SSH_KEY)
         result = await model.get_ssh_key(True)
-        result = res.serialize()['results'][0].serialize()['result']
+        result = result.serialize()['results'][0].serialize()['result']
         assert SSH_KEY not in result
 
 
