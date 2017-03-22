@@ -7,7 +7,7 @@ from juju.model import Model
 
 MB = 1
 GB = 1024
-
+SSH_KEY = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCsYMJGNGG74HAJha3n2CFmWYsOOaORnJK6VqNy86pj0MIpvRXBzFzVy09uPQ66GOQhTEoJHEqE77VMui7+62AcMXT+GG7cFHcnU8XVQsGM6UirCcNyWNysfiEMoAdZScJf/GvoY87tMEszhZIUV37z8PUBx6twIqMdr31W1J0IaPa+sV6FEDadeLaNTvancDcHK1zuKsL39jzAg7+LYjKJfEfrsQP+lj/EQcjtKqlhVS5kzsJVfx8ZEd0xhW5G7N6bCdKNalS8mKCMaBXJpijNQ82AiyqCIDCRrre2To0/i7pTjRiL0U9f9mV3S4NJaQaokR050w/ZLySFf6F7joJT mathijs@Qrama-Mathijs'
 
 @base.bootstrapped
 @pytest.mark.asyncio
@@ -120,6 +120,7 @@ async def test_explicit_loop(event_loop):
             _deploy_in_loop(new_loop, model_name))
         await model._wait_for_new('application', 'ubuntu')
         assert 'ubuntu' in model.applications
+        await model.disconnect()
 
 
 @base.bootstrapped
@@ -135,3 +136,32 @@ async def test_explicit_loop_threaded(event_loop):
             f.result()
         await model._wait_for_new('application', 'ubuntu')
         assert 'ubuntu' in model.applications
+        await model.disconnect()
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_ssh_key(event_loop):
+    async with base.CleanModel() as model:
+        await model.add_ssh_key('admin', SSH_KEY)
+        result = await model.get_ssh_key(True)
+        result = result.serialize()['results'][0].serialize()['result']
+        assert SSH_KEY in result
+        await model.remove_ssh_key('admin', SSH_KEY)
+        result = await model.get_ssh_key(True)
+        result = result.serialize()['results'][0].serialize()['result']
+        assert result is None
+        await model.disconnect()
+
+
+# @base.bootstrapped
+# @pytest.mark.asyncio
+# async def test_grant(event_loop)
+#    async with base.CleanController() as controller:
+#        await controller.add_user('test-model-grant')
+#        await controller.grant('test-model-grant', 'superuser')
+#    async with base.CleanModel() as model:
+#        await model.grant('test-model-grant', 'admin')
+#        assert model.get_user('test-model-grant')['access'] == 'admin'
+#        await model.grant('test-model-grant', 'login')
+#        assert model.get_user('test-model-grant')['access'] == 'login'

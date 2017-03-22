@@ -1,5 +1,7 @@
 import asyncio
+import base64
 import collections
+import hashlib
 import json
 import logging
 import os
@@ -16,6 +18,7 @@ import yaml
 import theblues.charmstore
 import theblues.errors
 
+from . import tag
 from .client import client
 from .client import watcher
 from .client import connection
@@ -841,13 +844,16 @@ class Model(object):
         """
         raise NotImplementedError()
 
-    def add_ssh_key(self, key):
+    async def add_ssh_key(self, user, key):
         """Add a public SSH key to this model.
 
+        :param str user: The username of the user
         :param str key: The public ssh key
 
         """
-        raise NotImplementedError()
+        key_facade = client.KeyManagerFacade()
+        key_facade.connect(self.connection)
+        return await key_facade.AddKeys([key], user)
     add_ssh_keys = add_ssh_key
 
     def add_subnet(self, cidr_or_id, space, *zones):
@@ -1061,7 +1067,7 @@ class Model(object):
                 storage=storage,
                 channel=channel,
                 num_units=num_units,
-                placement=parse_placement(to),
+                placement=parse_placement(to)
             )
 
     async def _deploy(self, charm_url, application, series, config,
@@ -1090,7 +1096,7 @@ class Model(object):
             num_units=num_units,
             resources=resources,
             storage=storage,
-            placement=placement,
+            placement=placement
         )
 
         result = await app_facade.Deploy([app])
@@ -1099,9 +1105,9 @@ class Model(object):
             raise JujuError('\n'.join(errors))
         return await self._wait_for_new('application', application)
 
-    def destroy(self):
+    async def destroy(self):
         """Terminate all machines and resources for this model.
-
+            Is already implemented in controller.py.
         """
         raise NotImplementedError()
 
@@ -1160,14 +1166,21 @@ class Model(object):
         """
         raise NotImplementedError()
 
-    def grant(self, username, acl='read'):
+    async def grant(self, username, acl='read'):
         """Grant a user access to this model.
 
         :param str username: Username
         :param str acl: Access control ('read' or 'write')
 
         """
-        raise NotImplementedError()
+        model_facade = client.ModelManagerFacade()
+        controller_conn = await self.connection.controller()
+        await model_facade.connect(controller_conn)
+        user = tag.user(username)
+        model = tag.model(self.info.uuid)
+        changes = client.ModifyModelAccess(acl, 'grant', model, user)
+        await self.revoke(username)
+        return await model_facade.ModifyModelAccess([changes])
 
     def import_ssh_key(self, identity):
         """Add a public SSH key from a trusted indentity source to this model.
@@ -1178,14 +1191,13 @@ class Model(object):
         raise NotImplementedError()
     import_ssh_keys = import_ssh_key
 
-    def get_machines(self, machine, utc=False):
+    async def get_machines(self):
         """Return list of machines in this model.
 
-        :param str machine: Machine id, e.g. '0'
-        :param bool utc: Display time as UTC in RFC3339 format
-
         """
-        raise NotImplementedError()
+        model_facade = client.ModelManagerFacade()
+        model_facade.connect(self.connection)
+        return await list(self.state.machines.keys())
 
     def get_shares(self):
         """Return list of all users with access to this model.
@@ -1199,11 +1211,16 @@ class Model(object):
         """
         raise NotImplementedError()
 
-    def get_ssh_key(self):
+    async def get_ssh_key(self, raw_ssh=False):
         """Return known SSH keys for this model.
+        :param bool raw_ssh: if True, returns the raw ssh key, else it's fingerprint
 
         """
-        raise NotImplementedError()
+        key_facade = client.KeyManagerFacade()
+        key_facade.connect(self.connection)
+        entity = {'tag': tag.model(self.info.uuid)}
+        entities = client.Entities([entity])
+        return await key_facade.ListKeys(entities, raw_ssh)
     get_ssh_keys = get_ssh_key
 
     def get_storage(self, filesystem=False, volume=False):
@@ -1266,13 +1283,19 @@ class Model(object):
         raise NotImplementedError()
     remove_machines = remove_machine
 
-    def remove_ssh_key(self, *keys):
+    async def remove_ssh_key(self, user, key):
         """Remove a public SSH key(s) from this model.
 
-        :param str \*keys: Keys to remove
+        :param str key: Full ssh key
+        :param str user: Juju user to which the key is registered
 
         """
-        raise NotImplementedError()
+        key_facade = client.KeyManagerFacade()
+        key_facade.connect(self.connection)
+        key = base64.b64decode(bytes(key.strip().split()[1].encode('ascii')))
+        key = hashlib.md5(key).hexdigest()
+        key = ':'.join(a+b for a, b in zip(key[::2], key[1::2]))
+        await key_facade.DeleteKeys([key], user)
     remove_ssh_keys = remove_ssh_key
 
     def restore_backup(
@@ -1296,14 +1319,19 @@ class Model(object):
         """
         raise NotImplementedError()
 
-    def revoke(self, username, acl='read'):
+    async def revoke(self, username):
         """Revoke a user's access to this model.
 
         :param str username: Username to revoke
-        :param str acl: Access control ('read' or 'write')
 
         """
-        raise NotImplementedError()
+        model_facade = client.ModelManagerFacade()
+        controller_conn = await self.connection.controller()
+        model_facade.connect(controller_conn)
+        user = tag.user(username)
+        model = tag.model(self.info.uuid)
+        changes = client.ModifyModelAccess('read', 'revoke', model, user)
+        return await model_facade.ModifyModelAccess([changes])
 
     def run(self, command, timeout=None):
         """Run command on all machines in this model.
