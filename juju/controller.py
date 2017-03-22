@@ -95,7 +95,7 @@ class Controller(object):
             credential,
             model_name,
             owner,
-            region,
+            region
         )
 
         # Add our ssh key to the model, to work around
