@@ -1294,7 +1294,7 @@ class Model(object):
         key_facade.connect(self.connection)
         key = base64.b64decode(bytes(key.strip().split()[1].encode('ascii')))
         key = hashlib.md5(key).hexdigest()
-        key = ':'.join(a+b for a, b in zip(fp_plain[::2], fp_plain[1::2]))
+        key = ':'.join(a+b for a, b in zip(key[::2], key[1::2]))
         await key_facade.DeleteKeys(key, user)
     remove_ssh_keys = remove_ssh_key
 
