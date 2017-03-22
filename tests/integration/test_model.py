@@ -120,6 +120,7 @@ async def test_explicit_loop(event_loop):
             _deploy_in_loop(new_loop, model_name))
         await model._wait_for_new('application', 'ubuntu')
         assert 'ubuntu' in model.applications
+        await model.disconnect()
 
 
 @base.bootstrapped
@@ -135,6 +136,7 @@ async def test_explicit_loop_threaded(event_loop):
             f.result()
         await model._wait_for_new('application', 'ubuntu')
         assert 'ubuntu' in model.applications
+        await model.disconnect()
 
 
 @base.bootstrapped
@@ -149,6 +151,7 @@ async def test_ssh_key(event_loop):
         result = await model.get_ssh_key(True)
         result = result.serialize()['results'][0].serialize()['result']
         assert SSH_KEY not in result
+        await model.disconnect()
 
 
 # @base.bootstrapped
