@@ -150,7 +150,7 @@ async def test_ssh_key(event_loop):
         await model.remove_ssh_key('admin', SSH_KEY)
         result = await model.get_ssh_key(True)
         result = result.serialize()['results'][0].serialize()['result']
-        assert SSH_KEY not in result
+        assert result is None
         await model.disconnect()
 
 
