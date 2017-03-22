@@ -1,5 +1,7 @@
 import asyncio
+import base64
 import collections
+import hashlib
 import json
 import logging
 import os
@@ -1281,18 +1283,19 @@ class Model(object):
         raise NotImplementedError()
     remove_machines = remove_machine
 
-    async def remove_ssh_key(self, *keys):
+    async def remove_ssh_key(self, user, key):
         """Remove a public SSH key(s) from this model.
 
-        :param str \*keys: Keys to remove. Keys must be given in the
-                           [fingerprint] (user@host) format
+        :param str key: Full ssh key
+        :param str user: Juju user to which the key is registered
 
         """
         key_facade = client.KeyManagerFacade()
         key_facade.connect(self.connection)
-        for key in keys:
-            k_h = key.split(' ')
-            await key_facade.DeleteKeys([k_h[0]], k_h[1])
+        key = base64.b64decode(bytes(key.strip().split()[1].encode('ascii')))
+        key = hashlib.md5(key).hexdigest()
+        key = ':'.join(a+b for a, b in zip(fp_plain[::2], fp_plain[1::2]))
+        await key_facade.DeleteKeys(key, user)
     remove_ssh_keys = remove_ssh_key
 
     def restore_backup(
