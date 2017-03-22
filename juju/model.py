@@ -1175,7 +1175,7 @@ class Model(object):
         """
         model_facade = client.ModelManagerFacade()
         controller_conn = await self.connection.controller()
-        model_facade.connect(controller_conn)
+        await model_facade.connect(controller_conn)
         user = tag.user(username)
         model = tag.model(self.info.uuid)
         changes = client.ModifyModelAccess(acl, 'grant', model, user)
@@ -1196,7 +1196,7 @@ class Model(object):
 
         """
         model_facade = client.ModelManagerFacade()
-        model_facade.connect(self.connection)
+        await model_facade.connect(self.connection)
         return await list(self.state.machines.keys())
 
     def get_shares(self):
@@ -1217,7 +1217,7 @@ class Model(object):
 
         """
         key_facade = client.KeyManagerFacade()
-        key_facade.connect(self.connection)
+        await key_facade.connect(self.connection)
         entity = {'tag': tag.model(self.info.uuid)}
         entities = client.Entities([entity])
         return await key_facade.ListKeys(entities, raw_ssh)
@@ -1291,7 +1291,7 @@ class Model(object):
 
         """
         key_facade = client.KeyManagerFacade()
-        key_facade.connect(self.connection)
+        await key_facade.connect(self.connection)
         key = base64.b64decode(bytes(key.strip().split()[1].encode('ascii')))
         key = hashlib.md5(key).hexdigest()
         key = ':'.join(a+b for a, b in zip(fp_plain[::2], fp_plain[1::2]))
@@ -1327,7 +1327,7 @@ class Model(object):
         """
         model_facade = client.ModelManagerFacade()
         controller_conn = await self.connection.controller()
-        model_facade.connect(controller_conn)
+        await model_facade.connect(controller_conn)
         user = tag.user(username)
         model = tag.model(self.info.uuid)
         changes = client.ModifyModelAccess('read', 'revoke', model, user)
