@@ -1175,7 +1175,7 @@ class Model(object):
         """
         model_facade = client.ModelManagerFacade()
         controller_conn = await self.connection.controller()
-        await model_facade.connect(controller_conn)
+        model_facade.connect(controller_conn)
         user = tag.user(username)
         model = tag.model(self.info.uuid)
         changes = client.ModifyModelAccess(acl, 'grant', model, user)
