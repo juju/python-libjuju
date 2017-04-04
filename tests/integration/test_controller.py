@@ -66,4 +66,4 @@ async def test_grant(event_loop):
 async def test_get_models(event_loop):
     async with base.CleanController() as controller:
         result = await controller.get_models()
-        assert isInstance(result.serialize()['user-models'], list)
+        assert isinstance(result.serialize()['user-models'], list)
