@@ -1195,8 +1195,6 @@ class Model(object):
         """Return list of machines in this model.
 
         """
-        model_facade = client.ModelManagerFacade()
-        model_facade.connect(self.connection)
         return await list(self.state.machines.keys())
 
     def get_shares(self):

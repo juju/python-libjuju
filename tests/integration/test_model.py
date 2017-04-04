@@ -120,7 +120,6 @@ async def test_explicit_loop(event_loop):
             _deploy_in_loop(new_loop, model_name))
         await model._wait_for_new('application', 'ubuntu')
         assert 'ubuntu' in model.applications
-        await model.disconnect()
 
 
 @base.bootstrapped
@@ -136,7 +135,6 @@ async def test_explicit_loop_threaded(event_loop):
             f.result()
         await model._wait_for_new('application', 'ubuntu')
         assert 'ubuntu' in model.applications
-        await model.disconnect()
 
 
 @base.bootstrapped
@@ -151,7 +149,14 @@ async def test_ssh_key(event_loop):
         result = await model.get_ssh_key(True)
         result = result.serialize()['results'][0].serialize()['result']
         assert result is None
-        await model.disconnect()
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_get_machines(event_loop):
+    async with base.CleanModel() as model:
+    result = await model.get_machines()
+    assert isInstance(result, list)
 
 
 # @base.bootstrapped
@@ -165,3 +170,37 @@ async def test_ssh_key(event_loop):
 #        assert model.get_user('test-model-grant')['access'] == 'admin'
 #        await model.grant('test-model-grant', 'login')
 #        assert model.get_user('test-model-grant')['access'] == 'login'
+
+
+async def test_store_resources_charm(event_loop):
+    async with base.CleanModel() as model:
+        ghost = await model.deploy('cs:ghost-18')
+        assert 'ghost' in model.applications
+        terminal_statuses = ('active', 'error', 'blocked')
+        await model.block_until(
+            lambda: (
+                len(ghost.units) > 0 and
+                ghost.units[0].workload_status in terminal_statuses)
+            )
+        # ghost will go in to blocked (or error, for older
+        # charm revs) if the resource is missing
+        assert ghost.units[0].workload_status == 'active'
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_store_resources_bundle(event_loop):
+    async with base.CleanModel() as model:
+        bundle = str(Path(__file__).parent / 'bundle')
+        await model.deploy(bundle)
+        assert 'ghost' in model.applications
+        ghost = model.applications['ghost']
+        terminal_statuses = ('active', 'error', 'blocked')
+        await model.block_until(
+            lambda: (
+                len(ghost.units) > 0 and
+                ghost.units[0].workload_status in terminal_statuses)
+            )
+        # ghost will go in to blocked (or error, for older
+        # charm revs) if the resource is missing
+        assert ghost.units[0].workload_status == 'active'
