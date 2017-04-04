@@ -1195,7 +1195,8 @@ class Model(object):
         """Return list of machines in this model.
 
         """
-        return await list(self.state.machines.keys())
+        result = await self.state.machines
+        return list(result.keys())
 
     def get_shares(self):
         """Return list of all users with access to this model.
