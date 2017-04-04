@@ -155,8 +155,8 @@ async def test_ssh_key(event_loop):
 @pytest.mark.asyncio
 async def test_get_machines(event_loop):
     async with base.CleanModel() as model:
-    result = await model.get_machines()
-    assert isInstance(result, list)
+        result = await model.get_machines()
+        assert isInstance(result, list)
 
 
 # @base.bootstrapped
