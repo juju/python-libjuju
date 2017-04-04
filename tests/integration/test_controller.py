@@ -58,7 +58,7 @@ async def test_grant(event_loop):
         await controller.grant('test-grant', 'login')
         result = await controller.get_user('test-grant')
         result = result.serialize()['results'][0].serialize()['result'].serialize()
-        assert result['access'] == 'login
+        assert result['access'] == 'login'
 
 
 @base.bootstrapped
