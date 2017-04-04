@@ -57,14 +57,14 @@ class Monitor:
 
         """
 
-        # DISCONNECTED: connection not yet open, or deliberately closed.
+        # DISCONNECTED: connection not yet open
         if not self.connection.ws:
             return self.DISCONNECTED
         if not self.receiver:
             return self.DISCONNECTED
 
-        # ERROR: Connection closed, or receiver errored, but we didn't
-        # call connection.close
+        # ERROR: Connection closed (or errored), but we didn't call
+        # connection.close
         if not self.connection.close_called and self.receiver_exceptions():
             return self.ERROR
         if not self.connection.close_called and not self.connection.ws.open:
