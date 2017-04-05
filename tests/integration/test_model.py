@@ -173,6 +173,8 @@ async def test_get_machines(event_loop):
 #        assert model.get_user('test-model-grant')['access'] == 'login'
 
 
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_store_resources_charm(event_loop):
     async with base.CleanModel() as model:
         ghost = await model.deploy('cs:ghost-18')
