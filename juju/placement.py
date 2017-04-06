@@ -22,7 +22,13 @@ def parse(directive):
         # Handle null case
         return None
 
-    if type(directive) in [dict, client.Placement]:
+    if isinstance(directive, (list, tuple)):
+        results = []
+        for d in directive:
+            results.extend(parse(d))
+        return results
+
+    if isinstance(directive, (dict, client.Placement)):
         # We've been handed something that we can simply hand back to
         # the api. (Forwards compatibility)
         return [directive]

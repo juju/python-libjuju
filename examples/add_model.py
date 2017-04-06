@@ -61,4 +61,5 @@ async def main():
         await controller.disconnect()
 
 
-loop.run(main())
+if __name__ == '__main__':
+    loop.run(main())

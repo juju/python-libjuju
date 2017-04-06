@@ -233,7 +233,14 @@ class ModelEntity(object):
         model.
 
         """
-        return self.safe_data[name]
+        try:
+            return self.safe_data[name]
+        except KeyError:
+            name = name.replace('_', '-')
+            if name in self.safe_data:
+                return self.safe_data[name]
+            else:
+                raise
 
     def __bool__(self):
         return bool(self.data)
@@ -991,9 +998,7 @@ class Model(object):
 
         TODO::
 
-            - application_name is required; fill this in automatically if not
-              provided by caller
-            - series is required; how do we pick a default?
+            - support local resources
 
         """
         if storage:
@@ -1045,6 +1050,11 @@ class Model(object):
                 if not channel:
                     channel = 'stable'
                 await client_facade.AddCharm(channel, entity_id)
+                # XXX: we're dropping local resources here, but we don't
+                # actually support them yet anyway
+                resources = await self._add_store_resources(application_name,
+                                                            entity_id,
+                                                            entity)
             else:
                 # We have a local charm dir that needs to be uploaded
                 charm_dir = os.path.abspath(
@@ -1069,6 +1079,37 @@ class Model(object):
                 num_units=num_units,
                 placement=parse_placement(to)
             )
+
+    async def _add_store_resources(self, application, entity_url, entity=None):
+        if not entity:
+            # avoid extra charm store call if one was already made
+            entity = await self.charmstore.entity(entity_url)
+        resources = [
+            {
+                'description': resource['Description'],
+                'fingerprint': resource['Fingerprint'],
+                'name': resource['Name'],
+                'path': resource['Path'],
+                'revision': resource['Revision'],
+                'size': resource['Size'],
+                'type_': resource['Type'],
+                'origin': 'store',
+            } for resource in entity['Meta']['resources']
+        ]
+
+        if not resources:
+            return None
+
+        resources_facade = client.ResourcesFacade()
+        resources_facade.connect(self.connection)
+        response = await resources_facade.AddPendingResources(
+            tag.application(application),
+            entity_url,
+            [client.CharmResource(**resource) for resource in resources])
+        resource_map = {resource['name']: pid
+                        for resource, pid
+                        in zip(resources, response.pending_ids)}
+        return resource_map
 
     async def _deploy(self, charm_url, application, series, config,
                       constraints, endpoint_bindings, resources, storage,
@@ -1195,9 +1236,7 @@ class Model(object):
         """Return list of machines in this model.
 
         """
-        model_facade = client.ModelManagerFacade()
-        model_facade.connect(self.connection)
-        return await list(self.state.machines.keys())
+        return list(self.state.machines.keys())
 
     def get_shares(self):
         """Return list of all users with access to this model.
@@ -1728,6 +1767,11 @@ class BundleHandler(object):
         """
         # resolve indirect references
         charm = self.resolve(charm)
+        # the bundle plan doesn't actually do anything with resources, even
+        # though it ostensibly gives us something (None) for that param
+        if not charm.startswith('local:'):
+            resources = await self.model._add_store_resources(application,
+                                                              charm)
         await self.model._deploy(
             charm_url=charm,
             application=application,

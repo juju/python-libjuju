@@ -25,3 +25,7 @@ def model(cloud_name):
 
 def user(username):
     return _prefix('user-', username)
+
+
+def application(app_name):
+    return _prefix('application-', app_name)

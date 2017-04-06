@@ -15,7 +15,6 @@ async def test_add_user(event_loop):
         result = await controller.get_user('test')
         res_ser = result.serialize()['results'][0].serialize()
         assert res_ser['result'] is not None
-        await controller.disconnect()
 
 
 @base.bootstrapped
@@ -31,7 +30,6 @@ async def test_disable_enable_user(event_loop):
         result = await controller.get_user('test-disable')
         res_ser = result.serialize()['results'][0].serialize()
         assert res_ser['result'].serialize()['disabled'] is False
-        await controller.disconnect()
 
 
 @base.bootstrapped
@@ -46,7 +44,6 @@ async def test_change_user_password(event_loop):
         except JujuAPIError:
             result = False
         assert result is True
-        await controller.disconnect()
 
 
 @base.bootstrapped
@@ -62,4 +59,11 @@ async def test_grant(event_loop):
         result = await controller.get_user('test-grant')
         result = result.serialize()['results'][0].serialize()['result'].serialize()
         assert result['access'] == 'login'
-        await controller.disconnect()
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_get_models(event_loop):
+    async with base.CleanController() as controller:
+        result = await controller.get_models()
+        assert isinstance(result.serialize()['user-models'], list)

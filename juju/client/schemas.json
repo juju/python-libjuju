@@ -2167,144 +2167,6 @@
     }
   },
   {
-    "Name": "ApplicationRelationsWatcher",
-    "Version": 1,
-    "Schema": {
-      "type": "object",
-      "properties": {
-        "Next": {
-          "type": "object",
-          "properties": {
-            "Result": {
-              "$ref": "#/definitions/ApplicationRelationsWatchResult"
-            }
-          }
-        },
-        "Stop": {
-          "type": "object"
-        }
-      },
-      "definitions": {
-        "ApplicationRelationsChange": {
-          "type": "object",
-          "properties": {
-            "changed": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/RelationChange"
-              }
-            },
-            "removed": {
-              "type": "array",
-              "items": {
-                "type": "integer"
-              }
-            }
-          },
-          "additionalProperties": false
-        },
-        "ApplicationRelationsWatchResult": {
-          "type": "object",
-          "properties": {
-            "ApplicationRelationsWatcherId": {
-              "type": "string"
-            },
-            "changes": {
-              "$ref": "#/definitions/ApplicationRelationsChange"
-            },
-            "error": {
-              "$ref": "#/definitions/Error"
-            }
-          },
-          "additionalProperties": false,
-          "required": [
-            "ApplicationRelationsWatcherId"
-          ]
-        },
-        "Error": {
-          "type": "object",
-          "properties": {
-            "code": {
-              "type": "string"
-            },
-            "info": {
-              "$ref": "#/definitions/ErrorInfo"
-            },
-            "message": {
-              "type": "string"
-            }
-          },
-          "additionalProperties": false,
-          "required": [
-            "message",
-            "code"
-          ]
-        },
-        "ErrorInfo": {
-          "type": "object",
-          "properties": {
-            "macaroon": {
-              "$ref": "#/definitions/Macaroon"
-            },
-            "macaroon-path": {
-              "type": "string"
-            }
-          },
-          "additionalProperties": false
-        },
-        "Macaroon": {
-          "type": "object",
-          "additionalProperties": false
-        },
-        "RelationChange": {
-          "type": "object",
-          "properties": {
-            "changedunits": {
-              "type": "object",
-              "patternProperties": {
-                ".*": {
-                  "$ref": "#/definitions/RelationUnitChange"
-                }
-              }
-            },
-            "departedunits": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "id": {
-              "type": "integer"
-            },
-            "life": {
-              "type": "string"
-            }
-          },
-          "additionalProperties": false,
-          "required": [
-            "id",
-            "life"
-          ]
-        },
-        "RelationUnitChange": {
-          "type": "object",
-          "properties": {
-            "settings": {
-              "type": "object",
-              "patternProperties": {
-                ".*": {
-                  "type": "object",
-                  "additionalProperties": true
-                }
-              }
-            }
-          },
-          "additionalProperties": false
-        }
-      }
-    }
-  },
-  {
     "Name": "ApplicationScaler",
     "Version": 1,
     "Schema": {
@@ -4578,6 +4440,9 @@
             "agent-status": {
               "$ref": "#/definitions/DetailedStatus"
             },
+            "constraints": {
+              "type": "string"
+            },
             "containers": {
               "type": "object",
               "patternProperties": {
@@ -4633,6 +4498,7 @@
             "series",
             "id",
             "containers",
+            "constraints",
             "hardware",
             "jobs",
             "has-vote",
@@ -4699,6 +4565,9 @@
                 "$ref": "#/definitions/ModelMachineInfo"
               }
             },
+            "migration": {
+              "$ref": "#/definitions/ModelMigrationStatus"
+            },
             "name": {
               "type": "string"
             },
@@ -4761,6 +4630,27 @@
           "additionalProperties": false,
           "required": [
             "id"
+          ]
+        },
+        "ModelMigrationStatus": {
+          "type": "object",
+          "properties": {
+            "end": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "start": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "status": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "start"
           ]
         },
         "ModelSet": {
@@ -5466,6 +5356,17 @@
             }
           }
         },
+        "InstanceTypes": {
+          "type": "object",
+          "properties": {
+            "Params": {
+              "$ref": "#/definitions/CloudInstanceTypesConstraints"
+            },
+            "Result": {
+              "$ref": "#/definitions/InstanceTypesResults"
+            }
+          }
+        },
         "RevokeCredentials": {
           "type": "object",
           "properties": {
@@ -5583,6 +5484,40 @@
             }
           },
           "additionalProperties": false
+        },
+        "CloudInstanceTypesConstraint": {
+          "type": "object",
+          "properties": {
+            "cloud-tag": {
+              "type": "string"
+            },
+            "constraints": {
+              "$ref": "#/definitions/Value"
+            },
+            "region": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "cloud-tag",
+            "region"
+          ]
+        },
+        "CloudInstanceTypesConstraints": {
+          "type": "object",
+          "properties": {
+            "constraints": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CloudInstanceTypesConstraint"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "constraints"
+          ]
         },
         "CloudRegion": {
           "type": "object",
@@ -5725,6 +5660,83 @@
             "results"
           ]
         },
+        "InstanceType": {
+          "type": "object",
+          "properties": {
+            "arches": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "cost": {
+              "type": "integer"
+            },
+            "cpu-cores": {
+              "type": "integer"
+            },
+            "deprecated": {
+              "type": "boolean"
+            },
+            "memory": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "root-disk": {
+              "type": "integer"
+            },
+            "virt-type": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "arches",
+            "cpu-cores",
+            "memory"
+          ]
+        },
+        "InstanceTypesResult": {
+          "type": "object",
+          "properties": {
+            "cost-currency": {
+              "type": "string"
+            },
+            "cost-divisor": {
+              "type": "integer"
+            },
+            "cost-unit": {
+              "type": "string"
+            },
+            "error": {
+              "$ref": "#/definitions/Error"
+            },
+            "instance-types": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/InstanceType"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "InstanceTypesResults": {
+          "type": "object",
+          "properties": {
+            "results": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/InstanceTypesResult"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "results"
+          ]
+        },
         "Macaroon": {
           "type": "object",
           "additionalProperties": false
@@ -5826,6 +5838,48 @@
               "items": {
                 "$ref": "#/definitions/UserCloud"
               }
+            }
+          },
+          "additionalProperties": false
+        },
+        "Value": {
+          "type": "object",
+          "properties": {
+            "arch": {
+              "type": "string"
+            },
+            "container": {
+              "type": "string"
+            },
+            "cores": {
+              "type": "integer"
+            },
+            "cpu-power": {
+              "type": "integer"
+            },
+            "instance-type": {
+              "type": "string"
+            },
+            "mem": {
+              "type": "integer"
+            },
+            "root-disk": {
+              "type": "integer"
+            },
+            "spaces": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "tags": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "virt-type": {
+              "type": "string"
             }
           },
           "additionalProperties": false
@@ -11257,6 +11311,17 @@
               "$ref": "#/definitions/AddMachinesResults"
             }
           }
+        },
+        "InstanceTypes": {
+          "type": "object",
+          "properties": {
+            "Params": {
+              "$ref": "#/definitions/ModelInstanceTypesConstraints"
+            },
+            "Result": {
+              "$ref": "#/definitions/InstanceTypesResults"
+            }
+          }
         }
       },
       "definitions": {
@@ -11468,9 +11533,110 @@
           },
           "additionalProperties": false
         },
+        "InstanceType": {
+          "type": "object",
+          "properties": {
+            "arches": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "cost": {
+              "type": "integer"
+            },
+            "cpu-cores": {
+              "type": "integer"
+            },
+            "deprecated": {
+              "type": "boolean"
+            },
+            "memory": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "root-disk": {
+              "type": "integer"
+            },
+            "virt-type": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "arches",
+            "cpu-cores",
+            "memory"
+          ]
+        },
+        "InstanceTypesResult": {
+          "type": "object",
+          "properties": {
+            "cost-currency": {
+              "type": "string"
+            },
+            "cost-divisor": {
+              "type": "integer"
+            },
+            "cost-unit": {
+              "type": "string"
+            },
+            "error": {
+              "$ref": "#/definitions/Error"
+            },
+            "instance-types": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/InstanceType"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "InstanceTypesResults": {
+          "type": "object",
+          "properties": {
+            "results": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/InstanceTypesResult"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "results"
+          ]
+        },
         "Macaroon": {
           "type": "object",
           "additionalProperties": false
+        },
+        "ModelInstanceTypesConstraint": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "$ref": "#/definitions/Value"
+            }
+          },
+          "additionalProperties": false
+        },
+        "ModelInstanceTypesConstraints": {
+          "type": "object",
+          "properties": {
+            "constraints": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ModelInstanceTypesConstraint"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "constraints"
+          ]
         },
         "Placement": {
           "type": "object",
@@ -12247,6 +12413,12 @@
             "provider-vlan-id": {
               "type": "string"
             },
+            "routes": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/NetworkRoute"
+              }
+            },
             "vlan-tag": {
               "type": "integer"
             }
@@ -12267,6 +12439,26 @@
             "parent-interface-name",
             "interface-type",
             "disabled"
+          ]
+        },
+        "NetworkRoute": {
+          "type": "object",
+          "properties": {
+            "destination-cidr": {
+              "type": "string"
+            },
+            "gateway-ip": {
+              "type": "string"
+            },
+            "metric": {
+              "type": "integer"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "destination-cidr",
+            "gateway-ip",
+            "metric"
           ]
         },
         "NotifyWatchResult": {
@@ -13325,6 +13517,9 @@
             "agent-version": {
               "$ref": "#/definitions/Number"
             },
+            "controller-agent-version": {
+              "$ref": "#/definitions/Number"
+            },
             "name": {
               "type": "string"
             },
@@ -13340,7 +13535,8 @@
             "uuid",
             "name",
             "owner-tag",
-            "agent-version"
+            "agent-version",
+            "controller-agent-version"
           ]
         },
         "MigrationSpec": {
@@ -13496,6 +13692,12 @@
                 "type": "string"
               }
             },
+            "resources": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/SerializedModelResource"
+              }
+            },
             "tools": {
               "type": "array",
               "items": {
@@ -13507,7 +13709,85 @@
           "required": [
             "bytes",
             "charms",
-            "tools"
+            "tools",
+            "resources"
+          ]
+        },
+        "SerializedModelResource": {
+          "type": "object",
+          "properties": {
+            "application": {
+              "type": "string"
+            },
+            "application-revision": {
+              "$ref": "#/definitions/SerializedModelResourceRevision"
+            },
+            "charmstore-revision": {
+              "$ref": "#/definitions/SerializedModelResourceRevision"
+            },
+            "name": {
+              "type": "string"
+            },
+            "unit-revisions": {
+              "type": "object",
+              "patternProperties": {
+                ".*": {
+                  "$ref": "#/definitions/SerializedModelResourceRevision"
+                }
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "application",
+            "name",
+            "application-revision",
+            "charmstore-revision",
+            "unit-revisions"
+          ]
+        },
+        "SerializedModelResourceRevision": {
+          "type": "object",
+          "properties": {
+            "description": {
+              "type": "string"
+            },
+            "fingerprint": {
+              "type": "string"
+            },
+            "origin": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            },
+            "revision": {
+              "type": "integer"
+            },
+            "size": {
+              "type": "integer"
+            },
+            "timestamp": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "type": {
+              "type": "string"
+            },
+            "username": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "revision",
+            "type",
+            "path",
+            "description",
+            "origin",
+            "fingerprint",
+            "size",
+            "timestamp"
           ]
         },
         "SerializedModelTools": {
@@ -13740,11 +14020,31 @@
             }
           }
         },
+        "AdoptResources": {
+          "type": "object",
+          "properties": {
+            "Params": {
+              "$ref": "#/definitions/AdoptResourcesArgs"
+            }
+          }
+        },
         "Import": {
           "type": "object",
           "properties": {
             "Params": {
               "$ref": "#/definitions/SerializedModel"
+            }
+          }
+        },
+        "LatestLogTime": {
+          "type": "object",
+          "properties": {
+            "Params": {
+              "$ref": "#/definitions/ModelArgs"
+            },
+            "Result": {
+              "type": "string",
+              "format": "date-time"
             }
           }
         },
@@ -13758,10 +14058,29 @@
         }
       },
       "definitions": {
+        "AdoptResourcesArgs": {
+          "type": "object",
+          "properties": {
+            "model-tag": {
+              "type": "string"
+            },
+            "source-controller-version": {
+              "$ref": "#/definitions/Number"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "model-tag",
+            "source-controller-version"
+          ]
+        },
         "MigrationModelInfo": {
           "type": "object",
           "properties": {
             "agent-version": {
+              "$ref": "#/definitions/Number"
+            },
+            "controller-agent-version": {
               "$ref": "#/definitions/Number"
             },
             "name": {
@@ -13779,7 +14098,8 @@
             "uuid",
             "name",
             "owner-tag",
-            "agent-version"
+            "agent-version",
+            "controller-agent-version"
           ]
         },
         "ModelArgs": {
@@ -13837,6 +14157,12 @@
                 "type": "string"
               }
             },
+            "resources": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/SerializedModelResource"
+              }
+            },
             "tools": {
               "type": "array",
               "items": {
@@ -13848,7 +14174,85 @@
           "required": [
             "bytes",
             "charms",
-            "tools"
+            "tools",
+            "resources"
+          ]
+        },
+        "SerializedModelResource": {
+          "type": "object",
+          "properties": {
+            "application": {
+              "type": "string"
+            },
+            "application-revision": {
+              "$ref": "#/definitions/SerializedModelResourceRevision"
+            },
+            "charmstore-revision": {
+              "$ref": "#/definitions/SerializedModelResourceRevision"
+            },
+            "name": {
+              "type": "string"
+            },
+            "unit-revisions": {
+              "type": "object",
+              "patternProperties": {
+                ".*": {
+                  "$ref": "#/definitions/SerializedModelResourceRevision"
+                }
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "application",
+            "name",
+            "application-revision",
+            "charmstore-revision",
+            "unit-revisions"
+          ]
+        },
+        "SerializedModelResourceRevision": {
+          "type": "object",
+          "properties": {
+            "description": {
+              "type": "string"
+            },
+            "fingerprint": {
+              "type": "string"
+            },
+            "origin": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            },
+            "revision": {
+              "type": "integer"
+            },
+            "size": {
+              "type": "integer"
+            },
+            "timestamp": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "type": {
+              "type": "string"
+            },
+            "username": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "revision",
+            "type",
+            "path",
+            "description",
+            "origin",
+            "fingerprint",
+            "size",
+            "timestamp"
           ]
         },
         "SerializedModelTools": {
@@ -14422,6 +14826,9 @@
                 "$ref": "#/definitions/ModelMachineInfo"
               }
             },
+            "migration": {
+              "$ref": "#/definitions/ModelMigrationStatus"
+            },
             "name": {
               "type": "string"
             },
@@ -14511,6 +14918,27 @@
           "additionalProperties": false,
           "required": [
             "id"
+          ]
+        },
+        "ModelMigrationStatus": {
+          "type": "object",
+          "properties": {
+            "end": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "start": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "status": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "start"
           ]
         },
         "ModelStatus": {
@@ -14745,6 +15173,379 @@
     }
   },
   {
+    "Name": "Payloads",
+    "Version": 1,
+    "Schema": {
+      "type": "object",
+      "properties": {
+        "List": {
+          "type": "object",
+          "properties": {
+            "Params": {
+              "$ref": "#/definitions/EnvListArgs"
+            },
+            "Result": {
+              "$ref": "#/definitions/EnvListResults"
+            }
+          }
+        }
+      },
+      "definitions": {
+        "EnvListArgs": {
+          "type": "object",
+          "properties": {
+            "patterns": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "patterns"
+          ]
+        },
+        "EnvListResults": {
+          "type": "object",
+          "properties": {
+            "results": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Payload"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "results"
+          ]
+        },
+        "Payload": {
+          "type": "object",
+          "properties": {
+            "class": {
+              "type": "string"
+            },
+            "id": {
+              "type": "string"
+            },
+            "labels": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "machine": {
+              "type": "string"
+            },
+            "status": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            },
+            "unit": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "class",
+            "type",
+            "id",
+            "status",
+            "labels",
+            "unit",
+            "machine"
+          ]
+        }
+      }
+    }
+  },
+  {
+    "Name": "PayloadsHookContext",
+    "Version": 1,
+    "Schema": {
+      "type": "object",
+      "properties": {
+        "List": {
+          "type": "object",
+          "properties": {
+            "Params": {
+              "$ref": "#/definitions/Entities"
+            },
+            "Result": {
+              "$ref": "#/definitions/PayloadResults"
+            }
+          }
+        },
+        "LookUp": {
+          "type": "object",
+          "properties": {
+            "Params": {
+              "$ref": "#/definitions/LookUpArgs"
+            },
+            "Result": {
+              "$ref": "#/definitions/PayloadResults"
+            }
+          }
+        },
+        "SetStatus": {
+          "type": "object",
+          "properties": {
+            "Params": {
+              "$ref": "#/definitions/SetStatusArgs"
+            },
+            "Result": {
+              "$ref": "#/definitions/PayloadResults"
+            }
+          }
+        },
+        "Track": {
+          "type": "object",
+          "properties": {
+            "Params": {
+              "$ref": "#/definitions/TrackArgs"
+            },
+            "Result": {
+              "$ref": "#/definitions/PayloadResults"
+            }
+          }
+        },
+        "Untrack": {
+          "type": "object",
+          "properties": {
+            "Params": {
+              "$ref": "#/definitions/Entities"
+            },
+            "Result": {
+              "$ref": "#/definitions/PayloadResults"
+            }
+          }
+        }
+      },
+      "definitions": {
+        "Entities": {
+          "type": "object",
+          "properties": {
+            "entities": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Entity"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "entities"
+          ]
+        },
+        "Entity": {
+          "type": "object",
+          "properties": {
+            "tag": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "tag"
+          ]
+        },
+        "Error": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string"
+            },
+            "info": {
+              "$ref": "#/definitions/ErrorInfo"
+            },
+            "message": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "message",
+            "code"
+          ]
+        },
+        "ErrorInfo": {
+          "type": "object",
+          "properties": {
+            "macaroon": {
+              "$ref": "#/definitions/Macaroon"
+            },
+            "macaroon-path": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "LookUpArg": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "id"
+          ]
+        },
+        "LookUpArgs": {
+          "type": "object",
+          "properties": {
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/LookUpArg"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "args"
+          ]
+        },
+        "Macaroon": {
+          "type": "object",
+          "additionalProperties": false
+        },
+        "Payload": {
+          "type": "object",
+          "properties": {
+            "class": {
+              "type": "string"
+            },
+            "id": {
+              "type": "string"
+            },
+            "labels": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "machine": {
+              "type": "string"
+            },
+            "status": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            },
+            "unit": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "class",
+            "type",
+            "id",
+            "status",
+            "labels",
+            "unit",
+            "machine"
+          ]
+        },
+        "PayloadResult": {
+          "type": "object",
+          "properties": {
+            "Entity": {
+              "$ref": "#/definitions/Entity"
+            },
+            "error": {
+              "$ref": "#/definitions/Error"
+            },
+            "not-found": {
+              "type": "boolean"
+            },
+            "payload": {
+              "$ref": "#/definitions/Payload"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "Entity",
+            "payload",
+            "not-found"
+          ]
+        },
+        "PayloadResults": {
+          "type": "object",
+          "properties": {
+            "results": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PayloadResult"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "results"
+          ]
+        },
+        "SetStatusArg": {
+          "type": "object",
+          "properties": {
+            "Entity": {
+              "$ref": "#/definitions/Entity"
+            },
+            "status": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "Entity",
+            "status"
+          ]
+        },
+        "SetStatusArgs": {
+          "type": "object",
+          "properties": {
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/SetStatusArg"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "args"
+          ]
+        },
+        "TrackArgs": {
+          "type": "object",
+          "properties": {
+            "payloads": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Payload"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "payloads"
+          ]
+        }
+      }
+    }
+  },
+  {
     "Name": "Pinger",
     "Version": 1,
     "Schema": {
@@ -14871,6 +15672,17 @@
             }
           }
         },
+        "HostChangesForContainers": {
+          "type": "object",
+          "properties": {
+            "Params": {
+              "$ref": "#/definitions/Entities"
+            },
+            "Result": {
+              "$ref": "#/definitions/HostNetworkChangeResults"
+            }
+          }
+        },
         "InstanceId": {
           "type": "object",
           "properties": {
@@ -14994,6 +15806,14 @@
             }
           }
         },
+        "SetHostMachineNetworkConfig": {
+          "type": "object",
+          "properties": {
+            "Params": {
+              "$ref": "#/definitions/SetMachineNetworkConfig"
+            }
+          }
+        },
         "SetInstanceInfo": {
           "type": "object",
           "properties": {
@@ -15013,6 +15833,14 @@
             },
             "Result": {
               "$ref": "#/definitions/ErrorResults"
+            }
+          }
+        },
+        "SetObservedNetworkConfig": {
+          "type": "object",
+          "properties": {
+            "Params": {
+              "$ref": "#/definitions/SetMachineNetworkConfig"
             }
           }
         },
@@ -15383,6 +16211,22 @@
             "config"
           ]
         },
+        "DeviceBridgeInfo": {
+          "type": "object",
+          "properties": {
+            "bridge-name": {
+              "type": "string"
+            },
+            "host-device-name": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "host-device-name",
+            "bridge-name"
+          ]
+        },
         "DistributionGroupResult": {
           "type": "object",
           "properties": {
@@ -15634,6 +16478,43 @@
             }
           },
           "additionalProperties": false
+        },
+        "HostNetworkChange": {
+          "type": "object",
+          "properties": {
+            "error": {
+              "$ref": "#/definitions/Error"
+            },
+            "new-bridges": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/DeviceBridgeInfo"
+              }
+            },
+            "reconfigure-delay": {
+              "type": "integer"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "new-bridges",
+            "reconfigure-delay"
+          ]
+        },
+        "HostNetworkChangeResults": {
+          "type": "object",
+          "properties": {
+            "results": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/HostNetworkChange"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "results"
+          ]
         },
         "HostPort": {
           "type": "object",
@@ -15898,6 +16779,12 @@
             "provider-vlan-id": {
               "type": "string"
             },
+            "routes": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/NetworkRoute"
+              }
+            },
             "vlan-tag": {
               "type": "integer"
             }
@@ -15918,6 +16805,26 @@
             "parent-interface-name",
             "interface-type",
             "disabled"
+          ]
+        },
+        "NetworkRoute": {
+          "type": "object",
+          "properties": {
+            "destination-cidr": {
+              "type": "string"
+            },
+            "gateway-ip": {
+              "type": "string"
+            },
+            "metric": {
+              "type": "integer"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "destination-cidr",
+            "gateway-ip",
+            "metric"
           ]
         },
         "NotifyWatchResult": {
@@ -16066,6 +16973,25 @@
           "additionalProperties": false,
           "required": [
             "results"
+          ]
+        },
+        "SetMachineNetworkConfig": {
+          "type": "object",
+          "properties": {
+            "config": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/NetworkConfig"
+              }
+            },
+            "tag": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "tag",
+            "config"
           ]
         },
         "SetStatus": {
@@ -16989,6 +17915,866 @@
           "additionalProperties": false,
           "required": [
             "version"
+          ]
+        }
+      }
+    }
+  },
+  {
+    "Name": "RemoteApplicationWatcher",
+    "Version": 1,
+    "Schema": {
+      "type": "object",
+      "properties": {
+        "Next": {
+          "type": "object",
+          "properties": {
+            "Result": {
+              "$ref": "#/definitions/RemoteApplicationWatchResult"
+            }
+          }
+        },
+        "Stop": {
+          "type": "object"
+        }
+      },
+      "definitions": {
+        "Error": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string"
+            },
+            "info": {
+              "$ref": "#/definitions/ErrorInfo"
+            },
+            "message": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "message",
+            "code"
+          ]
+        },
+        "ErrorInfo": {
+          "type": "object",
+          "properties": {
+            "macaroon": {
+              "$ref": "#/definitions/Macaroon"
+            },
+            "macaroon-path": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "Macaroon": {
+          "type": "object",
+          "additionalProperties": false
+        },
+        "RemoteApplicationChange": {
+          "type": "object",
+          "properties": {
+            "application-tag": {
+              "type": "string"
+            },
+            "life": {
+              "type": "string"
+            },
+            "relations": {
+              "$ref": "#/definitions/RemoteRelationsChange"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "application-tag",
+            "life",
+            "relations"
+          ]
+        },
+        "RemoteApplicationWatchResult": {
+          "type": "object",
+          "properties": {
+            "change": {
+              "$ref": "#/definitions/RemoteApplicationChange"
+            },
+            "error": {
+              "$ref": "#/definitions/Error"
+            },
+            "id": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "id"
+          ]
+        },
+        "RemoteEntityId": {
+          "type": "object",
+          "properties": {
+            "model-uuid": {
+              "type": "string"
+            },
+            "token": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "model-uuid",
+            "token"
+          ]
+        },
+        "RemoteRelationChange": {
+          "type": "object",
+          "properties": {
+            "changed-units": {
+              "type": "object",
+              "patternProperties": {
+                ".*": {
+                  "$ref": "#/definitions/RemoteRelationUnitChange"
+                }
+              }
+            },
+            "departed-units": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "id": {
+              "type": "integer"
+            },
+            "life": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "life"
+          ]
+        },
+        "RemoteRelationUnitChange": {
+          "type": "object",
+          "properties": {
+            "settings": {
+              "type": "object",
+              "patternProperties": {
+                ".*": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            },
+            "unit-id": {
+              "$ref": "#/definitions/RemoteEntityId"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "unit-id"
+          ]
+        },
+        "RemoteRelationsChange": {
+          "type": "object",
+          "properties": {
+            "changed": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/RemoteRelationChange"
+              }
+            },
+            "initial": {
+              "type": "boolean"
+            },
+            "removed": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "initial"
+          ]
+        }
+      }
+    }
+  },
+  {
+    "Name": "RemoteRelationsWatcher",
+    "Version": 1,
+    "Schema": {
+      "type": "object",
+      "properties": {
+        "Next": {
+          "type": "object",
+          "properties": {
+            "Result": {
+              "$ref": "#/definitions/RemoteRelationsWatchResult"
+            }
+          }
+        },
+        "Stop": {
+          "type": "object"
+        }
+      },
+      "definitions": {
+        "Error": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string"
+            },
+            "info": {
+              "$ref": "#/definitions/ErrorInfo"
+            },
+            "message": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "message",
+            "code"
+          ]
+        },
+        "ErrorInfo": {
+          "type": "object",
+          "properties": {
+            "macaroon": {
+              "$ref": "#/definitions/Macaroon"
+            },
+            "macaroon-path": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "Macaroon": {
+          "type": "object",
+          "additionalProperties": false
+        },
+        "RemoteEntityId": {
+          "type": "object",
+          "properties": {
+            "model-uuid": {
+              "type": "string"
+            },
+            "token": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "model-uuid",
+            "token"
+          ]
+        },
+        "RemoteRelationChange": {
+          "type": "object",
+          "properties": {
+            "changed-units": {
+              "type": "object",
+              "patternProperties": {
+                ".*": {
+                  "$ref": "#/definitions/RemoteRelationUnitChange"
+                }
+              }
+            },
+            "departed-units": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "id": {
+              "type": "integer"
+            },
+            "life": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "life"
+          ]
+        },
+        "RemoteRelationUnitChange": {
+          "type": "object",
+          "properties": {
+            "settings": {
+              "type": "object",
+              "patternProperties": {
+                ".*": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            },
+            "unit-id": {
+              "$ref": "#/definitions/RemoteEntityId"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "unit-id"
+          ]
+        },
+        "RemoteRelationsChange": {
+          "type": "object",
+          "properties": {
+            "changed": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/RemoteRelationChange"
+              }
+            },
+            "initial": {
+              "type": "boolean"
+            },
+            "removed": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "initial"
+          ]
+        },
+        "RemoteRelationsWatchResult": {
+          "type": "object",
+          "properties": {
+            "RemoteRelationsWatcherId": {
+              "type": "string"
+            },
+            "change": {
+              "$ref": "#/definitions/RemoteRelationsChange"
+            },
+            "error": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "RemoteRelationsWatcherId"
+          ]
+        }
+      }
+    }
+  },
+  {
+    "Name": "Resources",
+    "Version": 1,
+    "Schema": {
+      "type": "object",
+      "properties": {
+        "AddPendingResources": {
+          "type": "object",
+          "properties": {
+            "Params": {
+              "$ref": "#/definitions/AddPendingResourcesArgs"
+            },
+            "Result": {
+              "$ref": "#/definitions/AddPendingResourcesResult"
+            }
+          }
+        },
+        "ListResources": {
+          "type": "object",
+          "properties": {
+            "Params": {
+              "$ref": "#/definitions/ListResourcesArgs"
+            },
+            "Result": {
+              "$ref": "#/definitions/ResourcesResults"
+            }
+          }
+        }
+      },
+      "definitions": {
+        "AddCharmWithAuthorization": {
+          "type": "object",
+          "properties": {
+            "channel": {
+              "type": "string"
+            },
+            "macaroon": {
+              "$ref": "#/definitions/Macaroon"
+            },
+            "url": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "url",
+            "channel",
+            "macaroon"
+          ]
+        },
+        "AddPendingResourcesArgs": {
+          "type": "object",
+          "properties": {
+            "AddCharmWithAuthorization": {
+              "$ref": "#/definitions/AddCharmWithAuthorization"
+            },
+            "Entity": {
+              "$ref": "#/definitions/Entity"
+            },
+            "Resources": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CharmResource"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "Entity",
+            "AddCharmWithAuthorization",
+            "Resources"
+          ]
+        },
+        "AddPendingResourcesResult": {
+          "type": "object",
+          "properties": {
+            "ErrorResult": {
+              "$ref": "#/definitions/ErrorResult"
+            },
+            "pending-ids": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "ErrorResult",
+            "pending-ids"
+          ]
+        },
+        "CharmResource": {
+          "type": "object",
+          "properties": {
+            "description": {
+              "type": "string"
+            },
+            "fingerprint": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "name": {
+              "type": "string"
+            },
+            "origin": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            },
+            "revision": {
+              "type": "integer"
+            },
+            "size": {
+              "type": "integer"
+            },
+            "type": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "type",
+            "path",
+            "origin",
+            "revision",
+            "fingerprint",
+            "size"
+          ]
+        },
+        "Entity": {
+          "type": "object",
+          "properties": {
+            "tag": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "tag"
+          ]
+        },
+        "Error": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string"
+            },
+            "info": {
+              "$ref": "#/definitions/ErrorInfo"
+            },
+            "message": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "message",
+            "code"
+          ]
+        },
+        "ErrorInfo": {
+          "type": "object",
+          "properties": {
+            "macaroon": {
+              "$ref": "#/definitions/Macaroon"
+            },
+            "macaroon-path": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "ErrorResult": {
+          "type": "object",
+          "properties": {
+            "error": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "additionalProperties": false
+        },
+        "ListResourcesArgs": {
+          "type": "object",
+          "properties": {
+            "entities": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Entity"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "entities"
+          ]
+        },
+        "Macaroon": {
+          "type": "object",
+          "additionalProperties": false
+        },
+        "Resource": {
+          "type": "object",
+          "properties": {
+            "CharmResource": {
+              "$ref": "#/definitions/CharmResource"
+            },
+            "application": {
+              "type": "string"
+            },
+            "id": {
+              "type": "string"
+            },
+            "pending-id": {
+              "type": "string"
+            },
+            "timestamp": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "username": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "CharmResource",
+            "id",
+            "pending-id",
+            "application",
+            "username",
+            "timestamp"
+          ]
+        },
+        "ResourcesResult": {
+          "type": "object",
+          "properties": {
+            "ErrorResult": {
+              "$ref": "#/definitions/ErrorResult"
+            },
+            "charm-store-resources": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CharmResource"
+              }
+            },
+            "resources": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Resource"
+              }
+            },
+            "unit-resources": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/UnitResources"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "ErrorResult",
+            "resources",
+            "charm-store-resources",
+            "unit-resources"
+          ]
+        },
+        "ResourcesResults": {
+          "type": "object",
+          "properties": {
+            "results": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ResourcesResult"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "results"
+          ]
+        },
+        "UnitResources": {
+          "type": "object",
+          "properties": {
+            "Entity": {
+              "$ref": "#/definitions/Entity"
+            },
+            "download-progress": {
+              "type": "object",
+              "patternProperties": {
+                ".*": {
+                  "type": "integer"
+                }
+              }
+            },
+            "resources": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Resource"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "Entity",
+            "resources",
+            "download-progress"
+          ]
+        }
+      }
+    }
+  },
+  {
+    "Name": "ResourcesHookContext",
+    "Version": 1,
+    "Schema": {
+      "type": "object",
+      "properties": {
+        "GetResourceInfo": {
+          "type": "object",
+          "properties": {
+            "Params": {
+              "$ref": "#/definitions/ListResourcesArgs"
+            },
+            "Result": {
+              "$ref": "#/definitions/ResourcesResult"
+            }
+          }
+        }
+      },
+      "definitions": {
+        "CharmResource": {
+          "type": "object",
+          "properties": {
+            "description": {
+              "type": "string"
+            },
+            "fingerprint": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "name": {
+              "type": "string"
+            },
+            "origin": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            },
+            "revision": {
+              "type": "integer"
+            },
+            "size": {
+              "type": "integer"
+            },
+            "type": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "type",
+            "path",
+            "origin",
+            "revision",
+            "fingerprint",
+            "size"
+          ]
+        },
+        "Error": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string"
+            },
+            "info": {
+              "$ref": "#/definitions/ErrorInfo"
+            },
+            "message": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "message",
+            "code"
+          ]
+        },
+        "ErrorInfo": {
+          "type": "object",
+          "properties": {
+            "macaroon": {
+              "$ref": "#/definitions/Macaroon"
+            },
+            "macaroon-path": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "ErrorResult": {
+          "type": "object",
+          "properties": {
+            "error": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "additionalProperties": false
+        },
+        "ListResourcesArgs": {
+          "type": "object",
+          "properties": {
+            "resource-names": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "resource-names"
+          ]
+        },
+        "Macaroon": {
+          "type": "object",
+          "additionalProperties": false
+        },
+        "Resource": {
+          "type": "object",
+          "properties": {
+            "CharmResource": {
+              "$ref": "#/definitions/CharmResource"
+            },
+            "application": {
+              "type": "string"
+            },
+            "id": {
+              "type": "string"
+            },
+            "pending-id": {
+              "type": "string"
+            },
+            "timestamp": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "username": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "CharmResource",
+            "id",
+            "pending-id",
+            "application",
+            "username",
+            "timestamp"
+          ]
+        },
+        "ResourceResult": {
+          "type": "object",
+          "properties": {
+            "ErrorResult": {
+              "$ref": "#/definitions/ErrorResult"
+            },
+            "resource": {
+              "$ref": "#/definitions/Resource"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "ErrorResult",
+            "resource"
+          ]
+        },
+        "ResourcesResult": {
+          "type": "object",
+          "properties": {
+            "ErrorResult": {
+              "$ref": "#/definitions/ErrorResult"
+            },
+            "resources": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ResourceResult"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "ErrorResult",
+            "resources"
           ]
         }
       }
@@ -22322,6 +24108,12 @@
             "provider-vlan-id": {
               "type": "string"
             },
+            "routes": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/NetworkRoute"
+              }
+            },
             "vlan-tag": {
               "type": "integer"
             }
@@ -22342,6 +24134,26 @@
             "parent-interface-name",
             "interface-type",
             "disabled"
+          ]
+        },
+        "NetworkRoute": {
+          "type": "object",
+          "properties": {
+            "destination-cidr": {
+              "type": "string"
+            },
+            "gateway-ip": {
+              "type": "string"
+            },
+            "metric": {
+              "type": "integer"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "destination-cidr",
+            "gateway-ip",
+            "metric"
           ]
         },
         "NotifyWatchResult": {

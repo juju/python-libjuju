@@ -10,13 +10,14 @@ import asyncio
 import logging
 
 from juju.model import Model
+from juju import loop
 
 log = logging.getLogger(__name__)
 
 MB = 1
 
 
-async def run():
+async def main():
     model = Model()
     await model.connect_current()
     await model.reset(force=True)
@@ -45,12 +46,10 @@ async def run():
     assert(constraints['mem'] == 512 * MB)
 
     await model.disconnect()
-    model.loop.stop()
 
-logging.basicConfig(level=logging.DEBUG)
-ws_logger = logging.getLogger('websockets.protocol')
-ws_logger.setLevel(logging.INFO)
-loop = asyncio.get_event_loop()
-loop.set_debug(False)
-loop.create_task(run())
-loop.run_forever()
+    
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.DEBUG)
+    ws_logger = logging.getLogger('websockets.protocol')
+    ws_logger.setLevel(logging.INFO)
+    loop.run(main())

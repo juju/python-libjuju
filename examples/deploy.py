@@ -36,4 +36,5 @@ async def main():
         await model.disconnect()
 
 
-loop.run(main())
+if __name__ == '__main__':
+    loop.run(main())
