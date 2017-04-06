@@ -264,6 +264,8 @@ def retspec(defs):
     # Error or the expected Type
     if not defs:
         return None
+    if defs in basic_types:
+        return strcast(defs, False)
     rtypes = _registry.getObj(_types[defs])
     if not rtypes:
         return None
@@ -399,7 +401,11 @@ def _buildMethod(cls, name):
         prop = method['properties']
         spec = prop.get('Params')
         if spec:
-            params = _types.get(spec['$ref'])
+            result = _types.get(spec['$ref'])
+            if '$ref' in spec:
+                result = _types.get(spec['$ref'])
+            else:
+                result = SCHEMA_TO_PYTHON[spec['type']]
         spec = prop.get('Result')
         if spec:
             result = _types.get(spec['$ref'])
