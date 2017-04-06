@@ -1,7 +1,7 @@
 from collections import namedtuple
 
 from .facade import ReturnMapping, Type
-from .import _clien
+from .import _client
 
 __all__ = [
     'Delta',
