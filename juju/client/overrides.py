@@ -1,9 +1,14 @@
 from collections import namedtuple
 
-from .facade import Type
+from .facade import ReturnMapping, Type
+from .import _clien
 
 __all__ = [
     'Delta',
+]
+
+__patches__ = [
+    'ResourcesFacade',
 ]
 
 
@@ -43,3 +48,35 @@ class Delta(Type):
     @classmethod
     def from_json(cls, data):
         return cls(deltas=data)
+
+
+class ResourcesFacade(Type):
+    """Patch parts of ResourcesFacade to make it work.
+    """
+
+    @ReturnMapping(_client.AddPendingResourcesResult)
+    async def AddPendingResources(self, application_tag, charm_url, resources):
+        """Fix the calling signature of AddPendingResources.
+
+        The ResourcesFacade doesn't conform to the standard facade pattern in
+        the Juju source, which leads to the schemagened code not matching up
+        properly with the actual calling convention in the API.  There is work
+        planned to fix this in Juju, but we have to work around it for now.
+
+        application_tag : str
+        charm_url : str
+        resources : typing.Sequence<+T_co>[~CharmResource]<~CharmResource>
+        Returns -> typing.Union[_ForwardRef('ErrorResult'),
+                                typing.Sequence<+T_co>[str]]
+        """
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Resources',
+                   request='AddPendingResources',
+                   version=1,
+                   params=_params)
+        _params['tag'] = application_tag
+        _params['url'] = charm_url
+        _params['resources'] = resources
+        reply = await self.rpc(msg)
+        return reply
