@@ -142,7 +142,7 @@ async def test_explicit_loop_threaded(event_loop):
 @pytest.mark.asyncio
 async def test_store_resources_charm(event_loop):
     async with base.CleanModel() as model:
-        ghost = await model.deploy('cs:ghost-18')
+        ghost = await model.deploy('cs:ghost-19')
         assert 'ghost' in model.applications
         terminal_statuses = ('active', 'error', 'blocked')
         await model.block_until(
