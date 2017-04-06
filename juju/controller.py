@@ -97,7 +97,7 @@ class Controller(object):
             credential,
             model_name,
             owner,
-            region,
+            region
         )
 
         # Add our ssh key to the model, to work around
@@ -152,7 +152,7 @@ class Controller(object):
         ])
     destroy_model = destroy_models
 
-    def add_user(self, username, display_name=None, acl=None, models=None):
+    async def add_user(self, username, password=None, display_name=None):
         """Add a user to this controller.
 
         :param str username: Username
@@ -161,39 +161,57 @@ class Controller(object):
         :param list models: Models to which the user is granted access
 
         """
-        raise NotImplementedError()
+        if not display_name:
+            display_name = username
+        user_facade = client.UserManagerFacade()
+        user_facade.connect(self.connection)
+        users = [{'display_name': display_name,
+                  'password': password,
+                  'username': username}]
+        return await user_facade.AddUser(users)
 
-    def change_user_password(self, username, password):
+    async def change_user_password(self, username, password):
         """Change the password for a user in this controller.
 
         :param str username: Username
         :param str password: New password
 
         """
-        raise NotImplementedError()
+        user_facade = client.UserManagerFacade()
+        user_facade.connect(self.connection)
+        entity = client.EntityPassword(password, tag.user(username))
+        return await user_facade.SetPassword([entity])
 
-    def destroy(self, destroy_all_models=False):
+    async def destroy(self, destroy_all_models=False):
         """Destroy this controller.
 
         :param bool destroy_all_models: Destroy all hosted models in the
             controller.
 
         """
-        raise NotImplementedError()
+        controller_facade = client.ControllerFacade()
+        controller_facade.connect(self.connection)
+        return await controller_facade.DestroyController(destroy_all_models)
 
-    def disable_user(self, username):
+    async def disable_user(self, username):
         """Disable a user.
 
         :param str username: Username
 
         """
-        raise NotImplementedError()
+        user_facade = client.UserManagerFacade()
+        user_facade.connect(self.connection)
+        entity = client.Entity(tag.user(username))
+        return await user_facade.DisableUser([entity])
 
-    def enable_user(self):
+    async def enable_user(self, username):
         """Re-enable a previously disabled user.
 
         """
-        raise NotImplementedError()
+        user_facade = client.UserManagerFacade()
+        user_facade.connect(self.connection)
+        entity = client.Entity(tag.user(username))
+        return await user_facade.EnableUser([entity])
 
     def kill(self):
         """Forcibly terminate all machines and other associated resources for
@@ -213,7 +231,7 @@ class Controller(object):
         cloud = list(result.clouds.keys())[0]  # only lives on one cloud
         return tag.untag('cloud-', cloud)
 
-    def get_models(self, all_=False, username=None):
+    async def get_models(self, all_=False, username=None):
         """Return list of available models on this controller.
 
         :param bool all_: List all models, regardless of user accessibilty
@@ -221,7 +239,10 @@ class Controller(object):
         :param str username: User for which to list models (admin use only)
 
         """
-        raise NotImplementedError()
+        controller_facade = client.ControllerFacade()
+        controller_facade.connect(self.connection)
+        return await controller_facade.AllModels()
+
 
     def get_payloads(self, *patterns):
         """Return list of known payloads.
@@ -272,10 +293,39 @@ class Controller(object):
         """
         raise NotImplementedError()
 
-    def get_user(self, username):
+    async def get_user(self, username, include_disabled=False):
         """Get a user by name.
 
         :param str username: Username
 
         """
-        raise NotImplementedError()
+        client_facade = client.UserManagerFacade()
+        client_facade.connect(self.connection)
+        user = tag.user(username)
+        return await client_facade.UserInfo([client.Entity(user)], include_disabled)
+
+    async def grant(self, username, acl='login'):
+        """Set access level of the given user on the controller
+
+        :param str username: Username
+        :param str acl: Access control ('login', 'add-model' or 'superuser')
+
+        """
+        controller_facade = client.ControllerFacade()
+        controller_facade.connect(self.connection)
+        user = tag.user(username)
+        await self.revoke(username)
+        changes = client.ModifyControllerAccess(acl, 'grant', user)
+        return await controller_facade.ModifyControllerAccess([changes])
+
+    async def revoke(self, username):
+        """Removes all access from a controller
+
+        :param str username: username
+
+        """
+        controller_facade = client.ControllerFacade()
+        controller_facade.connect(self.connection)
+        user = tag.user(username)
+        changes = client.ModifyControllerAccess('login', 'revoke', user)
+        return await controller_facade.ModifyControllerAccess([changes])

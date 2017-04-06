@@ -1,5 +1,4 @@
 '''Replace auto-generated classes with our own, where necessary.
-
 '''
 
 from . import _client
