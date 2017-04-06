@@ -22771,6 +22771,3 @@ class VolumeAttachmentsWatcherFacade(Type):
 
         reply = await self.rpc(msg)
         return reply
-
-
-0

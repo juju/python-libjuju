@@ -12,11 +12,11 @@ clean:
 	tox -r --notest
 
 client:
-	ifndef SCHEMAGEN
- 		$(error "schemagen is not available, please install from https://github.com/juju/schemagen")
-  endif
- 		schemagen > juju/client/schemas.json
-		$(PY) -m juju.client.facade -s juju/client/schemas.json -o juju/client/_client.py
+ifndef SCHEMAGEN
+	$(error "schemagen is not available, please install from https://github.com/juju/schemagen")
+endif
+	schemagen > juju/client/schemas.json
+	$(PY) -m juju.client.facade -s juju/client/schemas.json -o juju/client/_client.py
 
 test:
 	tox

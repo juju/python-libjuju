@@ -51,10 +51,11 @@ and in the documentation.
   import asyncio
   import logging
 
+  from juju import loop
   from juju.model import Model
 
 
-  async def run():
+  async def deploy():
       # Create a Model instance. We need to connect our Model to a Juju api
       # server before we can use it.
       model = Model()
@@ -74,9 +75,6 @@ and in the documentation.
       # Disconnect from the api server and cleanup.
       model.disconnect()
 
-      # Stop the asyncio event loop.
-      model.loop.stop()
-
 
   def main():
       # Set logging level to debug so we can see verbose output from the
@@ -88,14 +86,9 @@ and in the documentation.
       ws_logger = logging.getLogger('websockets.protocol')
       ws_logger.setLevel(logging.INFO)
 
-      # Create the asyncio event loop
-      loop = asyncio.get_event_loop()
-
-      # Queue up our `run()` coroutine for execution
-      loop.create_task(run())
-
-      # Start the event loop
-      loop.run_forever()
+      # Run the deploy coroutine in an asyncio event loop, using a helper
+      # that abstracts loop creation and teardown.
+      loop.run(deploy())
 
 
   if __name__ == '__main__':

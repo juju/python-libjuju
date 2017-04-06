@@ -22,6 +22,7 @@ class Controller(object):
         """
         self.loop = loop or asyncio.get_event_loop()
         self.connection = None
+        self.controller_name = None
 
     async def connect(
             self, endpoint, username, password, cacert=None, macaroons=None):
@@ -44,6 +45,7 @@ class Controller(object):
         """
         self.connection = (
             await connection.Connection.connect_controller(controller_name))
+        self.controller_name = controller_name
 
     async def disconnect(self):
         """Shut down the watcher task and close websockets.
@@ -102,9 +104,13 @@ class Controller(object):
         # https://bugs.launchpad.net/juju/+bug/1643076
         try:
             ssh_key = await utils.read_ssh_key(loop=self.loop)
-            await utils.execute_process(
-                'juju', 'add-ssh-key', '-m', model_name, ssh_key, log=log,
-                loop=self.loop)
+
+            if self.controller_name:
+                model_name = "{}:{}".format(self.controller_name, model_name)
+
+            cmd = ['juju', 'add-ssh-key', '-m', model_name, ssh_key]
+
+            await utils.execute_process(*cmd, log=log, loop=self.loop)
         except Exception:
             log.exception(
                 "Could not add ssh key to model. You will not be able "

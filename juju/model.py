@@ -233,7 +233,14 @@ class ModelEntity(object):
         model.
 
         """
-        return self.safe_data[name]
+        try:
+            return self.safe_data[name]
+        except KeyError:
+            name = name.replace('_', '-')
+            if name in self.safe_data:
+                return self.safe_data[name]
+            else:
+                raise
 
     def __bool__(self):
         return bool(self.data)
@@ -1045,7 +1052,8 @@ class Model(object):
                 await client_facade.AddCharm(channel, entity_id)
                 # XXX: we're dropping local resources here, but we don't
                 # actually support them yet anyway
-                resources = await self._add_store_resources(application_name,                                                            entity_id,
+                resources = await self._add_store_resources(application_name,
+                                                            entity_id,
                                                             entity)
             else:
                 # We have a local charm dir that needs to be uploaded

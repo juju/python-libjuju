@@ -408,7 +408,10 @@ def _buildMethod(cls, name):
                 result = SCHEMA_TO_PYTHON[spec['type']]
         spec = prop.get('Result')
         if spec:
-            result = _types.get(spec['$ref'])
+            if '$ref' in spec:
+                result = _types.get(spec['$ref'])
+            else:
+                result = SCHEMA_TO_PYTHON[spec['type']]
     return makeFunc(cls, name, params, result)
 
 
@@ -624,7 +627,6 @@ def main():
     capture = generate_facacdes(options)
     with open(options.output, "w") as fp:
         print(capture, file=fp)
-
 
 
 if __name__ == '__main__':

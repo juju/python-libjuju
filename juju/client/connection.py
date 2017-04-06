@@ -21,6 +21,83 @@ from juju.utils import IdQueue
 log = logging.getLogger("websocket")
 
 
+class Monitor:
+    """
+    Monitor helper class for our Connection class.
+
+    Contains a reference to an instantiated Connection, along with a
+    reference to the Connection.receiver Future. Upon inspecttion of
+    these objects, this class determines whether the connection is in
+    an 'error', 'connected' or 'disconnected' state.
+
+    Use this class to stay up to date on the health of a connection,
+    and take appropriate action if the connection errors out due to
+    network issues or other unexpected circumstances.
+
+    """
+    ERROR = 'error'
+    CONNECTED = 'connected'
+    DISCONNECTED = 'disconnected'
+    UNKNOWN = 'unknown'
+
+    def __init__(self, connection):
+        self.connection = connection
+        self.receiver = None
+
+    @property
+    def status(self):
+        """
+        Determine the status of the connection and receiver, and return
+        ERROR, CONNECTED, or DISCONNECTED as appropriate.
+
+        For simplicity, we only consider ourselves to be connected
+        after the Connection class has setup a receiver task. This
+        only happens after the websocket is open, and the connection
+        isn't usable until that receiver has been started.
+
+        """
+
+        # DISCONNECTED: connection not yet open
+        if not self.connection.ws:
+            return self.DISCONNECTED
+        if not self.receiver:
+            return self.DISCONNECTED
+
+        # ERROR: Connection closed (or errored), but we didn't call
+        # connection.close
+        if not self.connection.close_called and self.receiver_exceptions():
+            return self.ERROR
+        if not self.connection.close_called and not self.connection.ws.open:
+            # The check for self.receiver existing above guards against the
+            # case where we're not open because we simply haven't
+            # setup the connection yet.
+            return self.ERROR
+
+        # DISCONNECTED: cleanly disconnected.
+        if self.connection.close_called and not self.connection.ws.open:
+            return self.DISCONNECTED
+
+        # CONNECTED: everything is fine!
+        if self.connection.ws.open:
+            return self.CONNECTED
+
+        # UNKNOWN: We should never hit this state -- if we do,
+        # something went wrong with the logic above, and we do not
+        # know what state the connection is in.
+        return self.UNKNOWN
+
+    def receiver_exceptions(self):
+        """
+        Return exceptions in the receiver, if any.
+
+        """
+        if not self.receiver:
+            return None
+        if not self.receiver.done():
+            return None
+        return self.receiver.exception()
+
+
 class Connection:
     """
     Usage::
@@ -54,6 +131,8 @@ class Connection:
         self.ws = None
         self.facades = {}
         self.messages = IdQueue(loop=self.loop)
+        self.close_called = False
+        self.monitor = Monitor(connection=self)
 
     @property
     def is_open(self):
@@ -76,11 +155,12 @@ class Connection:
         kw['loop'] = self.loop
         self.addr = url
         self.ws = await websockets.connect(url, **kw)
-        self.loop.create_task(self.receiver())
+        self.monitor.receiver = self.loop.create_task(self.receiver())
         log.info("Driver connected to juju %s", url)
         return self
 
     async def close(self):
+        self.close_called = True
         await self.ws.close()
 
     async def recv(self, request_id):
