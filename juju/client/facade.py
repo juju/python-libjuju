@@ -393,7 +393,7 @@ def buildMethods(cls, capture):
     for methodname in sorted(properties):
         method, source = _buildMethod(cls, methodname)
         setattr(cls, methodname, method)
-        capture[cls.__name__].write(source, depth=1)
+        capture["{}Facade".format(cls.__name__)].write(source, depth=1)
 
 
 def _buildMethod(cls, name):
@@ -627,8 +627,10 @@ def generate_facades(options):
         # the generated class has the right name and it in turn uses
         # the metaclass to populate cls
         cls, source = buildFacade(schema)
-        captures[schema.version].clear(cls.__name__)
-        captures[schema.version][cls.__name__].write(source)
+        cls_name = "{}Facade".format(schema.name)
+
+        captures[schema.version].clear(cls_name)
+        captures[schema.version][cls_name].write(source)
         buildMethods(cls, captures[schema.version])
         classes[schema.name] = cls
 
