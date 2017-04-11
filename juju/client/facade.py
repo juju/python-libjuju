@@ -248,8 +248,9 @@ class {}(Type):
                     source.append("{}self.{} = {}".format(INDENT * 2, arg_name, arg_name))
 
         source = "\n".join(source)
-        capture.write(source)
-        capture.write("\n\n")
+        capture.clear(name)
+        capture[name].write(source)
+        capture[name].write("\n\n")
         co = compile(source, __name__, "exec")
         ns = _getns()
         exec(co, ns)
@@ -391,7 +392,7 @@ def buildMethods(cls, capture):
     for methodname in sorted(properties):
         method, source = _buildMethod(cls, methodname)
         setattr(cls, methodname, method)
-        capture.write(source, depth=1)
+        capture[cls.__name__].write(source, depth=1)
 
 
 def _buildMethod(cls, name):
@@ -610,7 +611,7 @@ def _getns():
 
 def generate_facades(options):
     global classes
-    captures = defaultdict(codegen.CodeWriter)
+    captures = defaultdict(codegen.Capture)
     schemas = json.loads(Path(options.schema).read_text("utf-8"))
     schemas = [Schema(s) for s in schemas]
 
@@ -623,7 +624,8 @@ def generate_facades(options):
         # the generated class has the right name and it in turn uses
         # the metaclass to populate cls
         cls, source = buildFacade(schema)
-        captures[schema.version].write(source)
+        captures[schema.version].clear(cls.__name__)
+        captures[schema.version][cls.__name__].write(source)
         buildMethods(cls, captures[schema.version])
         classes[schema.name] = cls
 
@@ -649,11 +651,11 @@ def main():
     options = setup()
     captures = generate_facades(options)
     for version in captures:
-        # TODO: merge with old files, rather than overwriting
         filename = "{}{}.py".format(options.output, version)
         with open(filename, "w") as f:
             f.write(header)
-            print(captures[version], file=f)
+            for key in sorted(captures[version].keys()):
+                print(captures[version][key], file=f)
 
 if __name__ == '__main__':
     main()
