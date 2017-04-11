@@ -2,6 +2,7 @@ import argparse
 import builtins
 from collections import defaultdict
 import functools
+from glob import glob
 import json
 import keyword
 from pathlib import Path
@@ -612,8 +613,10 @@ def _getns():
 def generate_facades(options):
     global classes
     captures = defaultdict(codegen.Capture)
-    schemas = json.loads(Path(options.schema).read_text("utf-8"))
-    schemas = [Schema(s) for s in schemas]
+    schemas = []
+    for p in glob(options.schema):
+        new_schemas = json.loads(Path(p).read_text("utf-8"))
+        schemas += [Schema(s) for s in new_schemas]
 
     for schema in schemas:
         schema.buildDefinitions()
