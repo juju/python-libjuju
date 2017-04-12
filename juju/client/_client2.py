@@ -10549,7 +10549,40 @@ class MachineManagerFacade(Type):
                                                                 'tags': {'items': {'type': 'string'},
                                                                          'type': 'array'}},
                                                  'type': 'object'},
+                     'InstanceType': {'additionalProperties': False,
+                                      'properties': {'arches': {'items': {'type': 'string'},
+                                                                'type': 'array'},
+                                                     'cost': {'type': 'integer'},
+                                                     'cpu-cores': {'type': 'integer'},
+                                                     'deprecated': {'type': 'boolean'},
+                                                     'memory': {'type': 'integer'},
+                                                     'name': {'type': 'string'},
+                                                     'root-disk': {'type': 'integer'},
+                                                     'virt-type': {'type': 'string'}},
+                                      'required': ['arches', 'cpu-cores', 'memory'],
+                                      'type': 'object'},
+                     'InstanceTypesResult': {'additionalProperties': False,
+                                             'properties': {'cost-currency': {'type': 'string'},
+                                                            'cost-divisor': {'type': 'integer'},
+                                                            'cost-unit': {'type': 'string'},
+                                                            'error': {'$ref': '#/definitions/Error'},
+                                                            'instance-types': {'items': {'$ref': '#/definitions/InstanceType'},
+                                                                               'type': 'array'}},
+                                             'type': 'object'},
+                     'InstanceTypesResults': {'additionalProperties': False,
+                                              'properties': {'results': {'items': {'$ref': '#/definitions/InstanceTypesResult'},
+                                                                         'type': 'array'}},
+                                              'required': ['results'],
+                                              'type': 'object'},
                      'Macaroon': {'additionalProperties': False, 'type': 'object'},
+                     'ModelInstanceTypesConstraint': {'additionalProperties': False,
+                                                      'properties': {'value': {'$ref': '#/definitions/Value'}},
+                                                      'type': 'object'},
+                     'ModelInstanceTypesConstraints': {'additionalProperties': False,
+                                                       'properties': {'constraints': {'items': {'$ref': '#/definitions/ModelInstanceTypesConstraint'},
+                                                                                      'type': 'array'}},
+                                                       'required': ['constraints'],
+                                                       'type': 'object'},
                      'Placement': {'additionalProperties': False,
                                    'properties': {'directive': {'type': 'string'},
                                                   'scope': {'type': 'string'}},
@@ -10571,7 +10604,10 @@ class MachineManagerFacade(Type):
                                'type': 'object'}},
      'properties': {'AddMachines': {'properties': {'Params': {'$ref': '#/definitions/AddMachines'},
                                                    'Result': {'$ref': '#/definitions/AddMachinesResults'}},
-                                    'type': 'object'}},
+                                    'type': 'object'},
+                    'InstanceTypes': {'properties': {'Params': {'$ref': '#/definitions/ModelInstanceTypesConstraints'},
+                                                     'Result': {'$ref': '#/definitions/InstanceTypesResults'}},
+                                      'type': 'object'}},
      'type': 'object'}
     
 
@@ -10584,6 +10620,21 @@ class MachineManagerFacade(Type):
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='MachineManager', request='AddMachines', version=2, params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(InstanceTypesResults)
+    async def InstanceTypes(self):
+        '''
+
+        Returns -> typing.Sequence<+T_co>[~InstanceTypesResult]<~InstanceTypesResult>
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='MachineManager', request='InstanceTypes', version=2, params=_params)
 
         reply = await self.rpc(msg)
         return reply
@@ -10871,6 +10922,7 @@ class ModelManagerFacade(Type):
                                                   'life': {'type': 'string'},
                                                   'machines': {'items': {'$ref': '#/definitions/ModelMachineInfo'},
                                                                'type': 'array'},
+                                                  'migration': {'$ref': '#/definitions/ModelMigrationStatus'},
                                                   'name': {'type': 'string'},
                                                   'owner-tag': {'type': 'string'},
                                                   'provider-type': {'type': 'string'},
@@ -10908,6 +10960,14 @@ class ModelManagerFacade(Type):
                                                          'wants-vote': {'type': 'boolean'}},
                                           'required': ['id'],
                                           'type': 'object'},
+                     'ModelMigrationStatus': {'additionalProperties': False,
+                                              'properties': {'end': {'format': 'date-time',
+                                                                     'type': 'string'},
+                                                             'start': {'format': 'date-time',
+                                                                       'type': 'string'},
+                                                             'status': {'type': 'string'}},
+                                              'required': ['status', 'start'],
+                                              'type': 'object'},
                      'ModelStatus': {'additionalProperties': False,
                                      'properties': {'application-count': {'type': 'integer'},
                                                     'hosted-machine-count': {'type': 'integer'},

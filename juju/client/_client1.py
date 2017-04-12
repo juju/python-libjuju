@@ -8595,6 +8595,7 @@ class ClientFacade(Type):
                                          'type': 'object'},
                      'MachineStatus': {'additionalProperties': False,
                                        'properties': {'agent-status': {'$ref': '#/definitions/DetailedStatus'},
+                                                      'constraints': {'type': 'string'},
                                                       'containers': {'patternProperties': {'.*': {'$ref': '#/definitions/MachineStatus'}},
                                                                      'type': 'object'},
                                                       'dns-name': {'type': 'string'},
@@ -8617,6 +8618,7 @@ class ClientFacade(Type):
                                                     'series',
                                                     'id',
                                                     'containers',
+                                                    'constraints',
                                                     'hardware',
                                                     'jobs',
                                                     'has-vote',
@@ -8641,6 +8643,7 @@ class ClientFacade(Type):
                                                   'life': {'type': 'string'},
                                                   'machines': {'items': {'$ref': '#/definitions/ModelMachineInfo'},
                                                                'type': 'array'},
+                                                  'migration': {'$ref': '#/definitions/ModelMigrationStatus'},
                                                   'name': {'type': 'string'},
                                                   'owner-tag': {'type': 'string'},
                                                   'provider-type': {'type': 'string'},
@@ -8669,6 +8672,14 @@ class ClientFacade(Type):
                                                          'wants-vote': {'type': 'boolean'}},
                                           'required': ['id'],
                                           'type': 'object'},
+                     'ModelMigrationStatus': {'additionalProperties': False,
+                                              'properties': {'end': {'format': 'date-time',
+                                                                     'type': 'string'},
+                                                             'start': {'format': 'date-time',
+                                                                       'type': 'string'},
+                                                             'status': {'type': 'string'}},
+                                              'required': ['status', 'start'],
+                                              'type': 'object'},
                      'ModelSet': {'additionalProperties': False,
                                   'properties': {'config': {'patternProperties': {'.*': {'additionalProperties': True,
                                                                                          'type': 'object'}},
@@ -9430,6 +9441,18 @@ class CloudFacade(Type):
                                                 'properties': {'results': {'items': {'$ref': '#/definitions/CloudCredentialResult'},
                                                                            'type': 'array'}},
                                                 'type': 'object'},
+                     'CloudInstanceTypesConstraint': {'additionalProperties': False,
+                                                      'properties': {'cloud-tag': {'type': 'string'},
+                                                                     'constraints': {'$ref': '#/definitions/Value'},
+                                                                     'region': {'type': 'string'}},
+                                                      'required': ['cloud-tag',
+                                                                   'region'],
+                                                      'type': 'object'},
+                     'CloudInstanceTypesConstraints': {'additionalProperties': False,
+                                                       'properties': {'constraints': {'items': {'$ref': '#/definitions/CloudInstanceTypesConstraint'},
+                                                                                      'type': 'array'}},
+                                                       'required': ['constraints'],
+                                                       'type': 'object'},
                      'CloudRegion': {'additionalProperties': False,
                                      'properties': {'endpoint': {'type': 'string'},
                                                     'identity-endpoint': {'type': 'string'},
@@ -9476,6 +9499,31 @@ class CloudFacade(Type):
                                                                  'type': 'array'}},
                                       'required': ['results'],
                                       'type': 'object'},
+                     'InstanceType': {'additionalProperties': False,
+                                      'properties': {'arches': {'items': {'type': 'string'},
+                                                                'type': 'array'},
+                                                     'cost': {'type': 'integer'},
+                                                     'cpu-cores': {'type': 'integer'},
+                                                     'deprecated': {'type': 'boolean'},
+                                                     'memory': {'type': 'integer'},
+                                                     'name': {'type': 'string'},
+                                                     'root-disk': {'type': 'integer'},
+                                                     'virt-type': {'type': 'string'}},
+                                      'required': ['arches', 'cpu-cores', 'memory'],
+                                      'type': 'object'},
+                     'InstanceTypesResult': {'additionalProperties': False,
+                                             'properties': {'cost-currency': {'type': 'string'},
+                                                            'cost-divisor': {'type': 'integer'},
+                                                            'cost-unit': {'type': 'string'},
+                                                            'error': {'$ref': '#/definitions/Error'},
+                                                            'instance-types': {'items': {'$ref': '#/definitions/InstanceType'},
+                                                                               'type': 'array'}},
+                                             'type': 'object'},
+                     'InstanceTypesResults': {'additionalProperties': False,
+                                              'properties': {'results': {'items': {'$ref': '#/definitions/InstanceTypesResult'},
+                                                                         'type': 'array'}},
+                                              'required': ['results'],
+                                              'type': 'object'},
                      'Macaroon': {'additionalProperties': False, 'type': 'object'},
                      'StringResult': {'additionalProperties': False,
                                       'properties': {'error': {'$ref': '#/definitions/Error'},
@@ -9509,7 +9557,21 @@ class CloudFacade(Type):
                      'UserClouds': {'additionalProperties': False,
                                     'properties': {'user-clouds': {'items': {'$ref': '#/definitions/UserCloud'},
                                                                    'type': 'array'}},
-                                    'type': 'object'}},
+                                    'type': 'object'},
+                     'Value': {'additionalProperties': False,
+                               'properties': {'arch': {'type': 'string'},
+                                              'container': {'type': 'string'},
+                                              'cores': {'type': 'integer'},
+                                              'cpu-power': {'type': 'integer'},
+                                              'instance-type': {'type': 'string'},
+                                              'mem': {'type': 'integer'},
+                                              'root-disk': {'type': 'integer'},
+                                              'spaces': {'items': {'type': 'string'},
+                                                         'type': 'array'},
+                                              'tags': {'items': {'type': 'string'},
+                                                       'type': 'array'},
+                                              'virt-type': {'type': 'string'}},
+                               'type': 'object'}},
      'properties': {'Cloud': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                              'Result': {'$ref': '#/definitions/CloudResults'}},
                               'type': 'object'},
@@ -9520,6 +9582,9 @@ class CloudFacade(Type):
                                    'type': 'object'},
                     'DefaultCloud': {'properties': {'Result': {'$ref': '#/definitions/StringResult'}},
                                      'type': 'object'},
+                    'InstanceTypes': {'properties': {'Params': {'$ref': '#/definitions/CloudInstanceTypesConstraints'},
+                                                     'Result': {'$ref': '#/definitions/InstanceTypesResults'}},
+                                      'type': 'object'},
                     'RevokeCredentials': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                          'Result': {'$ref': '#/definitions/ErrorResults'}},
                                           'type': 'object'},
@@ -9586,6 +9651,21 @@ class CloudFacade(Type):
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Cloud', request='DefaultCloud', version=1, params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(InstanceTypesResults)
+    async def InstanceTypes(self):
+        '''
+
+        Returns -> typing.Sequence<+T_co>[~InstanceTypesResult]<~InstanceTypesResult>
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Cloud', request='InstanceTypes', version=1, params=_params)
 
         reply = await self.rpc(msg)
         return reply
@@ -10958,6 +11038,8 @@ class MachinerFacade(Type):
                                                       'provider-space-id': {'type': 'string'},
                                                       'provider-subnet-id': {'type': 'string'},
                                                       'provider-vlan-id': {'type': 'string'},
+                                                      'routes': {'items': {'$ref': '#/definitions/NetworkRoute'},
+                                                                 'type': 'array'},
                                                       'vlan-tag': {'type': 'integer'}},
                                        'required': ['device-index',
                                                     'mac-address',
@@ -10974,6 +11056,14 @@ class MachinerFacade(Type):
                                                     'interface-type',
                                                     'disabled'],
                                        'type': 'object'},
+                     'NetworkRoute': {'additionalProperties': False,
+                                      'properties': {'destination-cidr': {'type': 'string'},
+                                                     'gateway-ip': {'type': 'string'},
+                                                     'metric': {'type': 'integer'}},
+                                      'required': ['destination-cidr',
+                                                   'gateway-ip',
+                                                   'metric'],
+                                      'type': 'object'},
                      'NotifyWatchResult': {'additionalProperties': False,
                                            'properties': {'NotifyWatcherId': {'type': 'string'},
                                                           'error': {'$ref': '#/definitions/Error'}},
@@ -11520,13 +11610,15 @@ class MigrationMasterFacade(Type):
                                                'type': 'object'},
                      'MigrationModelInfo': {'additionalProperties': False,
                                             'properties': {'agent-version': {'$ref': '#/definitions/Number'},
+                                                           'controller-agent-version': {'$ref': '#/definitions/Number'},
                                                            'name': {'type': 'string'},
                                                            'owner-tag': {'type': 'string'},
                                                            'uuid': {'type': 'string'}},
                                             'required': ['uuid',
                                                          'name',
                                                          'owner-tag',
-                                                         'agent-version'],
+                                                         'agent-version',
+                                                         'controller-agent-version'],
                                             'type': 'object'},
                      'MigrationSpec': {'additionalProperties': False,
                                        'properties': {'external-control': {'type': 'boolean'},
@@ -11589,10 +11681,48 @@ class MigrationMasterFacade(Type):
                                                                   'type': 'array'},
                                                         'charms': {'items': {'type': 'string'},
                                                                    'type': 'array'},
+                                                        'resources': {'items': {'$ref': '#/definitions/SerializedModelResource'},
+                                                                      'type': 'array'},
                                                         'tools': {'items': {'$ref': '#/definitions/SerializedModelTools'},
                                                                   'type': 'array'}},
-                                         'required': ['bytes', 'charms', 'tools'],
+                                         'required': ['bytes',
+                                                      'charms',
+                                                      'tools',
+                                                      'resources'],
                                          'type': 'object'},
+                     'SerializedModelResource': {'additionalProperties': False,
+                                                 'properties': {'application': {'type': 'string'},
+                                                                'application-revision': {'$ref': '#/definitions/SerializedModelResourceRevision'},
+                                                                'charmstore-revision': {'$ref': '#/definitions/SerializedModelResourceRevision'},
+                                                                'name': {'type': 'string'},
+                                                                'unit-revisions': {'patternProperties': {'.*': {'$ref': '#/definitions/SerializedModelResourceRevision'}},
+                                                                                   'type': 'object'}},
+                                                 'required': ['application',
+                                                              'name',
+                                                              'application-revision',
+                                                              'charmstore-revision',
+                                                              'unit-revisions'],
+                                                 'type': 'object'},
+                     'SerializedModelResourceRevision': {'additionalProperties': False,
+                                                         'properties': {'description': {'type': 'string'},
+                                                                        'fingerprint': {'type': 'string'},
+                                                                        'origin': {'type': 'string'},
+                                                                        'path': {'type': 'string'},
+                                                                        'revision': {'type': 'integer'},
+                                                                        'size': {'type': 'integer'},
+                                                                        'timestamp': {'format': 'date-time',
+                                                                                      'type': 'string'},
+                                                                        'type': {'type': 'string'},
+                                                                        'username': {'type': 'string'}},
+                                                         'required': ['revision',
+                                                                      'type',
+                                                                      'path',
+                                                                      'description',
+                                                                      'origin',
+                                                                      'fingerprint',
+                                                                      'size',
+                                                                      'timestamp'],
+                                                         'type': 'object'},
                      'SerializedModelTools': {'additionalProperties': False,
                                               'properties': {'uri': {'type': 'string'},
                                                              'version': {'type': 'string'}},
@@ -11903,15 +12033,23 @@ class MigrationStatusWatcherFacade(Type):
 class MigrationTargetFacade(Type):
     name = 'MigrationTarget'
     version = 1
-    schema =     {'definitions': {'MigrationModelInfo': {'additionalProperties': False,
+    schema =     {'definitions': {'AdoptResourcesArgs': {'additionalProperties': False,
+                                            'properties': {'model-tag': {'type': 'string'},
+                                                           'source-controller-version': {'$ref': '#/definitions/Number'}},
+                                            'required': ['model-tag',
+                                                         'source-controller-version'],
+                                            'type': 'object'},
+                     'MigrationModelInfo': {'additionalProperties': False,
                                             'properties': {'agent-version': {'$ref': '#/definitions/Number'},
+                                                           'controller-agent-version': {'$ref': '#/definitions/Number'},
                                                            'name': {'type': 'string'},
                                                            'owner-tag': {'type': 'string'},
                                                            'uuid': {'type': 'string'}},
                                             'required': ['uuid',
                                                          'name',
                                                          'owner-tag',
-                                                         'agent-version'],
+                                                         'agent-version',
+                                                         'controller-agent-version'],
                                             'type': 'object'},
                      'ModelArgs': {'additionalProperties': False,
                                    'properties': {'model-tag': {'type': 'string'}},
@@ -11934,10 +12072,48 @@ class MigrationTargetFacade(Type):
                                                                   'type': 'array'},
                                                         'charms': {'items': {'type': 'string'},
                                                                    'type': 'array'},
+                                                        'resources': {'items': {'$ref': '#/definitions/SerializedModelResource'},
+                                                                      'type': 'array'},
                                                         'tools': {'items': {'$ref': '#/definitions/SerializedModelTools'},
                                                                   'type': 'array'}},
-                                         'required': ['bytes', 'charms', 'tools'],
+                                         'required': ['bytes',
+                                                      'charms',
+                                                      'tools',
+                                                      'resources'],
                                          'type': 'object'},
+                     'SerializedModelResource': {'additionalProperties': False,
+                                                 'properties': {'application': {'type': 'string'},
+                                                                'application-revision': {'$ref': '#/definitions/SerializedModelResourceRevision'},
+                                                                'charmstore-revision': {'$ref': '#/definitions/SerializedModelResourceRevision'},
+                                                                'name': {'type': 'string'},
+                                                                'unit-revisions': {'patternProperties': {'.*': {'$ref': '#/definitions/SerializedModelResourceRevision'}},
+                                                                                   'type': 'object'}},
+                                                 'required': ['application',
+                                                              'name',
+                                                              'application-revision',
+                                                              'charmstore-revision',
+                                                              'unit-revisions'],
+                                                 'type': 'object'},
+                     'SerializedModelResourceRevision': {'additionalProperties': False,
+                                                         'properties': {'description': {'type': 'string'},
+                                                                        'fingerprint': {'type': 'string'},
+                                                                        'origin': {'type': 'string'},
+                                                                        'path': {'type': 'string'},
+                                                                        'revision': {'type': 'integer'},
+                                                                        'size': {'type': 'integer'},
+                                                                        'timestamp': {'format': 'date-time',
+                                                                                      'type': 'string'},
+                                                                        'type': {'type': 'string'},
+                                                                        'username': {'type': 'string'}},
+                                                         'required': ['revision',
+                                                                      'type',
+                                                                      'path',
+                                                                      'description',
+                                                                      'origin',
+                                                                      'fingerprint',
+                                                                      'size',
+                                                                      'timestamp'],
+                                                         'type': 'object'},
                      'SerializedModelTools': {'additionalProperties': False,
                                               'properties': {'uri': {'type': 'string'},
                                                              'version': {'type': 'string'}},
@@ -11947,8 +12123,14 @@ class MigrationTargetFacade(Type):
                               'type': 'object'},
                     'Activate': {'properties': {'Params': {'$ref': '#/definitions/ModelArgs'}},
                                  'type': 'object'},
+                    'AdoptResources': {'properties': {'Params': {'$ref': '#/definitions/AdoptResourcesArgs'}},
+                                       'type': 'object'},
                     'Import': {'properties': {'Params': {'$ref': '#/definitions/SerializedModel'}},
                                'type': 'object'},
+                    'LatestLogTime': {'properties': {'Params': {'$ref': '#/definitions/ModelArgs'},
+                                                     'Result': {'format': 'date-time',
+                                                                'type': 'string'}},
+                                      'type': 'object'},
                     'Prechecks': {'properties': {'Params': {'$ref': '#/definitions/MigrationModelInfo'}},
                                   'type': 'object'}},
      'type': 'object'}
@@ -11984,6 +12166,21 @@ class MigrationTargetFacade(Type):
 
 
 
+    @ReturnMapping(AdoptResourcesArgs)
+    async def AdoptResources(self):
+        '''
+
+        Returns -> typing.Union[str, _ForwardRef('Number')]
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='MigrationTarget', request='AdoptResources', version=1, params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
     @ReturnMapping(SerializedModel)
     async def Import(self):
         '''
@@ -11993,6 +12190,21 @@ class MigrationTargetFacade(Type):
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='MigrationTarget', request='Import', version=1, params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(str)
+    async def LatestLogTime(self):
+        '''
+
+        Returns -> str
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='MigrationTarget', request='LatestLogTime', version=1, params=_params)
 
         reply = await self.rpc(msg)
         return reply

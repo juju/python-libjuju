@@ -9951,6 +9951,12 @@ class ProvisionerFacade(Type):
                                                                           'type': 'object'}},
                                                 'required': ['config'],
                                                 'type': 'object'},
+                     'DeviceBridgeInfo': {'additionalProperties': False,
+                                          'properties': {'bridge-name': {'type': 'string'},
+                                                         'host-device-name': {'type': 'string'}},
+                                          'required': ['host-device-name',
+                                                       'bridge-name'],
+                                          'type': 'object'},
                      'DistributionGroupResult': {'additionalProperties': False,
                                                  'properties': {'error': {'$ref': '#/definitions/Error'},
                                                                 'result': {'items': {'type': 'string'},
@@ -10039,6 +10045,19 @@ class ProvisionerFacade(Type):
                                                                 'tags': {'items': {'type': 'string'},
                                                                          'type': 'array'}},
                                                  'type': 'object'},
+                     'HostNetworkChange': {'additionalProperties': False,
+                                           'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                          'new-bridges': {'items': {'$ref': '#/definitions/DeviceBridgeInfo'},
+                                                                          'type': 'array'},
+                                                          'reconfigure-delay': {'type': 'integer'}},
+                                           'required': ['new-bridges',
+                                                        'reconfigure-delay'],
+                                           'type': 'object'},
+                     'HostNetworkChangeResults': {'additionalProperties': False,
+                                                  'properties': {'results': {'items': {'$ref': '#/definitions/HostNetworkChange'},
+                                                                             'type': 'array'}},
+                                                  'required': ['results'],
+                                                  'type': 'object'},
                      'HostPort': {'additionalProperties': False,
                                   'properties': {'Address': {'$ref': '#/definitions/Address'},
                                                  'port': {'type': 'integer'}},
@@ -10130,6 +10149,8 @@ class ProvisionerFacade(Type):
                                                       'provider-space-id': {'type': 'string'},
                                                       'provider-subnet-id': {'type': 'string'},
                                                       'provider-vlan-id': {'type': 'string'},
+                                                      'routes': {'items': {'$ref': '#/definitions/NetworkRoute'},
+                                                                 'type': 'array'},
                                                       'vlan-tag': {'type': 'integer'}},
                                        'required': ['device-index',
                                                     'mac-address',
@@ -10146,6 +10167,14 @@ class ProvisionerFacade(Type):
                                                     'interface-type',
                                                     'disabled'],
                                        'type': 'object'},
+                     'NetworkRoute': {'additionalProperties': False,
+                                      'properties': {'destination-cidr': {'type': 'string'},
+                                                     'gateway-ip': {'type': 'string'},
+                                                     'metric': {'type': 'integer'}},
+                                      'required': ['destination-cidr',
+                                                   'gateway-ip',
+                                                   'metric'],
+                                      'type': 'object'},
                      'NotifyWatchResult': {'additionalProperties': False,
                                            'properties': {'NotifyWatcherId': {'type': 'string'},
                                                           'error': {'$ref': '#/definitions/Error'}},
@@ -10197,6 +10226,12 @@ class ProvisionerFacade(Type):
                                                  'properties': {'results': {'items': {'$ref': '#/definitions/ProvisioningInfoResult'},
                                                                             'type': 'array'}},
                                                  'required': ['results'],
+                                                 'type': 'object'},
+                     'SetMachineNetworkConfig': {'additionalProperties': False,
+                                                 'properties': {'config': {'items': {'$ref': '#/definitions/NetworkConfig'},
+                                                                           'type': 'array'},
+                                                                'tag': {'type': 'string'}},
+                                                 'required': ['tag', 'config'],
                                                  'type': 'object'},
                      'SetStatus': {'additionalProperties': False,
                                    'properties': {'entities': {'items': {'$ref': '#/definitions/EntityStatusArgs'},
@@ -10382,6 +10417,9 @@ class ProvisionerFacade(Type):
                     'GetContainerInterfaceInfo': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                                  'Result': {'$ref': '#/definitions/MachineNetworkConfigResults'}},
                                                   'type': 'object'},
+                    'HostChangesForContainers': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                                'Result': {'$ref': '#/definitions/HostNetworkChangeResults'}},
+                                                 'type': 'object'},
                     'InstanceId': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                   'Result': {'$ref': '#/definitions/StringResults'}},
                                    'type': 'object'},
@@ -10415,12 +10453,16 @@ class ProvisionerFacade(Type):
                     'Series': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                               'Result': {'$ref': '#/definitions/StringResults'}},
                                'type': 'object'},
+                    'SetHostMachineNetworkConfig': {'properties': {'Params': {'$ref': '#/definitions/SetMachineNetworkConfig'}},
+                                                    'type': 'object'},
                     'SetInstanceInfo': {'properties': {'Params': {'$ref': '#/definitions/InstancesInfo'},
                                                        'Result': {'$ref': '#/definitions/ErrorResults'}},
                                         'type': 'object'},
                     'SetInstanceStatus': {'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
                                                          'Result': {'$ref': '#/definitions/ErrorResults'}},
                                           'type': 'object'},
+                    'SetObservedNetworkConfig': {'properties': {'Params': {'$ref': '#/definitions/SetMachineNetworkConfig'}},
+                                                 'type': 'object'},
                     'SetPasswords': {'properties': {'Params': {'$ref': '#/definitions/EntityPasswords'},
                                                     'Result': {'$ref': '#/definitions/ErrorResults'}},
                                      'type': 'object'},
@@ -10623,6 +10665,21 @@ class ProvisionerFacade(Type):
 
 
 
+    @ReturnMapping(HostNetworkChangeResults)
+    async def HostChangesForContainers(self):
+        '''
+
+        Returns -> typing.Sequence<+T_co>[~HostNetworkChange]<~HostNetworkChange>
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner', request='HostChangesForContainers', version=3, params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
     @ReturnMapping(StringResults)
     async def InstanceId(self):
         '''
@@ -10803,6 +10860,21 @@ class ProvisionerFacade(Type):
 
 
 
+    @ReturnMapping(SetMachineNetworkConfig)
+    async def SetHostMachineNetworkConfig(self):
+        '''
+
+        Returns -> typing.Sequence<+T_co>[~NetworkConfig]<~NetworkConfig>
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner', request='SetHostMachineNetworkConfig', version=3, params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
     @ReturnMapping(ErrorResults)
     async def SetInstanceInfo(self):
         '''
@@ -10827,6 +10899,21 @@ class ProvisionerFacade(Type):
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner', request='SetInstanceStatus', version=3, params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SetMachineNetworkConfig)
+    async def SetObservedNetworkConfig(self):
+        '''
+
+        Returns -> typing.Sequence<+T_co>[~NetworkConfig]<~NetworkConfig>
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner', request='SetObservedNetworkConfig', version=3, params=_params)
 
         reply = await self.rpc(msg)
         return reply
