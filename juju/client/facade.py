@@ -43,7 +43,7 @@ def lookup_facade(name, version):
 
         """
         try:
-            facade = getattr(CLIENTS[version], name)
+            facade = getattr(CLIENTS[str(version)], name)
         except KeyError:
             raise ImportError("No facades found for version {}".format(version))
         except AttributeError:
@@ -70,7 +70,7 @@ class TypeFactory:
 
         c = lookup_facade(cls.__name__, version)
         c = c()
-        c.connection(connection)
+        c.connect(connection)
 
         return c
 
@@ -243,7 +243,7 @@ def buildTypes(schema, capture):
     for kind in sorted((k for k in _types if not isinstance(k, str)),
                        key=lambda x: str(x)):
         name = _types[kind]
-        if name in classes:
+        if name in capture:
             continue
         args = Args(kind)
         # Write Factory class for _client.py
@@ -646,6 +646,8 @@ def _getns():
 
 
 def make_factory(classname):
+    if classname in factories:
+        del factories[classname]
     factories[classname].write("""
 class {}(TypeFactory):
     pass
@@ -695,22 +697,26 @@ def main():
         with open(filename, "w") as f:
             f.write(HEADER)
             f.write("from juju.client.facade import Type, ReturnMapping\n\n")
-            for key in sorted(captures[version].keys()):
+            for key in sorted([k for k in captures[version].keys() if "Facade" not in k]):
+                print(captures[version][key], file=f)
+            for key in sorted([k for k in captures[version].keys() if "Facade" in k]):
                 print(captures[version][key], file=f)
 
     with open("{}.py".format(options.output), "w") as f:
         f.write(HEADER)
-        clients = ", ".join("client{}".format(v) for v in captures)
+        clients = ", ".join("_client{}".format(v) for v in captures)
         client_table = """
 CLIENTS = {{
     {clients}
 }}
-""".format(clients=",\n    ".join(['"{}": client{}'.format(v, v) for v in captures]))
+""".format(clients=",\n    ".join(['"{}": _client{}'.format(v, v) for v in captures]))
         f.write("from juju.client import " + clients + "\n\n")
         f.write(client_table + "\n")
         f.write(LOOKUP_FACADE)
         f.write(TYPE_FACTORY)
-        for key in sorted(factories.keys()):
+        for key in sorted([k for k in factories.keys() if "Facade" not in k]):
+            print(factories[key], file=f)
+        for key in sorted([k for k in factories.keys() if "Facade" in k]):
             print(factories[key], file=f)
 
 
