@@ -3013,21 +3013,19 @@ class FindToolsResult(Type):
 
 
 class FullStatus(Type):
-    _toSchema = {'applications': 'applications', 'machines': 'machines', 'model': 'model', 'relations': 'relations', 'remote_applications': 'remote-applications'}
-    _toPy = {'applications': 'applications', 'machines': 'machines', 'model': 'model', 'relations': 'relations', 'remote-applications': 'remote_applications'}
-    def __init__(self, applications=None, machines=None, model=None, relations=None, remote_applications=None):
+    _toSchema = {'applications': 'applications', 'machines': 'machines', 'model': 'model', 'relations': 'relations'}
+    _toPy = {'applications': 'applications', 'machines': 'machines', 'model': 'model', 'relations': 'relations'}
+    def __init__(self, applications=None, machines=None, model=None, relations=None):
         '''
         applications : typing.Mapping<~KT, +VT_co>[str, ~ApplicationStatus]<~ApplicationStatus>
         machines : typing.Mapping<~KT, +VT_co>[str, ~MachineStatus]<~MachineStatus>
         model : ModelStatusInfo
         relations : typing.Sequence<+T_co>[~RelationStatus]<~RelationStatus>
-        remote_applications : typing.Mapping<~KT, +VT_co>[str, ~RemoteApplicationStatus]<~RemoteApplicationStatus>
         '''
         self.applications = applications
         self.machines = machines
         self.model = ModelStatusInfo.from_json(model) if model else None
         self.relations = [RelationStatus.from_json(o) for o in relations or []]
-        self.remote_applications = remote_applications
 
 
 
@@ -3871,12 +3869,11 @@ class MachinePortsResults(Type):
 
 
 class MachineStatus(Type):
-    _toSchema = {'agent_status': 'agent-status', 'constraints': 'constraints', 'containers': 'containers', 'dns_name': 'dns-name', 'hardware': 'hardware', 'has_vote': 'has-vote', 'id_': 'id', 'instance_id': 'instance-id', 'instance_status': 'instance-status', 'ip_addresses': 'ip-addresses', 'jobs': 'jobs', 'series': 'series', 'wants_vote': 'wants-vote'}
-    _toPy = {'agent-status': 'agent_status', 'constraints': 'constraints', 'containers': 'containers', 'dns-name': 'dns_name', 'hardware': 'hardware', 'has-vote': 'has_vote', 'id': 'id_', 'instance-id': 'instance_id', 'instance-status': 'instance_status', 'ip-addresses': 'ip_addresses', 'jobs': 'jobs', 'series': 'series', 'wants-vote': 'wants_vote'}
-    def __init__(self, agent_status=None, constraints=None, containers=None, dns_name=None, hardware=None, has_vote=None, id_=None, instance_id=None, instance_status=None, ip_addresses=None, jobs=None, series=None, wants_vote=None):
+    _toSchema = {'agent_status': 'agent-status', 'containers': 'containers', 'dns_name': 'dns-name', 'hardware': 'hardware', 'has_vote': 'has-vote', 'id_': 'id', 'instance_id': 'instance-id', 'instance_status': 'instance-status', 'ip_addresses': 'ip-addresses', 'jobs': 'jobs', 'series': 'series', 'wants_vote': 'wants-vote'}
+    _toPy = {'agent-status': 'agent_status', 'containers': 'containers', 'dns-name': 'dns_name', 'hardware': 'hardware', 'has-vote': 'has_vote', 'id': 'id_', 'instance-id': 'instance_id', 'instance-status': 'instance_status', 'ip-addresses': 'ip_addresses', 'jobs': 'jobs', 'series': 'series', 'wants-vote': 'wants_vote'}
+    def __init__(self, agent_status=None, containers=None, dns_name=None, hardware=None, has_vote=None, id_=None, instance_id=None, instance_status=None, ip_addresses=None, jobs=None, series=None, wants_vote=None):
         '''
         agent_status : DetailedStatus
-        constraints : str
         containers : typing.Mapping<~KT, +VT_co>[str, ~MachineStatus]<~MachineStatus>
         dns_name : str
         hardware : str
@@ -3890,7 +3887,6 @@ class MachineStatus(Type):
         wants_vote : bool
         '''
         self.agent_status = DetailedStatus.from_json(agent_status) if agent_status else None
-        self.constraints = constraints
         self.containers = containers
         self.dns_name = dns_name
         self.hardware = hardware
@@ -4219,18 +4215,16 @@ class MetricResults(Type):
 
 
 class MigrationModelInfo(Type):
-    _toSchema = {'agent_version': 'agent-version', 'controller_agent_version': 'controller-agent-version', 'name': 'name', 'owner_tag': 'owner-tag', 'uuid': 'uuid'}
-    _toPy = {'agent-version': 'agent_version', 'controller-agent-version': 'controller_agent_version', 'name': 'name', 'owner-tag': 'owner_tag', 'uuid': 'uuid'}
-    def __init__(self, agent_version=None, controller_agent_version=None, name=None, owner_tag=None, uuid=None):
+    _toSchema = {'agent_version': 'agent-version', 'name': 'name', 'owner_tag': 'owner-tag', 'uuid': 'uuid'}
+    _toPy = {'agent-version': 'agent_version', 'name': 'name', 'owner-tag': 'owner_tag', 'uuid': 'uuid'}
+    def __init__(self, agent_version=None, name=None, owner_tag=None, uuid=None):
         '''
         agent_version : Number
-        controller_agent_version : Number
         name : str
         owner_tag : str
         uuid : str
         '''
         self.agent_version = Number.from_json(agent_version) if agent_version else None
-        self.controller_agent_version = Number.from_json(controller_agent_version) if controller_agent_version else None
         self.name = name
         self.owner_tag = owner_tag
         self.uuid = uuid
@@ -4475,9 +4469,9 @@ class ModelDefaultsResult(Type):
 
 
 class ModelInfo(Type):
-    _toSchema = {'cloud_credential_tag': 'cloud-credential-tag', 'cloud_region': 'cloud-region', 'cloud_tag': 'cloud-tag', 'controller_uuid': 'controller-uuid', 'default_series': 'default-series', 'life': 'life', 'machines': 'machines', 'migration': 'migration', 'name': 'name', 'owner_tag': 'owner-tag', 'provider_type': 'provider-type', 'status': 'status', 'users': 'users', 'uuid': 'uuid'}
-    _toPy = {'cloud-credential-tag': 'cloud_credential_tag', 'cloud-region': 'cloud_region', 'cloud-tag': 'cloud_tag', 'controller-uuid': 'controller_uuid', 'default-series': 'default_series', 'life': 'life', 'machines': 'machines', 'migration': 'migration', 'name': 'name', 'owner-tag': 'owner_tag', 'provider-type': 'provider_type', 'status': 'status', 'users': 'users', 'uuid': 'uuid'}
-    def __init__(self, cloud_credential_tag=None, cloud_region=None, cloud_tag=None, controller_uuid=None, default_series=None, life=None, machines=None, migration=None, name=None, owner_tag=None, provider_type=None, status=None, users=None, uuid=None):
+    _toSchema = {'cloud_credential_tag': 'cloud-credential-tag', 'cloud_region': 'cloud-region', 'cloud_tag': 'cloud-tag', 'controller_uuid': 'controller-uuid', 'default_series': 'default-series', 'life': 'life', 'machines': 'machines', 'name': 'name', 'owner_tag': 'owner-tag', 'provider_type': 'provider-type', 'status': 'status', 'users': 'users', 'uuid': 'uuid'}
+    _toPy = {'cloud-credential-tag': 'cloud_credential_tag', 'cloud-region': 'cloud_region', 'cloud-tag': 'cloud_tag', 'controller-uuid': 'controller_uuid', 'default-series': 'default_series', 'life': 'life', 'machines': 'machines', 'name': 'name', 'owner-tag': 'owner_tag', 'provider-type': 'provider_type', 'status': 'status', 'users': 'users', 'uuid': 'uuid'}
+    def __init__(self, cloud_credential_tag=None, cloud_region=None, cloud_tag=None, controller_uuid=None, default_series=None, life=None, machines=None, name=None, owner_tag=None, provider_type=None, status=None, users=None, uuid=None):
         '''
         cloud_credential_tag : str
         cloud_region : str
@@ -4486,7 +4480,6 @@ class ModelInfo(Type):
         default_series : str
         life : str
         machines : typing.Sequence<+T_co>[~ModelMachineInfo]<~ModelMachineInfo>
-        migration : ModelMigrationStatus
         name : str
         owner_tag : str
         provider_type : str
@@ -4501,7 +4494,6 @@ class ModelInfo(Type):
         self.default_series = default_series
         self.life = life
         self.machines = [ModelMachineInfo.from_json(o) for o in machines or []]
-        self.migration = ModelMigrationStatus.from_json(migration) if migration else None
         self.name = name
         self.owner_tag = owner_tag
         self.provider_type = provider_type
@@ -6097,18 +6089,16 @@ class SSHPublicKeysResults(Type):
 
 
 class SerializedModel(Type):
-    _toSchema = {'bytes_': 'bytes', 'charms': 'charms', 'resources': 'resources', 'tools': 'tools'}
-    _toPy = {'bytes': 'bytes_', 'charms': 'charms', 'resources': 'resources', 'tools': 'tools'}
-    def __init__(self, bytes_=None, charms=None, resources=None, tools=None):
+    _toSchema = {'bytes_': 'bytes', 'charms': 'charms', 'tools': 'tools'}
+    _toPy = {'bytes': 'bytes_', 'charms': 'charms', 'tools': 'tools'}
+    def __init__(self, bytes_=None, charms=None, tools=None):
         '''
         bytes_ : typing.Sequence<+T_co>[int]
         charms : typing.Sequence<+T_co>[str]
-        resources : typing.Sequence<+T_co>[~SerializedModelResource]<~SerializedModelResource>
         tools : typing.Sequence<+T_co>[~SerializedModelTools]<~SerializedModelTools>
         '''
         self.bytes_ = bytes_
         self.charms = charms
-        self.resources = [SerializedModelResource.from_json(o) for o in resources or []]
         self.tools = [SerializedModelTools.from_json(o) for o in tools or []]
 
 
@@ -8608,12 +8598,13 @@ class ClientFacade(Type):
                                                                        'type': 'array'},
                                                       'jobs': {'items': {'type': 'string'},
                                                                'type': 'array'},
+                                                      'network-interfaces': {'patternProperties': {'.*': {'$ref': '#/definitions/NetworkInterface'}},
+                                                                             'type': 'object'},
                                                       'series': {'type': 'string'},
                                                       'wants-vote': {'type': 'boolean'}},
                                        'required': ['agent-status',
                                                     'instance-status',
                                                     'dns-name',
-                                                    'ip-addresses',
                                                     'instance-id',
                                                     'series',
                                                     'id',
@@ -8689,14 +8680,15 @@ class ClientFacade(Type):
                      'ModelStatusInfo': {'additionalProperties': False,
                                          'properties': {'available-version': {'type': 'string'},
                                                         'cloud-tag': {'type': 'string'},
-                                                        'migration': {'type': 'string'},
+                                                        'model-status': {'$ref': '#/definitions/DetailedStatus'},
                                                         'name': {'type': 'string'},
                                                         'region': {'type': 'string'},
                                                         'version': {'type': 'string'}},
                                          'required': ['name',
                                                       'cloud-tag',
                                                       'version',
-                                                      'available-version'],
+                                                      'available-version',
+                                                      'model-status'],
                                          'type': 'object'},
                      'ModelUnset': {'additionalProperties': False,
                                     'properties': {'keys': {'items': {'type': 'string'},
@@ -8723,6 +8715,19 @@ class ClientFacade(Type):
                                                                          'type': 'array'}},
                                               'required': ['results'],
                                               'type': 'object'},
+                     'NetworkInterface': {'additionalProperties': False,
+                                          'properties': {'dns-nameservers': {'items': {'type': 'string'},
+                                                                             'type': 'array'},
+                                                         'gateway': {'type': 'string'},
+                                                         'ip-addresses': {'items': {'type': 'string'},
+                                                                          'type': 'array'},
+                                                         'is-up': {'type': 'boolean'},
+                                                         'mac-address': {'type': 'string'},
+                                                         'space': {'type': 'string'}},
+                                          'required': ['ip-addresses',
+                                                       'mac-address',
+                                                       'is-up'],
+                                          'type': 'object'},
                      'Number': {'additionalProperties': False,
                                 'properties': {'Build': {'type': 'integer'},
                                                'Major': {'type': 'integer'},
@@ -8846,8 +8851,13 @@ class ClientFacade(Type):
                                              'properties': {'date': {'format': 'date-time',
                                                                      'type': 'string'},
                                                             'delta': {'type': 'integer'},
+                                                            'exclude': {'items': {'type': 'string'},
+                                                                        'type': 'array'},
                                                             'size': {'type': 'integer'}},
-                                             'required': ['size', 'date', 'delta'],
+                                             'required': ['size',
+                                                          'date',
+                                                          'delta',
+                                                          'exclude'],
                                              'type': 'object'},
                      'StatusHistoryRequest': {'additionalProperties': False,
                                               'properties': {'filter': {'$ref': '#/definitions/StatusHistoryFilter'},
@@ -9130,7 +9140,7 @@ class ClientFacade(Type):
     async def FullStatus(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('ModelStatusInfo'), typing.Sequence<+T_co>[~RelationStatus]<~RelationStatus>, typing.Mapping<~KT, +VT_co>[str, ~RemoteApplicationStatus]<~RemoteApplicationStatus>]
+        Returns -> typing.Union[typing.Mapping<~KT, +VT_co>[str, ~MachineStatus]<~MachineStatus>, _ForwardRef('ModelStatusInfo'), typing.Sequence<+T_co>[~RelationStatus]<~RelationStatus>]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -9205,7 +9215,7 @@ class ClientFacade(Type):
     async def ModelInfo(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('ModelMigrationStatus'), _ForwardRef('EntityStatus'), typing.Sequence<+T_co>[~ModelUserInfo]<~ModelUserInfo>]
+        Returns -> typing.Union[_ForwardRef('EntityStatus'), typing.Sequence<+T_co>[~ModelUserInfo]<~ModelUserInfo>]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -11806,7 +11816,7 @@ class MigrationMasterFacade(Type):
     async def ModelInfo(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Number'), _ForwardRef('Number'), str]
+        Returns -> typing.Union[_ForwardRef('Number'), str]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -12215,7 +12225,7 @@ class MigrationTargetFacade(Type):
     async def Prechecks(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Number'), _ForwardRef('Number'), str]
+        Returns -> typing.Union[_ForwardRef('Number'), str]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -12345,17 +12355,7 @@ class NotifyWatcherFacade(Type):
 class PayloadsFacade(Type):
     name = 'Payloads'
     version = 1
-    schema =     {'definitions': {'EnvListArgs': {'additionalProperties': False,
-                                     'properties': {'patterns': {'items': {'type': 'string'},
-                                                                 'type': 'array'}},
-                                     'required': ['patterns'],
-                                     'type': 'object'},
-                     'EnvListResults': {'additionalProperties': False,
-                                        'properties': {'results': {'items': {'$ref': '#/definitions/Payload'},
-                                                                   'type': 'array'}},
-                                        'required': ['results'],
-                                        'type': 'object'},
-                     'Payload': {'additionalProperties': False,
+    schema =     {'definitions': {'Payload': {'additionalProperties': False,
                                  'properties': {'class': {'type': 'string'},
                                                 'id': {'type': 'string'},
                                                 'labels': {'items': {'type': 'string'},
@@ -12371,14 +12371,24 @@ class PayloadsFacade(Type):
                                               'labels',
                                               'unit',
                                               'machine'],
-                                 'type': 'object'}},
-     'properties': {'List': {'properties': {'Params': {'$ref': '#/definitions/EnvListArgs'},
-                                            'Result': {'$ref': '#/definitions/EnvListResults'}},
+                                 'type': 'object'},
+                     'PayloadListArgs': {'additionalProperties': False,
+                                         'properties': {'patterns': {'items': {'type': 'string'},
+                                                                     'type': 'array'}},
+                                         'required': ['patterns'],
+                                         'type': 'object'},
+                     'PayloadListResults': {'additionalProperties': False,
+                                            'properties': {'results': {'items': {'$ref': '#/definitions/Payload'},
+                                                                       'type': 'array'}},
+                                            'required': ['results'],
+                                            'type': 'object'}},
+     'properties': {'List': {'properties': {'Params': {'$ref': '#/definitions/PayloadListArgs'},
+                                            'Result': {'$ref': '#/definitions/PayloadListResults'}},
                              'type': 'object'}},
      'type': 'object'}
     
 
-    @ReturnMapping(EnvListResults)
+    @ReturnMapping(PayloadListResults)
     async def List(self):
         '''
 
@@ -12415,16 +12425,16 @@ class PayloadsHookContextFacade(Type):
                                    'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
                                                   'macaroon-path': {'type': 'string'}},
                                    'type': 'object'},
-                     'LookUpArg': {'additionalProperties': False,
-                                   'properties': {'id': {'type': 'string'},
-                                                  'name': {'type': 'string'}},
-                                   'required': ['name', 'id'],
-                                   'type': 'object'},
-                     'LookUpArgs': {'additionalProperties': False,
-                                    'properties': {'args': {'items': {'$ref': '#/definitions/LookUpArg'},
-                                                            'type': 'array'}},
-                                    'required': ['args'],
-                                    'type': 'object'},
+                     'LookUpPayloadArg': {'additionalProperties': False,
+                                          'properties': {'id': {'type': 'string'},
+                                                         'name': {'type': 'string'}},
+                                          'required': ['name', 'id'],
+                                          'type': 'object'},
+                     'LookUpPayloadArgs': {'additionalProperties': False,
+                                           'properties': {'args': {'items': {'$ref': '#/definitions/LookUpPayloadArg'},
+                                                                   'type': 'array'}},
+                                           'required': ['args'],
+                                           'type': 'object'},
                      'Macaroon': {'additionalProperties': False, 'type': 'object'},
                      'Payload': {'additionalProperties': False,
                                  'properties': {'class': {'type': 'string'},
@@ -12457,31 +12467,31 @@ class PayloadsHookContextFacade(Type):
                                                                    'type': 'array'}},
                                         'required': ['results'],
                                         'type': 'object'},
-                     'SetStatusArg': {'additionalProperties': False,
-                                      'properties': {'Entity': {'$ref': '#/definitions/Entity'},
-                                                     'status': {'type': 'string'}},
-                                      'required': ['Entity', 'status'],
-                                      'type': 'object'},
-                     'SetStatusArgs': {'additionalProperties': False,
-                                       'properties': {'args': {'items': {'$ref': '#/definitions/SetStatusArg'},
-                                                               'type': 'array'}},
-                                       'required': ['args'],
-                                       'type': 'object'},
-                     'TrackArgs': {'additionalProperties': False,
-                                   'properties': {'payloads': {'items': {'$ref': '#/definitions/Payload'},
-                                                               'type': 'array'}},
-                                   'required': ['payloads'],
-                                   'type': 'object'}},
+                     'SetPayloadStatusArg': {'additionalProperties': False,
+                                             'properties': {'Entity': {'$ref': '#/definitions/Entity'},
+                                                            'status': {'type': 'string'}},
+                                             'required': ['Entity', 'status'],
+                                             'type': 'object'},
+                     'SetPayloadStatusArgs': {'additionalProperties': False,
+                                              'properties': {'args': {'items': {'$ref': '#/definitions/SetPayloadStatusArg'},
+                                                                      'type': 'array'}},
+                                              'required': ['args'],
+                                              'type': 'object'},
+                     'TrackPayloadArgs': {'additionalProperties': False,
+                                          'properties': {'payloads': {'items': {'$ref': '#/definitions/Payload'},
+                                                                      'type': 'array'}},
+                                          'required': ['payloads'],
+                                          'type': 'object'}},
      'properties': {'List': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                             'Result': {'$ref': '#/definitions/PayloadResults'}},
                              'type': 'object'},
-                    'LookUp': {'properties': {'Params': {'$ref': '#/definitions/LookUpArgs'},
+                    'LookUp': {'properties': {'Params': {'$ref': '#/definitions/LookUpPayloadArgs'},
                                               'Result': {'$ref': '#/definitions/PayloadResults'}},
                                'type': 'object'},
-                    'SetStatus': {'properties': {'Params': {'$ref': '#/definitions/SetStatusArgs'},
+                    'SetStatus': {'properties': {'Params': {'$ref': '#/definitions/SetPayloadStatusArgs'},
                                                  'Result': {'$ref': '#/definitions/PayloadResults'}},
                                   'type': 'object'},
-                    'Track': {'properties': {'Params': {'$ref': '#/definitions/TrackArgs'},
+                    'Track': {'properties': {'Params': {'$ref': '#/definitions/TrackPayloadArgs'},
                                              'Result': {'$ref': '#/definitions/PayloadResults'}},
                               'type': 'object'},
                     'Untrack': {'properties': {'Params': {'$ref': '#/definitions/Entities'},

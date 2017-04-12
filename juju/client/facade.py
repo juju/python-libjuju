@@ -658,7 +658,7 @@ def generate_facades(options):
     global classes
     captures = defaultdict(codegen.Capture)
     schemas = []
-    for p in glob(options.schema):
+    for p in sorted(glob(options.schema)):
         new_schemas = json.loads(Path(p).read_text("utf-8"))
         schemas += [Schema(s) for s in new_schemas]
 
