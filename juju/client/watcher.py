@@ -5,8 +5,7 @@ from .client import ClientFacade
 class AllWatcher(BaseAllWatcher):
     async def rpc(self, msg):
         if not hasattr(self, 'Id'):
-            client = ClientFacade()
-            client.connect(self.connection)
+            client = ClientFacade.from_connection(self.connection)
 
             result = await client.WatchAll()
             self.Id = result.watcher_id
