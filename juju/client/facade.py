@@ -692,30 +692,41 @@ def setup():
 def main():
     options = setup()
     captures = generate_facades(options)
-    for version in captures:
+    for version in sorted(captures.keys()):
         filename = "{}{}.py".format(options.output, version)
         with open(filename, "w") as f:
             f.write(HEADER)
-            f.write("from juju.client.facade import Type, ReturnMapping\n\n")
-            for key in sorted([k for k in captures[version].keys() if "Facade" not in k]):
+            f.write("from juju.client.facade import Type, ReturnMapping\n")
+            f.write("from juju.client._client_definitions import *\n\n")
+            for key in sorted(
+                    [k for k in captures[version].keys() if "Facade" in k]):
                 print(captures[version][key], file=f)
-            for key in sorted([k for k in captures[version].keys() if "Facade" in k]):
-                print(captures[version][key], file=f)
+
+    with open("{}_definitions.py".format(options.output), "w") as f:
+        f.write(HEADER)
+        f.write("from juju.client.facade import Type, ReturnMapping\n\n")
+        for key in sorted(
+                [k for k in captures[version].keys() if "Facade" not in k]):
+            print(captures[version][key], file=f)
+
 
     with open("{}.py".format(options.output), "w") as f:
         f.write(HEADER)
+        f.write("from juju.client._client_definitions import *\n\n")
         clients = ", ".join("_client{}".format(v) for v in captures)
         client_table = """
 CLIENTS = {{
     {clients}
 }}
-""".format(clients=",\n    ".join(['"{}": _client{}'.format(v, v) for v in captures]))
+
+""".format(clients=",\n    ".join(
+    ['"{}": _client{}'.format(v, v) for v in captures]))
         f.write("from juju.client import " + clients + "\n\n")
-        f.write(client_table + "\n")
+        f.write(client_table)
         f.write(LOOKUP_FACADE)
         f.write(TYPE_FACTORY)
-        for key in sorted([k for k in factories.keys() if "Facade" not in k]):
-            print(factories[key], file=f)
+        #for key in sorted([k for k in factories.keys() if "Facade" not in k]):
+        #    print(factories[key], file=f)
         for key in sorted([k for k in factories.keys() if "Facade" in k]):
             print(factories[key], file=f)
 
