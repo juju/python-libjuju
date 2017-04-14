@@ -462,11 +462,7 @@ def _buildMethod(cls, name):
         prop = method['properties']
         spec = prop.get('Params')
         if spec:
-            result = _types.get(spec['$ref'])
-            if '$ref' in spec:
-                result = _types.get(spec['$ref'])
-            else:
-                result = SCHEMA_TO_PYTHON[spec['type']]
+            params = _types.get(spec['$ref'])
         spec = prop.get('Result')
         if spec:
             if '$ref' in spec:
