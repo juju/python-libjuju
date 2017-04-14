@@ -42,11 +42,9 @@ class TypeFactory:
         @param connection: initialized Connection object.
 
         """
-        # Get current version (stripping 'Facade' off of the name of the
-        # Facade class.)
-        version = connection.facades[cls.__name__[:-6]]
+        version = connection.facades[cls.__name__]
 
-        c = lookup_facade(cls.__name__, version)
+        c = lookup_facade("{}Facade".format(cls.__name__), version)
         c = c()
         c.connect(connection)
 
