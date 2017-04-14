@@ -66,9 +66,9 @@ class TypeFactory:
         @param connection: initialized Connection object.
 
         """
-        version = connection.facades[cls.__name__]
+        version = connection.facades[cls.__name__[:-6]]
 
-        c = lookup_facade("{}Facade".format(cls.__name__), version)
+        c = lookup_facade(cls.__name__, version)
         c = c()
         c.connect(connection)
 

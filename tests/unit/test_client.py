@@ -19,7 +19,7 @@ def test_basics():
 
 def test_from_connection():
     connection = mock.Mock()
-    connection.facades = {"ActionFacade": 2}
+    connection.facades = {"Action": 2}
     action_facade = client.ActionFacade.from_connection(connection)
 
     
