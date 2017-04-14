@@ -664,7 +664,9 @@ def generate_facades(options):
         new_schemas = json.loads(Path(p).read_text("utf-8"))
         schemas += [Schema(s) for s in new_schemas]
 
-    # Build all of the auxillary classes
+    # Build all of the auxillary (unversioned) classes
+    # TODO: get rid of some of the excess trips through loops in the
+    # called functions.
     for schema in schemas:
         schema.buildDefinitions()
         buildTypes(schema, captures[schema.version])
@@ -679,7 +681,12 @@ def generate_facades(options):
         make_factory(cls_name)
         # Make the actual class
         captures[schema.version][cls_name].write(source)
+        # Build the methods for each Facade class.
+        # TODO (critical bug): figure out why we aren't building the
+        # params for all these methods.
         buildMethods(cls, captures[schema.version])
+        # Mark this Facade class as being done for this version --
+        # helps mitigate some excessive looping.
         classes[schema.name] = cls
 
     return captures
@@ -693,7 +700,11 @@ def setup():
 
 def main():
     options = setup()
+
+    # Generate some text blobs
     captures = generate_facades(options)
+
+    # Write the Facades to the appropriate _client<version>.py
     for version in sorted(captures.keys()):
         filename = "{}{}.py".format(options.output, version)
         with open(filename, "w") as f:
@@ -704,6 +715,10 @@ def main():
                     [k for k in captures[version].keys() if "Facade" in k]):
                 print(captures[version][key], file=f)
 
+    # Write auxillary (non versioned) classes to
+    # _client_definitions.py The auxillary classes currently get
+    # written redudantly into each capture object, so we can look in
+    # one of them -- we just use the last one from the loop above.
     with open("{}_definitions.py".format(options.output), "w") as f:
         f.write(HEADER)
         f.write("from juju.client.facade import Type, ReturnMapping\n\n")
@@ -712,6 +727,9 @@ def main():
             print(captures[version][key], file=f)
 
 
+    # Write the TypeFactory classes to _client.py, along with some
+    # imports and tables so that we can look up versioned Facades.
+    # TODO: clean this up.
     with open("{}.py".format(options.output), "w") as f:
         f.write(HEADER)
         f.write("from juju.client._client_definitions import *\n\n")
