@@ -163,180 +163,196 @@ class ActionFacade(Type):
     
 
     @ReturnMapping(ActionResults)
-    async def Actions(self):
+    async def Actions(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ActionResult]<~ActionResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Action', request='Actions', version=2, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ApplicationsCharmActionsResults)
-    async def ApplicationsCharmsActions(self):
+    async def ApplicationsCharmsActions(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ApplicationCharmActionsResult]<~ApplicationCharmActionsResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Action', request='ApplicationsCharmsActions', version=2, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ActionResults)
-    async def Cancel(self):
+    async def Cancel(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ActionResult]<~ActionResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Action', request='Cancel', version=2, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ActionResults)
-    async def Enqueue(self):
+    async def Enqueue(self, actions):
         '''
-
+        actions : typing.Sequence<+T_co>[~Action]<~Action>
         Returns -> typing.Sequence<+T_co>[~ActionResult]<~ActionResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Action', request='Enqueue', version=2, params=_params)
-
+        _params['actions'] = actions
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(FindTagsResults)
-    async def FindActionTagsByPrefix(self):
+    async def FindActionTagsByPrefix(self, prefixes):
         '''
-
+        prefixes : typing.Sequence<+T_co>[str]
         Returns -> typing.Sequence<+T_co>[~Entity]<~Entity>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Action', request='FindActionTagsByPrefix', version=2, params=_params)
-
+        _params['prefixes'] = prefixes
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ActionsByNames)
-    async def FindActionsByNames(self):
+    async def FindActionsByNames(self, names):
         '''
-
+        names : typing.Sequence<+T_co>[str]
         Returns -> typing.Sequence<+T_co>[~ActionsByName]<~ActionsByName>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Action', request='FindActionsByNames', version=2, params=_params)
-
+        _params['names'] = names
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ActionsByReceivers)
-    async def ListAll(self):
+    async def ListAll(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ActionsByReceiver]<~ActionsByReceiver>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Action', request='ListAll', version=2, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ActionsByReceivers)
-    async def ListCompleted(self):
+    async def ListCompleted(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ActionsByReceiver]<~ActionsByReceiver>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Action', request='ListCompleted', version=2, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ActionsByReceivers)
-    async def ListPending(self):
+    async def ListPending(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ActionsByReceiver]<~ActionsByReceiver>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Action', request='ListPending', version=2, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ActionsByReceivers)
-    async def ListRunning(self):
+    async def ListRunning(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ActionsByReceiver]<~ActionsByReceiver>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Action', request='ListRunning', version=2, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ActionResults)
-    async def Run(self):
+    async def Run(self, applications, commands, machines, timeout, units):
         '''
-
+        applications : typing.Sequence<+T_co>[str]
+        commands : str
+        machines : typing.Sequence<+T_co>[str]
+        timeout : int
+        units : typing.Sequence<+T_co>[str]
         Returns -> typing.Sequence<+T_co>[~ActionResult]<~ActionResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Action', request='Run', version=2, params=_params)
-
+        _params['applications'] = applications
+        _params['commands'] = commands
+        _params['machines'] = machines
+        _params['timeout'] = timeout
+        _params['units'] = units
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ActionResults)
-    async def RunOnAllMachines(self):
+    async def RunOnAllMachines(self, applications, commands, machines, timeout, units):
         '''
-
+        applications : typing.Sequence<+T_co>[str]
+        commands : str
+        machines : typing.Sequence<+T_co>[str]
+        timeout : int
+        units : typing.Sequence<+T_co>[str]
         Returns -> typing.Sequence<+T_co>[~ActionResult]<~ActionResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Action', request='RunOnAllMachines', version=2, params=_params)
-
+        _params['applications'] = applications
+        _params['commands'] = commands
+        _params['machines'] = machines
+        _params['timeout'] = timeout
+        _params['units'] = units
         reply = await self.rpc(msg)
         return reply
 
@@ -499,30 +515,30 @@ class AgentFacade(Type):
     
 
     @ReturnMapping(ErrorResults)
-    async def ClearReboot(self):
+    async def ClearReboot(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Agent', request='ClearReboot', version=2, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(CloudSpecResults)
-    async def CloudSpec(self):
+    async def CloudSpec(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~CloudSpecResult]<~CloudSpecResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Agent', request='CloudSpec', version=2, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
@@ -559,15 +575,15 @@ class AgentFacade(Type):
 
 
     @ReturnMapping(AgentGetEntitiesResults)
-    async def GetEntities(self):
+    async def GetEntities(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~AgentGetEntitiesResult]<~AgentGetEntitiesResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Agent', request='GetEntities', version=2, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
@@ -604,15 +620,15 @@ class AgentFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def SetPasswords(self):
+    async def SetPasswords(self, changes):
         '''
-
+        changes : typing.Sequence<+T_co>[~EntityPassword]<~EntityPassword>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Agent', request='SetPasswords', version=2, params=_params)
-
+        _params['changes'] = changes
         reply = await self.rpc(msg)
         return reply
 
@@ -634,15 +650,15 @@ class AgentFacade(Type):
 
 
     @ReturnMapping(NotifyWatchResults)
-    async def WatchCredentials(self):
+    async def WatchCredentials(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Agent', request='WatchCredentials', version=2, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
@@ -777,30 +793,30 @@ class AnnotationsFacade(Type):
     
 
     @ReturnMapping(AnnotationsGetResults)
-    async def Get(self):
+    async def Get(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~AnnotationsGetResult]<~AnnotationsGetResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Annotations', request='Get', version=2, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def Set(self):
+    async def Set(self, annotations):
         '''
-
+        annotations : typing.Sequence<+T_co>[~EntityAnnotations]<~EntityAnnotations>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Annotations', request='Set', version=2, params=_params)
-
+        _params['annotations'] = annotations
         reply = await self.rpc(msg)
         return reply
 
@@ -1101,270 +1117,310 @@ class ApplicationFacade(Type):
     
 
     @ReturnMapping(AddRelationResults)
-    async def AddRelation(self):
+    async def AddRelation(self, endpoints):
         '''
-
+        endpoints : typing.Sequence<+T_co>[str]
         Returns -> typing.Mapping<~KT, +VT_co>[str, ~CharmRelation]<~CharmRelation>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='AddRelation', version=2, params=_params)
-
+        _params['endpoints'] = endpoints
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(AddApplicationUnitsResults)
-    async def AddUnits(self):
+    async def AddUnits(self, application, num_units, placement):
         '''
-
+        application : str
+        num_units : int
+        placement : typing.Sequence<+T_co>[~Placement]<~Placement>
         Returns -> typing.Sequence<+T_co>[str]
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='AddUnits', version=2, params=_params)
-
+        _params['application'] = application
+        _params['num-units'] = num_units
+        _params['placement'] = placement
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ApplicationCharmRelationsResults)
-    async def CharmRelations(self):
+    async def CharmRelations(self, application):
         '''
-
+        application : str
         Returns -> typing.Sequence<+T_co>[str]
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='CharmRelations', version=2, params=_params)
-
+        _params['application'] = application
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def Deploy(self):
+    async def Deploy(self, applications):
         '''
-
+        applications : typing.Sequence<+T_co>[~ApplicationDeploy]<~ApplicationDeploy>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='Deploy', version=2, params=_params)
-
+        _params['applications'] = applications
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(ApplicationDestroy)
-    async def Destroy(self):
+    @ReturnMapping(None)
+    async def Destroy(self, application):
         '''
-
-        Returns -> str
+        application : str
+        Returns -> None
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='Destroy', version=2, params=_params)
-
+        _params['application'] = application
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(DestroyRelation)
-    async def DestroyRelation(self):
+    @ReturnMapping(None)
+    async def DestroyRelation(self, endpoints):
         '''
-
-        Returns -> typing.Sequence<+T_co>[str]
+        endpoints : typing.Sequence<+T_co>[str]
+        Returns -> None
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='DestroyRelation', version=2, params=_params)
-
+        _params['endpoints'] = endpoints
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(DestroyApplicationUnits)
-    async def DestroyUnits(self):
+    @ReturnMapping(None)
+    async def DestroyUnits(self, unit_names):
         '''
-
-        Returns -> typing.Sequence<+T_co>[str]
+        unit_names : typing.Sequence<+T_co>[str]
+        Returns -> None
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='DestroyUnits', version=2, params=_params)
-
+        _params['unit-names'] = unit_names
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(ApplicationExpose)
-    async def Expose(self):
+    @ReturnMapping(None)
+    async def Expose(self, application):
         '''
-
-        Returns -> str
+        application : str
+        Returns -> None
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='Expose', version=2, params=_params)
-
+        _params['application'] = application
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ApplicationGetResults)
-    async def Get(self):
+    async def Get(self, application):
         '''
-
+        application : str
         Returns -> typing.Union[str, typing.Mapping<~KT, +VT_co>[str, typing.Any], _ForwardRef('Value')]
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='Get', version=2, params=_params)
-
+        _params['application'] = application
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringResult)
-    async def GetCharmURL(self):
+    async def GetCharmURL(self, application):
         '''
-
+        application : str
         Returns -> typing.Union[_ForwardRef('Error'), str]
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='GetCharmURL', version=2, params=_params)
-
+        _params['application'] = application
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(GetConstraintsResults)
-    async def GetConstraints(self):
+    async def GetConstraints(self, application):
         '''
-
+        application : str
         Returns -> Value
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='GetConstraints', version=2, params=_params)
-
+        _params['application'] = application
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(ApplicationSet)
-    async def Set(self):
+    @ReturnMapping(None)
+    async def Set(self, application, options):
         '''
-
-        Returns -> typing.Union[str, typing.Mapping<~KT, +VT_co>[str, str]]
+        application : str
+        options : typing.Mapping<~KT, +VT_co>[str, str]
+        Returns -> None
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='Set', version=2, params=_params)
-
+        _params['application'] = application
+        _params['options'] = options
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(ApplicationSetCharm)
-    async def SetCharm(self):
+    @ReturnMapping(None)
+    async def SetCharm(self, application, channel, charm_url, config_settings, config_settings_yaml, force_series, force_units, resource_ids, storage_constraints):
         '''
-
-        Returns -> typing.Union[str, bool, typing.Mapping<~KT, +VT_co>[str, ~StorageConstraints]<~StorageConstraints>]
+        application : str
+        channel : str
+        charm_url : str
+        config_settings : typing.Mapping<~KT, +VT_co>[str, str]
+        config_settings_yaml : str
+        force_series : bool
+        force_units : bool
+        resource_ids : typing.Mapping<~KT, +VT_co>[str, str]
+        storage_constraints : typing.Mapping<~KT, +VT_co>[str, ~StorageConstraints]<~StorageConstraints>
+        Returns -> None
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='SetCharm', version=2, params=_params)
-
+        _params['application'] = application
+        _params['channel'] = channel
+        _params['charm-url'] = charm_url
+        _params['config-settings'] = config_settings
+        _params['config-settings-yaml'] = config_settings_yaml
+        _params['force-series'] = force_series
+        _params['force-units'] = force_units
+        _params['resource-ids'] = resource_ids
+        _params['storage-constraints'] = storage_constraints
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(SetConstraints)
-    async def SetConstraints(self):
+    @ReturnMapping(None)
+    async def SetConstraints(self, application, constraints):
         '''
-
-        Returns -> typing.Union[str, _ForwardRef('Value')]
+        application : str
+        constraints : Value
+        Returns -> None
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='SetConstraints', version=2, params=_params)
-
+        _params['application'] = application
+        _params['constraints'] = constraints
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetMetricCredentials(self):
+    async def SetMetricCredentials(self, creds):
         '''
-
+        creds : typing.Sequence<+T_co>[~ApplicationMetricCredential]<~ApplicationMetricCredential>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='SetMetricCredentials', version=2, params=_params)
-
+        _params['creds'] = creds
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(ApplicationUnexpose)
-    async def Unexpose(self):
+    @ReturnMapping(None)
+    async def Unexpose(self, application):
         '''
-
-        Returns -> str
+        application : str
+        Returns -> None
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='Unexpose', version=2, params=_params)
-
+        _params['application'] = application
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(ApplicationUnset)
-    async def Unset(self):
+    @ReturnMapping(None)
+    async def Unset(self, application, options):
         '''
-
-        Returns -> typing.Sequence<+T_co>[str]
+        application : str
+        options : typing.Sequence<+T_co>[str]
+        Returns -> None
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='Unset', version=2, params=_params)
-
+        _params['application'] = application
+        _params['options'] = options
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(ApplicationUpdate)
-    async def Update(self):
+    @ReturnMapping(None)
+    async def Update(self, application, charm_url, constraints, force_charm_url, force_series, min_units, settings, settings_yaml):
         '''
-
-        Returns -> typing.Union[str, _ForwardRef('Value'), int, typing.Mapping<~KT, +VT_co>[str, str]]
+        application : str
+        charm_url : str
+        constraints : Value
+        force_charm_url : bool
+        force_series : bool
+        min_units : int
+        settings : typing.Mapping<~KT, +VT_co>[str, str]
+        settings_yaml : str
+        Returns -> None
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='Update', version=2, params=_params)
-
+        _params['application'] = application
+        _params['charm-url'] = charm_url
+        _params['constraints'] = constraints
+        _params['force-charm-url'] = force_charm_url
+        _params['force-series'] = force_series
+        _params['min-units'] = min_units
+        _params['settings'] = settings
+        _params['settings-yaml'] = settings_yaml
         reply = await self.rpc(msg)
         return reply
 
@@ -1435,30 +1491,34 @@ class BlockFacade(Type):
 
 
     @ReturnMapping(ErrorResult)
-    async def SwitchBlockOff(self):
+    async def SwitchBlockOff(self, message, type_):
         '''
-
+        message : str
+        type_ : str
         Returns -> Error
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Block', request='SwitchBlockOff', version=2, params=_params)
-
+        _params['message'] = message
+        _params['type'] = type_
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResult)
-    async def SwitchBlockOn(self):
+    async def SwitchBlockOn(self, message, type_):
         '''
-
+        message : str
+        type_ : str
         Returns -> Error
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Block', request='SwitchBlockOn', version=2, params=_params)
-
+        _params['message'] = message
+        _params['type'] = type_
         reply = await self.rpc(msg)
         return reply
 
@@ -1661,45 +1721,45 @@ class CharmsFacade(Type):
     
 
     @ReturnMapping(CharmInfo)
-    async def CharmInfo(self):
+    async def CharmInfo(self, url):
         '''
-
+        url : str
         Returns -> typing.Union[_ForwardRef('CharmActions'), typing.Mapping<~KT, +VT_co>[str, ~CharmOption]<~CharmOption>, _ForwardRef('CharmMeta'), _ForwardRef('CharmMetrics'), int, str]
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Charms', request='CharmInfo', version=2, params=_params)
-
+        _params['url'] = url
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(IsMeteredResult)
-    async def IsMetered(self):
+    async def IsMetered(self, url):
         '''
-
+        url : str
         Returns -> bool
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Charms', request='IsMetered', version=2, params=_params)
-
+        _params['url'] = url
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(CharmsListResult)
-    async def List(self):
+    async def List(self, names):
         '''
-
+        names : typing.Sequence<+T_co>[str]
         Returns -> typing.Sequence<+T_co>[str]
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Charms', request='List', version=2, params=_params)
-
+        _params['names'] = names
         reply = await self.rpc(msg)
         return reply
 
@@ -1873,30 +1933,30 @@ class DiscoverSpacesFacade(Type):
     
 
     @ReturnMapping(ErrorResults)
-    async def AddSubnets(self):
+    async def AddSubnets(self, subnets):
         '''
-
+        subnets : typing.Sequence<+T_co>[~AddSubnetParams]<~AddSubnetParams>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='DiscoverSpaces', request='AddSubnets', version=2, params=_params)
-
+        _params['subnets'] = subnets
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def CreateSpaces(self):
+    async def CreateSpaces(self, spaces):
         '''
-
+        spaces : typing.Sequence<+T_co>[~CreateSpaceParams]<~CreateSpaceParams>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='DiscoverSpaces', request='CreateSpaces', version=2, params=_params)
-
+        _params['spaces'] = spaces
         reply = await self.rpc(msg)
         return reply
 
@@ -1918,15 +1978,17 @@ class DiscoverSpacesFacade(Type):
 
 
     @ReturnMapping(ListSubnetsResults)
-    async def ListSubnets(self):
+    async def ListSubnets(self, space_tag, zone):
         '''
-
+        space_tag : str
+        zone : str
         Returns -> typing.Sequence<+T_co>[~Subnet]<~Subnet>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='DiscoverSpaces', request='ListSubnets', version=2, params=_params)
-
+        _params['space-tag'] = space_tag
+        _params['zone'] = zone
         reply = await self.rpc(msg)
         return reply
 
@@ -2010,15 +2072,15 @@ class DiskManagerFacade(Type):
     
 
     @ReturnMapping(ErrorResults)
-    async def SetMachineBlockDevices(self):
+    async def SetMachineBlockDevices(self, machine_block_devices):
         '''
-
+        machine_block_devices : typing.Sequence<+T_co>[~MachineBlockDevices]<~MachineBlockDevices>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='DiskManager', request='SetMachineBlockDevices', version=2, params=_params)
-
+        _params['machine-block-devices'] = machine_block_devices
         reply = await self.rpc(msg)
         return reply
 
@@ -2290,45 +2352,45 @@ class HighAvailabilityFacade(Type):
     
 
     @ReturnMapping(ControllersChangeResults)
-    async def EnableHA(self):
+    async def EnableHA(self, specs):
         '''
-
+        specs : typing.Sequence<+T_co>[~ControllersSpec]<~ControllersSpec>
         Returns -> typing.Sequence<+T_co>[~ControllersChangeResult]<~ControllersChangeResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='HighAvailability', request='EnableHA', version=2, params=_params)
-
+        _params['specs'] = specs
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(ResumeReplicationParams)
-    async def ResumeHAReplicationAfterUpgrade(self):
+    @ReturnMapping(None)
+    async def ResumeHAReplicationAfterUpgrade(self, members):
         '''
-
-        Returns -> typing.Sequence<+T_co>[~Member]<~Member>
+        members : typing.Sequence<+T_co>[~Member]<~Member>
+        Returns -> None
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='HighAvailability', request='ResumeHAReplicationAfterUpgrade', version=2, params=_params)
-
+        _params['members'] = members
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(MongoUpgradeResults)
-    async def StopHAReplicationForUpgrade(self):
+    async def StopHAReplicationForUpgrade(self, target):
         '''
-
+        target : MongoVersion
         Returns -> typing.Union[_ForwardRef('HAMember'), typing.Sequence<+T_co>[~Member]<~Member>]
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='HighAvailability', request='StopHAReplicationForUpgrade', version=2, params=_params)
-
+        _params['target'] = target
         reply = await self.rpc(msg)
         return reply
 
@@ -2395,30 +2457,30 @@ class ImageManagerFacade(Type):
     
 
     @ReturnMapping(ErrorResults)
-    async def DeleteImages(self):
+    async def DeleteImages(self, images):
         '''
-
+        images : typing.Sequence<+T_co>[~ImageSpec]<~ImageSpec>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='ImageManager', request='DeleteImages', version=2, params=_params)
-
+        _params['images'] = images
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ListImageResult)
-    async def ListImages(self):
+    async def ListImages(self, images):
         '''
-
+        images : typing.Sequence<+T_co>[~ImageSpec]<~ImageSpec>
         Returns -> typing.Sequence<+T_co>[~ImageMetadata]<~ImageMetadata>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='ImageManager', request='ListImages', version=2, params=_params)
-
+        _params['images'] = images
         reply = await self.rpc(msg)
         return reply
 
@@ -2508,45 +2570,55 @@ class ImageMetadataFacade(Type):
     
 
     @ReturnMapping(ErrorResults)
-    async def Delete(self):
+    async def Delete(self, image_ids):
         '''
-
+        image_ids : typing.Sequence<+T_co>[str]
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='ImageMetadata', request='Delete', version=2, params=_params)
-
+        _params['image-ids'] = image_ids
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ListCloudImageMetadataResult)
-    async def List(self):
+    async def List(self, arches, region, root_storage_type, series, stream, virt_type):
         '''
-
+        arches : typing.Sequence<+T_co>[str]
+        region : str
+        root_storage_type : str
+        series : typing.Sequence<+T_co>[str]
+        stream : str
+        virt_type : str
         Returns -> typing.Sequence<+T_co>[~CloudImageMetadata]<~CloudImageMetadata>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='ImageMetadata', request='List', version=2, params=_params)
-
+        _params['arches'] = arches
+        _params['region'] = region
+        _params['root-storage-type'] = root_storage_type
+        _params['series'] = series
+        _params['stream'] = stream
+        _params['virt-type'] = virt_type
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def Save(self):
+    async def Save(self, metadata):
         '''
-
+        metadata : typing.Sequence<+T_co>[~CloudImageMetadataList]<~CloudImageMetadataList>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='ImageMetadata', request='Save', version=2, params=_params)
-
+        _params['metadata'] = metadata
         reply = await self.rpc(msg)
         return reply
 
@@ -2616,30 +2688,30 @@ class LeadershipServiceFacade(Type):
     
 
     @ReturnMapping(ErrorResult)
-    async def BlockUntilLeadershipReleased(self):
+    async def BlockUntilLeadershipReleased(self, name):
         '''
-
+        name : str
         Returns -> Error
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='LeadershipService', request='BlockUntilLeadershipReleased', version=2, params=_params)
-
+        _params['Name'] = name
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ClaimLeadershipBulkResults)
-    async def ClaimLeadership(self):
+    async def ClaimLeadership(self, params):
         '''
-
+        params : typing.Sequence<+T_co>[~ClaimLeadershipParams]<~ClaimLeadershipParams>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='LeadershipService', request='ClaimLeadership', version=2, params=_params)
-
+        _params['params'] = params
         reply = await self.rpc(msg)
         return reply
 
@@ -2784,30 +2856,30 @@ class MachineManagerFacade(Type):
     
 
     @ReturnMapping(AddMachinesResults)
-    async def AddMachines(self):
+    async def AddMachines(self, params):
         '''
-
+        params : typing.Sequence<+T_co>[~AddMachineParams]<~AddMachineParams>
         Returns -> typing.Sequence<+T_co>[~AddMachinesResult]<~AddMachinesResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='MachineManager', request='AddMachines', version=2, params=_params)
-
+        _params['params'] = params
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(InstanceTypesResults)
-    async def InstanceTypes(self):
+    async def InstanceTypes(self, constraints):
         '''
-
+        constraints : typing.Sequence<+T_co>[~ModelInstanceTypesConstraint]<~ModelInstanceTypesConstraint>
         Returns -> typing.Sequence<+T_co>[~InstanceTypesResult]<~InstanceTypesResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='MachineManager', request='InstanceTypes', version=2, params=_params)
-
+        _params['constraints'] = constraints
         reply = await self.rpc(msg)
         return reply
 
@@ -2871,15 +2943,15 @@ class MetricsAdderFacade(Type):
     
 
     @ReturnMapping(ErrorResults)
-    async def AddMetricBatches(self):
+    async def AddMetricBatches(self, batches):
         '''
-
+        batches : typing.Sequence<+T_co>[~MetricBatchParam]<~MetricBatchParam>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='MetricsAdder', request='AddMetricBatches', version=2, params=_params)
-
+        _params['batches'] = batches
         reply = await self.rpc(msg)
         return reply
 
@@ -2955,30 +3027,30 @@ class MetricsDebugFacade(Type):
     
 
     @ReturnMapping(MetricResults)
-    async def GetMetrics(self):
+    async def GetMetrics(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~EntityMetrics]<~EntityMetrics>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='MetricsDebug', request='GetMetrics', version=2, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetMeterStatus(self):
+    async def SetMeterStatus(self, statues):
         '''
-
+        statues : typing.Sequence<+T_co>[~MeterStatusParam]<~MeterStatusParam>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='MetricsDebug', request='SetMeterStatus', version=2, params=_params)
-
+        _params['statues'] = statues
         reply = await self.rpc(msg)
         return reply
 
@@ -3255,75 +3327,85 @@ class ModelManagerFacade(Type):
     
 
     @ReturnMapping(ModelInfo)
-    async def CreateModel(self):
+    async def CreateModel(self, cloud_tag, config, credential, name, owner_tag, region):
         '''
-
+        cloud_tag : str
+        config : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        credential : str
+        name : str
+        owner_tag : str
+        region : str
         Returns -> typing.Union[_ForwardRef('EntityStatus'), typing.Sequence<+T_co>[~ModelUserInfo]<~ModelUserInfo>]
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='ModelManager', request='CreateModel', version=2, params=_params)
-
+        _params['cloud-tag'] = cloud_tag
+        _params['config'] = config
+        _params['credential'] = credential
+        _params['name'] = name
+        _params['owner-tag'] = owner_tag
+        _params['region'] = region
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def DestroyModels(self):
+    async def DestroyModels(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='ModelManager', request='DestroyModels', version=2, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(MapResults)
-    async def DumpModels(self):
+    async def DumpModels(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~MapResult]<~MapResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='ModelManager', request='DumpModels', version=2, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(MapResults)
-    async def DumpModelsDB(self):
+    async def DumpModelsDB(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~MapResult]<~MapResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='ModelManager', request='DumpModelsDB', version=2, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(UserModelList)
-    async def ListModels(self):
+    async def ListModels(self, tag):
         '''
-
+        tag : str
         Returns -> typing.Sequence<+T_co>[~UserModel]<~UserModel>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='ModelManager', request='ListModels', version=2, params=_params)
-
+        _params['tag'] = tag
         reply = await self.rpc(msg)
         return reply
 
@@ -3345,75 +3427,75 @@ class ModelManagerFacade(Type):
 
 
     @ReturnMapping(ModelInfoResults)
-    async def ModelInfo(self):
+    async def ModelInfo(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ModelInfoResult]<~ModelInfoResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='ModelManager', request='ModelInfo', version=2, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ModelStatusResults)
-    async def ModelStatus(self):
+    async def ModelStatus(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ModelStatus]<~ModelStatus>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='ModelManager', request='ModelStatus', version=2, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def ModifyModelAccess(self):
+    async def ModifyModelAccess(self, changes):
         '''
-
+        changes : typing.Sequence<+T_co>[~ModifyModelAccess]<~ModifyModelAccess>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='ModelManager', request='ModifyModelAccess', version=2, params=_params)
-
+        _params['changes'] = changes
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetModelDefaults(self):
+    async def SetModelDefaults(self, config):
         '''
-
+        config : typing.Sequence<+T_co>[~ModelDefaultValues]<~ModelDefaultValues>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='ModelManager', request='SetModelDefaults', version=2, params=_params)
-
+        _params['config'] = config
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def UnsetModelDefaults(self):
+    async def UnsetModelDefaults(self, keys):
         '''
-
+        keys : typing.Sequence<+T_co>[~ModelUnsetKeys]<~ModelUnsetKeys>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='ModelManager', request='UnsetModelDefaults', version=2, params=_params)
-
+        _params['keys'] = keys
         reply = await self.rpc(msg)
         return reply
 
@@ -3478,45 +3560,45 @@ class RebootFacade(Type):
     
 
     @ReturnMapping(ErrorResults)
-    async def ClearReboot(self):
+    async def ClearReboot(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Reboot', request='ClearReboot', version=2, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(RebootActionResults)
-    async def GetRebootAction(self):
+    async def GetRebootAction(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~RebootActionResult]<~RebootActionResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Reboot', request='GetRebootAction', version=2, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def RequestReboot(self):
+    async def RequestReboot(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Reboot', request='RequestReboot', version=2, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
@@ -3633,30 +3715,30 @@ class SSHClientFacade(Type):
     
 
     @ReturnMapping(SSHAddressesResults)
-    async def AllAddresses(self):
+    async def AllAddresses(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~SSHAddressesResult]<~SSHAddressesResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='SSHClient', request='AllAddresses', version=2, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(SSHAddressResults)
-    async def PrivateAddress(self):
+    async def PrivateAddress(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~SSHAddressResult]<~SSHAddressResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='SSHClient', request='PrivateAddress', version=2, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
@@ -3678,30 +3760,30 @@ class SSHClientFacade(Type):
 
 
     @ReturnMapping(SSHAddressResults)
-    async def PublicAddress(self):
+    async def PublicAddress(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~SSHAddressResult]<~SSHAddressResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='SSHClient', request='PublicAddress', version=2, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(SSHPublicKeysResults)
-    async def PublicKeys(self):
+    async def PublicKeys(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~SSHPublicKeysResult]<~SSHPublicKeysResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='SSHClient', request='PublicKeys', version=2, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
@@ -3780,15 +3862,15 @@ class SpacesFacade(Type):
     
 
     @ReturnMapping(ErrorResults)
-    async def CreateSpaces(self):
+    async def CreateSpaces(self, spaces):
         '''
-
+        spaces : typing.Sequence<+T_co>[~CreateSpaceParams]<~CreateSpaceParams>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Spaces', request='CreateSpaces', version=2, params=_params)
-
+        _params['spaces'] = spaces
         reply = await self.rpc(msg)
         return reply
 
@@ -3823,16 +3905,18 @@ class StatusHistoryFacade(Type):
      'type': 'object'}
     
 
-    @ReturnMapping(StatusHistoryPruneArgs)
-    async def Prune(self):
+    @ReturnMapping(None)
+    async def Prune(self, max_history_mb, max_history_time):
         '''
-
-        Returns -> <class 'int'>
+        max_history_mb : int
+        max_history_time : int
+        Returns -> None
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StatusHistory', request='Prune', version=2, params=_params)
-
+        _params['max-history-mb'] = max_history_mb
+        _params['max-history-time'] = max_history_time
         reply = await self.rpc(msg)
         return reply
 
@@ -3933,15 +4017,15 @@ class SubnetsFacade(Type):
     
 
     @ReturnMapping(ErrorResults)
-    async def AddSubnets(self):
+    async def AddSubnets(self, subnets):
         '''
-
+        subnets : typing.Sequence<+T_co>[~AddSubnetParams]<~AddSubnetParams>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Subnets', request='AddSubnets', version=2, params=_params)
-
+        _params['subnets'] = subnets
         reply = await self.rpc(msg)
         return reply
 
@@ -3978,15 +4062,17 @@ class SubnetsFacade(Type):
 
 
     @ReturnMapping(ListSubnetsResults)
-    async def ListSubnets(self):
+    async def ListSubnets(self, space_tag, zone):
         '''
-
+        space_tag : str
+        zone : str
         Returns -> typing.Sequence<+T_co>[~Subnet]<~Subnet>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Subnets', request='ListSubnets', version=2, params=_params)
-
+        _params['space-tag'] = space_tag
+        _params['zone'] = zone
         reply = await self.rpc(msg)
         return reply
 

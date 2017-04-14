@@ -410,330 +410,370 @@ class ApplicationFacade(Type):
     
 
     @ReturnMapping(AddRelationResults)
-    async def AddRelation(self):
+    async def AddRelation(self, endpoints):
         '''
-
+        endpoints : typing.Sequence<+T_co>[str]
         Returns -> typing.Mapping<~KT, +VT_co>[str, ~CharmRelation]<~CharmRelation>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='AddRelation', version=4, params=_params)
-
+        _params['endpoints'] = endpoints
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(AddApplicationUnitsResults)
-    async def AddUnits(self):
+    async def AddUnits(self, application, num_units, placement):
         '''
-
+        application : str
+        num_units : int
+        placement : typing.Sequence<+T_co>[~Placement]<~Placement>
         Returns -> typing.Sequence<+T_co>[str]
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='AddUnits', version=4, params=_params)
-
+        _params['application'] = application
+        _params['num-units'] = num_units
+        _params['placement'] = placement
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ApplicationCharmRelationsResults)
-    async def CharmRelations(self):
+    async def CharmRelations(self, application):
         '''
-
+        application : str
         Returns -> typing.Sequence<+T_co>[str]
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='CharmRelations', version=4, params=_params)
-
+        _params['application'] = application
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ConsumeApplicationResults)
-    async def Consume(self):
+    async def Consume(self, args):
         '''
-
+        args : typing.Sequence<+T_co>[~ConsumeApplicationArg]<~ConsumeApplicationArg>
         Returns -> typing.Sequence<+T_co>[~ConsumeApplicationResult]<~ConsumeApplicationResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='Consume', version=4, params=_params)
-
+        _params['args'] = args
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def Deploy(self):
+    async def Deploy(self, applications):
         '''
-
+        applications : typing.Sequence<+T_co>[~ApplicationDeploy]<~ApplicationDeploy>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='Deploy', version=4, params=_params)
-
+        _params['applications'] = applications
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(ApplicationDestroy)
-    async def Destroy(self):
+    @ReturnMapping(None)
+    async def Destroy(self, application):
         '''
-
-        Returns -> str
+        application : str
+        Returns -> None
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='Destroy', version=4, params=_params)
-
+        _params['application'] = application
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(DestroyApplicationResults)
-    async def DestroyApplication(self):
+    async def DestroyApplication(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~DestroyApplicationResult]<~DestroyApplicationResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='DestroyApplication', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(DestroyRelation)
-    async def DestroyRelation(self):
+    @ReturnMapping(None)
+    async def DestroyRelation(self, endpoints):
         '''
-
-        Returns -> typing.Sequence<+T_co>[str]
+        endpoints : typing.Sequence<+T_co>[str]
+        Returns -> None
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='DestroyRelation', version=4, params=_params)
-
+        _params['endpoints'] = endpoints
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(DestroyUnitResults)
-    async def DestroyUnit(self):
+    async def DestroyUnit(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~DestroyUnitResult]<~DestroyUnitResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='DestroyUnit', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(DestroyApplicationUnits)
-    async def DestroyUnits(self):
+    @ReturnMapping(None)
+    async def DestroyUnits(self, unit_names):
         '''
-
-        Returns -> typing.Sequence<+T_co>[str]
+        unit_names : typing.Sequence<+T_co>[str]
+        Returns -> None
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='DestroyUnits', version=4, params=_params)
-
+        _params['unit-names'] = unit_names
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(ApplicationExpose)
-    async def Expose(self):
+    @ReturnMapping(None)
+    async def Expose(self, application):
         '''
-
-        Returns -> str
+        application : str
+        Returns -> None
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='Expose', version=4, params=_params)
-
+        _params['application'] = application
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ApplicationGetResults)
-    async def Get(self):
+    async def Get(self, application):
         '''
-
+        application : str
         Returns -> typing.Union[str, typing.Mapping<~KT, +VT_co>[str, typing.Any], _ForwardRef('Value')]
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='Get', version=4, params=_params)
-
+        _params['application'] = application
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringResult)
-    async def GetCharmURL(self):
+    async def GetCharmURL(self, application):
         '''
-
+        application : str
         Returns -> typing.Union[_ForwardRef('Error'), str]
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='GetCharmURL', version=4, params=_params)
-
+        _params['application'] = application
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(GetConstraintsResults)
-    async def GetConstraints(self):
+    async def GetConstraints(self, application):
         '''
-
+        application : str
         Returns -> Value
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='GetConstraints', version=4, params=_params)
-
+        _params['application'] = application
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(RemoteApplicationInfoResults)
-    async def RemoteApplicationInfo(self):
+    async def RemoteApplicationInfo(self, application_urls):
         '''
-
+        application_urls : typing.Sequence<+T_co>[str]
         Returns -> typing.Sequence<+T_co>[~RemoteApplicationInfoResult]<~RemoteApplicationInfoResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='RemoteApplicationInfo', version=4, params=_params)
-
+        _params['application-urls'] = application_urls
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(ApplicationSet)
-    async def Set(self):
+    @ReturnMapping(None)
+    async def Set(self, application, options):
         '''
-
-        Returns -> typing.Union[str, typing.Mapping<~KT, +VT_co>[str, str]]
+        application : str
+        options : typing.Mapping<~KT, +VT_co>[str, str]
+        Returns -> None
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='Set', version=4, params=_params)
-
+        _params['application'] = application
+        _params['options'] = options
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(ApplicationSetCharm)
-    async def SetCharm(self):
+    @ReturnMapping(None)
+    async def SetCharm(self, application, channel, charm_url, config_settings, config_settings_yaml, force_series, force_units, resource_ids, storage_constraints):
         '''
-
-        Returns -> typing.Union[str, bool, typing.Mapping<~KT, +VT_co>[str, ~StorageConstraints]<~StorageConstraints>]
+        application : str
+        channel : str
+        charm_url : str
+        config_settings : typing.Mapping<~KT, +VT_co>[str, str]
+        config_settings_yaml : str
+        force_series : bool
+        force_units : bool
+        resource_ids : typing.Mapping<~KT, +VT_co>[str, str]
+        storage_constraints : typing.Mapping<~KT, +VT_co>[str, ~StorageConstraints]<~StorageConstraints>
+        Returns -> None
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='SetCharm', version=4, params=_params)
-
+        _params['application'] = application
+        _params['channel'] = channel
+        _params['charm-url'] = charm_url
+        _params['config-settings'] = config_settings
+        _params['config-settings-yaml'] = config_settings_yaml
+        _params['force-series'] = force_series
+        _params['force-units'] = force_units
+        _params['resource-ids'] = resource_ids
+        _params['storage-constraints'] = storage_constraints
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(SetConstraints)
-    async def SetConstraints(self):
+    @ReturnMapping(None)
+    async def SetConstraints(self, application, constraints):
         '''
-
-        Returns -> typing.Union[str, _ForwardRef('Value')]
+        application : str
+        constraints : Value
+        Returns -> None
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='SetConstraints', version=4, params=_params)
-
+        _params['application'] = application
+        _params['constraints'] = constraints
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetMetricCredentials(self):
+    async def SetMetricCredentials(self, creds):
         '''
-
+        creds : typing.Sequence<+T_co>[~ApplicationMetricCredential]<~ApplicationMetricCredential>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='SetMetricCredentials', version=4, params=_params)
-
+        _params['creds'] = creds
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(ApplicationUnexpose)
-    async def Unexpose(self):
+    @ReturnMapping(None)
+    async def Unexpose(self, application):
         '''
-
-        Returns -> str
+        application : str
+        Returns -> None
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='Unexpose', version=4, params=_params)
-
+        _params['application'] = application
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(ApplicationUnset)
-    async def Unset(self):
+    @ReturnMapping(None)
+    async def Unset(self, application, options):
         '''
-
-        Returns -> typing.Sequence<+T_co>[str]
+        application : str
+        options : typing.Sequence<+T_co>[str]
+        Returns -> None
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='Unset', version=4, params=_params)
-
+        _params['application'] = application
+        _params['options'] = options
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(ApplicationUpdate)
-    async def Update(self):
+    @ReturnMapping(None)
+    async def Update(self, application, charm_url, constraints, force_charm_url, force_series, min_units, settings, settings_yaml):
         '''
-
-        Returns -> typing.Union[str, _ForwardRef('Value'), int, typing.Mapping<~KT, +VT_co>[str, str]]
+        application : str
+        charm_url : str
+        constraints : Value
+        force_charm_url : bool
+        force_series : bool
+        min_units : int
+        settings : typing.Mapping<~KT, +VT_co>[str, str]
+        settings_yaml : str
+        Returns -> None
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application', request='Update', version=4, params=_params)
-
+        _params['application'] = application
+        _params['charm-url'] = charm_url
+        _params['constraints'] = constraints
+        _params['force-charm-url'] = force_charm_url
+        _params['force-series'] = force_series
+        _params['min-units'] = min_units
+        _params['settings'] = settings
+        _params['settings-yaml'] = settings_yaml
         reply = await self.rpc(msg)
         return reply
 
@@ -1611,120 +1651,120 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ActionResults)
-    async def Actions(self):
+    async def Actions(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ActionResult]<~ActionResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='Actions', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def AddMetricBatches(self):
+    async def AddMetricBatches(self, batches):
         '''
-
+        batches : typing.Sequence<+T_co>[~MetricBatchParam]<~MetricBatchParam>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='AddMetricBatches', version=4, params=_params)
-
+        _params['batches'] = batches
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def AddUnitStorage(self):
+    async def AddUnitStorage(self, storages):
         '''
-
+        storages : typing.Sequence<+T_co>[~StorageAddParams]<~StorageAddParams>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='AddUnitStorage', version=4, params=_params)
-
+        _params['storages'] = storages
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(MachinePortsResults)
-    async def AllMachinePorts(self):
+    async def AllMachinePorts(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~MachinePortsResult]<~MachinePortsResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='AllMachinePorts', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ApplicationStatusResults)
-    async def ApplicationStatus(self):
+    async def ApplicationStatus(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ApplicationStatusResult]<~ApplicationStatusResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='ApplicationStatus', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringResults)
-    async def AssignedMachine(self):
+    async def AssignedMachine(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~StringResult]<~StringResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='AssignedMachine', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringResults)
-    async def AvailabilityZone(self):
+    async def AvailabilityZone(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~StringResult]<~StringResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='AvailabilityZone', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def BeginActions(self):
+    async def BeginActions(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='BeginActions', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
@@ -1746,90 +1786,90 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(StringResults)
-    async def CharmArchiveSha256(self):
+    async def CharmArchiveSha256(self, urls):
         '''
-
+        urls : typing.Sequence<+T_co>[~CharmURL]<~CharmURL>
         Returns -> typing.Sequence<+T_co>[~StringResult]<~StringResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='CharmArchiveSha256', version=4, params=_params)
-
+        _params['urls'] = urls
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(IntResults)
-    async def CharmModifiedVersion(self):
+    async def CharmModifiedVersion(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~IntResult]<~IntResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='CharmModifiedVersion', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringBoolResults)
-    async def CharmURL(self):
+    async def CharmURL(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~StringBoolResult]<~StringBoolResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='CharmURL', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def ClearResolved(self):
+    async def ClearResolved(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='ClearResolved', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def ClosePorts(self):
+    async def ClosePorts(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~EntityPortRange]<~EntityPortRange>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='ClosePorts', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ConfigSettingsResults)
-    async def ConfigSettings(self):
+    async def ConfigSettings(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ConfigSettingsResult]<~ConfigSettingsResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='ConfigSettings', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
@@ -1851,195 +1891,195 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def Destroy(self):
+    async def Destroy(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='Destroy', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def DestroyAllSubordinates(self):
+    async def DestroyAllSubordinates(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='DestroyAllSubordinates', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def DestroyUnitStorageAttachments(self):
+    async def DestroyUnitStorageAttachments(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='DestroyUnitStorageAttachments', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def EnsureDead(self):
+    async def EnsureDead(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='EnsureDead', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def EnterScope(self):
+    async def EnterScope(self, relation_units):
         '''
-
+        relation_units : typing.Sequence<+T_co>[~RelationUnit]<~RelationUnit>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='EnterScope', version=4, params=_params)
-
+        _params['relation-units'] = relation_units
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def FinishActions(self):
+    async def FinishActions(self, results):
         '''
-
+        results : typing.Sequence<+T_co>[~ActionExecutionResult]<~ActionExecutionResult>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='FinishActions', version=4, params=_params)
-
+        _params['results'] = results
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(MeterStatusResults)
-    async def GetMeterStatus(self):
+    async def GetMeterStatus(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~MeterStatusResult]<~MeterStatusResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='GetMeterStatus', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringBoolResults)
-    async def GetPrincipal(self):
+    async def GetPrincipal(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~StringBoolResult]<~StringBoolResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='GetPrincipal', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(BoolResults)
-    async def HasSubordinates(self):
+    async def HasSubordinates(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~BoolResult]<~BoolResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='HasSubordinates', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsResults)
-    async def JoinedRelations(self):
+    async def JoinedRelations(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~StringsResult]<~StringsResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='JoinedRelations', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def LeaveScope(self):
+    async def LeaveScope(self, relation_units):
         '''
-
+        relation_units : typing.Sequence<+T_co>[~RelationUnit]<~RelationUnit>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='LeaveScope', version=4, params=_params)
-
+        _params['relation-units'] = relation_units
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(LifeResults)
-    async def Life(self):
+    async def Life(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~LifeResult]<~LifeResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='Life', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def Merge(self):
+    async def Merge(self, params):
         '''
-
+        params : typing.Sequence<+T_co>[~MergeLeadershipSettingsParam]<~MergeLeadershipSettingsParam>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='Merge', version=4, params=_params)
-
+        _params['params'] = params
         reply = await self.rpc(msg)
         return reply
 
@@ -2076,45 +2116,45 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(UnitNetworkConfigResults)
-    async def NetworkConfig(self):
+    async def NetworkConfig(self, args):
         '''
-
+        args : typing.Sequence<+T_co>[~UnitNetworkConfig]<~UnitNetworkConfig>
         Returns -> typing.Sequence<+T_co>[~UnitNetworkConfigResult]<~UnitNetworkConfigResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='NetworkConfig', version=4, params=_params)
-
+        _params['args'] = args
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def OpenPorts(self):
+    async def OpenPorts(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~EntityPortRange]<~EntityPortRange>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='OpenPorts', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringResults)
-    async def PrivateAddress(self):
+    async def PrivateAddress(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~StringResult]<~StringResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='PrivateAddress', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
@@ -2136,315 +2176,315 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(StringResults)
-    async def PublicAddress(self):
+    async def PublicAddress(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~StringResult]<~StringResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='PublicAddress', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(GetLeadershipSettingsBulkResults)
-    async def Read(self):
+    async def Read(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~GetLeadershipSettingsResult]<~GetLeadershipSettingsResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='Read', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(SettingsResults)
-    async def ReadRemoteSettings(self):
+    async def ReadRemoteSettings(self, relation_unit_pairs):
         '''
-
+        relation_unit_pairs : typing.Sequence<+T_co>[~RelationUnitPair]<~RelationUnitPair>
         Returns -> typing.Sequence<+T_co>[~SettingsResult]<~SettingsResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='ReadRemoteSettings', version=4, params=_params)
-
+        _params['relation-unit-pairs'] = relation_unit_pairs
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(SettingsResults)
-    async def ReadSettings(self):
+    async def ReadSettings(self, relation_units):
         '''
-
+        relation_units : typing.Sequence<+T_co>[~RelationUnit]<~RelationUnit>
         Returns -> typing.Sequence<+T_co>[~SettingsResult]<~SettingsResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='ReadSettings', version=4, params=_params)
-
+        _params['relation-units'] = relation_units
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(RelationResults)
-    async def Relation(self):
+    async def Relation(self, relation_units):
         '''
-
+        relation_units : typing.Sequence<+T_co>[~RelationUnit]<~RelationUnit>
         Returns -> typing.Sequence<+T_co>[~RelationResult]<~RelationResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='Relation', version=4, params=_params)
-
+        _params['relation-units'] = relation_units
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(RelationResults)
-    async def RelationById(self):
+    async def RelationById(self, relation_ids):
         '''
-
+        relation_ids : typing.Sequence<+T_co>[int]
         Returns -> typing.Sequence<+T_co>[~RelationResult]<~RelationResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='RelationById', version=4, params=_params)
-
+        _params['relation-ids'] = relation_ids
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def RemoveStorageAttachments(self):
+    async def RemoveStorageAttachments(self, ids):
         '''
-
+        ids : typing.Sequence<+T_co>[~StorageAttachmentId]<~StorageAttachmentId>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='RemoveStorageAttachments', version=4, params=_params)
-
+        _params['ids'] = ids
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def RequestReboot(self):
+    async def RequestReboot(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='RequestReboot', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ResolvedModeResults)
-    async def Resolved(self):
+    async def Resolved(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ResolvedModeResult]<~ResolvedModeResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='Resolved', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetAgentStatus(self):
+    async def SetAgentStatus(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='SetAgentStatus', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetApplicationStatus(self):
+    async def SetApplicationStatus(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='SetApplicationStatus', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetCharmURL(self):
+    async def SetCharmURL(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~EntityCharmURL]<~EntityCharmURL>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='SetCharmURL', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetStatus(self):
+    async def SetStatus(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='SetStatus', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetUnitStatus(self):
+    async def SetUnitStatus(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='SetUnitStatus', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetWorkloadVersion(self):
+    async def SetWorkloadVersion(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~EntityWorkloadVersion]<~EntityWorkloadVersion>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='SetWorkloadVersion', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(LifeResults)
-    async def StorageAttachmentLife(self):
+    async def StorageAttachmentLife(self, ids):
         '''
-
+        ids : typing.Sequence<+T_co>[~StorageAttachmentId]<~StorageAttachmentId>
         Returns -> typing.Sequence<+T_co>[~LifeResult]<~LifeResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='StorageAttachmentLife', version=4, params=_params)
-
+        _params['ids'] = ids
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StorageAttachmentResults)
-    async def StorageAttachments(self):
+    async def StorageAttachments(self, ids):
         '''
-
+        ids : typing.Sequence<+T_co>[~StorageAttachmentId]<~StorageAttachmentId>
         Returns -> typing.Sequence<+T_co>[~StorageAttachmentResult]<~StorageAttachmentResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='StorageAttachments', version=4, params=_params)
-
+        _params['ids'] = ids
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StatusResults)
-    async def UnitStatus(self):
+    async def UnitStatus(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~StatusResult]<~StatusResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='UnitStatus', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StorageAttachmentIdsResults)
-    async def UnitStorageAttachments(self):
+    async def UnitStorageAttachments(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~StorageAttachmentIdsResult]<~StorageAttachmentIdsResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='UnitStorageAttachments', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def UpdateSettings(self):
+    async def UpdateSettings(self, relation_units):
         '''
-
+        relation_units : typing.Sequence<+T_co>[~RelationUnitSettings]<~RelationUnitSettings>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='UpdateSettings', version=4, params=_params)
-
+        _params['relation-units'] = relation_units
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(NotifyWatchResults)
-    async def Watch(self):
+    async def Watch(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='Watch', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
@@ -2466,45 +2506,45 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(StringsWatchResults)
-    async def WatchActionNotifications(self):
+    async def WatchActionNotifications(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~StringsWatchResult]<~StringsWatchResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='WatchActionNotifications', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsWatchResults)
-    async def WatchApplicationRelations(self):
+    async def WatchApplicationRelations(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~StringsWatchResult]<~StringsWatchResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='WatchApplicationRelations', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(NotifyWatchResults)
-    async def WatchConfigSettings(self):
+    async def WatchConfigSettings(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='WatchConfigSettings', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
@@ -2526,105 +2566,105 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(NotifyWatchResults)
-    async def WatchLeadershipSettings(self):
+    async def WatchLeadershipSettings(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='WatchLeadershipSettings', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(NotifyWatchResults)
-    async def WatchMeterStatus(self):
+    async def WatchMeterStatus(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='WatchMeterStatus', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(RelationUnitsWatchResults)
-    async def WatchRelationUnits(self):
+    async def WatchRelationUnits(self, relation_units):
         '''
-
+        relation_units : typing.Sequence<+T_co>[~RelationUnit]<~RelationUnit>
         Returns -> typing.Sequence<+T_co>[~RelationUnitsWatchResult]<~RelationUnitsWatchResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='WatchRelationUnits', version=4, params=_params)
-
+        _params['relation-units'] = relation_units
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(NotifyWatchResults)
-    async def WatchStorageAttachments(self):
+    async def WatchStorageAttachments(self, ids):
         '''
-
+        ids : typing.Sequence<+T_co>[~StorageAttachmentId]<~StorageAttachmentId>
         Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='WatchStorageAttachments', version=4, params=_params)
-
+        _params['ids'] = ids
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(NotifyWatchResults)
-    async def WatchUnitAddresses(self):
+    async def WatchUnitAddresses(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='WatchUnitAddresses', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsWatchResults)
-    async def WatchUnitStorageAttachments(self):
+    async def WatchUnitStorageAttachments(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~StringsWatchResult]<~StringsWatchResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='WatchUnitStorageAttachments', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringResults)
-    async def WorkloadVersion(self):
+    async def WorkloadVersion(self, entities):
         '''
-
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~StringResult]<~StringResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='WorkloadVersion', version=4, params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
