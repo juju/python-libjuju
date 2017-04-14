@@ -802,7 +802,7 @@ class Model(object):
         results = await client_facade.AddMachines([params])
         error = results.machines[0].error
         if error:
-            raise ValueError("Error adding machine: %s", error.message)
+            raise ValueError("Error adding machine: %s" % error.message)
         machine_id = results.machines[0].machine
         log.debug('Added new machine %s', machine_id)
         return await self._wait_for_new('machine', machine_id)
@@ -1252,7 +1252,8 @@ class Model(object):
 
     async def get_ssh_key(self, raw_ssh=False):
         """Return known SSH keys for this model.
-        :param bool raw_ssh: if True, returns the raw ssh key, else it's fingerprint
+        :param bool raw_ssh: if True, returns the raw ssh key,
+            else it's fingerprint
 
         """
         key_facade = client.KeyManagerFacade()
@@ -1711,7 +1712,7 @@ class BundleHandler(object):
         results = await self.client_facade.AddMachines([params])
         error = results.machines[0].error
         if error:
-            raise ValueError("Error adding machine: %s", error.message)
+            raise ValueError("Error adding machine: %s" % error.message)
         machine = results.machines[0].machine
         log.debug('Added new machine %s', machine)
         return machine
