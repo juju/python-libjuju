@@ -7,6 +7,7 @@ import json
 import keyword
 from pathlib import Path
 import pprint
+import re
 import textwrap
 from typing import Sequence, Mapping, TypeVar, Any, Union
 import typing
@@ -14,6 +15,10 @@ import typing
 from . import codegen
 
 _marker = object()
+
+JUJU_VERSION = re.compile('[0-9]+\.[0-9-]+[\.\-][0-9a-z]+')
+VERSION_MAP = defaultdict(dict)
+
 
 # Map basic types to Python's typing with a callable
 SCHEMA_TO_PYTHON = {
@@ -650,38 +655,67 @@ class {}(TypeFactory):
     """.format(classname))
 
 
+def write_version_map(options):
+    """
+    In order to work around
+    https://bugs.launchpad.net/juju/+bug/1682925, we build a map of
+    the facades that each version supports, and write it to disk here.
+
+    """
+    with open("{}_version_map.py".format(options.output), "w") as f:
+        f.write(HEADER)
+        f.write("VERSION_MAP = {\n")
+        for juju_version in VERSION_MAP:
+            f.write('    "{}": {{\n'.format(juju_version))
+            for key in VERSION_MAP[juju_version]:
+                f.write('        "{}": {},\n'.format(
+                    key, VERSION_MAP[juju_version][key]))
+            f.write('    },\n')
+        f.write("}\n")
+
+
 def generate_facades(options):
     global classes
     captures = defaultdict(codegen.Capture)
-    schemas = []
+    schemas = {}
     for p in sorted(glob(options.schema)):
+        try:
+            juju_version = re.search(JUJU_VERSION, p).group()
+        except AttributeError:
+            print("Cannot extract a juju version from {}".format(p))
+            print("Schemas must include a juju version in the filename")
+            raise SystemExit(1)
+
         new_schemas = json.loads(Path(p).read_text("utf-8"))
-        schemas += [Schema(s) for s in new_schemas]
+        schemas[juju_version] = [Schema(s) for s in new_schemas]
 
     # Build all of the auxillary (unversioned) classes
     # TODO: get rid of some of the excess trips through loops in the
     # called functions.
-    for schema in schemas:
-        schema.buildDefinitions()
-        buildTypes(schema, captures[schema.version])
+    for juju_version in sorted(schemas.keys()):
+        for schema in schemas[juju_version]:
+            schema.buildDefinitions()
+            buildTypes(schema, captures[schema.version])
+            VERSION_MAP[juju_version][schema.name] = schema.version
 
     # Build the Facade classes
-    for schema in schemas:
-        cls, source = buildFacade(schema)
-        cls_name = "{}Facade".format(schema.name)
+    for juju_version in sorted(schemas.keys()):
+        for schema in schemas[juju_version]:
+            cls, source = buildFacade(schema)
+            cls_name = "{}Facade".format(schema.name)
 
-        captures[schema.version].clear(cls_name)
-        # Make the factory class for _client.py
-        make_factory(cls_name)
-        # Make the actual class
-        captures[schema.version][cls_name].write(source)
-        # Build the methods for each Facade class.
-        # TODO (critical bug): figure out why we aren't building the
-        # params for all these methods.
-        buildMethods(cls, captures[schema.version])
-        # Mark this Facade class as being done for this version --
-        # helps mitigate some excessive looping.
-        classes[schema.name] = cls
+            captures[schema.version].clear(cls_name)
+            # Make the factory class for _client.py
+            make_factory(cls_name)
+            # Make the actual class
+            captures[schema.version][cls_name].write(source)
+            # Build the methods for each Facade class.
+            # TODO (critical bug): figure out why we aren't building the
+            # params for all these methods.
+            buildMethods(cls, captures[schema.version])
+            # Mark this Facade class as being done for this version --
+            # helps mitigate some excessive looping.
+            classes[schema.name] = cls
 
     return captures
 
@@ -744,6 +778,7 @@ CLIENTS = {{
         for key in sorted([k for k in factories.keys() if "Facade" in k]):
             print(factories[key], file=f)
 
+    write_version_map(options)
 
 if __name__ == '__main__':
     main()
