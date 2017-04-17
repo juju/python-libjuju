@@ -20,7 +20,6 @@ import theblues.errors
 
 from . import tag
 from .client import client
-from .client import watcher
 from .client import connection
 from .constraints import parse as parse_constraints, normalize_key
 from .delta import get_entity_delta
@@ -566,8 +565,7 @@ class Model(object):
         explicit call to this method.
 
         """
-        facade = client.ClientFacade()
-        facade.connect(self.connection)
+        facade = client.ClientFacade.from_connection(self.connection)
 
         self.info = await facade.ModelInfo()
         log.debug('Got ModelInfo: %s', vars(self.info))
@@ -623,9 +621,9 @@ class Model(object):
         async def _start_watch():
             self._watch_shutdown.clear()
             try:
-                allwatcher = watcher.AllWatcher()
                 self._watch_conn = await self.connection.clone()
-                allwatcher.connect(self._watch_conn)
+                allwatcher = client.AllWatcherFacade.from_connection(
+                    self._watch_conn)
                 while True:
                     results = await allwatcher.Next()
                     for delta in results.deltas:
@@ -797,8 +795,7 @@ class Model(object):
             params.series = series
 
         # Submit the request.
-        client_facade = client.ClientFacade()
-        client_facade.connect(self.connection)
+        client_facade = client.ClientFacade.from_connection(self.connection)
         results = await client_facade.AddMachines([params])
         error = results.machines[0].error
         if error:
@@ -814,8 +811,7 @@ class Model(object):
         :param str relation2: '<application>[:<relation_name>]'
 
         """
-        app_facade = client.ApplicationFacade()
-        app_facade.connect(self.connection)
+        app_facade = client.ApplicationFacade.from_conection(self.connection)
 
         log.debug(
             'Adding relation %s <-> %s', relation1, relation2)
@@ -858,8 +854,7 @@ class Model(object):
         :param str key: The public ssh key
 
         """
-        key_facade = client.KeyManagerFacade()
-        key_facade.connect(self.connection)
+        key_facade = client.KeyManagerFacade.from_connection(self.connection)
         return await key_facade.AddKeys([key], user)
     add_ssh_keys = add_ssh_key
 
@@ -1017,8 +1012,7 @@ class Model(object):
             entity = await self.charmstore.entity(entity_url)
             entity_id = entity['Id']
 
-        client_facade = client.ClientFacade()
-        client_facade.connect(self.connection)
+        client_facade = client.ClientFacade.from_connection(self.connection)
 
         is_bundle = ((is_local and
                       (Path(entity_id) / 'bundle.yaml').exists()) or
@@ -1100,8 +1094,8 @@ class Model(object):
         if not resources:
             return None
 
-        resources_facade = client.ResourcesFacade()
-        resources_facade.connect(self.connection)
+        resources_facade = client.ResourcesFacade.from_connection(
+            self.connection)
         response = await resources_facade.AddPendingResources(
             tag.application(application),
             entity_url,
@@ -1123,8 +1117,8 @@ class Model(object):
         config = yaml.dump({application: config},
                            default_flow_style=False)
 
-        app_facade = client.ApplicationFacade()
-        app_facade.connect(self.connection)
+        app_facade = client.ApplicationFacade.from_connection(
+            self.connection)
 
         app = client.ApplicationDeploy(
             charm_url=charm_url,
@@ -1156,8 +1150,7 @@ class Model(object):
         """Destroy units by name.
 
         """
-        app_facade = client.ApplicationFacade()
-        app_facade.connect(self.connection)
+        app_facade = client.ApplicationFacade.from_connection(self.connection)
 
         log.debug(
             'Destroying unit%s %s',
@@ -1214,9 +1207,9 @@ class Model(object):
         :param str acl: Access control ('read' or 'write')
 
         """
-        model_facade = client.ModelManagerFacade()
         controller_conn = await self.connection.controller()
-        model_facade.connect(controller_conn)
+        model_facade = client.ModelManagerFacade.from_connection(
+            controller_conn)
         user = tag.user(username)
         model = tag.model(self.info.uuid)
         changes = client.ModifyModelAccess(acl, 'grant', model, user)
@@ -1256,8 +1249,7 @@ class Model(object):
             else it's fingerprint
 
         """
-        key_facade = client.KeyManagerFacade()
-        key_facade.connect(self.connection)
+        key_facade = client.KeyManagerFacade.from_connection(self.connection)
         entity = {'tag': tag.model(self.info.uuid)}
         entities = client.Entities([entity])
         return await key_facade.ListKeys(entities, raw_ssh)
@@ -1330,8 +1322,7 @@ class Model(object):
         :param str user: Juju user to which the key is registered
 
         """
-        key_facade = client.KeyManagerFacade()
-        key_facade.connect(self.connection)
+        key_facade = client.KeyManagerFacade.from_connection(self.connection)
         key = base64.b64decode(bytes(key.strip().split()[1].encode('ascii')))
         key = hashlib.md5(key).hexdigest()
         key = ':'.join(a+b for a, b in zip(key[::2], key[1::2]))
@@ -1365,9 +1356,9 @@ class Model(object):
         :param str username: Username to revoke
 
         """
-        model_facade = client.ModelManagerFacade()
         controller_conn = await self.connection.controller()
-        model_facade.connect(controller_conn)
+        model_facade = client.ModelManagerFacade.from_connection(
+            controller_conn)
         user = tag.user(username)
         model = tag.model(self.info.uuid)
         changes = client.ModifyModelAccess('read', 'revoke', model, user)
@@ -1432,8 +1423,7 @@ class Model(object):
         :param bool utc: Display time as UTC in RFC3339 format
 
         """
-        client_facade = client.ClientFacade()
-        client_facade.connect(self.connection)
+        client_facade = client.ClientFacade.from_connection(self.connection)
         return await client_facade.FullStatus(filters)
 
     def sync_tools(
@@ -1513,8 +1503,8 @@ class Model(object):
         log.debug("Retrieving metrics for %s",
                   ', '.join(tags) if tags else "all units")
 
-        metrics_facade = client.MetricsDebugFacade()
-        metrics_facade.connect(self.connection)
+        metrics_facade = client.MetricsDebugFacade.from_connection(
+            self.connection)
 
         entities = [client.Entity(tag) for tag in tags]
         metrics_result = await metrics_facade.GetMetrics(entities)
@@ -1564,12 +1554,12 @@ class BundleHandler(object):
         for unit_name, unit in model.units.items():
             app_units = self._units_by_app.setdefault(unit.application, [])
             app_units.append(unit_name)
-        self.client_facade = client.ClientFacade()
-        self.client_facade.connect(model.connection)
-        self.app_facade = client.ApplicationFacade()
-        self.app_facade.connect(model.connection)
-        self.ann_facade = client.AnnotationsFacade()
-        self.ann_facade.connect(model.connection)
+        self.client_facade = client.ClientFacade.from_connection(
+            model.connection)
+        self.app_facade = client.ApplicationFacade.from_connection(
+            model.connection)
+        self.ann_facade = client.AnnotationsFacade.from_connection(
+            model.connection)
 
     async def _handle_local_charms(self, bundle):
         """Search for references to local charms (i.e. filesystem paths)

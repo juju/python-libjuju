@@ -15,6 +15,7 @@ import asyncio
 import yaml
 
 from juju import tag
+from juju.client._client_version_map import VERSION_MAP
 from juju.errors import JujuError, JujuAPIError, JujuConnectionError
 from juju.utils import IdQueue
 
@@ -410,10 +411,23 @@ class Connection:
         return await cls.connect(
             endpoint, model_uuid, username, password, cacert, macaroons, loop)
 
-    def build_facades(self, info):
+    def build_facades(self, facades):
         self.facades.clear()
-        for facade in info:
-            self.facades[facade['name']] = facade['versions'][-1]
+        # In order to work around an issue where the juju api is not
+        # returning a complete list of facades, we simply look up the
+        # juju version in a pregenerated map, and use that info to
+        # populate our list of facades.
+
+        # TODO: if a future version of juju fixes this bug, restore
+        # the following code for that version and higher:
+        # for facade in facades:
+        #     self.facades[facade['name']] = facade['versions'][-1]
+        try:
+            self.facades = VERSION_MAP[self.info['server-version']]
+        except KeyError:
+            raise JujuAPIError(
+                "Juju version {} is not supported".format(
+                    self.info['server-version']))
 
     async def login(self, username, password, macaroons=None):
         if macaroons:
@@ -434,8 +448,8 @@ class Connection:
                 "macaroons": macaroons or []
             }})
         response = result['response']
-        self.build_facades(response.get('facades', {}))
         self.info = response.copy()
+        self.build_facades(response.get('facades', {}))
         return response
 
     async def redirect_info(self):
