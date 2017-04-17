@@ -20,7 +20,6 @@ import theblues.errors
 
 from . import tag
 from .client import client
-from .client import watcher
 from .client import connection
 from .constraints import parse as parse_constraints, normalize_key
 from .delta import get_entity_delta
@@ -623,7 +622,7 @@ class Model(object):
             self._watch_shutdown.clear()
             try:
                 self._watch_conn = await self.connection.clone()
-                allwatcher = watcher.AllWatcher.from_connection(
+                allwatcher = client.AllWatcherFacade.from_connection(
                     self._watch_conn)
                 while True:
                     results = await allwatcher.Next()

@@ -80,3 +80,18 @@ class ResourcesFacade(Type):
         _params['resources'] = resources
         reply = await self.rpc(msg)
         return reply
+
+class AllWatcherFacade(Type):
+    """
+    Patch rpc method of allwatcher to add in 'id' stuff.
+
+    """
+    async def rpc(self, msg):
+        if not hasattr(self, 'Id'):
+            client = ClientFacade.from_connection(self.connection)
+
+            result = await client.WatchAll()
+            self.Id = result.watcher_id
+
+        msg['Id'] = self.Id
+        return await self.connection.rpc(msg, encoder=TypeEncoder)
