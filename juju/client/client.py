@@ -17,9 +17,9 @@ for o in overrides.__all__:
             "it instead.")
 
 for o in overrides.__patches__:
-    for c in _client.CLIENTS.values():
+    for client_version in _client.CLIENTS.values():
         try:
-            c_type = getattr(c, o)
+            c_type = getattr(client_version, o)
         except AttributeError:
             continue
         o_type = getattr(overrides, o)
