@@ -667,11 +667,11 @@ def write_facades(captures, options):
 
     """
     for version in sorted(captures.keys()):
-        filename = "{}{}.py".format(options.output, version)
+        filename = "{}/_client{}.py".format(options.output_dir, version)
         with open(filename, "w") as f:
             f.write(HEADER)
             f.write("from juju.client.facade import Type, ReturnMapping\n")
-            f.write("from juju.client._client_definitions import *\n\n")
+            f.write("from juju.client._definitions import *\n\n")
             for key in sorted(
                     [k for k in captures[version].keys() if "Facade" in k]):
                 print(captures[version][key], file=f)
@@ -683,12 +683,12 @@ def write_facades(captures, options):
 def write_definitions(captures, options, version):
     """
     Write auxillary (non versioned) classes to
-    _client_definitions.py The auxillary classes currently get
+    _definitions.py The auxillary classes currently get
     written redudantly into each capture object, so we can look in
     one of them -- we just use the last one from the loop above.
 
     """
-    with open("{}_definitions.py".format(options.output), "w") as f:
+    with open("{}/_definitions.py".format(options.output_dir), "w") as f:
         f.write(HEADER)
         f.write("from juju.client.facade import Type, ReturnMapping\n\n")
         for key in sorted(
@@ -702,9 +702,9 @@ def write_client(captures, options):
     imports and tables so that we can look up versioned Facades.
 
     """
-    with open("{}.py".format(options.output), "w") as f:
+    with open("{}/_client.py".format(options.output_dir), "w") as f:
         f.write(HEADER)
-        f.write("from juju.client._client_definitions import *\n\n")
+        f.write("from juju.client._definitions import *\n\n")
         clients = ", ".join("_client{}".format(v) for v in captures)
         f.write("from juju.client import " + clients + "\n\n")
         f.write(CLIENT_TABLE.format(clients=",\n    ".join(
@@ -722,7 +722,7 @@ def write_version_map(options):
     the facades that each version supports, and write it to disk here.
 
     """
-    with open("{}_version_map.py".format(options.output), "w") as f:
+    with open("{}/version_map.py".format(options.output_dir), "w") as f:
         f.write(HEADER)
         f.write("VERSION_MAP = {\n")
         for juju_version in VERSION_MAP:
@@ -778,8 +778,8 @@ def generate_facades(options):
 
 def setup():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-s", "--schema", default="schemas.json")
-    parser.add_argument("-o", "--output", default="client.py")
+    parser.add_argument("-s", "--schema", default="juju/client/schemas*")
+    parser.add_argument("-o", "--output_dir", default="juju/client")
     options = parser.parse_args()
     return options
 

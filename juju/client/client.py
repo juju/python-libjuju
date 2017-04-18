@@ -1,15 +1,15 @@
 '''Replace auto-generated classes with our own, where necessary.
 '''
 
-from . import _client, _client_definitions, overrides
+from . import _client, _definitions, overrides
 
 
 for o in overrides.__all__:
     if not "Facade" in o:
-        # Override stuff in _client_definitions, which is all imported
+        # Override stuff in _definitions, which is all imported
         # into _client. We Monkey patch both the original class and
         # the ref in _client (import shenanigans are fun!)
-        setattr(_client_definitions, o, getattr(overrides, o))
+        setattr(_definitions, o, getattr(overrides, o))
         setattr(_client, o, getattr(overrides, o))
     # We shouldn't be overriding Facades!
     else:

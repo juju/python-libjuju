@@ -2,7 +2,7 @@
 # Changes will be overwritten/lost when the file is regenerated.
 
 from juju.client.facade import Type, ReturnMapping
-from juju.client._client_definitions import *
+from juju.client._definitions import *
 
 
 class UniterFacade(Type):

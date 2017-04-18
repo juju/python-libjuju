@@ -15,7 +15,7 @@ import asyncio
 import yaml
 
 from juju import tag
-from juju.client._client_version_map import VERSION_MAP
+from juju.client.version_map import VERSION_MAP
 from juju.errors import JujuError, JujuAPIError, JujuConnectionError
 from juju.utils import IdQueue
 
