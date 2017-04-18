@@ -852,6 +852,12 @@ class ClientFacade(Type):
                                                              'status': {'type': 'string'}},
                                               'required': ['status', 'start'],
                                               'type': 'object'},
+                     'ModelSLA': {'additionalProperties': False,
+                                  'properties': {'creds': {'items': {'type': 'integer'},
+                                                           'type': 'array'},
+                                                 'level': {'type': 'string'}},
+                                  'required': ['level', 'creds'],
+                                  'type': 'object'},
                      'ModelSet': {'additionalProperties': False,
                                   'properties': {'config': {'patternProperties': {'.*': {'additionalProperties': True,
                                                                                          'type': 'object'}},
@@ -861,6 +867,7 @@ class ClientFacade(Type):
                      'ModelStatusInfo': {'additionalProperties': False,
                                          'properties': {'available-version': {'type': 'string'},
                                                         'cloud-tag': {'type': 'string'},
+                                                        'meter-status': {'$ref': '#/definitions/MeterStatus'},
                                                         'model-status': {'$ref': '#/definitions/DetailedStatus'},
                                                         'name': {'type': 'string'},
                                                         'region': {'type': 'string'},
@@ -869,7 +876,8 @@ class ClientFacade(Type):
                                                       'cloud-tag',
                                                       'version',
                                                       'available-version',
-                                                      'model-status'],
+                                                      'model-status',
+                                                      'meter-status'],
                                          'type': 'object'},
                      'ModelUnset': {'additionalProperties': False,
                                     'properties': {'keys': {'items': {'type': 'string'},
@@ -1070,6 +1078,11 @@ class ClientFacade(Type):
                                                                   'type': 'array'}},
                                       'required': ['patterns'],
                                       'type': 'object'},
+                     'StringResult': {'additionalProperties': False,
+                                      'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                     'result': {'type': 'string'}},
+                                      'required': ['result'],
+                                      'type': 'object'},
                      'Tools': {'additionalProperties': False,
                                'properties': {'sha256': {'type': 'string'},
                                               'size': {'type': 'integer'},
@@ -1170,10 +1183,14 @@ class ClientFacade(Type):
                     'RetryProvisioning': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                          'Result': {'$ref': '#/definitions/ErrorResults'}},
                                           'type': 'object'},
+                    'SLALevel': {'properties': {'Result': {'$ref': '#/definitions/StringResult'}},
+                                 'type': 'object'},
                     'SetModelAgentVersion': {'properties': {'Params': {'$ref': '#/definitions/SetModelAgentVersion'}},
                                              'type': 'object'},
                     'SetModelConstraints': {'properties': {'Params': {'$ref': '#/definitions/SetConstraints'}},
                                             'type': 'object'},
+                    'SetSLALevel': {'properties': {'Params': {'$ref': '#/definitions/ModelSLA'}},
+                                    'type': 'object'},
                     'StatusHistory': {'properties': {'Params': {'$ref': '#/definitions/StatusHistoryRequests'},
                                                      'Result': {'$ref': '#/definitions/StatusHistoryResults'}},
                                       'type': 'object'},
@@ -1566,6 +1583,21 @@ class ClientFacade(Type):
 
 
 
+    @ReturnMapping(StringResult)
+    async def SLALevel(self):
+        '''
+
+        Returns -> typing.Union[_ForwardRef('Error'), str]
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client', request='SLALevel', version=1, params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
     @ReturnMapping(None)
     async def SetModelAgentVersion(self, version):
         '''
@@ -1593,6 +1625,23 @@ class ClientFacade(Type):
         msg = dict(type='Client', request='SetModelConstraints', version=1, params=_params)
         _params['application'] = application
         _params['constraints'] = constraints
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def SetSLALevel(self, creds, level):
+        '''
+        creds : typing.Sequence<+T_co>[int]
+        level : str
+        Returns -> None
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client', request='SetSLALevel', version=1, params=_params)
+        _params['creds'] = creds
+        _params['level'] = level
         reply = await self.rpc(msg)
         return reply
 
@@ -3690,7 +3739,8 @@ class MetricsManagerFacade(Type):
                                       'required': ['results'],
                                       'type': 'object'},
                      'Macaroon': {'additionalProperties': False, 'type': 'object'}},
-     'properties': {'CleanupOldMetrics': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+     'properties': {'AddJujuMachineMetrics': {'type': 'object'},
+                    'CleanupOldMetrics': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                          'Result': {'$ref': '#/definitions/ErrorResults'}},
                                           'type': 'object'},
                     'SendMetrics': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
@@ -3698,6 +3748,21 @@ class MetricsManagerFacade(Type):
                                     'type': 'object'}},
      'type': 'object'}
     
+
+    @ReturnMapping(None)
+    async def AddJujuMachineMetrics(self):
+        '''
+
+        Returns -> None
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='MetricsManager', request='AddJujuMachineMetrics', version=1, params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
 
     @ReturnMapping(ErrorResults)
     async def CleanupOldMetrics(self, entities):
@@ -4478,11 +4543,28 @@ class ModelConfigFacade(Type):
                                                               'type': 'object'}},
                                      'required': ['value', 'source'],
                                      'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'$ref': '#/definitions/ErrorInfo'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ErrorInfo': {'additionalProperties': False,
+                                   'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
+                                                  'macaroon-path': {'type': 'string'}},
+                                   'type': 'object'},
+                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
                      'ModelConfigResults': {'additionalProperties': False,
                                             'properties': {'config': {'patternProperties': {'.*': {'$ref': '#/definitions/ConfigValue'}},
                                                                       'type': 'object'}},
                                             'required': ['config'],
                                             'type': 'object'},
+                     'ModelSLA': {'additionalProperties': False,
+                                  'properties': {'creds': {'items': {'type': 'integer'},
+                                                           'type': 'array'},
+                                                 'level': {'type': 'string'}},
+                                  'required': ['level', 'creds'],
+                                  'type': 'object'},
                      'ModelSet': {'additionalProperties': False,
                                   'properties': {'config': {'patternProperties': {'.*': {'additionalProperties': True,
                                                                                          'type': 'object'}},
@@ -4493,13 +4575,22 @@ class ModelConfigFacade(Type):
                                     'properties': {'keys': {'items': {'type': 'string'},
                                                             'type': 'array'}},
                                     'required': ['keys'],
-                                    'type': 'object'}},
+                                    'type': 'object'},
+                     'StringResult': {'additionalProperties': False,
+                                      'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                     'result': {'type': 'string'}},
+                                      'required': ['result'],
+                                      'type': 'object'}},
      'properties': {'ModelGet': {'properties': {'Result': {'$ref': '#/definitions/ModelConfigResults'}},
                                  'type': 'object'},
                     'ModelSet': {'properties': {'Params': {'$ref': '#/definitions/ModelSet'}},
                                  'type': 'object'},
                     'ModelUnset': {'properties': {'Params': {'$ref': '#/definitions/ModelUnset'}},
-                                   'type': 'object'}},
+                                   'type': 'object'},
+                    'SLALevel': {'properties': {'Result': {'$ref': '#/definitions/StringResult'}},
+                                 'type': 'object'},
+                    'SetSLALevel': {'properties': {'Params': {'$ref': '#/definitions/ModelSLA'}},
+                                    'type': 'object'}},
      'type': 'object'}
     
 
@@ -4543,6 +4634,38 @@ class ModelConfigFacade(Type):
         _params = dict()
         msg = dict(type='ModelConfig', request='ModelUnset', version=1, params=_params)
         _params['keys'] = keys
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResult)
+    async def SLALevel(self):
+        '''
+
+        Returns -> typing.Union[_ForwardRef('Error'), str]
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ModelConfig', request='SLALevel', version=1, params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def SetSLALevel(self, creds, level):
+        '''
+        creds : typing.Sequence<+T_co>[int]
+        level : str
+        Returns -> None
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ModelConfig', request='SetSLALevel', version=1, params=_params)
+        _params['creds'] = creds
+        _params['level'] = level
         reply = await self.rpc(msg)
         return reply
 
@@ -5199,11 +5322,11 @@ class ResourcesFacade(Type):
                      'AddPendingResourcesArgs': {'additionalProperties': False,
                                                  'properties': {'AddCharmWithAuthorization': {'$ref': '#/definitions/AddCharmWithAuthorization'},
                                                                 'Entity': {'$ref': '#/definitions/Entity'},
-                                                                'Resources': {'items': {'$ref': '#/definitions/CharmResource'},
+                                                                'resources': {'items': {'$ref': '#/definitions/CharmResource'},
                                                                               'type': 'array'}},
                                                  'required': ['Entity',
                                                               'AddCharmWithAuthorization',
-                                                              'Resources'],
+                                                              'resources'],
                                                  'type': 'object'},
                      'AddPendingResourcesResult': {'additionalProperties': False,
                                                    'properties': {'ErrorResult': {'$ref': '#/definitions/ErrorResult'},
@@ -5373,11 +5496,11 @@ class ResourcesHookContextFacade(Type):
                      'ErrorResult': {'additionalProperties': False,
                                      'properties': {'error': {'$ref': '#/definitions/Error'}},
                                      'type': 'object'},
-                     'ListResourcesArgs': {'additionalProperties': False,
-                                           'properties': {'resource-names': {'items': {'type': 'string'},
-                                                                             'type': 'array'}},
-                                           'required': ['resource-names'],
-                                           'type': 'object'},
+                     'ListUnitResourcesArgs': {'additionalProperties': False,
+                                               'properties': {'resource-names': {'items': {'type': 'string'},
+                                                                                 'type': 'array'}},
+                                               'required': ['resource-names'],
+                                               'type': 'object'},
                      'Macaroon': {'additionalProperties': False, 'type': 'object'},
                      'Resource': {'additionalProperties': False,
                                   'properties': {'CharmResource': {'$ref': '#/definitions/CharmResource'},
@@ -5394,33 +5517,34 @@ class ResourcesHookContextFacade(Type):
                                                'username',
                                                'timestamp'],
                                   'type': 'object'},
-                     'ResourceResult': {'additionalProperties': False,
-                                        'properties': {'ErrorResult': {'$ref': '#/definitions/ErrorResult'},
-                                                       'resource': {'$ref': '#/definitions/Resource'}},
-                                        'required': ['ErrorResult', 'resource'],
-                                        'type': 'object'},
-                     'ResourcesResult': {'additionalProperties': False,
-                                         'properties': {'ErrorResult': {'$ref': '#/definitions/ErrorResult'},
-                                                        'resources': {'items': {'$ref': '#/definitions/ResourceResult'},
-                                                                      'type': 'array'}},
-                                         'required': ['ErrorResult', 'resources'],
-                                         'type': 'object'}},
-     'properties': {'GetResourceInfo': {'properties': {'Params': {'$ref': '#/definitions/ListResourcesArgs'},
-                                                       'Result': {'$ref': '#/definitions/ResourcesResult'}},
+                     'UnitResourceResult': {'additionalProperties': False,
+                                            'properties': {'ErrorResult': {'$ref': '#/definitions/ErrorResult'},
+                                                           'resource': {'$ref': '#/definitions/Resource'}},
+                                            'required': ['ErrorResult', 'resource'],
+                                            'type': 'object'},
+                     'UnitResourcesResult': {'additionalProperties': False,
+                                             'properties': {'ErrorResult': {'$ref': '#/definitions/ErrorResult'},
+                                                            'resources': {'items': {'$ref': '#/definitions/UnitResourceResult'},
+                                                                          'type': 'array'}},
+                                             'required': ['ErrorResult',
+                                                          'resources'],
+                                             'type': 'object'}},
+     'properties': {'GetResourceInfo': {'properties': {'Params': {'$ref': '#/definitions/ListUnitResourcesArgs'},
+                                                       'Result': {'$ref': '#/definitions/UnitResourcesResult'}},
                                         'type': 'object'}},
      'type': 'object'}
     
 
-    @ReturnMapping(ResourcesResult)
-    async def GetResourceInfo(self, entities):
+    @ReturnMapping(UnitResourcesResult)
+    async def GetResourceInfo(self, resource_names):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Union[_ForwardRef('ErrorResult'), typing.Sequence<+T_co>[~UnitResources]<~UnitResources>]
+        resource_names : typing.Sequence<+T_co>[str]
+        Returns -> typing.Union[_ForwardRef('ErrorResult'), typing.Sequence<+T_co>[~UnitResourceResult]<~UnitResourceResult>]
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='ResourcesHookContext', request='GetResourceInfo', version=1, params=_params)
-        _params['entities'] = entities
+        _params['resource-names'] = resource_names
         reply = await self.rpc(msg)
         return reply
 

@@ -3,14 +3,15 @@
 
 from juju.client._client_definitions import *
 
-from juju.client import _client1, _client2, _client3, _client4
+from juju.client import _client1, _client2, _client3, _client4, _client5
 
 
 CLIENTS = {
     "1": _client1,
     "2": _client2,
     "3": _client3,
-    "4": _client4
+    "4": _client4,
+    "5": _client5
 }
 
 

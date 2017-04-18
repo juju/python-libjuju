@@ -1824,7 +1824,8 @@ class DiscoverSpacesFacade(Type):
     name = 'DiscoverSpaces'
     version = 2
     schema =     {'definitions': {'AddSubnetParams': {'additionalProperties': False,
-                                         'properties': {'space-tag': {'type': 'string'},
+                                         'properties': {'provider-network-id': {'type': 'string'},
+                                                        'space-tag': {'type': 'string'},
                                                         'subnet-provider-id': {'type': 'string'},
                                                         'subnet-tag': {'type': 'string'},
                                                         'vlan-tag': {'type': 'integer'},
@@ -1901,6 +1902,7 @@ class DiscoverSpacesFacade(Type):
                                 'properties': {'cidr': {'type': 'string'},
                                                'life': {'type': 'string'},
                                                'provider-id': {'type': 'string'},
+                                               'provider-network-id': {'type': 'string'},
                                                'space-tag': {'type': 'string'},
                                                'status': {'type': 'string'},
                                                'vlan-tag': {'type': 'integer'},
@@ -3842,6 +3844,7 @@ class SpacesFacade(Type):
                                 'properties': {'cidr': {'type': 'string'},
                                                'life': {'type': 'string'},
                                                'provider-id': {'type': 'string'},
+                                               'provider-network-id': {'type': 'string'},
                                                'space-tag': {'type': 'string'},
                                                'status': {'type': 'string'},
                                                'vlan-tag': {'type': 'integer'},
@@ -3926,7 +3929,8 @@ class SubnetsFacade(Type):
     name = 'Subnets'
     version = 2
     schema =     {'definitions': {'AddSubnetParams': {'additionalProperties': False,
-                                         'properties': {'space-tag': {'type': 'string'},
+                                         'properties': {'provider-network-id': {'type': 'string'},
+                                                        'space-tag': {'type': 'string'},
                                                         'subnet-provider-id': {'type': 'string'},
                                                         'subnet-tag': {'type': 'string'},
                                                         'vlan-tag': {'type': 'integer'},
@@ -3977,6 +3981,7 @@ class SubnetsFacade(Type):
                                 'properties': {'cidr': {'type': 'string'},
                                                'life': {'type': 'string'},
                                                'provider-id': {'type': 'string'},
+                                               'provider-network-id': {'type': 'string'},
                                                'space-tag': {'type': 'string'},
                                                'status': {'type': 'string'},
                                                'vlan-tag': {'type': 'integer'},

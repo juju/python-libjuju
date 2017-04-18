@@ -2678,6 +2678,9 @@ class ProvisionerFacade(Type):
                     'SetPasswords': {'properties': {'Params': {'$ref': '#/definitions/EntityPasswords'},
                                                     'Result': {'$ref': '#/definitions/ErrorResults'}},
                                      'type': 'object'},
+                    'SetProviderNetworkConfig': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                                'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                                 'type': 'object'},
                     'SetStatus': {'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
                                                  'Result': {'$ref': '#/definitions/ErrorResults'}},
                                   'type': 'object'},
@@ -3154,6 +3157,21 @@ class ProvisionerFacade(Type):
         _params = dict()
         msg = dict(type='Provisioner', request='SetPasswords', version=3, params=_params)
         _params['changes'] = changes
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def SetProviderNetworkConfig(self, entities):
+        '''
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner', request='SetProviderNetworkConfig', version=3, params=_params)
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 

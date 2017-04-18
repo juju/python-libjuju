@@ -3551,6 +3551,17 @@ class ListSubnetsResults(Type):
 
 
 
+class ListUnitResourcesArgs(Type):
+    _toSchema = {'resource_names': 'resource-names'}
+    _toPy = {'resource-names': 'resource_names'}
+    def __init__(self, resource_names=None):
+        '''
+        resource_names : typing.Sequence<+T_co>[str]
+        '''
+        self.resource_names = resource_names
+
+
+
 class LogForwardingGetLastSentParams(Type):
     _toSchema = {'ids': 'ids'}
     _toPy = {'ids': 'ids'}
@@ -4602,6 +4613,19 @@ class ModelResult(Type):
 
 
 
+class ModelSLA(Type):
+    _toSchema = {'creds': 'creds', 'level': 'level'}
+    _toPy = {'creds': 'creds', 'level': 'level'}
+    def __init__(self, creds=None, level=None):
+        '''
+        creds : typing.Sequence<+T_co>[int]
+        level : str
+        '''
+        self.creds = creds
+        self.level = level
+
+
+
 class ModelSet(Type):
     _toSchema = {'config': 'config'}
     _toPy = {'config': 'config'}
@@ -4635,12 +4659,13 @@ class ModelStatus(Type):
 
 
 class ModelStatusInfo(Type):
-    _toSchema = {'available_version': 'available-version', 'cloud_tag': 'cloud-tag', 'model_status': 'model-status', 'name': 'name', 'region': 'region', 'version': 'version'}
-    _toPy = {'available-version': 'available_version', 'cloud-tag': 'cloud_tag', 'model-status': 'model_status', 'name': 'name', 'region': 'region', 'version': 'version'}
-    def __init__(self, available_version=None, cloud_tag=None, model_status=None, name=None, region=None, version=None):
+    _toSchema = {'available_version': 'available-version', 'cloud_tag': 'cloud-tag', 'meter_status': 'meter-status', 'model_status': 'model-status', 'name': 'name', 'region': 'region', 'version': 'version'}
+    _toPy = {'available-version': 'available_version', 'cloud-tag': 'cloud_tag', 'meter-status': 'meter_status', 'model-status': 'model_status', 'name': 'name', 'region': 'region', 'version': 'version'}
+    def __init__(self, available_version=None, cloud_tag=None, meter_status=None, model_status=None, name=None, region=None, version=None):
         '''
         available_version : str
         cloud_tag : str
+        meter_status : MeterStatus
         model_status : DetailedStatus
         name : str
         region : str
@@ -4648,6 +4673,7 @@ class ModelStatusInfo(Type):
         '''
         self.available_version = available_version
         self.cloud_tag = cloud_tag
+        self.meter_status = MeterStatus.from_json(meter_status) if meter_status else None
         self.model_status = DetailedStatus.from_json(model_status) if model_status else None
         self.name = name
         self.region = region
@@ -7144,6 +7170,19 @@ class UnitNetworkConfigResults(Type):
 
 
 
+class UnitResourceResult(Type):
+    _toSchema = {'errorresult': 'ErrorResult', 'resource': 'resource'}
+    _toPy = {'ErrorResult': 'errorresult', 'resource': 'resource'}
+    def __init__(self, errorresult=None, resource=None):
+        '''
+        errorresult : ErrorResult
+        resource : Resource
+        '''
+        self.errorresult = ErrorResult.from_json(errorresult) if errorresult else None
+        self.resource = Resource.from_json(resource) if resource else None
+
+
+
 class UnitResources(Type):
     _toSchema = {'download_progress': 'download-progress', 'entity': 'Entity', 'resources': 'resources'}
     _toPy = {'Entity': 'entity', 'download-progress': 'download_progress', 'resources': 'resources'}
@@ -7156,6 +7195,19 @@ class UnitResources(Type):
         self.entity = Entity.from_json(entity) if entity else None
         self.download_progress = download_progress
         self.resources = [Resource.from_json(o) for o in resources or []]
+
+
+
+class UnitResourcesResult(Type):
+    _toSchema = {'errorresult': 'ErrorResult', 'resources': 'resources'}
+    _toPy = {'ErrorResult': 'errorresult', 'resources': 'resources'}
+    def __init__(self, errorresult=None, resources=None):
+        '''
+        errorresult : ErrorResult
+        resources : typing.Sequence<+T_co>[~UnitResourceResult]<~UnitResourceResult>
+        '''
+        self.errorresult = ErrorResult.from_json(errorresult) if errorresult else None
+        self.resources = [UnitResourceResult.from_json(o) for o in resources or []]
 
 
 
