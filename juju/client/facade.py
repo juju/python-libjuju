@@ -84,6 +84,14 @@ class TypeFactory:
 
 '''
 
+CLIENT_TABLE = '''
+CLIENTS = {{
+    {clients}
+}}
+
+
+'''
+
 
 class KindRegistry(dict):
     def register(self, name, version, obj):
@@ -121,7 +129,7 @@ class TypeRegistry(dict):
 
 _types = TypeRegistry()
 _registry = KindRegistry()
-classes = {}
+CLASSES = {}
 factories = codegen.Capture()
 
 
@@ -245,7 +253,6 @@ class Args(list):
 
 
 def buildTypes(schema, capture):
-    global classes
     INDENT = "    "
     for kind in sorted((k for k in _types if not isinstance(k, str)),
                        key=lambda x: str(x)):
@@ -319,7 +326,7 @@ class {}(Type):
         ns = _getns()
         exec(co, ns)
         cls = ns[name]
-        classes[name] = cls
+        CLASSES[name] = cls
 
 
 def retspec(defs):
@@ -386,7 +393,7 @@ def ReturnMapping(cls):
             if cls is None:
                 return reply
             if 'error' in reply:
-                cls = classes['Error']
+                cls = CLASSES['Error']
             if issubclass(cls, typing.Sequence):
                 result = []
                 item_cls = cls.__parameters__[0]
@@ -394,7 +401,7 @@ def ReturnMapping(cls):
                     result.append(item_cls.from_json(item))
                     """
                     if 'error' in item:
-                        cls = classes['Error']
+                        cls = CLASSES['Error']
                     else:
                         cls = item_cls
                     result.append(cls.from_json(item))
@@ -648,13 +655,64 @@ def _getns():
     return ns
 
 
-def make_factory(classname):
-    if classname in factories:
-        del factories[classname]
-    factories[classname].write("""
-class {}(TypeFactory):
-    pass
-    """.format(classname))
+def make_factory(name):
+    if name in factories:
+        del factories[name]
+    factories[name].write("class {}(TypeFactory):\n    pass\n\n".format(name))
+
+
+def write_facades(captures, options):
+    """
+    Write the Facades to the appropriate _client<version>.py
+
+    """
+    for version in sorted(captures.keys()):
+        filename = "{}{}.py".format(options.output, version)
+        with open(filename, "w") as f:
+            f.write(HEADER)
+            f.write("from juju.client.facade import Type, ReturnMapping\n")
+            f.write("from juju.client._client_definitions import *\n\n")
+            for key in sorted(
+                    [k for k in captures[version].keys() if "Facade" in k]):
+                print(captures[version][key], file=f)
+
+    # Return the last (most recent) version for use in other routines.
+    return version
+
+
+def write_definitions(captures, options, version):
+    """
+    Write auxillary (non versioned) classes to
+    _client_definitions.py The auxillary classes currently get
+    written redudantly into each capture object, so we can look in
+    one of them -- we just use the last one from the loop above.
+
+    """
+    with open("{}_definitions.py".format(options.output), "w") as f:
+        f.write(HEADER)
+        f.write("from juju.client.facade import Type, ReturnMapping\n\n")
+        for key in sorted(
+                [k for k in captures[version].keys() if "Facade" not in k]):
+            print(captures[version][key], file=f)
+
+
+def write_client(captures, options):
+    """
+    Write the TypeFactory classes to _client.py, along with some
+    imports and tables so that we can look up versioned Facades.
+
+    """
+    with open("{}.py".format(options.output), "w") as f:
+        f.write(HEADER)
+        f.write("from juju.client._client_definitions import *\n\n")
+        clients = ", ".join("_client{}".format(v) for v in captures)
+        f.write("from juju.client import " + clients + "\n\n")
+        f.write(CLIENT_TABLE.format(clients=",\n    ".join(
+            ['"{}": _client{}'.format(v, v) for v in captures])))
+        f.write(LOOKUP_FACADE)
+        f.write(TYPE_FACTORY)
+        for key in sorted([k for k in factories.keys() if "Facade" in k]):
+            print(factories[key], file=f)
 
 
 def write_version_map(options):
@@ -677,7 +735,6 @@ def write_version_map(options):
 
 
 def generate_facades(options):
-    global classes
     captures = defaultdict(codegen.Capture)
     schemas = {}
     for p in sorted(glob(options.schema)):
@@ -715,7 +772,7 @@ def generate_facades(options):
             buildMethods(cls, captures[schema.version])
             # Mark this Facade class as being done for this version --
             # helps mitigate some excessive looping.
-            classes[schema.name] = cls
+            CLASSES[schema.name] = cls
 
     return captures
 
@@ -732,52 +789,10 @@ def main():
     # Generate some text blobs
     captures = generate_facades(options)
 
-    # Write the Facades to the appropriate _client<version>.py
-    for version in sorted(captures.keys()):
-        filename = "{}{}.py".format(options.output, version)
-        with open(filename, "w") as f:
-            f.write(HEADER)
-            f.write("from juju.client.facade import Type, ReturnMapping\n")
-            f.write("from juju.client._client_definitions import *\n\n")
-            for key in sorted(
-                    [k for k in captures[version].keys() if "Facade" in k]):
-                print(captures[version][key], file=f)
-
-    # Write auxillary (non versioned) classes to
-    # _client_definitions.py The auxillary classes currently get
-    # written redudantly into each capture object, so we can look in
-    # one of them -- we just use the last one from the loop above.
-    with open("{}_definitions.py".format(options.output), "w") as f:
-        f.write(HEADER)
-        f.write("from juju.client.facade import Type, ReturnMapping\n\n")
-        for key in sorted(
-                [k for k in captures[version].keys() if "Facade" not in k]):
-            print(captures[version][key], file=f)
-
-
-    # Write the TypeFactory classes to _client.py, along with some
-    # imports and tables so that we can look up versioned Facades.
-    # TODO: clean this up.
-    with open("{}.py".format(options.output), "w") as f:
-        f.write(HEADER)
-        f.write("from juju.client._client_definitions import *\n\n")
-        clients = ", ".join("_client{}".format(v) for v in captures)
-        client_table = """
-CLIENTS = {{
-    {clients}
-}}
-
-""".format(clients=",\n    ".join(
-    ['"{}": _client{}'.format(v, v) for v in captures]))
-        f.write("from juju.client import " + clients + "\n\n")
-        f.write(client_table)
-        f.write(LOOKUP_FACADE)
-        f.write(TYPE_FACTORY)
-        #for key in sorted([k for k in factories.keys() if "Facade" not in k]):
-        #    print(factories[key], file=f)
-        for key in sorted([k for k in factories.keys() if "Facade" in k]):
-            print(factories[key], file=f)
-
+    # ... and write them out
+    last_version = write_facades(captures, options)
+    write_definitions(captures, options, last_version)
+    write_client(captures, options)
     write_version_map(options)
 
 if __name__ == '__main__':
