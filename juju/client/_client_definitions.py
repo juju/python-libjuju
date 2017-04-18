@@ -3013,19 +3013,21 @@ class FindToolsResult(Type):
 
 
 class FullStatus(Type):
-    _toSchema = {'applications': 'applications', 'machines': 'machines', 'model': 'model', 'relations': 'relations'}
-    _toPy = {'applications': 'applications', 'machines': 'machines', 'model': 'model', 'relations': 'relations'}
-    def __init__(self, applications=None, machines=None, model=None, relations=None):
+    _toSchema = {'applications': 'applications', 'machines': 'machines', 'model': 'model', 'relations': 'relations', 'remote_applications': 'remote-applications'}
+    _toPy = {'applications': 'applications', 'machines': 'machines', 'model': 'model', 'relations': 'relations', 'remote-applications': 'remote_applications'}
+    def __init__(self, applications=None, machines=None, model=None, relations=None, remote_applications=None):
         '''
         applications : typing.Mapping<~KT, +VT_co>[str, ~ApplicationStatus]<~ApplicationStatus>
         machines : typing.Mapping<~KT, +VT_co>[str, ~MachineStatus]<~MachineStatus>
         model : ModelStatusInfo
         relations : typing.Sequence<+T_co>[~RelationStatus]<~RelationStatus>
+        remote_applications : typing.Mapping<~KT, +VT_co>[str, ~RemoteApplicationStatus]<~RemoteApplicationStatus>
         '''
         self.applications = applications
         self.machines = machines
         self.model = ModelStatusInfo.from_json(model) if model else None
         self.relations = [RelationStatus.from_json(o) for o in relations or []]
+        self.remote_applications = remote_applications
 
 
 
@@ -4633,20 +4635,20 @@ class ModelStatus(Type):
 
 
 class ModelStatusInfo(Type):
-    _toSchema = {'available_version': 'available-version', 'cloud_tag': 'cloud-tag', 'migration': 'migration', 'name': 'name', 'region': 'region', 'version': 'version'}
-    _toPy = {'available-version': 'available_version', 'cloud-tag': 'cloud_tag', 'migration': 'migration', 'name': 'name', 'region': 'region', 'version': 'version'}
-    def __init__(self, available_version=None, cloud_tag=None, migration=None, name=None, region=None, version=None):
+    _toSchema = {'available_version': 'available-version', 'cloud_tag': 'cloud-tag', 'model_status': 'model-status', 'name': 'name', 'region': 'region', 'version': 'version'}
+    _toPy = {'available-version': 'available_version', 'cloud-tag': 'cloud_tag', 'model-status': 'model_status', 'name': 'name', 'region': 'region', 'version': 'version'}
+    def __init__(self, available_version=None, cloud_tag=None, model_status=None, name=None, region=None, version=None):
         '''
         available_version : str
         cloud_tag : str
-        migration : str
+        model_status : DetailedStatus
         name : str
         region : str
         version : str
         '''
         self.available_version = available_version
         self.cloud_tag = cloud_tag
-        self.migration = migration
+        self.model_status = DetailedStatus.from_json(model_status) if model_status else None
         self.name = name
         self.region = region
         self.version = version

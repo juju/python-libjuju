@@ -1337,7 +1337,7 @@ class ClientFacade(Type):
     async def FullStatus(self, patterns):
         '''
         patterns : typing.Sequence<+T_co>[str]
-        Returns -> typing.Union[typing.Mapping<~KT, +VT_co>[str, ~MachineStatus]<~MachineStatus>, _ForwardRef('ModelStatusInfo'), typing.Sequence<+T_co>[~RelationStatus]<~RelationStatus>]
+        Returns -> typing.Union[_ForwardRef('ModelStatusInfo'), typing.Sequence<+T_co>[~RelationStatus]<~RelationStatus>, typing.Mapping<~KT, +VT_co>[str, ~RemoteApplicationStatus]<~RemoteApplicationStatus>]
         '''
         # map input types to rpc msg
         _params = dict()

@@ -18,6 +18,8 @@ _marker = object()
 
 JUJU_VERSION = re.compile('[0-9]+\.[0-9-]+[\.\-][0-9a-z]+')
 VERSION_MAP = defaultdict(dict)
+# Workaround for https://bugs.launchpad.net/juju/+bug/1683906
+NAUGHTY_CLASSES = ['ClientFacade', 'Client', 'FullStatus', 'ModelStatusInfo']
 
 
 # Map basic types to Python's typing with a callable
@@ -248,7 +250,7 @@ def buildTypes(schema, capture):
     for kind in sorted((k for k in _types if not isinstance(k, str)),
                        key=lambda x: str(x)):
         name = _types[kind]
-        if name in capture:
+        if name in capture and not name in NAUGHTY_CLASSES:
             continue
         args = Args(kind)
         # Write Factory class for _client.py
@@ -564,7 +566,7 @@ class Schema(dict):
         if not defs:
             return
         for d, data in defs.items():
-            if d in _registry:
+            if d in _registry and not d in NAUGHTY_CLASSES:
                 continue
             node = self.deref(data, d)
             kind = node.get("type")
@@ -710,8 +712,6 @@ def generate_facades(options):
             # Make the actual class
             captures[schema.version][cls_name].write(source)
             # Build the methods for each Facade class.
-            # TODO (critical bug): figure out why we aren't building the
-            # params for all these methods.
             buildMethods(cls, captures[schema.version])
             # Mark this Facade class as being done for this version --
             # helps mitigate some excessive looping.
