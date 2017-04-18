@@ -644,6 +644,9 @@ class Model(object):
                 await self._watch_conn.close()
                 self._watch_shutdown.set()
                 self._watch_conn = None
+            except Exception as e:
+                log.exception('Error in watcher')
+                raise
 
         log.debug('Starting watcher task')
         self._watcher_task = self.loop.create_task(_start_watch())

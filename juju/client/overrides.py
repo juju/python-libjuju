@@ -96,4 +96,5 @@ class AllWatcherFacade(Type):
             self.Id = result.watcher_id
 
         msg['Id'] = self.Id
-        return await self.connection.rpc(msg, encoder=TypeEncoder)
+        result =  await self.connection.rpc(msg, encoder=TypeEncoder)
+        return result
