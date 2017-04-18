@@ -39,10 +39,12 @@ async def test_disable_enable_user(event_loop):
 @pytest.mark.asyncio
 async def test_change_user_password(event_loop):
     async with base.CleanController() as controller:
-        await controller.add_user('test-password')
-        await controller.change_user_password('test-password', 'password')
+        username = 'test-password{}'.format(uuid.uuid4())
+        await controller.add_user(username)
+        await controller.change_user_password(username, 'password')
         try:
-            con = await controller.connect(controller.connection.endpoint, 'test-password', 'password')
+            con = await controller.connect(
+                controller.connection.endpoint, username, 'password')
             result = True
         except JujuAPIError:
             result = False
@@ -53,13 +55,14 @@ async def test_change_user_password(event_loop):
 @pytest.mark.asyncio
 async def test_grant(event_loop):
     async with base.CleanController() as controller:
-        await controller.add_user('test-grant')
-        await controller.grant('test-grant', 'superuser')
-        result = await controller.get_user('test-grant')
+        username = 'test-grant{}'.format(uuid.uuid4())
+        await controller.add_user(username)
+        await controller.grant(username, 'superuser')
+        result = await controller.get_user(username)
         result = result.serialize()['results'][0].serialize()['result'].serialize()
         assert result['access'] == 'superuser'
-        await controller.grant('test-grant', 'login')
-        result = await controller.get_user('test-grant')
+        await controller.grant(username, 'login')
+        result = await controller.get_user(username)
         result = result.serialize()['results'][0].serialize()['result'].serialize()
         assert result['access'] == 'login'
 
