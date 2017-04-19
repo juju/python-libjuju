@@ -158,7 +158,6 @@ class Connection:
         self.addr = url
         self.ws = await websockets.connect(url, **kw)
         self.monitor.receiver = self.loop.create_task(self.receiver())
-        self.loop.create_task(self.pinger())
         log.info("Driver connected to juju %s", url)
         return self
 
@@ -467,6 +466,9 @@ class Connection:
         response = result['response']
         self.info = response.copy()
         self.build_facades(response.get('facades', {}))
+        # Create a pinger to keep the connection alive (needed for
+        # JaaS; harmless elsewhere).
+        self.loop.create_task(self.pinger())
         return response
 
     async def redirect_info(self):
