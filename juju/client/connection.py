@@ -440,9 +440,11 @@ class Connection:
         try:
             self.facades = VERSION_MAP[self.info['server-version']]
         except KeyError:
-            raise JujuAPIError(
-                "Juju version {} is not supported".format(
-                    self.info['server-version']))
+            latest_version = sorted(VERSION_MAP.keys())[-1]
+            log.warning("Could not find a set of facades for {}. Using "
+                        "the latest facade set instead ""({}).".format(
+                            self.info['server-version'], latest_version))
+            self.facades = VERSION_MAP[latest_version]
 
     async def login(self, username, password, macaroons=None):
         if macaroons:
