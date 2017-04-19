@@ -75,8 +75,7 @@ class Unit(model.ModelEntity):
         """Destroy this unit.
 
         """
-        app_facade = client.ApplicationFacade()
-        app_facade.connect(self.connection)
+        app_facade = client.ApplicationFacade.from_connection(self.connection)
 
         log.debug(
             'Destroying %s', self.name)
@@ -109,8 +108,7 @@ class Unit(model.ModelEntity):
         :returns: A :class:`juju.action.Action` instance.
 
         """
-        action = client.ActionFacade()
-        action.connect(self.connection)
+        action = client.ActionFacade.from_connection(self.connection)
 
         log.debug(
             'Running `%s` on %s', command, self.name)
@@ -136,8 +134,7 @@ class Unit(model.ModelEntity):
         to block until the action is complete.
 
         """
-        action_facade = client.ActionFacade()
-        action_facade.connect(self.connection)
+        action_facade = client.ActionFacade.from_connection(self.connection)
 
         log.debug('Starting action `%s` on %s', action_name, self.name)
 
@@ -216,8 +213,7 @@ class Unit(model.ModelEntity):
         """
         app = self.name.split("/")[0]
 
-        c = client.ClientFacade()
-        c.connect(self.model.connection)
+        c = client.ClientFacade.from_connection(self.connection)
 
         status = await c.FullStatus(None)
 

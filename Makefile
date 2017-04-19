@@ -15,8 +15,7 @@ client:
 ifndef SCHEMAGEN
 	$(error "schemagen is not available, please install from https://github.com/juju/schemagen")
 endif
-	schemagen > juju/client/schemas.json
-	$(PY) -m juju.client.facade -s juju/client/schemas.json -o juju/client/_client.py
+	$(PY) -m juju.client.facade -s "juju/client/schemas*" -o juju/client/
 
 test:
 	tox

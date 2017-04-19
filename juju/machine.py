@@ -13,8 +13,7 @@ class Machine(model.ModelEntity):
         Blocks until the machine is actually removed.
 
         """
-        facade = client.ClientFacade()
-        facade.connect(self.connection)
+        facade = client.ClientFacade.from_connection(self.connection)
 
         log.debug(
             'Destroying machine %s', self.id)
@@ -42,8 +41,8 @@ class Machine(model.ModelEntity):
         """
         log.debug('Updating annotations on machine %s', self.id)
 
-        self.ann_facade = client.AnnotationsFacade()
-        self.ann_facade.connect(self.connection)
+        self.ann_facade = client.AnnotationsFacade.from_connection(
+            self.connection)
 
         ann = client.EntityAnnotations(
             entity=self.id,

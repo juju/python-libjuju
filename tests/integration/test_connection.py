@@ -1,6 +1,7 @@
 import pytest
 
 from juju.client.connection import Connection
+from juju.client import client
 from .. import base
 
 
@@ -40,3 +41,19 @@ async def test_monitor_catches_error(event_loop):
         assert conn.monitor.status == 'error'
 
         await conn.close()
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_full_status(event_loop):
+    async with base.CleanModel() as model:
+        app = await model.deploy(
+            'ubuntu-0',
+            application_name='ubuntu',
+            series='trusty',
+            channel='stable',
+        )
+
+        c = client.ClientFacade.from_connection(model.connection)
+
+        status = await c.FullStatus(None)

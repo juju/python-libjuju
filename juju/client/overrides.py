@@ -1,7 +1,8 @@
 from collections import namedtuple
 
-from .facade import ReturnMapping, Type
+from .facade import ReturnMapping, Type, TypeEncoder
 from .import _client
+
 
 __all__ = [
     'Delta',
@@ -9,6 +10,7 @@ __all__ = [
 
 __patches__ = [
     'ResourcesFacade',
+    'AllWatcherFacade'
 ]
 
 
@@ -80,3 +82,19 @@ class ResourcesFacade(Type):
         _params['resources'] = resources
         reply = await self.rpc(msg)
         return reply
+
+class AllWatcherFacade(Type):
+    """
+    Patch rpc method of allwatcher to add in 'id' stuff.
+
+    """
+    async def rpc(self, msg):
+        if not hasattr(self, 'Id'):
+            client = _client.ClientFacade.from_connection(self.connection)
+
+            result = await client.WatchAll()
+            self.Id = result.watcher_id
+
+        msg['Id'] = self.Id
+        result =  await self.connection.rpc(msg, encoder=TypeEncoder)
+        return result

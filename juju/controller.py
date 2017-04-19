@@ -74,8 +74,8 @@ class Controller(object):
         :param str region: Region in which to create the model.
 
         """
-        model_facade = client.ModelManagerFacade()
-        model_facade.connect(self.connection)
+        model_facade = client.ModelManagerFacade.from_connection(
+            self.connection)
 
         owner = owner or self.connection.info['user-info']['identity']
         cloud_name = cloud_name or await self.get_cloud()
@@ -137,8 +137,8 @@ class Controller(object):
         :param str \*uuids: UUIDs of models to destroy
 
         """
-        model_facade = client.ModelManagerFacade()
-        model_facade.connect(self.connection)
+        model_facade = client.ModelManagerFacade.from_connection(
+            self.connection)
 
         log.debug(
             'Destroying model%s %s',
@@ -163,8 +163,7 @@ class Controller(object):
         """
         if not display_name:
             display_name = username
-        user_facade = client.UserManagerFacade()
-        user_facade.connect(self.connection)
+        user_facade = client.UserManagerFacade.from_connection(self.connection)
         users = [{'display_name': display_name,
                   'password': password,
                   'username': username}]
@@ -177,8 +176,7 @@ class Controller(object):
         :param str password: New password
 
         """
-        user_facade = client.UserManagerFacade()
-        user_facade.connect(self.connection)
+        user_facade = client.UserManagerFacade.from_connection(self.connection)
         entity = client.EntityPassword(password, tag.user(username))
         return await user_facade.SetPassword([entity])
 
@@ -189,8 +187,8 @@ class Controller(object):
             controller.
 
         """
-        controller_facade = client.ControllerFacade()
-        controller_facade.connect(self.connection)
+        controller_facade = client.ControllerFacade.from_connection(
+            self.connection)
         return await controller_facade.DestroyController(destroy_all_models)
 
     async def disable_user(self, username):
@@ -199,8 +197,7 @@ class Controller(object):
         :param str username: Username
 
         """
-        user_facade = client.UserManagerFacade()
-        user_facade.connect(self.connection)
+        user_facade = client.UserManagerFacade.from_connection(self.connection)
         entity = client.Entity(tag.user(username))
         return await user_facade.DisableUser([entity])
 
@@ -208,8 +205,7 @@ class Controller(object):
         """Re-enable a previously disabled user.
 
         """
-        user_facade = client.UserManagerFacade()
-        user_facade.connect(self.connection)
+        user_facade = client.UserManagerFacade.from_connection(self.connection)
         entity = client.Entity(tag.user(username))
         return await user_facade.EnableUser([entity])
 
@@ -224,8 +220,7 @@ class Controller(object):
         """
         Get the name of the cloud that this controller lives on.
         """
-        cloud_facade = client.CloudFacade()
-        cloud_facade.connect(self.connection)
+        cloud_facade = client.CloudFacade.from_connection(self.connection)
 
         result = await cloud_facade.Clouds()
         cloud = list(result.clouds.keys())[0]  # only lives on one cloud
@@ -239,8 +234,8 @@ class Controller(object):
         :param str username: User for which to list models (admin use only)
 
         """
-        controller_facade = client.ControllerFacade()
-        controller_facade.connect(self.connection)
+        controller_facade = client.ControllerFacade.from_connection(
+            self.connection)
         return await controller_facade.AllModels()
 
 
@@ -299,8 +294,8 @@ class Controller(object):
         :param str username: Username
 
         """
-        client_facade = client.UserManagerFacade()
-        client_facade.connect(self.connection)
+        client_facade = client.UserManagerFacade.from_connection(
+            self.connection)
         user = tag.user(username)
         return await client_facade.UserInfo([client.Entity(user)], include_disabled)
 
@@ -311,8 +306,8 @@ class Controller(object):
         :param str acl: Access control ('login', 'add-model' or 'superuser')
 
         """
-        controller_facade = client.ControllerFacade()
-        controller_facade.connect(self.connection)
+        controller_facade = client.ControllerFacade.from_connection(
+            self.connection)
         user = tag.user(username)
         await self.revoke(username)
         changes = client.ModifyControllerAccess(acl, 'grant', user)
@@ -324,8 +319,8 @@ class Controller(object):
         :param str username: username
 
         """
-        controller_facade = client.ControllerFacade()
-        controller_facade.connect(self.connection)
+        controller_facade = client.ControllerFacade.from_connection(
+            self.connection)
         user = tag.user(username)
         changes = client.ModifyControllerAccess('login', 'revoke', user)
         return await controller_facade.ModifyControllerAccess([changes])

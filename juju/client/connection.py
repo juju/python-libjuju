@@ -15,6 +15,8 @@ import asyncio
 import yaml
 
 from juju import tag
+from juju.client import client
+from juju.client.version_map import VERSION_MAP
 from juju.errors import JujuError, JujuAPIError, JujuConnectionError
 from juju.utils import IdQueue
 
@@ -182,6 +184,19 @@ class Connection:
                     # but it may be for any pending message listeners
                     return
                 raise
+
+    async def pinger(self):
+        '''
+        A Controller can time us out if we are silent for too long. This
+        is especially true in JaaS, which has a fairly strict timeout.
+
+        To prevent timing out, we send a ping every ten seconds.
+
+        '''
+        pinger_facade = client.PingerFacade.from_connection(self)
+        while self.is_open:
+            await pinger_facade.Ping()
+            await asyncio.sleep(10)
 
     async def rpc(self, msg, encoder=None):
         self.__request_id__ += 1
@@ -410,10 +425,24 @@ class Connection:
         return await cls.connect(
             endpoint, model_uuid, username, password, cacert, macaroons, loop)
 
-    def build_facades(self, info):
+    def build_facades(self, facades):
         self.facades.clear()
-        for facade in info:
-            self.facades[facade['name']] = facade['versions'][-1]
+        # In order to work around an issue where the juju api is not
+        # returning a complete list of facades, we simply look up the
+        # juju version in a pregenerated map, and use that info to
+        # populate our list of facades.
+
+        # TODO: if a future version of juju fixes this bug, restore
+        # the following code for that version and higher:
+        # for facade in facades:
+        #     self.facades[facade['name']] = facade['versions'][-1]
+        try:
+            self.facades = VERSION_MAP[self.info['server-version']]
+        except KeyError:
+            log.warning("Could not find a set of facades for {}. Using "
+                        "the latest facade set instead".format(
+                            self.info['server-version']))
+            self.facades = VERSION_MAP['latest']
 
     async def login(self, username, password, macaroons=None):
         if macaroons:
@@ -434,8 +463,11 @@ class Connection:
                 "macaroons": macaroons or []
             }})
         response = result['response']
-        self.build_facades(response.get('facades', {}))
         self.info = response.copy()
+        self.build_facades(response.get('facades', {}))
+        # Create a pinger to keep the connection alive (needed for
+        # JaaS; harmless elsewhere).
+        self.loop.create_task(self.pinger())
         return response
 
     async def redirect_info(self):

@@ -79,8 +79,7 @@ class Application(model.ModelEntity):
             If None, a new machine is provisioned.
 
         """
-        app_facade = client.ApplicationFacade()
-        app_facade.connect(self.connection)
+        app_facade = client.ApplicationFacade.from_connection(self.connection)
 
         log.debug(
             'Adding %s unit%s to %s',
@@ -134,8 +133,7 @@ class Application(model.ModelEntity):
         if ':' not in local_relation:
             local_relation = '{}:{}'.format(self.name, local_relation)
 
-        app_facade = client.ApplicationFacade()
-        app_facade.connect(self.connection)
+        app_facade = client.ApplicationFacade.from_connection(self.connection)
 
         log.debug(
             'Destroying relation %s <-> %s', local_relation, remote_relation)
@@ -155,8 +153,7 @@ class Application(model.ModelEntity):
         """Remove this application from the model.
 
         """
-        app_facade = client.ApplicationFacade()
-        app_facade.connect(self.connection)
+        app_facade = client.ApplicationFacade.from_connection(self.connection)
 
         log.debug(
             'Destroying %s', self.name)
@@ -168,8 +165,7 @@ class Application(model.ModelEntity):
         """Make this application publicly available over the network.
 
         """
-        app_facade = client.ApplicationFacade()
-        app_facade.connect(self.connection)
+        app_facade = client.ApplicationFacade.from_connection(self.connection)
 
         log.debug(
             'Exposing %s', self.name)
@@ -180,8 +176,7 @@ class Application(model.ModelEntity):
         """Return the configuration settings dict for this application.
 
         """
-        app_facade = client.ApplicationFacade()
-        app_facade.connect(self.connection)
+        app_facade = client.ApplicationFacade.from_connection(self.connection)
 
         log.debug(
             'Getting config for %s', self.name)
@@ -192,8 +187,7 @@ class Application(model.ModelEntity):
         """Return the machine constraints dict for this application.
 
         """
-        app_facade = client.ApplicationFacade()
-        app_facade.connect(self.connection)
+        app_facade = client.ApplicationFacade.from_connection(self.connection)
 
         log.debug(
             'Getting constraints for %s', self.name)
@@ -225,8 +219,7 @@ class Application(model.ModelEntity):
         :param int timeout: Time to wait before command is considered failed
 
         """
-        action = client.ActionFacade()
-        action.connect(self.connection)
+        action = client.ActionFacade.from_connection(self.connection)
 
         log.debug(
             'Running `%s` on all units of %s', command, self.name)
@@ -249,8 +242,8 @@ class Application(model.ModelEntity):
         """
         log.debug('Updating annotations on application %s', self.name)
 
-        self.ann_facade = client.AnnotationsFacade()
-        self.ann_facade.connect(self.connection)
+        self.ann_facade = client.AnnotationsFacade.from_connection(
+            self.connection)
 
         ann = client.EntityAnnotations(
             entity=self.tag,
@@ -265,8 +258,7 @@ class Application(model.ModelEntity):
         :param bool to_default: Set application options to default values
 
         """
-        app_facade = client.ApplicationFacade()
-        app_facade.connect(self.connection)
+        app_facade = client.ApplicationFacade.from_connection(self.connection)
 
         log.debug(
             'Setting config for %s: %s', self.name, config)
@@ -279,8 +271,7 @@ class Application(model.ModelEntity):
         :param dict constraints: Dict of machine constraints
 
         """
-        app_facade = client.ApplicationFacade()
-        app_facade.connect(self.connection)
+        app_facade = client.ApplicationFacade.from_connection(self.connection)
 
         log.debug(
             'Setting constraints for %s: %s', self.name, constraints)
@@ -308,8 +299,7 @@ class Application(model.ModelEntity):
         """Remove public availability over the network for this application.
 
         """
-        app_facade = client.ApplicationFacade()
-        app_facade.connect(self.connection)
+        app_facade = client.ApplicationFacade.from_connection(self.connection)
 
         log.debug(
             'Unexposing %s', self.name)
