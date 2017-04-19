@@ -15,6 +15,7 @@ import asyncio
 import yaml
 
 from juju import tag
+from juju.client import client
 from juju.client.version_map import VERSION_MAP
 from juju.errors import JujuError, JujuAPIError, JujuConnectionError
 from juju.utils import IdQueue
@@ -157,6 +158,7 @@ class Connection:
         self.addr = url
         self.ws = await websockets.connect(url, **kw)
         self.monitor.receiver = self.loop.create_task(self.receiver())
+        self.loop.create_task(self.pinger())
         log.info("Driver connected to juju %s", url)
         return self
 
@@ -183,6 +185,19 @@ class Connection:
                     # but it may be for any pending message listeners
                     return
                 raise
+
+    async def pinger(self):
+        '''
+        A Controller can time us out if we are silent for too long. This
+        is especially true in JaaS, which has a fairly strict timeout.
+
+        To prevent timing out, we send a ping every ten seconds.
+
+        '''
+        pinger_facade = client.PingerFacade.from_connection(self)
+        while self.is_open:
+            await pinger_facade.Ping()
+            await asyncio.sleep(10)
 
     async def rpc(self, msg, encoder=None):
         self.__request_id__ += 1
