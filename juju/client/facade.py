@@ -725,7 +725,7 @@ def write_version_map(options):
     with open("{}/version_map.py".format(options.output_dir), "w") as f:
         f.write(HEADER)
         f.write("VERSION_MAP = {\n")
-        for juju_version in VERSION_MAP:
+        for juju_version in sorted(VERSION_MAP.keys()):
             f.write('    "{}": {{\n'.format(juju_version))
             for key in VERSION_MAP[juju_version]:
                 f.write('        "{}": {},\n'.format(
@@ -738,12 +738,15 @@ def generate_facades(options):
     captures = defaultdict(codegen.Capture)
     schemas = {}
     for p in sorted(glob(options.schema)):
-        try:
-            juju_version = re.search(JUJU_VERSION, p).group()
-        except AttributeError:
-            print("Cannot extract a juju version from {}".format(p))
-            print("Schemas must include a juju version in the filename")
-            raise SystemExit(1)
+        if 'latest' in p:
+            juju_version = 'latest'
+        else:
+            try:
+                juju_version = re.search(JUJU_VERSION, p).group()
+            except AttributeError:
+                print("Cannot extract a juju version from {}".format(p))
+                print("Schemas must include a juju version in the filename")
+                raise SystemExit(1)
 
         new_schemas = json.loads(Path(p).read_text("utf-8"))
         schemas[juju_version] = [Schema(s) for s in new_schemas]

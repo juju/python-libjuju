@@ -3172,6 +3172,7 @@ class ModelManagerFacade(Type):
                                                   'name': {'type': 'string'},
                                                   'owner-tag': {'type': 'string'},
                                                   'provider-type': {'type': 'string'},
+                                                  'sla': {'$ref': '#/definitions/ModelSLAInfo'},
                                                   'status': {'$ref': '#/definitions/EntityStatus'},
                                                   'users': {'items': {'$ref': '#/definitions/ModelUserInfo'},
                                                             'type': 'array'},
@@ -3186,7 +3187,8 @@ class ModelManagerFacade(Type):
                                                 'life',
                                                 'status',
                                                 'users',
-                                                'machines'],
+                                                'machines',
+                                                'sla'],
                                    'type': 'object'},
                      'ModelInfoResult': {'additionalProperties': False,
                                          'properties': {'error': {'$ref': '#/definitions/Error'},
@@ -3214,6 +3216,11 @@ class ModelManagerFacade(Type):
                                                              'status': {'type': 'string'}},
                                               'required': ['status', 'start'],
                                               'type': 'object'},
+                     'ModelSLAInfo': {'additionalProperties': False,
+                                      'properties': {'level': {'type': 'string'},
+                                                     'owner': {'type': 'string'}},
+                                      'required': ['level', 'owner'],
+                                      'type': 'object'},
                      'ModelStatus': {'additionalProperties': False,
                                      'properties': {'application-count': {'type': 'integer'},
                                                     'hosted-machine-count': {'type': 'integer'},
@@ -3897,16 +3904,57 @@ class SpacesFacade(Type):
 class StatusHistoryFacade(Type):
     name = 'StatusHistory'
     version = 2
-    schema =     {'definitions': {'StatusHistoryPruneArgs': {'additionalProperties': False,
+    schema =     {'definitions': {'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'$ref': '#/definitions/ErrorInfo'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ErrorInfo': {'additionalProperties': False,
+                                   'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
+                                                  'macaroon-path': {'type': 'string'}},
+                                   'type': 'object'},
+                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
+                     'ModelConfigResult': {'additionalProperties': False,
+                                           'properties': {'config': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                  'type': 'object'}},
+                                                                     'type': 'object'}},
+                                           'required': ['config'],
+                                           'type': 'object'},
+                     'NotifyWatchResult': {'additionalProperties': False,
+                                           'properties': {'NotifyWatcherId': {'type': 'string'},
+                                                          'error': {'$ref': '#/definitions/Error'}},
+                                           'required': ['NotifyWatcherId'],
+                                           'type': 'object'},
+                     'StatusHistoryPruneArgs': {'additionalProperties': False,
                                                 'properties': {'max-history-mb': {'type': 'integer'},
                                                                'max-history-time': {'type': 'integer'}},
                                                 'required': ['max-history-time',
                                                              'max-history-mb'],
                                                 'type': 'object'}},
-     'properties': {'Prune': {'properties': {'Params': {'$ref': '#/definitions/StatusHistoryPruneArgs'}},
-                              'type': 'object'}},
+     'properties': {'ModelConfig': {'properties': {'Result': {'$ref': '#/definitions/ModelConfigResult'}},
+                                    'type': 'object'},
+                    'Prune': {'properties': {'Params': {'$ref': '#/definitions/StatusHistoryPruneArgs'}},
+                              'type': 'object'},
+                    'WatchForModelConfigChanges': {'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
+                                                   'type': 'object'}},
      'type': 'object'}
     
+
+    @ReturnMapping(ModelConfigResult)
+    async def ModelConfig(self):
+        '''
+
+        Returns -> typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='StatusHistory', request='ModelConfig', version=2, params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
 
     @ReturnMapping(None)
     async def Prune(self, max_history_mb, max_history_time):
@@ -3920,6 +3968,21 @@ class StatusHistoryFacade(Type):
         msg = dict(type='StatusHistory', request='Prune', version=2, params=_params)
         _params['max-history-mb'] = max_history_mb
         _params['max-history-time'] = max_history_time
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResult)
+    async def WatchForModelConfigChanges(self):
+        '''
+
+        Returns -> typing.Union[str, _ForwardRef('Error')]
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='StatusHistory', request='WatchForModelConfigChanges', version=2, params=_params)
+
         reply = await self.rpc(msg)
         return reply
 

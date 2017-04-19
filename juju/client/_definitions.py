@@ -4626,6 +4626,19 @@ class ModelSLA(Type):
 
 
 
+class ModelSLAInfo(Type):
+    _toSchema = {'level': 'level', 'owner': 'owner'}
+    _toPy = {'level': 'level', 'owner': 'owner'}
+    def __init__(self, level=None, owner=None):
+        '''
+        level : str
+        owner : str
+        '''
+        self.level = level
+        self.owner = owner
+
+
+
 class ModelSet(Type):
     _toSchema = {'config': 'config'}
     _toPy = {'config': 'config'}
@@ -4659,9 +4672,9 @@ class ModelStatus(Type):
 
 
 class ModelStatusInfo(Type):
-    _toSchema = {'available_version': 'available-version', 'cloud_tag': 'cloud-tag', 'meter_status': 'meter-status', 'model_status': 'model-status', 'name': 'name', 'region': 'region', 'version': 'version'}
-    _toPy = {'available-version': 'available_version', 'cloud-tag': 'cloud_tag', 'meter-status': 'meter_status', 'model-status': 'model_status', 'name': 'name', 'region': 'region', 'version': 'version'}
-    def __init__(self, available_version=None, cloud_tag=None, meter_status=None, model_status=None, name=None, region=None, version=None):
+    _toSchema = {'available_version': 'available-version', 'cloud_tag': 'cloud-tag', 'meter_status': 'meter-status', 'model_status': 'model-status', 'name': 'name', 'region': 'region', 'sla': 'sla', 'version': 'version'}
+    _toPy = {'available-version': 'available_version', 'cloud-tag': 'cloud_tag', 'meter-status': 'meter_status', 'model-status': 'model_status', 'name': 'name', 'region': 'region', 'sla': 'sla', 'version': 'version'}
+    def __init__(self, available_version=None, cloud_tag=None, meter_status=None, model_status=None, name=None, region=None, sla=None, version=None):
         '''
         available_version : str
         cloud_tag : str
@@ -4669,6 +4682,7 @@ class ModelStatusInfo(Type):
         model_status : DetailedStatus
         name : str
         region : str
+        sla : str
         version : str
         '''
         self.available_version = available_version
@@ -4677,6 +4691,7 @@ class ModelStatusInfo(Type):
         self.model_status = DetailedStatus.from_json(model_status) if model_status else None
         self.name = name
         self.region = region
+        self.sla = sla
         self.version = version
 
 
