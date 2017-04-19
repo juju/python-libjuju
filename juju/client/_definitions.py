@@ -4482,9 +4482,9 @@ class ModelDefaultsResult(Type):
 
 
 class ModelInfo(Type):
-    _toSchema = {'cloud_credential_tag': 'cloud-credential-tag', 'cloud_region': 'cloud-region', 'cloud_tag': 'cloud-tag', 'controller_uuid': 'controller-uuid', 'default_series': 'default-series', 'life': 'life', 'machines': 'machines', 'name': 'name', 'owner_tag': 'owner-tag', 'provider_type': 'provider-type', 'status': 'status', 'users': 'users', 'uuid': 'uuid'}
-    _toPy = {'cloud-credential-tag': 'cloud_credential_tag', 'cloud-region': 'cloud_region', 'cloud-tag': 'cloud_tag', 'controller-uuid': 'controller_uuid', 'default-series': 'default_series', 'life': 'life', 'machines': 'machines', 'name': 'name', 'owner-tag': 'owner_tag', 'provider-type': 'provider_type', 'status': 'status', 'users': 'users', 'uuid': 'uuid'}
-    def __init__(self, cloud_credential_tag=None, cloud_region=None, cloud_tag=None, controller_uuid=None, default_series=None, life=None, machines=None, name=None, owner_tag=None, provider_type=None, status=None, users=None, uuid=None):
+    _toSchema = {'cloud_credential_tag': 'cloud-credential-tag', 'cloud_region': 'cloud-region', 'cloud_tag': 'cloud-tag', 'controller_uuid': 'controller-uuid', 'default_series': 'default-series', 'life': 'life', 'machines': 'machines', 'migration': 'migration', 'name': 'name', 'owner_tag': 'owner-tag', 'provider_type': 'provider-type', 'sla': 'sla', 'status': 'status', 'users': 'users', 'uuid': 'uuid'}
+    _toPy = {'cloud-credential-tag': 'cloud_credential_tag', 'cloud-region': 'cloud_region', 'cloud-tag': 'cloud_tag', 'controller-uuid': 'controller_uuid', 'default-series': 'default_series', 'life': 'life', 'machines': 'machines', 'migration': 'migration', 'name': 'name', 'owner-tag': 'owner_tag', 'provider-type': 'provider_type', 'sla': 'sla', 'status': 'status', 'users': 'users', 'uuid': 'uuid'}
+    def __init__(self, cloud_credential_tag=None, cloud_region=None, cloud_tag=None, controller_uuid=None, default_series=None, life=None, machines=None, migration=None, name=None, owner_tag=None, provider_type=None, sla=None, status=None, users=None, uuid=None):
         '''
         cloud_credential_tag : str
         cloud_region : str
@@ -4493,9 +4493,11 @@ class ModelInfo(Type):
         default_series : str
         life : str
         machines : typing.Sequence<+T_co>[~ModelMachineInfo]<~ModelMachineInfo>
+        migration : ModelMigrationStatus
         name : str
         owner_tag : str
         provider_type : str
+        sla : ModelSLAInfo
         status : EntityStatus
         users : typing.Sequence<+T_co>[~ModelUserInfo]<~ModelUserInfo>
         uuid : str
@@ -4507,9 +4509,11 @@ class ModelInfo(Type):
         self.default_series = default_series
         self.life = life
         self.machines = [ModelMachineInfo.from_json(o) for o in machines or []]
+        self.migration = ModelMigrationStatus.from_json(migration) if migration else None
         self.name = name
         self.owner_tag = owner_tag
         self.provider_type = provider_type
+        self.sla = ModelSLAInfo.from_json(sla) if sla else None
         self.status = EntityStatus.from_json(status) if status else None
         self.users = [ModelUserInfo.from_json(o) for o in users or []]
         self.uuid = uuid

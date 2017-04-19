@@ -1438,7 +1438,7 @@ class ClientFacade(Type):
     async def ModelInfo(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('EntityStatus'), typing.Sequence<+T_co>[~ModelUserInfo]<~ModelUserInfo>]
+        Returns -> typing.Union[_ForwardRef('ModelMigrationStatus'), _ForwardRef('ModelSLAInfo'), _ForwardRef('EntityStatus'), typing.Sequence<+T_co>[~ModelUserInfo]<~ModelUserInfo>]
         '''
         # map input types to rpc msg
         _params = dict()
