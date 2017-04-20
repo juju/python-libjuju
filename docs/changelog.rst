@@ -1,6 +1,29 @@
 Change Log
 ----------
 
+0.4.0
+^^^^^
+Wed Apr 19 2017
+
+* Feature/api version support (#109)
+* Expanding controller.py with basic user functions, get_models and
+  destroy (#89)
+* Added Monitor class to Connection. (#105)
+* Support placement lists (#103)
+* Include resources from store when deploying (#102)
+* Allow underscore to dash translation when accessing model
+  attributes (#101)
+* Added controller to ssh fix. (#100)
+* Regen schema to pick up missing APIs
+* Improve error handling
+* Fix issue where we do not check to make sure that we are receiving the
+  correct response.
+* Retry calls to charmstore and increase timeout to 5s
+* Make connect_model and deploy a bit more friendly
+* Fix model name not including user
+* Implement Model.get_status
+* Add integration tests.
+
 0.3.0
 ^^^^^
 Mon Feb 27 2017
