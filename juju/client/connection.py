@@ -323,7 +323,16 @@ class Connection:
                      loop)
         await client.open()
 
-        redirect_info = await client.redirect_info()
+        try:
+            redirect_info = await client.redirect_info()
+        except JujuAPIError as e:
+            # JaaS doesn't seem to current support redirect_info. We
+            # get an APIError, which I believe that we can safely
+            # ignore.
+            log.warning(
+                "Unable to get redirect info due to "
+                "JujuAPIError: '{}'. Ignoring and continuing".format(e))
+            redirect_info = None
         if not redirect_info:
             await client.login(username, password, macaroons)
             return client
