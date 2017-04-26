@@ -621,9 +621,8 @@ class Model(object):
         async def _start_watch():
             self._watch_shutdown.clear()
             try:
-                self._watch_conn = await self.connection.clone()
                 allwatcher = client.AllWatcherFacade.from_connection(
-                    self._watch_conn)
+                    self.connection)
                 while True:
                     results = await allwatcher.Next()
                     for delta in results.deltas:
@@ -640,11 +639,8 @@ class Model(object):
                             loop=self.loop)
                     self._watch_received.set()
             except CancelledError:
-                log.debug('Closing watcher connection')
-                await self._watch_conn.close()
                 self._watch_shutdown.set()
-                self._watch_conn = None
-            except Exception as e:
+            except Exception:
                 log.exception('Error in watcher')
                 raise
 

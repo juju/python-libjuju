@@ -51,13 +51,14 @@ async def main():
         print("Destroying model")
         await controller.destroy_model(model.info.uuid)
 
-    except Exception as e:
+    except Exception:
         LOG.exception(
             "Test failed! Model {} may not be cleaned up".format(model_name))
 
     finally:
         print('Disconnecting from controller')
-        await model.disconnect()
+        if model:
+            await model.disconnect()
         await controller.disconnect()
 
 

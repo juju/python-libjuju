@@ -1,5 +1,3 @@
-import asyncio
-from concurrent.futures import ThreadPoolExecutor
 import pytest
 import uuid
 
@@ -43,9 +41,11 @@ async def test_change_user_password(event_loop):
         await controller.add_user(username)
         await controller.change_user_password(username, 'password')
         try:
-            con = await controller.connect(
+            new_controller = Controller()
+            await new_controller.connect(
                 controller.connection.endpoint, username, 'password')
             result = True
+            await new_controller.disconnect()
         except JujuAPIError:
             result = False
         assert result is True
@@ -59,11 +59,13 @@ async def test_grant(event_loop):
         await controller.add_user(username)
         await controller.grant(username, 'superuser')
         result = await controller.get_user(username)
-        result = result.serialize()['results'][0].serialize()['result'].serialize()
+        result = result.serialize()['results'][0].serialize()['result']\
+            .serialize()
         assert result['access'] == 'superuser'
         await controller.grant(username, 'login')
         result = await controller.get_user(username)
-        result = result.serialize()['results'][0].serialize()['result'].serialize()
+        result = result.serialize()['results'][0].serialize()['result']\
+            .serialize()
         assert result['access'] == 'login'
 
 
