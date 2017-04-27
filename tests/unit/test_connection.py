@@ -20,7 +20,7 @@ class WebsocketMock:
 
     async def recv(self):
         if not self.responses:
-            raise ConnectionClosed(0, 'no reason')
+            raise ConnectionClosed(0, 'ran out of responses')
         return json.dumps(self.responses.popleft())
 
     async def close(self):
@@ -41,9 +41,12 @@ async def test_out_of_order(event_loop):
         {'request-id': 3},
     ]
     con._get_sll = mock.MagicMock()
-    with mock.patch('websockets.connect', base.AsyncMock(return_value=ws)):
-        await con.open()
-    actual_responses = []
-    for i in range(3):
-        actual_responses.append(await con.rpc({'version': 1}))
-    assert actual_responses == expected_responses
+    try:
+        with mock.patch('websockets.connect', base.AsyncMock(return_value=ws)):
+            await con.open()
+        actual_responses = []
+        for i in range(3):
+            actual_responses.append(await con.rpc({'version': 1}))
+        assert actual_responses == expected_responses
+    finally:
+        await con.close()
