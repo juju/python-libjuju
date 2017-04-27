@@ -17,7 +17,6 @@ from . import codegen
 _marker = object()
 
 JUJU_VERSION = re.compile('[0-9]+\.[0-9-]+[\.\-][0-9a-z]+(\.[0-9]+)?')
-VERSION_MAP = defaultdict(dict)
 # Workaround for https://bugs.launchpad.net/juju/+bug/1683906
 NAUGHTY_CLASSES = ['ClientFacade', 'Client', 'FullStatus', 'ModelStatusInfo',
                    'ModelInfo']
@@ -716,25 +715,6 @@ def write_client(captures, options):
             print(factories[key], file=f)
 
 
-def write_version_map(options):
-    """
-    In order to work around
-    https://bugs.launchpad.net/juju/+bug/1682925, we build a map of
-    the facades that each version supports, and write it to disk here.
-
-    """
-    with open("{}/version_map.py".format(options.output_dir), "w") as f:
-        f.write(HEADER)
-        f.write("VERSION_MAP = {\n")
-        for juju_version in sorted(VERSION_MAP.keys()):
-            f.write('    "{}": {{\n'.format(juju_version))
-            for key in VERSION_MAP[juju_version]:
-                f.write('        "{}": {},\n'.format(
-                    key, VERSION_MAP[juju_version][key]))
-            f.write('    },\n')
-        f.write("}\n")
-
-
 def generate_facades(options):
     captures = defaultdict(codegen.Capture)
     schemas = {}
@@ -759,7 +739,6 @@ def generate_facades(options):
         for schema in schemas[juju_version]:
             schema.buildDefinitions()
             buildTypes(schema, captures[schema.version])
-            VERSION_MAP[juju_version][schema.name] = schema.version
 
     # Build the Facade classes
     for juju_version in sorted(schemas.keys()):
@@ -797,7 +776,6 @@ def main():
     last_version = write_facades(captures, options)
     write_definitions(captures, options, last_version)
     write_client(captures, options)
-    write_version_map(options)
 
 if __name__ == '__main__':
     main()
