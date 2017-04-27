@@ -27,7 +27,14 @@ docs: .tox
 	$(BIN)/sphinx-build -b html docs/  docs/_build/
 	cd docs/_build/ && zip -r docs.zip *
 
-upload: docs
-	$(PY) setup.py sdist upload upload_docs --upload-dir=docs/_build
+release: docs
+	git remote | xargs -L1 git fetch --tags
+	$(PY) setup.py sdist upload
+	git tag ${VERSION}
+	git remote | xargs -L1 git push --tags
+	@echo "Please manually upload docs/_build/docs.zip via the PyPI website"
 
-.PHONY: clean client test docs upload
+upload: release
+
+
+.PHONY: clean client test docs upload release
