@@ -1,6 +1,14 @@
 Change Log
 ----------
 
+0.4.1
+^^^^^
+Wed Apr 27 2017
+
+* Remove VERSION_MAP and rely on facade list from controller (#118)
+* Refactor connection task management to avoid cancels (#117)
+* Refactored login code to better handle redirects (#116)
+
 0.4.0
 ^^^^^
 Wed Apr 19 2017
