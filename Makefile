@@ -2,6 +2,7 @@ BIN := .tox/py35/bin
 PY := $(BIN)/python3.5
 PIP := $(BIN)/pip
 SCHEMAGEN := $(shell which schemagen)
+VERSION=$(shell cat VERSION)
 
 clean:
 	find . -name __pycache__ -type d -exec rm -r {} +
