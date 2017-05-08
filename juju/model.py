@@ -1000,7 +1000,7 @@ class Model(object):
             os.path.isdir(entity_url)
         )
         if is_local:
-            entity_id = entity_url
+            entity_id = entity_url.replace('local:', '')
         else:
             entity = await self.charmstore.entity(entity_url)
             entity_id = entity['Id']
