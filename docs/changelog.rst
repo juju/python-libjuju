@@ -1,6 +1,12 @@
 Change Log
 ----------
 
+0.4.2
+^^^^^
+Wed May 10 2017
+
+* Support (and prefer) per-controller macaroon files (#125)
+
 0.4.1
 ^^^^^
 Wed Apr 27 2017
