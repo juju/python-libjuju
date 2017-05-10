@@ -11,6 +11,7 @@ import subprocess
 import websockets
 from concurrent.futures import CancelledError
 from http.client import HTTPSConnection
+from pathlib import Path
 
 import asyncio
 import yaml
@@ -436,7 +437,7 @@ class Connection:
         accounts = jujudata.accounts()[controller_name]
         username = accounts['user']
         password = accounts.get('password')
-        macaroons = get_macaroons() if not password else None
+        macaroons = get_macaroons(controller_name) if not password else None
 
         return await cls.connect(
             endpoint, None, username, password, cacert, macaroons, loop)
@@ -470,7 +471,7 @@ class Connection:
         password = accounts.get('password')
         models = jujudata.models()[controller_name]
         model_uuid = models['models'][model_name]['uuid']
-        macaroons = get_macaroons() if not password else None
+        macaroons = get_macaroons(controller_name) if not password else None
 
         return await cls.connect(
             endpoint, model_uuid, username, password, cacert, macaroons, loop)
@@ -545,16 +546,26 @@ class JujuData:
             return yaml.safe_load(f)[key]
 
 
-def get_macaroons():
+def get_macaroons(controller_name=None):
     """Decode and return macaroons from default ~/.go-cookies
 
     """
-    try:
-        cookie_file = os.path.expanduser('~/.go-cookies')
-        with open(cookie_file, 'r') as f:
-            cookies = json.load(f)
-    except (OSError, ValueError):
-        log.warn("Couldn't load macaroons from %s", cookie_file)
+    cookie_files = []
+    if controller_name:
+        cookie_files.append('~/.local/share/juju/cookies/{}.json'.format(
+            controller_name))
+    cookie_files.append('~/.go-cookies')
+    for cookie_file in cookie_files:
+        cookie_file = Path(cookie_file).expanduser()
+        if cookie_file.exists():
+            try:
+                cookies = json.loads(cookie_file.read_text())
+                break
+            except (OSError, ValueError):
+                log.warn("Couldn't load macaroons from %s", cookie_file)
+                return []
+    else:
+        log.warn("Couldn't load macaroons from %s", ' or '.join(cookie_files))
         return []
 
     base64_macaroons = [
