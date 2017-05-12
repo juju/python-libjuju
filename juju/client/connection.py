@@ -407,7 +407,11 @@ class Connection:
 
         """
         jujudata = JujuData()
+
         controller_name = jujudata.current_controller()
+        if not controller_name:
+            raise JujuConnectionError('No current controller')
+
         model_name = jujudata.current_model()
 
         return await cls.connect_model(

@@ -390,6 +390,16 @@ class Model(object):
         self._watch_received = asyncio.Event(loop=self.loop)
         self._charmstore = CharmStore(self.loop)
 
+    async def __aenter__(self):
+        await self.connect_current()
+        return self
+
+    async def __aexit__(self, exc_type, exc, tb):
+        await self.disconnect()
+
+        if exc_type is not None:
+            return False
+
     async def connect(self, *args, **kw):
         """Connect to an arbitrary Juju model.
 
