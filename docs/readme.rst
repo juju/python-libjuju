@@ -31,7 +31,7 @@ Installation
 
 .. code:: bash
 
-  pip install juju
+  pip3 install juju
 
 
 Quickstart
