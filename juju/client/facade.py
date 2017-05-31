@@ -519,7 +519,10 @@ class Type:
         if isinstance(data, cls):
             return data
         if isinstance(data, str):
-            data = json.loads(data)
+            try:
+                data = json.loads(data)
+            except json.JSONDecodeError:
+                raise
         d = {}
         for k, v in (data or {}).items():
             d[cls._toPy.get(k, k)] = v

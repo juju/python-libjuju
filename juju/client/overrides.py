@@ -1,16 +1,20 @@
 from collections import namedtuple
+import re
 
 from .facade import ReturnMapping, Type, TypeEncoder
 from .import _client
+from .import _definitions
 
 
 __all__ = [
     'Delta',
+    'Number',
+    'Binary',
 ]
 
 __patches__ = [
     'ResourcesFacade',
-    'AllWatcherFacade'
+    'AllWatcherFacade',
 ]
 
 
@@ -83,6 +87,7 @@ class ResourcesFacade(Type):
         reply = await self.rpc(msg)
         return reply
 
+
 class AllWatcherFacade(Type):
     """
     Patch rpc method of allwatcher to add in 'id' stuff.
@@ -96,5 +101,94 @@ class AllWatcherFacade(Type):
             self.Id = result.watcher_id
 
         msg['Id'] = self.Id
-        result =  await self.connection.rpc(msg, encoder=TypeEncoder)
+        result = await self.connection.rpc(msg, encoder=TypeEncoder)
         return result
+
+
+class Number(_definitions.Number):
+    """
+    This type represents a semver string.
+
+    Because it is not standard JSON, the typical from_json parsing fails and
+    the parsing must be handled specially.
+
+    See https://github.com/juju/version for more info.
+    """
+    numberPat = re.compile(r'^(\d{1,9})\.(\d{1,9})(?:\.|-([a-z]+))(\d{1,9})(\.\d{1,9})?$')  # noqa
+
+    @classmethod
+    def from_json(cls, data):
+        if isinstance(data, cls):
+            return data
+        if isinstance(data, str):
+            match = cls.numberPat.match(data)
+            if match:
+                data = {
+                    'major': match.group(1),
+                    'minor': match.group(2),
+                    'tag': match.group(3),
+                    'patch': match.group(4),
+                    'build': (match.group(5)[1:] if match.group(5)
+                              else None),
+                }
+            else:
+                raise TypeError('Unable to parse Number version string: '
+                                '{}'.format(data))
+        d = {}
+        for k, v in (data or {}).items():
+            d[cls._toPy.get(k, k)] = v
+
+        return cls(**d)
+
+    def serialize(self):
+        s = ""
+        if not self.tag:
+            s = "%d.%d.%d" % (self.major, self.minor, self.patch)
+        else:
+            s = "%d.%d-%s%d" % (self.major, self.minor, self.tag, self.patch)
+        if self.build:
+            s += ".%d" % self.build
+        return s
+
+
+class Binary(_definitions.Binary):
+    """
+    This type represents a semver string with additional series and arch info.
+
+    Because it is not standard JSON, the typical from_json parsing fails and
+    the parsing must be handled specially.
+
+    See https://github.com/juju/version for more info.
+    """
+    binaryPat = re.compile(r'^(\d{1,9})\.(\d{1,9})(?:\.|-([a-z]+))(\d{1,9})(\.\d{1,9})?-([^-]+)-([^-]+)$')  # noqa
+
+    @classmethod
+    def from_json(cls, data):
+        if isinstance(data, cls):
+            return data
+        if isinstance(data, str):
+            match = cls.binaryPat.match(data)
+            if match:
+                data = {
+                    'number': {
+                        'major': match.group(1),
+                        'minor': match.group(2),
+                        'tag': match.group(3),
+                        'patch': match.group(4),
+                        'build': (match.group(5)[1:] if match.group(5)
+                                  else None),
+                    },
+                    'series': match.group(6),
+                    'arch': match.group(7),
+                }
+            else:
+                raise TypeError('Unable to parse Binary version string: '
+                                '{}'.format(data))
+        d = {}
+        for k, v in (data or {}).items():
+            d[cls._toPy.get(k, k)] = v
+
+        return cls(**d)
+
+    def serialize(self):
+        return "%s-%s-%s" % (self.number.serialize(), self.series, self.arch)

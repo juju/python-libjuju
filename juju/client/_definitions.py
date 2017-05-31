@@ -3413,6 +3413,19 @@ class IntResults(Type):
 
 
 
+class InterfaceAddress(Type):
+    _toSchema = {'cidr': 'cidr', 'value': 'value'}
+    _toPy = {'cidr': 'cidr', 'value': 'value'}
+    def __init__(self, cidr=None, value=None, **unknown_fields):
+        '''
+        cidr : str
+        value : str
+        '''
+        self.cidr = cidr
+        self.value = value
+
+
+
 class IsMasterResult(Type):
     _toSchema = {'master': 'master'}
     _toPy = {'master': 'master'}
@@ -4482,10 +4495,11 @@ class ModelDefaultsResult(Type):
 
 
 class ModelInfo(Type):
-    _toSchema = {'cloud_credential_tag': 'cloud-credential-tag', 'cloud_region': 'cloud-region', 'cloud_tag': 'cloud-tag', 'controller_uuid': 'controller-uuid', 'default_series': 'default-series', 'life': 'life', 'machines': 'machines', 'migration': 'migration', 'name': 'name', 'owner_tag': 'owner-tag', 'provider_type': 'provider-type', 'sla': 'sla', 'status': 'status', 'users': 'users', 'uuid': 'uuid'}
-    _toPy = {'cloud-credential-tag': 'cloud_credential_tag', 'cloud-region': 'cloud_region', 'cloud-tag': 'cloud_tag', 'controller-uuid': 'controller_uuid', 'default-series': 'default_series', 'life': 'life', 'machines': 'machines', 'migration': 'migration', 'name': 'name', 'owner-tag': 'owner_tag', 'provider-type': 'provider_type', 'sla': 'sla', 'status': 'status', 'users': 'users', 'uuid': 'uuid'}
-    def __init__(self, cloud_credential_tag=None, cloud_region=None, cloud_tag=None, controller_uuid=None, default_series=None, life=None, machines=None, migration=None, name=None, owner_tag=None, provider_type=None, sla=None, status=None, users=None, uuid=None, **unknown_fields):
+    _toSchema = {'agent_version': 'agent-version', 'cloud_credential_tag': 'cloud-credential-tag', 'cloud_region': 'cloud-region', 'cloud_tag': 'cloud-tag', 'controller_uuid': 'controller-uuid', 'default_series': 'default-series', 'life': 'life', 'machines': 'machines', 'migration': 'migration', 'name': 'name', 'owner_tag': 'owner-tag', 'provider_type': 'provider-type', 'sla': 'sla', 'status': 'status', 'users': 'users', 'uuid': 'uuid'}
+    _toPy = {'agent-version': 'agent_version', 'cloud-credential-tag': 'cloud_credential_tag', 'cloud-region': 'cloud_region', 'cloud-tag': 'cloud_tag', 'controller-uuid': 'controller_uuid', 'default-series': 'default_series', 'life': 'life', 'machines': 'machines', 'migration': 'migration', 'name': 'name', 'owner-tag': 'owner_tag', 'provider-type': 'provider_type', 'sla': 'sla', 'status': 'status', 'users': 'users', 'uuid': 'uuid'}
+    def __init__(self, agent_version=None, cloud_credential_tag=None, cloud_region=None, cloud_tag=None, controller_uuid=None, default_series=None, life=None, machines=None, migration=None, name=None, owner_tag=None, provider_type=None, sla=None, status=None, users=None, uuid=None, **unknown_fields):
         '''
+        agent_version : Number
         cloud_credential_tag : str
         cloud_region : str
         cloud_tag : str
@@ -4502,6 +4516,7 @@ class ModelInfo(Type):
         users : typing.Sequence<+T_co>[~ModelUserInfo]<~ModelUserInfo>
         uuid : str
         '''
+        self.agent_version = Number.from_json(agent_version) if agent_version else None
         self.cloud_credential_tag = cloud_credential_tag
         self.cloud_region = cloud_region
         self.cloud_tag = cloud_tag
@@ -4934,6 +4949,58 @@ class NetworkConfig(Type):
         self.provider_subnet_id = provider_subnet_id
         self.provider_vlan_id = provider_vlan_id
         self.vlan_tag = vlan_tag
+
+
+
+class NetworkInfo(Type):
+    _toSchema = {'addresses': 'addresses', 'interface_name': 'interface-name', 'mac_address': 'mac-address'}
+    _toPy = {'addresses': 'addresses', 'interface-name': 'interface_name', 'mac-address': 'mac_address'}
+    def __init__(self, addresses=None, interface_name=None, mac_address=None, **unknown_fields):
+        '''
+        addresses : typing.Sequence<+T_co>[~InterfaceAddress]<~InterfaceAddress>
+        interface_name : str
+        mac_address : str
+        '''
+        self.addresses = [InterfaceAddress.from_json(o) for o in addresses or []]
+        self.interface_name = interface_name
+        self.mac_address = mac_address
+
+
+
+class NetworkInfoParams(Type):
+    _toSchema = {'bindings': 'bindings', 'unit': 'unit'}
+    _toPy = {'bindings': 'bindings', 'unit': 'unit'}
+    def __init__(self, bindings=None, unit=None, **unknown_fields):
+        '''
+        bindings : typing.Sequence<+T_co>[str]
+        unit : str
+        '''
+        self.bindings = bindings
+        self.unit = unit
+
+
+
+class NetworkInfoResult(Type):
+    _toSchema = {'error': 'error', 'network_info': 'network-info'}
+    _toPy = {'error': 'error', 'network-info': 'network_info'}
+    def __init__(self, error=None, network_info=None, **unknown_fields):
+        '''
+        error : Error
+        network_info : typing.Sequence<+T_co>[~NetworkInfo]<~NetworkInfo>
+        '''
+        self.error = Error.from_json(error) if error else None
+        self.network_info = [NetworkInfo.from_json(o) for o in network_info or []]
+
+
+
+class NetworkInfoResults(Type):
+    _toSchema = {'results': 'results'}
+    _toPy = {'results': 'results'}
+    def __init__(self, results=None, **unknown_fields):
+        '''
+        results : typing.Mapping<~KT, +VT_co>[str, ~NetworkInfoResult]<~NetworkInfoResult>
+        '''
+        self.results = results
 
 
 
