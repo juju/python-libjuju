@@ -267,7 +267,7 @@ def buildTypes(schema, capture):
 class {}(Type):
     _toSchema = {}
     _toPy = {}
-    def __init__(self{}{}):
+    def __init__(self{}{}, **unknown_fields):
         '''
 {}
         '''""".format(
