@@ -346,6 +346,8 @@ class Application(model.ModelEntity):
 
         if switch is not None:
             charm_url = switch
+            if not charm_url.startswith('cs:'):
+                charm_url = 'cs:' + charm_url
         else:
             charm_url = self.data['charm-url']
             charm_url = charm_url.rpartition('-')[0]
