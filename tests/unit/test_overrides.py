@@ -3,6 +3,8 @@ import pytest
 from juju.client.overrides import Number, Binary  # noqa
 
 
+# test cases ported from:
+# https://github.com/juju/version/blob/master/version_test.go
 @pytest.mark.parametrize("input,expected", (
     (None, Number(major=0, minor=0, patch=0, tag='', build=0)),
     (Number(major=1, minor=0, patch=0), Number(major=1, minor=0, patch=0)),
@@ -41,6 +43,8 @@ def test_number(input, expected):
             assert result.to_json() == input
 
 
+# test cases ported from:
+# https://github.com/juju/version/blob/master/version_test.go
 @pytest.mark.parametrize("input,expected", (
     (None, Binary(Number(), None, None)),
     (Binary(Number(1), 'trusty', 'amd64'), Binary(Number(1),
