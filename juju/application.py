@@ -314,9 +314,9 @@ class Application(model.ModelEntity):
         """
         raise NotImplementedError()
 
-    def upgrade_charm(
+    async def upgrade_charm(
             self, channel=None, force_series=False, force_units=False,
-            path=None, resources=None, revision=-1, switch=None):
+            path=None, resources=None, revision=None, switch=None):
         """Upgrade the charm for this application.
 
         :param str channel: Channel to use when getting the charm from the
@@ -331,7 +331,49 @@ class Application(model.ModelEntity):
         :param str switch: Crossgrade charm url
 
         """
-        raise NotImplementedError()
+        # TODO: Support local upgrades
+        if path is not None:
+            raise NotImplementedError("path option is not implemented")
+        if resources is not None:
+            raise NotImplementedError("resources option is not implemented")
+
+        if switch is not None and revision is not None:
+            raise ValueError("switch and revision are mutually exclusive")
+
+        client_facade = client.ClientFacade.from_connection(self.connection)
+        app_facade = client.ApplicationFacade.from_connection(self.connection)
+
+        if switch is not None:
+            charm_url = switch
+        else:
+            charm_url = self.data['charm-url']
+            charm_url = charm_url.rpartition('-')[0]
+            if revision is not None:
+                charm_url = "%s-%d" % (charm_url, revision)
+            else:
+                charmstore = self.model.charmstore
+                entity = await charmstore.entity(charm_url, channel=channel)
+                charm_url = entity['Id']
+
+        await client_facade.AddCharm(
+            url=charm_url,
+            channel=channel
+        )
+
+        await app_facade.SetCharm(
+            application=self.entity_id,
+            channel=channel,
+            charm_url=charm_url,
+            config_settings=None,
+            config_settings_yaml=None,
+            force_series=force_series,
+            force_units=force_units,
+            resource_ids=None,
+            storage_constraints=None
+        )
+
+        while self.data['charm-url'] != charm_url:
+            await asyncio.sleep(1)
 
     async def get_metrics(self):
         """Get metrics for this application's units.
