@@ -3,6 +3,7 @@ import logging
 
 from . import model
 from .client import client
+from .errors import JujuError
 from .placement import parse as parse_placement
 
 log = logging.getLogger(__name__)
@@ -354,6 +355,9 @@ class Application(model.ModelEntity):
                 charmstore = self.model.charmstore
                 entity = await charmstore.entity(charm_url, channel=channel)
                 charm_url = entity['Id']
+
+        if charm_url == self.data['charm-url']:
+            raise JujuError('already running charm "%s"' % charm_url)
 
         await client_facade.AddCharm(
             url=charm_url,
