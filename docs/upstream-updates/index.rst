@@ -44,15 +44,15 @@ using the `client` make target:
   make client
 
 You should expect to see updates to the `juju/client/_definitions.py` file,
-as well as one or more of the `juju/client/_clientX.py` files, dependning on
+as well as one or more of the `juju/client/_clientX.py` files, depending on
 which facades were touched.
 
 
 Overrides
 ---------
 
-It should be quite rare, but occasionally the generated Python code is does
-not capture all of the logic needed properly parse the output from the API
+It should be quite rare, but occasionally the generated Python code does
+not capture all of the logic needed to properly parse the output from the API
 or may otherwise need some small amount of tweaking.  This is what the
 `juju/client/overrides.py` file is for.  An example of this is the `Number`
 type, which isn't standard JSON and must be parsed slightly differently.

@@ -116,26 +116,62 @@ class Number(_definitions.Number):
     """
     numberPat = re.compile(r'^(\d{1,9})\.(\d{1,9})(?:\.|-([a-z]+))(\d{1,9})(\.\d{1,9})?$')  # noqa
 
+    def __init__(self, major=None, minor=None, patch=None, tag=None,
+                 build=None, **unknown_fields):
+        '''
+        major : int
+        minor : int
+        patch : int
+        tag : str
+        build : int
+        '''
+        self.major = int(major or '0')
+        self.minor = int(minor or '0')
+        self.patch = int(patch or '0')
+        self.tag = tag or ''
+        self.build = int(build or '0')
+
+    def __repr__(self):
+        return '<Number major={} minor={} patch={} tag={} build={}>'.format(
+            self.major, self.minor, self.patch, self.tag, self.build)
+
+    def __str__(self):
+        return self.serialize()
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, type(self)) and
+            other.major == self.major and
+            other.minor == self.minor and
+            other.tag == self.tag and
+            other.patch == self.patch and
+            other.build == self.build)
+
     @classmethod
     def from_json(cls, data):
+        parsed = None
         if isinstance(data, cls):
             return data
-        if isinstance(data, str):
+        elif data is None:
+            return cls()
+        elif isinstance(data, dict):
+            parsed = data
+        elif isinstance(data, str):
             match = cls.numberPat.match(data)
             if match:
-                data = {
+                parsed = {
                     'major': match.group(1),
                     'minor': match.group(2),
                     'tag': match.group(3),
                     'patch': match.group(4),
                     'build': (match.group(5)[1:] if match.group(5)
-                              else None),
+                              else 0),
                 }
-            else:
-                raise TypeError('Unable to parse Number version string: '
-                                '{}'.format(data))
+        if not parsed:
+            raise TypeError('Unable to parse Number version string: '
+                            '{}'.format(data))
         d = {}
-        for k, v in (data or {}).items():
+        for k, v in parsed.items():
             d[cls._toPy.get(k, k)] = v
 
         return cls(**d)
@@ -143,11 +179,12 @@ class Number(_definitions.Number):
     def serialize(self):
         s = ""
         if not self.tag:
-            s = "%d.%d.%d" % (self.major, self.minor, self.patch)
+            s = "{}.{}.{}".format(self.major, self.minor, self.patch)
         else:
-            s = "%d.%d-%s%d" % (self.major, self.minor, self.tag, self.patch)
+            s = "{}.{}-{}{}".format(self.major, self.minor, self.tag,
+                                    self.patch)
         if self.build:
-            s += ".%d" % self.build
+            s = "{}.{}".format(s, self.build)
         return s
 
 
@@ -162,30 +199,59 @@ class Binary(_definitions.Binary):
     """
     binaryPat = re.compile(r'^(\d{1,9})\.(\d{1,9})(?:\.|-([a-z]+))(\d{1,9})(\.\d{1,9})?-([^-]+)-([^-]+)$')  # noqa
 
+    def __init__(self, number=None, series=None, arch=None, **unknown_fields):
+        '''
+        number : Number
+        series : str
+        arch : str
+        '''
+        self.number = Number.from_json(number)
+        self.series = series
+        self.arch = arch
+
+    def __repr__(self):
+        return '<Binary number={} series={} arch={}>'.format(
+            self.number, self.series, self.arch)
+
+    def __str__(self):
+        return self.serialize()
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, type(self)) and
+            other.number == self.number and
+            other.series == self.series and
+            other.arch == self.arch)
+
     @classmethod
     def from_json(cls, data):
+        parsed = None
         if isinstance(data, cls):
             return data
-        if isinstance(data, str):
+        elif data is None:
+            return cls()
+        elif isinstance(data, dict):
+            parsed = data
+        elif isinstance(data, str):
             match = cls.binaryPat.match(data)
             if match:
-                data = {
+                parsed = {
                     'number': {
                         'major': match.group(1),
                         'minor': match.group(2),
                         'tag': match.group(3),
                         'patch': match.group(4),
                         'build': (match.group(5)[1:] if match.group(5)
-                                  else None),
+                                  else 0),
                     },
                     'series': match.group(6),
                     'arch': match.group(7),
                 }
-            else:
-                raise TypeError('Unable to parse Binary version string: '
-                                '{}'.format(data))
+        if parsed is None:
+            raise TypeError('Unable to parse Binary version string: '
+                            '{}'.format(data))
         d = {}
-        for k, v in (data or {}).items():
+        for k, v in parsed.items():
             d[cls._toPy.get(k, k)] = v
 
         return cls(**d)
