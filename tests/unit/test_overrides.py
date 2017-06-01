@@ -4,6 +4,7 @@ from juju.client.overrides import Number, Binary  # noqa
 
 
 @pytest.mark.parametrize("input,expected", (
+    (None, Number(major=0, minor=0, patch=0, tag='', build=0)),
     (Number(major=1, minor=0, patch=0), Number(major=1, minor=0, patch=0)),
     ({'major': 1, 'minor': 0, 'patch': 0}, Number(major=1, minor=0, patch=0)),
     ("0.0.1", Number(major=0, minor=0, patch=1)),
@@ -34,10 +35,19 @@ def test_number(input, expected):
         with pytest.raises(expected):
             Number.from_json(input)
     else:
-        assert Number.from_json(input) == expected
+        result = Number.from_json(input)
+        assert result == expected
+        if isinstance(input, str):
+            assert result.to_json() == input
 
 
 @pytest.mark.parametrize("input,expected", (
+    (None, Binary(Number(), None, None)),
+    (Binary(Number(1), 'trusty', 'amd64'), Binary(Number(1),
+                                                  'trusty', 'amd64')),
+    ({'number': {'major': 1},
+      'series': 'trusty',
+      'arch': 'amd64'}, Binary(Number(1), 'trusty', 'amd64')),
     ("1.2.3-trusty-amd64", Binary(Number(1, 2, 3, "", 0),
                                   "trusty", "amd64")),
     ("1.2.3.4-trusty-amd64", Binary(Number(1, 2, 3, "", 4),
@@ -56,4 +66,7 @@ def test_binary(input, expected):
         with pytest.raises(expected):
             Binary.from_json(input)
     else:
-        assert Binary.from_json(input) == expected
+        result = Binary.from_json(input)
+        assert result == expected
+        if isinstance(input, str):
+            assert result.to_json() == input

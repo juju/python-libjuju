@@ -187,6 +187,9 @@ class Number(_definitions.Number):
             s = "{}.{}".format(s, self.build)
         return s
 
+    def to_json(self):
+        return self.serialize()
+
 
 class Binary(_definitions.Binary):
     """
@@ -257,4 +260,8 @@ class Binary(_definitions.Binary):
         return cls(**d)
 
     def serialize(self):
-        return "%s-%s-%s" % (self.number.serialize(), self.series, self.arch)
+        return "{}-{}-{}".format(self.number.serialize(),
+                                 self.series, self.arch)
+
+    def to_json(self):
+        return self.serialize()
