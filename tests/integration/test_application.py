@@ -50,3 +50,45 @@ async def test_add_units(event_loop):
         assert len(units) == 2
         for unit in units:
             assert isinstance(unit, Unit)
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_upgrade_charm(event_loop):
+    async with base.CleanModel() as model:
+        app = await model.deploy('ubuntu-0')
+        assert app.data['charm-url'] == 'cs:ubuntu-0'
+        await app.upgrade_charm()
+        assert app.data['charm-url'].startswith('cs:ubuntu-')
+        assert app.data['charm-url'] != 'cs:ubuntu-0'
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_upgrade_charm_channel(event_loop):
+    async with base.CleanModel() as model:
+        app = await model.deploy('ubuntu-0')
+        assert app.data['charm-url'] == 'cs:ubuntu-0'
+        await app.upgrade_charm(channel='stable')
+        assert app.data['charm-url'].startswith('cs:ubuntu-')
+        assert app.data['charm-url'] != 'cs:ubuntu-0'
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_upgrade_charm_revision(event_loop):
+    async with base.CleanModel() as model:
+        app = await model.deploy('ubuntu-0')
+        assert app.data['charm-url'] == 'cs:ubuntu-0'
+        await app.upgrade_charm(revision=8)
+        assert app.data['charm-url'] == 'cs:ubuntu-8'
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_upgrade_charm_switch(event_loop):
+    async with base.CleanModel() as model:
+        app = await model.deploy('ubuntu-0')
+        assert app.data['charm-url'] == 'cs:ubuntu-0'
+        await app.upgrade_charm(switch='ubuntu-8')
+        assert app.data['charm-url'] == 'cs:ubuntu-8'
