@@ -372,8 +372,9 @@ class Application(model.ModelEntity):
             storage_constraints=None
         )
 
-        while self.data['charm-url'] != charm_url:
-            await asyncio.sleep(1)
+        await self.model.block_until(
+            lambda: self.data['charm-url'] == charm_url
+        )
 
     async def get_metrics(self):
         """Get metrics for this application's units.
