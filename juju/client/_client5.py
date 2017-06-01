@@ -231,6 +231,11 @@ class UniterFacade(Type):
                                                                'type': 'array'}},
                                     'required': ['results'],
                                     'type': 'object'},
+                     'InterfaceAddress': {'additionalProperties': False,
+                                          'properties': {'cidr': {'type': 'string'},
+                                                         'value': {'type': 'string'}},
+                                          'required': ['value', 'cidr'],
+                                          'type': 'object'},
                      'LifeResult': {'additionalProperties': False,
                                     'properties': {'error': {'$ref': '#/definitions/Error'},
                                                    'life': {'type': 'string'}},
@@ -325,54 +330,32 @@ class UniterFacade(Type):
                                                     'uuid': {'type': 'string'}},
                                      'required': ['name', 'uuid'],
                                      'type': 'object'},
-                     'NetworkConfig': {'additionalProperties': False,
-                                       'properties': {'address': {'type': 'string'},
-                                                      'cidr': {'type': 'string'},
-                                                      'config-type': {'type': 'string'},
-                                                      'device-index': {'type': 'integer'},
-                                                      'disabled': {'type': 'boolean'},
-                                                      'dns-search-domains': {'items': {'type': 'string'},
-                                                                             'type': 'array'},
-                                                      'dns-servers': {'items': {'type': 'string'},
-                                                                      'type': 'array'},
-                                                      'gateway-address': {'type': 'string'},
-                                                      'interface-name': {'type': 'string'},
-                                                      'interface-type': {'type': 'string'},
-                                                      'mac-address': {'type': 'string'},
-                                                      'mtu': {'type': 'integer'},
-                                                      'no-auto-start': {'type': 'boolean'},
-                                                      'parent-interface-name': {'type': 'string'},
-                                                      'provider-address-id': {'type': 'string'},
-                                                      'provider-id': {'type': 'string'},
-                                                      'provider-space-id': {'type': 'string'},
-                                                      'provider-subnet-id': {'type': 'string'},
-                                                      'provider-vlan-id': {'type': 'string'},
-                                                      'routes': {'items': {'$ref': '#/definitions/NetworkRoute'},
-                                                                 'type': 'array'},
-                                                      'vlan-tag': {'type': 'integer'}},
-                                       'required': ['device-index',
-                                                    'mac-address',
-                                                    'cidr',
-                                                    'mtu',
-                                                    'provider-id',
-                                                    'provider-subnet-id',
-                                                    'provider-space-id',
-                                                    'provider-address-id',
-                                                    'provider-vlan-id',
-                                                    'vlan-tag',
-                                                    'interface-name',
-                                                    'parent-interface-name',
-                                                    'interface-type',
-                                                    'disabled'],
-                                       'type': 'object'},
-                     'NetworkRoute': {'additionalProperties': False,
-                                      'properties': {'destination-cidr': {'type': 'string'},
-                                                     'gateway-ip': {'type': 'string'},
-                                                     'metric': {'type': 'integer'}},
-                                      'required': ['destination-cidr',
-                                                   'gateway-ip',
-                                                   'metric'],
-                                      'type': 'object'},
+                     'NetworkInfo': {'additionalProperties': False,
+                                     'properties': {'addresses': {'items': {'$ref': '#/definitions/InterfaceAddress'},
+                                                                  'type': 'array'},
+                                                    'interface-name': {'type': 'string'},
+                                                    'mac-address': {'type': 'string'}},
+                                     'required': ['mac-address',
+                                                  'interface-name',
+                                                  'addresses'],
+                                     'type': 'object'},
+                     'NetworkInfoParams': {'additionalProperties': False,
+                                           'properties': {'bindings': {'items': {'type': 'string'},
+                                                                       'type': 'array'},
+                                                          'unit': {'type': 'string'}},
+                                           'required': ['unit', 'bindings'],
+                                           'type': 'object'},
+                     'NetworkInfoResult': {'additionalProperties': False,
+                                           'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                          'network-info': {'items': {'$ref': '#/definitions/NetworkInfo'},
+                                                                           'type': 'array'}},
+                                           'required': ['network-info'],
+                                           'type': 'object'},
+                     'NetworkInfoResults': {'additionalProperties': False,
+                                            'properties': {'results': {'patternProperties': {'.*': {'$ref': '#/definitions/NetworkInfoResult'}},
+                                                                       'type': 'object'}},
+                                            'required': ['results'],
+                                            'type': 'object'},
                      'NotifyWatchResult': {'additionalProperties': False,
                                            'properties': {'NotifyWatcherId': {'type': 'string'},
                                                           'error': {'$ref': '#/definitions/Error'}},
@@ -617,31 +600,10 @@ class UniterFacade(Type):
                                                                         'type': 'array'}},
                                              'required': ['results'],
                                              'type': 'object'},
-                     'UnitNetworkConfig': {'additionalProperties': False,
-                                           'properties': {'binding-name': {'type': 'string'},
-                                                          'unit-tag': {'type': 'string'}},
-                                           'required': ['unit-tag', 'binding-name'],
-                                           'type': 'object'},
-                     'UnitNetworkConfigResult': {'additionalProperties': False,
-                                                 'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                                'info': {'items': {'$ref': '#/definitions/NetworkConfig'},
-                                                                         'type': 'array'}},
-                                                 'required': ['info'],
-                                                 'type': 'object'},
-                     'UnitNetworkConfigResults': {'additionalProperties': False,
-                                                  'properties': {'results': {'items': {'$ref': '#/definitions/UnitNetworkConfigResult'},
-                                                                             'type': 'array'}},
-                                                  'required': ['results'],
-                                                  'type': 'object'},
                      'UnitSettings': {'additionalProperties': False,
                                       'properties': {'version': {'type': 'integer'}},
                                       'required': ['version'],
-                                      'type': 'object'},
-                     'UnitsNetworkConfig': {'additionalProperties': False,
-                                            'properties': {'args': {'items': {'$ref': '#/definitions/UnitNetworkConfig'},
-                                                                    'type': 'array'}},
-                                            'required': ['args'],
-                                            'type': 'object'}},
+                                      'type': 'object'}},
      'properties': {'APIAddresses': {'properties': {'Result': {'$ref': '#/definitions/StringsResult'}},
                                      'type': 'object'},
                     'APIHostPorts': {'properties': {'Result': {'$ref': '#/definitions/APIHostPortsResult'}},
@@ -735,9 +697,9 @@ class UniterFacade(Type):
                                     'type': 'object'},
                     'ModelUUID': {'properties': {'Result': {'$ref': '#/definitions/StringResult'}},
                                   'type': 'object'},
-                    'NetworkConfig': {'properties': {'Params': {'$ref': '#/definitions/UnitsNetworkConfig'},
-                                                     'Result': {'$ref': '#/definitions/UnitNetworkConfigResults'}},
-                                      'type': 'object'},
+                    'NetworkInfo': {'properties': {'Params': {'$ref': '#/definitions/NetworkInfoParams'},
+                                                   'Result': {'$ref': '#/definitions/NetworkInfoResults'}},
+                                    'type': 'object'},
                     'OpenPorts': {'properties': {'Params': {'$ref': '#/definitions/EntitiesPortRanges'},
                                                  'Result': {'$ref': '#/definitions/ErrorResults'}},
                                   'type': 'object'},
@@ -816,9 +778,6 @@ class UniterFacade(Type):
                     'WatchActionNotifications': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                                 'Result': {'$ref': '#/definitions/StringsWatchResults'}},
                                                  'type': 'object'},
-                    'WatchApplicationRelations': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                                 'Result': {'$ref': '#/definitions/StringsWatchResults'}},
-                                                  'type': 'object'},
                     'WatchConfigSettings': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                            'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
                                             'type': 'object'},
@@ -838,6 +797,9 @@ class UniterFacade(Type):
                                                 'type': 'object'},
                     'WatchUnitAddresses': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                           'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
+                                           'type': 'object'},
+                    'WatchUnitRelations': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                          'Result': {'$ref': '#/definitions/StringsWatchResults'}},
                                            'type': 'object'},
                     'WatchUnitStorageAttachments': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                                    'Result': {'$ref': '#/definitions/StringsWatchResults'}},
@@ -1343,16 +1305,18 @@ class UniterFacade(Type):
 
 
 
-    @ReturnMapping(UnitNetworkConfigResults)
-    async def NetworkConfig(self, args):
+    @ReturnMapping(NetworkInfoResults)
+    async def NetworkInfo(self, bindings, unit):
         '''
-        args : typing.Sequence<+T_co>[~UnitNetworkConfig]<~UnitNetworkConfig>
-        Returns -> typing.Sequence<+T_co>[~UnitNetworkConfigResult]<~UnitNetworkConfigResult>
+        bindings : typing.Sequence<+T_co>[str]
+        unit : str
+        Returns -> typing.Mapping<~KT, +VT_co>[str, ~NetworkInfoResult]<~NetworkInfoResult>
         '''
         # map input types to rpc msg
         _params = dict()
-        msg = dict(type='Uniter', request='NetworkConfig', version=5, params=_params)
-        _params['args'] = args
+        msg = dict(type='Uniter', request='NetworkInfo', version=5, params=_params)
+        _params['bindings'] = bindings
+        _params['unit'] = unit
         reply = await self.rpc(msg)
         return reply
 
@@ -1763,21 +1727,6 @@ class UniterFacade(Type):
 
 
 
-    @ReturnMapping(StringsWatchResults)
-    async def WatchApplicationRelations(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~StringsWatchResult]<~StringsWatchResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter', request='WatchApplicationRelations', version=5, params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
     @ReturnMapping(NotifyWatchResults)
     async def WatchConfigSettings(self, entities):
         '''
@@ -1877,6 +1826,21 @@ class UniterFacade(Type):
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter', request='WatchUnitAddresses', version=5, params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResults)
+    async def WatchUnitRelations(self, entities):
+        '''
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~StringsWatchResult]<~StringsWatchResult>
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter', request='WatchUnitRelations', version=5, params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply

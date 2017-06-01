@@ -16,6 +16,7 @@ Table of Contents
 
    narrative/index
    API Docs <api/modules>
+   upstream-updates/index
 
 
 .. include:: changelog.rst

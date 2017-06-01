@@ -267,7 +267,7 @@ def buildTypes(schema, capture):
 class {}(Type):
     _toSchema = {}
     _toPy = {}
-    def __init__(self{}{}):
+    def __init__(self{}{}, **unknown_fields):
         '''
 {}
         '''""".format(
@@ -519,7 +519,10 @@ class Type:
         if isinstance(data, cls):
             return data
         if isinstance(data, str):
-            data = json.loads(data)
+            try:
+                data = json.loads(data)
+            except json.JSONDecodeError:
+                raise
         d = {}
         for k, v in (data or {}).items():
             d[cls._toPy.get(k, k)] = v

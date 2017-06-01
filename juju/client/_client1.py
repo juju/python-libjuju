@@ -608,6 +608,11 @@ class ClientFacade(Type):
                                                              'errors': {'items': {'type': 'string'},
                                                                         'type': 'array'}},
                                               'type': 'object'},
+                     'BytesResult': {'additionalProperties': False,
+                                     'properties': {'result': {'items': {'type': 'integer'},
+                                                               'type': 'array'}},
+                                     'required': ['result'],
+                                     'type': 'object'},
                      'ConfigValue': {'additionalProperties': False,
                                      'properties': {'source': {'type': 'string'},
                                                     'value': {'additionalProperties': True,
@@ -807,7 +812,8 @@ class ClientFacade(Type):
                                             'required': ['config'],
                                             'type': 'object'},
                      'ModelInfo': {'additionalProperties': False,
-                                   'properties': {'cloud-credential-tag': {'type': 'string'},
+                                   'properties': {'agent-version': {'$ref': '#/definitions/Number'},
+                                                  'cloud-credential-tag': {'type': 'string'},
                                                   'cloud-region': {'type': 'string'},
                                                   'cloud-tag': {'type': 'string'},
                                                   'controller-uuid': {'type': 'string'},
@@ -827,15 +833,13 @@ class ClientFacade(Type):
                                    'required': ['name',
                                                 'uuid',
                                                 'controller-uuid',
-                                                'provider-type',
-                                                'default-series',
                                                 'cloud-tag',
                                                 'owner-tag',
                                                 'life',
-                                                'status',
                                                 'users',
                                                 'machines',
-                                                'sla'],
+                                                'sla',
+                                                'agent-version'],
                                    'type': 'object'},
                      'ModelMachineInfo': {'additionalProperties': False,
                                           'properties': {'hardware': {'$ref': '#/definitions/MachineHardware'},
@@ -1149,6 +1153,8 @@ class ClientFacade(Type):
                                       'type': 'object'},
                     'AgentVersion': {'properties': {'Result': {'$ref': '#/definitions/AgentVersionResult'}},
                                      'type': 'object'},
+                    'CACert': {'properties': {'Result': {'$ref': '#/definitions/BytesResult'}},
+                               'type': 'object'},
                     'DestroyMachines': {'properties': {'Params': {'$ref': '#/definitions/DestroyMachines'}},
                                         'type': 'object'},
                     'FindTools': {'properties': {'Params': {'$ref': '#/definitions/FindToolsParams'},
@@ -1319,6 +1325,21 @@ class ClientFacade(Type):
 
 
 
+    @ReturnMapping(BytesResult)
+    async def CACert(self):
+        '''
+
+        Returns -> typing.Sequence<+T_co>[int]
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client', request='CACert', version=1, params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
     @ReturnMapping(None)
     async def DestroyMachines(self, force, machine_names):
         '''
@@ -1438,7 +1459,7 @@ class ClientFacade(Type):
     async def ModelInfo(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('ModelMigrationStatus'), _ForwardRef('ModelSLAInfo'), _ForwardRef('EntityStatus'), typing.Sequence<+T_co>[~ModelUserInfo]<~ModelUserInfo>]
+        Returns -> typing.Union[_ForwardRef('Number'), _ForwardRef('ModelMigrationStatus'), _ForwardRef('ModelSLAInfo'), _ForwardRef('EntityStatus'), typing.Sequence<+T_co>[~ModelUserInfo]<~ModelUserInfo>]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -3922,14 +3943,9 @@ class MigrationMasterFacade(Type):
                                                          'controller-agent-version'],
                                             'type': 'object'},
                      'MigrationSpec': {'additionalProperties': False,
-                                       'properties': {'external-control': {'type': 'boolean'},
-                                                      'model-tag': {'type': 'string'},
-                                                      'skip-initial-prechecks': {'type': 'boolean'},
+                                       'properties': {'model-tag': {'type': 'string'},
                                                       'target-info': {'$ref': '#/definitions/MigrationTargetInfo'}},
-                                       'required': ['model-tag',
-                                                    'target-info',
-                                                    'external-control',
-                                                    'skip-initial-prechecks'],
+                                       'required': ['model-tag', 'target-info'],
                                        'type': 'object'},
                      'MigrationTargetInfo': {'additionalProperties': False,
                                              'properties': {'addrs': {'items': {'type': 'string'},
@@ -4281,7 +4297,6 @@ class MigrationStatusWatcherFacade(Type):
     version = 1
     schema =     {'definitions': {'MigrationStatus': {'additionalProperties': False,
                                          'properties': {'attempt': {'type': 'integer'},
-                                                        'external-control': {'type': 'boolean'},
                                                         'migration-id': {'type': 'string'},
                                                         'phase': {'type': 'string'},
                                                         'source-api-addrs': {'items': {'type': 'string'},
@@ -4293,7 +4308,6 @@ class MigrationStatusWatcherFacade(Type):
                                          'required': ['migration-id',
                                                       'attempt',
                                                       'phase',
-                                                      'external-control',
                                                       'source-api-addrs',
                                                       'source-ca-cert',
                                                       'target-api-addrs',
@@ -4344,6 +4358,11 @@ class MigrationTargetFacade(Type):
                                             'required': ['model-tag',
                                                          'source-controller-version'],
                                             'type': 'object'},
+                     'BytesResult': {'additionalProperties': False,
+                                     'properties': {'result': {'items': {'type': 'integer'},
+                                                               'type': 'array'}},
+                                     'required': ['result'],
+                                     'type': 'object'},
                      'MigrationModelInfo': {'additionalProperties': False,
                                             'properties': {'agent-version': {'$ref': '#/definitions/Number'},
                                                            'controller-agent-version': {'$ref': '#/definitions/Number'},
@@ -4430,6 +4449,8 @@ class MigrationTargetFacade(Type):
                                  'type': 'object'},
                     'AdoptResources': {'properties': {'Params': {'$ref': '#/definitions/AdoptResourcesArgs'}},
                                        'type': 'object'},
+                    'CACert': {'properties': {'Result': {'$ref': '#/definitions/BytesResult'}},
+                               'type': 'object'},
                     'Import': {'properties': {'Params': {'$ref': '#/definitions/SerializedModel'}},
                                'type': 'object'},
                     'LatestLogTime': {'properties': {'Params': {'$ref': '#/definitions/ModelArgs'},
@@ -4483,6 +4504,21 @@ class MigrationTargetFacade(Type):
         msg = dict(type='MigrationTarget', request='AdoptResources', version=1, params=_params)
         _params['model-tag'] = model_tag
         _params['source-controller-version'] = source_controller_version
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(BytesResult)
+    async def CACert(self):
+        '''
+
+        Returns -> typing.Sequence<+T_co>[int]
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='MigrationTarget', request='CACert', version=1, params=_params)
+
         reply = await self.rpc(msg)
         return reply
 
