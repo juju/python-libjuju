@@ -31,6 +31,7 @@ async def test_status(event_loop):
             timeout=240)
 
         assert machine.status == 'running'
-        assert machine.status_message == 'Running'
+        # there is some inconsistency in the message case between providers
+        assert machine.status_message.lower() == 'running'
         assert machine.agent_status == 'started'
         assert machine.agent_version.major >= 2
