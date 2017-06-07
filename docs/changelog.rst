@@ -4,6 +4,7 @@ Change Log
 0.4.3
 ^^^^^
 Thu June 1 2017
+
 * Accept new / unknown API fields gracefully (#131)
 * Add support for new agent-version field in ModelInfo (#131)
 * Replace pip with pip3 in install instructions (#129)
