@@ -11,144 +11,144 @@ Subpackages
 Submodules
 ----------
 
-juju.action module
-------------------
+juju\.action module
+-------------------
 
 .. automodule:: juju.action
     :members:
     :undoc-members:
     :show-inheritance:
 
-juju.annotation module
-----------------------
+juju\.annotation module
+-----------------------
 
 .. automodule:: juju.annotation
     :members:
     :undoc-members:
     :show-inheritance:
 
-juju.application module
------------------------
+juju\.application module
+------------------------
 
 .. automodule:: juju.application
     :members:
     :undoc-members:
     :show-inheritance:
 
-juju.cloud module
------------------
+juju\.cloud module
+------------------
 
 .. automodule:: juju.cloud
     :members:
     :undoc-members:
     :show-inheritance:
 
-juju.constraints module
------------------------
+juju\.constraints module
+------------------------
 
 .. automodule:: juju.constraints
     :members:
     :undoc-members:
     :show-inheritance:
 
-juju.controller module
-----------------------
+juju\.controller module
+-----------------------
 
 .. automodule:: juju.controller
     :members:
     :undoc-members:
     :show-inheritance:
 
-juju.delta module
------------------
+juju\.delta module
+------------------
 
 .. automodule:: juju.delta
     :members:
     :undoc-members:
     :show-inheritance:
 
-juju.errors module
-------------------
+juju\.errors module
+-------------------
 
 .. automodule:: juju.errors
     :members:
     :undoc-members:
     :show-inheritance:
 
-juju.exceptions module
-----------------------
+juju\.exceptions module
+-----------------------
 
 .. automodule:: juju.exceptions
     :members:
     :undoc-members:
     :show-inheritance:
 
-juju.juju module
-----------------
+juju\.juju module
+-----------------
 
 .. automodule:: juju.juju
     :members:
     :undoc-members:
     :show-inheritance:
 
-juju.loop module
-----------------
+juju\.loop module
+-----------------
 
 .. automodule:: juju.loop
     :members:
     :undoc-members:
     :show-inheritance:
 
-juju.machine module
--------------------
+juju\.machine module
+--------------------
 
 .. automodule:: juju.machine
     :members:
     :undoc-members:
     :show-inheritance:
 
-juju.model module
------------------
+juju\.model module
+------------------
 
 .. automodule:: juju.model
     :members:
     :undoc-members:
     :show-inheritance:
 
-juju.placement module
----------------------
+juju\.placement module
+----------------------
 
 .. automodule:: juju.placement
     :members:
     :undoc-members:
     :show-inheritance:
 
-juju.relation module
---------------------
+juju\.relation module
+---------------------
 
 .. automodule:: juju.relation
     :members:
     :undoc-members:
     :show-inheritance:
 
-juju.tag module
----------------
+juju\.tag module
+----------------
 
 .. automodule:: juju.tag
     :members:
     :undoc-members:
     :show-inheritance:
 
-juju.unit module
-----------------
+juju\.unit module
+-----------------
 
 .. automodule:: juju.unit
     :members:
     :undoc-members:
     :show-inheritance:
 
-juju.utils module
------------------
+juju\.utils module
+------------------
 
 .. automodule:: juju.utils
     :members:
