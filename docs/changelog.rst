@@ -1,6 +1,14 @@
 Change Log
 ----------
 
+0.5.0
+^^^^^
+Thu June 8 2017
+
+* Add machine status properties (#133)
+* Add model context manager (#128)
+* Implement Application.upgrade_charm method (#132)
+
 0.4.3
 ^^^^^
 Thu June 1 2017
