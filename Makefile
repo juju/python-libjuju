@@ -8,6 +8,7 @@ clean:
 	find . -name __pycache__ -type d -exec rm -r {} +
 	find . -name *.pyc -delete
 	rm -rf .tox
+	rm -rf docs/api/* docs/_build/
 
 .tox:
 	tox -r --notest
