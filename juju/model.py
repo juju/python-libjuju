@@ -755,14 +755,34 @@ class Model(object):
                 'zone=us-east-1a' - starts a machine in zone us-east-1s on AWS
                 'maas2.name' - acquire machine maas2.name on MAAS
 
-        :param dict constraints: Machine constraints
+        :param dict constraints: Machine constraints, which can contain the
+            the following keys::
+
+                arch : str
+                container : str
+                cores : int
+                cpu_power : int
+                instance_type : str
+                mem : int
+                root_disk : int
+                spaces : list(str)
+                tags : list(str)
+                virt_type : str
+
             Example::
 
                 constraints={
                     'mem': 256 * MB,
+                    'tags': ['virtual'],
                 }
 
-        :param list disks: List of disk constraint dictionaries
+        :param list disks: List of disk constraint dictionaries, which can
+            contain the following keys::
+
+                count : int
+                pool : str
+                size : int
+
             Example::
 
                 disks=[{
