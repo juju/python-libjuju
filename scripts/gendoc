@@ -1,11 +1,5 @@
-juju
-====
-
-It is recommended that you start with :doc:`juju.model` or :doc:`juju.controller`.
-If you need helpers to manage the asyncio loop, try :doc:`juju.loop`.
-
-.. toctree::
-
+#!/bin/bash
+packages=(
     juju.action
     juju.annotation
     juju.application
@@ -24,8 +18,22 @@ If you need helpers to manage the asyncio loop, try :doc:`juju.loop`.
     juju.tag
     juju.unit
     juju.utils
+)
 
-.. automodule:: juju
+for pkg in ${packages[@]}; do
+    cat <<EOD > docs/api/$pkg.rst
+$pkg
+$(echo $pkg | sed -e 's/./=/g')
+
+.. rubric:: Summary
+
+.. automembersummary:: $pkg
+
+.. rubric:: Reference
+
+.. automodule:: $pkg
     :members:
     :undoc-members:
     :show-inheritance:
+EOD
+done
