@@ -1,0 +1,39 @@
+#!/bin/bash
+packages=(
+    juju.action
+    juju.annotation
+    juju.application
+    juju.cloud
+    juju.constraints
+    juju.controller
+    juju.delta
+    juju.errors
+    juju.exceptions
+    juju.juju
+    juju.loop
+    juju.machine
+    juju.model
+    juju.placement
+    juju.relation
+    juju.tag
+    juju.unit
+    juju.utils
+)
+
+for pkg in ${packages[@]}; do
+    cat <<EOD > docs/api/$pkg.rst
+$pkg
+$(echo $pkg | sed -e 's/./=/g')
+
+.. rubric:: Summary
+
+.. automembersummary:: $pkg
+
+.. rubric:: Reference
+
+.. automodule:: $pkg
+    :members:
+    :undoc-members:
+    :show-inheritance:
+EOD
+done

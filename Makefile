@@ -8,7 +8,7 @@ clean:
 	find . -name __pycache__ -type d -exec rm -r {} +
 	find . -name *.pyc -delete
 	rm -rf .tox
-	rm -rf docs/api/* docs/_build/
+	rm -rf docs/_build/
 
 .tox:
 	tox -r --notest
@@ -24,8 +24,7 @@ test:
 
 docs: .tox
 	$(PIP) install -r docs/requirements.txt
-	rm -rf docs/api/* docs/_build/
-	$(BIN)/sphinx-apidoc -o docs/api/ juju/
+	rm -rf docs/_build/
 	$(BIN)/sphinx-build -b html docs/  docs/_build/
 	cd docs/_build/ && zip -r docs.zip *
 

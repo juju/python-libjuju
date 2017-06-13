@@ -16,6 +16,7 @@ Table of Contents
 
    narrative/index
    API Docs <api/modules>
+   Internal API Docs <api/juju.client>
    upstream-updates/index
 
 

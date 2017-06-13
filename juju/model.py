@@ -76,6 +76,9 @@ class _Observer(object):
 
 
 class ModelObserver(object):
+    """
+    Base class for creating observers that react to changes in a model.
+    """
     async def __call__(self, delta, old, new, model):
         handler_name = 'on_{}_{}'.format(delta.entity, delta.type)
         method = getattr(self, handler_name, self.on_change)
@@ -83,6 +86,8 @@ class ModelObserver(object):
 
     async def on_change(self, delta, old, new, model):
         """Generic model-change handler.
+
+        This should be overridden in a subclass.
 
         :param delta: :class:`juju.client.overrides.Delta`
         :param old: :class:`juju.model.ModelEntity`
@@ -374,6 +379,9 @@ class ModelEntity(object):
 
 
 class Model(object):
+    """
+    The main API for interacting with a Juju model.
+    """
     def __init__(self, loop=None):
         """Instantiate a new connected Model.
 
@@ -1890,6 +1898,12 @@ class CharmStore(object):
 
 
 class CharmArchiveGenerator(object):
+    """
+    Create a Zip archive of a local charm directory for upload to a controller.
+
+    This is used automatically by
+    `Model.add_local_charm_dir <#juju.model.Model.add_local_charm_dir>`_.
+    """
     def __init__(self, path):
         self.path = os.path.abspath(os.path.expanduser(path))
 

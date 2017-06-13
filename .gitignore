@@ -3,7 +3,6 @@
 *.pyc
 *.py~
 docs/_build/
-docs/api/
 __pycache__/
 .tox/
 *.egg-info/
