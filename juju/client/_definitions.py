@@ -696,6 +696,31 @@ class ApplicationMetricCredentials(Type):
 
 
 
+class ApplicationOffer(Type):
+    _toSchema = {'access': 'access', 'application_description': 'application-description', 'bindings': 'bindings', 'endpoints': 'endpoints', 'offer_name': 'offer-name', 'offer_url': 'offer-url', 'source_model_tag': 'source-model-tag', 'spaces': 'spaces'}
+    _toPy = {'access': 'access', 'application-description': 'application_description', 'bindings': 'bindings', 'endpoints': 'endpoints', 'offer-name': 'offer_name', 'offer-url': 'offer_url', 'source-model-tag': 'source_model_tag', 'spaces': 'spaces'}
+    def __init__(self, access=None, application_description=None, bindings=None, endpoints=None, offer_name=None, offer_url=None, source_model_tag=None, spaces=None, **unknown_fields):
+        '''
+        access : str
+        application_description : str
+        bindings : typing.Mapping<~KT, +VT_co>[str, str]
+        endpoints : typing.Sequence<+T_co>[~RemoteEndpoint]<~RemoteEndpoint>
+        offer_name : str
+        offer_url : str
+        source_model_tag : str
+        spaces : typing.Sequence<+T_co>[~RemoteSpace]<~RemoteSpace>
+        '''
+        self.access = access
+        self.application_description = application_description
+        self.bindings = bindings
+        self.endpoints = [RemoteEndpoint.from_json(o) for o in endpoints or []]
+        self.offer_name = offer_name
+        self.offer_url = offer_url
+        self.source_model_tag = source_model_tag
+        self.spaces = [RemoteSpace.from_json(o) for o in spaces or []]
+
+
+
 class ApplicationRelationsChange(Type):
     _toSchema = {'changed': 'changed', 'removed': 'removed'}
     _toPy = {'changed': 'changed', 'removed': 'removed'}
@@ -2297,6 +2322,19 @@ class DistributionGroupResults(Type):
         results : typing.Sequence<+T_co>[~DistributionGroupResult]<~DistributionGroupResult>
         '''
         self.results = [DistributionGroupResult.from_json(o) for o in results or []]
+
+
+
+class DumpModelRequest(Type):
+    _toSchema = {'entities': 'entities', 'simplified': 'simplified'}
+    _toPy = {'entities': 'entities', 'simplified': 'simplified'}
+    def __init__(self, entities=None, simplified=None, **unknown_fields):
+        '''
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        simplified : bool
+        '''
+        self.entities = [Entity.from_json(o) for o in entities or []]
+        self.simplified = simplified
 
 
 
@@ -5863,6 +5901,25 @@ class RemoteRelationsWatchResult(Type):
         self.remoterelationswatcherid = remoterelationswatcherid
         self.change = RemoteRelationsChange.from_json(change) if change else None
         self.error = Error.from_json(error) if error else None
+
+
+
+class RemoteSpace(Type):
+    _toSchema = {'cloud_type': 'cloud-type', 'name': 'name', 'provider_attributes': 'provider-attributes', 'provider_id': 'provider-id', 'subnets': 'subnets'}
+    _toPy = {'cloud-type': 'cloud_type', 'name': 'name', 'provider-attributes': 'provider_attributes', 'provider-id': 'provider_id', 'subnets': 'subnets'}
+    def __init__(self, cloud_type=None, name=None, provider_attributes=None, provider_id=None, subnets=None, **unknown_fields):
+        '''
+        cloud_type : str
+        name : str
+        provider_attributes : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        provider_id : str
+        subnets : typing.Sequence<+T_co>[~Subnet]<~Subnet>
+        '''
+        self.cloud_type = cloud_type
+        self.name = name
+        self.provider_attributes = provider_attributes
+        self.provider_id = provider_id
+        self.subnets = [Subnet.from_json(o) for o in subnets or []]
 
 
 

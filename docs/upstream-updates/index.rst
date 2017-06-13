@@ -4,7 +4,7 @@ Upstream Updates
 Updating the facade and definitions code generated from the schema
 to reflect changes in upstream Juju consists of two steps:
 
-* Creating a new `schema-juju-<version>.json` file from the Juju code-base
+* Creating a new `schemas-juju-<version>.json` file from the Juju code-base
 * Generating the libjuju Python code from that schema
 
 Rarely, you may also have to add or update an override.
@@ -21,7 +21,7 @@ the output into a file in the libjuju repository:
 
 .. code:: bash
 
-  schemagen > juju/client/schema-juju-2.2-rc1.json
+  schemagen > juju/client/schemas-juju-2.2-rc1.json
 
 The version number you use in the filename should match the upstream
 version of Juju.  You should then also move the `latest` pointer to
@@ -29,8 +29,8 @@ the new file:
 
 .. code:: bash
 
-  rm juju/client/schema-juju-latest.json
-  ln -s schema-juju-2.2-rc1.json juju/client/schema-juju-latest.json
+  rm juju/client/schemas-juju-latest.json
+  ln -s schemas-juju-2.2-rc1.json juju/client/schemas-juju-latest.json
 
 
 Generating the Python Code
