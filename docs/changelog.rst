@@ -1,6 +1,14 @@
 Change Log
 ----------
 
+0.5.1
+^^^^^
+Tue June 13 2017
+
+* Update schema for Juju 2.3 alpha1 (#142)
+* Improve API doc navigation and coverage (#141)
+* Add type info to Model.add_machine docs (#138)
+
 0.5.0
 ^^^^^
 Thu June 8 2017
