@@ -28,7 +28,7 @@ async def test_status(event_loop):
         await asyncio.wait_for(
             model.block_until(lambda: (machine.status == 'running' and
                                        machine.agent_status == 'started')),
-            timeout=240)
+            timeout=480)
 
         assert machine.status == 'running'
         # there is some inconsistency in the message case between providers

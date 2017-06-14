@@ -36,6 +36,22 @@ async def test_deploy_bundle(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_deploy_channels_revs(event_loop):
+    async with base.CleanModel() as model:
+        charm = 'cs:~johnsca/libjuju-test'
+        stable = await model.deploy(charm, 'a1')
+        edge = await model.deploy(charm, 'a2', channel='edge')
+        rev = await model.deploy(charm+'-2', 'a3')
+
+        assert [a.charm_url for a in (stable, edge, rev)] == [
+            'cs:~johnsca/libjuju-test-1',
+            'cs:~johnsca/libjuju-test-2',
+            'cs:~johnsca/libjuju-test-2',
+        ]
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_add_machine(event_loop):
     from juju.machine import Machine
 

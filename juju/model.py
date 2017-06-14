@@ -1002,7 +1002,7 @@ class Model(object):
         :param dict bind: <charm endpoint>:<network space> pairs
         :param dict budget: <budget name>:<limit> pairs
         :param str channel: Charm store channel from which to retrieve
-            the charm or bundle, e.g. 'development'
+            the charm or bundle, e.g. 'edge'
         :param dict config: Charm configuration dictionary
         :param constraints: Service constraints
         :type constraints: :class:`juju.Constraints`
@@ -1040,7 +1040,7 @@ class Model(object):
         if is_local:
             entity_id = entity_url.replace('local:', '')
         else:
-            entity = await self.charmstore.entity(entity_url)
+            entity = await self.charmstore.entity(entity_url, channel=channel)
             entity_id = entity['Id']
 
         client_facade = client.ClientFacade.from_connection(self.connection)
@@ -1072,8 +1072,6 @@ class Model(object):
                     application_name = entity['Meta']['charm-metadata']['Name']
                 if not series:
                     series = self._get_series(entity_url, entity)
-                if not channel:
-                    channel = 'stable'
                 await client_facade.AddCharm(channel, entity_id)
                 # XXX: we're dropping local resources here, but we don't
                 # actually support them yet anyway
