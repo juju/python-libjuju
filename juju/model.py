@@ -1002,7 +1002,7 @@ class Model(object):
         :param dict bind: <charm endpoint>:<network space> pairs
         :param dict budget: <budget name>:<limit> pairs
         :param str channel: Charm store channel from which to retrieve
-            the charm or bundle, e.g. 'development'
+            the charm or bundle, e.g. 'edge'
         :param dict config: Charm configuration dictionary
         :param constraints: Service constraints
         :type constraints: :class:`juju.Constraints`
