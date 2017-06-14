@@ -1,6 +1,12 @@
 Change Log
 ----------
 
+0.5.2
+^^^^^
+Wed June 14 2017
+
+* Fix deploying non-stable channels and explicit revs (#144)
+
 0.5.1
 ^^^^^
 Tue June 13 2017
