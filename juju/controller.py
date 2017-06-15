@@ -11,7 +11,8 @@ log = logging.getLogger(__name__)
 
 
 class Controller(object):
-    def __init__(self, loop=None):
+    def __init__(self, loop=None,
+                 max_frame_size=connection.Connection.DEFAULT_FRAME_SIZE):
         """Instantiate a new Controller.
 
         One of the connect_* methods will need to be called before this
@@ -21,6 +22,7 @@ class Controller(object):
 
         """
         self.loop = loop or asyncio.get_event_loop()
+        self.max_frame_size = None
         self.connection = None
         self.controller_name = None
 
@@ -30,21 +32,24 @@ class Controller(object):
 
         """
         self.connection = await connection.Connection.connect(
-            endpoint, None, username, password, cacert, macaroons)
+            endpoint, None, username, password, cacert, macaroons,
+            max_frame_size=self.max_frame_size)
 
     async def connect_current(self):
         """Connect to the current Juju controller.
 
         """
         self.connection = (
-            await connection.Connection.connect_current_controller())
+            await connection.Connection.connect_current_controller(
+                max_frame_size=self.max_frame_size))
 
     async def connect_controller(self, controller_name):
         """Connect to a Juju controller by name.
 
         """
         self.connection = (
-            await connection.Connection.connect_controller(controller_name))
+            await connection.Connection.connect_controller(
+                controller_name, max_frame_size=self.max_frame_size))
         self.controller_name = controller_name
 
     async def disconnect(self):
@@ -238,7 +243,6 @@ class Controller(object):
             self.connection)
         return await controller_facade.AllModels()
 
-
     def get_payloads(self, *patterns):
         """Return list of known payloads.
 
@@ -297,7 +301,8 @@ class Controller(object):
         client_facade = client.UserManagerFacade.from_connection(
             self.connection)
         user = tag.user(username)
-        return await client_facade.UserInfo([client.Entity(user)], include_disabled)
+        return await client_facade.UserInfo([client.Entity(user)],
+                                            include_disabled)
 
     async def grant(self, username, acl='login'):
         """Set access level of the given user on the controller

@@ -382,13 +382,17 @@ class Model(object):
     """
     The main API for interacting with a Juju model.
     """
-    def __init__(self, loop=None):
+    def __init__(self, loop=None,
+                 max_frame_size=connection.Connection.DEFAULT_FRAME_SIZE):
         """Instantiate a new connected Model.
 
         :param loop: an asyncio event loop
+        :param max_frame_size: See
+            `juju.client.connection.Connection.MAX_FRAME_SIZE`
 
         """
         self.loop = loop or asyncio.get_event_loop()
+        self.max_frame_size = max_frame_size
         self.connection = None
         self.observers = weakref.WeakValueDictionary()
         self.state = ModelState(self)
@@ -416,6 +420,8 @@ class Model(object):
         """
         if 'loop' not in kw:
             kw['loop'] = self.loop
+        if 'max_frame_size' not in kw:
+            kw['max_frame_size'] = self.max_frame_size
         self.connection = await connection.Connection.connect(*args, **kw)
         await self._after_connect()
 
@@ -424,7 +430,7 @@ class Model(object):
 
         """
         self.connection = await connection.Connection.connect_current(
-            self.loop)
+            self.loop, max_frame_size=self.max_frame_size)
         await self._after_connect()
 
     async def connect_model(self, model_name):
@@ -433,8 +439,8 @@ class Model(object):
         :param model_name:  Format [controller:][user/]model
 
         """
-        self.connection = await connection.Connection.connect_model(model_name,
-                                                                    self.loop)
+        self.connection = await connection.Connection.connect_model(
+            model_name, self.loop, self.max_frame_size)
         await self._after_connect()
 
     async def _after_connect(self):
