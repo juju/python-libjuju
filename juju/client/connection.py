@@ -8,6 +8,7 @@ import shlex
 import ssl
 import string
 import subprocess
+import weakref
 import websockets
 from concurrent.futures import CancelledError
 from http.client import HTTPSConnection
@@ -44,10 +45,10 @@ class Monitor:
     UNKNOWN = 'unknown'
 
     def __init__(self, connection):
-        self.connection = connection
-        self.close_called = asyncio.Event(loop=self.connection.loop)
-        self.receiver_stopped = asyncio.Event(loop=self.connection.loop)
-        self.pinger_stopped = asyncio.Event(loop=self.connection.loop)
+        self.connection = weakref.ref(connection)
+        self.close_called = asyncio.Event(loop=connection.loop)
+        self.receiver_stopped = asyncio.Event(loop=connection.loop)
+        self.pinger_stopped = asyncio.Event(loop=connection.loop)
         self.receiver_stopped.set()
         self.pinger_stopped.set()
 
@@ -64,8 +65,13 @@ class Monitor:
 
         """
 
+        connection = self.connection()
         # DISCONNECTED: connection not yet open
-        if not self.connection.ws:
+        if not connection:
+            # the connection instance was destroyed before we were
+            # this should never happen
+            return self.DISCONNECTED
+        if not connection.ws:
             return self.DISCONNECTED
         if self.receiver_stopped.is_set():
             return self.DISCONNECTED
@@ -74,18 +80,18 @@ class Monitor:
         # connection.close
         if not self.close_called.is_set() and self.receiver_stopped.is_set():
             return self.ERROR
-        if not self.close_called.is_set() and not self.connection.ws.open:
+        if not self.close_called.is_set() and not connection.ws.open:
             # The check for self.receiver_stopped existing above guards
             # against the case where we're not open because we simply
             # haven't setup the connection yet.
             return self.ERROR
 
         # DISCONNECTED: cleanly disconnected.
-        if self.close_called.is_set() and not self.connection.ws.open:
+        if self.close_called.is_set() and not connection.ws.open:
             return self.DISCONNECTED
 
         # CONNECTED: everything is fine!
-        if self.connection.ws.open:
+        if connection.ws.open:
             return self.CONNECTED
 
         # UNKNOWN: We should never hit this state -- if we do,
