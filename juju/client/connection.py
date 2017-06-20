@@ -41,8 +41,8 @@ class Monitor:
     """
     ERROR = 'error'
     CONNECTED = 'connected'
+    DISCONNECTING = 'disconnecting'
     DISCONNECTED = 'disconnected'
-    UNKNOWN = 'unknown'
 
     def __init__(self, connection):
         self.connection = weakref.ref(connection)
@@ -64,40 +64,27 @@ class Monitor:
         isn't usable until that receiver has been started.
 
         """
-
         connection = self.connection()
-        # DISCONNECTED: connection not yet open
+
+        # the connection instance was destroyed but someone kept
+        # a separate reference to the monitor for some reason
         if not connection:
-            # the connection instance was destroyed before we were
-            # this should never happen
             return self.DISCONNECTED
+
+        # connection cleanly disconnected or not yet opened
         if not connection.ws:
             return self.DISCONNECTED
-        if self.receiver_stopped.is_set():
-            return self.DISCONNECTED
 
-        # ERROR: Connection closed (or errored), but we didn't call
-        # connection.close
-        if not self.close_called.is_set() and self.receiver_stopped.is_set():
-            return self.ERROR
-        if not self.close_called.is_set() and not connection.ws.open:
-            # The check for self.receiver_stopped existing above guards
-            # against the case where we're not open because we simply
-            # haven't setup the connection yet.
+        # close called but not yet complete
+        if self.close_called.is_set():
+            return self.DISCONNECTING
+
+        # connection closed uncleanly (we didn't call connection.close)
+        if self.receiver_stopped.is_set() or not connection.ws.open:
             return self.ERROR
 
-        # DISCONNECTED: cleanly disconnected.
-        if self.close_called.is_set() and not connection.ws.open:
-            return self.DISCONNECTED
-
-        # CONNECTED: everything is fine!
-        if connection.ws.open:
-            return self.CONNECTED
-
-        # UNKNOWN: We should never hit this state -- if we do,
-        # something went wrong with the logic above, and we do not
-        # know what state the connection is in.
-        return self.UNKNOWN
+        # everything is fine!
+        return self.CONNECTED
 
 
 class Connection:
@@ -150,9 +137,7 @@ class Connection:
 
     @property
     def is_open(self):
-        if self.ws:
-            return self.ws.open
-        return False
+        return self.monitor.status == Monitor.CONNECTED
 
     def _get_ssl(self, cert=None):
         return ssl.create_default_context(
@@ -183,6 +168,7 @@ class Connection:
         await self.monitor.pinger_stopped.wait()
         await self.monitor.receiver_stopped.wait()
         await self.ws.close()
+        self.ws = None
 
     async def recv(self, request_id):
         if not self.is_open:
