@@ -44,6 +44,9 @@ class CleanModel():
         model_name = 'model-{}'.format(uuid.uuid4())
         self.model = await self.controller.add_model(model_name)
 
+        # save the model UUID in case test closes model
+        self.model_uuid = self.model.info.uuid
+
         # Ensure that we connect to the new model by default.  This also
         # prevents failures if test was started with no current model.
         self._patch_cm = mock.patch.object(JujuData, 'current_model',
@@ -55,7 +58,7 @@ class CleanModel():
     async def __aexit__(self, exc_type, exc, tb):
         self._patch_cm.stop()
         await self.model.disconnect()
-        await self.controller.destroy_model(self.model.info.uuid)
+        await self.controller.destroy_model(self.model_uuid)
         await self.controller.disconnect()
 
 

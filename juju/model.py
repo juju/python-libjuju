@@ -646,15 +646,28 @@ class Model(object):
         See :meth:`add_observer` to register an onchange callback.
 
         """
-        async def _start_watch():
+        async def _all_watcher():
             try:
                 allwatcher = client.AllWatcherFacade.from_connection(
                     self.connection)
                 while not self._watch_stopping.is_set():
-                    results = await utils.run_with_interrupt(
-                        allwatcher.Next(),
-                        self._watch_stopping,
-                        self.loop)
+                    try:
+                        results = await utils.run_with_interrupt(
+                            allwatcher.Next(),
+                            self._watch_stopping,
+                            self.loop)
+                    except websockets.ConnectionClosed:
+                        monitor = self.connection.monitor
+                        if monitor.status == monitor.ERROR:
+                            # closed unexpectedly, try to reopen
+                            log.warning(
+                                'Watcher: connection closed, reopening')
+                            await self.connection.reconnect()
+                            del allwatcher.Id
+                            continue
+                        else:
+                            # closed on request, go ahead and shutdown
+                            break
                     if self._watch_stopping.is_set():
                         break
                     for delta in results.deltas:
@@ -664,8 +677,6 @@ class Model(object):
                     self._watch_received.set()
             except CancelledError:
                 pass
-            except websockets.ConnectionClosed:
-                log.error('Connection closed on watcher')
             except Exception:
                 log.exception('Error in watcher')
                 raise
@@ -676,7 +687,7 @@ class Model(object):
         self._watch_received.clear()
         self._watch_stopping.clear()
         self._watch_stopped.clear()
-        self.loop.create_task(_start_watch())
+        self.loop.create_task(_all_watcher())
 
     async def _notify_observers(self, delta, old_obj, new_obj):
         """Call observing callbacks, notifying them of a change in model state

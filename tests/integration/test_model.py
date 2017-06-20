@@ -212,6 +212,15 @@ async def test_get_machines(event_loop):
         assert isinstance(result, list)
 
 
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_watcher_reconnect(event_loop):
+    async with base.CleanModel() as model:
+        await model.connection.ws.close()
+        await asyncio.sleep(0.1)
+        assert model.connection.is_open
+
+
 # @base.bootstrapped
 # @pytest.mark.asyncio
 # async def test_grant(event_loop)

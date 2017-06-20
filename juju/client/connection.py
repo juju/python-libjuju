@@ -46,6 +46,7 @@ class Monitor:
 
     def __init__(self, connection):
         self.connection = weakref.ref(connection)
+        self.reconnecting = asyncio.Lock(loop=connection.loop)
         self.close_called = asyncio.Event(loop=connection.loop)
         self.receiver_stopped = asyncio.Event(loop=connection.loop)
         self.pinger_stopped = asyncio.Event(loop=connection.loop)
@@ -113,6 +114,7 @@ class Connection:
             self, endpoint, uuid, username, password, cacert=None,
             macaroons=None, loop=None, max_frame_size=DEFAULT_FRAME_SIZE):
         self.endpoint = endpoint
+        self._endpoint = endpoint
         self.uuid = uuid
         if macaroons:
             self.macaroons = macaroons
@@ -123,6 +125,7 @@ class Connection:
             self.username = username
             self.password = password
         self.cacert = cacert
+        self._cacert = cacert
         self.loop = loop or asyncio.get_event_loop()
 
         self.__request_id__ = 0
@@ -162,7 +165,7 @@ class Connection:
         return self
 
     async def close(self):
-        if not self.is_open:
+        if not self.ws:
             return
         self.monitor.close_called.set()
         await self.monitor.pinger_stopped.wait()
@@ -190,7 +193,12 @@ class Connection:
         except CancelledError:
             pass
         except websockets.ConnectionClosed as e:
+            log.warning('Receiver: Connection closed, reconnecting')
             await self.messages.put_all(e)
+            # the reconnect has to be done as a task because the receiver will
+            # be cancelled by the reconnect and we don't want the reconnect
+            # to be aborted half-way through
+            self.loop.create_task(self.reconnect())
             return
         except Exception as e:
             log.exception("Error in receiver")
@@ -217,7 +225,7 @@ class Connection:
 
         pinger_facade = client.PingerFacade.from_connection(self)
         try:
-            while self.is_open:
+            while True:
                 await utils.run_with_interrupt(
                     _do_ping(),
                     self.monitor.close_called,
@@ -226,6 +234,7 @@ class Connection:
                     break
         finally:
             self.monitor.pinger_stopped.set()
+            return
 
     async def rpc(self, msg, encoder=None):
         self.__request_id__ += 1
@@ -235,7 +244,19 @@ class Connection:
         if "version" not in msg:
             msg['version'] = self.facades[msg['type']]
         outgoing = json.dumps(msg, indent=2, cls=encoder)
-        await self.ws.send(outgoing)
+        for attempt in range(3):
+            try:
+                await self.ws.send(outgoing)
+                break
+            except websockets.ConnectionClosed:
+                if attempt == 2:
+                    raise
+                log.warning('RPC: Connection closed, reconnecting')
+                # the reconnect has to be done in a separate task because,
+                # if it is triggered by the pinger, then this RPC call will
+                # be cancelled when the pinger is cancelled by the reconnect,
+                # and we don't want the reconnect to be aborted halfway through
+                await asyncio.wait([self.reconnect()], loop=self.loop)
         result = await self.recv(msg['request-id'])
 
         if not result:
@@ -371,6 +392,35 @@ class Connection:
                 await self.close()
         return success, result, new_endpoints
 
+    async def reconnect(self):
+        """ Force a reconnection.
+        """
+        if self.monitor.reconnecting.locked():
+            return
+        async with self.monitor.reconnecting:
+            await self.close()
+            await self._connect()
+
+    async def _connect(self):
+        endpoints = [(self._endpoint, self._cacert)]
+        while endpoints:
+            _endpoint, _cacert = endpoints.pop(0)
+            success, result, new_endpoints = await self._try_endpoint(
+                _endpoint, _cacert)
+            if success:
+                break
+            endpoints.extend(new_endpoints)
+        else:
+            # ran out of endpoints without a successful login
+            raise Exception("Couldn't authenticate to {}".format(
+                self._endpoint))
+
+        response = result['response']
+        self.info = response.copy()
+        self.build_facades(response.get('facades', {}))
+        self.loop.create_task(self.pinger())
+        self.monitor.pinger_stopped.clear()
+
     @classmethod
     async def connect(
             cls, endpoint, uuid, username, password, cacert=None,
@@ -383,24 +433,7 @@ class Connection:
         """
         client = cls(endpoint, uuid, username, password, cacert, macaroons,
                      loop, max_frame_size)
-        endpoints = [(endpoint, cacert)]
-        while endpoints:
-            _endpoint, _cacert = endpoints.pop(0)
-            success, result, new_endpoints = await client._try_endpoint(
-                _endpoint, _cacert)
-            if success:
-                break
-            endpoints.extend(new_endpoints)
-        else:
-            # ran out of endpoints without a successful login
-            raise Exception("Couldn't authenticate to {}".format(endpoint))
-
-        response = result['response']
-        client.info = response.copy()
-        client.build_facades(response.get('facades', {}))
-        client.loop.create_task(client.pinger())
-        client.monitor.pinger_stopped.clear()
-
+        await client._connect()
         return client
 
     @classmethod
