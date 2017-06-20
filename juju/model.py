@@ -14,6 +14,7 @@ from concurrent.futures import CancelledError
 from functools import partial
 from pathlib import Path
 
+import websockets
 import yaml
 import theblues.charmstore
 import theblues.errors
@@ -661,6 +662,8 @@ class Model(object):
                     self._watch_received.set()
             except CancelledError:
                 pass
+            except websockets.ConnectionClosed:
+                log.error('Connection closed on watcher')
             except Exception:
                 log.exception('Error in watcher')
                 raise

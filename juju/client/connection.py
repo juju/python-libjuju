@@ -189,13 +189,13 @@ class Connection:
                     await self.messages.put(result['request-id'], result)
         except CancelledError:
             pass
-        except Exception as e:
+        except websockets.ConnectionClosed as e:
             await self.messages.put_all(e)
-            if isinstance(e, websockets.ConnectionClosed):
-                # ConnectionClosed is not really exceptional for us,
-                # but it may be for any pending message listeners
-                return
+            return
+        except Exception as e:
             log.exception("Error in receiver")
+            # make pending listeners aware of the error
+            await self.messages.put_all(e)
             raise
         finally:
             self.monitor.receiver_stopped.set()
