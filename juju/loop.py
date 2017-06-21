@@ -20,7 +20,14 @@ def run(*steps):
         task.cancel()
         run._sigint = True
 
-    loop.add_signal_handler(signal.SIGINT, abort)
+    added = False
+    try:
+        loop.add_signal_handler(signal.SIGINT, abort)
+        added = True
+    except ValueError as e:
+        # add_signal_handler doesn't work in a thread
+        if 'main thread' not in str(e):
+            raise
     try:
         for step in steps:
             task = loop.create_task(step)
@@ -31,4 +38,5 @@ def run(*steps):
                 raise task.exception()
         return task.result()
     finally:
-        loop.remove_signal_handler(signal.SIGINT)
+        if added:
+            loop.remove_signal_handler(signal.SIGINT)
