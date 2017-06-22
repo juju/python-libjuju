@@ -659,11 +659,14 @@ class Model(object):
                     except JujuAPIError as e:
                         if 'watcher was stopped' not in str(e):
                             raise
+                        if self._watch_stopping.is_set():
+                            # this shouldn't ever actually happen, because
+                            # the event should trigger before the controller
+                            # has a chance to tell us the watcher is stopped
+                            # but handle it gracefully, just in case
+                            break
                         # controller stopped our watcher for some reason
-                        # (we never actually call AllWatcherFacade.Stop(),
-                        # so there's no reason we should see this, but the
-                        # controller does occasionally send it anyway; so
-                        # if we get it, just start a new watcher)
+                        # but we're not actually stopping, so just restart it
                         log.warning(
                             'Watcher: watcher stopped, restarting')
                         del allwatcher.Id
@@ -681,6 +684,7 @@ class Model(object):
                             # closed on request, go ahead and shutdown
                             break
                     if self._watch_stopping.is_set():
+                        await allwatcher.Stop()
                         break
                     for delta in results.deltas:
                         delta = get_entity_delta(delta)
