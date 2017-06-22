@@ -52,6 +52,15 @@ class Unit(model.ModelEntity):
         return self.safe_data['workload-status']['message']
 
     @property
+    def machine(self):
+        """Get the machine object for this unit.
+
+        """
+        machine_id = self.safe_data['machine-id']
+        machine = self.model.machines[machine_id] if machine_id else None
+        return machine
+
+    @property
     def public_address(self):
         """ Get the public address.
 
@@ -164,7 +173,7 @@ class Unit(model.ModelEntity):
         return await self.model._wait_for_new('action', action_id)
 
     async def scp_to(self, source, destination, user='ubuntu', proxy=False,
-                     scp_opts=None):
+                     scp_opts=''):
         """Transfer files to this unit.
 
         :param str source: Local path of file(s) to transfer
@@ -173,10 +182,11 @@ class Unit(model.ModelEntity):
         :param bool proxy: Proxy through the Juju API server
         :param str scp_opts: Additional options to the `scp` command
         """
-        raise NotImplementedError()
+        await self.machine.scp_to(source, destination, user=user, proxy=proxy,
+                                  scp_opts=scp_opts)
 
     async def scp_from(self, source, destination, user='ubuntu', proxy=False,
-                     scp_opts=None):
+                       scp_opts=''):
         """Transfer files from this unit.
 
         :param str source: Remote path of file(s) to transfer
@@ -185,7 +195,8 @@ class Unit(model.ModelEntity):
         :param bool proxy: Proxy through the Juju API server
         :param str scp_opts: Additional options to the `scp` command
         """
-        raise NotImplementedError()
+        await self.machine.scp_from(source, destination, user=user,
+                                    proxy=proxy, scp_opts=scp_opts)
 
     def set_meter_status(self):
         """Set the meter status on this unit.

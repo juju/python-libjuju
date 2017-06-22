@@ -1,4 +1,7 @@
+import asyncio
 import pytest
+
+from tempfile import NamedTemporaryFile
 
 from .. import base
 
@@ -44,3 +47,30 @@ async def test_run_action(event_loop):
             action = await run_action(unit)
             assert action.results == {'dir': '/var/git/myrepo.git'}
             break
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_scp(event_loop):
+    async with base.CleanModel() as model:
+        app = await model.deploy('ubuntu')
+        await asyncio.wait_for(
+            model.block_until(lambda: app.units),
+            timeout=60
+        )
+        unit = app.units[0]
+        await asyncio.wait_for(
+            model.block_until(
+                lambda: unit.machine and unit.machine.status == 'running'
+            ),
+            timeout=480
+        )
+
+        with NamedTemporaryFile() as f:
+            f.write(b'testcontents')
+            f.flush()
+            await unit.scp_to(f.name, 'testfile')
+
+        with NamedTemporaryFile() as f:
+            await unit.scp_from('testfile', f.name)
+            assert f.read() == b'testcontents'
