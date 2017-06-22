@@ -14,6 +14,7 @@ from concurrent.futures import CancelledError
 from functools import partial
 from pathlib import Path
 
+import websockets
 import yaml
 import theblues.charmstore
 import theblues.errors
@@ -550,6 +551,8 @@ class Model(object):
         """
         async def _block():
             while not all(c() for c in conditions):
+                if not (self.connection and self.connection.is_open):
+                    raise websockets.ConnectionClosed(1006, 'no reason')
                 await asyncio.sleep(wait_period, loop=self.loop)
         await asyncio.wait_for(_block(), timeout, loop=self.loop)
 
@@ -643,16 +646,45 @@ class Model(object):
         See :meth:`add_observer` to register an onchange callback.
 
         """
-        async def _start_watch():
+        async def _all_watcher():
             try:
                 allwatcher = client.AllWatcherFacade.from_connection(
                     self.connection)
                 while not self._watch_stopping.is_set():
-                    results = await utils.run_with_interrupt(
-                        allwatcher.Next(),
-                        self._watch_stopping,
-                        self.loop)
+                    try:
+                        results = await utils.run_with_interrupt(
+                            allwatcher.Next(),
+                            self._watch_stopping,
+                            self.loop)
+                    except JujuAPIError as e:
+                        if 'watcher was stopped' not in str(e):
+                            raise
+                        if self._watch_stopping.is_set():
+                            # this shouldn't ever actually happen, because
+                            # the event should trigger before the controller
+                            # has a chance to tell us the watcher is stopped
+                            # but handle it gracefully, just in case
+                            break
+                        # controller stopped our watcher for some reason
+                        # but we're not actually stopping, so just restart it
+                        log.warning(
+                            'Watcher: watcher stopped, restarting')
+                        del allwatcher.Id
+                        continue
+                    except websockets.ConnectionClosed:
+                        monitor = self.connection.monitor
+                        if monitor.status == monitor.ERROR:
+                            # closed unexpectedly, try to reopen
+                            log.warning(
+                                'Watcher: connection closed, reopening')
+                            await self.connection.reconnect()
+                            del allwatcher.Id
+                            continue
+                        else:
+                            # closed on request, go ahead and shutdown
+                            break
                     if self._watch_stopping.is_set():
+                        await allwatcher.Stop()
                         break
                     for delta in results.deltas:
                         delta = get_entity_delta(delta)
@@ -671,7 +703,7 @@ class Model(object):
         self._watch_received.clear()
         self._watch_stopping.clear()
         self._watch_stopped.clear()
-        self.loop.create_task(_start_watch())
+        self.loop.create_task(_all_watcher())
 
     async def _notify_observers(self, delta, old_obj, new_obj):
         """Call observing callbacks, notifying them of a change in model state
