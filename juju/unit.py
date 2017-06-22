@@ -57,8 +57,10 @@ class Unit(model.ModelEntity):
 
         """
         machine_id = self.safe_data['machine-id']
-        machine = self.model.machines[machine_id] if machine_id else None
-        return machine
+        if machine_id:
+            return self.model.machines.get(machine_id, None)
+        else:
+            return None
 
     @property
     def public_address(self):
