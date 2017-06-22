@@ -656,6 +656,18 @@ class Model(object):
                             allwatcher.Next(),
                             self._watch_stopping,
                             self.loop)
+                    except JujuAPIError as e:
+                        if 'watcher was stopped' not in str(e):
+                            raise
+                        # controller stopped our watcher for some reason
+                        # (we never actually call AllWatcherFacade.Stop(),
+                        # so there's no reason we should see this, but the
+                        # controller does occasionally send it anyway; so
+                        # if we get it, just start a new watcher)
+                        log.warning(
+                            'Watcher: watcher stopped, restarting')
+                        del allwatcher.Id
+                        continue
                     except websockets.ConnectionClosed:
                         monitor = self.connection.monitor
                         if monitor.status == monitor.ERROR:
