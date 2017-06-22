@@ -395,9 +395,10 @@ class Connection:
     async def reconnect(self):
         """ Force a reconnection.
         """
-        if self.monitor.reconnecting.locked():
+        monitor = self.monitor
+        if monitor.reconnecting.locked() or monitor.close_called.is_set():
             return
-        async with self.monitor.reconnecting:
+        async with monitor.reconnecting:
             await self.close()
             await self._connect()
 
