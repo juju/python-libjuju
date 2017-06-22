@@ -1,6 +1,13 @@
 Change Log
 ----------
 
+0.5.3
+^^^^^
+Thu June 22 2017
+
+* Improve handling of closed connections (#148) 
+* Configurable and larger max message size (#146) 
+
 0.5.2
 ^^^^^
 Wed June 14 2017
