@@ -163,18 +163,27 @@ class Unit(model.ModelEntity):
         # action is complete, rather than just being in the model
         return await self.model._wait_for_new('action', action_id)
 
-    def scp(
-            self, source_path, user=None, destination_path=None, proxy=False,
-            scp_opts=None):
+    async def scp_to(self, source, destination, user='ubuntu', proxy=False,
+                     scp_opts=None):
         """Transfer files to this unit.
 
-        :param str source_path: Path of file(s) to transfer
+        :param str source: Local path of file(s) to transfer
+        :param str destination: Remote destination of transferred files
         :param str user: Remote username
-        :param str destination_path: Destination of transferred files on
-            remote machine
         :param bool proxy: Proxy through the Juju API server
         :param str scp_opts: Additional options to the `scp` command
+        """
+        raise NotImplementedError()
 
+    async def scp_from(self, source, destination, user='ubuntu', proxy=False,
+                     scp_opts=None):
+        """Transfer files from this unit.
+
+        :param str source: Remote path of file(s) to transfer
+        :param str destination: Local destination of transferred files
+        :param str user: Remote username
+        :param bool proxy: Proxy through the Juju API server
+        :param str scp_opts: Additional options to the `scp` command
         """
         raise NotImplementedError()
 

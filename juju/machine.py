@@ -124,18 +124,27 @@ class Machine(model.ModelEntity):
         )
         return await self.ann_facade.Set([ann])
 
-    def scp(
-            self, source_path, user=None, destination_path=None, proxy=False,
-            scp_opts=None):
+    async def scp_to(self, source, destination, user='ubuntu', proxy=False,
+                     scp_opts=None):
         """Transfer files to this machine.
 
-        :param str source_path: Path of file(s) to transfer
+        :param str source: Local path of file(s) to transfer
+        :param str destination: Remote destination of transferred files
         :param str user: Remote username
-        :param str destination_path: Destination of transferred files on
-            remote machine
         :param bool proxy: Proxy through the Juju API server
         :param str scp_opts: Additional options to the `scp` command
+        """
+        raise NotImplementedError()
 
+    async def scp_from(self, source, destination, user='ubuntu', proxy=False,
+                     scp_opts=None):
+        """Transfer files from this machine.
+
+        :param str source: Remote path of file(s) to transfer
+        :param str destination: Local destination of transferred files
+        :param str user: Remote username
+        :param bool proxy: Proxy through the Juju API server
+        :param str scp_opts: Additional options to the `scp` command
         """
         raise NotImplementedError()
 
