@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import os
 
 from dateutil.parser import parse as parse_date
 
@@ -166,7 +167,7 @@ class Machine(model.ModelEntity):
         """
         cmd = [
             'scp',
-            '-i', '~/.local/share/juju/ssh/juju_id_rsa',
+            '-i', os.path.expanduser('~/.local/share/juju/ssh/juju_id_rsa'),
             '-o', 'StrictHostKeyChecking=no',
             source, destination
         ]
