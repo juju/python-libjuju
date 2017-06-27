@@ -1446,7 +1446,7 @@ class Model(object):
     async def set_config(self, config):
         """Set configuration keys on this model.
 
-        :param \*\*config: Config key/values
+        :param config: Config key/values
 
         """
         config_facade = client.ModelConfigFacade.from_connection(
