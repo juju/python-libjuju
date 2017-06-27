@@ -10,6 +10,7 @@ __all__ = [
     'Delta',
     'Number',
     'Binary',
+    'ConfigValue',
 ]
 
 __patches__ = [
@@ -265,3 +266,10 @@ class Binary(_definitions.Binary):
 
     def to_json(self):
         return self.serialize()
+
+
+class ConfigValue(_definitions.ConfigValue):
+    def __repr__(self):
+        return '<{} source={} value={}>'.format(type(self).__name__,
+                                                repr(self.source),
+                                                repr(self.value))

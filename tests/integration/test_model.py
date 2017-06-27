@@ -5,6 +5,7 @@ import pytest
 
 from .. import base
 from juju.model import Model
+from juju.client.client import ConfigValue
 
 MB = 1
 GB = 1024
@@ -226,10 +227,14 @@ async def test_watcher_reconnect(event_loop):
 @pytest.mark.asyncio
 async def test_config(event_loop):
     async with base.CleanModel() as model:
-        await model.set_config({'extra-info': 'booyah'})
+        await model.set_config({
+            'extra-info': 'booyah',
+            'test-mode': ConfigValue(value=True),
+        })
         result = await model.get_config()
-        assert 'extra-info' in result.serialize()['config']
-        assert result.serialize()['config']['extra-info']['value'] == 'booyah'
+        assert 'extra-info' in result
+        assert result['extra-info'].source == 'model'
+        assert result['extra-info'].value == 'booyah'
 
 # @base.bootstrapped
 # @pytest.mark.asyncio
