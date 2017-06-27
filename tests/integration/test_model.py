@@ -5,10 +5,12 @@ import pytest
 
 from .. import base
 from juju.model import Model
+from juju.client.client import ConfigValue
 
 MB = 1
 GB = 1024
-SSH_KEY = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCsYMJGNGG74HAJha3n2CFmWYsOOaORnJK6VqNy86pj0MIpvRXBzFzVy09uPQ66GOQhTEoJHEqE77VMui7+62AcMXT+GG7cFHcnU8XVQsGM6UirCcNyWNysfiEMoAdZScJf/GvoY87tMEszhZIUV37z8PUBx6twIqMdr31W1J0IaPa+sV6FEDadeLaNTvancDcHK1zuKsL39jzAg7+LYjKJfEfrsQP+lj/EQcjtKqlhVS5kzsJVfx8ZEd0xhW5G7N6bCdKNalS8mKCMaBXJpijNQ82AiyqCIDCRrre2To0/i7pTjRiL0U9f9mV3S4NJaQaokR050w/ZLySFf6F7joJT mathijs@Qrama-Mathijs'
+SSH_KEY = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCsYMJGNGG74HAJha3n2CFmWYsOOaORnJK6VqNy86pj0MIpvRXBzFzVy09uPQ66GOQhTEoJHEqE77VMui7+62AcMXT+GG7cFHcnU8XVQsGM6UirCcNyWNysfiEMoAdZScJf/GvoY87tMEszhZIUV37z8PUBx6twIqMdr31W1J0IaPa+sV6FEDadeLaNTvancDcHK1zuKsL39jzAg7+LYjKJfEfrsQP+lj/EQcjtKqlhVS5kzsJVfx8ZEd0xhW5G7N6bCdKNalS8mKCMaBXJpijNQ82AiyqCIDCRrre2To0/i7pTjRiL0U9f9mV3S4NJaQaokR050w/ZLySFf6F7joJT mathijs@Qrama-Mathijs'  # noqa
+
 
 @base.bootstrapped
 @pytest.mark.asyncio
@@ -220,6 +222,19 @@ async def test_watcher_reconnect(event_loop):
         await asyncio.sleep(0.1)
         assert model.connection.is_open
 
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_config(event_loop):
+    async with base.CleanModel() as model:
+        await model.set_config({
+            'extra-info': 'booyah',
+            'test-mode': ConfigValue(value=True),
+        })
+        result = await model.get_config()
+        assert 'extra-info' in result
+        assert result['extra-info'].source == 'model'
+        assert result['extra-info'].value == 'booyah'
 
 # @base.bootstrapped
 # @pytest.mark.asyncio

@@ -22,6 +22,7 @@ import theblues.errors
 from . import tag, utils
 from .client import client
 from .client import connection
+from .client.client import ConfigValue
 from .constraints import parse as parse_constraints, normalize_key
 from .delta import get_entity_delta
 from .delta import get_entity_class
@@ -1255,11 +1256,20 @@ class Model(object):
         """
         raise NotImplementedError()
 
-    def get_config(self):
+    async def get_config(self):
         """Return the configuration settings for this model.
 
+        :returns: A ``dict`` mapping keys to `ConfigValue` instances,
+            which have `source` and `value` attributes.
         """
-        raise NotImplementedError()
+        config_facade = client.ModelConfigFacade.from_connection(
+            self.connection
+        )
+        result = await config_facade.ModelGet()
+        config = result.config
+        for key, value in config.items():
+            config[key] = ConfigValue.from_json(value)
+        return config
 
     def get_constraints(self):
         """Return the machine constraints for this model.
@@ -1440,13 +1450,19 @@ class Model(object):
         """
         raise NotImplementedError()
 
-    def set_config(self, **config):
+    async def set_config(self, config):
         """Set configuration keys on this model.
 
-        :param \*\*config: Config key/values
-
+        :param dict config: Mapping of config keys to either string values or
+            `ConfigValue` instances, as returned by `get_config`.
         """
-        raise NotImplementedError()
+        config_facade = client.ModelConfigFacade.from_connection(
+            self.connection
+        )
+        for key, value in config.items():
+            if isinstance(value, ConfigValue):
+                config[key] = value.value
+        await config_facade.ModelSet(config)
 
     def set_constraints(self, constraints):
         """Set machine constraints on this model.
