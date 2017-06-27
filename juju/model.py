@@ -1255,11 +1255,14 @@ class Model(object):
         """
         raise NotImplementedError()
 
-    def get_config(self):
+    async def get_config(self):
         """Return the configuration settings for this model.
 
         """
-        raise NotImplementedError()
+        config_facade = client.ModelConfigFacade.from_connection(
+            self.connection
+        )
+        return await config_facade.ModelGet()
 
     def get_constraints(self):
         """Return the machine constraints for this model.
@@ -1440,13 +1443,16 @@ class Model(object):
         """
         raise NotImplementedError()
 
-    def set_config(self, **config):
+    async def set_config(self, config):
         """Set configuration keys on this model.
 
         :param \*\*config: Config key/values
 
         """
-        raise NotImplementedError()
+        config_facade = client.ModelConfigFacade.from_connection(
+            self.connection
+        )
+        return await config_facade.ModelSet(config)
 
     def set_constraints(self, constraints):
         """Set machine constraints on this model.
