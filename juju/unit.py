@@ -52,6 +52,13 @@ class Unit(model.ModelEntity):
         return self.safe_data['workload-status']['message']
 
     @property
+    def public_address(self):
+        """ Get the public address.
+
+        """
+        return self.safe_data['public-address'] or None
+
+    @property
     def tag(self):
         return 'unit-%s' % self.name.replace('/', '-')
 
