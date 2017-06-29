@@ -1,12 +1,20 @@
 Change Log
 ----------
 
+0.6.0
+^^^^^
+Thu June 29 2017
+
+* Implement scp functionality (#149)
+* Add Unit.public_address property (#153)
+* Adds support for getting/setting config on a model (#152)
+
 0.5.3
 ^^^^^
 Thu June 22 2017
 
-* Improve handling of closed connections (#148) 
-* Configurable and larger max message size (#146) 
+* Improve handling of closed connections (#148)
+* Configurable and larger max message size (#146)
 
 0.5.2
 ^^^^^
