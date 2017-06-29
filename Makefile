@@ -28,12 +28,11 @@ docs: .tox
 	$(BIN)/sphinx-build -b html docs/  docs/_build/
 	cd docs/_build/ && zip -r docs.zip *
 
-release: docs
+release:
 	git remote | xargs -L1 git fetch --tags
 	$(PY) setup.py sdist upload
 	git tag ${VERSION}
 	git remote | xargs -L1 git push --tags
-	@echo "Please manually upload docs/_build/docs.zip via the PyPI website"
 
 upload: release
 
