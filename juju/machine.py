@@ -140,7 +140,7 @@ class Machine(model.ModelEntity):
         if proxy:
             raise NotImplementedError('proxy option is not implemented')
 
-        address = self.public_address
+        address = self.dns_name
         destination = '%s@%s:%s' % (user, address, destination)
         await self._scp(source, destination, scp_opts)
 
@@ -157,7 +157,7 @@ class Machine(model.ModelEntity):
         if proxy:
             raise NotImplementedError('proxy option is not implemented')
 
-        address = self.public_address
+        address = self.dns_name
         source = '%s@%s:%s' % (user, address, source)
         await self._scp(source, destination, scp_opts)
 
@@ -247,10 +247,11 @@ class Machine(model.ModelEntity):
         return parse_date(self.safe_data['instance-status']['since'])
 
     @property
-    def public_address(self):
-        """Get a public address for this machine.
+    def dns_name(self):
+        """Get the DNS name for this machine. This is a best guess based on the
+        addresses available in current data.
 
-        May return None if no public address is found.
+        May return None if no suitable address is found.
         """
         for scope in ['public', 'local-cloud']:
             addresses = self.safe_data['addresses'] or []
