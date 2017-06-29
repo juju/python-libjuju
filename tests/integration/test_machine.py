@@ -48,7 +48,8 @@ async def test_scp(event_loop):
             timeout=240)
         machine = model.machines['0']
         await asyncio.wait_for(
-            model.block_until(lambda: machine.status == 'running'),
+            model.block_until(lambda: (machine.status == 'running' and
+                                       machine.agent_status == 'started')),
             timeout=480)
 
         with NamedTemporaryFile() as f:

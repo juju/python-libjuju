@@ -54,17 +54,19 @@ async def test_run_action(event_loop):
 async def test_scp(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy('ubuntu')
+
         await asyncio.wait_for(
             model.block_until(lambda: app.units),
-            timeout=60
-        )
+            timeout=60)
         unit = app.units[0]
         await asyncio.wait_for(
-            model.block_until(
-                lambda: unit.machine and unit.machine.status == 'running'
-            ),
-            timeout=480
-        )
+            model.block_until(lambda: unit.machine),
+            timeout=60)
+        machine = unit.machine
+        await asyncio.wait_for(
+            model.block_until(lambda: (machine.status == 'running' and
+                                       machine.agent_status == 'started')),
+            timeout=480)
 
         with NamedTemporaryFile() as f:
             f.write(b'testcontents')
