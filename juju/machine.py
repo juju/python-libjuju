@@ -252,7 +252,10 @@ class Machine(model.ModelEntity):
 
         May return None if no public address is found.
         """
-        addresses = self.safe_data['addresses'] or []
-        addresses = [address for address in addresses
-                     if address['scope'] == 'public']
-        return addresses[0]['value'] if addresses else None
+        for scope in ['public', 'local-cloud']:
+            addresses = self.safe_data['addresses'] or []
+            addresses = [address for address in addresses
+                         if address['scope'] == scope]
+            if addresses:
+                return addresses[0]['value']
+        return None
