@@ -1,6 +1,7 @@
 import asyncio
-
 import pytest
+
+from tempfile import NamedTemporaryFile
 
 from .. import base
 
@@ -35,3 +36,27 @@ async def test_status(event_loop):
         assert machine.status_message.lower() == 'running'
         assert machine.agent_status == 'started'
         assert machine.agent_version.major >= 2
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_scp(event_loop):
+    async with base.CleanModel() as model:
+        await model.add_machine()
+        await asyncio.wait_for(
+            model.block_until(lambda: model.machines),
+            timeout=240)
+        machine = model.machines['0']
+        await asyncio.wait_for(
+            model.block_until(lambda: (machine.status == 'running' and
+                                       machine.agent_status == 'started')),
+            timeout=480)
+
+        with NamedTemporaryFile() as f:
+            f.write(b'testcontents')
+            f.flush()
+            await machine.scp_to(f.name, 'testfile')
+
+        with NamedTemporaryFile() as f:
+            await machine.scp_from('testfile', f.name)
+            assert f.read() == b'testcontents'

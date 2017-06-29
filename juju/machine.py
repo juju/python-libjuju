@@ -1,9 +1,12 @@
+import asyncio
 import logging
+import os
 
 from dateutil.parser import parse as parse_date
 
 from . import model, utils
 from .client import client
+from .errors import JujuError
 
 log = logging.getLogger(__name__)
 
@@ -124,20 +127,56 @@ class Machine(model.ModelEntity):
         )
         return await self.ann_facade.Set([ann])
 
-    def scp(
-            self, source_path, user=None, destination_path=None, proxy=False,
-            scp_opts=None):
+    async def scp_to(self, source, destination, user='ubuntu', proxy=False,
+                     scp_opts=''):
         """Transfer files to this machine.
 
-        :param str source_path: Path of file(s) to transfer
+        :param str source: Local path of file(s) to transfer
+        :param str destination: Remote destination of transferred files
         :param str user: Remote username
-        :param str destination_path: Destination of transferred files on
-            remote machine
         :param bool proxy: Proxy through the Juju API server
         :param str scp_opts: Additional options to the `scp` command
-
         """
-        raise NotImplementedError()
+        if proxy:
+            raise NotImplementedError('proxy option is not implemented')
+
+        address = self.dns_name
+        destination = '%s@%s:%s' % (user, address, destination)
+        await self._scp(source, destination, scp_opts)
+
+    async def scp_from(self, source, destination, user='ubuntu', proxy=False,
+                       scp_opts=''):
+        """Transfer files from this machine.
+
+        :param str source: Remote path of file(s) to transfer
+        :param str destination: Local destination of transferred files
+        :param str user: Remote username
+        :param bool proxy: Proxy through the Juju API server
+        :param str scp_opts: Additional options to the `scp` command
+        """
+        if proxy:
+            raise NotImplementedError('proxy option is not implemented')
+
+        address = self.dns_name
+        source = '%s@%s:%s' % (user, address, source)
+        await self._scp(source, destination, scp_opts)
+
+    async def _scp(self, source, destination, scp_opts):
+        """ Execute an scp command. Requires a fully qualified source and
+        destination.
+        """
+        cmd = [
+            'scp',
+            '-i', os.path.expanduser('~/.local/share/juju/ssh/juju_id_rsa'),
+            '-o', 'StrictHostKeyChecking=no',
+            source, destination
+        ]
+        cmd += scp_opts.split()
+        loop = self.model.loop
+        process = await asyncio.create_subprocess_exec(*cmd, loop=loop)
+        await process.wait()
+        if process.returncode != 0:
+            raise JujuError("command failed: %s" % cmd)
 
     def ssh(
             self, command, user=None, proxy=False, ssh_opts=None):
@@ -206,3 +245,18 @@ class Machine(model.ModelEntity):
 
         """
         return parse_date(self.safe_data['instance-status']['since'])
+
+    @property
+    def dns_name(self):
+        """Get the DNS name for this machine. This is a best guess based on the
+        addresses available in current data.
+
+        May return None if no suitable address is found.
+        """
+        for scope in ['public', 'local-cloud']:
+            addresses = self.safe_data['addresses'] or []
+            addresses = [address for address in addresses
+                         if address['scope'] == scope]
+            if addresses:
+                return addresses[0]['value']
+        return None
