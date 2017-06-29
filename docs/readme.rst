@@ -5,7 +5,7 @@ Source code: https://github.com/juju/python-libjuju
 
 Bug reports: https://github.com/juju/python-libjuju/issues
 
-Documentation: https://pythonhosted.org/juju/
+Documentation: https://pythonlibjuju.readthedocs.io/en/latest/
 
 
 Requirements
