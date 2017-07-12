@@ -5,14 +5,19 @@ python:
   - "3.5"
 before_install:
   - sudo add-apt-repository ppa:ubuntu-lxc/lxd-stable -y
-  - sudo add-apt-repository ppa:juju/daily -y
   - sudo apt-get update -q
-  - sudo apt-get install lxd juju -y
+  - sudo apt-get install lxd snapd -y
   - sudo usermod -a -G lxd $USER
+  - sudo service lxd start || true
   - sudo lxd init --auto
 install: pip install tox-travis
-before_script:
-  - sudo -E sudo -u $USER -E bash -c "juju bootstrap localhost test"
-script: tox -e py35,integration
-after_script:
-  - sudo -E sudo -u $USER -E bash -c "juju destroy-controller --destroy-all-models -y test"
+env:
+  - SNAP_CMD="sudo snap install juju --classic --stable"
+  - SNAP_CMD="sudo snap install juju --classic --edge"
+script:
+  - (eval "$SNAP_CMD")
+  - sudo ln -s /snap/bin/juju /usr/bin/juju || true
+  - sudo -E sudo -u $USER -E bash -c "/snap/bin/juju bootstrap localhost test"
+  - tox -e py35,integration
+  - sudo -E sudo -u $USER -E bash -c "/snap/bin/juju destroy-controller --destroy-all-models -y test"
+  - sudo snap remove juju
