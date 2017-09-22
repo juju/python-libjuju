@@ -11,6 +11,7 @@ __all__ = [
     'Number',
     'Binary',
     'ConfigValue',
+    'Resource',
 ]
 
 __patches__ = [
@@ -273,3 +274,26 @@ class ConfigValue(_definitions.ConfigValue):
         return '<{} source={} value={}>'.format(type(self).__name__,
                                                 repr(self.source),
                                                 repr(self.value))
+
+class Resource(Type):
+    _toSchema = {'application': 'application', 'charmresource': 'CharmResource', 'id_': 'id', 'pending_id': 'pending-id', 'timestamp': 'timestamp', 'username': 'username', 'name': 'name', 'origin': 'origin'}
+    _toPy = {'CharmResource': 'charmresource', 'application': 'application', 'id': 'id_', 'pending-id': 'pending_id', 'timestamp': 'timestamp', 'username': 'username', 'name': 'name', 'origin': 'origin'}
+    def __init__(self, charmresource=None, application=None, id_=None, pending_id=None, timestamp=None, username=None, name=None, origin=None, **unknown_fields):
+        '''
+        charmresource : CharmResource
+        application : str
+        id_ : str
+        pending_id : str
+        timestamp : str
+        username : str
+        name: str
+        origin : str
+        '''
+        self.charmresource = CharmResource.from_json(charmresource) if charmresource else None
+        self.application = application
+        self.id_ = id_
+        self.pending_id = pending_id
+        self.timestamp = timestamp
+        self.username = username
+        self.name = name
+        self.origin = origin
