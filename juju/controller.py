@@ -1,6 +1,7 @@
 import asyncio
 import logging
 
+from . import errors
 from . import tag
 from . import utils
 from .client import client
@@ -39,9 +40,11 @@ class Controller(object):
         """Connect to the current Juju controller.
 
         """
-        self.connection = (
-            await connection.Connection.connect_current_controller(
-                max_frame_size=self.max_frame_size))
+        jujudata = connection.JujuData()
+        controller_name = jujudata.current_controller()
+        if not controller_name:
+            raise errors.JujuConnectionError('No current controller')
+        return await self.connect_controller(controller_name)
 
     async def connect_controller(self, controller_name):
         """Connect to a Juju controller by name.
@@ -95,10 +98,11 @@ class Controller(object):
             credential = None
 
         log.debug('Creating model %s', model_name)
-        
+
         if not config or 'authorized-keys' not in config:
             config = config or {}
-            config['authorized-keys'] = await utils.read_ssh_key(loop=self.loop)
+            config['authorized-keys'] = await utils.read_ssh_key(
+                loop=self.loop)
 
         model_info = await model_facade.CreateModel(
             tag.cloud(cloud_name),
@@ -121,7 +125,6 @@ class Controller(object):
         )
 
         return model
-
 
     async def destroy_models(self, *uuids):
         """Destroy one or more models.
