@@ -346,6 +346,9 @@ class Application(model.ModelEntity):
             self.connection)
         app_facade = client.ApplicationFacade.from_connection(self.connection)
 
+        charmstore = self.model.charmstore
+        charmstore_entity = None
+
         if switch is not None:
             charm_url = switch
             if not charm_url.startswith('cs:'):
@@ -356,9 +359,9 @@ class Application(model.ModelEntity):
             if revision is not None:
                 charm_url = "%s-%d" % (charm_url, revision)
             else:
-                charmstore = self.model.charmstore
-                entity = await charmstore.entity(charm_url, channel=channel)
-                charm_url = entity['Id']
+                charmstore_entity = await charmstore.entity(charm_url,
+                                                            channel=channel)
+                charm_url = charmstore_entity['Id']
 
         if charm_url == self.data['charm-url']:
             raise JujuError('already running charm "%s"' % charm_url)
@@ -370,9 +373,10 @@ class Application(model.ModelEntity):
         )
 
         # Update resources
-        response = await self.model.charmstore.entity(charm_url,
-                                                      channel=channel)
-        store_resources = response['Meta']['resources']
+        if not charmstore_entity:
+            charmstore_entity = await charmstore.entity(charm_url,
+                                                        channel=channel)
+        store_resources = charmstore_entity['Meta']['resources']
 
         request_data = [client.Entity(self.tag)]
         response = await resources_facade.ListResources(request_data)
