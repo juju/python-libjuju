@@ -115,10 +115,13 @@ class Controller(object):
             self.connection.macaroons,
             loop=self.loop,
         )
-        #ssh_key = await utils.read_ssh_key(loop=self.loop)
-        #await model.add_ssh_key(owner, ssh_key)
+        
+        if not config or 'authorized-keys' not in config:
+            config = config or {}
+            config['authorized-keys'] = await utils.read_ssh_key(loop=self.loop)
 
         return model
+
 
     async def destroy_models(self, *uuids):
         """Destroy one or more models.
