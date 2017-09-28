@@ -115,8 +115,8 @@ class Controller(object):
             self.connection.macaroons,
             loop=self.loop,
         )
-        ssh_key = await utils.read_ssh_key(loop=self.loop)
-        await model.add_ssh_key(owner, ssh_key)
+        #ssh_key = await utils.read_ssh_key(loop=self.loop)
+        #await model.add_ssh_key(owner, ssh_key)
 
         return model
 
