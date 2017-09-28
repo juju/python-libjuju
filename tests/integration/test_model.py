@@ -131,18 +131,6 @@ async def _deploy_in_loop(new_loop, model_name):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_explicit_loop(event_loop):
-    async with base.CleanModel() as model:
-        model_name = model.info.name
-        new_loop = asyncio.new_event_loop()
-        new_loop.run_until_complete(
-            _deploy_in_loop(new_loop, model_name))
-        await model._wait_for_new('application', 'ubuntu')
-        assert 'ubuntu' in model.applications
-
-
-@base.bootstrapped
-@pytest.mark.asyncio
 async def test_explicit_loop_threaded(event_loop):
     async with base.CleanModel() as model:
         model_name = model.info.name
