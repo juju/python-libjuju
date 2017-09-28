@@ -1,3 +1,4 @@
+import asyncio
 import pytest
 
 from .. import base
@@ -92,3 +93,32 @@ async def test_upgrade_charm_switch(event_loop):
         assert app.data['charm-url'] == 'cs:ubuntu-0'
         await app.upgrade_charm(switch='ubuntu-8')
         assert app.data['charm-url'] == 'cs:ubuntu-8'
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_upgrade_charm_resource(event_loop):
+    async with base.CleanModel() as model:
+        app = await model.deploy('cs:~cynerva/upgrade-charm-resource-test-1')
+
+        def units_ready():
+            if not app.units:
+                return False
+            unit = app.units[0]
+            return unit.workload_status == 'active' and \
+                unit.agent_status == 'idle'
+
+        await asyncio.wait_for(model.block_until(units_ready), timeout=480)
+        unit = app.units[0]
+        expected_message = 'I have no resource.'
+        assert unit.workload_status_message == expected_message
+
+        await app.upgrade_charm(revision=2)
+        await asyncio.wait_for(
+            model.block_until(
+                lambda: unit.workload_status_message != 'I have no resource.'
+            ),
+            timeout=60
+        )
+        expected_message = 'My resource: I am the resource.'
+        assert app.units[0].workload_status_message == expected_message

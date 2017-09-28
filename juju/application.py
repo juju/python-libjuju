@@ -342,7 +342,12 @@ class Application(model.ModelEntity):
             raise ValueError("switch and revision are mutually exclusive")
 
         client_facade = client.ClientFacade.from_connection(self.connection)
+        resources_facade = client.ResourcesFacade.from_connection(
+            self.connection)
         app_facade = client.ApplicationFacade.from_connection(self.connection)
+
+        charmstore = self.model.charmstore
+        charmstore_entity = None
 
         if switch is not None:
             charm_url = switch
@@ -354,18 +359,65 @@ class Application(model.ModelEntity):
             if revision is not None:
                 charm_url = "%s-%d" % (charm_url, revision)
             else:
-                charmstore = self.model.charmstore
-                entity = await charmstore.entity(charm_url, channel=channel)
-                charm_url = entity['Id']
+                charmstore_entity = await charmstore.entity(charm_url,
+                                                            channel=channel)
+                charm_url = charmstore_entity['Id']
 
         if charm_url == self.data['charm-url']:
             raise JujuError('already running charm "%s"' % charm_url)
 
+        # Update charm
         await client_facade.AddCharm(
             url=charm_url,
             channel=channel
         )
 
+        # Update resources
+        if not charmstore_entity:
+            charmstore_entity = await charmstore.entity(charm_url,
+                                                        channel=channel)
+        store_resources = charmstore_entity['Meta']['resources']
+
+        request_data = [client.Entity(self.tag)]
+        response = await resources_facade.ListResources(request_data)
+        existing_resources = {
+            resource.name: resource
+            for resource in response.results[0].resources
+        }
+
+        resources_to_update = [
+            resource for resource in store_resources
+            if resource['Name'] not in existing_resources or
+            existing_resources[resource['Name']].origin != 'upload'
+        ]
+
+        if resources_to_update:
+            request_data = [
+                client.CharmResource(
+                    description=resource.get('Description'),
+                    fingerprint=resource['Fingerprint'],
+                    name=resource['Name'],
+                    path=resource['Path'],
+                    revision=resource['Revision'],
+                    size=resource['Size'],
+                    type_=resource['Type'],
+                    origin='store',
+                ) for resource in resources_to_update
+            ]
+            response = await resources_facade.AddPendingResources(
+                self.tag,
+                charm_url,
+                request_data
+            )
+            pending_ids = response.pending_ids
+            resource_ids = {
+                resource['Name']: id
+                for resource, id in zip(resources_to_update, pending_ids)
+            }
+        else:
+            resource_ids = None
+
+        # Update application
         await app_facade.SetCharm(
             application=self.entity_id,
             channel=channel,
@@ -374,7 +426,7 @@ class Application(model.ModelEntity):
             config_settings_yaml=None,
             force_series=force_series,
             force_units=force_units,
-            resource_ids=None,
+            resource_ids=resource_ids,
             storage_constraints=None
         )
 
