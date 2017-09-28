@@ -116,7 +116,7 @@ class Controller(object):
             loop=self.loop,
         )
         ssh_key = await utils.read_ssh_key(loop=self.loop)
-        model.add_ssh_key(owner, ssh_key)
+        await model.add_ssh_key(owner, ssh_key)
 
         return model
 
