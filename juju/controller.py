@@ -105,24 +105,6 @@ class Controller(object):
             region
         )
 
-        # Add our ssh key to the model, to work around
-        # https://bugs.launchpad.net/juju/+bug/1643076
-        try:
-            ssh_key = await utils.read_ssh_key(loop=self.loop)
-
-            if self.controller_name:
-                model_name = "{}:{}".format(self.controller_name, model_name)
-
-            cmd = ['juju', 'add-ssh-key', '-m', model_name, ssh_key]
-
-            await utils.execute_process(*cmd, log=log, loop=self.loop)
-        except Exception:
-            log.exception(
-                "Could not add ssh key to model. You will not be able "
-                "to ssh into machines in this model. "
-                "Manually running `juju add-ssh-key <key>` in the cli "
-                "may fix this problem.")
-
         model = Model()
         await model.connect(
             self.connection.endpoint,
