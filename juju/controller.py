@@ -95,6 +95,10 @@ class Controller(object):
             credential = None
 
         log.debug('Creating model %s', model_name)
+        
+        if not config or 'authorized-keys' not in config:
+            config = config or {}
+            config['authorized-keys'] = await utils.read_ssh_key(loop=self.loop)
 
         model_info = await model_facade.CreateModel(
             tag.cloud(cloud_name),
@@ -115,10 +119,6 @@ class Controller(object):
             self.connection.macaroons,
             loop=self.loop,
         )
-        
-        if not config or 'authorized-keys' not in config:
-            config = config or {}
-            config['authorized-keys'] = await utils.read_ssh_key(loop=self.loop)
 
         return model
 
