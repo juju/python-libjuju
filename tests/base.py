@@ -48,7 +48,7 @@ class CleanModel():
         self.user_name = juju_data.accounts()[self.controller_name]['user']
         await self.controller.connect_controller(self.controller_name)
 
-        self.model_name = 'model-{}'.format(self.user_name, uuid.uuid4())
+        self.model_name = 'model-{}'.format(uuid.uuid4())
         self.model = await self.controller.add_model(self.model_name)
 
         # save the model UUID in case test closes model
