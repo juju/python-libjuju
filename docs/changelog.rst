@@ -1,6 +1,17 @@
 Change Log
 ----------
 
+0.6.1
+^^^^^
+Fri Sept 29 2017
+
+* Fix failure when controller supports newer facade version (#145)
+* Fix test failures (#163)
+* Fix SSH key handling when adding a new model (#161)
+* Make Application.upgrade_charm upgrade resources (#158)
+* Expand integration tests to use stable/edge versions of juju (#155)
+* Move docs to ReadTheDocs (https://pythonlibjuju.readthedocs.io/en/latest/)
+
 0.6.0
 ^^^^^
 Thu June 29 2017
