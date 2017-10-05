@@ -539,7 +539,7 @@ class Type:
         return d
 
     def to_json(self):
-        return json.dumps(self.serialize())
+        return json.dumps(self.serialize(), cls=TypeEncoder, sort_keys=True)
 
 
 class Schema(dict):
