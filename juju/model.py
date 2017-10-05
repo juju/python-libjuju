@@ -1658,8 +1658,9 @@ class BundleHandler(object):
         apps, args = [], []
 
         default_series = bundle.get('series')
+        apps_dict = bundle.get('applications', bundle.get('services', {}))
         for app_name in self.applications:
-            app_dict = bundle['services'][app_name]
+            app_dict = apps_dict[app_name]
             charm_dir = os.path.abspath(os.path.expanduser(app_dict['charm']))
             if not os.path.isdir(charm_dir):
                 continue
@@ -1688,7 +1689,7 @@ class BundleHandler(object):
             ], loop=self.model.loop)
             # Update the 'charm:' entry for each app with the new 'local:' url.
             for app_name, charm_url in zip(apps, charm_urls):
-                bundle['services'][app_name]['charm'] = charm_url
+                apps_dict[app_name]['charm'] = charm_url
 
         return bundle
 
@@ -1714,7 +1715,9 @@ class BundleHandler(object):
 
     @property
     def applications(self):
-        return list(self.bundle['services'].keys())
+        apps_dict = self.bundle.get('applications',
+                                    self.bundle.get('services', {}))
+        return list(apps_dict.keys())
 
     def resolve(self, reference):
         if reference and reference.startswith('$'):
