@@ -413,7 +413,7 @@ class Connection:
             endpoints.extend(new_endpoints)
         else:
             # ran out of endpoints without a successful login
-            raise Exception("Couldn't authenticate to {}".format(
+            raise JujuConnectionError("Couldn't authenticate to {}".format(
                 self._endpoint))
 
         response = result['response']
