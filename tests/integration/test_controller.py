@@ -19,6 +19,21 @@ async def test_add_user(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_remove_user(event_loop):
+    async with base.CleanController() as controller:
+        username = 'test{}'.format(uuid.uuid4())
+        await controller.add_user(username)
+        result = await controller.get_user(username)
+        res_ser = result.serialize()['results'][0].serialize()
+        assert res_ser['result'] is not None
+        await controller.remove_user(username)
+        result = await controller.get_user(username)
+        res_ser = result.serialize()['results'][0].serialize()
+        assert res_ser['result'] is None
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_disable_enable_user(event_loop):
     async with base.CleanController() as controller:
         username = 'test-disable{}'.format(uuid.uuid4())
