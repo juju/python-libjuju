@@ -584,6 +584,38 @@ class JujuData:
     def accounts(self):
         return self._load_yaml('accounts.yaml', 'controllers')
 
+    def credentials(self):
+        return self._load_yaml('credentials.yaml', 'credentials')
+
+    def load_credential(self, cloud, name=None):
+        """Load a local credential.
+
+        :param str cloud: Name of cloud to load credentials from.
+        :param str name: Name of credential. If None, the default credential
+            will be used, if available.
+        :returns: A CloudCredential instance, or None.
+        """
+        try:
+            cloud = tag.untag('cloud-', cloud)
+            creds_data = self.credentials()[cloud]
+            if not name:
+                default_credential = creds_data.pop('default-credential', None)
+                default_region = creds_data.pop('default-region', None)  # noqa
+                if default_credential:
+                    name = creds_data['default-credential']
+                elif len(creds_data) == 1:
+                    name = list(creds_data)[0]
+                else:
+                    return None, None
+            cred_data = creds_data[name]
+            auth_type = cred_data.pop('auth-type')
+            return name, client.CloudCredential(
+                auth_type=auth_type,
+                attrs=cred_data,
+            )
+        except (KeyError, FileNotFoundError):
+            return None, None
+
     def _load_yaml(self, filename, key):
         filepath = os.path.join(self.path, filename)
         with io.open(filepath, 'rt') as f:
