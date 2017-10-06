@@ -236,6 +236,7 @@ class Controller(object):
                 return await controller_facade.AllModels()
             except errors.JujuAPIError as e:
                 # retry concurrency error until resolved in Juju
+                # see: https://bugs.launchpad.net/juju/+bug/1721786
                 if 'has been removed' not in e.message or attempt == 3:
                     raise
 
