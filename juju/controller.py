@@ -64,6 +64,47 @@ class Controller(object):
             await self.connection.close()
             self.connection = None
 
+    async def add_credential(self, name=None, credential=None, cloud=None,
+                             owner=None):
+        """Add or update a credential to the controller.
+
+        :param str name: Name of new credential. If None, the default
+            local credential is used.  Name must be provided if a credential
+            is given.
+        :param CloudCredential credential: Credential to add. If not given,
+            it will attempt to read from local data, if available.
+        :param str cloud: Name of cloud to associate the credential with.
+            Defaults to the same cloud as the controller.
+        :param str owner: Username that will own the credential. Defaults to
+            the current user.
+        :returns: Name of credential that was uploaded.
+        """
+        if not cloud:
+            cloud = await self.get_cloud()
+
+        if not owner:
+            owner = self.connection.info['user-info']['identity']
+
+        if credential and not name:
+            raise errors.JujuError('Name must be provided for credential')
+
+        if not credential:
+            name, credential = connection.JujuData().load_credential(cloud,
+                                                                     name)
+            if credential is None:
+                raise errors.JujuError('Unable to find credential: '
+                                       '{}'.format(name))
+
+        log.debug('Uploading credential %s', name)
+        cloud_facade = client.CloudFacade.from_connection(self.connection)
+        await cloud_facade.UpdateCredentials([
+            client.UpdateCloudCredential(
+                tag=tag.credential(cloud, tag.untag('user-', owner), name),
+                credential=credential,
+            )])
+
+        return name
+
     async def add_model(
             self, model_name, cloud_name=None, credential_name=None,
             owner=None, config=None, region=None):
@@ -73,9 +114,8 @@ class Controller(object):
         :param str cloud_name: Name of the cloud in which to create the
             model, e.g. 'aws'. Defaults to same cloud as controller.
         :param str credential_name: Name of the credential to use when
-            creating the model. Defaults to current credential. If you
-            pass a credential_name, you must also pass a cloud_name,
-            even if it's the default cloud.
+            creating the model. If not given, it will attempt to find a
+            default credential.
         :param str owner: Username that will own the model. Defaults to
             the current user.
         :param dict config: Model configuration.
@@ -87,6 +127,16 @@ class Controller(object):
 
         owner = owner or self.connection.info['user-info']['identity']
         cloud_name = cloud_name or await self.get_cloud()
+
+        try:
+            # attempt to add/update the credential from local data if available
+            credential_name = await self.add_credential(
+                name=credential_name,
+                cloud=cloud_name,
+                owner=owner)
+        except errors.JujuError:
+            # if it's not available locally, assume it's on the controller
+            pass
 
         if credential_name:
             credential = tag.credential(
