@@ -24,7 +24,7 @@ def run(*steps):
     try:
         loop.add_signal_handler(signal.SIGINT, abort)
         added = True
-    except ValueError as e:
+    except (ValueError, OSError, RuntimeError) as e:
         # add_signal_handler doesn't work in a thread
         if 'main thread' not in str(e):
             raise
