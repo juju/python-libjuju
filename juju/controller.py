@@ -231,7 +231,14 @@ class Controller(object):
         """
         controller_facade = client.ControllerFacade.from_connection(
             self.connection)
-        return await controller_facade.AllModels()
+        for attempt in (1, 2, 3):
+            try:
+                return await controller_facade.AllModels()
+            except errors.JujuAPIError as e:
+                # retry concurrency error until resolved in Juju
+                # see: https://bugs.launchpad.net/juju/+bug/1721786
+                if 'has been removed' not in e.message or attempt == 3:
+                    raise
 
     def get_payloads(self, *patterns):
         """Return list of known payloads.

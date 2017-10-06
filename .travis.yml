@@ -19,5 +19,3 @@ script:
   - sudo ln -s /snap/bin/juju /usr/bin/juju || true
   - sudo -E sudo -u $USER -E bash -c "/snap/bin/juju bootstrap localhost test"
   - tox -e py35,integration
-  - sudo -E sudo -u $USER -E bash -c "/snap/bin/juju destroy-controller --destroy-all-models -y test"
-  - sudo snap remove juju
