@@ -176,6 +176,7 @@ class Controller(object):
 
         return model
 
+
     async def destroy_models(self, *uuids):
         """Destroy one or more models.
 
@@ -213,6 +214,16 @@ class Controller(object):
                   'password': password,
                   'username': username}]
         return await user_facade.AddUser(users)
+
+    async def remove_user(self, username):
+        """Remove a user.
+
+        :param str username: Username
+
+        """
+        user_facade = client.UserManagerFacade.from_connection(self.connection)
+        entity = client.Entity(tag.user(username))
+        return await user_facade.RemoveUser([entity])
 
     async def change_user_password(self, username, password):
         """Change the password for a user in this controller.
