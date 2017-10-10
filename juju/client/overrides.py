@@ -275,10 +275,28 @@ class ConfigValue(_definitions.ConfigValue):
                                                 repr(self.source),
                                                 repr(self.value))
 
+
 class Resource(Type):
-    _toSchema = {'application': 'application', 'charmresource': 'CharmResource', 'id_': 'id', 'pending_id': 'pending-id', 'timestamp': 'timestamp', 'username': 'username', 'name': 'name', 'origin': 'origin'}
-    _toPy = {'CharmResource': 'charmresource', 'application': 'application', 'id': 'id_', 'pending-id': 'pending_id', 'timestamp': 'timestamp', 'username': 'username', 'name': 'name', 'origin': 'origin'}
-    def __init__(self, charmresource=None, application=None, id_=None, pending_id=None, timestamp=None, username=None, name=None, origin=None, **unknown_fields):
+    _toSchema = {'application': 'application',
+                 'charmresource': 'CharmResource',
+                 'id_': 'id',
+                 'pending_id': 'pending-id',
+                 'timestamp': 'timestamp',
+                 'username': 'username',
+                 'name': 'name',
+                 'origin': 'origin'}
+    _toPy = {'CharmResource': 'charmresource',
+             'application': 'application',
+             'id': 'id_',
+             'pending-id': 'pending_id',
+             'timestamp': 'timestamp',
+             'username': 'username',
+             'name': 'name',
+             'origin': 'origin'}
+
+    def __init__(self, charmresource=None, application=None, id_=None,
+                 pending_id=None, timestamp=None, username=None, name=None,
+                 origin=None, **unknown_fields):
         '''
         charmresource : CharmResource
         application : str
@@ -289,7 +307,10 @@ class Resource(Type):
         name: str
         origin : str
         '''
-        self.charmresource = CharmResource.from_json(charmresource) if charmresource else None
+        if charmresource:
+            self.charmresource = _client.CharmResource.from_json(charmresource)
+        else:
+            self.charmresource = None
         self.application = application
         self.id_ = id_
         self.pending_id = pending_id

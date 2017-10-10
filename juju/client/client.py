@@ -5,7 +5,7 @@ from . import _client, _definitions, overrides
 
 
 for o in overrides.__all__:
-    if not "Facade" in o:
+    if "Facade" not in o:
         # Override stuff in _definitions, which is all imported
         # into _client. We Monkey patch both the original class and
         # the ref in _client (import shenanigans are fun!)

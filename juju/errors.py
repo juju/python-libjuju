@@ -1,5 +1,16 @@
 class JujuError(Exception):
-    pass
+    def __init__(self, *args, **kwargs):
+        self.message = ''
+        self.errors = []
+        if args:
+            self.message = str(args[0])
+            if isinstance(args[0], (list, tuple)):
+                self.errors = args[0]
+            elif len(args) > 1:
+                self.errors = list(args)
+            else:
+                self.errors = [self.message]
+        super().__init__(*args, **kwargs)
 
 
 class JujuAPIError(JujuError):

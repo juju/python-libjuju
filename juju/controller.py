@@ -7,6 +7,7 @@ from . import utils
 from .client import client
 from .client import connection
 from .model import Model
+from .user import User
 
 log = logging.getLogger(__name__)
 
@@ -201,18 +202,26 @@ class Controller(object):
         """Add a user to this controller.
 
         :param str username: Username
+        :param str password: Password
         :param str display_name: Display name
-        :param str acl: Access control, e.g. 'read'
-        :param list models: Models to which the user is granted access
-
+        :returns: A :class:`~juju.user.User` instance
         """
         if not display_name:
             display_name = username
         user_facade = client.UserManagerFacade.from_connection(self.connection)
-        users = [{'display_name': display_name,
-                  'password': password,
-                  'username': username}]
-        return await user_facade.AddUser(users)
+        users = [client.AddUser(display_name=display_name,
+                                username=username,
+                                password=password)]
+        await user_facade.AddUser(users)
+        return await self.get_user(username)
+
+    async def remove_user(self, username):
+        """Remove a user from this controller.
+        """
+        client_facade = client.UserManagerFacade.from_connection(
+            self.connection)
+        user = tag.user(username)
+        await client_facade.RemoveUser([client.Entity(user)])
 
     async def change_user_password(self, username, password):
         """Change the password for a user in this controller.
@@ -308,14 +317,6 @@ class Controller(object):
         """
         raise NotImplementedError()
 
-    def get_users(self, all_=False):
-        """Return list of users that can connect to this controller.
-
-        :param bool all_: Include disabled users
-
-        """
-        raise NotImplementedError()
-
     def login(self):
         """Log in to this controller.
 
@@ -339,17 +340,38 @@ class Controller(object):
         """
         raise NotImplementedError()
 
-    async def get_user(self, username, include_disabled=False):
+    async def get_user(self, username):
         """Get a user by name.
 
         :param str username: Username
-
+        :returns: A :class:`~juju.user.User` instance
         """
         client_facade = client.UserManagerFacade.from_connection(
             self.connection)
         user = tag.user(username)
-        return await client_facade.UserInfo([client.Entity(user)],
-                                            include_disabled)
+        args = [client.Entity(user)]
+        try:
+            response = await client_facade.UserInfo(args, True)
+        except errors.JujuError as e:
+            if 'permission denied' in e.errors:
+                # apparently, trying to get info for a nonexistent user returns
+                # a "permission denied" error rather than an empty result set
+                return None
+            raise
+        if response.results and response.results[0].result:
+            return User(self, response.results[0].result)
+        return None
+
+    async def get_users(self, include_disabled=False):
+        """Return list of users that can connect to this controller.
+
+        :param bool include_disabled: Include disabled users
+        :returns: A list of :class:`~juju.user.User` instances
+        """
+        client_facade = client.UserManagerFacade.from_connection(
+            self.connection)
+        response = await client_facade.UserInfo(None, include_disabled)
+        return [User(self, r.result) for r in response.results]
 
     async def grant(self, username, acl='login'):
         """Set access level of the given user on the controller
