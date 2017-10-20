@@ -177,24 +177,28 @@ class Controller(object):
 
         return model
 
-    async def destroy_models(self, *uuids):
+    async def destroy_models(self, *models):
         """Destroy one or more models.
 
-        :param str \*uuids: UUIDs of models to destroy
+        :param str \*models: Names or UUIDs of models to destroy
 
         """
+        uuids = await self._model_uuids()
+        models = [uuids[model] if model in uuids else model
+                  for model in models]
+
         model_facade = client.ModelManagerFacade.from_connection(
             self.connection)
 
         log.debug(
             'Destroying model%s %s',
-            '' if len(uuids) == 1 else 's',
-            ', '.join(uuids)
+            '' if len(models) == 1 else 's',
+            ', '.join(models)
         )
 
         await model_facade.DestroyModels([
-            client.Entity(tag.model(uuid))
-            for uuid in uuids
+            client.Entity(tag.model(model))
+            for model in models
         ])
     destroy_model = destroy_models
 
@@ -280,24 +284,31 @@ class Controller(object):
         cloud = list(result.clouds.keys())[0]  # only lives on one cloud
         return tag.untag('cloud-', cloud)
 
-    async def get_models(self, all_=False, username=None):
-        """Return list of available models on this controller.
+    async def _model_uuids(self, all_=False, username=None):
+        controller_facade = client.ControllerFacade.from_connection(
+            self.connection)
+        for attempt in (1, 2, 3):
+            try:
+                response = await controller_facade.AllModels()
+                return {um.model.name: um.model.uuid
+                        for um in response.user_models}
+            except errors.JujuAPIError as e:
+                # retry concurrency error until resolved in Juju
+                # see: https://bugs.launchpad.net/juju/+bug/1721786
+                if 'has been removed' not in e.message or attempt == 3:
+                    raise
+                await asyncio.sleep(attempt, loop=self.loop)
+
+    async def list_models(self, all_=False, username=None):
+        """Return list of names of the available models on this controller.
 
         :param bool all_: List all models, regardless of user accessibilty
             (admin use only)
         :param str username: User for which to list models (admin use only)
 
         """
-        controller_facade = client.ControllerFacade.from_connection(
-            self.connection)
-        for attempt in (1, 2, 3):
-            try:
-                return await controller_facade.AllModels()
-            except errors.JujuAPIError as e:
-                # retry concurrency error until resolved in Juju
-                # see: https://bugs.launchpad.net/juju/+bug/1721786
-                if 'has been removed' not in e.message or attempt == 3:
-                    raise
+        uuids = await self._model_uuids(all_, username)
+        return sorted(uuids.keys())
 
     def get_payloads(self, *patterns):
         """Return list of known payloads.
@@ -332,13 +343,29 @@ class Controller(object):
         """
         raise NotImplementedError()
 
-    def get_model(self, name):
-        """Get a model by name.
+    async def get_model(self, model):
+        """Get a model by name or UUID.
 
-        :param str name: Model name
+        :param str model: Model name or UUID
 
         """
-        raise NotImplementedError()
+        uuids = await self._model_uuids()
+        if model in uuids:
+            name_or_uuid = uuids[model]
+        else:
+            name_or_uuid = model
+
+        model = Model()
+        await model.connect(
+            self.connection.endpoint,
+            name_or_uuid,
+            self.connection.username,
+            self.connection.password,
+            self.connection.cacert,
+            self.connection.macaroons,
+            loop=self.loop,
+        )
+        return model
 
     async def get_user(self, username):
         """Get a user by name.
