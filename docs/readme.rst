@@ -46,10 +46,10 @@ and in the documentation.
 
 .. code:: python
 
-  #!/usr/bin/python3.5
+  #!/usr/bin/python3
 
-  import asyncio
   import logging
+  import sys
 
   from juju import loop
   from juju.model import Model
@@ -63,26 +63,28 @@ and in the documentation.
       # Connect to the currently active Juju model
       await model.connect_current()
 
-      # Deploy a single unit of the ubuntu charm, using revision 0 from the
-      # stable channel of the Charm Store.
-      ubuntu_app = await model.deploy(
-          'ubuntu-0',
-          application_name='ubuntu',
-          series='xenial',
-          channel='stable',
-      )
+      try:
+          # Deploy a single unit of the ubuntu charm, using the latest revision
+          # from the stable channel of the Charm Store.
+          ubuntu_app = await model.deploy(
+            'ubuntu',
+            application_name='ubuntu',
+            series='xenial',
+            channel='stable',
+          )
 
-      # Disconnect from the api server and cleanup.
-      model.disconnect()
+          if '--wait' in sys.argv:
+              # optionally block until the application is ready
+              await model.block_until(lambda: ubuntu_app.status == 'active')
+      finally:
+          # Disconnect from the api server and cleanup.
+          await model.disconnect()
 
 
   def main():
-      # Set logging level to debug so we can see verbose output from the
-      # juju library.
-      logging.basicConfig(level=logging.DEBUG)
+      logging.basicConfig(level=logging.INFO)
 
-      # Quiet logging from the websocket library. If you want to see
-      # everything sent over the wire, set this to DEBUG.
+      # If you want to see everything sent over the wire, set this to DEBUG.
       ws_logger = logging.getLogger('websockets.protocol')
       ws_logger.setLevel(logging.INFO)
 
