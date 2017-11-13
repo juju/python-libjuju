@@ -679,6 +679,11 @@ class Model(object):
                             log.warning(
                                 'Watcher: connection closed, reopening')
                             await self.connection.reconnect()
+                            if monitor.status != monitor.CONNECTED:
+                                # reconnect failed; abort and shutdown
+                                log.error('Watcher: automatic reconnect '
+                                          'failed; stopping watcher')
+                                break
                             del allwatcher.Id
                             continue
                         else:
