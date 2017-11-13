@@ -6,6 +6,7 @@ from . import tag
 from . import utils
 from .client import client
 from .client import connection
+from .client.jujudata import JujuData
 from .model import Model
 from .user import User
 
@@ -41,7 +42,7 @@ class Controller(object):
         """Connect to the current Juju controller.
 
         """
-        jujudata = connection.JujuData()
+        jujudata = JujuData()
         controller_name = jujudata.current_controller()
         if not controller_name:
             raise errors.JujuConnectionError('No current controller')
@@ -90,11 +91,10 @@ class Controller(object):
             raise errors.JujuError('Name must be provided for credential')
 
         if not credential:
-            name, credential = connection.JujuData().load_credential(cloud,
-                                                                     name)
+            name, credential = JujuData().load_credential(cloud, name)
             if credential is None:
-                raise errors.JujuError('Unable to find credential: '
-                                       '{}'.format(name))
+                raise errors.JujuError(
+                    'Unable to find credential: {}'.format(name))
 
         log.debug('Uploading credential %s', name)
         cloud_facade = client.CloudFacade.from_connection(self.connection)
