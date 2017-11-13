@@ -33,15 +33,17 @@ async def test_monitor(event_loop):
 @pytest.mark.asyncio
 async def test_monitor_catches_error(event_loop):
 
-    async with base.CleanModel():
-        conn = await Connection.connect_current()
+    async with base.CleanModel() as model:
+        conn = model.connection
 
         assert conn.monitor.status == 'connected'
-        await conn.ws.close()
-
-        assert conn.monitor.status == 'error'
-
-        await conn.close()
+        try:
+            async with conn.monitor.reconnecting:
+                await conn.ws.close()
+                await asyncio.sleep(1)
+                assert conn.monitor.status == 'error'
+        finally:
+            await conn.close()
 
 
 @base.bootstrapped
