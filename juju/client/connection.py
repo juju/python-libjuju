@@ -1,13 +1,9 @@
 import base64
-import io
 import json
 import logging
-import os
 import random
-import shlex
 import ssl
 import string
-import subprocess
 import weakref
 import websockets
 from concurrent.futures import CancelledError
@@ -15,10 +11,10 @@ from http.client import HTTPSConnection
 from pathlib import Path
 
 import asyncio
-import yaml
 
 from juju import tag, utils
 from juju.client import client
+from juju.client.jujudata import JujuData
 from juju.errors import JujuError, JujuAPIError, JujuConnectionError
 from juju.utils import IdQueue
 
@@ -554,72 +550,6 @@ class Connection:
                 return None
             raise
         return result['response']
-
-
-class JujuData:
-    def __init__(self):
-        self.path = os.environ.get('JUJU_DATA') or '~/.local/share/juju'
-        self.path = os.path.abspath(os.path.expanduser(self.path))
-
-    def current_controller(self):
-        cmd = shlex.split('juju list-controllers --format yaml')
-        output = subprocess.check_output(cmd)
-        output = yaml.safe_load(output)
-        return output.get('current-controller', '')
-
-    def current_model(self, controller_name=None):
-        if not controller_name:
-            controller_name = self.current_controller()
-        models = self.models()[controller_name]
-        if 'current-model' not in models:
-            raise JujuError('No current model')
-        return models['current-model']
-
-    def controllers(self):
-        return self._load_yaml('controllers.yaml', 'controllers')
-
-    def models(self):
-        return self._load_yaml('models.yaml', 'controllers')
-
-    def accounts(self):
-        return self._load_yaml('accounts.yaml', 'controllers')
-
-    def credentials(self):
-        return self._load_yaml('credentials.yaml', 'credentials')
-
-    def load_credential(self, cloud, name=None):
-        """Load a local credential.
-
-        :param str cloud: Name of cloud to load credentials from.
-        :param str name: Name of credential. If None, the default credential
-            will be used, if available.
-        :returns: A CloudCredential instance, or None.
-        """
-        try:
-            cloud = tag.untag('cloud-', cloud)
-            creds_data = self.credentials()[cloud]
-            if not name:
-                default_credential = creds_data.pop('default-credential', None)
-                default_region = creds_data.pop('default-region', None)  # noqa
-                if default_credential:
-                    name = creds_data['default-credential']
-                elif len(creds_data) == 1:
-                    name = list(creds_data)[0]
-                else:
-                    return None, None
-            cred_data = creds_data[name]
-            auth_type = cred_data.pop('auth-type')
-            return name, client.CloudCredential(
-                auth_type=auth_type,
-                attrs=cred_data,
-            )
-        except (KeyError, FileNotFoundError):
-            return None, None
-
-    def _load_yaml(self, filename, key):
-        filepath = os.path.join(self.path, filename)
-        with io.open(filepath, 'rt') as f:
-            return yaml.safe_load(f)[key]
 
 
 def get_macaroons(controller_name=None):
