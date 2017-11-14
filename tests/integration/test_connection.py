@@ -38,9 +38,13 @@ async def test_monitor_catches_error(event_loop):
 
         assert conn.monitor.status == 'connected'
         try:
+            # grab the reconnect lock to prevent automatic
+            # reconnecting during the test
             async with conn.monitor.reconnecting:
-                await conn.ws.close()
-                await asyncio.sleep(1)
+                await conn.ws.close()  # this could be racey with reconnect
+                # if auto-reconnect is not disabled by lock, force this
+                # test to fail by deferring to the reconnect task via sleep
+                await asyncio.sleep(0.1)
                 assert conn.monitor.status == 'error'
         finally:
             await conn.close()
