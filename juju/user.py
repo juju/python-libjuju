@@ -1,5 +1,5 @@
 import logging
-from dateutil.parser import parse as parse_date
+import pyrfc3339
 
 from . import tag
 
@@ -25,7 +25,7 @@ class User(object):
 
     @property
     def last_connection(self):
-        return parse_date(self._user_info.last_connection)
+        return pyrfc3339.parse(self._user_info.last_connection)
 
     @property
     def access(self):

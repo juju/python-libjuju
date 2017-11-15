@@ -1,6 +1,6 @@
 import logging
 
-from dateutil.parser import parse as parse_date
+import pyrfc3339
 
 from . import model
 from .client import client
@@ -21,7 +21,7 @@ class Unit(model.ModelEntity):
         """Get the time when the `agent_status` was last updated.
 
         """
-        return parse_date(self.safe_data['agent-status']['since'])
+        return pyrfc3339.parse(self.safe_data['agent-status']['since'])
 
     @property
     def agent_status_message(self):
@@ -42,7 +42,7 @@ class Unit(model.ModelEntity):
         """Get the time when the `workload_status` was last updated.
 
         """
-        return parse_date(self.safe_data['workload-status']['since'])
+        return pyrfc3339.parse(self.safe_data['workload-status']['since'])
 
     @property
     def workload_status_message(self):
