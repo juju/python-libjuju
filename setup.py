@@ -33,7 +33,7 @@ setup(
         'websockets',
         'pyyaml',
         'theblues',
-        'python-dateutil'
+        'pyRFC3339>=1.0,<2.0',
     ],
     include_package_data=True,
     maintainer='Juju Ecosystem Engineering',
