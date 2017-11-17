@@ -6,6 +6,7 @@ import unittest
 
 from juju import constraints
 
+
 class TestConstraints(unittest.TestCase):
 
     def test_mem_regex(self):

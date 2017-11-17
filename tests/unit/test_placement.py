@@ -5,7 +5,7 @@
 import unittest
 
 from juju import placement
-from juju.client import client
+
 
 class TestPlacement(unittest.TestCase):
 
