@@ -17,7 +17,7 @@ from juju import loop
 
 async def main():
     controller = Controller()
-    await controller.connect_current()
+    await controller.connect()
     model = await controller.add_model(
         'my-test-model',
         'aws',

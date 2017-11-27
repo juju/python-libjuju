@@ -9,7 +9,7 @@ from .. import base
 @pytest.mark.asyncio
 async def test_user_info(event_loop):
     async with base.CleanModel() as model:
-        controller_conn = await model.connection.controller()
+        controller_conn = await model.connection().controller()
 
         um = client.UserManagerFacade.from_connection(controller_conn)
         result = await um.UserInfo(

@@ -27,7 +27,7 @@ async def run_action(unit):
 
 async def main():
     model = Model()
-    await model.connect_current()
+    await model.connect()
     await model.reset(force=True)
 
     app = await model.deploy(

@@ -11,7 +11,7 @@ from juju import loop
 
 async def main():
     model = Model()
-    await model.connect_current()
+    await model.connect()
     await model.reset(force=True)
 
     goal_state = Model.from_yaml('bundle-like-thing')

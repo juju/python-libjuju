@@ -19,7 +19,7 @@ LOG = getLogger(__name__)
 async def main():
     controller = Controller()
     print("Connecting to controller")
-    await controller.connect_current()
+    await controller.connect()
 
     try:
         model_name = "addmodeltest-{}".format(uuid.uuid4())

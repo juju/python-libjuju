@@ -30,10 +30,11 @@ setup(
     packages=find_packages(
         exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
     install_requires=[
-        'websockets',
+        'macaroonbakery<1.0',
+        'pyRFC3339>=1.0,<2.0',
         'pyyaml',
         'theblues',
-        'pyRFC3339>=1.0,<2.0',
+        'websockets',
     ],
     include_package_data=True,
     maintainer='Juju Ecosystem Engineering',

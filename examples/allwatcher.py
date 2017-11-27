@@ -16,7 +16,7 @@ from juju import loop
 
 
 async def watch():
-    conn = await Connection.connect_current()
+    conn = await Connection.connect()
     allwatcher = client.AllWatcherFacade.from_connection(conn)
     while True:
         change = await allwatcher.Next()

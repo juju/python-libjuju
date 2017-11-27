@@ -13,7 +13,7 @@ from juju import loop
 
 async def report_leadership():
     model = Model()
-    await model.connect_current()
+    await model.connect()
 
     print("Leadership: ")
     for app in model.applications.values():

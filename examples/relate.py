@@ -40,7 +40,7 @@ class MyModelObserver(ModelObserver):
 
 async def main():
     model = Model()
-    await model.connect_current()
+    await model.connect()
 
     model.add_observer(MyRemoveObserver())
     await model.reset(force=True)

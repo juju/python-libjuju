@@ -19,7 +19,7 @@ GB = 1024
 
 async def main():
     model = Model()
-    await model.connect_current()
+    await model.connect()
 
     try:
         # add a new default machine

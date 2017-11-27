@@ -19,7 +19,7 @@ MB = 1
 
 async def main():
     model = Model()
-    await model.connect_current()
+    await model.connect()
     await model.reset(force=True)
 
     ubuntu_app = await model.deploy(

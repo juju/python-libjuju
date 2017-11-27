@@ -123,7 +123,7 @@ async def test_relate(event_loop):
 
 async def _deploy_in_loop(new_loop, model_name):
     new_model = Model(new_loop)
-    await new_model.connect_model(model_name)
+    await new_model.connect(model_name)
     try:
         await new_model.deploy('cs:xenial/ubuntu')
         assert 'ubuntu' in new_model.applications
@@ -208,9 +208,9 @@ async def test_get_machines(event_loop):
 @pytest.mark.asyncio
 async def test_watcher_reconnect(event_loop):
     async with base.CleanModel() as model:
-        await model.connection.ws.close()
+        await model.connection().ws.close()
         await asyncio.sleep(0.1)
-        assert model.connection.is_open
+        assert model.is_connected()
 
 
 @base.bootstrapped
