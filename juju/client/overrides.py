@@ -2,8 +2,8 @@ from collections import namedtuple
 import re
 
 from .facade import ReturnMapping, Type, TypeEncoder
-from .import _client
-from .import _definitions
+from . import _client
+from . import _definitions
 
 
 __all__ = [
