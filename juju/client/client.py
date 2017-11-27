@@ -1,7 +1,7 @@
 '''Replace auto-generated classes with our own, where necessary.
 '''
 
-from . import _client, _definitions, overrides # isort:skip
+from . import _client, _definitions, overrides  # isort:skip
 
 for o in overrides.__all__:
     if "Facade" not in o:

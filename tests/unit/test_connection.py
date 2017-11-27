@@ -32,7 +32,7 @@ class WebsocketMock:
 
 @pytest.mark.asyncio
 async def test_out_of_order(event_loop):
-    con = Connection(*[None]*4)
+    con = Connection(*[None] * 4)
     ws = WebsocketMock([
         {'request-id': 1},
         {'request-id': 3},

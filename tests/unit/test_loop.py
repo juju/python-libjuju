@@ -16,6 +16,7 @@ class TestLoop(unittest.TestCase):
 
     def test_run(self):
         assert asyncio.get_event_loop() == self.loop
+
         async def _test():
             return 'success'
         self.assertEqual(juju.loop.run(_test()), 'success')

@@ -58,7 +58,7 @@ async def test_juju_error_in_result(event_loop):
     looking at a single result coming back.
 
     '''
-    from juju.errors import JujuError    
+    from juju.errors import JujuError
     from juju.client import client
 
     async with base.CleanModel() as model:
