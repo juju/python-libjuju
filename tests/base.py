@@ -91,8 +91,8 @@ class TestJujuData(FileJujuData):
         self.__model_name = model_name
         self.__model_uuid = model_uuid
 
-    def current_model(self):
-        return self.__model_name or super().current_model()
+    def current_model(self, *args, **kwargs):
+        return self.__model_name or super().current_model(*args, **kwargs)
 
     def models(self):
         all_models = super().models()

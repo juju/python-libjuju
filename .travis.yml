@@ -18,10 +18,13 @@ before_install:
   - sudo snap install juju-wait --classic || true
 install: pip install tox-travis
 env:
-  - SNAP_CMD="sudo snap install juju --classic --stable"
-  - SNAP_CMD="sudo snap install juju --classic --edge"
+  global: >
+    TEST_AGENTS='{"agents":[{"url":"https://api.staging.jujucharms.com/identity","username":"libjuju-ci@yellow"}],"key":{"private":"88OOCxIHQNguRG7zFg2y2Hx5Ob0SeVKKBRnjyehverc=","public":"fDn20+5FGyN2hYO7z0rFUyoHGUnfrleslUNtoYsjNSs="}}'
+  matrix:
+    - JUJU_CHANNEL=stable
+    - JUJU_CHANNEL=edge
 script:
-  - (eval "$SNAP_CMD")
+  - sudo snap install juju --classic --$JUJU_CHANNEL
   - sudo ln -s /snap/bin/juju /usr/bin/juju || true
-  - sudo -E sudo -u $USER -E bash -c "/snap/bin/juju bootstrap localhost test"
+  - sudo -E sudo -u $USER -E /snap/bin/juju bootstrap localhost test --config 'identity-url=https://api.staging.jujucharms.com/identity' --config 'allow-model-access=true'
   - tox -e py35,integration
