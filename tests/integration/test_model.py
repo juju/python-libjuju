@@ -1,11 +1,13 @@
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+
+from juju.client.client import ConfigValue
+from juju.model import Model
+
 import pytest
 
 from .. import base
-from juju.model import Model
-from juju.client.client import ConfigValue
 
 MB = 1
 GB = 1024
@@ -43,7 +45,7 @@ async def test_deploy_channels_revs(event_loop):
         charm = 'cs:~johnsca/libjuju-test'
         stable = await model.deploy(charm, 'a1')
         edge = await model.deploy(charm, 'a2', channel='edge')
-        rev = await model.deploy(charm+'-2', 'a3')
+        rev = await model.deploy(charm + '-2', 'a3')
 
         assert [a.charm_url for a in (stable, edge, rev)] == [
             'cs:~johnsca/libjuju-test-1',
@@ -155,7 +157,7 @@ async def test_store_resources_charm(event_loop):
             lambda: (
                 len(ghost.units) > 0 and
                 ghost.units[0].workload_status in terminal_statuses)
-            )
+        )
         # ghost will go in to blocked (or error, for older
         # charm revs) if the resource is missing
         assert ghost.units[0].workload_status == 'active'
@@ -174,7 +176,7 @@ async def test_store_resources_bundle(event_loop):
             lambda: (
                 len(ghost.units) > 0 and
                 ghost.units[0].workload_status in terminal_statuses)
-            )
+        )
         # ghost will go in to blocked (or error, for older
         # charm revs) if the resource is missing
         assert ghost.units[0].workload_status == 'active'

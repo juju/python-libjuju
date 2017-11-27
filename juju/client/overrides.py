@@ -1,10 +1,8 @@
-from collections import namedtuple
 import re
+from collections import namedtuple
 
+from . import _client, _definitions
 from .facade import ReturnMapping, Type, TypeEncoder
-from .import _client
-from .import _definitions
-
 
 __all__ = [
     'Delta',

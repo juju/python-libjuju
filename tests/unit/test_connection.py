@@ -1,13 +1,14 @@
 import asyncio
 import json
-import mock
-import pytest
 from collections import deque
 
+import mock
+from juju.client.connection import Connection
 from websockets.exceptions import ConnectionClosed
 
+import pytest
+
 from .. import base
-from juju.client.connection import Connection
 
 
 class WebsocketMock:
@@ -31,7 +32,7 @@ class WebsocketMock:
 
 @pytest.mark.asyncio
 async def test_out_of_order(event_loop):
-    con = Connection(*[None]*4)
+    con = Connection(*[None] * 4)
     ws = WebsocketMock([
         {'request-id': 1},
         {'request-id': 3},

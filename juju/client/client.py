@@ -1,8 +1,7 @@
 '''Replace auto-generated classes with our own, where necessary.
 '''
 
-from . import _client, _definitions, overrides
-
+from . import _client, _definitions, overrides  # isort:skip
 
 for o in overrides.__all__:
     if "Facade" not in o:
@@ -31,4 +30,4 @@ for o in overrides.__patches__:
             if not a.startswith('_'):
                 setattr(c_type, a, getattr(o_type, a))
 
-from ._client import *  # noqa
+from ._client import *  # noqa, isort:skip

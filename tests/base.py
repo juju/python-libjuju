@@ -1,11 +1,11 @@
-import mock
 import subprocess
 import uuid
 
-import pytest
-
-from juju.controller import Controller
+import mock
 from juju.client.connection import JujuData
+from juju.controller import Controller
+
+import pytest
 
 
 def is_bootstrapped():
@@ -13,6 +13,7 @@ def is_bootstrapped():
     return (
         result.returncode == 0 and
         len(result.stdout.decode().strip()) > 0)
+
 
 bootstrapped = pytest.mark.skipif(
     not is_bootstrapped(),

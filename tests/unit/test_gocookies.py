@@ -8,7 +8,6 @@ import unittest
 import urllib.request
 
 import pyrfc3339
-
 from juju.client.gocookies import GoCookieJar
 
 # cookie_content holds the JSON contents of a Go-produced

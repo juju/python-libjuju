@@ -1,10 +1,12 @@
 import asyncio
-import pytest
 import uuid
 
-from .. import base
 from juju.controller import Controller
 from juju.errors import JujuAPIError
+
+import pytest
+
+from .. import base
 
 
 @base.bootstrapped

@@ -1,7 +1,7 @@
 import asyncio
-import pytest
-
 from tempfile import NamedTemporaryFile
+
+import pytest
 
 from .. import base
 

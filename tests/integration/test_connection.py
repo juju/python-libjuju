@@ -1,8 +1,10 @@
 import asyncio
+
+from juju.client import client
+from juju.client.connection import Connection
+
 import pytest
 
-from juju.client.connection import Connection
-from juju.client import client
 from .. import base
 
 

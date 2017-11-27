@@ -1,3 +1,4 @@
+import asyncio
 import base64
 import json
 import logging
@@ -5,17 +6,15 @@ import random
 import ssl
 import string
 import weakref
-import websockets
 from concurrent.futures import CancelledError
 from http.client import HTTPSConnection
 from pathlib import Path
 
-import asyncio
-
+import websockets
 from juju import tag, utils
 from juju.client import client
 from juju.client.jujudata import JujuData
-from juju.errors import JujuError, JujuAPIError, JujuConnectionError
+from juju.errors import JujuAPIError, JujuConnectionError, JujuError
 from juju.utils import IdQueue
 
 log = logging.getLogger("websocket")

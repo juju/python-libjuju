@@ -1,11 +1,8 @@
 import asyncio
 import logging
 
-from . import errors
-from . import tag
-from . import utils
-from .client import client
-from .client import connection
+from . import errors, tag, utils
+from .client import client, connection
 from .client.jujudata import JujuData
 from .model import Model
 from .user import User
