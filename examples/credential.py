@@ -7,7 +7,7 @@ async def main(cloud_name, credential_name):
     controller = Controller()
     model = None
     print('Connecting to controller')
-    await controller.connect_current()
+    await controller.connect()
     try:
         print('Adding model')
         model = await controller.add_model(

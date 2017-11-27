@@ -5,7 +5,7 @@ from juju.client.client import ClientFacade
 from juju import loop
 
 async def status():
-    conn = await Connection.connect_current()
+    conn = await Connection.connect()
     client = ClientFacade.from_connection(conn)
 
     patterns = None

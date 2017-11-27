@@ -41,7 +41,13 @@ class TypeFactory:
         @param connection: initialized Connection object.
 
         """
-        version = connection.facades[cls.__name__[:-6]]
+        facade_name = cls.__name__
+        if not facade_name.endswith('Facade'):
+           raise TypeError('Unexpected class name: {}'.format(facade_name))
+        facade_name = facade_name[:-len('Facade')]
+        version = connection.facades.get(facade_name)
+        if version is None:
+            raise Exception('No facade {} in facades {}'.format(facade_name, connection.facades))
 
         c = lookup_facade(cls.__name__, version)
         c = c()

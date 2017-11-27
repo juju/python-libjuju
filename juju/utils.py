@@ -46,6 +46,7 @@ async def read_ssh_key(loop):
     can be passed on to a model.
 
     '''
+    loop = loop or asyncio.get_event_loop()
     return await loop.run_in_executor(None, _read_ssh_key)
 
 

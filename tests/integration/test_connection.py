@@ -10,21 +10,10 @@ from .. import base
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_connect_current(event_loop):
-    async with base.CleanModel():
-        conn = await Connection.connect_current()
-
-        assert isinstance(conn, Connection)
-        await conn.close()
-
-
-@base.bootstrapped
-@pytest.mark.asyncio
 async def test_monitor(event_loop):
 
-    async with base.CleanModel():
-        conn = await Connection.connect_current()
-
+    async with base.CleanModel() as model:
+        conn = model.connection()
         assert conn.monitor.status == 'connected'
         await conn.close()
 
@@ -36,7 +25,7 @@ async def test_monitor(event_loop):
 async def test_monitor_catches_error(event_loop):
 
     async with base.CleanModel() as model:
-        conn = model.connection
+        conn = model.connection()
 
         assert conn.monitor.status == 'connected'
         try:
@@ -59,7 +48,7 @@ async def test_full_status(event_loop):
             channel='stable',
         )
 
-        c = client.ClientFacade.from_connection(model.connection)
+        c = client.ClientFacade.from_connection(model.connection())
 
         await c.FullStatus(None)
 
@@ -68,15 +57,8 @@ async def test_full_status(event_loop):
 @pytest.mark.asyncio
 async def test_reconnect(event_loop):
     async with base.CleanModel() as model:
-        conn = await Connection.connect(
-            model.connection.endpoint,
-            model.connection.uuid,
-            model.connection.username,
-            model.connection.password,
-            model.connection.cacert,
-            model.connection.macaroons,
-            model.connection.loop,
-            model.connection.max_frame_size)
+        endpoint, kwargs = model.connection().connect_params()
+        conn = await Connection.connect(endpoint, **kwargs)
         try:
             await asyncio.sleep(0.1)
             assert conn.is_open

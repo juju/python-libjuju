@@ -13,7 +13,7 @@ from juju.model import Model
 async def main():
     model = Model()
     print('Connecting to model')
-    await model.connect_current()
+    await model.connect()
 
     try:
         print('Deploying ubuntu')

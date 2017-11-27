@@ -15,7 +15,7 @@ from juju import loop
 
 async def main():
     model = Model()
-    await model.connect_current()
+    await model.connect()
 
     # Deploy a local charm using a path to the charm directory
     await model.deploy(

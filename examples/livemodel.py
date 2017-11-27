@@ -21,7 +21,7 @@ async def on_model_change(delta, old, new, model):
 
 async def watch_model():
     model = Model()
-    await model.connect_current()
+    await model.connect()
 
     model.add_observer(on_model_change)
 

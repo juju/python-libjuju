@@ -2,7 +2,7 @@ import subprocess
 import uuid
 
 import mock
-from juju.client.connection import JujuData
+from juju.client.jujudata import JujuData
 from juju.controller import Controller
 
 import pytest
@@ -26,7 +26,7 @@ class CleanController():
 
     async def __aenter__(self):
         self.controller = Controller()
-        await self.controller.connect_current()
+        await self.controller.connect()
         return self.controller
 
     async def __aexit__(self, exc_type, exc, tb):
@@ -47,7 +47,7 @@ class CleanModel():
         juju_data = JujuData()
         self.controller_name = juju_data.current_controller()
         self.user_name = juju_data.accounts()[self.controller_name]['user']
-        await self.controller.connect_controller(self.controller_name)
+        await self.controller.connect(self.controller_name)
 
         self.model_name = 'test-{}'.format(uuid.uuid4())
         self.model = await self.controller.add_model(self.model_name)

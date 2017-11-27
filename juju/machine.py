@@ -169,6 +169,8 @@ class Machine(model.ModelEntity):
             'scp',
             '-i', os.path.expanduser('~/.local/share/juju/ssh/juju_id_rsa'),
             '-o', 'StrictHostKeyChecking=no',
+            '-q',
+            '-B',
             source, destination
         ]
         cmd += scp_opts.split()
