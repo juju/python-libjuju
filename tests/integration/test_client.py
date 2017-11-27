@@ -1,6 +1,6 @@
-import pytest
-
 from juju.client import client
+
+import pytest
 
 from .. import base
 

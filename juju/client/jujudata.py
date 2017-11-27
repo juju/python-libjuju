@@ -1,9 +1,9 @@
-import os
-import yaml
 import io
+import os
 
-from juju import tag
 import juju.client.client as jujuclient
+import yaml
+from juju import tag
 from juju.errors import JujuError
 
 

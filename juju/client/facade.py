@@ -1,16 +1,16 @@
 import argparse
 import builtins
-from collections import defaultdict
 import functools
-from glob import glob
 import json
 import keyword
-from pathlib import Path
 import pprint
 import re
 import textwrap
-from typing import Sequence, Mapping, TypeVar, Any, Union
 import typing
+from collections import defaultdict
+from glob import glob
+from pathlib import Path
+from typing import Any, Mapping, Sequence, TypeVar, Union
 
 from . import codegen
 

@@ -1,11 +1,13 @@
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+
+from juju.client.client import ConfigValue
+from juju.model import Model
+
 import pytest
 
 from .. import base
-from juju.model import Model
-from juju.client.client import ConfigValue
 
 MB = 1
 GB = 1024

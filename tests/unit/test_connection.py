@@ -1,13 +1,14 @@
 import asyncio
 import json
-import mock
-import pytest
 from collections import deque
 
+import mock
+from juju.client.connection import Connection
 from websockets.exceptions import ConnectionClosed
 
+import pytest
+
 from .. import base
-from juju.client.connection import Connection
 
 
 class WebsocketMock:

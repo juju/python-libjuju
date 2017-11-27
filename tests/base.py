@@ -1,11 +1,11 @@
-import mock
 import subprocess
 import uuid
 
-import pytest
-
-from juju.controller import Controller
+import mock
 from juju.client.connection import JujuData
+from juju.controller import Controller
+
+import pytest
 
 
 def is_bootstrapped():

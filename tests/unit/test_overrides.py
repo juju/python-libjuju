@@ -1,6 +1,6 @@
-import pytest
+from juju.client.overrides import Binary, Number  # noqa
 
-from juju.client.overrides import Number, Binary  # noqa
+import pytest
 
 
 # test cases ported from:

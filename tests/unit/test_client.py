@@ -4,8 +4,6 @@ Tests for generated client code
 """
 
 import mock
-
-
 from juju.client import client
 
 
