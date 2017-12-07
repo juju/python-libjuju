@@ -63,7 +63,7 @@ class JujuData:
         if not controller_name:
             controller_name = self.current_controller()
         if not model_name:
-            model_name = self.current_model(controller_name)
+            model_name = self.current_model(controller_name).split(':')[1]
 
         if '/' not in model_name:
             # model name doesn't include a user prefix, so add one

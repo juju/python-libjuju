@@ -143,6 +143,14 @@ class ModelState:
         """
         return self._live_entity_map('unit')
 
+    @property
+    def relations(self):
+        """Return a map of relation-id:Relation for all relations currently in
+        the model.
+
+        """
+        return self._live_entity_map('relation')
+
     def entity_history(self, entity_type, entity_id):
         """Return the history deque for an entity.
 
@@ -589,6 +597,13 @@ class Model:
         """
         return self.state.units
 
+    @property
+    def relations(self):
+        """Return a list of all Relations currently in the model.
+
+        """
+        return list(self.state.relations.values())
+
     async def get_info(self):
         """Return a client.ModelInfo object for this Model.
 
@@ -768,24 +783,19 @@ class Model:
         # 'remove' action
         return self.state._live_entity_map(entity_type).get(entity_id)
 
-    async def _wait_for_new(self, entity_type, entity_id=None, predicate=None):
+    async def _wait_for_new(self, entity_type, entity_id):
         """Wait for a new object to appear in the Model and return it.
 
-        Waits for an object of type ``entity_type`` with id ``entity_id``.
-        If ``entity_id`` is ``None``, it will wait for the first new entity
-        of the correct type.
-
-        This coroutine blocks until the new object appears in the model.
+        Waits for an object of type ``entity_type`` with id ``entity_id``
+        to appear in the model.  This is similar to watching for the
+        object using ``block_until``, but uses the watcher rather than
+        polling.
 
         """
         # if the entity is already in the model, just return it
         if entity_id in self.state._live_entity_map(entity_type):
             return self.state._live_entity_map(entity_type)[entity_id]
-        # if we know the entity_id, we can trigger on any action that puts
-        # the enitty into the model; otherwise, we have to watch for the
-        # next "add" action on that entity_type
-        action = 'add' if entity_id is None else None
-        return await self._wait(entity_type, entity_id, action, predicate)
+        return await self._wait(entity_type, entity_id, None)
 
     async def wait_for_action(self, action_id):
         """Given an action, wait for it to complete."""
@@ -904,19 +914,30 @@ class Model:
         except JujuAPIError as e:
             if 'relation already exists' not in e.message:
                 raise
-            log.debug(
-                'Relation %s <-> %s already exists', relation1, relation2)
-            # TODO: if relation already exists we should return the
-            # Relation ModelEntity here
-            return None
+            requested = sorted([relation1.split(':'), relation2.split(':')])
+            for rel in self.relations:
+                for req, key in zip(requested, rel.key.split()):
+                    req_app = req[0]
+                    req_end = req[1] if len(req) > 1 else None
+                    key_app = key[0]
+                    key_end = key[1]
+                    if req_app == key_app and req_end in (key_end, None):
+                        return rel
+            raise JujuError('Relation {} {} exists but not in model'.format(
+                relation1, relation2))
 
-        def predicate(delta):
-            endpoints = {}
-            for endpoint in delta.data['endpoints']:
-                endpoints[endpoint['application-name']] = endpoint['relation']
-            return endpoints == result.endpoints
+        key = ' '.join(sorted('{}:{}'.format(app, data['name'])
+                              for app, data in result.endpoints.items()))
 
-        return await self._wait_for_new('relation', None, predicate)
+        def added_relation():
+            relations = [rel for rel in self.relations if rel.key == key]
+            if relations:
+                return relations[0]
+            else:
+                return None
+
+        await self.block_until(added_relation)
+        return added_relation()
 
     def add_space(self, name, *cidrs):
         """Add a new network space.
