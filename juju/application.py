@@ -53,10 +53,7 @@ class Application(model.ModelEntity):
 
     @property
     def relations(self):
-        return [
-            rel for rel in self.model.relations
-            if self.name in {app.name for app in rel.applications}
-        ]
+        return [rel for rel in self.model.relations if rel.matches(self.name)]
 
     def related_applications(self, endpoint_name=None):
         apps = {}

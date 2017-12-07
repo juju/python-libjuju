@@ -935,35 +935,28 @@ class Model:
         log.debug(
             'Adding relation %s <-> %s', relation1, relation2)
 
+        def _find_relation(*specs):
+            for rel in self.relations:
+                if rel.matches(*specs):
+                    return rel
+            return None
+
         try:
             result = await app_facade.AddRelation([relation1, relation2])
         except JujuAPIError as e:
             if 'relation already exists' not in e.message:
                 raise
-            requested = sorted([relation1.split(':'), relation2.split(':')])
-            for rel in self.relations:
-                for req, key in zip(requested, rel.key.split()):
-                    req_app = req[0]
-                    req_end = req[1] if len(req) > 1 else None
-                    key_app = key[0]
-                    key_end = key[1]
-                    if req_app == key_app and req_end in (key_end, None):
-                        return rel
+            rel = _find_relation(relation1, relation2)
+            if rel:
+                return rel
             raise JujuError('Relation {} {} exists but not in model'.format(
                 relation1, relation2))
 
-        key = ' '.join(sorted('{}:{}'.format(app, data['name'])
-                              for app, data in result.endpoints.items()))
+        specs = ['{}:{}'.format(app, data['name'])
+                 for app, data in result.endpoints.items()]
 
-        def added_relation():
-            relations = [rel for rel in self.relations if rel.key == key]
-            if relations:
-                return relations[0]
-            else:
-                return None
-
-        await self.block_until(added_relation)
-        return added_relation()
+        await self.block_until(lambda: _find_relation(*specs) is not None)
+        return _find_relation(*specs)
 
     def add_space(self, name, *cidrs):
         """Add a new network space.
