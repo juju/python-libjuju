@@ -713,7 +713,10 @@ class Model:
                             # closed on request, go ahead and shutdown
                             break
                     if self._watch_stopping.is_set():
-                        await allwatcher.Stop()
+                        try:
+                            await allwatcher.Stop()
+                        except websockets.ConnectionClosed:
+                            pass  # can't stop on a closed conn
                         break
                     for delta in results.deltas:
                         delta = get_entity_delta(delta)

@@ -246,13 +246,14 @@ class Connection:
                 pass
 
         pinger_facade = client.PingerFacade.from_connection(self)
-        while True:
-            await utils.run_with_interrupt(
-                _do_ping(),
-                self.monitor.close_called,
-                loop=self.loop)
-            if self.monitor.close_called.is_set():
-                break
+        while self.monitor.status == Monitor.CONNECTED:
+            try:
+                await utils.run_with_interrupt(
+                    _do_ping(),
+                    self.monitor.close_called,
+                    loop=self.loop)
+            except websockets.ConnectionClosed:
+                pass
 
     async def rpc(self, msg, encoder=None):
         '''Make an RPC to the API. The message is encoded as JSON
