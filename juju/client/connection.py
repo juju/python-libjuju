@@ -452,7 +452,7 @@ class Connection:
         success = False
         try:
             await self._connect(endpoints)
-           # It's possible that we may get several discharge-required errors,
+            # It's possible that we may get several discharge-required errors,
             # corresponding to different levels of authentication, so retry
             # a few times.
             for i in range(0, 4):

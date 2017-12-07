@@ -449,6 +449,20 @@ class Model:
         await self._connector.connect_model(model_name)
         await self._after_connect()
 
+    async def connect_model(self, model_name):
+        """
+        .. deprecated:: 0.6.2
+           Use connect instead.
+        """
+        return await self.connect(model_name)
+
+    async def connect_current(self):
+        """
+        .. deprecated:: 0.6.2
+           Use connect instead.
+        """
+        return await self.connect()
+
     async def _connect_direct(self, *args, **kwargs):
         await self.disconnect()
         await self._connector.connect(*args, **kwargs)
