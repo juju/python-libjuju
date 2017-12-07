@@ -10,6 +10,7 @@ from juju.utils import run_with_interrupt
 import pytest
 
 from .. import base
+from juju.utils import block_until
 
 MB = 1
 GB = 1024
@@ -238,8 +239,7 @@ async def test_get_machines(event_loop):
 async def test_watcher_reconnect(event_loop):
     async with base.CleanModel() as model:
         await model.connection().ws.close()
-        await asyncio.sleep(0.1)
-        assert model.is_connected()
+        await block_until(model.is_connected, timeout=3)
 
 
 @base.bootstrapped

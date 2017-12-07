@@ -414,6 +414,7 @@ class Model:
         self._watch_stopping = asyncio.Event(loop=self._connector.loop)
         self._watch_stopped = asyncio.Event(loop=self._connector.loop)
         self._watch_received = asyncio.Event(loop=self._connector.loop)
+        self._watch_stopped.set()
         self._charmstore = CharmStore(self._connector.loop)
 
     def is_connected(self):
@@ -485,15 +486,16 @@ class Model:
         """Shut down the watcher task and close websockets.
 
         """
-        if not self.is_connected():
-            return
+        if not self._watch_stopped.is_set():
+            log.debug('Stopping watcher task')
+            self._watch_stopping.set()
+            await self._watch_stopped.wait()
+            self._watch_stopping.clear()
 
-        log.debug('Stopping watcher task')
-        self._watch_stopping.set()
-        await self._watch_stopped.wait()
-        log.debug('Closing model connection')
-        await self._connector.disconnect()
-        self.info = None
+        if self.is_connected():
+            log.debug('Closing model connection')
+            await self._connector.disconnect()
+            self.info = None
 
     async def add_local_charm_dir(self, charm_dir, series):
         """Upload a local charm to the model.
@@ -579,13 +581,20 @@ class Model:
     async def block_until(self, *conditions, timeout=None, wait_period=0.5):
         """Return only after all conditions are true.
 
+        Raises `websockets.ConnectionClosed` if disconnected.
         """
-        async def _block():
-            while not all(c() for c in conditions):
-                if not (self.is_connected() and self.connection().is_open):
-                    raise websockets.ConnectionClosed(1006, 'no reason')
-                await asyncio.sleep(wait_period, loop=self._connector.loop)
-        await asyncio.wait_for(_block(), timeout, loop=self._connector.loop)
+        def _disconnected():
+            return not (self.is_connected() and self.connection().is_open)
+
+        def done():
+            return _disconnected() or all(c() for c in conditions)
+
+        await utils.block_until(done,
+                                timeout=timeout,
+                                wait_period=wait_period,
+                                loop=self.loop)
+        if _disconnected():
+            raise websockets.ConnectionClosed(1006, 'no reason')
 
     @property
     def applications(self):
