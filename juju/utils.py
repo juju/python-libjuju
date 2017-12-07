@@ -92,6 +92,10 @@ async def run_with_interrupt(task, event, loop=None):
                                        return_when=asyncio.FIRST_COMPLETED)
     for f in pending:
         f.cancel()
+    exception = [f.exception() for f in done
+                 if f is not event_task and f.exception()]
+    if exception:
+        raise exception[0]
     result = [f.result() for f in done if f is not event_task]
     if result:
         return result[0]
