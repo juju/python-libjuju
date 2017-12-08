@@ -204,7 +204,7 @@ class TestGoCookieJar(unittest.TestCase):
         ]'''
         jar = self.load_jar(content)
         got_expires = tuple(jar)[0].expires
-        want_expires = pyrfc3339.parse('2345-11-15T18:16:08Z').timestamp()
+        want_expires = int(pyrfc3339.parse('2345-11-15T18:16:08Z').timestamp())
         self.assertEqual(got_expires, want_expires)
 
     def load_jar(self, content):

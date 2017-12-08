@@ -72,6 +72,16 @@ class IdQueue:
             await queue.put(value)
 
 
+async def block_until(*conditions, timeout=None, wait_period=0.5, loop=None):
+    """Return only after all conditions are true.
+
+    """
+    async def _block():
+        while not all(c() for c in conditions):
+            await asyncio.sleep(wait_period, loop=loop)
+    await asyncio.wait_for(_block(), timeout, loop=loop)
+
+
 async def run_with_interrupt(task, event, loop=None):
     """
     Awaits a task while allowing it to be interrupted by an `asyncio.Event`.
@@ -92,6 +102,10 @@ async def run_with_interrupt(task, event, loop=None):
                                        return_when=asyncio.FIRST_COMPLETED)
     for f in pending:
         f.cancel()
+    exception = [f.exception() for f in done
+                 if f is not event_task and f.exception()]
+    if exception:
+        raise exception[0]
     result = [f.result() for f in done if f is not event_task]
     if result:
         return result[0]

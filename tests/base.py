@@ -1,3 +1,4 @@
+import inspect
 import subprocess
 import uuid
 
@@ -18,6 +19,8 @@ def is_bootstrapped():
 bootstrapped = pytest.mark.skipif(
     not is_bootstrapped(),
     reason='bootstrapped Juju environment required')
+
+test_run_nonce = uuid.uuid4().hex[-4:]
 
 
 class CleanController():
@@ -43,13 +46,18 @@ class CleanModel():
         self.model_uuid = None
 
     async def __aenter__(self):
+        model_nonce = uuid.uuid4().hex[-4:]
+        frame = inspect.stack()[1]
+        test_name = frame.function.replace('_', '-')
         self.controller = Controller()
         juju_data = JujuData()
         self.controller_name = juju_data.current_controller()
         self.user_name = juju_data.accounts()[self.controller_name]['user']
         await self.controller.connect(self.controller_name)
 
-        self.model_name = 'test-{}'.format(uuid.uuid4())
+        self.model_name = 'test-{}-{}-{}'.format(test_run_nonce,
+                                                 test_name,
+                                                 model_nonce)
         self.model = await self.controller.add_model(self.model_name)
 
         # save the model UUID in case test closes model

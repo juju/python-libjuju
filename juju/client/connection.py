@@ -246,13 +246,14 @@ class Connection:
                 pass
 
         pinger_facade = client.PingerFacade.from_connection(self)
-        while True:
-            await utils.run_with_interrupt(
-                _do_ping(),
-                self.monitor.close_called,
-                loop=self.loop)
-            if self.monitor.close_called.is_set():
-                break
+        while self.monitor.status == Monitor.CONNECTED:
+            try:
+                await utils.run_with_interrupt(
+                    _do_ping(),
+                    self.monitor.close_called,
+                    loop=self.loop)
+            except websockets.ConnectionClosed:
+                pass
 
     async def rpc(self, msg, encoder=None):
         '''Make an RPC to the API. The message is encoded as JSON
@@ -272,6 +273,10 @@ class Connection:
         outgoing = json.dumps(msg, indent=2, cls=encoder)
         log.debug('connection {} -> {}'.format(id(self), outgoing))
         for attempt in range(3):
+            if self.monitor.status == Monitor.DISCONNECTED:
+                # closed cleanly; shouldn't try to reconnect
+                raise websockets.exceptions.ConnectionClosed(
+                    0, 'websocket closed')
             try:
                 await self.ws.send(outgoing)
                 break
@@ -284,6 +289,10 @@ class Connection:
                 # be cancelled when the pinger is cancelled by the reconnect,
                 # and we don't want the reconnect to be aborted halfway through
                 await asyncio.wait([self.reconnect()], loop=self.loop)
+                if self.monitor.status != Monitor.CONNECTED:
+                    # reconnect failed; abort and shutdown
+                    log.error('RPC: Automatic reconnect failed')
+                    raise
         result = await self._recv(msg['request-id'])
         log.debug('connection {} <- {}'.format(id(self), result))
 
@@ -443,7 +452,7 @@ class Connection:
         success = False
         try:
             await self._connect(endpoints)
-           # It's possible that we may get several discharge-required errors,
+            # It's possible that we may get several discharge-required errors,
             # corresponding to different levels of authentication, so retry
             # a few times.
             for i in range(0, 4):

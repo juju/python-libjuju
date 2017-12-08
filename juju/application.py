@@ -52,6 +52,24 @@ class Application(model.ModelEntity):
         ]
 
     @property
+    def relations(self):
+        return [rel for rel in self.model.relations if rel.matches(self.name)]
+
+    def related_applications(self, endpoint_name=None):
+        apps = {}
+        for rel in self.relations:
+            if rel.is_peer:
+                local_ep, remote_ep = rel.endpoints[0]
+            else:
+                def is_us(ep):
+                    return ep.application.name == self.name
+                local_ep, remote_ep = sorted(rel.endpoints, key=is_us)
+            if endpoint_name is not None and endpoint_name != local_ep.name:
+                continue
+            apps[remote_ep.application.name] = remote_ep.application
+        return apps
+
+    @property
     def status(self):
         """Get the application status, as set by the charm's leader.
 

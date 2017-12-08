@@ -14,6 +14,7 @@ class NoConnectionException(Exception):
     and there is no current connection.'''
     pass
 
+
 class Connector:
     '''This class abstracts out a reconnectable client that can connect
     to controllers and models found in the Juju data files.
