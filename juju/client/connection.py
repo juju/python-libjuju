@@ -225,13 +225,13 @@ class Connection:
 
         pinger_facade = client.PingerFacade.from_connection(self)
         try:
-            while True:
+            while self.monitor.status == Monitor.CONNECTED:
                 await utils.run_with_interrupt(
                     _do_ping(),
                     self.monitor.close_called,
                     loop=self.loop)
-                if self.monitor.close_called.is_set():
-                    break
+        except websockets.ConnectionClosed:
+            pass
         finally:
             self.monitor.pinger_stopped.set()
             return
@@ -245,6 +245,10 @@ class Connection:
             msg['version'] = self.facades[msg['type']]
         outgoing = json.dumps(msg, indent=2, cls=encoder)
         for attempt in range(3):
+            if self.monitor.status == Monitor.DISCONNECTED:
+                # closed cleanly; shouldn't try to reconnect
+                raise websockets.exceptions.ConnectionClosed(
+                    0, 'websocket closed')
             try:
                 await self.ws.send(outgoing)
                 break
@@ -257,6 +261,10 @@ class Connection:
                 # be cancelled when the pinger is cancelled by the reconnect,
                 # and we don't want the reconnect to be aborted halfway through
                 await asyncio.wait([self.reconnect()], loop=self.loop)
+                if self.monitor.status != Monitor.CONNECTED:
+                    # reconnect failed; abort and shutdown
+                    log.error('RPC: Automatic reconnect failed')
+                    raise
         result = await self.recv(msg['request-id'])
 
         if not result:

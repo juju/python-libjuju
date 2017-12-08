@@ -1,6 +1,8 @@
 import asyncio
+import mock
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+from juju.utils import run_with_interrupt
 import pytest
 
 from .. import base
@@ -111,10 +113,37 @@ async def test_relate(event_loop):
             # subordinates must be deployed without units
             num_units=0,
         )
-        my_relation = await model.add_relation(
-            'ubuntu',
-            'nrpe',
-        )
+
+        relation_added = asyncio.Event()
+        timeout = asyncio.Event()
+
+        class TestObserver(ModelObserver):
+            async def on_relation_add(self, delta, old, new, model):
+                if set(new.key.split()) == {'nrpe:general-info',
+                                            'ubuntu:juju-info'}:
+                    relation_added.set()
+                    event_loop.call_later(2, timeout.set)
+
+        model.add_observer(TestObserver())
+
+        real_app_facade = ApplicationFacade.from_connection(model.connection())
+        mock_app_facade = mock.MagicMock()
+
+        async def mock_AddRelation(*args):
+            # force response delay from AddRelation to test race condition
+            # (see https://github.com/juju/python-libjuju/issues/191)
+            result = await real_app_facade.AddRelation(*args)
+            await relation_added.wait()
+            return result
+
+        mock_app_facade.AddRelation = mock_AddRelation
+
+        with mock.patch.object(ApplicationFacade, 'from_connection',
+                               return_value=mock_app_facade):
+            my_relation = await run_with_interrupt(model.add_relation(
+                'ubuntu',
+                'nrpe',
+            ), timeout, event_loop)
 
         assert isinstance(my_relation, Relation)
 
@@ -207,8 +236,7 @@ async def test_get_machines(event_loop):
 async def test_watcher_reconnect(event_loop):
     async with base.CleanModel() as model:
         await model.connection.ws.close()
-        await asyncio.sleep(0.1)
-        assert model.connection.is_open
+        await block_until(model.is_connected, timeout=3)
 
 
 @base.bootstrapped
