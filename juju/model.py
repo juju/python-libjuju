@@ -391,22 +391,32 @@ class Model:
     """
     The main API for interacting with a Juju model.
     """
-    def __init__(self, loop=None, max_frame_size=None, bakery_client=None):
+    def __init__(
+        self,
+        loop=None,
+        max_frame_size=None,
+        bakery_client=None,
+        jujudata=None,
+    ):
         """Instantiate a new Model.
 
         The connect method will need to be called before this
         object can be used for anything interesting.
+
+        If jujudata is None, jujudata.FileJujuData will be used.
 
         :param loop: an asyncio event loop
         :param max_frame_size: See
             `juju.client.connection.Connection.MAX_FRAME_SIZE`
         :param bakery_client httpbakery.Client: The bakery client to use
             for macaroon authorization.
+        :param jujudata JujuData: The source for current controller information.
         """
         self._connector = connector.Connector(
             loop=loop,
             max_frame_size=max_frame_size,
             bakery_client=bakery_client,
+            jujudata=jujudata,
         )
         self._observers = weakref.WeakValueDictionary()
         self.state = ModelState(self)

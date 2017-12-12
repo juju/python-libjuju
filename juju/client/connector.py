@@ -3,7 +3,7 @@ import logging
 
 import macaroonbakery.httpbakery as httpbakery
 from juju.client.connection import Connection
-from juju.client.jujudata import JujuData
+from juju.client.jujudata import FileJujuData
 from juju.errors import JujuConnectionError, JujuError
 
 log = logging.getLogger('connector')
@@ -19,7 +19,13 @@ class Connector:
     '''This class abstracts out a reconnectable client that can connect
     to controllers and models found in the Juju data files.
     '''
-    def __init__(self, loop=None, max_frame_size=None, bakery_client=None):
+    def __init__(
+        self,
+        loop=None,
+        max_frame_size=None,
+        bakery_client=None,
+        jujudata=None,
+    ):
         '''Initialize a connector that will use the given parameters
         by default when making a new connection'''
         self.max_frame_size = max_frame_size
@@ -28,7 +34,7 @@ class Connector:
         self._connection = None
         self.controller_name = None
         self.model_name = None
-        self.jujudata = JujuData()
+        self.jujudata = jujudata or FileJujuData()
 
     def is_connected(self):
         '''Report whether there is a currently connected controller or not'''
@@ -110,7 +116,7 @@ class Connector:
         # to that. This will let connect_model work with models that
         # haven't necessarily synced with the local juju data,
         # and also remove the need for base.CleanModel to
-        # patch JujuData.models with a mock.
+        # subclass JujuData.
         await self.connect(
             endpoint=endpoint,
             uuid=models['models'][model_name]['uuid'],

@@ -3,7 +3,6 @@ import logging
 
 from . import errors, tag, utils
 from .client import client, connector
-from .client.jujudata import JujuData
 from .model import Model
 from .user import User
 
@@ -11,22 +10,32 @@ log = logging.getLogger(__name__)
 
 
 class Controller(object):
-    def __init__(self, loop=None, max_frame_size=None, bakery_client=None):
+    def __init__(
+        self,
+        loop=None,
+        max_frame_size=None,
+        bakery_client=None,
+        jujudata=None,
+    ):
         """Instantiate a new Controller.
 
         One of the connect_* methods will need to be called before this
         object can be used for anything interesting.
+
+        If jujudata is None, jujudata.FileJujuData will be used.
 
         :param loop: an asyncio event loop
         :param max_frame_size: See
             `juju.client.connection.Connection.MAX_FRAME_SIZE`
         :param bakery_client httpbakery.Client: The bakery client to use
             for macaroon authorization.
+        :param jujudata JujuData: The source for current controller information.
         """
         self._connector = connector.Connector(
             loop=loop,
             max_frame_size=max_frame_size,
             bakery_client=bakery_client,
+            jujudata=jujudata,
         )
 
     @property
@@ -103,7 +112,7 @@ class Controller(object):
             raise errors.JujuError('Name must be provided for credential')
 
         if not credential:
-            name, credential = JujuData().load_credential(cloud, name)
+            name, credential = self._connector.jujudata.load_credential(cloud, name)
             if credential is None:
                 raise errors.JujuError(
                     'Unable to find credential: {}'.format(name))
