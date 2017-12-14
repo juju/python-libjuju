@@ -62,10 +62,10 @@ async def test_change_user_password(event_loop):
         # Check that we can connect with the new password.
         new_connection = None
         try:
-            endpoint, kwargs = controller.connection().connect_params()
+            kwargs = controller.connection().connect_params()
             kwargs['username'] = username
             kwargs['password'] = 'password'
-            new_connection = await Connection.connect(endpoint, **kwargs)
+            new_connection = await Connection.connect(**kwargs)
         except JujuAPIError:
             raise AssertionError('Unable to connect with new password')
         finally:

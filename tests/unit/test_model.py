@@ -154,3 +154,46 @@ class TestContextManager(asynctest.TestCase):
         with self.assertRaises(JujuConnectionError):
             async with Model():
                 pass
+
+
+class TestModelConnect(asynctest.TestCase):
+    @asynctest.patch('juju.client.connector.Connector.connect_model')
+    @asynctest.patch('juju.model.Model._after_connect')
+    async def test_model_connect_no_args(self, mock_after_connect, mock_connect_model):
+        from juju.model import Model
+        m = Model()
+        await m.connect()
+        mock_connect_model.assert_called_once_with(None)
+
+    @asynctest.patch('juju.client.connector.Connector.connect_model')
+    @asynctest.patch('juju.model.Model._after_connect')
+    async def test_model_connect_with_model_name(self, mock_after_connect, mock_connect_model):
+        from juju.model import Model
+        m = Model()
+        await m.connect(model_name='foo')
+        mock_connect_model.assert_called_once_with('foo')
+
+    @asynctest.patch('juju.client.connector.Connector.connect_model')
+    @asynctest.patch('juju.model.Model._after_connect')
+    async def test_model_connect_with_endpoint_but_no_uuid(
+        self,
+        mock_after_connect,
+        mock_connect_model,
+    ):
+        from juju.model import Model
+        m = Model()
+        with self.assertRaises(ValueError):
+            await m.connect(endpoint='0.1.2.3:4566')
+        self.assertEqual(mock_connect_model.call_count, 0)
+
+    @asynctest.patch('juju.client.connector.Connector.connect')
+    @asynctest.patch('juju.model.Model._after_connect')
+    async def test_model_connect_with_endpoint_and_uuid(
+        self,
+        mock_after_connect,
+        mock_connect,
+    ):
+        from juju.model import Model
+        m = Model()
+        await m.connect(endpoint='0.1.2.3:4566', uuid='some-uuid')
+        mock_connect.assert_called_once_with(endpoint='0.1.2.3:4566', uuid='some-uuid')

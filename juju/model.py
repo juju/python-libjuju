@@ -438,24 +438,37 @@ class Model:
     async def __aexit__(self, exc_type, exc, tb):
         await self.disconnect()
 
-    async def connect(self, model_name=None):
-        """Connect to a specific Juju model by name.
-        If model_name is None or empty, connect to the current
+    async def connect(self, model_name=None, **kwargs):
+        """Connect to a juju model.
+
+        If any arguments are specified other than model_name, then
+        model_name must be None and an explicit connection will be made
+        using Connection.connect using those parameters (the 'uuid'
+        parameter must be specified).
+
+        Otherwise, if model_name is None, connect to the current model.
+
+        Otherwise, model_name must specify the name of a known
         model.
 
         :param model_name:  Format [controller:][user/]model
 
         """
         await self.disconnect()
-        await self._connector.connect_model(model_name)
+        if not kwargs:
+            await self._connector.connect_model(model_name)
+        else:
+            if kwargs.get('uuid') is None:
+                raise ValueError('no UUID specified when connecting to model')
+            await self._connector.connect(**kwargs)
         await self._after_connect()
 
     async def connect_model(self, model_name):
         """
         .. deprecated:: 0.6.2
-           Use connect instead.
+           Use connect(model_name=model_name) instead.
         """
-        return await self.connect(model_name)
+        return await self.connect(model_name=model_name)
 
     async def connect_current(self):
         """
@@ -464,9 +477,9 @@ class Model:
         """
         return await self.connect()
 
-    async def _connect_direct(self, *args, **kwargs):
+    async def _connect_direct(self, **kwargs):
         await self.disconnect()
-        await self._connector.connect(*args, **kwargs)
+        await self._connector.connect(**kwargs)
         await self._after_connect()
 
     async def _after_connect(self):
