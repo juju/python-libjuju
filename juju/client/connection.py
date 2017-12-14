@@ -95,7 +95,7 @@ class Connection:
     @classmethod
     async def connect(
             cls,
-            endpoint,
+            endpoint=None,
             uuid=None,
             username=None,
             password=None,
@@ -124,6 +124,8 @@ class Connection:
         :param max_frame_size The maximum websocket frame size to allow.
         """
         self = cls()
+        if endpoint is None:
+            raise ValueError('no endpoint provided')
         self.uuid = uuid
         if bakery_client is None:
             bakery_client = httpbakery.Client()
