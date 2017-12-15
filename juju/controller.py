@@ -33,11 +33,31 @@ class Controller(object):
     def loop(self):
         return self._connector.loop
 
-    async def connect(self, controller_name=None):
-        """Connect to a Juju controller by name. If controller_name
-        is empty, connect to the current controller.
+    async def connect(self, controller_name=None, **kwargs):
+        """Connect to a Juju controller.
+
+        If any arguments are specified other than controller_name,
+        then controller_name must be None and an explicit
+        connection will be made using Connection.connect
+        using those parameters (the 'uuid' parameter must
+        be absent or None).
+
+        Otherwise, if controller_name is None, connect to the
+        current controller.
+
+        Otherwise, controller_name must specify the name
+        of a known controller.
         """
-        await self._connector.connect_controller(controller_name)
+        await self.disconnect()
+        if not kwargs:
+            await self._connector.connect_controller(controller_name)
+        else:
+            if controller_name is not None:
+                raise ValueError('controller name may not be specified with other connect parameters')
+            if kwargs.get('uuid') is not None:
+                # A UUID implies a model connection, not a controller connection.
+                raise ValueError('model UUID specified when connecting to controller')
+            await self._connector.connect(**kwargs)
 
     def is_connected(self):
         """Reports whether the Controller is currently connected."""
@@ -157,9 +177,9 @@ class Controller(object):
         )
 
         model = Model()
-        endpoint, kwargs = self.connection().connect_params()
+        kwargs = self.connection().connect_params()
         kwargs['uuid'] = model_info.uuid
-        await model._connect_direct(endpoint, **kwargs)
+        await model._connect_direct(**kwargs)
 
         return model
 
@@ -342,9 +362,9 @@ class Controller(object):
             uuid = model
 
         model = Model()
-        endpoint, kwargs = self.connection().connect_params()
+        kwargs = self.connection().connect_params()
         kwargs['uuid'] = uuid
-        await model._connect_direct(endpoint, **kwargs)
+        await model._connect_direct(**kwargs)
         return model
 
     async def get_user(self, username):

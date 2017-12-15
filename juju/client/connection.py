@@ -376,9 +376,7 @@ class Connection:
         as this one.
 
         """
-        endpoint, kwargs = self.connect_params()
-
-        return await Connection.connect(endpoint, **kwargs)
+        return await Connection.connect(**self.connect_params())
 
     def connect_params(self):
         """Return a tuple of parameters suitable for passing to Connection.connect that
@@ -386,19 +384,16 @@ class Connection:
         if specified. The first element in the returned tuple holds the endpoint argument; the other
         holds a dict of the keyword args.
         """
-        # TODO if the connect method took all keyword arguments then this could
-        # be simpler and just return a dict rather than a tuple.
-        return (
-            self.endpoint, {
-                'uuid': self.uuid,
-                'username': self.username,
-                'password': self.password,
-                'cacert': self.cacert,
-                'bakery_client': self.bakery_client,
-                'loop': self.loop,
-                'max_frame_size': self.max_frame_size,
-            }
-        )
+        return {
+            'endpoint': self.endpoint,
+            'uuid': self.uuid,
+            'username': self.username,
+            'password': self.password,
+            'cacert': self.cacert,
+            'bakery_client': self.bakery_client,
+            'loop': self.loop,
+            'max_frame_size': self.max_frame_size,
+        }
 
     async def controller(self):
         """Return a Connection to the controller at self.endpoint

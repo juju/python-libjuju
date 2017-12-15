@@ -57,8 +57,8 @@ async def test_full_status(event_loop):
 @pytest.mark.asyncio
 async def test_reconnect(event_loop):
     async with base.CleanModel() as model:
-        endpoint, kwargs = model.connection().connect_params()
-        conn = await Connection.connect(endpoint, **kwargs)
+        kwargs = model.connection().connect_params()
+        conn = await Connection.connect(**kwargs)
         try:
             await asyncio.sleep(0.1)
             assert conn.is_open
