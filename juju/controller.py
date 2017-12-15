@@ -284,7 +284,25 @@ class Controller(object):
         cloud = list(result.clouds.keys())[0]  # only lives on one cloud
         return tag.untag('cloud-', cloud)
 
-    async def _model_uuids(self, all_=False, username=None):
+    async def get_models(self, all_=False, username=None):
+        """
+        .. deprecated:: 0.6.2
+           Use :meth:`.list_models` instead.
+        """
+        controller_facade = client.ControllerFacade.from_connection(
+            self.connection)
+        for attempt in (1, 2, 3):
+            try:
+                return await controller_facade.AllModels()
+            except errors.JujuAPIError as e:
+                # retry concurrency error until resolved in Juju
+                # see: https://bugs.launchpad.net/juju/+bug/1721786
+                if 'has been removed' not in e.message or attempt == 3:
+                    raise
+
+    async def model_uuids(self):
+        """Return a mapping of model names to UUIDs.
+        """
         controller_facade = client.ControllerFacade.from_connection(
             self.connection)
         for attempt in (1, 2, 3):
@@ -299,15 +317,12 @@ class Controller(object):
                     raise
                 await asyncio.sleep(attempt, loop=self.loop)
 
-    async def list_models(self, all_=False, username=None):
+    async def list_models(self):
         """Return list of names of the available models on this controller.
 
-        :param bool all_: List all models, regardless of user accessibilty
-            (admin use only)
-        :param str username: User for which to list models (admin use only)
-
+        Equivalent to ``sorted((await self.model_uuids()).keys())``
         """
-        uuids = await self._model_uuids(all_, username)
+        uuids = await self.model_uuids()
         return sorted(uuids.keys())
 
     def get_payloads(self, *patterns):
