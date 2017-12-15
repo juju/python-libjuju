@@ -185,7 +185,7 @@ class Controller(object):
             region
         )
 
-        model = Model()
+        model = Model(jujudata=self._connector.jujudata)
         kwargs = self.connection().connect_params()
         kwargs['uuid'] = model_info.uuid
         await model._connect_direct(**kwargs)

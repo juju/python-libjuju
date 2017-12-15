@@ -46,10 +46,10 @@ class CleanModel():
         model_nonce = uuid.uuid4().hex[-4:]
         frame = inspect.stack()[1]
         test_name = frame.function.replace('_', '-')
-        self._controller = Controller()
-        juju_data = TestJujuData()
-        controller_name = juju_data.current_controller()
-        user_name = juju_data.accounts()[controller_name]['user']
+        jujudata = TestJujuData()
+        self._controller = Controller(jujudata=jujudata)
+        controller_name = jujudata.current_controller()
+        user_name = jujudata.accounts()[controller_name]['user']
         await self._controller.connect(controller_name)
 
         model_name = 'test-{}-{}-{}'.format(
@@ -62,9 +62,11 @@ class CleanModel():
         # Change the JujuData instance so that it will return the new
         # model as the current model name, so that we'll connect
         # to it by default.
-        juju_data.__model_name = user_name + "/" + model_name
-        juju_data.__controller_name = controller_name
-        juju_data.__model_uuid = self._model.info.uuid
+        jujudata.set_model(
+            controller_name,
+            user_name + "/" + model_name,
+            self._model.info.uuid,
+        )
 
         # save the model UUID in case test closes model
         self._model_uuid = self._model.info.uuid
@@ -83,6 +85,11 @@ class TestJujuData(FileJujuData):
         self.__model_name = None
         self.__model_uuid = None
         super().__init__()
+
+    def set_model(self, controller_name, model_name, model_uuid):
+        self.__controller_name = controller_name
+        self.__model_name = model_name
+        self.__model_uuid = model_uuid
 
     def current_model(self):
         return self.__model_name or super().current_model()
