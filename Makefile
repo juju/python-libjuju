@@ -29,10 +29,10 @@ docs: .tox
 	cd docs/_build/ && zip -r docs.zip *
 
 release:
-	git remote | xargs -L1 git fetch --tags
+	git fetch --tags
 	$(PY) setup.py sdist upload
 	git tag ${VERSION}
-	git remote | xargs -L1 git push --tags
+	git push --tags
 
 upload: release
 

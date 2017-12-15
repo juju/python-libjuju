@@ -1,6 +1,23 @@
 Change Log
 ----------
 
+0.7.0
+^^^^^
+Fri Dec 15 2017
+
+* Fix race condition in adding relations (#192)
+* Fix race condition in connection monitor test (#183)
+* Fix example in README (#178)
+* Fix rare hang during Unit.run (#177)
+* Fix licensing quirks (#176)
+* Refactor model handling (#171)
+* Refactor users handling, add get_users (#170)
+* Upload credential to controller when adding model (#168)
+* Support 'applications' key in bundles (#165)
+* Improve handling of thread error handling for loop.run() (#169)
+* Fix encoding when using to_json() (#166)
+* Fix intermittent test failures (#167)
+
 0.6.1
 ^^^^^
 Fri Sept 29 2017

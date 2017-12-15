@@ -286,7 +286,7 @@ class Controller(object):
 
     async def get_models(self, all_=False, username=None):
         """
-        .. deprecated:: 0.6.2
+        .. deprecated:: 0.7.0
            Use :meth:`.list_models` instead.
         """
         controller_facade = client.ControllerFacade.from_connection(
