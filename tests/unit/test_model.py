@@ -4,6 +4,8 @@ import mock
 
 import asynctest
 
+from juju.client.jujudata import FileJujuData
+
 
 def _make_delta(entity, type_, data=None):
     from juju.client.client import Delta
@@ -144,15 +146,16 @@ class TestContextManager(asynctest.TestCase):
         self.assertTrue(mock_connect.called)
         self.assertTrue(mock_disconnect.called)
 
-    @asynctest.patch('juju.client.jujudata.JujuData.current_controller')
-    async def test_no_current_connection(self, mock_current_controller):
+    async def test_no_current_connection(self):
         from juju.model import Model
         from juju.errors import JujuConnectionError
 
-        mock_current_controller.return_value = ""
+        class NoControllerJujuData(FileJujuData):
+            def current_controller(self):
+                return ""
 
         with self.assertRaises(JujuConnectionError):
-            async with Model():
+            async with Model(jujudata=NoControllerJujuData()):
                 pass
 
 

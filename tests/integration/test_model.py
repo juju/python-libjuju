@@ -151,8 +151,8 @@ async def test_relate(event_loop):
         assert isinstance(my_relation, Relation)
 
 
-async def _deploy_in_loop(new_loop, model_name):
-    new_model = Model(new_loop)
+async def _deploy_in_loop(new_loop, model_name, jujudata):
+    new_model = Model(new_loop, jujudata=jujudata)
     await new_model.connect(model_name)
     try:
         await new_model.deploy('cs:xenial/ubuntu')
@@ -170,7 +170,7 @@ async def test_explicit_loop_threaded(event_loop):
         with ThreadPoolExecutor(1) as executor:
             f = executor.submit(
                 new_loop.run_until_complete,
-                _deploy_in_loop(new_loop, model_name))
+                _deploy_in_loop(new_loop, model_name, model._connector.jujudata))
             f.result()
         await model._wait_for_new('application', 'ubuntu')
         assert 'ubuntu' in model.applications
