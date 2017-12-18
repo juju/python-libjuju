@@ -1,6 +1,12 @@
 Change Log
 ----------
 
+0.7.1
+^^^^^
+Monday Dec 18 2017
+
+* Fix missed renames of model_uuids (#197)
+
 0.7.0
 ^^^^^
 Fri Dec 15 2017
