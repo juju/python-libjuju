@@ -2,12 +2,12 @@ import asyncio
 import mock
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from juju.utils import run_with_interrupt
+from juju.utils import block_until, run_with_interrupt
 import pytest
 
 from .. import base
-from juju.model import Model
-from juju.client.client import ConfigValue
+from juju.model import Model, ModelObserver
+from juju.client.client import ApplicationFacade, ConfigValue
 
 MB = 1
 GB = 1024
@@ -126,7 +126,7 @@ async def test_relate(event_loop):
 
         model.add_observer(TestObserver())
 
-        real_app_facade = ApplicationFacade.from_connection(model.connection())
+        real_app_facade = ApplicationFacade.from_connection(model.connection)
         mock_app_facade = mock.MagicMock()
 
         async def mock_AddRelation(*args):

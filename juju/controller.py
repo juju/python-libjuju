@@ -183,7 +183,7 @@ class Controller(object):
         :param str \*models: Names or UUIDs of models to destroy
 
         """
-        uuids = await self._model_uuids()
+        uuids = await self.model_uuids()
         models = [uuids[model] if model in uuids else model
                   for model in models]
 
@@ -364,7 +364,7 @@ class Controller(object):
         :param str model: Model name or UUID
 
         """
-        uuids = await self._model_uuids()
+        uuids = await self.model_uuids()
         if model in uuids:
             name_or_uuid = uuids[model]
         else:
