@@ -2,15 +2,20 @@ dist: trusty
 sudo: required
 language: python
 python:
-  - "3.5"
+  - "3.6"
+before_script:
+  - sudo addgroup lxd || true
+  - sudo usermod -a -G lxd $USER || true
+  - sudo ln -s /snap/bin/juju /usr/bin/juju
+  - sudo ln -s /snap/bin/lxc /usr/bin/lxc
 before_install:
-  - sudo add-apt-repository ppa:ubuntu-lxc/lxd-stable -y
+  - sudo add-apt-repository -y ppa:jonathonf/python-3.6
   - sudo add-apt-repository ppa:chris-lea/libsodium -y
   - sudo apt-get update -q
-  - sudo apt-get install lxd snapd libsodium-dev -y
-  - sudo usermod -a -G lxd $USER
-  - sudo service lxd start || true
-  - sudo lxd init --auto
+  - sudo apt-get remove -qy lxd lxd-client
+  - sudo apt-get install snapd libsodium-dev -y
+  - sudo snap install lxd || true
+  - sudo snap install juju-wait --classic || true
 install: pip install tox-travis
 env:
   - SNAP_CMD="sudo snap install juju --classic --stable"
