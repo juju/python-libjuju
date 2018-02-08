@@ -5,12 +5,12 @@ from pathlib import Path
 
 from juju.client.client import ConfigValue, ApplicationFacade
 from juju.model import Model, ModelObserver
-from juju.utils import run_with_interrupt
+from juju.utils import block_until, run_with_interrupt
 
 import pytest
 
 from .. import base
-from juju.utils import block_until
+
 
 MB = 1
 GB = 1024
