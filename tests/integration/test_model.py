@@ -23,11 +23,13 @@ async def test_deploy_local_bundle(event_loop):
     from pathlib import Path
     tests_dir = Path(__file__).absolute().parent.parent
     bundle_path = tests_dir / 'bundle'
+    mini_bundle_file_path = bundle_path / 'mini-bundle.yaml'
 
     async with base.CleanModel() as model:
         await model.deploy(str(bundle_path))
+        await model.deploy(str(mini_bundle_file_path))
 
-        for app in ('wordpress', 'mysql'):
+        for app in ('wordpress', 'mysql', 'myapp'):
             assert app in model.applications
 
 
