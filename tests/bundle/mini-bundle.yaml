@@ -1,0 +1,3 @@
+applications:
+  myapp:
+    charm: cs:xenial/ubuntu-0
