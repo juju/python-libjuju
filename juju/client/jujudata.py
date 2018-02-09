@@ -209,9 +209,11 @@ class FileJujuData(JujuData):
             return data.get(key)
 
     def cookies_for_controller(self, controller_name):
-        f = pathlib.Path(self.path) / 'cookies' / controller_name
+        f = pathlib.Path(self.path) / 'cookies' / (controller_name + '.json')
         if not f.exists():
             f = pathlib.Path('~/.go-cookies').expanduser()
             # TODO if neither cookie file exists, where should
             # we create the cookies?
-        return GoCookieJar(str(f))
+        jar = GoCookieJar(str(f))
+        jar.load()
+        return jar

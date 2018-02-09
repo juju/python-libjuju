@@ -138,3 +138,4 @@ class Connector:
         else:
             bakery_client = httpbakery.Client()
         bakery_client.cookies = self.jujudata.cookies_for_controller(controller_name)
+        return bakery_client

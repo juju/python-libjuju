@@ -10,9 +10,10 @@ from http.client import HTTPSConnection
 
 import macaroonbakery.httpbakery as httpbakery
 import websockets
+from pymacaroons.serializers.json_serializer import JsonSerializer
 from juju import utils
 from juju.client import client
-from juju.errors import JujuAPIError, JujuError
+from juju.errors import JujuAPIError, JujuError, JujuRedirectError
 from juju.utils import IdQueue
 
 log = logging.getLogger("websocket")
@@ -70,7 +71,8 @@ class Monitor:
             return self.DISCONNECTING
 
         # connection closed uncleanly (we didn't call connection.close)
-        if connection._receiver_task.stopped.is_set() or not connection.ws.open:
+        stopped = connection._receiver_task.stopped.is_set()
+        if stopped or not connection.ws.open:
             return self.ERROR
 
         # everything is fine!
@@ -381,10 +383,11 @@ class Connection:
         return await Connection.connect(**self.connect_params())
 
     def connect_params(self):
-        """Return a tuple of parameters suitable for passing to Connection.connect that
-        can be used to make a new connection to the same controller (and model
-        if specified. The first element in the returned tuple holds the endpoint argument; the other
-        holds a dict of the keyword args.
+        """Return a tuple of parameters suitable for passing to
+        Connection.connect that can be used to make a new connection
+        to the same controller (and model if specified. The first
+        element in the returned tuple holds the endpoint argument;
+        the other holds a dict of the keyword args.
         """
         return {
             'endpoint': self.endpoint,
@@ -454,13 +457,22 @@ class Connection:
             # a few times.
             for i in range(0, 4):
                 result = await self.login()
-                macaroonJSON = result.get('discharge-required')
+                response = result['response']
+                macaroonJSON = response.get('discharge-required')
                 if macaroonJSON is None:
-                    self.info = result['response']
+                    self.info = response
                     success = True
                     return result
                 # TODO implement macaroon authentication
-                raise NotImplementedError('macaroon authentication not implemented yet')
+                error_msg = response['discharge-required-error']
+                raise NotImplementedError('Macaroon auth not implemented: '
+                                          '{}'.format(error_msg))
+        except JujuAPIError as e:
+            if e.error_code == 'redirection required':
+                redirect_info = await self.redirect_info()
+                raise JujuRedirectError(redirect_info)
+            else:
+                raise
         finally:
             if not success:
                 await self.close()
@@ -468,18 +480,9 @@ class Connection:
     async def _connect_with_redirect(self, endpoints):
         try:
             login_result = await self._connect_with_login(endpoints)
-        except JujuAPIError as e:
-            if e.error_code != 'redirection required':
-                raise
+        except JujuRedirectError as e:
             log.info('Controller requested redirect')
-            redirect_info = await self.redirect_info()
-            redir_cacert = redirect_info['ca-cert']
-            new_endpoints = [
-                ('{value}:{port}'.format(**s), redir_cacert)
-                for servers in redirect_info['servers']
-                for s in servers if s['scope'] == 'public'
-            ]
-            login_result = await self._connect_with_login(new_endpoints)
+            login_result = await self._connect_with_login(e.endpoints)
         response = login_result['response']
         self._build_facades(response.get('facades', {}))
         self._pinger_task.start()
@@ -491,11 +494,12 @@ class Connection:
 
     async def login(self):
         params = {}
-        if self.usertag:
+        if self.password:
             params['auth-tag'] = self.usertag
             params['credentials'] = self.password
         else:
-            params['macaroons'] = _macaroons_for_domain(self.bakery_client.cookies, self.endpoint)
+            cookies = self.bakery_client.cookies
+            params['macaroons'] = _macaroons_for_domain(cookies, self.endpoint)
 
         return await self.rpc({
             "type": "Admin",
@@ -540,4 +544,12 @@ def _macaroons_for_domain(cookies, domain):
     apply to the given domain name.'''
     req = urllib.request.Request('https://' + domain + '/')
     cookies.add_cookie_header(req)
-    return httpbakery.extract_macaroons(req.headers)
+    headers = dict(req.headers)
+    headers.update(req.unredirected_hdrs)
+    macaroons = httpbakery.extract_macaroons(headers)
+    serializer = JsonSerializer()
+    serialized_macaroons = [
+        [json.loads(macaroon.serialize(serializer)) for macaroon in group]
+        for group in macaroons
+    ]
+    return serialized_macaroons
