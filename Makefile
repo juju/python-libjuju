@@ -1,5 +1,5 @@
-BIN := .tox/py35/bin
-PY := $(BIN)/python3.5
+BIN := .tox/py3/bin
+PY := $(BIN)/python
 PIP := $(BIN)/pip
 SCHEMAGEN := $(shell which schemagen)
 VERSION=$(shell cat VERSION)
