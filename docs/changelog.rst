@@ -1,6 +1,12 @@
 Change Log
 ----------
 
+0.7.2
+^^^^^
+Friday Feb 9 2018
+
+* Support deploying bundle YAML file directly (rather than just directory) (#202)
+
 0.7.1
 ^^^^^
 Monday Dec 18 2017
