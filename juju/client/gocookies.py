@@ -46,7 +46,7 @@ def _new_py_cookie(go_cookie):
     expires = None
     if go_cookie.get('Expires') is not None:
         t = pyrfc3339.parse(go_cookie['Expires'])
-        expires = t.strftime("%s")
+        expires = t.timestamp()
     return cookiejar.Cookie(
         version=0,
         name=go_cookie['Name'],
