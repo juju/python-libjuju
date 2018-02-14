@@ -14,7 +14,7 @@ class GoCookieJar(cookiejar.FileCookieJar):
         '''Implement the _really_load method called by FileCookieJar
         to implement the actual cookie loading'''
         now = time.time()
-        for cookie in map(_new_py_cookie, json.load(f)):
+        for cookie in map(_new_py_cookie, json.load(f) or []):
             if not ignore_expires and cookie.is_expired(now):
                 continue
             self.set_cookie(cookie)
