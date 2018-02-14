@@ -190,7 +190,7 @@ class Connection:
             ssl=self._get_ssl(cacert),
             loop=self.loop,
             max_size=self.max_frame_size,
-        ), url)
+        ), url, endpoint, cacert)
 
     async def close(self):
         if not self.ws:
@@ -426,21 +426,28 @@ class Connection:
     async def _connect(self, endpoints):
         if len(endpoints) == 0:
             raise Exception('no endpoints to connect to')
-        first_exception = None
-        # TODO try connecting concurrently.
-        for endpoint, cacert in endpoints:
-            try:
-                self.ws, self.addr = await self._open(endpoint, cacert)
-                self.endpoint = endpoint
-                self.cacert = cacert
-                self._receiver_task.start()
-                log.info("Driver connected to juju %s", self.addr)
-                self.monitor.close_called.clear()
-                return
-            except Exception as e:
-                if first_exception is None:
-                    first_exception = e
-        raise first_exception
+
+        # try all endpoints in parallel, use the first to connect
+        done, pending = await asyncio.wait([self._open(endpoint, cacert)
+                                            for endpoint, cacert in endpoints],
+                                           loop=self.loop,
+                                           return_when=asyncio.FIRST_COMPLETED)
+        for task in pending:
+            task.cancel()
+        succeeded = [task for task in done if not task.exception()]
+        failed = [task for task in done if task.exception()]
+
+        if succeeded:
+            result = succeeded[0].result()
+            self.ws = result[0]
+            self.addr = result[1]
+            self.endpoint = result[2]
+            self.cacert = result[3]
+            self._receiver_task.start()
+            log.info("Driver connected to juju %s", self.addr)
+            self.monitor.close_called.clear()
+        else:
+            raise failed[0].exception()
 
     async def _connect_with_login(self, endpoints):
         """Connect to the websocket.
