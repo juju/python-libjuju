@@ -50,7 +50,7 @@ async def test_run_action(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.asyncio(forbid_global_loop=True)
 async def test_scp(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy('ubuntu')
