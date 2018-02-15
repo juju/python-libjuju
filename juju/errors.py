@@ -27,7 +27,11 @@ class JujuConnectionError(ConnectionError, JujuError):
     pass
 
 
-class JujuRedirectError(JujuAPIError):
+class JujuAuthError(JujuConnectionError):
+    pass
+
+
+class JujuRedirectException(JujuAPIError):
     def __init__(self, redirect_info):
         self.redirect_info = redirect_info
 

@@ -6,11 +6,12 @@ This example:
 3. Attempts to ssh into the charm
 
 """
+import logging
+
 from juju import loop
 from juju.controller import Model
-from logging import getLogger
 
-LOG = getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 async def main():
@@ -25,4 +26,5 @@ async def main():
 
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO)
     loop.run(main())

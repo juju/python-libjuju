@@ -11,9 +11,8 @@ from http.client import HTTPSConnection
 import macaroonbakery.httpbakery as httpbakery
 import websockets
 from pymacaroons.serializers.json_serializer import JsonSerializer
-from juju import utils
+from juju import errors, utils
 from juju.client import client
-from juju.errors import JujuAPIError, JujuError, JujuRedirectError
 from juju.utils import IdQueue
 
 log = logging.getLogger("websocket")
@@ -305,7 +304,7 @@ class Connection:
 
         if 'error' in result:
             # API Error Response
-            raise JujuAPIError(result)
+            raise errors.JujuAPIError(result)
 
         if 'response' not in result:
             # This may never happen
@@ -317,15 +316,15 @@ class Connection:
             # Perhaps JujuError should return all the results including
             # errors, or perhaps a keyword parameter to the rpc method
             # could be added to trigger this behaviour.
-            errors = []
+            err_results = []
             for res in result['response']['results']:
                 if res.get('error', {}).get('message'):
-                    errors.append(res['error']['message'])
-            if errors:
-                raise JujuError(errors)
+                    err_results.append(res['error']['message'])
+            if err_results:
+                raise errors.JujuError(err_results)
 
         elif result['response'].get('error', {}).get('message'):
-            raise JujuError(result['response']['error']['message'])
+            raise errors.JujuError(result['response']['error']['message'])
 
         return result
 
@@ -425,7 +424,7 @@ class Connection:
 
     async def _connect(self, endpoints):
         if len(endpoints) == 0:
-            raise Exception('no endpoints to connect to')
+            raise errors.JujuConnectionError('no endpoints to connect to')
 
         # try all endpoints in parallel, use the first to connect
         done, pending = await asyncio.wait([self._open(endpoint, cacert)
@@ -472,12 +471,12 @@ class Connection:
                     return result
                 # TODO implement macaroon authentication
                 error_msg = response['discharge-required-error']
-                raise NotImplementedError('Macaroon auth not implemented: '
-                                          '{}'.format(error_msg))
-        except JujuAPIError as e:
+                raise errors.JujuAuthError('Macaroon auth not implemented: '
+                                           '{}'.format(error_msg))
+        except errors.JujuAPIError as e:
             if e.error_code == 'redirection required':
                 redirect_info = await self.redirect_info()
-                raise JujuRedirectError(redirect_info)
+                raise errors.JujuRedirectException(redirect_info) from e
             else:
                 raise
         finally:
@@ -487,9 +486,21 @@ class Connection:
     async def _connect_with_redirect(self, endpoints):
         try:
             login_result = await self._connect_with_login(endpoints)
-        except JujuRedirectError as e:
+        except errors.JujuRedirectException as e:
             log.info('Controller requested redirect')
-            login_result = await self._connect_with_login(e.endpoints)
+            # filter endpoints for which we have no macaroons, since they're
+            # guaranteed to fail; we don't filter for the initial endpoints
+            # because not all controllers require auth (i.e., localhost)
+            cookies = self.bakery_client.cookies
+            authed_endpoints = [endpoint for endpoint in e.endpoints
+                                if _macaroons_for_domain(cookies, endpoint[0])]
+            if not authed_endpoints:
+                raise errors.JujuAuthError(
+                    'No valid macaroons available for any endpoint: '
+                    '{}'.format(', '.join([endpoint[0]
+                                           for endpoint in e.endpoints]))
+                )
+            login_result = await self._connect_with_login(authed_endpoints)
         response = login_result['response']
         self._build_facades(response.get('facades', {}))
         self._pinger_task.start()
@@ -522,7 +533,7 @@ class Connection:
                 "request": "RedirectInfo",
                 "version": 3,
             })
-        except JujuAPIError as e:
+        except errors.JujuAPIError as e:
             if e.message == 'not redirected':
                 return None
             raise
