@@ -9,13 +9,22 @@ from concurrent.futures import CancelledError
 from http.client import HTTPSConnection
 
 import macaroonbakery.httpbakery as httpbakery
+import macaroonbakery.bakery as bakery
 import websockets
 from juju import utils
 from juju.client import client
 from juju.errors import JujuAPIError, JujuError
 from juju.utils import IdQueue
 
-log = logging.getLogger("websocket")
+log = logging.getLogger('juju.client.connection')
+
+
+class _RedirectError(Exception):
+    """_RedirectError is the exception raised from Monitor.login when
+    the controller is redirecting us to another controller
+    :param endpoints list((str, str)): list of (host:port, cacert) pairs"""
+    def __init__(self, endpoints):
+        self.endpoints = endpoints
 
 
 class Monitor:
@@ -130,6 +139,12 @@ class Connection:
         if bakery_client is None:
             bakery_client = httpbakery.Client()
         self.bakery_client = bakery_client
+        if username is not None and '@' in username and not username.endswith('@local'):
+            # We're trying to log in as an external user - we need to use macaroon
+            # authentication with no username or password.
+            if password is not None:
+                raise Exception('cannot log in as external user with a password')
+            username = None
         self.usertag = username
         if username is not None and not username.startswith('user-'):
             # TODO this doesn't seem quite right, as 'user-foo' is
@@ -248,14 +263,19 @@ class Connection:
                 pass
 
         pinger_facade = client.PingerFacade.from_connection(self)
-        while self.monitor.status == Monitor.CONNECTED:
-            try:
+        try:
+            while True:
                 await utils.run_with_interrupt(
                     _do_ping(),
                     self.monitor.close_called,
                     loop=self.loop)
-            except websockets.ConnectionClosed:
-                pass
+                if self.monitor.close_called.is_set():
+                    break
+        except websockets.exceptions.ConnectionClosed:
+            # The connection has closed - we can't do anything
+            # more until the connection is restarted.
+            log.debug('ping failed because of closed connection')
+            pass
 
     async def rpc(self, msg, encoder=None):
         '''Make an RPC to the API. The message is encoded as JSON
@@ -444,7 +464,7 @@ class Connection:
 
         If uuid is None, the connection will be to the controller. Otherwise it
         will be to the model.
-        :return: The login response JSON object.
+        :return: The response field of login response JSON object.
         """
         success = False
         try:
@@ -452,15 +472,28 @@ class Connection:
             # It's possible that we may get several discharge-required errors,
             # corresponding to different levels of authentication, so retry
             # a few times.
-            for i in range(0, 4):
-                result = await self.login()
+            for i in range(0, 2):
+                result = (await self.login())['response']
                 macaroonJSON = result.get('discharge-required')
                 if macaroonJSON is None:
-                    self.info = result['response']
+                    self.info = result
                     success = True
                     return result
-                # TODO implement macaroon authentication
-                raise NotImplementedError('macaroon authentication not implemented yet')
+                macaroon = bakery.Macaroon.from_dict(macaroonJSON)
+                self.bakery_client.handle_error(
+                    httpbakery.Error(
+                        code=httpbakery.ERR_DISCHARGE_REQUIRED,
+                        message=result.get('discharge-required-error'),
+                        version=macaroon.version,
+                        info=httpbakery.ErrorInfo(
+                            macaroon=macaroon,
+                            macaroon_path=result.get('macaroon-path'),
+                        ),
+                    ),
+                    # note: remove the port number.
+                    'https://' + self.endpoint + '/',
+                )
+            raise Exception('failed to authenticate after several attempts')
         finally:
             if not success:
                 await self.close()
@@ -468,20 +501,9 @@ class Connection:
     async def _connect_with_redirect(self, endpoints):
         try:
             login_result = await self._connect_with_login(endpoints)
-        except JujuAPIError as e:
-            if e.error_code != 'redirection required':
-                raise
-            log.info('Controller requested redirect')
-            redirect_info = await self.redirect_info()
-            redir_cacert = redirect_info['ca-cert']
-            new_endpoints = [
-                ('{value}:{port}'.format(**s), redir_cacert)
-                for servers in redirect_info['servers']
-                for s in servers if s['scope'] == 'public'
-            ]
-            login_result = await self._connect_with_login(new_endpoints)
-        response = login_result['response']
-        self._build_facades(response.get('facades', {}))
+        except _RedirectError as e:
+            login_result = await self._connect_with_login(e.endpoints)
+        self._build_facades(login_result.get('facades', {}))
         self._pinger_task.start()
 
     def _build_facades(self, facades):
@@ -491,31 +513,40 @@ class Connection:
 
     async def login(self):
         params = {}
+        macaroons = _macaroons_for_domain(self.bakery_client.cookies, self.endpoint)
         if self.usertag:
             params['auth-tag'] = self.usertag
             params['credentials'] = self.password
         else:
-            params['macaroons'] = _macaroons_for_domain(self.bakery_client.cookies, self.endpoint)
+            params['macaroons'] = [[bakery.macaroon_to_dict(m) for m in ms] for ms in macaroons]
 
-        return await self.rpc({
-            "type": "Admin",
-            "request": "Login",
-            "version": 3,
-            "params": params,
-        })
-
-    async def redirect_info(self):
         try:
-            result = await self.rpc({
+            return await self.rpc({
+                "type": "Admin",
+                "request": "Login",
+                "version": 3,
+                "params": params,
+            })
+        except JujuAPIError as e:
+            if e.error_code != 'redirection required':
+                raise
+            log.info('Controller requested redirect')
+            # Fetch additional redirection information now so that
+            # we can safely close the connection after login
+            # fails.
+            redirect_info = (await self.rpc({
                 "type": "Admin",
                 "request": "RedirectInfo",
                 "version": 3,
-            })
-        except JujuAPIError as e:
-            if e.message == 'not redirected':
-                return None
-            raise
-        return result['response']
+            }))['response']
+            cacert = redirect_info['ca-cert']
+            raise _RedirectError(
+                endpoints=[
+                    ('{value}:{port}'.format(**s), cacert)
+                    for servers in redirect_info['servers']
+                    for s in servers if s['scope'] == 'public'
+                ],
+            )
 
 
 class _Task:
@@ -540,4 +571,4 @@ def _macaroons_for_domain(cookies, domain):
     apply to the given domain name.'''
     req = urllib.request.Request('https://' + domain + '/')
     cookies.add_cookie_header(req)
-    return httpbakery.extract_macaroons(req.headers)
+    return httpbakery.extract_macaroons(req)
