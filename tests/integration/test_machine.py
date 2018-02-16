@@ -42,6 +42,11 @@ async def test_status(event_loop):
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_scp(event_loop):
+    # ensure that asyncio.subprocess will work;
+    try:
+        asyncio.get_child_watcher().attach_loop(event_loop)
+    except RuntimeError:
+        pytest.skip('test_scp will always fail outside of MainThread')
     async with base.CleanModel() as model:
         await model.add_machine()
         await asyncio.wait_for(

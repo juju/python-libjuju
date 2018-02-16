@@ -11,20 +11,11 @@ from http.client import HTTPSConnection
 import macaroonbakery.httpbakery as httpbakery
 import macaroonbakery.bakery as bakery
 import websockets
-from juju import utils
+from juju import errors, tag, utils
 from juju.client import client
-from juju.errors import JujuAPIError, JujuError
 from juju.utils import IdQueue
 
 log = logging.getLogger('juju.client.connection')
-
-
-class _RedirectError(Exception):
-    """_RedirectError is the exception raised from Monitor.login when
-    the controller is redirecting us to another controller
-    :param endpoints list((str, str)): list of (host:port, cacert) pairs"""
-    def __init__(self, endpoints):
-        self.endpoints = endpoints
 
 
 class Monitor:
@@ -79,7 +70,8 @@ class Monitor:
             return self.DISCONNECTING
 
         # connection closed uncleanly (we didn't call connection.close)
-        if connection._receiver_task.stopped.is_set() or not connection.ws.open:
+        stopped = connection._receiver_task.stopped.is_set()
+        if stopped or not connection.ws.open:
             return self.ERROR
 
         # everything is fine!
@@ -139,18 +131,14 @@ class Connection:
         if bakery_client is None:
             bakery_client = httpbakery.Client()
         self.bakery_client = bakery_client
-        if username is not None and '@' in username and not username.endswith('@local'):
-            # We're trying to log in as an external user - we need to use macaroon
-            # authentication with no username or password.
+        if username and '@' in username and not username.endswith('@local'):
+            # We're trying to log in as an external user - we need to use
+            # macaroon authentication with no username or password.
             if password is not None:
-                raise Exception('cannot log in as external user with a password')
+                raise errors.JujuAuthError('cannot log in as external '
+                                           'user with a password')
             username = None
-        self.usertag = username
-        if username is not None and not username.startswith('user-'):
-            # TODO this doesn't seem quite right, as 'user-foo' is
-            # actually a valid username (its tag would be user-user-foo),
-            # but don't break the existing API.
-            self.usertag = 'user-' + username
+        self.usertag = tag.user(username)
         self.password = password
         self.loop = loop or asyncio.get_event_loop()
 
@@ -203,7 +191,7 @@ class Connection:
             ssl=self._get_ssl(cacert),
             loop=self.loop,
             max_size=self.max_frame_size,
-        ), url)
+        ), url, endpoint, cacert)
 
     async def close(self):
         if not self.ws:
@@ -323,7 +311,7 @@ class Connection:
 
         if 'error' in result:
             # API Error Response
-            raise JujuAPIError(result)
+            raise errors.JujuAPIError(result)
 
         if 'response' not in result:
             # This may never happen
@@ -335,15 +323,15 @@ class Connection:
             # Perhaps JujuError should return all the results including
             # errors, or perhaps a keyword parameter to the rpc method
             # could be added to trigger this behaviour.
-            errors = []
+            err_results = []
             for res in result['response']['results']:
                 if res.get('error', {}).get('message'):
-                    errors.append(res['error']['message'])
-            if errors:
-                raise JujuError(errors)
+                    err_results.append(res['error']['message'])
+            if err_results:
+                raise errors.JujuError(err_results)
 
         elif result['response'].get('error', {}).get('message'):
-            raise JujuError(result['response']['error']['message'])
+            raise errors.JujuError(result['response']['error']['message'])
 
         return result
 
@@ -401,10 +389,11 @@ class Connection:
         return await Connection.connect(**self.connect_params())
 
     def connect_params(self):
-        """Return a tuple of parameters suitable for passing to Connection.connect that
-        can be used to make a new connection to the same controller (and model
-        if specified. The first element in the returned tuple holds the endpoint argument; the other
-        holds a dict of the keyword args.
+        """Return a tuple of parameters suitable for passing to
+        Connection.connect that can be used to make a new connection
+        to the same controller (and model if specified. The first
+        element in the returned tuple holds the endpoint argument;
+        the other holds a dict of the keyword args.
         """
         return {
             'endpoint': self.endpoint,
@@ -442,22 +431,38 @@ class Connection:
 
     async def _connect(self, endpoints):
         if len(endpoints) == 0:
-            raise Exception('no endpoints to connect to')
-        first_exception = None
-        # TODO try connecting concurrently.
-        for endpoint, cacert in endpoints:
+            raise errors.JujuConnectionError('no endpoints to connect to')
+
+        async def _try_endpoint(endpoint, cacert, delay):
+            if delay:
+                await asyncio.sleep(delay)
+            return await self._open(endpoint, cacert)
+
+        # Try all endpoints in parallel, with slight increasing delay (+100ms
+        # for each subsequent endpoint); the delay allows us to prefer the
+        # earlier endpoints over the latter. Use first successful connection.
+        tasks = [self.loop.create_task(_try_endpoint(endpoint, cacert,
+                                                     0.1 * i))
+                 for i, (endpoint, cacert) in enumerate(endpoints)]
+        for task in asyncio.as_completed(tasks, loop=self.loop):
             try:
-                self.ws, self.addr = await self._open(endpoint, cacert)
-                self.endpoint = endpoint
-                self.cacert = cacert
-                self._receiver_task.start()
-                log.info("Driver connected to juju %s", self.addr)
-                self.monitor.close_called.clear()
-                return
-            except Exception as e:
-                if first_exception is None:
-                    first_exception = e
-        raise first_exception
+                result = await task
+                break
+            except ConnectionError:
+                continue  # ignore; try another endpoint
+        else:
+            raise errors.JujuConnectionError(
+                'Unable to connect to any endpoint: {}'.format(', '.join([
+                    endpoint for endpoint, cacert in endpoints])))
+        for task in tasks:
+            task.cancel()
+        self.ws = result[0]
+        self.addr = result[1]
+        self.endpoint = result[2]
+        self.cacert = result[3]
+        self._receiver_task.start()
+        log.info("Driver connected to juju %s", self.addr)
+        self.monitor.close_called.clear()
 
     async def _connect_with_login(self, endpoints):
         """Connect to the websocket.
@@ -493,7 +498,8 @@ class Connection:
                     # note: remove the port number.
                     'https://' + self.endpoint + '/',
                 )
-            raise Exception('failed to authenticate after several attempts')
+            raise errors.JujuAuthError('failed to authenticate '
+                                       'after several attempts')
         finally:
             if not success:
                 await self.close()
@@ -501,7 +507,7 @@ class Connection:
     async def _connect_with_redirect(self, endpoints):
         try:
             login_result = await self._connect_with_login(endpoints)
-        except _RedirectError as e:
+        except errors.JujuRedirectException as e:
             login_result = await self._connect_with_login(e.endpoints)
         self._build_facades(login_result.get('facades', {}))
         self._pinger_task.start()
@@ -513,12 +519,14 @@ class Connection:
 
     async def login(self):
         params = {}
-        macaroons = _macaroons_for_domain(self.bakery_client.cookies, self.endpoint)
-        if self.usertag:
+        if self.password:
             params['auth-tag'] = self.usertag
             params['credentials'] = self.password
         else:
-            params['macaroons'] = [[bakery.macaroon_to_dict(m) for m in ms] for ms in macaroons]
+            macaroons = _macaroons_for_domain(self.bakery_client.cookies,
+                                              self.endpoint)
+            params['macaroons'] = [[bakery.macaroon_to_dict(m) for m in ms]
+                                   for ms in macaroons]
 
         try:
             return await self.rpc({
@@ -527,7 +535,7 @@ class Connection:
                 "version": 3,
                 "params": params,
             })
-        except JujuAPIError as e:
+        except errors.JujuAPIError as e:
             if e.error_code != 'redirection required':
                 raise
             log.info('Controller requested redirect')
@@ -539,14 +547,7 @@ class Connection:
                 "request": "RedirectInfo",
                 "version": 3,
             }))['response']
-            cacert = redirect_info['ca-cert']
-            raise _RedirectError(
-                endpoints=[
-                    ('{value}:{port}'.format(**s), cacert)
-                    for servers in redirect_info['servers']
-                    for s in servers if s['scope'] == 'public'
-                ],
-            )
+            raise errors.JujuRedirectException(redirect_info) from e
 
 
 class _Task:
