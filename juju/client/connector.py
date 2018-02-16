@@ -4,7 +4,7 @@ import logging
 import macaroonbakery.httpbakery as httpbakery
 from juju.client.connection import Connection
 from juju.client.jujudata import FileJujuData
-from juju.errors import JujuConnectionError, JujuError
+from juju.errors import JujuAuthError, JujuConnectionError, JujuError
 
 log = logging.getLogger('connector')
 
@@ -104,12 +104,19 @@ class Connector:
         except JujuError as e:
             raise JujuConnectionError(e.message) from e
         if controller is None:
-            raise JujuConnectionError('Controller {} not found'.format(controller_name))
+            raise JujuConnectionError('Controller {} not found'.format(
+                controller_name))
         # TODO change Connection so we can pass all the endpoints
         # instead of just the first one.
         endpoint = controller['api-endpoints'][0]
-        models = self.jujudata.models()[controller_name]
-        account = self.jujudata.accounts()[controller_name]
+        accounts = self.jujudata.accounts()
+        if controller_name not in accounts:
+            raise JujuAuthError('Account not found for controller: {}'.format(
+                controller_name))
+        account = accounts[controller_name]
+        models = self.jujudata.models().get(controller_name, {})['models']
+        if model_name not in models:
+            raise JujuConnectionError('Model found: {}'.format(model_name))
 
         # TODO if there's no record for the required model name, connect
         # to the controller to find out the model's uuid, then connect
@@ -119,7 +126,7 @@ class Connector:
         # subclass JujuData.
         await self.connect(
             endpoint=endpoint,
-            uuid=models['models'][model_name]['uuid'],
+            uuid=models[model_name]['uuid'],
             username=account.get('user'),
             password=account.get('password'),
             cacert=controller.get('ca-cert'),
@@ -138,3 +145,4 @@ class Connector:
         else:
             bakery_client = httpbakery.Client()
         bakery_client.cookies = self.jujudata.cookies_for_controller(controller_name)
+        return bakery_client

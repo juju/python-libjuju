@@ -13,8 +13,9 @@ class GoCookieJar(cookiejar.FileCookieJar):
     def _really_load(self, f, filename, ignore_discard, ignore_expires):
         '''Implement the _really_load method called by FileCookieJar
         to implement the actual cookie loading'''
+        data = json.load(f) or []
         now = time.time()
-        for cookie in map(_new_py_cookie, json.load(f)):
+        for cookie in map(_new_py_cookie, data):
             if not ignore_expires and cookie.is_expired(now):
                 continue
             self.set_cookie(cookie)
@@ -46,7 +47,7 @@ def _new_py_cookie(go_cookie):
     expires = None
     if go_cookie.get('Expires') is not None:
         t = pyrfc3339.parse(go_cookie['Expires'])
-        expires = t.strftime("%s")
+        expires = t.timestamp()
     return cookiejar.Cookie(
         version=0,
         name=go_cookie['Name'],

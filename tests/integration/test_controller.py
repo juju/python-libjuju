@@ -126,6 +126,11 @@ async def test_get_model(event_loop):
             await controller.destroy_model(model_name)
 
 
+async def _wait_for_model(controller, model_name):
+    while model_name not in await controller.list_models():
+        await asyncio.sleep(0.5, loop=controller.loop)
+
+
 async def _wait_for_model_gone(controller, model_name):
     while model_name in await controller.list_models():
         await asyncio.sleep(0.5, loop=controller.loop)
@@ -138,6 +143,9 @@ async def test_destroy_model_by_name(event_loop):
         model_name = 'test-{}'.format(uuid.uuid4())
         model = await controller.add_model(model_name)
         await model.disconnect()
+        await asyncio.wait_for(_wait_for_model(controller,
+                                               model_name),
+                               timeout=60)
         await controller.destroy_model(model_name)
         await asyncio.wait_for(_wait_for_model_gone(controller,
                                                     model_name),
@@ -152,6 +160,9 @@ async def test_add_destroy_model_by_uuid(event_loop):
         model = await controller.add_model(model_name)
         model_uuid = model.info.uuid
         await model.disconnect()
+        await asyncio.wait_for(_wait_for_model(controller,
+                                               model_name),
+                               timeout=60)
         await controller.destroy_model(model_uuid)
         await asyncio.wait_for(_wait_for_model_gone(controller,
                                                     model_name),

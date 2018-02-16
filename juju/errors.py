@@ -25,3 +25,24 @@ class JujuAPIError(JujuError):
 
 class JujuConnectionError(ConnectionError, JujuError):
     pass
+
+
+class JujuAuthError(JujuConnectionError):
+    pass
+
+
+class JujuRedirectException(JujuAPIError):
+    def __init__(self, redirect_info):
+        self.redirect_info = redirect_info
+
+    @property
+    def ca_cert(self):
+        return self.redirect_info['ca-cert']
+
+    @property
+    def endpoints(self):
+        return [
+            ('{value}:{port}'.format(**s), self.ca_cert)
+            for servers in self.redirect_info['servers']
+            for s in servers if s['scope'] == 'public'
+        ]

@@ -10,9 +10,9 @@ from http.client import HTTPSConnection
 
 import macaroonbakery.httpbakery as httpbakery
 import websockets
-from juju import utils
+from pymacaroons.serializers.json_serializer import JsonSerializer
+from juju import errors, utils
 from juju.client import client
-from juju.errors import JujuAPIError, JujuError
 from juju.utils import IdQueue
 
 log = logging.getLogger("websocket")
@@ -70,7 +70,8 @@ class Monitor:
             return self.DISCONNECTING
 
         # connection closed uncleanly (we didn't call connection.close)
-        if connection._receiver_task.stopped.is_set() or not connection.ws.open:
+        stopped = connection._receiver_task.stopped.is_set()
+        if stopped or not connection.ws.open:
             return self.ERROR
 
         # everything is fine!
@@ -188,7 +189,7 @@ class Connection:
             ssl=self._get_ssl(cacert),
             loop=self.loop,
             max_size=self.max_frame_size,
-        ), url)
+        ), url, endpoint, cacert)
 
     async def close(self):
         if not self.ws:
@@ -303,7 +304,7 @@ class Connection:
 
         if 'error' in result:
             # API Error Response
-            raise JujuAPIError(result)
+            raise errors.JujuAPIError(result)
 
         if 'response' not in result:
             # This may never happen
@@ -315,15 +316,15 @@ class Connection:
             # Perhaps JujuError should return all the results including
             # errors, or perhaps a keyword parameter to the rpc method
             # could be added to trigger this behaviour.
-            errors = []
+            err_results = []
             for res in result['response']['results']:
                 if res.get('error', {}).get('message'):
-                    errors.append(res['error']['message'])
-            if errors:
-                raise JujuError(errors)
+                    err_results.append(res['error']['message'])
+            if err_results:
+                raise errors.JujuError(err_results)
 
         elif result['response'].get('error', {}).get('message'):
-            raise JujuError(result['response']['error']['message'])
+            raise errors.JujuError(result['response']['error']['message'])
 
         return result
 
@@ -381,10 +382,11 @@ class Connection:
         return await Connection.connect(**self.connect_params())
 
     def connect_params(self):
-        """Return a tuple of parameters suitable for passing to Connection.connect that
-        can be used to make a new connection to the same controller (and model
-        if specified. The first element in the returned tuple holds the endpoint argument; the other
-        holds a dict of the keyword args.
+        """Return a tuple of parameters suitable for passing to
+        Connection.connect that can be used to make a new connection
+        to the same controller (and model if specified. The first
+        element in the returned tuple holds the endpoint argument;
+        the other holds a dict of the keyword args.
         """
         return {
             'endpoint': self.endpoint,
@@ -422,22 +424,29 @@ class Connection:
 
     async def _connect(self, endpoints):
         if len(endpoints) == 0:
-            raise Exception('no endpoints to connect to')
-        first_exception = None
-        # TODO try connecting concurrently.
-        for endpoint, cacert in endpoints:
-            try:
-                self.ws, self.addr = await self._open(endpoint, cacert)
-                self.endpoint = endpoint
-                self.cacert = cacert
-                self._receiver_task.start()
-                log.info("Driver connected to juju %s", self.addr)
-                self.monitor.close_called.clear()
-                return
-            except Exception as e:
-                if first_exception is None:
-                    first_exception = e
-        raise first_exception
+            raise errors.JujuConnectionError('no endpoints to connect to')
+
+        # try all endpoints in parallel, use the first to connect
+        done, pending = await asyncio.wait([self._open(endpoint, cacert)
+                                            for endpoint, cacert in endpoints],
+                                           loop=self.loop,
+                                           return_when=asyncio.FIRST_COMPLETED)
+        for task in pending:
+            task.cancel()
+        succeeded = [task for task in done if not task.exception()]
+        failed = [task for task in done if task.exception()]
+
+        if succeeded:
+            result = succeeded[0].result()
+            self.ws = result[0]
+            self.addr = result[1]
+            self.endpoint = result[2]
+            self.cacert = result[3]
+            self._receiver_task.start()
+            log.info("Driver connected to juju %s", self.addr)
+            self.monitor.close_called.clear()
+        else:
+            raise failed[0].exception()
 
     async def _connect_with_login(self, endpoints):
         """Connect to the websocket.
@@ -454,13 +463,22 @@ class Connection:
             # a few times.
             for i in range(0, 4):
                 result = await self.login()
-                macaroonJSON = result.get('discharge-required')
+                response = result['response']
+                macaroonJSON = response.get('discharge-required')
                 if macaroonJSON is None:
-                    self.info = result['response']
+                    self.info = response
                     success = True
                     return result
                 # TODO implement macaroon authentication
-                raise NotImplementedError('macaroon authentication not implemented yet')
+                error_msg = response['discharge-required-error']
+                raise errors.JujuAuthError('Macaroon auth not implemented: '
+                                           '{}'.format(error_msg))
+        except errors.JujuAPIError as e:
+            if e.error_code == 'redirection required':
+                redirect_info = await self.redirect_info()
+                raise errors.JujuRedirectException(redirect_info) from e
+            else:
+                raise
         finally:
             if not success:
                 await self.close()
@@ -468,18 +486,21 @@ class Connection:
     async def _connect_with_redirect(self, endpoints):
         try:
             login_result = await self._connect_with_login(endpoints)
-        except JujuAPIError as e:
-            if e.error_code != 'redirection required':
-                raise
+        except errors.JujuRedirectException as e:
             log.info('Controller requested redirect')
-            redirect_info = await self.redirect_info()
-            redir_cacert = redirect_info['ca-cert']
-            new_endpoints = [
-                ('{value}:{port}'.format(**s), redir_cacert)
-                for servers in redirect_info['servers']
-                for s in servers if s['scope'] == 'public'
-            ]
-            login_result = await self._connect_with_login(new_endpoints)
+            # filter endpoints for which we have no macaroons, since they're
+            # guaranteed to fail; we don't filter for the initial endpoints
+            # because not all controllers require auth (i.e., localhost)
+            cookies = self.bakery_client.cookies
+            authed_endpoints = [endpoint for endpoint in e.endpoints
+                                if _macaroons_for_domain(cookies, endpoint[0])]
+            if not authed_endpoints:
+                raise errors.JujuAuthError(
+                    'No valid macaroons available for any endpoint: '
+                    '{}'.format(', '.join([endpoint[0]
+                                           for endpoint in e.endpoints]))
+                )
+            login_result = await self._connect_with_login(authed_endpoints)
         response = login_result['response']
         self._build_facades(response.get('facades', {}))
         self._pinger_task.start()
@@ -491,11 +512,12 @@ class Connection:
 
     async def login(self):
         params = {}
-        if self.usertag:
+        if self.password:
             params['auth-tag'] = self.usertag
             params['credentials'] = self.password
         else:
-            params['macaroons'] = _macaroons_for_domain(self.bakery_client.cookies, self.endpoint)
+            cookies = self.bakery_client.cookies
+            params['macaroons'] = _macaroons_for_domain(cookies, self.endpoint)
 
         return await self.rpc({
             "type": "Admin",
@@ -511,7 +533,7 @@ class Connection:
                 "request": "RedirectInfo",
                 "version": 3,
             })
-        except JujuAPIError as e:
+        except errors.JujuAPIError as e:
             if e.message == 'not redirected':
                 return None
             raise
@@ -540,4 +562,12 @@ def _macaroons_for_domain(cookies, domain):
     apply to the given domain name.'''
     req = urllib.request.Request('https://' + domain + '/')
     cookies.add_cookie_header(req)
-    return httpbakery.extract_macaroons(req.headers)
+    headers = dict(req.headers)
+    headers.update(req.unredirected_hdrs)
+    macaroons = httpbakery.extract_macaroons(headers)
+    serializer = JsonSerializer()
+    serialized_macaroons = [
+        [json.loads(macaroon.serialize(serializer)) for macaroon in group]
+        for group in macaroons
+    ]
+    return serialized_macaroons
