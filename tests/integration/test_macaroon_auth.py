@@ -54,7 +54,7 @@ async def test_macaroon_auth_with_bad_key(event_loop):
                 jujudata=NoAccountsJujuData(m._connector.jujudata),
                 bakery_client=client,
             ):
-                pass
+                pytest.fail('Should not be able to connect with invalid key')
         except httpbakery.BakeryException:
             # We're expecting this because we're using the
             # wrong key.
@@ -77,7 +77,7 @@ async def test_macaroon_auth_with_unauthorized_user(event_loop):
                 jujudata=NoAccountsJujuData(m._connector.jujudata),
                 bakery_client=client,
             ):
-                pass
+                pytest.fail('Should not be able to connect without grant')
         except JujuAPIError:
             # We're expecting this because we're using the
             # wrong user name.
@@ -87,7 +87,8 @@ async def test_macaroon_auth_with_unauthorized_user(event_loop):
 def agent_auth_info():
     agent_data = os.environ.get('TEST_AGENTS')
     if agent_data is None:
-        pytest.skip('skipping macaroon_auth because no TEST_AGENTS environment variable is set')
+        pytest.skip('skipping macaroon_auth because no TEST_AGENTS '
+                    'environment variable is set')
     auth_info = agent.read_auth_info(agent_data)
     if len(auth_info.agents) != 1:
         raise Exception('TEST_AGENTS agent data requires exactly one agent')
