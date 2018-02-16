@@ -5,7 +5,7 @@ import copy
 import macaroonbakery.httpbakery as httpbakery
 from juju.client.connection import Connection
 from juju.client.jujudata import FileJujuData
-from juju.errors import JujuAuthError, JujuConnectionError, JujuError
+from juju.errors import JujuConnectionError, JujuError
 
 log = logging.getLogger('connector')
 
@@ -110,12 +110,9 @@ class Connector:
         # TODO change Connection so we can pass all the endpoints
         # instead of just the first one.
         endpoint = controller['api-endpoints'][0]
-        accounts = self.jujudata.accounts()
-        if controller_name not in accounts:
-            raise JujuAuthError('Account not found for controller: {}'.format(
-                controller_name))
-        account = accounts[controller_name]
-        models = self.jujudata.models().get(controller_name, {}).get('models', {})
+        account = self.jujudata.accounts().get(controller_name, {})
+        models = self.jujudata.models().get(controller_name, {}).get('models',
+                                                                     {})
         if model_name not in models:
             raise JujuConnectionError('Model not found: {}'.format(model_name))
 
@@ -145,5 +142,6 @@ class Connector:
             bakery_client = copy.copy(bakery_client)
         else:
             bakery_client = httpbakery.Client()
-        bakery_client.cookies = self.jujudata.cookies_for_controller(controller_name)
+        bakery_client.cookies = self.jujudata.cookies_for_controller(
+            controller_name)
         return bakery_client

@@ -16,6 +16,7 @@ log = logging.getLogger(__name__)
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.xfail
 async def test_macaroon_auth(event_loop):
     auth_info, username = agent_auth_info()
     # Create a bakery client that can do agent authentication.
@@ -36,6 +37,7 @@ async def test_macaroon_auth(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.xfail
 async def test_macaroon_auth_with_bad_key(event_loop):
     auth_info, username = agent_auth_info()
     # Use a random key rather than the correct key.
