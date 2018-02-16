@@ -59,8 +59,8 @@ class User(object):
 
         :param str acl: Access control ('login', 'add-model', or 'superuser')
         """
-        await self.controller.grant(self.username, acl)
-        self._user_info.access = acl
+        if await self.controller.grant(self.username, acl):
+            self._user_info.access = acl
 
     async def revoke(self):
         """Removes all access rights for this user from the controller.

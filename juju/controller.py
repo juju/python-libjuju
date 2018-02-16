@@ -442,12 +442,21 @@ class Controller:
         remove permissions).
         :param str username: Username
         :param str acl: Access control ('login', 'add-model' or 'superuser')
+        :returns: True if new access was granted, False if user already had
+            requested access or greater.  Raises JujuError if failed.
         """
         controller_facade = client.ControllerFacade.from_connection(
             self.connection())
         user = tag.user(username)
         changes = client.ModifyControllerAccess(acl, 'grant', user)
-        return await controller_facade.ModifyControllerAccess([changes])
+        try:
+            await controller_facade.ModifyControllerAccess([changes])
+            return True
+        except errors.JujuError as e:
+            if 'user already has' in str(e):
+                return False
+            else:
+                raise
 
     async def revoke(self, username, acl='login'):
         """Removes some or all access of a user to from a controller

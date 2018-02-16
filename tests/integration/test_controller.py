@@ -83,10 +83,10 @@ async def test_grant_revoke(event_loop):
         assert user.access == 'superuser'
         fresh = await controller.get_user(username)  # fetch fresh copy
         assert fresh.access == 'superuser'
-        await user.grant('login')
-        assert user.access == 'login'
+        await user.grant('login')  # already has 'superuser', so no-op
+        assert user.access == 'superuser'
         fresh = await controller.get_user(username)  # fetch fresh copy
-        assert fresh.access == 'login'
+        assert fresh.access == 'superuser'
         await user.revoke()
         assert user.access is ''
         fresh = await controller.get_user(username)  # fetch fresh copy
