@@ -37,17 +37,21 @@ class CleanController():
 
 
 class CleanModel():
-    def __init__(self):
+    def __init__(self, bakery_client=None):
         self._controller = None
         self._model = None
         self._model_uuid = None
+        self._bakery_client = bakery_client
 
     async def __aenter__(self):
         model_nonce = uuid.uuid4().hex[-4:]
         frame = inspect.stack()[1]
         test_name = frame.function.replace('_', '-')
         jujudata = TestJujuData()
-        self._controller = Controller(jujudata=jujudata)
+        self._controller = Controller(
+            jujudata=jujudata,
+            bakery_client=self._bakery_client,
+        )
         controller_name = jujudata.current_controller()
         user_name = jujudata.accounts()[controller_name]['user']
         await self._controller.connect(controller_name)

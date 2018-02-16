@@ -4,7 +4,6 @@ import os
 import macaroonbakery.bakery as bakery
 import macaroonbakery.httpbakery as httpbakery
 import macaroonbakery.httpbakery.agent as agent
-from juju.client import client
 from juju.errors import JujuAPIError
 from juju.model import Model
 
@@ -18,33 +17,27 @@ log = logging.getLogger(__name__)
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_macaroon_auth(event_loop):
-    try:
-       auth_info, username = agent_auth_info()
-    except NoAgentInfo:
-       return
-    # Create a bakery client can do agent authentication.
+    auth_info, username = agent_auth_info()
+    # Create a bakery client that can do agent authentication.
     client = httpbakery.Client(
         key=auth_info.key,
         interaction_methods=[agent.AgentInteractor(auth_info)],
     )
 
-    async with base.CleanModel() as m:
+    async with base.CleanModel(bakery_client=client) as m:
         async with await m.get_controller() as c:
             await c.grant_model(username, m.info.uuid, 'admin')
         async with Model(
             jujudata=NoAccountsJujuData(m._connector.jujudata),
             bakery_client=client,
-        ) as m1:
+        ):
             pass
 
 
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_macaroon_auth_with_bad_key(event_loop):
-    try:
-       auth_info, username = agent_auth_info()
-    except NoAgentInfo:
-       return
+    auth_info, username = agent_auth_info()
     # Use a random key rather than the correct key.
     auth_info = auth_info._replace(key=bakery.generate_key())
     # Create a bakery client can do agent authentication.
@@ -53,7 +46,7 @@ async def test_macaroon_auth_with_bad_key(event_loop):
         interaction_methods=[agent.AgentInteractor(auth_info)],
     )
 
-    async with base.CleanModel() as m:
+    async with base.CleanModel(bakery_client=client) as m:
         async with await m.get_controller() as c:
             await c.grant_model(username, m.info.uuid, 'admin')
         try:
@@ -71,40 +64,35 @@ async def test_macaroon_auth_with_bad_key(event_loop):
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_macaroon_auth_with_unauthorized_user(event_loop):
-    try:
-       auth_info, username = agent_auth_info()
-    except NoAgentInfo:
-       return
+    auth_info, username = agent_auth_info()
     # Create a bakery client can do agent authentication.
     client = httpbakery.Client(
         key=auth_info.key,
         interaction_methods=[agent.AgentInteractor(auth_info)],
     )
-    async with base.CleanModel() as m:
+    async with base.CleanModel(bakery_client=client) as m:
         # Note: no grant of rights to the agent user.
         try:
             async with Model(
                 jujudata=NoAccountsJujuData(m._connector.jujudata),
                 bakery_client=client,
-            ) as m1:
+            ):
                 pass
         except JujuAPIError:
             # We're expecting this because we're using the
             # wrong user name.
             pass
 
-class NoAgentInfo(Exception):
-    pass
 
 def agent_auth_info():
     agent_data = os.environ.get('TEST_AGENTS')
     if agent_data is None:
-        log.warning('skipping macaroon_auth because no TEST_AGENTS environment variable is set')
-        raise NoAgentInfo()
+        pytest.skip('skipping macaroon_auth because no TEST_AGENTS environment variable is set')
     auth_info = agent.read_auth_info(agent_data)
     if len(auth_info.agents) != 1:
         raise Exception('TEST_AGENTS agent data requires exactly one agent')
     return auth_info, auth_info.agents[0].username
+
 
 class NoAccountsJujuData:
     def __init__(self, jujudata):
