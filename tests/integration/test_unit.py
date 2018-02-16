@@ -50,8 +50,11 @@ async def test_run_action(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio(forbid_global_loop=True)
+@pytest.mark.asyncio
 async def test_scp(event_loop):
+    # ensure that asyncio.subprocess will work;
+    # this will fail outside of the main thread
+    asyncio.get_child_watcher().attach_loop(event_loop)
     async with base.CleanModel() as model:
         app = await model.deploy('ubuntu')
 
