@@ -1,10 +1,6 @@
 """
-This example:
-
-1. Creates a model on the current controller
-2. Deploys a charm to it.
-3. Attempts to ssh into the charm
-
+This is a very basic example that connects to the currently selected model
+and prints the number of applications deployed to it.
 """
 import logging
 
