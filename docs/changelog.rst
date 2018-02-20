@@ -1,6 +1,15 @@
 Change Log
 ----------
 
+0.7.3
+^^^^^
+Tuesday Feb 20 2018
+
+* Full macaroon bakery support (#206)
+* Fix regression with deploying local charm, add test case (#209)
+* Expose a machines series (#208)
+* Automated test runner fixes (#205)
+
 0.7.2
 ^^^^^
 Friday Feb 9 2018
