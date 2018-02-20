@@ -1148,10 +1148,14 @@ class Model:
                 for k, v in storage.items()
             }
 
+        entity_path = Path(entity_url.replace('local:', ''))
+        bundle_path = entity_path / 'bundle.yaml'
+        metadata_path = entity_path / 'metadata.yaml'
+
         is_local = (
             entity_url.startswith('local:') or
-            os.path.isdir(entity_url) or
-            os.path.isfile(entity_url)
+            entity_path.is_dir() or
+            entity_path.is_file()
         )
         if is_local:
             entity_id = entity_url.replace('local:', '')
@@ -1162,8 +1166,8 @@ class Model:
         client_facade = client.ClientFacade.from_connection(self.connection())
 
         is_bundle = ((is_local and
-                      (Path(entity_id).exists()) or
-                      (Path(entity_id) / 'bundle.yaml').exists()) or
+                      (entity_id.endswith('.yaml') and entity_path.exists()) or
+                      bundle_path.exists()) or
                      (not is_local and 'bundle/' in entity_id))
 
         if is_bundle:
@@ -1196,6 +1200,9 @@ class Model:
                                                             entity_id,
                                                             entity)
             else:
+                if not application_name:
+                    metadata = yaml.load(metadata_path.read_text())
+                    application_name = metadata['name']
                 # We have a local charm dir that needs to be uploaded
                 charm_dir = os.path.abspath(
                     os.path.expanduser(entity_id))

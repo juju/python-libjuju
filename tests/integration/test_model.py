@@ -35,6 +35,18 @@ async def test_deploy_local_bundle(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_deploy_local_charm(event_loop):
+    from pathlib import Path
+    tests_dir = Path(__file__).absolute().parent.parent
+    charm_path = tests_dir / 'charm'
+
+    async with base.CleanModel() as model:
+        await model.deploy(str(charm_path))
+        assert 'charm' in model.applications
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_deploy_bundle(event_loop):
     async with base.CleanModel() as model:
         await model.deploy('bundle/wiki-simple')
