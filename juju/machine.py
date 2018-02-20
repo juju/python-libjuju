@@ -262,3 +262,10 @@ class Machine(model.ModelEntity):
             if addresses:
                 return addresses[0]['value']
         return None
+
+    @property
+    def series(self):
+        """Returns the series of the current machine
+
+        """
+        return self.safe_data['series']
