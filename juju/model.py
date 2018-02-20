@@ -440,8 +440,18 @@ class Model:
         if the Model is disconnected"""
         return self._connector.connection()
 
+    async def get_controller(self):
+        """Return a Controller instance for the currently connected model.
+        :return Controller:
+        """
+        from juju.controller import Controller
+        controller = Controller(jujudata=self._connector.jujudata)
+        kwargs = self.connection().connect_params()
+        kwargs.pop('uuid')
+        await controller._connect_direct(**kwargs)
+        return controller
+
     async def __aenter__(self):
-        # TODO is this actually useful to have?
         await self.connect()
         return self
 
@@ -1361,22 +1371,6 @@ class Model:
         """
         raise NotImplementedError()
 
-    async def grant(self, username, acl='read'):
-        """Grant a user access to this model.
-
-        :param str username: Username
-        :param str acl: Access control ('read' or 'write')
-
-        """
-        controller_conn = await self.connection().controller()
-        model_facade = client.ModelManagerFacade.from_connection(
-            controller_conn)
-        user = tag.user(username)
-        model = tag.model(self.info.uuid)
-        changes = client.ModifyModelAccess(acl, 'grant', model, user)
-        await self.revoke(username)
-        return await model_facade.ModifyModelAccess([changes])
-
     def import_ssh_key(self, identity):
         """Add a public SSH key from a trusted indentity source to this model.
 
@@ -1510,20 +1504,6 @@ class Model:
 
         """
         raise NotImplementedError()
-
-    async def revoke(self, username):
-        """Revoke a user's access to this model.
-
-        :param str username: Username to revoke
-
-        """
-        controller_conn = await self.connection().controller()
-        model_facade = client.ModelManagerFacade.from_connection(
-            controller_conn)
-        user = tag.user(username)
-        model = tag.model(self.info.uuid)
-        changes = client.ModifyModelAccess('read', 'revoke', model, user)
-        return await model_facade.ModifyModelAccess([changes])
 
     def run(self, command, timeout=None):
         """Run command on all machines in this model.

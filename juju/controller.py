@@ -3,13 +3,12 @@ import logging
 
 from . import errors, tag, utils
 from .client import client, connector
-from .model import Model
 from .user import User
 
 log = logging.getLogger(__name__)
 
 
-class Controller(object):
+class Controller:
     def __init__(
         self,
         loop=None,
@@ -37,6 +36,13 @@ class Controller(object):
             bakery_client=bakery_client,
             jujudata=jujudata,
         )
+
+    async def __aenter__(self):
+        await self.connect()
+        return self
+
+    async def __aexit__(self, exc_type, exc, tb):
+        await self.disconnect()
 
     @property
     def loop(self):
@@ -67,6 +73,10 @@ class Controller(object):
                 # A UUID implies a model connection, not a controller connection.
                 raise ValueError('model UUID specified when connecting to controller')
             await self._connector.connect(**kwargs)
+
+    async def _connect_direct(self, **kwargs):
+        await self.disconnect()
+        await self._connector.connect(**kwargs)
 
     def is_connected(self):
         """Reports whether the Controller is currently connected."""
@@ -184,7 +194,7 @@ class Controller(object):
             owner,
             region
         )
-
+        from juju.model import Model
         model = Model(jujudata=self._connector.jujudata)
         kwargs = self.connection().connect_params()
         kwargs['uuid'] = model_info.uuid
@@ -385,6 +395,7 @@ class Controller(object):
         else:
             uuid = model
 
+        from juju.model import Model
         model = Model()
         kwargs = self.connection().connect_params()
         kwargs['uuid'] = uuid
@@ -425,27 +436,72 @@ class Controller(object):
         return [User(self, r.result) for r in response.results]
 
     async def grant(self, username, acl='login'):
-        """Set access level of the given user on the controller
-
+        """Grant access level of the given user on the controller.
+        Note that if the user already has higher permissions than the
+        provided ACL, this will do nothing (see revoke for a way to
+        remove permissions).
         :param str username: Username
         :param str acl: Access control ('login', 'add-model' or 'superuser')
-
+        :returns: True if new access was granted, False if user already had
+            requested access or greater.  Raises JujuError if failed.
         """
         controller_facade = client.ControllerFacade.from_connection(
             self.connection())
         user = tag.user(username)
-        await self.revoke(username)
         changes = client.ModifyControllerAccess(acl, 'grant', user)
-        return await controller_facade.ModifyControllerAccess([changes])
+        try:
+            await controller_facade.ModifyControllerAccess([changes])
+            return True
+        except errors.JujuError as e:
+            if 'user already has' in str(e):
+                return False
+            else:
+                raise
 
-    async def revoke(self, username):
-        """Removes all access from a controller
+    async def revoke(self, username, acl='login'):
+        """Removes some or all access of a user to from a controller
+        If 'login' access is revoked, the user will no longer have any
+        permissions on the controller. Revoking a higher privilege from
+        a user without that privilege will have no effect.
 
         :param str username: username
-
+        :param str acl: Access to remove ('login', 'add-model' or 'superuser')
         """
         controller_facade = client.ControllerFacade.from_connection(
             self.connection())
         user = tag.user(username)
         changes = client.ModifyControllerAccess('login', 'revoke', user)
         return await controller_facade.ModifyControllerAccess([changes])
+
+    async def grant_model(self, username, model_uuid, acl='read'):
+        """Grant a user access to a model. Note that if the user
+        already has higher permissions than the provided ACL,
+        this will do nothing (see revoke_model for a way to remove permissions).
+
+        :param str username: Username
+        :param str model_uuid: The UUID of the model to change.
+        :param str acl: Access control ('read, 'write' or 'admin')
+        """
+        model_facade = client.ModelManagerFacade.from_connection(
+            self.connection())
+        user = tag.user(username)
+        model = tag.model(model_uuid)
+        changes = client.ModifyModelAccess(acl, 'grant', model, user)
+        return await model_facade.ModifyModelAccess([changes])
+
+    async def revoke_model(self, username, model_uuid, acl='read'):
+        """Revoke some or all of a user's access to a model.
+        If 'read' access is revoked, the user will no longer have any
+        permissions on the model. Revoking a higher privilege from
+        a user without that privilege will have no effect.
+
+        :param str username: Username to revoke
+        :param str model_uuid: The UUID of the model to change.
+        :param str acl: Access control ('read, 'write' or 'admin')
+        """
+        model_facade = client.ModelManagerFacade.from_connection(
+            self.connection())
+        user = tag.user(username)
+        model = tag.model(self.info.uuid)
+        changes = client.ModifyModelAccess(acl, 'revoke', model, user)
+        return await model_facade.ModifyModelAccess([changes])

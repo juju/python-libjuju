@@ -1,3 +1,8 @@
+# TODO: Tags should be a proper class, so that we can distinguish whether
+# something is already a tag or not.  For example, 'user-foo' is a valid
+# username, but is ambiguous with the already-tagged username 'foo'.
+
+
 def _prefix(prefix, s):
     if s and not s.startswith(prefix):
         return '{}{}'.format(prefix, s)
