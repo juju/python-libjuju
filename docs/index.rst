@@ -11,16 +11,29 @@ Table of Contents
 -----------------
 
 .. toctree::
+   :caption: Overview
    :glob:
    :maxdepth: 3
 
    narrative/index
-   API Docs <api/modules>
-   Internal API Docs <api/juju.client>
+
+
+.. toctree::
+   :caption: API Documentation
+   :glob:
+   :maxdepth: 3
+
+   api/modules
+   api/juju.client
+
+.. toctree::
+   :caption: Project
+   :glob:
+   :maxdepth: 3
+
    upstream-updates/index
+   changelog
 
-
-.. include:: changelog.rst
 
 
 Indices and tables

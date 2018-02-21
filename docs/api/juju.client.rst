@@ -1,5 +1,5 @@
-juju\.client package
-====================
+Internal APIs
+=============
 
 These packages are for internal use in communicating with the low-level
 API.  You should use the object oriented API instead.  They are documented
