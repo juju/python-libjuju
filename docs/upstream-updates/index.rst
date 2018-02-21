@@ -1,5 +1,5 @@
-Upstream Updates
-================
+Syncing Upstream Updates
+========================
 
 Updating the facade and definitions code generated from the schema
 to reflect changes in upstream Juju consists of two steps:

@@ -1,5 +1,4 @@
-Narrative Docs
-==============
+**Overview**
 
 .. toctree::
    :glob:

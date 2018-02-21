@@ -1,5 +1,5 @@
-juju
-====
+Public APIs
+===========
 
 It is recommended that you start with :doc:`juju.model` or :doc:`juju.controller`.
 If you need helpers to manage the asyncio loop, try :doc:`juju.loop`.
