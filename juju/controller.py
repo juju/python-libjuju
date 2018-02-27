@@ -76,6 +76,20 @@ class Controller:
                 raise ValueError('model UUID specified when connecting to controller')
             await self._connector.connect(**kwargs)
 
+    async def connect_current(self):
+        """
+        .. deprecated:: 0.7.3
+           Use :meth:`.connect()` instead.
+        """
+        return await self.connect()
+
+    async def connect_controller(self, controller_name):
+        """
+        .. deprecated:: 0.7.3
+           Use :meth:`.connect(controller_name)` instead.
+        """
+        return await self.connect(controller_name)
+
     async def _connect_direct(self, **kwargs):
         await self.disconnect()
         await self._connector.connect(**kwargs)
