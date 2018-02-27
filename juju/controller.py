@@ -3,8 +3,11 @@ import json
 import logging
 from pathlib import Path
 
+import macaroonbakery.httpbakery as httpbakery
+
 from . import errors, tag, utils
 from .client import client, connector
+from .client.gocookies import GoCookieJar, _new_py_cookie
 from .user import User
 
 log = logging.getLogger(__name__)
@@ -50,7 +53,7 @@ class Controller:
     def loop(self):
         return self._connector.loop
 
-    async def connect(self, controller_name=None, **kwargs):
+    async def connect(self, controller_name=None, *args, **kwargs):
         """Connect to a Juju controller.
 
         If any arguments are specified other than controller_name,
@@ -64,8 +67,31 @@ class Controller:
 
         Otherwise, controller_name must specify the name
         of a known controller.
+
+        For backwards compatibility, positional args can also be used,
+        in which case ``controller_name`` should actually be the endpoint.
+        This usage is deprecated, however, in favor of explicitly named
+        keyword params.
         """
         await self.disconnect()
+        if args:
+            # backwards compatibility for positional params
+            if len(args) < 2:
+                raise TypeError('connect() missing required positional params')
+            kwargs.update({
+                'endpoint': controller_name,
+                'username': args[0],
+                'password': args[1],
+            })
+            if len(args) > 2:
+                kwargs['cacert'] = args[2]
+            if len(args) > 3:
+                kwargs['bakery_client'] = httpbakery.Client()
+                kwargs['bakery_client'].cookies = jar = GoCookieJar()
+                for macaroon in args[3]:
+                    jar.set_cookie(_new_py_cookie(macaroon))
+            controller_name = None
+
         if not kwargs:
             await self._connector.connect_controller(controller_name)
         else:
