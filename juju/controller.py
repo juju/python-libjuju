@@ -332,7 +332,7 @@ class Controller:
            Use :meth:`.list_models` instead.
         """
         controller_facade = client.ControllerFacade.from_connection(
-            self.connection)
+            self.connection())
         for attempt in (1, 2, 3):
             try:
                 return await controller_facade.AllModels()
