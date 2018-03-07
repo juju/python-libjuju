@@ -15,7 +15,7 @@ class GoCookieJar(cookiejar.FileCookieJar):
         to implement the actual cookie loading'''
         data = json.load(f) or []
         now = time.time()
-        for cookie in map(_new_py_cookie, data):
+        for cookie in map(go_to_py_cookie, data):
             if not ignore_expires and cookie.is_expired(now):
                 continue
             self.set_cookie(cookie)
@@ -37,12 +37,12 @@ class GoCookieJar(cookiejar.FileCookieJar):
                 continue
             if not ignore_expires and cookie.is_expired(now):
                 continue
-            go_cookies.append(_new_go_cookie(cookie))
+            go_cookies.append(py_to_go_cookie(cookie))
         with open(filename, "w") as f:
             f.write(json.dumps(go_cookies))
 
 
-def _new_py_cookie(go_cookie):
+def go_to_py_cookie(go_cookie):
     '''Convert a Go-style JSON-unmarshaled cookie into a Python cookie'''
     expires = None
     if go_cookie.get('Expires') is not None:
@@ -75,7 +75,7 @@ def _new_py_cookie(go_cookie):
     )
 
 
-def _new_go_cookie(py_cookie):
+def py_to_go_cookie(py_cookie):
     '''Convert a python cookie to the JSON-marshalable Go-style cookie form.'''
     # TODO (perhaps):
     #   HttpOnly

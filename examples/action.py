@@ -7,7 +7,6 @@ This example:
 4. Waits for the action results to come back, then exits.
 
 """
-import asyncio
 import logging
 
 from juju import loop
@@ -27,8 +26,8 @@ async def run_action(unit):
 
 async def main():
     model = Model()
+    # connect to current model with current user, per Juju CLI
     await model.connect()
-    await model.reset(force=True)
 
     app = await model.deploy(
         'git',

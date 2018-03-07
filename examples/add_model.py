@@ -19,6 +19,7 @@ LOG = getLogger(__name__)
 async def main():
     controller = Controller()
     print("Connecting to controller")
+    # connect to current controller with current user, per Juju CLI
     await controller.connect()
 
     try:

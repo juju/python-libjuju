@@ -4,7 +4,7 @@ A Juju controller provides websocket endpoints for each of its
 models. In order to do anything useful with a model, the juju lib must
 connect to one of these endpoints. There are several ways to do this.
 
-For api docs, see :class:`juju.model.Model`.
+For api docs, see py:class:`juju.model.Model`.
 
 
 Connecting to the Current Model
@@ -14,10 +14,8 @@ Connect to the currently active Juju model (the one returned by
 
 .. code:: python
 
-  from juju.model import Model
-
   model = Model()
-  await model.connect_current()
+  await model.connect()
 
 
 Connecting to a Named Model
@@ -28,88 +26,74 @@ This only works if you have the Juju CLI client installed.
 
 .. code:: python
 
-  # $ juju switch
-  # juju-2.0.1:admin/libjuju
+  model = Model()
+  await model.connect('juju-2.0.1:admin/libjuju')
 
-  from juju.model import Model
+
+Connecting with Authentication
+------------------------------
+You can control what user you are connecting with by specifying either a
+username/password pair, or a macaroon or bakery client that can provide
+a macaroon.
+
+
+.. code:: python
 
   model = Model()
-  await model.connect_model('juju-2.0.1:admin/libjuju')
+  await model.connect(username='admin',
+                      password='f53f08cfc32a2e257fe5393271d89d62')
+
+  # or with a macaroon
+  await model.connect(macaroons=[
+      {
+          "Name": "macaroon-218d87053ad19626bcd5a0eef0bc9ba8bd4fbd80a968f52a5fd430b2aa8660df",
+          "Value": "W3siY2F2ZWF0cyI6 ... jBkZiJ9XQ==",
+          "Domain": "10.130.48.27",
+          "Path": "/auth",
+          "Secure": false,
+          "HostOnly": true,
+          "Expires": "2018-03-07T22:07:23Z",
+      },
+  ])
+
+  # or with a bakery client
+  from macaroonbakery.httpbakery import Client
+  from http.cookiejar import FileCookieJar
+
+  bakery_client=Client()
+  bakery_client.cookies = FileCookieJar('cookies.txt')
+  model = Model()
+  await model.connect(bakery_client=bakery_client)
+  
 
 
-Connecting with Username/Password Authentication
-------------------------------------------------
+Connecting with an Explicit Endpoint
+------------------------------------
 The most flexible, but also most verbose, way to connect is using the API
-endpoint url and credentials directly. This method does NOT require the Juju
-CLI client to be installed.
+endpoint url, model UUID, and credentials directly. This method does NOT
+require the Juju CLI client to be installed.
 
 .. code:: python
 
   from juju.model import Model
 
   model = Model()
-
-  controller_endpoint = '10.0.4.171:17070'
-  model_uuid = 'e8399ac7-078c-4817-8e5e-32316d55b083'
-  username = 'admin'
-  password = 'f53f08cfc32a2e257fe5393271d89d62'
-
-  # Left out for brevity, but if you have a cert string you should pass it in.
-  # You can copy the cert from the output of The `juju show-controller`
-  # command.
-  cacert = None
-
   await model.connect(
-      controller_endpoint,
-      model_uuid,
-      username,
-      password,
-      cacert,
-  )
-
-
-Connecting with Macaroon Authentication
----------------------------------------
-To connect to a shared model, or a model an a shared controller, you'll need
-to use macaroon authentication. The simplest example is shown below, and uses
-already-discharged macaroons from the local filesystem. This will work if you
-have the Juju CLI installed.
-
-.. note::
-
-  The library does not yet contain support for fetching and discharging
-  macaroons. Until it does, if you want to use macaroon auth, you'll need
-  to supply already-discharged macaroons yourself.
-
-.. code:: python
-
-  from juju.client.connection import get_macaroons()
-  from juju.model import Model
-
-  model = Model()
-
-  controller_endpoint = '10.0.4.171:17070'
-  model_uuid = 'e8399ac7-078c-4817-8e5e-32316d55b083'
-  username = None
-  password = None
-  cacert = None
-  macaroons = get_macaroons()
-
-  await model.connect(
-      controller_endpoint,
-      model_uuid,
-      username,
-      password,
-      cacert,
-      macaroons,
+      endpoint='10.0.4.171:17070',
+      uuid='e8399ac7-078c-4817-8e5e-32316d55b083',
+      username='admin',
+      password='f53f08cfc32a2e257fe5393271d89d62',
+      cacert=None,  # Left out for brevity, but if you have a cert string you
+                    # should pass it in. You can get the cert from the output
+                    # of The `juju show-controller` command.
   )
 
 
 Creating and Destroying a Model
 -------------------------------
 Example of creating a new model and then destroying it. See
-:meth:`juju.controller.Controller.add_model` and
-:meth:`juju.controller.Controller.destroy_model` for more info.
+py:method:`juju.controller.Controller.add_model` and
+py:method:`juju.controller.Controller.destroy_model` for more info.
 
 .. code:: python
 
@@ -134,8 +118,8 @@ Example of creating a new model and then destroying it. See
 Adding Machines and Containers
 ------------------------------
 To add a machine or container, connect to a model and then call its
-:meth:`~juju.model.Model.add_machine` method. A
-:class:`~juju.machine.Machine` instance is returned. The machine id
+py:method:`~juju.model.Model.add_machine` method. A
+py:class:`~juju.machine.Machine` instance is returned. The machine id
 can be used to deploy a charm to a specific machine or container.
 
 .. code:: python
@@ -192,7 +176,7 @@ Reacting to Changes in a Model
 ------------------------------
 To watch for and respond to changes in a model, register an observer with the
 model. The easiest way to do this is by creating a
-:class:`juju.model.ModelObserver` subclass.
+py:class:`juju.model.ModelObserver` subclass.
 
 .. code:: python
 
@@ -283,7 +267,7 @@ to the entity and type of change that you wish to handle.
           # specific handler method is not defined.
 
 
-Any :class:`juju.model.ModelEntity` object can be observed directly by
+Any py:class:`juju.model.ModelEntity` object can be observed directly by
 registering callbacks on the object itself.
 
 .. code:: python

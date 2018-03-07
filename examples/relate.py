@@ -40,6 +40,7 @@ class MyModelObserver(ModelObserver):
 
 async def main():
     model = Model()
+    # connect to current model with current user, per Juju CLI
     await model.connect()
 
     try:

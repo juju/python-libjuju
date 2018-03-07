@@ -7,6 +7,7 @@ async def main(cloud_name, credential_name):
     controller = Controller()
     model = None
     print('Connecting to controller')
+    # connect to current controller with current user, per Juju CLI
     await controller.connect()
     try:
         print('Adding model')

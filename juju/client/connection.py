@@ -109,20 +109,22 @@ class Connection:
 
         If uuid is None, the connection will be to the controller. Otherwise it
         will be to the model.
-        :param str endpoint The hostname:port of the controller to connect to.
-        :param str uuid The model UUID to connect to (None for a
+
+        :param str endpoint: The hostname:port of the controller to connect to.
+        :param str uuid: The model UUID to connect to (None for a
             controller-only connection).
-        :param str username The username for controller-local users (or None
+        :param str username: The username for controller-local users (or None
             to use macaroon-based login.)
-        :param str password The password for controller-local users.
-        :param str cacert The CA certificate of the controller (PEM formatted).
-        :param httpbakery.Client bakery_client The macaroon bakery client to
+        :param str password: The password for controller-local users.
+        :param str cacert: The CA certificate of the controller
+            (PEM formatted).
+        :param httpbakery.Client bakery_client: The macaroon bakery client to
             to use when performing macaroon-based login. Macaroon tokens
             acquired when logging will be saved to bakery_client.cookies.
             If this is None, a default bakery_client will be used.
-        :param loop asyncio.BaseEventLoop The event loop to use for async
+        :param asyncio.BaseEventLoop loop: The event loop to use for async
             operations.
-        :param max_frame_size The maximum websocket frame size to allow.
+        :param int max_frame_size: The maximum websocket frame size to allow.
         """
         self = cls()
         if endpoint is None:

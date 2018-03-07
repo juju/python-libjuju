@@ -5,6 +5,7 @@ import mock
 import asynctest
 
 from juju.client.jujudata import FileJujuData
+from juju.model import Model
 
 
 def _make_delta(entity, type_, data=None):
@@ -159,44 +160,105 @@ class TestContextManager(asynctest.TestCase):
                 pass
 
 
+@asynctest.patch('juju.model.Model._after_connect')
 class TestModelConnect(asynctest.TestCase):
     @asynctest.patch('juju.client.connector.Connector.connect_model')
-    @asynctest.patch('juju.model.Model._after_connect')
-    async def test_model_connect_no_args(self, mock_after_connect, mock_connect_model):
-        from juju.model import Model
+    async def test_no_args(self, mock_connect_model, _):
         m = Model()
         await m.connect()
         mock_connect_model.assert_called_once_with(None)
 
     @asynctest.patch('juju.client.connector.Connector.connect_model')
-    @asynctest.patch('juju.model.Model._after_connect')
-    async def test_model_connect_with_model_name(self, mock_after_connect, mock_connect_model):
-        from juju.model import Model
+    async def test_with_model_name(self, mock_connect_model, _):
         m = Model()
         await m.connect(model_name='foo')
         mock_connect_model.assert_called_once_with('foo')
 
     @asynctest.patch('juju.client.connector.Connector.connect_model')
-    @asynctest.patch('juju.model.Model._after_connect')
-    async def test_model_connect_with_endpoint_but_no_uuid(
-        self,
-        mock_after_connect,
-        mock_connect_model,
-    ):
-        from juju.model import Model
+    async def test_with_endpoint_but_no_uuid(self, mock_connect_model, _):
         m = Model()
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             await m.connect(endpoint='0.1.2.3:4566')
         self.assertEqual(mock_connect_model.call_count, 0)
 
     @asynctest.patch('juju.client.connector.Connector.connect')
-    @asynctest.patch('juju.model.Model._after_connect')
-    async def test_model_connect_with_endpoint_and_uuid(
-        self,
-        mock_after_connect,
-        mock_connect,
-    ):
-        from juju.model import Model
+    async def test_with_endpoint_and_uuid_no_auth(self, mock_connect, _):
         m = Model()
-        await m.connect(endpoint='0.1.2.3:4566', uuid='some-uuid')
-        mock_connect.assert_called_once_with(endpoint='0.1.2.3:4566', uuid='some-uuid')
+        with self.assertRaises(TypeError):
+            await m.connect(endpoint='0.1.2.3:4566', uuid='some-uuid')
+        self.assertEqual(mock_connect.call_count, 0)
+
+    @asynctest.patch('juju.client.connector.Connector.connect')
+    async def test_with_endpoint_and_uuid_with_userpass(self, mock_connect, _):
+        m = Model()
+        with self.assertRaises(TypeError):
+            await m.connect(endpoint='0.1.2.3:4566',
+                            uuid='some-uuid',
+                            username='user')
+        await m.connect(endpoint='0.1.2.3:4566',
+                        uuid='some-uuid',
+                        username='user',
+                        password='pass')
+        mock_connect.assert_called_once_with(endpoint='0.1.2.3:4566',
+                                             uuid='some-uuid',
+                                             username='user',
+                                             password='pass')
+
+    @asynctest.patch('juju.client.connector.Connector.connect')
+    async def test_with_endpoint_and_uuid_with_bakery(self, mock_connect, _):
+        m = Model()
+        await m.connect(endpoint='0.1.2.3:4566',
+                        uuid='some-uuid',
+                        bakery_client='bakery')
+        mock_connect.assert_called_once_with(endpoint='0.1.2.3:4566',
+                                             uuid='some-uuid',
+                                             bakery_client='bakery')
+
+    @asynctest.patch('juju.client.connector.Connector.connect')
+    async def test_with_endpoint_and_uuid_with_macaroon(self, mock_connect, _):
+        m = Model()
+        with self.assertRaises(TypeError):
+            await m.connect(endpoint='0.1.2.3:4566',
+                            uuid='some-uuid',
+                            username='user')
+        await m.connect(endpoint='0.1.2.3:4566',
+                        uuid='some-uuid',
+                        macaroons=['macaroon'])
+        mock_connect.assert_called_with(endpoint='0.1.2.3:4566',
+                                        uuid='some-uuid',
+                                        macaroons=['macaroon'])
+        await m.connect(endpoint='0.1.2.3:4566',
+                        uuid='some-uuid',
+                        bakery_client='bakery',
+                        macaroons=['macaroon'])
+        mock_connect.assert_called_with(endpoint='0.1.2.3:4566',
+                                        uuid='some-uuid',
+                                        bakery_client='bakery',
+                                        macaroons=['macaroon'])
+
+    @asynctest.patch('juju.client.connector.Connector.connect_model')
+    @asynctest.patch('juju.client.connector.Connector.connect')
+    async def test_with_posargs(self, mock_connect, mock_connect_model, _):
+        m = Model()
+        await m.connect('foo')
+        mock_connect_model.assert_called_once_with('foo')
+        with self.assertRaises(TypeError):
+            await m.connect('endpoint', 'uuid')
+        with self.assertRaises(TypeError):
+            await m.connect('endpoint', 'uuid', 'user')
+        await m.connect('endpoint', 'uuid', 'user', 'pass')
+        mock_connect.assert_called_once_with(endpoint='endpoint',
+                                             uuid='uuid',
+                                             username='user',
+                                             password='pass')
+        await m.connect('endpoint', 'uuid', 'user', 'pass', 'cacert', 'bakery',
+                        'macaroons', 'loop', 'max_frame_size')
+        mock_connect.assert_called_with(endpoint='endpoint',
+                                        uuid='uuid',
+                                        username='user',
+                                        password='pass',
+                                        cacert='cacert',
+                                        bakery_client='bakery',
+                                        macaroons='macaroons',
+                                        loop='loop',
+                                        max_frame_size='max_frame_size')

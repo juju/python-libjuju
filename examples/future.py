@@ -2,7 +2,6 @@
 This example doesn't work - it demonstrates features that don't exist yet.
 
 """
-import asyncio
 import logging
 
 from juju.model import Model
@@ -11,8 +10,8 @@ from juju import loop
 
 async def main():
     model = Model()
+    # connect to current model with current user, per Juju CLI
     await model.connect()
-    await model.reset(force=True)
 
     goal_state = Model.from_yaml('bundle-like-thing')
     ubuntu_app = await model.deploy(
