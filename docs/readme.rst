@@ -38,10 +38,7 @@ Quickstart
 ----------
 Here's a simple example that shows basic usage of the library. The example
 connects to the currently active Juju model, deploys a single unit of the
-ubuntu charm, then exits.
-
-More examples can be found in the `examples/` directory of the source tree,
-and in the documentation.
+ubuntu charm, then exits:
 
 
 .. code:: python
@@ -95,3 +92,12 @@ and in the documentation.
 
   if __name__ == '__main__':
       main()
+
+
+More examples can be found in the docs, as well as in the ``examples/``
+directory of the source tree which can be run using ``tox``.  For
+example, to run ``examples/connect_current_model.py``, use:
+
+.. code:: bash
+
+  tox -e example -- examples/connect_current_model.py
