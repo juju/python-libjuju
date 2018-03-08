@@ -519,8 +519,8 @@ class Connection:
 
     async def login(self):
         params = {}
+        params['auth-tag'] = self.usertag
         if self.password:
-            params['auth-tag'] = self.usertag
             params['credentials'] = self.password
         else:
             macaroons = _macaroons_for_domain(self.bakery_client.cookies,

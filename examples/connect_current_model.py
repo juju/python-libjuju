@@ -13,7 +13,8 @@ log = logging.getLogger(__name__)
 async def main():
     model = Model()
     try:
-        await model.connect_current()
+        # connect to the current model with the current user, per the Juju CLI
+        await model.connect()
         print('There are {} applications'.format(len(model.applications)))
     finally:
         if model.is_connected():
