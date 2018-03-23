@@ -40,3 +40,4 @@ def run(*steps):
     finally:
         if added:
             loop.remove_signal_handler(signal.SIGINT)
+        loop.close()
