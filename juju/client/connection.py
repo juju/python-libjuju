@@ -354,8 +354,10 @@ class Connection:
         :return: Dictionary of headers
 
         """
-        if not self.usertag:
-            return {}
+        if not self.password:
+            req = urllib.request.Request('https://' + self.endpoint + '/')
+            self.bakery_client.cookies.add_cookie_header(req)
+            return dict(req.header_items())
 
         creds = u'{}:{}'.format(
             self.usertag,

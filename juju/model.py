@@ -639,12 +639,22 @@ class Model:
         headers['Content-Type'] = 'application/zip'
         if size:
             headers['Content-Length'] = size
-        conn.request("POST", path, charm_file, headers)
+        try:
+            conn.request("POST", path, charm_file, headers)
+        except BrokenPipeError:
+            pass  # upload is rejected if auth fails, continue to read response
         response = conn.getresponse()
-        result = response.read().decode()
-        if not response.status == 200:
-            raise JujuError(result)
-        result = json.loads(result)
+        response_text = response.read().decode()
+        try:
+            result = json.loads(response_text)
+        except json.JSONDecodeError:
+            result = {}
+        if response.status != 200:
+            if 'error-code' in result:
+                msg = '{}: {}'.format(result['error-code'], result['error'])
+            else:
+                msg = result.get('error', response_text)
+            raise JujuError('Upload local charm failed: {}'.format(msg))
         return result['charm-url']
 
     def all_units_idle(self):
