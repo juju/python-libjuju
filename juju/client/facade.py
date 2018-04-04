@@ -49,14 +49,15 @@ def lookup_facade(name, version):
     of the correct client<version>.py file.
 
     """
-    try:
-        facade = getattr(CLIENTS[str(version)], name)
-    except KeyError:
-        raise ImportError("No facades found for version {}".format(version))
-    except AttributeError:
-        raise ImportError(
-            "No facade with name '{}' in version {}".format(name, version))
-    return facade
+    for _version in range(int(version), 0, -1):
+        try:
+            facade = getattr(CLIENTS[str(_version)], name)
+            return facade
+        except (KeyError, AttributeError):
+            continue
+    else:
+        raise ImportError("No supported version for facade: "
+                          "{}".format(name))
 
 
 '''
