@@ -48,6 +48,16 @@ as well as one or more of the `juju/client/_clientX.py` files, depending on
 which facades were touched.
 
 
+Debugging Upstream Changes
+--------------------------
+
+An extremely useful method of ensuring that the library is performing the same
+steps as the CLI is to include the `--logging-config TRACE` option when running
+the command via the CLI.  This will log every single API request and response
+that the CLI makes, so that you can confirm that the library is doing
+everything the same way.
+
+
 Overrides
 ---------
 
