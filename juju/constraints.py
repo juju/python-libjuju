@@ -29,6 +29,8 @@ FACTORS = {
     "P": 1024 * 1024 * 1024
 }
 
+LIST_KEYS = {'tags', 'spaces'}
+
 SNAKE1 = re.compile(r'(.)([A-Z][a-z]+)')
 SNAKE2 = re.compile('([a-z0-9])([A-Z])')
 
@@ -47,8 +49,10 @@ def parse(constraints):
         return constraints
 
     constraints = {
-        normalize_key(k): normalize_value(v) for k, v in [
-            s.split("=") for s in constraints.split(" ")]}
+        normalize_key(k): (
+            normalize_list_value(v) if k in LIST_KEYS else
+            normalize_value(v)
+        ) for k, v in [s.split("=") for s in constraints.split(" ")]}
 
     return constraints
 
@@ -72,13 +76,12 @@ def normalize_value(value):
         # Translate aliases to Megabytes. e.g. 1G = 10240
         return int(value[:-1]) * FACTORS[value[-1:]]
 
-    if "," in value:
-        # Handle csv strings.
-        values = value.split(",")
-        values = [normalize_value(v) for v in values]
-        return values
-
     if value.isdigit():
         return int(value)
 
     return value
+
+
+def normalize_list_value(value):
+    values = value.strip().split(',')
+    return [normalize_value(value) for value in values]
