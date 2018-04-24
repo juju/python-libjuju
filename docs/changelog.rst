@@ -1,6 +1,16 @@
 Changelog
 ---------
 
+
+0.7.4
+^^^^^
+Tuesday Apr 24 2018
+
+* Always parse tags and spaces constraints to lists (#228) 
+* Doc index improvements (#211) 
+* Add doc req to force newer pymacaroons to fix RTD builds 
+* Fix dependency conflict for building docs 
+
 0.7.3
 ^^^^^
 Tuesday Feb 20 2018
