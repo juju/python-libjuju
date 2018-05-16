@@ -129,7 +129,7 @@ class Controller:
                 raise errors.JujuError(
                     'Unable to find credential: {}'.format(name))
 
-        if 'file' in credential.attrs:
+        if credential.auth_type == 'jsonfile' and 'file' in credential.attrs:
             # file creds have to be loaded before being sent to the controller
             try:
                 # it might already be JSON
