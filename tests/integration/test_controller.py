@@ -1,8 +1,12 @@
 import asyncio
+import subprocess
 import uuid
 
 from juju.client.connection import Connection
+from juju.client.jujudata import FileJujuData
+from juju.controller import Controller
 from juju.errors import JujuAPIError
+from juju.model import Model
 
 import pytest
 
@@ -167,3 +171,31 @@ async def test_add_destroy_model_by_uuid(event_loop):
         await asyncio.wait_for(_wait_for_model_gone(controller,
                                                     model_name),
                                timeout=60)
+
+
+# this test must be run serially because it modifies the login password
+@pytest.mark.serial
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_macaroon_auth(event_loop):
+    jujudata = FileJujuData()
+    account = jujudata.accounts()[jujudata.current_controller()]
+    with base.patch_file('~/.local/share/juju/accounts.yaml'):
+        if 'password' in account:
+            # force macaroon auth by "changing" password to current password
+            result = subprocess.run(
+                ['juju', 'change-user-password'],
+                input='{0}\n{0}\n'.format(account['password']),
+                universal_newlines=True,
+                stderr=subprocess.PIPE)
+            assert result.returncode == 0, ('Failed to change password: '
+                                            '{}'.format(result.stderr))
+        controller = Controller()
+        try:
+            await controller.connect()
+            assert controller.is_connected()
+        finally:
+            if controller.is_connected():
+                await controller.disconnect()
+        async with base.CleanModel():
+            pass  # create and login to model works

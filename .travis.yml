@@ -28,4 +28,4 @@ before_script:
   - sudo usermod -a -G lxd $USER || true
 script:
   - sudo -E sudo -u $USER -E juju bootstrap localhost test --config 'identity-url=https://api.staging.jujucharms.com/identity' --config 'allow-model-access=true'
-  - tox -e py35,integration
+  - tox -e py3,integration,serial
