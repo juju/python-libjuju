@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from pathlib import Path
 
 from . import errors, tag, utils
 from .client import client, connector
@@ -126,6 +127,16 @@ class Controller:
             if credential is None:
                 raise errors.JujuError(
                     'Unable to find credential: {}'.format(name))
+
+        if 'file' in credential.attrs:
+            # file creds have to be loaded before being sent to the controller
+            cred_path = Path(credential.attrs['file'])
+            if cred_path.exists():
+                # make a copy
+                cred_json = credential.to_json()
+                credential = client.CloudCredential.from_json(cred_json)
+                # inline the cred
+                credential.attrs['file'] = cred_path.read_text()
 
         log.debug('Uploading credential %s', name)
         cloud_facade = client.CloudFacade.from_connection(self.connection())
