@@ -1,6 +1,8 @@
 import inspect
 import subprocess
 import uuid
+from contextlib import contextmanager
+from pathlib import Path
 
 import mock
 from juju.client.jujudata import FileJujuData
@@ -24,6 +26,13 @@ test_run_nonce = uuid.uuid4().hex[-4:]
 
 
 class CleanController():
+    """
+    Context manager that automatically connects and disconnects from
+    the currently active controller.
+
+    Note: Unlike CleanModel, this will not create a new controller for you,
+    and an active controller must already be available.
+    """
     def __init__(self):
         self._controller = None
 
@@ -37,6 +46,14 @@ class CleanController():
 
 
 class CleanModel():
+    """
+    Context manager that automatically connects to the currently active
+    controller, adds a fresh model, returns the connection to that model,
+    and automatically disconnects and cleans up the model.
+
+    The new model is also set as the current default for the controller
+    connection.
+    """
     def __init__(self, bakery_client=None):
         self._controller = None
         self._model = None
@@ -112,3 +129,17 @@ class TestJujuData(FileJujuData):
 class AsyncMock(mock.MagicMock):
     async def __call__(self, *args, **kwargs):
         return super().__call__(*args, **kwargs)
+
+
+@contextmanager
+def patch_file(filename):
+    """
+    "Patch" a file so that its current contents are automatically restored
+    when the context is exited.
+    """
+    filepath = Path(filename).expanduser()
+    data = filepath.read_bytes()
+    try:
+        yield
+    finally:
+        filepath.write_bytes(data)

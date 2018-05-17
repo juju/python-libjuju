@@ -80,7 +80,7 @@ async def test_macaroon_auth_with_unauthorized_user(event_loop):
                 bakery_client=client,
             ):
                 pytest.fail('Should not be able to connect without grant')
-        except JujuAPIError:
+        except (JujuAPIError, httpbakery.DischargeError):
             # We're expecting this because we're using the
             # wrong user name.
             pass
