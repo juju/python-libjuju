@@ -6,6 +6,7 @@ from pathlib import Path
 from juju.client.client import ConfigValue, ApplicationFacade
 from juju.model import Model, ModelObserver
 from juju.utils import block_until, run_with_interrupt
+from juju.errors import JujuAPIError
 
 import pytest
 
@@ -20,7 +21,6 @@ SSH_KEY = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCsYMJGNGG74HAJha3n2CFmWYsOOaORn
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_deploy_local_bundle(event_loop):
-    from pathlib import Path
     tests_dir = Path(__file__).absolute().parent.parent
     bundle_path = tests_dir / 'bundle'
     mini_bundle_file_path = bundle_path / 'mini-bundle.yaml'
@@ -31,6 +31,16 @@ async def test_deploy_local_bundle(event_loop):
 
         for app in ('wordpress', 'mysql', 'myapp'):
             assert app in model.applications
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_deploy_invalid_bundle(event_loop):
+    tests_dir = Path(__file__).absolute().parent.parent
+    bundle_path = tests_dir / 'bundle' / 'invalid.yaml'
+    async with base.CleanModel() as model:
+        with pytest.raises(JujuAPIError):
+            await model.deploy(str(bundle_path))
 
 
 @base.bootstrapped
