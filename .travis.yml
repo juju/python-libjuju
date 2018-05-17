@@ -27,7 +27,7 @@ before_script:
   - sudo lxd init --auto || true
   - sudo addgroup lxd || true
   - sudo usermod -a -G lxd $USER || true
-  - sudo -E sudo -u $USER -E bash -c 'lxc network create lxdbr0 ipv4.nat=true ipv6.address=none ipv6.nat=false'
+  - sudo -E sudo -u $USER -E bash -c 'lxc config set core.https_address "[::]"'
   - sudo -E sudo -u $USER -E bash -c 'for i in 5 10 15 30; do [[ "$(lxc query --wait /1.0 | jq .environment.addresses)" != "[]" ]] && break; sleep $i; done'
 script:
   - sudo -E sudo -u $USER -E juju bootstrap localhost test --config 'identity-url=https://api.staging.jujucharms.com/identity' --config 'allow-model-access=true'
