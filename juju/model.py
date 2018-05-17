@@ -1775,7 +1775,7 @@ class BundleHandler:
             yaml.dump(self.bundle))
 
         if self.plan.errors:
-            raise JujuAPIError(self.plan.errors)
+            raise JujuError(self.plan.errors)
 
     async def execute_plan(self):
         for step in self.plan.changes:

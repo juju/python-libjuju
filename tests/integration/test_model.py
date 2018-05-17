@@ -6,7 +6,7 @@ from pathlib import Path
 from juju.client.client import ConfigValue, ApplicationFacade
 from juju.model import Model, ModelObserver
 from juju.utils import block_until, run_with_interrupt
-from juju.errors import JujuAPIError
+from juju.errors import JujuError
 
 import pytest
 
@@ -39,7 +39,7 @@ async def test_deploy_invalid_bundle(event_loop):
     tests_dir = Path(__file__).absolute().parent.parent
     bundle_path = tests_dir / 'bundle' / 'invalid.yaml'
     async with base.CleanModel() as model:
-        with pytest.raises(JujuAPIError):
+        with pytest.raises(JujuError):
             await model.deploy(str(bundle_path))
 
 
