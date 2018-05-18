@@ -1,0 +1,7 @@
+applications:
+  myapp:
+    charm: cs:xenial/ubuntu-0
+    num_units: 1
+    to:
+      - 0
+      - 0
