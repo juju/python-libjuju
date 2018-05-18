@@ -2,14 +2,22 @@ Changelog
 ---------
 
 
+0.7.5
+^^^^^
+Friday May 18 2018
+
+* Surface errors from bundle plan (#233)
+* Always send auth-tag even with macaroon auth (#217)
+* Inline jsonfile credential when sending to controller (#231)
+
 0.7.4
 ^^^^^
 Tuesday Apr 24 2018
 
-* Always parse tags and spaces constraints to lists (#228) 
-* Doc index improvements (#211) 
-* Add doc req to force newer pymacaroons to fix RTD builds 
-* Fix dependency conflict for building docs 
+* Always parse tags and spaces constraints to lists (#228)
+* Doc index improvements (#211)
+* Add doc req to force newer pymacaroons to fix RTD builds
+* Fix dependency conflict for building docs
 
 0.7.3
 ^^^^^
