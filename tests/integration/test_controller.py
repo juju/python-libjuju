@@ -6,7 +6,6 @@ from juju.client.connection import Connection
 from juju.client.jujudata import FileJujuData
 from juju.controller import Controller
 from juju.errors import JujuAPIError
-from juju.model import Model
 
 import pytest
 

@@ -11,3 +11,4 @@ __pycache__/
 dist/
 dev/
 .pytest_cache
+pytestdebug.log
