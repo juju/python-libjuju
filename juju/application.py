@@ -232,19 +232,20 @@ class Application(model.ModelEntity):
         """Get actions defined for this application.
 
         :param bool schema: Return the full action schema
-
+        :return dict: The charms actions, empty dict if none are defined.
         """
-        app_tag = "application-{}".format(self.name)
-        entity = [{"tag": app_tag}]
+        actions = {}
+        entity = [{"tag": self.tag}]
         action_facade = client.ActionFacade.from_connection(self.connection)
         results = (
             await action_facade.ApplicationsCharmsActions(entity)).results
-        # There should only be one element in results so this is probably OTT
         for result in results:
-            if result.application_tag == app_tag:
-                return result.actions
-        else:
-            return None
+            if result.application_tag == self.tag and result.actions:
+                actions = result.actions
+                break
+        if not schema:
+            actions = {k: v['description'] for k, v in actions.items()}
+        return actions
 
     def get_resources(self, details=False):
         """Return resources for this application.
