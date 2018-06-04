@@ -228,13 +228,24 @@ class Application(model.ModelEntity):
         result = (await app_facade.Get(self.name)).constraints
         return vars(result) if result else result
 
-    def get_actions(self, schema=False):
+    async def get_actions(self, schema=False):
         """Get actions defined for this application.
 
         :param bool schema: Return the full action schema
-
+        :return dict: The charms actions, empty dict if none are defined.
         """
-        raise NotImplementedError()
+        actions = {}
+        entity = [{"tag": self.tag}]
+        action_facade = client.ActionFacade.from_connection(self.connection)
+        results = (
+            await action_facade.ApplicationsCharmsActions(entity)).results
+        for result in results:
+            if result.application_tag == self.tag and result.actions:
+                actions = result.actions
+                break
+        if not schema:
+            actions = {k: v['description'] for k, v in actions.items()}
+        return actions
 
     def get_resources(self, details=False):
         """Return resources for this application.

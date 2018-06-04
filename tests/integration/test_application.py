@@ -12,9 +12,9 @@ MB = 1
 async def test_action(event_loop):
     async with base.CleanModel() as model:
         ubuntu_app = await model.deploy(
-            'mysql',
+            'percona-cluster',
             application_name='mysql',
-            series='trusty',
+            series='xenial',
             channel='stable',
             config={
                 'tuning-level': 'safest',
@@ -33,6 +33,10 @@ async def test_action(event_loop):
         await ubuntu_app.set_constraints({'mem': 512 * MB})
         constraints = await ubuntu_app.get_constraints()
         assert constraints['mem'] == 512 * MB
+
+        # check action definitions
+        actions = await ubuntu_app.get_actions()
+        assert 'backup' in actions.keys()
 
 
 @base.bootstrapped
