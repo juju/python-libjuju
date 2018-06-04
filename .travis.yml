@@ -30,6 +30,8 @@ before_script:
   - sudo lxd init --auto || true
   - sudo -E sudo -u $USER -E bash -c 'lxc config set core.https_address "[::]"'
   - sudo -E sudo -u $USER -E bash -c 'for i in 5 10 15 30; do [[ "$(lxc query --wait /1.0 | jq .environment.addresses)" != "[]" ]] && break; sleep $i; done'
+  - sudo -E sudo -u $USER -E bash -c 'sudo mkdir /var/snap/lxd/common/lxd/storage-pools/juju-zfs'
+  - sudo -E sudo -u $USER -E bash -c 'sudo lxc storage create juju-zfs dir source=/var/snap/lxd/common/lxd/storage-pools/juju-zfs' # Horrible workaround to LP Bug #1738614
 script:
   - sudo -E sudo -u $USER -E juju bootstrap localhost test --config 'identity-url=https://api.staging.jujucharms.com/identity' --config 'allow-model-access=true'
   - tox -e py3,integration,serial
