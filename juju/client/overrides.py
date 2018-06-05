@@ -138,14 +138,24 @@ class Number(_definitions.Number):
     def __str__(self):
         return self.serialize()
 
+    @property
+    def _cmp(self):
+        return (self.major, self.minor, self.tag, self.patch, self.build)
+
     def __eq__(self, other):
-        return (
-            isinstance(other, type(self)) and
-            other.major == self.major and
-            other.minor == self.minor and
-            other.tag == self.tag and
-            other.patch == self.patch and
-            other.build == self.build)
+        return isinstance(other, type(self)) and self._cmp == other._cmp
+
+    def __lt__(self, other):
+        return self._cmp < other._cmp
+
+    def __le__(self, other):
+        return self._cmp <= other._cmp
+
+    def __gt__(self, other):
+        return self._cmp > other._cmp
+
+    def __ge__(self, other):
+        return self._cmp >= other._cmp
 
     @classmethod
     def from_json(cls, data):
