@@ -25,6 +25,18 @@ async def test_run(event_loop):
             assert 'Stdout' in action.results
             break
 
+        for unit in app.units:
+            action = await unit.run('sleep 1', timeout=0.5)
+            assert isinstance(action, Action)
+            assert action.status == 'failed'
+            break
+
+        for unit in app.units:
+            action = await unit.run('sleep 0.5', timeout=2)
+            assert isinstance(action, Action)
+            assert action.status == 'completed'
+            break
+
 
 @base.bootstrapped
 @pytest.mark.asyncio
