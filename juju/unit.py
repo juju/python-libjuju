@@ -122,7 +122,7 @@ class Unit(model.ModelEntity):
         """Run command on this unit.
 
         :param str command: The command to run
-        :param int timeout: Time to wait before command is considered failed
+        :param int timeout: Time, in seconds, to wait before command is considered failed
         :returns: A :class:`juju.action.Action` instance.
 
         """
@@ -130,6 +130,10 @@ class Unit(model.ModelEntity):
 
         log.debug(
             'Running `%s` on %s', command, self.name)
+
+        if timeout:
+            # Convert seconds to nanoseconds
+            timeout = int(timeout * 1000000000)
 
         res = await action.Run(
             [],
