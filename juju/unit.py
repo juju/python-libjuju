@@ -133,7 +133,7 @@ class Unit(model.ModelEntity):
 
         if timeout:
             # Convert seconds to nanoseconds
-            timeout = timeout * 1000000000
+            timeout = int(timeout * 1000000000)
 
         res = await action.Run(
             [],
