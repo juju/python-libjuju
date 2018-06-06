@@ -11,6 +11,7 @@ before_install:
   - sudo apt-get install snapd libsodium-dev -y
 install:
   - sudo snap install lxd || true  # ignore failures so that unit tests will still run, at least
+  - sudo sh -c 'echo PATH=/snap/bin:$PATH >> /etc/environment';
   - sudo snap install jq || true
   - sudo snap install juju --classic --$JUJU_CHANNEL || true
   - sudo snap install juju-wait --classic || true
@@ -18,20 +19,26 @@ install:
 env:
   global: >
     TEST_AGENTS='{"agents":[{"url":"https://api.staging.jujucharms.com/identity","username":"libjuju-ci@yellow"}],"key":{"private":"88OOCxIHQNguRG7zFg2y2Hx5Ob0SeVKKBRnjyehverc=","public":"fDn20+5FGyN2hYO7z0rFUyoHGUnfrleslUNtoYsjNSs="}}'
+    LXD_PASSWORD="password"
     PATH="/snap/bin:$PATH"
+
   matrix:
     - JUJU_CHANNEL=stable
     - JUJU_CHANNEL=edge
 before_script:
-  - sudo bash -c 'for i in 5 10 15 30; do [[ -e /var/snap/lxd/common/lxd/unix.socket ]] && break; sleep $i; done'
+  - sudo lxd waitready --timeout 30
+  - sudo lxc storage create default dir
+  - sudo lxd init --auto --trust-password="${LXD_PASSWORD}" --network-address='[::]' --network-port=8443
+
+  # I suspect these could be integrated into the lxd init call
+  - sudo sudo mkdir /var/snap/lxd/common/lxd/storage-pools/juju-zfs
+  - sudo lxc storage create juju-zfs dir source=/var/snap/lxd/common/lxd/storage-pools/juju-zfs # Horrible workaround to LP Bug #1738614
+
   - sudo addgroup lxd || true
   - sudo usermod -a -G lxd $USER || true
-  - sudo -E sudo -u $USER -E bash -c 'lxc storage create default dir'
-  - sudo lxd init --auto || true
-  - sudo -E sudo -u $USER -E bash -c 'lxc config set core.https_address "[::]"'
-  - sudo -E sudo -u $USER -E bash -c 'for i in 5 10 15 30; do [[ "$(lxc query --wait /1.0 | jq .environment.addresses)" != "[]" ]] && break; sleep $i; done'
-  - sudo -E sudo -u $USER -E bash -c 'sudo mkdir /var/snap/lxd/common/lxd/storage-pools/juju-zfs'
-  - sudo -E sudo -u $USER -E bash -c 'sudo lxc storage create juju-zfs dir source=/var/snap/lxd/common/lxd/storage-pools/juju-zfs' # Horrible workaround to LP Bug #1738614
+  # Trigger generation of the client certificates
+  - sg lxd -c "echo y|lxc remote add "$USER" https://0.0.0.0:8443 --accept-certificate --password='${LXD_PASSWORD}'"
+
 script:
   - sudo -E sudo -u $USER -E juju bootstrap localhost test --config 'identity-url=https://api.staging.jujucharms.com/identity' --config 'allow-model-access=true'
   - tox -e py3,integration,serial
