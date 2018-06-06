@@ -32,9 +32,7 @@ async def test_status(event_loop):
             model.block_until(
                 lambda: (machine.status == 'running' and
                          machine.status_message.lower() == 'running' and
-                         machine.agent_status == 'started' and
-                         machine.agent_version is not None and
-                         machine.agent_version.major >= 2)),
+                         machine.agent_status == 'started')),
             timeout=480)
 
 

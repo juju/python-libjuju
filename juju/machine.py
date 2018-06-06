@@ -14,7 +14,8 @@ log = logging.getLogger(__name__)
 class Machine(model.ModelEntity):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.on_change(self._workaround_1695335)
+        if self.model.info.agent_version < client.Number.from_json('2.2.3'):
+            self.on_change(self._workaround_1695335)
 
     async def _workaround_1695335(self, delta, old, new, model):
         """
