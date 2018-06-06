@@ -21,7 +21,7 @@ Connect to the currently active Juju controller (the one returned by
   from juju.controller import Controller
 
   controller = Controller()
-  await controller.connect_current()
+  await controller.connect()
 
 
 Connecting to a Named Controller
