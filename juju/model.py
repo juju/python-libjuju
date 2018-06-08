@@ -410,7 +410,7 @@ class Model:
             `juju.client.connection.Connection.MAX_FRAME_SIZE`
         :param bakery_client httpbakery.Client: The bakery client to use
             for macaroon authorization.
-        :param jujudata JujuData: The source for current controller information.
+        :param jujudata JujuData: The source for current controller information
         """
         self._connector = connector.Connector(
             loop=loop,
@@ -528,7 +528,7 @@ class Model:
         if self.is_connected():
             log.debug('Closing model connection')
             await self._connector.disconnect()
-            self.info = None
+            self._info = None
 
     async def add_local_charm_dir(self, charm_dir, series):
         """Upload a local charm to the model.
@@ -675,10 +675,18 @@ class Model:
         """
         facade = client.ClientFacade.from_connection(self.connection())
 
-        self.info = await facade.ModelInfo()
+        self._info = await facade.ModelInfo()
         log.debug('Got ModelInfo: %s', vars(self.info))
 
         return self.info
+
+    @property
+    def info(self):
+        """Return the cached client.ModelInfo object for this Model.
+
+        If Model.get_info() has not been called, this will return None.
+        """
+        return self._info
 
     def add_observer(
             self, callable_, entity_type=None, action=None, entity_id=None,
@@ -963,7 +971,8 @@ class Model:
         :param str relation2: '<application>[:<relation_name>]'
 
         """
-        app_facade = client.ApplicationFacade.from_connection(self.connection())
+        connection = self.connection()
+        app_facade = client.ApplicationFacade.from_connection(connection)
 
         log.debug(
             'Adding relation %s <-> %s', relation1, relation2)
@@ -1312,7 +1321,8 @@ class Model:
         """Destroy units by name.
 
         """
-        app_facade = client.ApplicationFacade.from_connection(self.connection())
+        connection = self.connection()
+        app_facade = client.ApplicationFacade.from_connection(connection)
 
         log.debug(
             'Destroying unit%s %s',
@@ -1842,7 +1852,11 @@ class BundleHandler:
 
         # Fix up values, as necessary.
         if 'parent_id' in params:
-            params['parent_id'] = self.resolve(params['parent_id'])
+            if params['parent_id'].startswith('$addUnit'):
+                unit = self.resolve(params['parent_id'])[0]
+                params['parent_id'] = unit.machine.entity_id
+            else:
+                params['parent_id'] = self.resolve(params['parent_id'])
 
         params['constraints'] = parse_constraints(
             params.get('constraints'))
