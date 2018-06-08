@@ -1550,10 +1550,10 @@ class Model:
         entity = [{'tag': tag.action(action_uuid)}]
         action_output = await action_facade.Actions(entity)
         # ActionResult.output is None if the action produced no output
-        if action_output.results[0].output:
-            output = action_output.results[0].output
-        else:
+        if action_output.results[0].output is None:
             output = {}
+        else:
+            output = action_output.results[0].output
         return output
 
     def get_action_status(self, uuid_or_prefix=None, name=None):
