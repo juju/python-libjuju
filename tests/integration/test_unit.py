@@ -58,6 +58,8 @@ async def test_run_action(event_loop):
         for unit in app.units:
             action = await run_action(unit)
             assert action.results == {'dir': '/var/git/myrepo.git'}
+            out = await model.get_action_output(action.entity_id)
+            assert out == {'dir': '/var/git/myrepo.git'}
             break
 
 

@@ -34,3 +34,7 @@ def user(username):
 
 def application(app_name):
     return _prefix('application-', app_name)
+
+
+def action(action_uuid):
+    return _prefix('action-', action_uuid)
