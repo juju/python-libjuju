@@ -1540,13 +1540,15 @@ class Model:
         """Get the results of an action by ID.
 
         :param str action_uuid: Id of the action
-        :param int wait: Time in seconds to wait for action to complete
+        :param int wait: Time in seconds to wait for action to complete. This
+                         is currently ignored.
         :return dict: Output from action
         :raises: :class:`JujuError` if invalid action_uuid
         """
         action_facade = client.ActionFacade.from_connection(
             self.connection()
         )
+        await self.wait_for_action(action_uuid)
         entity = [{'tag': tag.action(action_uuid)}]
         action_output = await action_facade.Actions(entity)
         # ActionResult.output is None if the action produced no output
