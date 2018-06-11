@@ -1536,20 +1536,33 @@ class Model:
         """
         raise NotImplementedError()
 
-    async def get_action_output(self, action_uuid, wait=-1):
+    async def get_action_output(self, action_uuid, wait=None):
         """Get the results of an action by ID.
 
         :param str action_uuid: Id of the action
-        :param int wait: Time in seconds to wait for action to complete. This
-                         is currently ignored.
+        :param int wait: Time in seconds to wait for action to complete.
         :return dict: Output from action
         :raises: :class:`JujuError` if invalid action_uuid
         """
         action_facade = client.ActionFacade.from_connection(
             self.connection()
         )
-        await self.wait_for_action(action_uuid)
         entity = [{'tag': tag.action(action_uuid)}]
+        # Cannot use self.wait_for_action as the action event has probably
+        # already happened and self.wait_for_action works by processing
+        # model deltas and checking if they match our type. If the action
+        # has already occured then the delta has gone.
+
+        async def _wait_for_action_status():
+            while True:
+                action_output = await action_facade.Actions(entity)
+                if action_output.results[0].status in ('completed', 'failed'):
+                    return
+                else:
+                    await asyncio.sleep(1)
+        await asyncio.wait_for(
+            _wait_for_action_status(),
+            timeout=wait)
         action_output = await action_facade.Actions(entity)
         # ActionResult.output is None if the action produced no output
         if action_output.results[0].output is None:
