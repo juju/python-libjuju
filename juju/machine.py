@@ -14,7 +14,17 @@ log = logging.getLogger(__name__)
 class Machine(model.ModelEntity):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.model.info.agent_version < client.Number.from_json('2.2.3'):
+        self.model.loop.create_task(self._queue_workarounds())
+
+    async def _queue_workarounds(self):
+        model = self.model
+        if not model.info:
+            await utils.run_with_interrupt(model.get_info(),
+                                           model._watch_stopping,
+                                           model.loop)
+        if model._watch_stopping.is_set():
+            return
+        if model.info.agent_version < client.Number.from_json('2.2.3'):
             self.on_change(self._workaround_1695335)
 
     async def _workaround_1695335(self, delta, old, new, model):
