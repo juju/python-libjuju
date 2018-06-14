@@ -28,6 +28,8 @@ from .delta import get_entity_class, get_entity_delta
 from .errors import JujuAPIError, JujuError
 from .exceptions import DeadEntityException
 from .placement import parse as parse_placement
+from . import provisioner
+
 
 log = logging.getLogger(__name__)
 
@@ -947,7 +949,8 @@ class Model:
                 (None) - starts a new machine
                 'lxd' - starts a new machine with one lxd container
                 'lxd:4' - starts a new lxd container on machine 4
-                'ssh:user@10.10.0.3' - manually provisions a machine with ssh
+                'ssh:user@10.10.0.3:/path/to/private/key' - manually provision
+                a machine with ssh and the private key used for authentication
                 'zone=us-east-1a' - starts a machine in zone us-east-1s on AWS
                 'maas2.name' - acquire machine maas2.name on MAAS
 
@@ -996,12 +999,25 @@ class Model:
 
         """
         params = client.AddMachineParams()
-        params.jobs = ['JobHostUnits']
 
         if spec:
-            placement = parse_placement(spec)
-            if placement:
-                params.placement = placement[0]
+            if spec.startswith("ssh:"):
+                placement, target, private_key_path = spec.split(":")
+                user, host = target.split("@")
+
+                sshProvisioner = provisioner.SSHProvisioner(
+                    host=host,
+                    user=user,
+                    private_key_path=private_key_path,
+                )
+
+                params = sshProvisioner.provision_machine()
+            else:
+                placement = parse_placement(spec)
+                if placement:
+                    params.placement = placement[0]
+
+        params.jobs = ['JobHostUnits']
 
         if constraints:
             params.constraints = client.Value.from_json(constraints)
@@ -1020,6 +1036,17 @@ class Model:
         if error:
             raise ValueError("Error adding machine: %s" % error.message)
         machine_id = results.machines[0].machine
+
+        if spec:
+            if spec.startswith("ssh:"):
+                # Need to run this after AddMachines has been called,
+                # as we need the machine_id
+                await sshProvisioner.install_agent(
+                    self.connection(),
+                    params.nonce,
+                    machine_id,
+                )
+
         log.debug('Added new machine %s', machine_id)
         return await self._wait_for_new('machine', machine_id)
 
