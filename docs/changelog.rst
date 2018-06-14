@@ -2,6 +2,22 @@ Changelog
 ---------
 
 
+0.8.0
+^^^^^
+Thursday June 14 2018
+
+* Add support for adding a manual (ssh) machine (#240)
+* Backwards compatibility fixes (#213)
+* Implement model.get_action_output (#242)
+* Fix JSON serialization error for bundle with lxd to unit placement (#243)
+* Fix reference in docs to connect_current (#239)
+* Wrap machine agent status workaround in version check (#238)
+* Convert seconds to nanoseconds for juju.unit.run (#237)
+* Fix spurious intermittent failure in test_machines.py::test_status (#236)
+* Define an unused juju-zfs lxd storage pool for Travis (#235)
+* Add support for Application get_actions (#234)
+
+
 0.7.5
 ^^^^^
 Friday May 18 2018
