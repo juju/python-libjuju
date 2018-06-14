@@ -6,7 +6,6 @@ This example:
 3. Deploys a charm and prints its config and constraints
 
 """
-import asyncio
 import logging
 
 from juju.model import Model
@@ -19,8 +18,8 @@ MB = 1
 
 async def main():
     model = Model()
+    # connect to current model with current user, per Juju CLI
     await model.connect()
-    await model.reset(force=True)
 
     ubuntu_app = await model.deploy(
         'mysql',
@@ -47,7 +46,7 @@ async def main():
 
     await model.disconnect()
 
-    
+
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     ws_logger = logging.getLogger('websockets.protocol')

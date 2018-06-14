@@ -4,6 +4,7 @@ import copy
 
 import macaroonbakery.httpbakery as httpbakery
 from juju.client.connection import Connection
+from juju.client.gocookies import go_to_py_cookie, GoCookieJar
 from juju.client.jujudata import FileJujuData
 from juju.errors import JujuConnectionError, JujuError
 
@@ -56,6 +57,14 @@ class Connector:
         kwargs.setdefault('loop', self.loop)
         kwargs.setdefault('max_frame_size', self.max_frame_size)
         kwargs.setdefault('bakery_client', self.bakery_client)
+        if 'macaroons' in kwargs:
+            if not kwargs['bakery_client']:
+                kwargs['bakery_client'] = httpbakery.Client()
+            if not kwargs['bakery_client'].cookies:
+                kwargs['bakery_client'].cookies = GoCookieJar()
+            jar = kwargs['bakery_client'].cookies
+            for macaroon in kwargs.pop('macaroons'):
+                jar.set_cookie(go_to_py_cookie(macaroon))
         self._connection = await Connection.connect(**kwargs)
 
     async def disconnect(self):

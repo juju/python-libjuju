@@ -13,6 +13,7 @@ from juju.model import Model
 async def main():
     model = Model()
     print('Connecting to model')
+    # connect to current model with current user, per Juju CLI
     await model.connect()
 
     try:

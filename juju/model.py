@@ -458,42 +458,101 @@ class Model:
     async def __aexit__(self, exc_type, exc, tb):
         await self.disconnect()
 
-    async def connect(self, model_name=None, **kwargs):
+    async def connect(self, *args, **kwargs):
         """Connect to a juju model.
 
-        If any arguments are specified other than model_name, then
-        model_name must be None and an explicit connection will be made
-        using Connection.connect using those parameters (the 'uuid'
-        parameter must be specified).
+        This supports two calling conventions:
 
-        Otherwise, if model_name is None, connect to the current model.
+        The model and (optionally) authentication information can be taken
+        from the data files created by the Juju CLI.  This convention will
+        be used if a ``model_name`` is specified, or if the ``endpoint``
+        and ``uuid`` are not.
 
-        Otherwise, model_name must specify the name of a known
-        model.
+        Otherwise, all of the ``endpoint``, ``uuid``, and authentication
+        information (``username`` and ``password``, or ``bakery_client`` and/or
+        ``macaroons``) are required.
+
+        If a single positional argument is given, it will be assumed to be
+        the ``model_name``.  Otherwise, the first positional argument, if any,
+        must be the ``endpoint``.
+
+        Available parameters are:
 
         :param model_name:  Format [controller:][user/]model
-
+        :param str endpoint: The hostname:port of the controller to connect to.
+        :param str uuid: The model UUID to connect to.
+        :param str username: The username for controller-local users (or None
+            to use macaroon-based login.)
+        :param str password: The password for controller-local users.
+        :param str cacert: The CA certificate of the controller
+            (PEM formatted).
+        :param httpbakery.Client bakery_client: The macaroon bakery client to
+            to use when performing macaroon-based login. Macaroon tokens
+            acquired when logging will be saved to bakery_client.cookies.
+            If this is None, a default bakery_client will be used.
+        :param list macaroons: List of macaroons to load into the
+            ``bakery_client``.
+        :param asyncio.BaseEventLoop loop: The event loop to use for async
+            operations.
+        :param int max_frame_size: The maximum websocket frame size to allow.
         """
         await self.disconnect()
-        if not kwargs:
-            await self._connector.connect_model(model_name)
+        if 'endpoint' not in kwargs and len(args) < 2:
+            if args and 'model_name' in kwargs:
+                raise TypeError('connect() got multiple values for model_name')
+            elif args:
+                model_name = args[0]
+            else:
+                model_name = kwargs.pop('model_name', None)
+            await self._connector.connect_model(model_name, **kwargs)
         else:
-            if kwargs.get('uuid') is None:
-                raise ValueError('no UUID specified when connecting to model')
+            if 'model_name' in kwargs:
+                raise TypeError('connect() got values for both '
+                                'model_name and endpoint')
+            if args and 'endpoint' in kwargs:
+                raise TypeError('connect() got multiple values for endpoint')
+            if len(args) < 2 and 'uuid' not in kwargs:
+                raise TypeError('connect() missing value for uuid')
+            has_userpass = (len(args) >= 4 or
+                            {'username', 'password'}.issubset(kwargs))
+            has_macaroons = (len(args) >= 6 or not
+                             {'bakery_client', 'macaroons'}.isdisjoint(kwargs))
+            if not (has_userpass or has_macaroons):
+                raise TypeError('connect() missing auth params')
+            arg_names = [
+                'endpoint',
+                'uuid',
+                'username',
+                'password',
+                'cacert',
+                'bakery_client',
+                'macaroons',
+                'loop',
+                'max_frame_size',
+            ]
+            for i, arg in enumerate(args):
+                kwargs[arg_names[i]] = arg
+            if not {'endpoint', 'uuid'}.issubset(kwargs):
+                raise ValueError('endpoint and uuid are required '
+                                 'if model_name not given')
+            if not ({'username', 'password'}.issubset(kwargs) or
+                    {'bakery_client', 'macaroons'}.intersection(kwargs)):
+                raise ValueError('Authentication parameters are required '
+                                 'if model_name not given')
             await self._connector.connect(**kwargs)
         await self._after_connect()
 
     async def connect_model(self, model_name):
         """
         .. deprecated:: 0.6.2
-           Use connect(model_name=model_name) instead.
+           Use ``connect(model_name=model_name)`` instead.
         """
         return await self.connect(model_name=model_name)
 
     async def connect_current(self):
         """
         .. deprecated:: 0.6.2
-           Use connect instead.
+           Use ``connect()`` instead.
         """
         return await self.connect()
 
