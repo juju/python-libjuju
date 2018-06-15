@@ -171,13 +171,13 @@ def name_to_py(name):
 
 
 def strcast(kind, keep_builtins=False):
-    if issubclass(kind, typing.GenericMeta):
-        return str(kind)[1:]
-    if str(kind).startswith('~'):
-        return str(kind)[1:]
     if (kind in basic_types or
             type(kind) in basic_types) and keep_builtins is False:
         return kind.__name__
+    if str(kind).startswith('~'):
+        return str(kind)[1:]
+    if issubclass(kind, typing.GenericMeta):
+        return str(kind)[1:]
     return kind
 
 
@@ -291,6 +291,13 @@ class {}(Type):
                     source.append("{}self.{} = {}".format(INDENT * 2,
                                                           arg_name,
                                                           arg_name))
+                elif type(arg_type) is typing.TypeVar:
+                    source.append("{}self.{} = {}.from_json({}) "
+                                  "if {} else None".format(INDENT * 2,
+                                                           arg_name,
+                                                           arg_type_name,
+                                                           arg_name,
+                                                           arg_name))
                 elif issubclass(arg_type, typing.Sequence):
                     value_type = (
                         arg_type_name.__parameters__[0]
@@ -326,13 +333,6 @@ class {}(Type):
                         source.append("{}self.{} = {}".format(INDENT * 2,
                                                               arg_name,
                                                               arg_name))
-                elif type(arg_type) is typing.TypeVar:
-                    source.append("{}self.{} = {}.from_json({}) "
-                                  "if {} else None".format(INDENT * 2,
-                                                           arg_name,
-                                                           arg_type_name,
-                                                           arg_name,
-                                                           arg_name))
                 else:
                     source.append("{}self.{} = {}".format(INDENT * 2,
                                                           arg_name,
