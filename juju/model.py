@@ -1683,7 +1683,7 @@ class Model:
             name_results = await action_facade.FindActionsByNames([name])
             action_results.extend(name_results.actions[0].actions)
         if uuid_or_prefix:
-            # Collect list of actions matching prefix or name.
+            # Collect list of actions matching uuid or prefix
             matching_actions = await action_facade.FindActionTagsByPrefix(
                 [uuid_or_prefix])
             entities = []
