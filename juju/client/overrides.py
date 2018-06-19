@@ -15,6 +15,7 @@ __all__ = [
 __patches__ = [
     'ResourcesFacade',
     'AllWatcherFacade',
+    'ActionFacade',
 ]
 
 
@@ -103,6 +104,42 @@ class AllWatcherFacade(Type):
         msg['Id'] = self.Id
         result = await self.connection.rpc(msg, encoder=TypeEncoder)
         return result
+
+
+class ActionFacade(Type):
+
+    class _FindTagsResults(Type):
+        _toSchema = {'matches': 'matches'}
+        _toPy = {'matches': 'matches'}
+
+        def __init__(self, matches=None, **unknown_fields):
+            '''
+            FindTagsResults wraps the mapping between the requested prefix and the
+            matching tags for each requested prefix.
+
+            Matches map[string][]Entity `json:"matches"`
+            '''
+            self.matches = {}
+            matches = matches or {}
+            for prefix, tags in matches.items():
+                self.matches[prefix] = [_definitions.Entity.from_json(r)
+                                        for r in tags]
+
+    @ReturnMapping(_FindTagsResults)
+    async def FindActionTagsByPrefix(self, prefixes):
+        '''
+        prefixes : typing.Sequence[str]
+        Returns -> typing.Sequence[~Entity]
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Action',
+                   request='FindActionTagsByPrefix',
+                   version=2,
+                   params=_params)
+        _params['prefixes'] = prefixes
+        reply = await self.rpc(msg)
+        return reply
 
 
 class Number(_definitions.Number):

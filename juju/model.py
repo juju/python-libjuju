@@ -1667,14 +1667,34 @@ class Model:
             output = action_output.results[0].output
         return output
 
-    def get_action_status(self, uuid_or_prefix=None, name=None):
-        """Get the status of all actions, filtered by ID, ID prefix, or action name.
+    async def get_action_status(self, uuid_or_prefix=None, name=None):
+        """Get the status of all actions, filtered by ID, ID prefix, or name.
 
         :param str uuid_or_prefix: Filter by action uuid or prefix
         :param str name: Filter by action name
 
         """
-        raise NotImplementedError()
+        results = {}
+        action_results = []
+        action_facade = client.ActionFacade.from_connection(
+            self.connection()
+        )
+        if name:
+            name_results = await action_facade.FindActionsByNames([name])
+            action_results.extend(name_results.actions[0].actions)
+        if uuid_or_prefix:
+            # Collect list of actions matching prefix or name.
+            matching_actions = await action_facade.FindActionTagsByPrefix(
+                [uuid_or_prefix])
+            entities = []
+            for actions in matching_actions.matches.values():
+                entities = [{'tag': a.tag} for a in actions]
+            # Get action results matching action tags
+            uuid_results = await action_facade.Actions(entities)
+            action_results.extend(uuid_results.results)
+        for a in action_results:
+            results[tag.untag('action-', a.action.tag)] = a.status
+        return results
 
     def get_budget(self, budget_name):
         """Get budget usage info.
