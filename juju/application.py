@@ -295,12 +295,10 @@ class Application(model.ModelEntity):
         )
         return await self.ann_facade.Set([ann])
 
-    async def set_config(self, config, to_default=False):
+    async def set_config(self, config):
         """Set configuration options for this application.
 
         :param config: Dict of configuration to set
-        :param bool to_default: Set application options to default values
-
         """
         app_facade = client.ApplicationFacade.from_connection(self.connection)
 
@@ -308,6 +306,19 @@ class Application(model.ModelEntity):
             'Setting config for %s: %s', self.name, config)
 
         return await app_facade.Set(self.name, config)
+
+    async def reset_config(self, to_default):
+        """
+        Restore application config to default values.
+
+        :param list to_default: A list of config options to be reset to their default value.
+        """
+        app_facade = client.ApplicationFacade.from_connection(self.connection)
+
+        log.debug(
+            'Restoring default config for %s: %s', self.name, to_default)
+
+        return await app_facade.Unset(self.name, to_default)
 
     async def set_constraints(self, constraints):
         """Set machine constraints for this application.
