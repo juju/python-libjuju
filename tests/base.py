@@ -12,10 +12,13 @@ import pytest
 
 
 def is_bootstrapped():
-    result = subprocess.run(['juju', 'switch'], stdout=subprocess.PIPE)
-    return (
-        result.returncode == 0 and
-        len(result.stdout.decode().strip()) > 0)
+    try:
+        result = subprocess.run(['juju', 'switch'], stdout=subprocess.PIPE)
+        return (
+            result.returncode == 0 and
+            len(result.stdout.decode().strip()) > 0)
+    except FileNotFoundError:
+        return False
 
 
 bootstrapped = pytest.mark.skipif(
