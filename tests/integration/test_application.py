@@ -29,6 +29,11 @@ async def test_action(event_loop):
         config = await ubuntu_app.get_config()
         assert config['tuning-level']['value'] == 'fast'
 
+        # Restore config back to default
+        await ubuntu_app.reset_config(['tuning-level'])
+        config = await ubuntu_app.get_config()
+        assert config['tuning-level']['value'] == 'safest'
+
         # update and check app constraints
         await ubuntu_app.set_constraints({'mem': 512 * MB})
         constraints = await ubuntu_app.get_constraints()
