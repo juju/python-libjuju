@@ -1,6 +1,16 @@
 Changelog
 ---------
 
+0.9.0
+^^^^^
+Friday June 29 2018
+
+* python3.7 compatibility updates (#251)
+* Handle juju not installed in is_bootstrapped for tests (#250)
+* Add app.reset_config(list). (#249)
+* Implement model.get_action_status (#248)
+* Fix `make client` in Python 3.6 (#247)
+
 
 0.8.0
 ^^^^^
