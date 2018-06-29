@@ -35,7 +35,7 @@ setup(
         'pyyaml>=3.0,<=4.2',
         'theblues>=0.3.8,<1.0',
         'websockets>=4.0,<6.0',
-        'paramiko>=1.16.0,<1.17',
+        'paramiko>=2.4.0,<3.0.0',
     ],
     include_package_data=True,
     maintainer='Juju Ecosystem Engineering',
