@@ -434,7 +434,7 @@ def ReturnMapping(cls):
     return decorator
 
 
-def makeFunc(cls, name, params, result, async=True):
+def makeFunc(cls, name, params, result, _async=True):
     INDENT = "    "
     args = Args(params)
     assignments = []
@@ -448,7 +448,7 @@ def makeFunc(cls, name, params, result, async=True):
     source = """
 
 @ReturnMapping({rettype})
-{async}def {name}(self{argsep}{args}):
+{_async}def {name}(self{argsep}{args}):
     '''
 {docstring}
     Returns -> {res}
@@ -465,7 +465,7 @@ def makeFunc(cls, name, params, result, async=True):
 
 """
 
-    fsource = source.format(async="async " if async else "",
+    fsource = source.format(_async="async " if _async else "",
                             name=name,
                             argsep=", " if args else "",
                             args=args,
@@ -474,7 +474,7 @@ def makeFunc(cls, name, params, result, async=True):
                             docstring=textwrap.indent(args.get_doc(), INDENT),
                             cls=cls,
                             assignments=assignments,
-                            await="await " if async else "")
+                            await="await " if _async else "")
     ns = _getns()
     exec(fsource, ns)
     func = ns[name]
