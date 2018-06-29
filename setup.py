@@ -34,7 +34,7 @@ setup(
         'pyRFC3339>=1.0,<2.0',
         'pyyaml>=3.0,<4.0',
         'theblues>=0.3.8,<1.0',
-        'websockets>=4.0,<5.0',
+        'websockets>=4.0,<6.0',
         'paramiko>=1.16.0,<1.17',
     ],
     include_package_data=True,
@@ -50,6 +50,8 @@ setup(
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
     ],
     entry_points={
         'console_scripts': [
