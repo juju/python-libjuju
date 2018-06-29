@@ -32,7 +32,7 @@ setup(
     install_requires=[
         'macaroonbakery>=1.1,<2.0',
         'pyRFC3339>=1.0,<2.0',
-        'pyyaml>=4.2b1,<5.0',
+        'pyyaml>=3.0,<=4.2',
         'theblues>=0.3.8,<1.0',
         'websockets>=4.0,<6.0',
         'paramiko>=1.16.0,<1.17',
