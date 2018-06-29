@@ -460,7 +460,7 @@ def makeFunc(cls, name, params, result, _async=True):
                version={cls.version},
                params=_params)
 {assignments}
-    reply = {await}self.rpc(msg)
+    reply = {_await}self.rpc(msg)
     return reply
 
 """
@@ -474,7 +474,7 @@ def makeFunc(cls, name, params, result, _async=True):
                             docstring=textwrap.indent(args.get_doc(), INDENT),
                             cls=cls,
                             assignments=assignments,
-                            await="await " if _async else "")
+                            _await="await " if _async else "")
     ns = _getns()
     exec(fsource, ns)
     func = ns[name]
