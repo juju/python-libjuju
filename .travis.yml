@@ -22,12 +22,16 @@ env:
     LXD_PASSWORD="password"
     PATH="/snap/bin:$PATH"
 
-  matrix:
-    - JUJU_CHANNEL=stable
-    - JUJU_CHANNEL=edge
-    include:
-      - python: 3.6
-      - python: 3.7
+matrix:
+  include:
+  - python: 3.6
+    env: JUJU_CHANNEL=edge
+  - python: 3.6
+    env: JUJU_CHANNEL=stable
+  - python: 3.7
+    env: JUJU_CHANNEL=stable
+  - python: 3.7
+    env: JUJU_CHANNEL=edge
 before_script:
   - sudo lxd waitready --timeout 30
   - sudo lxc storage create default dir
