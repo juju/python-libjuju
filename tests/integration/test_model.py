@@ -398,7 +398,7 @@ async def test_set_constraints(event_loop):
     async with base.CleanModel() as model:
         await model.set_constraints({'cpu-power': 1})
         cons = await model.get_constraints()
-        assert cons['cpu-power'] == 1
+        assert cons['cpu_power'] == 1
 
 # @base.bootstrapped
 # @pytest.mark.asyncio
