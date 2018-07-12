@@ -22,6 +22,7 @@ import yaml
 from . import tag, utils
 from .client import client, connector
 from .client.client import ConfigValue
+from .client.client import Value
 from .constraints import parse as parse_constraints
 from .constraints import normalize_key
 from .delta import get_entity_class, get_entity_delta
@@ -1461,11 +1462,28 @@ class Model:
             config[key] = ConfigValue.from_json(value)
         return config
 
-    def get_constraints(self):
+    async def get_constraints(self):
         """Return the machine constraints for this model.
 
+        :returns: A ``dict`` of constraints.
         """
-        raise NotImplementedError()
+        constraints = {}
+        client_facade = client.ClientFacade.from_connection(self.connection())
+        result = await client_facade.GetModelConstraints()
+
+        # GetModelConstraints returns GetConstraintsResults which has a 'constraints'
+        # attribute. If no constraints have been set GetConstraintsResults.constraints
+        # is None. Otherwise GetConstraintsResults.constraints has an attribute for each
+        # possible constraint, each of these in turn will be None if they have not been
+        # set.
+        if result.constraints:
+           constraint_types = [a for a in dir(result.constraints)
+                               if a in Value._toSchema.keys()]
+           for constraint in constraint_types:
+               value = getattr(result.constraints, constraint)
+               if value is not None:
+                   constraints[constraint] = getattr(result.constraints, constraint)
+        return constraints
 
     def import_ssh_key(self, identity):
         """Add a public SSH key from a trusted indentity source to this model.
@@ -1624,13 +1642,15 @@ class Model:
                 config[key] = value.value
         await config_facade.ModelSet(config)
 
-    def set_constraints(self, constraints):
+    async def set_constraints(self, constraints):
         """Set machine constraints on this model.
 
-        :param :class:`juju.Constraints` constraints: Machine constraints
-
+        :param dict config: Mapping of model constraints
         """
-        raise NotImplementedError()
+        client_facade = client.ClientFacade.from_connection(self.connection())
+        await client_facade.SetModelConstraints(
+            application='',
+            constraints=constraints)
 
     async def get_action_output(self, action_uuid, wait=None):
         """Get the results of an action by ID.
