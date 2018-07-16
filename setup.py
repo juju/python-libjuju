@@ -34,7 +34,7 @@ setup(
         'pyRFC3339>=1.0,<2.0',
         'pyyaml>=3.0,<=4.2',
         'theblues>=0.3.8,<1.0',
-        'websockets>=4.0,<6.0',
+        'websockets>=4.0,<7.0',
         'paramiko>=2.4.0,<3.0.0',
     ],
     include_package_data=True,
