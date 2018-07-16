@@ -1,6 +1,13 @@
 Changelog
 ---------
 
+0.9.1
+^^^^^
+Monday July 16 2018
+
+* Update websockets to 6.0 to fix OS X support due to Brew update to Py3.7 (#254)
+
+
 0.9.0
 ^^^^^
 Friday June 29 2018
