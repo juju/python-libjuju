@@ -146,7 +146,8 @@ class Machine(model.ModelEntity):
         :param str destination: Remote destination of transferred files
         :param str user: Remote username
         :param bool proxy: Proxy through the Juju API server
-        :param str scp_opts: Additional options to the `scp` command
+        :param scp_opts: Additional options to the `scp` command
+        :type scp_opts: str or list
         """
         if proxy:
             raise NotImplementedError('proxy option is not implemented')
@@ -163,7 +164,8 @@ class Machine(model.ModelEntity):
         :param str destination: Local destination of transferred files
         :param str user: Remote username
         :param bool proxy: Proxy through the Juju API server
-        :param str scp_opts: Additional options to the `scp` command
+        :param scp_opts: Additional options to the `scp` command
+        :type scp_opts: str or list
         """
         if proxy:
             raise NotImplementedError('proxy option is not implemented')
@@ -176,15 +178,15 @@ class Machine(model.ModelEntity):
         """ Execute an scp command. Requires a fully qualified source and
         destination.
         """
-        cmd = ['scp']
-        cmd += scp_opts.split()
-        cmd.extend([
+        cmd = [
+            'scp',
             '-i', os.path.expanduser('~/.local/share/juju/ssh/juju_id_rsa'),
             '-o', 'StrictHostKeyChecking=no',
             '-q',
-            '-B',
-            source, destination
-        ])
+            '-B'
+        ]
+        cmd.extend(scp_opts.split() if isinstance(scp_opts, str) else scp_opts)
+        cmd.extend([source, destination])
         loop = self.model.loop
         process = await asyncio.create_subprocess_exec(*cmd, loop=loop)
         await process.wait()
