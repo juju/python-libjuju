@@ -12,3 +12,4 @@ dist/
 dev/
 .pytest_cache
 pytestdebug.log
+.vscode/

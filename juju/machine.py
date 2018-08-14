@@ -176,15 +176,15 @@ class Machine(model.ModelEntity):
         """ Execute an scp command. Requires a fully qualified source and
         destination.
         """
-        cmd = [
-            'scp',
+        cmd = ['scp']
+        cmd += scp_opts.split()
+        cmd.extend([
             '-i', os.path.expanduser('~/.local/share/juju/ssh/juju_id_rsa'),
             '-o', 'StrictHostKeyChecking=no',
             '-q',
             '-B',
             source, destination
-        ]
-        cmd += scp_opts.split()
+        ])
         loop = self.model.loop
         process = await asyncio.create_subprocess_exec(*cmd, loop=loop)
         await process.wait()
