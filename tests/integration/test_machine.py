@@ -58,8 +58,8 @@ async def test_scp(event_loop):
         with NamedTemporaryFile() as f:
             f.write(b'testcontents')
             f.flush()
-            await machine.scp_to(f.name, 'testfile')
+            await machine.scp_to(f.name, 'testfile', scp_opts='-p')
 
         with NamedTemporaryFile() as f:
-            await machine.scp_from('testfile', f.name)
+            await machine.scp_from('testfile', f.name, scp_opts='-p')
             assert f.read() == b'testcontents'
