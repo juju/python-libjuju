@@ -1,6 +1,14 @@
 Changelog
 ---------
 
+0.10.0
+^^^^^^
+Thursday August 16 2018
+
+* Fix error due to scp extra opts order (#260)
+* Implement set/get model constraints (#253)
+
+
 0.9.1
 ^^^^^
 Monday July 16 2018
