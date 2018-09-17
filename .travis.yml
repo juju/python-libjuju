@@ -32,6 +32,8 @@ matrix:
   - python: 3.7-dev
     env: JUJU_CHANNEL=edge
 before_script:
+  # Run lint before performing more expensive operations (fail fast/early)
+  - tox -e lint
   - sudo lxd waitready --timeout 30
   - sudo lxc storage create default dir
   - sudo lxd init --auto --trust-password="${LXD_PASSWORD}" --network-address='[::]' --network-port=8443
