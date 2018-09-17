@@ -1,6 +1,16 @@
 Changelog
 ---------
 
+0.10.1
+^^^^^^
+Monday September 17 2018
+
+* Retry ssh in manual provision test (#265)
+* Clean up lint and add lint coverage to travis config (#263)
+* Increase the timeout for charmstore connections (#262)
+* Fix log level of `Driver connected to juju` message (#258)
+
+
 0.10.0
 ^^^^^^
 Thursday August 16 2018
