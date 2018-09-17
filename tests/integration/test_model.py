@@ -2,6 +2,7 @@ import asyncio
 import mock
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+import paramiko
 
 from juju.client.client import ConfigValue, ApplicationFacade
 from juju.model import Model, ModelObserver
@@ -167,7 +168,9 @@ async def test_add_manual_machine_ssh(event_loop):
 
         profile = client.profiles.create(
             test_name,
-            config={'user.user-data': '#cloud-config\nssh_authorized_keys:\n- {}'.format(public_key)},
+            config={'user.user-data': '#cloud-config\n'
+                                      'ssh_authorized_keys:\n'
+                                      '- {}'.format(public_key)},
             devices={
                 'root': {'path': '/', 'pool': 'default', 'type': 'disk'},
                 'eth0': {
@@ -206,19 +209,28 @@ async def test_add_manual_machine_ssh(event_loop):
             return None
 
         host = wait_for_network(container)
+        assert host, 'Failed to get address for machine'
 
         # HACK: We need to give sshd a chance to bind to the interface,
         # and pylxd's container.execute seems to be broken and fails and/or
         # hangs trying to properly check if the service is up.
         time.sleep(5)
 
-        if host:
-            # add a new manual machine
-            machine1 = await model.add_machine(spec='ssh:{}@{}:{}'.format(
-                "ubuntu",
-                host['address'],
-                private_key_path,
-            ))
+        for attempt in range(1, 4):
+            try:
+                # add a new manual machine
+                machine1 = await model.add_machine(spec='ssh:{}@{}:{}'.format(
+                    "ubuntu",
+                    host['address'],
+                    private_key_path,
+                ))
+            except paramiko.ssh_exception.NoValidConnectionsError:
+                if attempt == 3:
+                    raise
+                # retry the ssh connection a few times if it fails
+                time.sleep(attempt * 5)
+            else:
+                break
 
             assert len(model.machines) == 1
 
@@ -307,7 +319,9 @@ async def test_explicit_loop_threaded(event_loop):
         with ThreadPoolExecutor(1) as executor:
             f = executor.submit(
                 new_loop.run_until_complete,
-                _deploy_in_loop(new_loop, model_name, model._connector.jujudata))
+                _deploy_in_loop(new_loop,
+                                model_name,
+                                model._connector.jujudata))
             f.result()
         await model._wait_for_new('application', 'ubuntu')
         assert 'ubuntu' in model.applications
@@ -391,6 +405,7 @@ async def test_config(event_loop):
         assert 'extra-info' in result
         assert result['extra-info'].source == 'model'
         assert result['extra-info'].value == 'booyah'
+
 
 @base.bootstrapped
 @pytest.mark.asyncio

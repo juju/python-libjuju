@@ -158,6 +158,7 @@ class SSHProvisioner:
         # TODO: Test this on an image without the ubuntu user setup.
 
         auth_user = self.user
+        ssh = None
         try:
             # Run w/o allocating a pty, so we fail if sudo prompts for a passwd
             ssh = self._get_ssh_client(
