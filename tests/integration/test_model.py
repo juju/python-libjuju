@@ -392,6 +392,7 @@ async def test_config(event_loop):
         assert result['extra-info'].source == 'model'
         assert result['extra-info'].value == 'booyah'
 
+
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_set_constraints(event_loop):
