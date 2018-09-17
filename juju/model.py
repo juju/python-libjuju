@@ -1477,12 +1477,12 @@ class Model:
         # possible constraint, each of these in turn will be None if they have not been
         # set.
         if result.constraints:
-           constraint_types = [a for a in dir(result.constraints)
-                               if a in Value._toSchema.keys()]
-           for constraint in constraint_types:
-               value = getattr(result.constraints, constraint)
-               if value is not None:
-                   constraints[constraint] = getattr(result.constraints, constraint)
+            constraint_types = [a for a in dir(result.constraints)
+                                if a in Value._toSchema.keys()]
+            for constraint in constraint_types:
+                value = getattr(result.constraints, constraint)
+                if value is not None:
+                    constraints[constraint] = getattr(result.constraints, constraint)
         return constraints
 
     def import_ssh_key(self, identity):
