@@ -2160,9 +2160,9 @@ class CharmStore:
     """
     Async wrapper around theblues.charmstore.CharmStore
     """
-    def __init__(self, loop):
+    def __init__(self, loop, cs_timeout=20):
         self.loop = loop
-        self._cs = theblues.charmstore.CharmStore(timeout=5)
+        self._cs = theblues.charmstore.CharmStore(timeout=cs_timeout)
 
     def __getattr__(self, name):
         """
