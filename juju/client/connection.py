@@ -463,7 +463,7 @@ class Connection:
         self.endpoint = result[2]
         self.cacert = result[3]
         self._receiver_task.start()
-        log.info("Driver connected to juju %s", self.addr)
+        log.debug("Driver connected to juju %s", self.addr)
         self.monitor.close_called.clear()
 
     async def _connect_with_login(self, endpoints):
