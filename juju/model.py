@@ -2162,7 +2162,7 @@ class CharmStore:
     """
     def __init__(self, loop):
         self.loop = loop
-        self._cs = theblues.charmstore.CharmStore(timeout=5)
+        self._cs = theblues.charmstore.CharmStore(timeout=20)
 
     def __getattr__(self, name):
         """
