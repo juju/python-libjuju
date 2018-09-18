@@ -1266,7 +1266,8 @@ class Model:
         if is_local:
             entity_id = entity_url.replace('local:', '')
         else:
-            entity = await self.charmstore.entity(entity_url, channel=channel)
+            entity = await self.charmstore.entity(entity_url, channel=channel,
+                                                  include_stats=False)
             entity_id = entity['Id']
 
         client_facade = client.ClientFacade.from_connection(self.connection())
@@ -1336,7 +1337,8 @@ class Model:
     async def _add_store_resources(self, application, entity_url, entity=None):
         if not entity:
             # avoid extra charm store call if one was already made
-            entity = await self.charmstore.entity(entity_url)
+            entity = await self.charmstore.entity(entity_url,
+                                                  include_stats=False)
         resources = [
             {
                 'description': resource['Description'],
