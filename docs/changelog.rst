@@ -1,6 +1,14 @@
 Changelog
 ---------
 
+
+0.10.2
+^^^^^^
+Tuesday September 18 2018
+
+* set include_stats to false to reduce request time (#266)
+
+
 0.10.1
 ^^^^^^
 Monday September 17 2018
