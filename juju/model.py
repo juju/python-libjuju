@@ -422,12 +422,14 @@ class Model:
             jujudata=jujudata,
         )
         self._observers = weakref.WeakValueDictionary()
+        self._fallbacks = []
         self.state = ModelState(self)
         self._info = None
         self._watch_stopping = asyncio.Event(loop=self._connector.loop)
         self._watch_stopped = asyncio.Event(loop=self._connector.loop)
         self._watch_received = asyncio.Event(loop=self._connector.loop)
         self._watch_stopped.set()
+        self._watch_timeout = 1.0
         self._charmstore = CharmStore(self._connector.loop)
 
     def is_connected(self):
@@ -790,6 +792,15 @@ class Model:
             callable_, entity_type, action, entity_id, predicate)
         self._observers[observer] = callable_
 
+    def add_fallback_check(self, callable_):
+        """Register a time-based regular callback
+
+        Once the model is connected, ``callable_``
+        will be called at regular intervals . ``callable_`` should
+        be Awaitable and accept no arguments.
+        """
+        self._fallbacks.append(callable_)
+
     def _watch(self):
         """Start an asynchronous watch against this model.
 
@@ -805,7 +816,9 @@ class Model:
                         results = await utils.run_with_interrupt(
                             allwatcher.Next(),
                             self._watch_stopping,
-                            self._connector.loop)
+                            loop=self._connector.loop,
+                            timeout=self._watch_timeout)
+                        deltas = [] if results is None else results.deltas
                     except JujuAPIError as e:
                         if 'watcher was stopped' not in str(e):
                             raise
@@ -844,10 +857,13 @@ class Model:
                         except websockets.ConnectionClosed:
                             pass  # can't stop on a closed conn
                         break
-                    for delta in results.deltas:
-                        delta = get_entity_delta(delta)
-                        old_obj, new_obj = self.state.apply_delta(delta)
-                        await self._notify_observers(delta, old_obj, new_obj)
+                    if deltas:
+                        for delta in deltas:
+                            delta = get_entity_delta(delta)
+                            old_obj, new_obj = self.state.apply_delta(delta)
+                            await self._notify_observers(delta, old_obj, new_obj)
+                    else:
+                        await self._notify_observers_fallback()
                     self._watch_received.set()
             except CancelledError:
                 pass
@@ -886,7 +902,11 @@ class Model:
                 asyncio.ensure_future(o(delta, old_obj, new_obj, self),
                                       loop=self._connector.loop)
 
-    async def _wait(self, entity_type, entity_id, action, predicate=None):
+    async def _notify_observers_fallback(self):
+        for o in self._fallbacks:
+            asyncio.ensure_future(o(), loop=self._connector.loop)
+
+    async def _wait(self, entity_type, entity_id, action, predicate=None, fallback=None):
         """
         Block the calling routine until a given action has happened to the
         given entity
@@ -906,7 +926,16 @@ class Model:
         async def callback(delta, old, new, model):
             await q.put(delta.get_id())
 
+        async def callback_fallback():
+            result = await fallback()
+            if result:
+                await q.put(entity_id)
+
         self.add_observer(callback, entity_type, action, entity_id, predicate)
+
+        if fallback:
+            self.add_fallback_check(callback_fallback)
+
         entity_id = await q.get()
         # object might not be in the entity_map if we were waiting for a
         # 'remove' action
@@ -937,7 +966,18 @@ class Model:
         def predicate(delta):
             return delta.data['status'] in ('completed', 'failed')
 
-        return await self._wait('action', action_id, None, predicate)
+        async def already_complete():
+            action_facade = client.ActionFacade.from_connection(
+                self.connection()
+            )
+            entity = [{'tag': tag.action(action_id)}]
+            response = False
+            action_output = await action_facade.Actions(entity)
+            if action_output.results[0].status in ('completed', 'failed'):
+                response = action_id
+            return response
+
+        return await self._wait('action', action_id, None, predicate, fallback=already_complete)
 
     async def add_machine(
             self, spec=None, constraints=None, disks=None, series=None):

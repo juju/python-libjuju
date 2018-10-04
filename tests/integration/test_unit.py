@@ -62,6 +62,9 @@ async def test_run_action(event_loop):
             assert out == {'dir': '/var/git/myrepo.git'}
             status = await model.get_action_status(uuid_or_prefix=action.entity_id)
             assert status[action.entity_id] == 'completed'
+            # Wait for an action which has already completed, issue 245
+            action = await model.wait_for_action(action.entity_id)
+            assert action.status == "completed"
             break
 
 

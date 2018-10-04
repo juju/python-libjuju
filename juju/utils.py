@@ -82,7 +82,7 @@ async def block_until(*conditions, timeout=None, wait_period=0.5, loop=None):
     await asyncio.wait_for(_block(), timeout, loop=loop)
 
 
-async def run_with_interrupt(task, event, loop=None):
+async def run_with_interrupt(task, event, loop=None, timeout=None):
     """
     Awaits a task while allowing it to be interrupted by an `asyncio.Event`.
 
@@ -93,12 +93,14 @@ async def run_with_interrupt(task, event, loop=None):
     :param task: Task to run
     :param event: An `asyncio.Event` which, if set, will interrupt `task`
         and cause it to be cancelled.
+    :param timeout: Optional max number of seconds to wait before returning.
     :param loop: Optional event loop to use other than the default.
     """
     loop = loop or asyncio.get_event_loop()
     event_task = loop.create_task(event.wait())
     done, pending = await asyncio.wait([task, event_task],
                                        loop=loop,
+                                       timeout=timeout,
                                        return_when=asyncio.FIRST_COMPLETED)
     for f in pending:
         f.cancel()
