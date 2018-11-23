@@ -588,6 +588,6 @@ class Controller:
         model_facade = client.ModelManagerFacade.from_connection(
             self.connection())
         user = tag.user(username)
-        model = tag.model(self.info.uuid)
+        model = tag.model(model_uuid)
         changes = client.ModifyModelAccess(acl, 'revoke', model, user)
         return await model_facade.ModifyModelAccess([changes])
