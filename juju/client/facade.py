@@ -49,14 +49,15 @@ def lookup_facade(name, version):
     of the correct client<version>.py file.
 
     """
-    try:
-        facade = getattr(CLIENTS[str(version)], name)
-    except KeyError:
-        raise ImportError("No facades found for version {}".format(version))
-    except AttributeError:
-        raise ImportError(
-            "No facade with name '{}' in version {}".format(name, version))
-    return facade
+    for _version in range(int(version), 0, -1):
+        try:
+            facade = getattr(CLIENTS[str(_version)], name)
+            return facade
+        except (KeyError, AttributeError):
+            continue
+    else:
+        raise ImportError("No supported version for facade: "
+                          "{}".format(name))
 
 
 '''
@@ -73,7 +74,14 @@ class TypeFactory:
         @param connection: initialized Connection object.
 
         """
-        version = connection.facades[cls.__name__[:-6]]
+        facade_name = cls.__name__
+        if not facade_name.endswith('Facade'):
+           raise TypeError('Unexpected class name: {}'.format(facade_name))
+        facade_name = facade_name[:-len('Facade')]
+        version = connection.facades.get(facade_name)
+        if version is None:
+            raise Exception('No facade {} in facades {}'.format(facade_name,
+                                                                connection.facades))
 
         c = lookup_facade(cls.__name__, version)
         c = c()
