@@ -1867,6 +1867,8 @@ class BundleHandler:
         for unit_name, unit in model.units.items():
             app_units = self._units_by_app.setdefault(unit.application, [])
             app_units.append(unit_name)
+        self.bundle_facade = client.BundleFacade.from_connection(
+            model.connection())
         self.client_facade = client.ClientFacade.from_connection(
             model.connection())
         self.app_facade = client.ApplicationFacade.from_connection(
@@ -1924,11 +1926,11 @@ class BundleHandler:
         return bundle
 
     async def fetch_plan(self, entity_id):
-        is_local = not entity_id.startswith('cs:')
+        is_store_url = entity_id.startswith('cs:')
 
-        if is_local and os.path.isfile(entity_id):
+        if not is_store_url and os.path.isfile(entity_id):
             bundle_yaml = Path(entity_id).read_text()
-        elif is_local and os.path.isdir(entity_id):
+        elif not is_store_url and os.path.isdir(entity_id):
             bundle_yaml = (Path(entity_id) / "bundle.yaml").read_text()
         else:
             bundle_yaml = await self.charmstore.files(entity_id,
@@ -1937,7 +1939,7 @@ class BundleHandler:
         self.bundle = yaml.safe_load(bundle_yaml)
         self.bundle = await self._handle_local_charms(self.bundle)
 
-        self.plan = await self.client_facade.GetBundleChanges(
+        self.plan = await self.bundle_facade.GetChanges(
             yaml.dump(self.bundle))
 
         if self.plan.errors:
