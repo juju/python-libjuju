@@ -122,7 +122,8 @@ class Unit(model.ModelEntity):
         """Run command on this unit.
 
         :param str command: The command to run
-        :param int timeout: Time, in seconds, to wait before command is considered failed
+        :param int timeout: Time, in seconds, to wait before command is
+        considered failed
         :returns: A :class:`juju.action.Action` instance.
 
         """
@@ -148,7 +149,7 @@ class Unit(model.ModelEntity):
         """Run an action on this unit.
 
         :param str action_name: Name of action to run
-        :param \*\*params: Action parameters
+        :param **params: Action parameters
         :returns: A :class:`juju.action.Action` instance.
 
         Note that this only enqueues the action.  You will need to call

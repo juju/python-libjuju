@@ -1094,7 +1094,7 @@ class Model:
         (optional) list of existing subnet CIDRs with it.
 
         :param str name: Name of the space
-        :param \*cidrs: Optional list of existing subnet CIDRs
+        :param *cidrs: Optional list of existing subnet CIDRs
 
         """
         raise NotImplementedError()
@@ -1115,7 +1115,7 @@ class Model:
 
         :param str cidr_or_id: CIDR or provider ID of the existing subnet
         :param str space: Network space with which to associate
-        :param str \*zones: Zone(s) in which the subnet resides
+        :param str *zones: Zone(s) in which the subnet resides
 
         """
         raise NotImplementedError()
@@ -1129,7 +1129,7 @@ class Model:
     def block(self, *commands):
         """Add a new block to this model.
 
-        :param str \*commands: The commands to block. Valid values are
+        :param str *commands: The commands to block. Valid values are
             'all-changes', 'destroy-model', 'remove-object'
 
         """
@@ -1166,7 +1166,7 @@ class Model:
 
         :param str name: Name to give the storage pool
         :param str provider_type: Pool provider type
-        :param \*\*pool_config: key/value pool configuration pairs
+        :param **pool_config: key/value pool configuration pairs
 
         """
         raise NotImplementedError()
@@ -1473,10 +1473,11 @@ class Model:
         client_facade = client.ClientFacade.from_connection(self.connection())
         result = await client_facade.GetModelConstraints()
 
-        # GetModelConstraints returns GetConstraintsResults which has a 'constraints'
-        # attribute. If no constraints have been set GetConstraintsResults.constraints
-        # is None. Otherwise GetConstraintsResults.constraints has an attribute for each
-        # possible constraint, each of these in turn will be None if they have not been
+        # GetModelConstraints returns GetConstraintsResults which has a
+        # 'constraints' attribute. If no constraints have been set
+        # GetConstraintsResults.constraints is None. Otherwise
+        # GetConstraintsResults.constraints has an attribute for each possible
+        # constraint, each of these in turn will be None if they have not been
         # set.
         if result.constraints:
             constraint_types = [a for a in dir(result.constraints)
@@ -1484,7 +1485,8 @@ class Model:
             for constraint in constraint_types:
                 value = getattr(result.constraints, constraint)
                 if value is not None:
-                    constraints[constraint] = getattr(result.constraints, constraint)
+                    constraints[constraint] = getattr(result.constraints,
+                                                      constraint)
         return constraints
 
     def import_ssh_key(self, identity):
@@ -1580,7 +1582,7 @@ class Model:
     def remove_machine(self, *machine_ids):
         """Remove a machine from this model.
 
-        :param str \*machine_ids: Ids of the machines to remove
+        :param str *machine_ids: Ids of the machines to remove
 
         """
         raise NotImplementedError()
@@ -1757,7 +1759,7 @@ class Model:
     def unblock(self, *commands):
         """Unblock an operation that would alter this model.
 
-        :param str \*commands: The commands to unblock. Valid values are
+        :param str *commands: The commands to unblock. Valid values are
             'all-changes', 'destroy-model', 'remove-object'
 
         """
@@ -1766,7 +1768,7 @@ class Model:
     def unset_config(self, *keys):
         """Unset configuration on this model.
 
-        :param str \*keys: The keys to unset
+        :param str *keys: The keys to unset
 
         """
         raise NotImplementedError()
@@ -1806,7 +1808,7 @@ class Model:
     async def get_metrics(self, *tags):
         """Retrieve metrics.
 
-        :param str \*tags: Tags of entities from which to retrieve metrics.
+        :param str *tags: Tags of entities from which to retrieve metrics.
             No tags retrieves the metrics of all units in the model.
         :return: Dictionary of unit_name:metrics
 
@@ -2207,9 +2209,9 @@ class CharmArchiveGenerator:
 
         Ignored::
 
-            * build/\* - This is used for packing the charm itself and any
+            * build/* - This is used for packing the charm itself and any
                           similar tasks.
-            * \*/.\*    - Hidden files are all ignored for now.  This will most
+            * */.*    - Hidden files are all ignored for now.  This will most
                           likely be changed into a specific ignore list
                           (.bzr, etc)
 

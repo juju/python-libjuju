@@ -19,7 +19,7 @@ class Juju(object):
     def agree(self, *terms):
         """Agree to the terms of a charm.
 
-        :param str \*terms: Terms to agree to
+        :param str *terms: Terms to agree to
 
         """
         raise NotImplementedError()

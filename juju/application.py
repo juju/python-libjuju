@@ -311,7 +311,8 @@ class Application(model.ModelEntity):
         """
         Restore application config to default values.
 
-        :param list to_default: A list of config options to be reset to their default value.
+        :param list to_default: A list of config options to be reset to their
+        default value.
         """
         app_facade = client.ApplicationFacade.from_connection(self.connection)
 
