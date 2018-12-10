@@ -562,7 +562,7 @@ class _Task:
     def start(self):
         async def run():
             try:
-                return await(self.task())
+                return await self.task()
             finally:
                 self.stopped.set()
         self.stopped.clear()
