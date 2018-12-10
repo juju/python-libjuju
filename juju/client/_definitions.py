@@ -768,32 +768,38 @@ class ApplicationConstraint(Type):
 
 
 class ApplicationDeploy(Type):
-    _toSchema = {'application': 'application', 'channel': 'channel', 'charm_url': 'charm-url', 'config': 'config', 'config_yaml': 'config-yaml', 'constraints': 'constraints', 'endpoint_bindings': 'endpoint-bindings', 'num_units': 'num-units', 'placement': 'placement', 'resources': 'resources', 'series': 'series', 'storage': 'storage'}
-    _toPy = {'application': 'application', 'channel': 'channel', 'charm-url': 'charm_url', 'config': 'config', 'config-yaml': 'config_yaml', 'constraints': 'constraints', 'endpoint-bindings': 'endpoint_bindings', 'num-units': 'num_units', 'placement': 'placement', 'resources': 'resources', 'series': 'series', 'storage': 'storage'}
-    def __init__(self, application=None, channel=None, charm_url=None, config=None, config_yaml=None, constraints=None, endpoint_bindings=None, num_units=None, placement=None, resources=None, series=None, storage=None, **unknown_fields):
+    _toSchema = {'application': 'application', 'attach_storage': 'attach-storage', 'channel': 'channel', 'charm_url': 'charm-url', 'config': 'config', 'config_yaml': 'config-yaml', 'constraints': 'constraints', 'devices': 'devices', 'endpoint_bindings': 'endpoint-bindings', 'num_units': 'num-units', 'placement': 'placement', 'policy': 'policy', 'resources': 'resources', 'series': 'series', 'storage': 'storage'}
+    _toPy = {'application': 'application', 'attach-storage': 'attach_storage', 'channel': 'channel', 'charm-url': 'charm_url', 'config': 'config', 'config-yaml': 'config_yaml', 'constraints': 'constraints', 'devices': 'devices', 'endpoint-bindings': 'endpoint_bindings', 'num-units': 'num_units', 'placement': 'placement', 'policy': 'policy', 'resources': 'resources', 'series': 'series', 'storage': 'storage'}
+    def __init__(self, application=None, attach_storage=None, channel=None, charm_url=None, config=None, config_yaml=None, constraints=None, devices=None, endpoint_bindings=None, num_units=None, placement=None, policy=None, resources=None, series=None, storage=None, **unknown_fields):
         '''
         application : str
+        attach_storage : typing.Sequence[str]
         channel : str
         charm_url : str
         config : typing.Mapping[str, str]
         config_yaml : str
         constraints : Value
+        devices : typing.Mapping[str, ~Constraints]
         endpoint_bindings : typing.Mapping[str, str]
         num_units : int
         placement : typing.Sequence[~Placement]
+        policy : str
         resources : typing.Mapping[str, str]
         series : str
         storage : typing.Mapping[str, ~Constraints]
         '''
         self.application = application
+        self.attach_storage = attach_storage
         self.channel = channel
         self.charm_url = charm_url
         self.config = config
         self.config_yaml = config_yaml
         self.constraints = Value.from_json(constraints) if constraints else None
+        self.devices = devices
         self.endpoint_bindings = endpoint_bindings
         self.num_units = num_units
         self.placement = [Placement.from_json(o) for o in placement or []]
+        self.policy = policy
         self.resources = resources
         self.series = series
         self.storage = storage

@@ -19,7 +19,7 @@ _marker = object()
 JUJU_VERSION = re.compile(r'[0-9]+\.[0-9-]+[\.\-][0-9a-z]+(\.[0-9]+)?')
 # Workaround for https://bugs.launchpad.net/juju/+bug/1683906
 NAUGHTY_CLASSES = ['ClientFacade', 'Client', 'FullStatus', 'ModelStatusInfo',
-                   'ModelInfo']
+                   'ModelInfo', 'ApplicationDeploy']
 
 
 # Map basic types to Python's typing with a callable
