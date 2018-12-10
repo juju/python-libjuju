@@ -46,5 +46,6 @@ before_script:
   - sudo usermod -a -G lxd $USER || true
 
 script:
+  # dual sudos are to ensure lxd group is available
   - sudo -E sudo -u $USER -E juju bootstrap localhost test --config 'identity-url=https://api.staging.jujucharms.com/identity' --config 'allow-model-access=true'
-  - tox -e py3,integration,serial
+  - sudo -E sudo -u $USER -E tox -e py3,integration,serial
