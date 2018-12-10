@@ -1215,7 +1215,7 @@ class Model:
             self, entity_url, application_name=None, bind=None, budget=None,
             channel=None, config=None, constraints=None, force=False,
             num_units=1, plan=None, resources=None, series=None, storage=None,
-            to=None):
+            to=None, devices=None):
         """Deploy a new service or bundle.
 
         :param str entity_url: Charm or bundle url
@@ -1331,7 +1331,8 @@ class Model:
                 storage=storage,
                 channel=channel,
                 num_units=num_units,
-                placement=parse_placement(to)
+                placement=parse_placement(to),
+                devices=devices,
             )
 
     async def _add_store_resources(self, application, entity_url, entity=None):
@@ -1368,7 +1369,8 @@ class Model:
 
     async def _deploy(self, charm_url, application, series, config,
                       constraints, endpoint_bindings, resources, storage,
-                      channel=None, num_units=None, placement=None):
+                      channel=None, num_units=None, placement=None,
+                      devices=None):
         """Logic shared between `Model.deploy` and `BundleHandler.deploy`.
         """
         log.info('Deploying %s', charm_url)
@@ -1392,7 +1394,8 @@ class Model:
             num_units=num_units,
             resources=resources,
             storage=storage,
-            placement=placement
+            placement=placement,
+            devices=devices,
         )
         result = await app_facade.Deploy([app])
         errors = [r.error.message for r in result.results if r.error]
@@ -2055,7 +2058,8 @@ class BundleHandler:
         return await self.model.add_relation(*endpoints)
 
     async def deploy(self, charm, series, application, options, constraints,
-                     storage, endpoint_bindings, resources):
+                     storage, endpoint_bindings, resources,
+                     devices=None, num_units=1, placement=None):
         """
         :param charm string:
             Charm holds the URL of the charm to be used to deploy this
@@ -2083,6 +2087,18 @@ class BundleHandler:
         :param resources map[string]int:
             Resources identifies the revision to use for each resource
             of the application's charm.
+
+        :param devices map[string]string:
+            Devices holds the optional devices constraints.
+
+        :param num_units int:
+            NumUnits holds the number of units required.  For IAAS models, this
+            will be 0 and separate AddUnitChanges will be used.  For Kubernetes
+            models, this will be used to scale the application.
+
+        :param placement string:
+            Placement holds the placement directive for units of this
+            application.  Only applicable for Kubernetes models.
         """
         # resolve indirect references
         charm = self.resolve(charm)
@@ -2100,6 +2116,9 @@ class BundleHandler:
             endpoint_bindings=endpoint_bindings,
             resources=resources,
             storage=storage,
+            devices=devices,
+            placement=placement,
+            num_units=num_units,
         )
         return application
 
@@ -2130,6 +2149,20 @@ class BundleHandler:
             count=1,
             to=placement,
         )
+
+    async def scale(self, application, scale):
+        """
+        Handle a change of scale to a k8s application.
+
+        :param string application:
+            Application holds the application placeholder name for which a unit
+            is added.
+
+        :param int scale:
+            New scale value to use.
+        """
+        application = self.resolve(application)
+        return await self.model.applications[application].scale(scale=scale)
 
     async def expose(self, application):
         """
