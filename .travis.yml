@@ -44,8 +44,6 @@ before_script:
 
   - sudo addgroup lxd || true
   - sudo usermod -a -G lxd $USER || true
-  # Trigger generation of the client certificates
-  - sg lxd -c "echo y|lxc remote add "$USER" https://0.0.0.0:8443 --accept-certificate --password='${LXD_PASSWORD}'"
 
 script:
   - sudo -E sudo -u $USER -E juju bootstrap localhost test --config 'identity-url=https://api.staging.jujucharms.com/identity' --config 'allow-model-access=true'
