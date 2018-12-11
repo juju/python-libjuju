@@ -2,6 +2,14 @@ Changelog
 ---------
 
 
+0.11.0
+^^^^^^
+Tuesday December 11 2018
+
+* Updates for new Juju version (#274)
+* Fix wrong variable name in revoke_model function (#271)
+
+
 0.10.2
 ^^^^^^
 Tuesday September 18 2018
