@@ -12,12 +12,12 @@ import uuid
 
 
 arches = [
-    [re.compile("amd64|x86_64"), "amd64"],
-    [re.compile("i?[3-9]86"), "i386"],
-    [re.compile("(arm$)|(armv.*)"), "armhf"],
-    [re.compile("aarch64"), "arm64"],
-    [re.compile("ppc64|ppc64el|ppc64le"), "ppc64el"],
-    [re.compile("ppc64|ppc64el|ppc64le"), "s390x"],
+    [re.compile(r"amd64|x86_64"), "amd64"],
+    [re.compile(r"i?[3-9]86"), "i386"],
+    [re.compile(r"(arm$)|(armv.*)"), "armhf"],
+    [re.compile(r"aarch64"), "arm64"],
+    [re.compile(r"ppc64|ppc64el|ppc64le"), "ppc64el"],
+    [re.compile(r"s390x?"), "s390x"],
 
 ]
 
@@ -235,7 +235,7 @@ class SSHProvisioner:
         info['series'] = lines[0].strip()
         info['arch'] = normalize_arch(lines[1].strip())
 
-        memKb = re.split('\s+', lines[2])[1]
+        memKb = re.split(r'\s+', lines[2])[1]
 
         # Convert megabytes -> kilobytes
         info['mem'] = round(int(memKb) / 1024)

@@ -13,7 +13,7 @@ clean:
 .tox:
 	tox -r --notest
 
-client:
+client: .tox
 ifndef SCHEMAGEN
 	$(error "schemagen is not available, please install from https://github.com/juju/schemagen")
 endif

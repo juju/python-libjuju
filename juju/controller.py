@@ -30,7 +30,8 @@ class Controller:
             `juju.client.connection.Connection.MAX_FRAME_SIZE`
         :param bakery_client httpbakery.Client: The bakery client to use
             for macaroon authorization.
-        :param jujudata JujuData: The source for current controller information.
+        :param jujudata JujuData: The source for current controller
+        information.
         """
         self._connector = connector.Connector(
             loop=loop,
@@ -193,7 +194,8 @@ class Controller:
             raise errors.JujuError('Name must be provided for credential')
 
         if not credential:
-            name, credential = self._connector.jujudata.load_credential(cloud, name)
+            name, credential = self._connector.jujudata.load_credential(cloud,
+                                                                        name)
             if credential is None:
                 raise errors.JujuError(
                     'Unable to find credential: {}'.format(name))
@@ -288,10 +290,12 @@ class Controller:
 
         return model
 
-    async def destroy_models(self, *models):
+    async def destroy_models(self, *models, destroy_storage=False):
         """Destroy one or more models.
 
-        :param str \*models: Names or UUIDs of models to destroy
+        :param str *models: Names or UUIDs of models to destroy
+        :param bool destroy_storage: Whether or not to destroy storage when
+            destroying the models. Defaults to false.
 
         """
         uuids = await self.model_uuids()
@@ -307,10 +311,15 @@ class Controller:
             ', '.join(models)
         )
 
-        await model_facade.DestroyModels([
-            client.Entity(tag.model(model))
-            for model in models
-        ])
+        if model_facade.version >= 5:
+            params = [
+                client.DestroyModelParams(model_tag=tag.model(model),
+                                          destroy_storage=destroy_storage)
+                for model in models]
+        else:
+            params = [client.Entity(tag.model(model)) for model in models]
+
+        await model_facade.DestroyModels(params)
     destroy_model = destroy_models
 
     async def add_user(self, username, password=None, display_name=None):
@@ -323,7 +332,8 @@ class Controller:
         """
         if not display_name:
             display_name = username
-        user_facade = client.UserManagerFacade.from_connection(self.connection())
+        user_facade = client.UserManagerFacade.from_connection(
+            self.connection())
         users = [client.AddUser(display_name=display_name,
                                 username=username,
                                 password=password)]
@@ -345,7 +355,8 @@ class Controller:
         :param str password: New password
 
         """
-        user_facade = client.UserManagerFacade.from_connection(self.connection())
+        user_facade = client.UserManagerFacade.from_connection(
+            self.connection())
         entity = client.EntityPassword(password, tag.user(username))
         return await user_facade.SetPassword([entity])
 
@@ -366,7 +377,8 @@ class Controller:
         :param str username: Username
 
         """
-        user_facade = client.UserManagerFacade.from_connection(self.connection())
+        user_facade = client.UserManagerFacade.from_connection(
+            self.connection())
         entity = client.Entity(tag.user(username))
         return await user_facade.DisableUser([entity])
 
@@ -374,7 +386,8 @@ class Controller:
         """Re-enable a previously disabled user.
 
         """
-        user_facade = client.UserManagerFacade.from_connection(self.connection())
+        user_facade = client.UserManagerFacade.from_connection(
+            self.connection())
         entity = client.Entity(tag.user(username))
         return await user_facade.EnableUser([entity])
 
@@ -439,7 +452,7 @@ class Controller:
     def get_payloads(self, *patterns):
         """Return list of known payloads.
 
-        :param str \*patterns: Patterns to match against
+        :param str *patterns: Patterns to match against
 
         Each pattern will be checked against the following info in Juju::
 
@@ -562,7 +575,8 @@ class Controller:
     async def grant_model(self, username, model_uuid, acl='read'):
         """Grant a user access to a model. Note that if the user
         already has higher permissions than the provided ACL,
-        this will do nothing (see revoke_model for a way to remove permissions).
+        this will do nothing (see revoke_model for a way to remove
+        permissions).
 
         :param str username: Username
         :param str model_uuid: The UUID of the model to change.
