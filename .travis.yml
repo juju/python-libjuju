@@ -36,7 +36,7 @@ before_script:
 
   # init lxd for tests
   - sudo lxd waitready --timeout 30
-  - sudo lxd init --auto --network-address='[::]' --network-port=8443 --storage-backend dir --storage-pool default
+  - sudo lxd init --auto --network-address='[::]' --network-port=8443 --storage-backend=dir
   - sudo chmod 666 /var/snap/lxd/current/lxd/unix.socket
 
   # Horrible workaround to LP Bug #1738614
