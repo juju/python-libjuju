@@ -17,7 +17,7 @@ arches = [
     [re.compile(r"(arm$)|(armv.*)"), "armhf"],
     [re.compile(r"aarch64"), "arm64"],
     [re.compile(r"ppc64|ppc64el|ppc64le"), "ppc64el"],
-    [re.compile(r"ppc64|ppc64el|ppc64le"), "s390x"],
+    [re.compile(r"s390x"), "s390x"],
 
 ]
 

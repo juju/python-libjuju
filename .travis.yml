@@ -44,6 +44,5 @@ before_script:
   - lxc storage create juju-zfs dir source=/var/snap/lxd/common/lxd/storage-pools/juju-zfs
 
 script:
-  # dual sudos are to ensure lxd group is available
   - juju bootstrap localhost test --config 'identity-url=https://api.staging.jujucharms.com/identity' --config 'allow-model-access=true'
   - tox -e py3,integration,serial
