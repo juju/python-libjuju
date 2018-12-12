@@ -82,32 +82,31 @@ async def block_until(*conditions, timeout=None, wait_period=0.5, loop=None):
     await asyncio.wait_for(_block(), timeout, loop=loop)
 
 
-async def run_with_interrupt(task, event, loop=None):
+async def run_with_interrupt(task, *events, loop=None):
     """
-    Awaits a task while allowing it to be interrupted by an `asyncio.Event`.
+    Awaits a task while allowing it to be interrupted by one or more
+    `asyncio.Event`s.
 
-    If the task finishes without the event becoming set, the results of the
-    task will be returned.  If the event becomes set, the task will be
-    cancelled ``None`` will be returned.
+    If the task finishes without the events becoming set, the results of the
+    task will be returned.  If the event become set, the task will be cancelled
+    ``None`` will be returned.
 
     :param task: Task to run
-    :param event: An `asyncio.Event` which, if set, will interrupt `task`
-        and cause it to be cancelled.
+    :param events: One or more `asyncio.Event`s which, if set, will interrupt
+        `task` and cause it to be cancelled.
     :param loop: Optional event loop to use other than the default.
     """
     loop = loop or asyncio.get_event_loop()
-    event_task = loop.create_task(event.wait())
-    done, pending = await asyncio.wait([task, event_task],
+    task = asyncio.ensure_future(task, loop=loop)
+    event_tasks = [loop.create_task(event.wait()) for event in events]
+    done, pending = await asyncio.wait([task] + event_tasks,
                                        loop=loop,
                                        return_when=asyncio.FIRST_COMPLETED)
     for f in pending:
-        f.cancel()
-    exception = [f.exception() for f in done
-                 if f is not event_task and f.exception()]
-    if exception:
-        raise exception[0]
-    result = [f.result() for f in done if f is not event_task]
-    if result:
-        return result[0]
+        f.cancel()  # cancel unfinished tasks
+    for f in done:
+        f.exception()  # prevent "exception was not retrieved" errors
+    if task in done:
+        return task.result()  # may raise exception
     else:
         return None

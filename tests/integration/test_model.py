@@ -285,7 +285,7 @@ async def test_relate(event_loop):
             my_relation = await run_with_interrupt(model.add_relation(
                 'ubuntu',
                 'nrpe',
-            ), timeout, event_loop)
+            ), timeout, loop=event_loop)
 
         assert isinstance(my_relation, Relation)
 

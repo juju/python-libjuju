@@ -21,7 +21,7 @@ class Machine(model.ModelEntity):
         if not model.info:
             await utils.run_with_interrupt(model.get_info(),
                                            model._watch_stopping,
-                                           model.loop)
+                                           loop=model.loop)
         if model._watch_stopping.is_set():
             return
         if model.info.agent_version < client.Number.from_json('2.2.3'):
@@ -50,7 +50,7 @@ class Machine(model.ModelEntity):
 
         full_status = await utils.run_with_interrupt(model.get_status(),
                                                      model._watch_stopping,
-                                                     model.loop)
+                                                     loop=model.loop)
         if model._watch_stopping.is_set():
             return
 
