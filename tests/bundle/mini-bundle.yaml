@@ -1,3 +1,9 @@
+series: xenial
 applications:
-  myapp:
-    charm: cs:xenial/ubuntu-0
+  dummy-sink:
+    charm: cs:~juju-qa/dummy-sink
+    num_units: 1
+  dummy-subordinate:
+    charm: cs:~juju-qa/dummy-subordinate
+relations:
+  - ['dummy-sink', 'dummy-subordinate']

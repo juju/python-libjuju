@@ -2059,7 +2059,7 @@ class BundleHandler:
 
     async def deploy(self, charm, series, application, options, constraints,
                      storage, endpoint_bindings, resources,
-                     devices=None, num_units=1, placement=None):
+                     devices=None, num_units=None, placement=None):
         """
         :param charm string:
             Charm holds the URL of the charm to be used to deploy this
