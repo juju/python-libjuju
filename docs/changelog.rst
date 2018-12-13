@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+0.11.1
+^^^^^^
+Thursday December 13 2018
+
+* Fix bundles with subordinates for Juju <2.5 (#277)
+
 
 0.11.0
 ^^^^^^
