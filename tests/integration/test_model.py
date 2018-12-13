@@ -38,7 +38,7 @@ async def test_deploy_local_bundle_dir(event_loop):
         assert wordpress and mysql
         await block_until(lambda: (len(wordpress.units) == 1 and
                                    len(mysql.units) == 1),
-                          timeout=60*2)
+                          timeout=60 * 2)
 
 
 @base.bootstrapped
@@ -56,7 +56,7 @@ async def test_deploy_local_bundle_file(event_loop):
         assert dummy_sink and dummy_subordinate
         await block_until(lambda: (len(dummy_sink.units) == 1 and
                                    len(dummy_subordinate.units) == 1),
-                          timeout=60*2)
+                          timeout=60 * 2)
 
 
 @base.bootstrapped
