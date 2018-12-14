@@ -38,7 +38,7 @@ async def test_deploy_local_bundle_dir(event_loop):
         assert wordpress and mysql
         await block_until(lambda: (len(wordpress.units) == 1 and
                                    len(mysql.units) == 1),
-                          timeout=60 * 2)
+                          timeout=60 * 4)
 
 
 @base.bootstrapped
@@ -56,7 +56,7 @@ async def test_deploy_local_bundle_file(event_loop):
         assert dummy_sink and dummy_subordinate
         await block_until(lambda: (len(dummy_sink.units) == 1 and
                                    len(dummy_subordinate.units) == 1),
-                          timeout=60 * 2)
+                          timeout=60 * 4)
 
 
 @base.bootstrapped
@@ -371,6 +371,29 @@ async def test_store_resources_bundle(event_loop):
         # ghost will go in to blocked (or error, for older
         # charm revs) if the resource is missing
         assert ghost.units[0].workload_status == 'active'
+        resources = await ghost.get_resources()
+        assert resources['ghost-stable'].revision >= 12
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_store_resources_bundle_revs(event_loop):
+    async with base.CleanModel() as model:
+        bundle = str(Path(__file__).parent / 'bundle/bundle-resource-rev.yaml')
+        await model.deploy(bundle)
+        assert 'ghost' in model.applications
+        ghost = model.applications['ghost']
+        terminal_statuses = ('active', 'error', 'blocked')
+        await model.block_until(
+            lambda: (
+                len(ghost.units) > 0 and
+                ghost.units[0].workload_status in terminal_statuses)
+        )
+        # ghost will go in to blocked (or error, for older
+        # charm revs) if the resource is missing
+        assert ghost.units[0].workload_status == 'active'
+        resources = await ghost.get_resources()
+        assert resources['ghost-stable'].revision == 11
 
 
 @base.bootstrapped

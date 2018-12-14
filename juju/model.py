@@ -1305,7 +1305,7 @@ class Model:
                 # actually support them yet anyway
                 resources = await self._add_store_resources(application_name,
                                                             entity_id,
-                                                            entity)
+                                                            entity=entity)
             else:
                 if not application_name:
                     metadata = yaml.load(metadata_path.read_text())
@@ -1335,7 +1335,8 @@ class Model:
                 devices=devices,
             )
 
-    async def _add_store_resources(self, application, entity_url, entity=None):
+    async def _add_store_resources(self, application, entity_url,
+                                   overrides=None, entity=None):
         if not entity:
             # avoid extra charm store call if one was already made
             entity = await self.charmstore.entity(entity_url,
@@ -1352,6 +1353,17 @@ class Model:
                 'origin': 'store',
             } for resource in entity['Meta']['resources']
         ]
+
+        if overrides:
+            names = {r['name'] for r in resources}
+            unknown = overrides.keys() - names
+            if unknown:
+                raise JujuError('Unrecognized resource{}: {}'.format(
+                    's' if len(unknown) > 1 else '',
+                    ', '.join(unknown)))
+            for resource in resources:
+                if resource['name'] in overrides:
+                    resource['revision'] = overrides[resource['name']]
 
         if not resources:
             return None
@@ -2058,8 +2070,7 @@ class BundleHandler:
         return await self.model.add_relation(*endpoints)
 
     async def deploy(self, charm, series, application, options, constraints,
-                     storage, endpoint_bindings, resources,
-                     devices=None, num_units=None, placement=None):
+                     storage, endpoint_bindings, *args):
         """
         :param charm string:
             Charm holds the URL of the charm to be used to deploy this
@@ -2084,29 +2095,40 @@ class BundleHandler:
         :param endpoint_bindings map[string]string:
             EndpointBindings holds the optional endpoint bindings
 
+        :param devices map[string]string:
+            Devices holds the optional devices constraints.
+            (Only given on Juju 2.5+)
+
         :param resources map[string]int:
             Resources identifies the revision to use for each resource
             of the application's charm.
-
-        :param devices map[string]string:
-            Devices holds the optional devices constraints.
 
         :param num_units int:
             NumUnits holds the number of units required.  For IAAS models, this
             will be 0 and separate AddUnitChanges will be used.  For Kubernetes
             models, this will be used to scale the application.
+            (Only given on Juju 2.5+)
 
         :param placement string:
             Placement holds the placement directive for units of this
             application.  Only applicable for Kubernetes models.
+            (Only given on Juju 2.5+)
         """
         # resolve indirect references
         charm = self.resolve(charm)
-        # the bundle plan doesn't actually do anything with resources, even
-        # though it ostensibly gives us something (None) for that param
+
+        if len(args) == 1:
+            # Juju 2.4 and below only sends the resources
+            resources = args[0]
+            devices, num_units, placement = None, None, None
+        else:
+            # Juju 2.5+ sends devices before resources, as well as num_units
+            # and placement
+            devices, resources, num_units, placement = args
+
         if not charm.startswith('local:'):
-            resources = await self.model._add_store_resources(application,
-                                                              charm)
+            resources = await self.model._add_store_resources(
+                application, charm, overrides=resources)
         await self.model._deploy(
             charm_url=charm,
             application=application,
