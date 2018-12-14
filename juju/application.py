@@ -272,14 +272,24 @@ class Application(model.ModelEntity):
             actions = {k: v['description'] for k, v in actions.items()}
         return actions
 
-    def get_resources(self, details=False):
+    async def get_resources(self):
         """Return resources for this application.
 
-        :param bool details: Include detailed info about resources used by each
-            unit
-
+        Returns a dict mapping resource name to
+        :class:`~juju._definitions.CharmResource` instances.
         """
-        raise NotImplementedError()
+        facade = client.ResourcesFacade.from_connection(self.connection)
+        response = await facade.ListResources([client.Entity(self.tag)])
+
+        resources = dict()
+        for result in response.results:
+            for resource in result.charm_store_resources or []:
+                resources[resource.name] = resource
+            for resource in result.resources or []:
+                if resource.charmresource:
+                    resource = resource.charmresource
+                    resources[resource.name] = resource
+        return resources
 
     async def run(self, command, timeout=None):
         """Run command on all units for this application.
