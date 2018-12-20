@@ -8,9 +8,10 @@ log = logging.getLogger(__name__)
 
 
 class User(object):
-    def __init__(self, controller, user_info):
+    def __init__(self, controller, user_info, secret_key=None):
         self.controller = controller
         self._user_info = user_info
+        self._secret_key = secret_key
 
     @property
     def tag(self):
@@ -47,6 +48,10 @@ class User(object):
     @property
     def created_by(self):
         return self._user_info.created_by
+
+    @property
+    def secret_key(self):
+        return self._secret_key
 
     async def set_password(self, password):
         """Update this user's password.

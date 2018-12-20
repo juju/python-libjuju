@@ -337,8 +337,9 @@ class Controller:
         users = [client.AddUser(display_name=display_name,
                                 username=username,
                                 password=password)]
-        await user_facade.AddUser(users)
-        return await self.get_user(username)
+        results = await user_facade.AddUser(users)
+        secret_key = results.results[0].secret_key
+        return await self.get_user(username, secret_key=secret_key)
 
     async def remove_user(self, username):
         """Remove a user from this controller.
@@ -359,6 +360,19 @@ class Controller:
             self.connection())
         entity = client.EntityPassword(password, tag.user(username))
         return await user_facade.SetPassword([entity])
+
+    async def reset_user_password(self, username):
+        """Reset user password.
+
+        :param str username: Username
+        :returns: A :class:`~juju.user.User` instance
+        """
+        user_facade = client.UserManagerFacade.from_connection(
+            self.connection())
+        entity = client.Entity(tag.user(username))
+        results = await user_facade.ResetPassword([entity])
+        secret_key = results.results[0].secret_key
+        return await self.get_user(username, secret_key=secret_key)
 
     async def destroy(self, destroy_all_models=False):
         """Destroy this controller.
@@ -501,10 +515,12 @@ class Controller:
         await model._connect_direct(**kwargs)
         return model
 
-    async def get_user(self, username):
+    async def get_user(self, username, secret_key=None):
         """Get a user by name.
 
         :param str username: Username
+        :param str secret_key: Issued by juju when add or reset user
+            password
         :returns: A :class:`~juju.user.User` instance
         """
         client_facade = client.UserManagerFacade.from_connection(
@@ -520,7 +536,7 @@ class Controller:
                 return None
             raise
         if response.results and response.results[0].result:
-            return User(self, response.results[0].result)
+            return User(self, response.results[0].result, secret_key=secret_key)
         return None
 
     async def get_users(self, include_disabled=False):
