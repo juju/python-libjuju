@@ -217,7 +217,12 @@ class Controller:
 
         log.debug('Uploading credential %s', name)
         cloud_facade = client.CloudFacade.from_connection(self.connection())
-        await cloud_facade.UpdateCredentials([
+        if cloud_facade.version >= 3:
+            # UpdateCredentials was renamed to UpdateCredentialsCheckModels in facade version 3.
+            update_credentials_func = cloud_facade.UpdateCredentialsCheckModels
+        else:
+            update_credentials_func = cloud_facade.UpdateCredentials
+        await update_credentials_func([
             client.UpdateCloudCredential(
                 tag=tag.credential(cloud, tag.untag('user-', owner), name),
                 credential=credential,
