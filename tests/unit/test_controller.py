@@ -86,7 +86,7 @@ class TestControllerConnect(asynctest.TestCase):
                                         max_frame_size='max_frame_size')
 
     @asynctest.patch('juju.client.client.CloudFacade')
-    async def test_file_cred(self, mock_cf):
+    async def test_file_cred_v2(self, mock_cf):
         with NamedTemporaryFile() as tempfile:
             tempfile.close()
             temppath = Path(tempfile.name)
@@ -97,7 +97,9 @@ class TestControllerConnect(asynctest.TestCase):
             c = Controller(jujudata=jujudata)
             c._connector = base.AsyncMock()
             up_creds = base.AsyncMock()
-            mock_cf.from_connection().UpdateCredentials = up_creds
+            cloud_facade = mock_cf.from_connection()
+            cloud_facade.version = 2
+            cloud_facade.UpdateCredentials = up_creds
             await c.add_credential(
                 name='name',
                 credential=cred,
@@ -106,5 +108,33 @@ class TestControllerConnect(asynctest.TestCase):
             )
             assert up_creds.called
             new_cred = up_creds.call_args[0][0][0].credential
+            assert cred.attrs['file'] == tempfile.name
+            assert new_cred.attrs['file'] == 'cred-test'
+
+    @asynctest.patch('juju.client.client.CloudFacade')
+    async def test_file_cred_v3(self, mock_cf):
+        with NamedTemporaryFile() as tempfile:
+            tempfile.close()
+            temppath = Path(tempfile.name)
+            temppath.write_text('cred-test')
+            cred = client.CloudCredential(auth_type='jsonfile',
+                                          attrs={'file': tempfile.name})
+            jujudata = mock.MagicMock()
+            c = Controller(jujudata=jujudata)
+            c._connector = base.AsyncMock()
+            up_creds = base.AsyncMock()
+            cloud_facade = mock_cf.from_connection()
+            cloud_facade.version = 3
+            cloud_facade.UpdateCredentialsCheckModels = up_creds
+            await c.add_credential(
+                name='name',
+                credential=cred,
+                cloud='cloud',
+                owner='owner',
+                force=True,
+            )
+            assert up_creds.called
+            assert up_creds.call_args[1]['force']
+            new_cred = up_creds.call_args[1]['credentials'][0].credential
             assert cred.attrs['file'] == tempfile.name
             assert new_cred.attrs['file'] == 'cred-test'
