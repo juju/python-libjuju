@@ -1,6 +1,15 @@
 Changelog
 ---------
 
+0.11.2
+^^^^^^
+Wednesday January 16 2019
+
+* update facade methods for Juju 2.5-rc2 (#281)
+* Add test case for redirect during connect (#275)
+* Implement App.get_resources and pinned resources in bundles (#278)
+
+
 0.11.1
 ^^^^^^
 Thursday December 13 2018
