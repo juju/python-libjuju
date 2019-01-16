@@ -183,7 +183,7 @@ class Controller:
         :param str owner: Username that will own the credential. Defaults to
             the current user.
         :param bool force: Force indicates whether the update should be forced.
-            It's only supported facade 3 or later.
+            It's only supported for facade v3 or later.
             Defaults to false.
         :returns: Name of credential that was uploaded.
         """
