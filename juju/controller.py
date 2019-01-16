@@ -170,7 +170,7 @@ class Controller:
         await self._connector.disconnect()
 
     async def add_credential(self, name=None, credential=None, cloud=None,
-                             owner=None):
+                             owner=None, force=False):
         """Add or update a credential to the controller.
 
         :param str name: Name of new credential. If None, the default
@@ -182,6 +182,9 @@ class Controller:
             Defaults to the same cloud as the controller.
         :param str owner: Username that will own the credential. Defaults to
             the current user.
+        :param bool force: Force indicates whether the update should be forced.
+            It's only supported facade 3 or later.
+            Defaults to false.
         :returns: Name of credential that was uploaded.
         """
         if not cloud:
@@ -217,17 +220,19 @@ class Controller:
 
         log.debug('Uploading credential %s', name)
         cloud_facade = client.CloudFacade.from_connection(self.connection())
-        if cloud_facade.version >= 3:
-            # UpdateCredentials was renamed to UpdateCredentialsCheckModels in facade version 3.
-            update_credentials_func = cloud_facade.UpdateCredentialsCheckModels
-        else:
-            update_credentials_func = cloud_facade.UpdateCredentials
-        await update_credentials_func([
+        tagged_credentials = [
             client.UpdateCloudCredential(
                 tag=tag.credential(cloud, tag.untag('user-', owner), name),
                 credential=credential,
-            )])
-
+            )]
+        if cloud_facade.version >= 3:
+            # UpdateCredentials was renamed to UpdateCredentialsCheckModels
+            # in facade version 3.
+            await cloud_facade.UpdateCredentialsCheckModels(
+                credentials=tagged_credentials, force=force,
+            )
+        else:
+            await cloud_facade.UpdateCredentials(tagged_credentials)
         return name
 
     async def add_model(

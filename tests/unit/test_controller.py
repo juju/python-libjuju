@@ -131,8 +131,10 @@ class TestControllerConnect(asynctest.TestCase):
                 credential=cred,
                 cloud='cloud',
                 owner='owner',
+                force=True,
             )
             assert up_creds.called
-            new_cred = up_creds.call_args[0][0][0].credential
+            assert up_creds.call_args[1]['force']
+            new_cred = up_creds.call_args[1]['credentials'][0].credential
             assert cred.attrs['file'] == tempfile.name
             assert new_cred.attrs['file'] == 'cred-test'
