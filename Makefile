@@ -24,7 +24,7 @@ test:
 
 .PHONY: lint
 lint: 
-	tox lint --notest
+	tox -e lint --notest
 
 docs: .tox
 	$(PIP) install -r docs/requirements.txt
@@ -34,6 +34,7 @@ docs: .tox
 
 release:
 	git fetch --tags
+	rm sdist/*.tar.gz
 	$(PY) setup.py sdist
 	$(BIN)/twine upload --repository-url https://upload.pypi.org/legacy/ dist/*
 	git tag ${VERSION}
