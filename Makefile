@@ -34,7 +34,7 @@ docs: .tox
 
 release:
 	git fetch --tags
-	rm sdist/*.tar.gz
+	rm dist/*.tar.gz
 	$(PY) setup.py sdist
 	$(BIN)/twine upload --repository-url https://upload.pypi.org/legacy/ dist/*
 	git tag ${VERSION}
