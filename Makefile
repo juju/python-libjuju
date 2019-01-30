@@ -22,6 +22,10 @@ endif
 test:
 	tox
 
+.PHONY: lint
+lint: 
+	tox -e lint --notest
+
 docs: .tox
 	$(PIP) install -r docs/requirements.txt
 	rm -rf docs/_build/
@@ -30,7 +34,9 @@ docs: .tox
 
 release:
 	git fetch --tags
-	$(PY) setup.py sdist upload
+	rm dist/*.tar.gz
+	$(PY) setup.py sdist
+	$(BIN)/twine upload --repository-url https://upload.pypi.org/legacy/ dist/*
 	git tag ${VERSION}
 	git push --tags
 
