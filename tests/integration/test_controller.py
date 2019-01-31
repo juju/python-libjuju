@@ -21,6 +21,7 @@ async def test_add_remove_user(event_loop):
         assert user is None
         user = await controller.add_user(username)
         assert user is not None
+        assert user.secret_key is not None
         assert user.username == username
         users = await controller.get_users()
         assert any(u.username == username for u in users)
@@ -74,6 +75,33 @@ async def test_change_user_password(event_loop):
         finally:
             if new_connection:
                 await new_connection.close()
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_reset_user_password(event_loop):
+    async with base.CleanController() as controller:
+        username = 'test{}'.format(uuid.uuid4())
+        user = await controller.add_user(username)
+        origin_secret_key = user.secret_key
+        await user.set_password('password')
+        await controller.reset_user_password(username)
+        user = await controller.get_user(username)
+        new_secret_key = user.secret_key
+        # Check secret key is different after the reset.
+        assert origin_secret_key != new_secret_key
+        # Check that we can't connect with the old password.
+        new_connection = None
+        try:
+            kwargs = controller.connection().connect_params()
+            kwargs['username'] = username
+            kwargs['password'] = 'password'
+            new_connection = await Connection.connect(**kwargs)
+        except JujuAPIError:
+            pass
+        finally:
+            # No connection with old password
+            assert new_connection is None
 
 
 @base.bootstrapped

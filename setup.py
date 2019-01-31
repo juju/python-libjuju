@@ -36,6 +36,7 @@ setup(
         'theblues>=0.3.8,<1.0',
         'websockets>=7.0,<8.0',
         'paramiko>=2.4.0,<3.0.0',
+        'pyasn1>=0.4.4',
     ],
     include_package_data=True,
     maintainer='Juju Ecosystem Engineering',
