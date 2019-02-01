@@ -200,16 +200,16 @@ class RedirectServer:
                                                 port=self.port,
                                                 ssl=self.ssl_context,
                                                 loop=self.loop):
-                            self.stopped.clear()
-                            self.running.set()
-                            logger.debug('server: started')
-                            while not self._stop.is_set():
-                                await run_with_interrupt(
-                                    asyncio.sleep(1, loop=self.loop),
-                                    self._stop,
-                                    loop=self.loop)
-                                logger.debug('server: tick')
-                            logger.debug('server: stopping')
+                        self.stopped.clear()
+                        self.running.set()
+                        logger.debug('server: started')
+                        while not self._stop.is_set():
+                            await run_with_interrupt(
+                                asyncio.sleep(1, loop=self.loop),
+                                self._stop,
+                                loop=self.loop)
+                            logger.debug('server: tick')
+                        logger.debug('server: stopping')
                 except asyncio.CancelledError:
                     break
                 finally:
