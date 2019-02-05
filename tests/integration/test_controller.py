@@ -119,9 +119,9 @@ async def test_grant_revoke(event_loop):
         fresh = await controller.get_user(username)  # fetch fresh copy
         assert fresh.access == 'superuser'
         await user.revoke()
-        assert user.access is ''
+        assert user.access == ''
         fresh = await controller.get_user(username)  # fetch fresh copy
-        assert fresh.access is ''
+        assert fresh.access == ''
 
 
 @base.bootstrapped

@@ -252,8 +252,8 @@ class SSHProvisioner:
                 cores = line.split(":")[1].strip()
 
                 if physical_id not in recorded.keys():
-                        info['cpu-cores'] += cores
-                        recorded[physical_id] = True
+                    info['cpu-cores'] += cores
+                    recorded[physical_id] = True
 
         return info
 

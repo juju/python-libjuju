@@ -104,6 +104,8 @@ class Connection:
             bakery_client=None,
             loop=None,
             max_frame_size=None,
+            retries=3,
+            retry_backoff=10,
     ):
         """Connect to the websocket.
 
@@ -125,6 +127,11 @@ class Connection:
         :param asyncio.BaseEventLoop loop: The event loop to use for async
             operations.
         :param int max_frame_size: The maximum websocket frame size to allow.
+        :param int retries: When connecting or reconnecting, and all endpoints
+            fail, how many times to retry the connection before giving up.
+        :param int retry_backoff: Number of seconds to increase the wait
+            between connection retry attempts (a backoff of 10 with 3 retries
+            would wait 10s, 20s, and 30s).
         """
         self = cls()
         if endpoint is None:
@@ -158,6 +165,9 @@ class Connection:
         # Create that _Task objects but don't start the tasks yet.
         self._pinger_task = _Task(self._pinger, self.loop)
         self._receiver_task = _Task(self._receiver, self.loop)
+
+        self._retries = retries
+        self._retry_backoff = retry_backoff
 
         self.facades = {}
         self.messages = IdQueue(loop=self.loop)
@@ -446,16 +456,30 @@ class Connection:
         tasks = [self.loop.create_task(_try_endpoint(endpoint, cacert,
                                                      0.1 * i))
                  for i, (endpoint, cacert) in enumerate(endpoints)]
-        for task in asyncio.as_completed(tasks, loop=self.loop):
-            try:
-                result = await task
-                break
-            except ConnectionError:
-                continue  # ignore; try another endpoint
-        else:
-            raise errors.JujuConnectionError(
-                'Unable to connect to any endpoint: {}'.format(', '.join([
-                    endpoint for endpoint, cacert in endpoints])))
+        for attempt in range(self._retries + 1):
+            for task in asyncio.as_completed(tasks, loop=self.loop):
+                try:
+                    result = await task
+                    break
+                except ConnectionError:
+                    continue  # ignore; try another endpoint
+            else:
+                _endpoints_str = ', '.join([endpoint
+                                            for endpoint, cacert in endpoints])
+                if attempt < self._retries:
+                    log.debug('Retrying connection to endpoints: {}; '
+                              'attempt {} of {}'.format(_endpoints_str,
+                                                        attempt + 1,
+                                                        self._retries + 1))
+                    await asyncio.sleep((attempt + 1) * self._retry_backoff)
+                    continue
+                else:
+                    raise errors.JujuConnectionError(
+                        'Unable to connect to any endpoint: '
+                        '{}'.format(_endpoints_str))
+            # only executed if inner loop's else did not continue
+            # (i.e., inner loop did break due to successful connection)
+            break
         for task in tasks:
             task.cancel()
         self.ws = result[0]
