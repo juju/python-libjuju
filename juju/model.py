@@ -543,6 +543,7 @@ class Model:
                 raise ValueError('Authentication parameters are required '
                                  'if model_name not given')
             await self._connector.connect(**kwargs)
+        self.uuid = self.connection().connect_params()['uuid']
         await self._after_connect()
 
     async def connect_model(self, model_name):
@@ -690,6 +691,10 @@ class Model:
                                 loop=self.loop)
         if _disconnected():
             raise websockets.ConnectionClosed(1006, 'no reason')
+
+    @property
+    def tag(self):
+        return 'model-%s' % self.uuid
 
     @property
     def applications(self):
@@ -938,6 +943,41 @@ class Model:
             return delta.data['status'] in ('completed', 'failed')
 
         return await self._wait('action', action_id, None, predicate)
+
+    async def get_annotations(self):
+        """Get annotations on this model.
+
+        :return dict: The annotations for this model
+        """
+
+        facade = client.AnnotationsFacade.from_connection(
+            self.connection())
+
+        result = (await facade.Get([{"tag": self.tag}])).results[0]
+        if result.error is not None:
+            raise errors.JujuError(result.error)
+
+        return result.annotations
+
+    async def set_annotations(self, annotations):
+        """Set annotations on this model.
+
+        :param annotations map[string]string: the annotations as key/value
+            pairs.
+
+        """
+        # TODO: ensure annotations is dict with only string keys
+        # and values.
+        log.debug('Updating annotations on model %s', self.uuid)
+
+        facade = client.AnnotationsFacade.from_connection(
+            self.connection())
+
+        ann = client.EntityAnnotations(
+            entity=self.tag,
+            annotations=annotations,
+        )
+        return await facade.Set([ann])
 
     async def add_machine(
             self, spec=None, constraints=None, disks=None, series=None):

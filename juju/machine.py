@@ -120,6 +120,22 @@ class Machine(model.ModelEntity):
         """
         raise NotImplementedError()
 
+    async def get_annotations(self):
+        """Get annotations on this machine.
+
+        :return dict: The annotations for this application
+        """
+
+        facade = client.AnnotationsFacade.from_connection(
+            self.connection)
+
+        result = (await facade.Get([{"tag": self.tag}])).results[0]
+        if result.error is not None:
+            raise errors.JujuError(result.error)
+
+        return result.annotations
+
+
     async def set_annotations(self, annotations):
         """Set annotations on this machine.
 
@@ -133,7 +149,7 @@ class Machine(model.ModelEntity):
             self.connection)
 
         ann = client.EntityAnnotations(
-            entity=self.id,
+            entity=self.tag,
             annotations=annotations,
         )
         return await self.ann_facade.Set([ann])
@@ -282,3 +298,7 @@ class Machine(model.ModelEntity):
 
         """
         return self.safe_data['series']
+
+    @property
+    def tag(self):
+        return 'machine-%s' % self.id

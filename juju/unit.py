@@ -279,3 +279,37 @@ class Unit(model.ModelEntity):
         """
         metrics = await self.model.get_metrics(self.tag)
         return metrics[self.name]
+
+    async def get_annotations(self):
+        """Get annotations on this unit.
+
+        :return dict: The annotations for this unit
+        """
+
+        facade = client.AnnotationsFacade.from_connection(
+            self.connection)
+
+        result = (await facade.Get([{"tag": self.tag}])).results[0]
+        if result.error is not None:
+            raise errors.JujuError(result.error)
+
+        return result.annotations
+
+
+    async def set_annotations(self, annotations):
+        """Set annotations on this unit.
+
+        :param annotations map[string]string: the annotations as key/value
+            pairs.
+
+        """
+        log.debug('Updating annotations on unit %s', self.name)
+
+        self.ann_facade = client.AnnotationsFacade.from_connection(
+            self.connection)
+
+        ann = client.EntityAnnotations(
+            entity=self.tag,
+            annotations=annotations,
+        )
+        return await self.ann_facade.Set([ann])

@@ -312,6 +312,21 @@ class Application(model.ModelEntity):
             [],
         )
 
+    async def get_annotations(self):
+        """Get annotations on this application.
+
+        :return dict: The annotations for this application
+        """
+
+        facade = client.AnnotationsFacade.from_connection(
+            self.connection)
+
+        result = (await facade.Get([{"tag": self.tag}])).results[0]
+        if result.error is not None:
+            raise errors.JujuError(result.error)
+
+        return result.annotations
+
     async def set_annotations(self, annotations):
         """Set annotations on this application.
 
@@ -319,16 +334,18 @@ class Application(model.ModelEntity):
             pairs.
 
         """
+        # TODO: ensure annotations is dict with only string keys
+        # and values.
         log.debug('Updating annotations on application %s', self.name)
 
-        self.ann_facade = client.AnnotationsFacade.from_connection(
+        facade = client.AnnotationsFacade.from_connection(
             self.connection)
 
         ann = client.EntityAnnotations(
             entity=self.tag,
             annotations=annotations,
         )
-        return await self.ann_facade.Set([ann])
+        return await facade.Set([ann])
 
     async def set_config(self, config):
         """Set configuration options for this application.
