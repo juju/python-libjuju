@@ -323,7 +323,7 @@ class Application(model.ModelEntity):
 
         result = (await facade.Get([{"tag": self.tag}])).results[0]
         if result.error is not None:
-            raise errors.JujuError(result.error)
+            raise JujuError(result.error)
 
         return result.annotations
 

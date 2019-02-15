@@ -4,6 +4,7 @@ import pyrfc3339
 
 from . import model
 from .client import client
+from .errors import JujuError
 
 log = logging.getLogger(__name__)
 
@@ -291,10 +292,9 @@ class Unit(model.ModelEntity):
 
         result = (await facade.Get([{"tag": self.tag}])).results[0]
         if result.error is not None:
-            raise errors.JujuError(result.error)
+            raise JujuError(result.error)
 
         return result.annotations
-
 
     async def set_annotations(self, annotations):
         """Set annotations on this unit.
