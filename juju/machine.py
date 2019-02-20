@@ -4,7 +4,7 @@ import os
 
 import pyrfc3339
 
-from . import model, tag, utils
+from . import annotation, model, tag, utils
 from .client import client
 from .errors import JujuError
 
@@ -125,15 +125,7 @@ class Machine(model.ModelEntity):
 
         :return dict: The annotations for this application
         """
-
-        facade = client.AnnotationsFacade.from_connection(
-            self.connection)
-
-        result = (await facade.Get([{"tag": self.tag}])).results[0]
-        if result.error is not None:
-            raise JujuError(result.error)
-
-        return result.annotations
+        return await annotation._get_annotations(self.tag, self.connection)
 
     async def set_annotations(self, annotations):
         """Set annotations on this machine.
@@ -142,16 +134,8 @@ class Machine(model.ModelEntity):
             pairs.
 
         """
-        log.debug('Updating annotations on machine %s', self.id)
-
-        self.ann_facade = client.AnnotationsFacade.from_connection(
-            self.connection)
-
-        ann = client.EntityAnnotations(
-            entity=self.tag,
-            annotations=annotations,
-        )
-        return await self.ann_facade.Set([ann])
+        return await annotation._set_annotations(
+            self.tag, annotations, self.connection)
 
     async def scp_to(self, source, destination, user='ubuntu', proxy=False,
                      scp_opts=''):

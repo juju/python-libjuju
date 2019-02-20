@@ -163,21 +163,13 @@ class TestContextManager(asynctest.TestCase):
 @asynctest.patch('juju.model.Model._after_connect')
 class TestModelConnect(asynctest.TestCase):
     @asynctest.patch('juju.client.connector.Connector.connect_model')
-    @asynctest.patch('juju.client.connector.Connector.connection')
-    async def test_no_args(self, mock_connection, mock_connect_model, _):
-        attrs = {'connect_params.return_value': {'uuid': 'some-uuid'}}
-        mock_connection.configure_mock(**attrs)
-
+    async def test_no_args(self, mock_connect_model, _):
         m = Model()
         await m.connect()
         mock_connect_model.assert_called_once_with(None)
 
     @asynctest.patch('juju.client.connector.Connector.connect_model')
-    @asynctest.patch('juju.client.connector.Connector.connection')
-    async def test_with_model_name(self, mock_connection, mock_connect_model, _):
-        attrs = {'connect_params.return_value': {'uuid': 'some-uuid'}}
-        mock_connection.configure_mock(**attrs)
-
+    async def test_with_model_name(self, mock_connect_model, _):
         m = Model()
         await m.connect(model_name='foo')
         mock_connect_model.assert_called_once_with('foo')
@@ -197,11 +189,7 @@ class TestModelConnect(asynctest.TestCase):
         self.assertEqual(mock_connect.call_count, 0)
 
     @asynctest.patch('juju.client.connector.Connector.connect')
-    @asynctest.patch('juju.client.connector.Connector.connection')
-    async def test_with_endpoint_and_uuid_with_userpass(self, mock_connection, mock_connect, _):
-        attrs = {'connect_params.return_value': {'uuid': 'some-uuid'}}
-        mock_connection.configure_mock(**attrs)
-
+    async def test_with_endpoint_and_uuid_with_userpass(self, mock_connect, _):
         m = Model()
         with self.assertRaises(TypeError):
             await m.connect(endpoint='0.1.2.3:4566',
@@ -217,11 +205,7 @@ class TestModelConnect(asynctest.TestCase):
                                              password='pass')
 
     @asynctest.patch('juju.client.connector.Connector.connect')
-    @asynctest.patch('juju.client.connector.Connector.connection')
-    async def test_with_endpoint_and_uuid_with_bakery(self, mock_connection, mock_connect, _):
-        attrs = {'connect_params.return_value': {'uuid': 'some-uuid'}}
-        mock_connection.configure_mock(**attrs)
-
+    async def test_with_endpoint_and_uuid_with_bakery(self, mock_connect, _):
         m = Model()
         await m.connect(endpoint='0.1.2.3:4566',
                         uuid='some-uuid',
@@ -231,11 +215,7 @@ class TestModelConnect(asynctest.TestCase):
                                              bakery_client='bakery')
 
     @asynctest.patch('juju.client.connector.Connector.connect')
-    @asynctest.patch('juju.client.connector.Connector.connection')
-    async def test_with_endpoint_and_uuid_with_macaroon(self, mock_connection, mock_connect, _):
-        attrs = {'connect_params.return_value': {'uuid': 'some-uuid'}}
-        mock_connection.configure_mock(**attrs)
-
+    async def test_with_endpoint_and_uuid_with_macaroon(self, mock_connect, _):
         m = Model()
         with self.assertRaises(TypeError):
             await m.connect(endpoint='0.1.2.3:4566',
@@ -258,11 +238,7 @@ class TestModelConnect(asynctest.TestCase):
 
     @asynctest.patch('juju.client.connector.Connector.connect_model')
     @asynctest.patch('juju.client.connector.Connector.connect')
-    @asynctest.patch('juju.client.connector.Connector.connection')
-    async def test_with_posargs(self, mock_connection, mock_connect, mock_connect_model, _):
-        attrs = {'connect_params.return_value': {'uuid': 'some-uuid'}}
-        mock_connect.configure_mock(**attrs)
-
+    async def test_with_posargs(self, mock_connect, mock_connect_model, _):
         m = Model()
         await m.connect('foo')
         mock_connect_model.assert_called_once_with('foo')

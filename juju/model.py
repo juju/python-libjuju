@@ -19,7 +19,7 @@ import theblues.errors
 import websockets
 import yaml
 
-from . import tag, utils
+from . import annotation, tag, utils
 from .client import client, connector
 from .client.client import ConfigValue
 from .client.client import Value
@@ -949,15 +949,7 @@ class Model:
 
         :return dict: The annotations for this model
         """
-
-        facade = client.AnnotationsFacade.from_connection(
-            self.connection())
-
-        result = (await facade.Get([{"tag": self.tag}])).results[0]
-        if result.error is not None:
-            raise JujuError(result.error)
-
-        return result.annotations
+        return await annotation._get_annotations(self.tag, self.connection())
 
     async def set_annotations(self, annotations):
         """Set annotations on this model.
@@ -966,18 +958,8 @@ class Model:
             pairs.
 
         """
-        # TODO: ensure annotations is dict with only string keys
-        # and values.
-        log.debug('Updating annotations on model %s', self.uuid)
-
-        facade = client.AnnotationsFacade.from_connection(
-            self.connection())
-
-        ann = client.EntityAnnotations(
-            entity=self.tag,
-            annotations=annotations,
-        )
-        return await facade.Set([ann])
+        return await annotation._set_annotations(
+            self.tag, annotations, self.connection())
 
     async def add_machine(
             self, spec=None, constraints=None, disks=None, series=None):

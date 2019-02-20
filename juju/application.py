@@ -15,7 +15,7 @@
 import asyncio
 import logging
 
-from . import model, tag
+from . import annotation, model, tag
 from .client import client
 from .errors import JujuError
 from .placement import parse as parse_placement
@@ -317,15 +317,7 @@ class Application(model.ModelEntity):
 
         :return dict: The annotations for this application
         """
-
-        facade = client.AnnotationsFacade.from_connection(
-            self.connection)
-
-        result = (await facade.Get([{"tag": self.tag}])).results[0]
-        if result.error is not None:
-            raise JujuError(result.error)
-
-        return result.annotations
+        return await annotation._get_annotations(self.tag, self.connection)
 
     async def set_annotations(self, annotations):
         """Set annotations on this application.
@@ -334,18 +326,8 @@ class Application(model.ModelEntity):
             pairs.
 
         """
-        # TODO: ensure annotations is dict with only string keys
-        # and values.
-        log.debug('Updating annotations on application %s', self.name)
-
-        facade = client.AnnotationsFacade.from_connection(
-            self.connection)
-
-        ann = client.EntityAnnotations(
-            entity=self.tag,
-            annotations=annotations,
-        )
-        return await facade.Set([ann])
+        return await annotation._set_annotations(
+            self.tag, annotations, self.connection)
 
     async def set_config(self, config):
         """Set configuration options for this application.
