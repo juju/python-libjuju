@@ -24,8 +24,12 @@ def credential(cloud, user, credential_name):
     return _prefix('cloudcred-', credential_string)
 
 
-def model(cloud_name):
-    return _prefix('model-', cloud_name)
+def model(model_uuid):
+    return _prefix('model-', model_uuid)
+
+
+def machine(machine_id):
+    return _prefix('machine-', machine_id)
 
 
 def user(username):
@@ -34,6 +38,10 @@ def user(username):
 
 def application(app_name):
     return _prefix('application-', app_name)
+
+
+def unit(unit_name):
+    return _prefix('unit-', unit_name.replace('/', '-'))
 
 
 def action(action_uuid):

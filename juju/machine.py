@@ -4,7 +4,7 @@ import os
 
 import pyrfc3339
 
-from . import model, utils
+from . import model, tag, utils
 from .client import client
 from .errors import JujuError
 
@@ -300,4 +300,4 @@ class Machine(model.ModelEntity):
 
     @property
     def tag(self):
-        return 'machine-%s' % self.id
+        return tag.machine(self.id)

@@ -543,7 +543,6 @@ class Model:
                 raise ValueError('Authentication parameters are required '
                                  'if model_name not given')
             await self._connector.connect(**kwargs)
-        self.uuid = self.connection().connect_params()['uuid']
         await self._after_connect()
 
     async def connect_model(self, model_name):
@@ -577,6 +576,7 @@ class Model:
         await self._watch_received.wait()
 
         await self.get_info()
+        self.uuid = self.info.uuid
 
     async def disconnect(self):
         """Shut down the watcher task and close websockets.
@@ -694,7 +694,7 @@ class Model:
 
     @property
     def tag(self):
-        return 'model-%s' % self.uuid
+        return tag.model(self.uuid)
 
     @property
     def applications(self):

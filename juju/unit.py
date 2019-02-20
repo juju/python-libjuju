@@ -2,7 +2,7 @@ import logging
 
 import pyrfc3339
 
-from . import model
+from . import model, tag
 from .client import client
 from .errors import JujuError
 
@@ -72,7 +72,7 @@ class Unit(model.ModelEntity):
 
     @property
     def tag(self):
-        return 'unit-%s' % self.name.replace('/', '-')
+        return tag.unit(self.name)
 
     def add_storage(self, name, constraints=None):
         """Add unit storage dynamically.

@@ -15,7 +15,7 @@
 import asyncio
 import logging
 
-from . import model
+from . import model, tag
 from .client import client
 from .errors import JujuError
 from .placement import parse as parse_placement
@@ -85,7 +85,7 @@ class Application(model.ModelEntity):
 
     @property
     def tag(self):
-        return 'application-%s' % self.name
+        return tag.application(self.name)
 
     async def add_relation(self, local_relation, remote_relation):
         """Add a relation to another application.
