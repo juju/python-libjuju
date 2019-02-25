@@ -1,9 +1,14 @@
 import logging
 
+from . import model
 from .client import client
 from .errors import JujuError
 
 log = logging.getLogger(__name__)
+
+
+class Annotation(model.ModelEntity):
+    pass
 
 
 async def _get_annotations(entity_tag, connection):
