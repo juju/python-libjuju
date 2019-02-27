@@ -4,7 +4,8 @@ import os
 
 import pyrfc3339
 
-from . import annotation, model, tag, utils
+from . import model, tag, utils
+from .annotationhelper import _get_annotations, _set_annotations
 from .client import client
 from .errors import JujuError
 
@@ -125,7 +126,7 @@ class Machine(model.ModelEntity):
 
         :return dict: The annotations for this application
         """
-        return await annotation._get_annotations(self.tag, self.connection)
+        return await _get_annotations(self.tag, self.connection)
 
     async def set_annotations(self, annotations):
         """Set annotations on this machine.
@@ -134,8 +135,7 @@ class Machine(model.ModelEntity):
             pairs.
 
         """
-        return await annotation._set_annotations(
-            self.tag, annotations, self.connection)
+        return await _set_annotations(self.tag, annotations, self.connection)
 
     async def scp_to(self, source, destination, user='ubuntu', proxy=False,
                      scp_opts=''):

@@ -19,7 +19,8 @@ import theblues.errors
 import websockets
 import yaml
 
-from . import annotation, tag, utils
+from . import tag, utils
+from .annotationhelper import _get_annotations, _set_annotations
 from .client import client, connector
 from .client.client import ConfigValue
 from .client.client import Value
@@ -949,7 +950,7 @@ class Model:
 
         :return dict: The annotations for this model
         """
-        return await annotation._get_annotations(self.tag, self.connection())
+        return await _get_annotations(self.tag, self.connection())
 
     async def set_annotations(self, annotations):
         """Set annotations on this model.
@@ -958,8 +959,7 @@ class Model:
             pairs.
 
         """
-        return await annotation._set_annotations(
-            self.tag, annotations, self.connection())
+        return await _set_annotations(self.tag, annotations, self.connection())
 
     async def add_machine(
             self, spec=None, constraints=None, disks=None, series=None):
