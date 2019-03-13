@@ -2108,11 +2108,6 @@ class BundleHandler:
             will be 0 and separate AddUnitChanges will be used.  For Kubernetes
             models, this will be used to scale the application.
             (Only given on Juju 2.5+)
-
-        :param placement string:
-            Placement holds the placement directive for units of this
-            application.  Only applicable for Kubernetes models.
-            (Only given on Juju 2.5+)
         """
         # resolve indirect references
         charm = self.resolve(charm)
@@ -2120,11 +2115,11 @@ class BundleHandler:
         if len(args) == 1:
             # Juju 2.4 and below only sends the resources
             resources = args[0]
-            devices, num_units, placement = None, None, None
+            devices, num_units = None, None
         else:
             # Juju 2.5+ sends devices before resources, as well as num_units
-            # and placement
-            devices, resources, num_units, placement = args
+            # There might be placement but we need to ignore that.
+            devices, resources, num_units = args[:3]
 
         if not charm.startswith('local:'):
             resources = await self.model._add_store_resources(
@@ -2139,7 +2134,6 @@ class BundleHandler:
             resources=resources,
             storage=storage,
             devices=devices,
-            placement=placement,
             num_units=num_units,
         )
         return application
