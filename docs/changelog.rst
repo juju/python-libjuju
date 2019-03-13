@@ -1,6 +1,16 @@
 Changelog
 ---------
 
+0.11.3
+^^^^^^
+Wednesday March 13 2019
+
+* k8s bundles no longer have application placement (#293)
+* Add retry for connection if all endpoints fail (#288)
+* Support generation of registration string for model sharing. (#279)
+* Add Twine for dist upload on release (#284)
+
+
 0.11.2
 ^^^^^^
 Wednesday January 16 2019
