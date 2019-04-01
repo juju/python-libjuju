@@ -5,7 +5,7 @@ Changelog
 ^^^^^^
 Monday April 1 2019
 
-* Handle deltas of unknown types. (#299)
+* Handle deltas of unknown types (fixes connecting to Juju 2.6 controllers) (#299)
 * Test fixes (#298)
 
 
