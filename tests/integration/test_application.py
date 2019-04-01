@@ -68,7 +68,8 @@ async def test_add_units(event_loop):
 async def test_upgrade_charm(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy('ubuntu-0')
-        await model.block_until(lambda: len(app.units) > 0)
+        await model.block_until(lambda: (len(app.units) > 0 and
+                                         app.units[0].machine))
         assert app.data['charm-url'] == 'cs:ubuntu-0'
         await app.upgrade_charm()
         assert app.data['charm-url'].startswith('cs:ubuntu-')
@@ -80,7 +81,8 @@ async def test_upgrade_charm(event_loop):
 async def test_upgrade_charm_channel(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy('ubuntu-0')
-        await model.block_until(lambda: len(app.units) > 0)
+        await model.block_until(lambda: (len(app.units) > 0 and
+                                         app.units[0].machine))
         assert app.data['charm-url'] == 'cs:ubuntu-0'
         await app.upgrade_charm(channel='stable')
         assert app.data['charm-url'].startswith('cs:ubuntu-')
@@ -92,7 +94,8 @@ async def test_upgrade_charm_channel(event_loop):
 async def test_upgrade_charm_revision(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy('ubuntu-0')
-        await model.block_until(lambda: len(app.units) > 0)
+        await model.block_until(lambda: (len(app.units) > 0 and
+                                         app.units[0].machine))
         assert app.data['charm-url'] == 'cs:ubuntu-0'
         await app.upgrade_charm(revision=8)
         assert app.data['charm-url'] == 'cs:ubuntu-8'
@@ -103,7 +106,8 @@ async def test_upgrade_charm_revision(event_loop):
 async def test_upgrade_charm_switch(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy('ubuntu-0')
-        await model.block_until(lambda: len(app.units) > 0)
+        await model.block_until(lambda: (len(app.units) > 0 and
+                                         app.units[0].machine))
         assert app.data['charm-url'] == 'cs:ubuntu-0'
         await app.upgrade_charm(switch='ubuntu-8')
         assert app.data['charm-url'] == 'cs:ubuntu-8'
