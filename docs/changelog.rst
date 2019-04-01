@@ -1,6 +1,14 @@
 Changelog
 ---------
 
+0.11.4
+^^^^^^
+Monday April 1 2019
+
+* Additional work with annotations. (#290)
+* Check server cert. (#296)
+
+
 0.11.3
 ^^^^^^
 Wednesday March 13 2019
