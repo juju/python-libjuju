@@ -851,9 +851,12 @@ class Model:
                             pass  # can't stop on a closed conn
                         break
                     for delta in results.deltas:
-                        delta = get_entity_delta(delta)
-                        old_obj, new_obj = self.state.apply_delta(delta)
-                        await self._notify_observers(delta, old_obj, new_obj)
+                        try:
+                            delta = get_entity_delta(delta)
+                            old_obj, new_obj = self.state.apply_delta(delta)
+                            await self._notify_observers(delta, old_obj, new_obj)
+                        except KeyError as e:
+                            log.debug("unknown delta type: %s", e.args[0])
                     self._watch_received.set()
             except CancelledError:
                 pass
