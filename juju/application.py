@@ -15,7 +15,8 @@
 import asyncio
 import logging
 
-from . import model
+from . import model, tag
+from .annotationhelper import _get_annotations, _set_annotations
 from .client import client
 from .errors import JujuError
 from .placement import parse as parse_placement
@@ -85,7 +86,7 @@ class Application(model.ModelEntity):
 
     @property
     def tag(self):
-        return 'application-%s' % self.name
+        return tag.application(self.name)
 
     async def add_relation(self, local_relation, remote_relation):
         """Add a relation to another application.
@@ -312,6 +313,13 @@ class Application(model.ModelEntity):
             [],
         )
 
+    async def get_annotations(self):
+        """Get annotations on this application.
+
+        :return dict: The annotations for this application
+        """
+        return await _get_annotations(self.tag, self.connection)
+
     async def set_annotations(self, annotations):
         """Set annotations on this application.
 
@@ -319,16 +327,7 @@ class Application(model.ModelEntity):
             pairs.
 
         """
-        log.debug('Updating annotations on application %s', self.name)
-
-        self.ann_facade = client.AnnotationsFacade.from_connection(
-            self.connection)
-
-        ann = client.EntityAnnotations(
-            entity=self.tag,
-            annotations=annotations,
-        )
-        return await self.ann_facade.Set([ann])
+        return await _set_annotations(self.tag, annotations, self.connection)
 
     async def set_config(self, config):
         """Set configuration options for this application.

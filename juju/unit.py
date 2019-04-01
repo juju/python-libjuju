@@ -2,7 +2,8 @@ import logging
 
 import pyrfc3339
 
-from . import model
+from . import model, tag
+from .annotationhelper import _get_annotations, _set_annotations
 from .client import client
 
 log = logging.getLogger(__name__)
@@ -71,7 +72,7 @@ class Unit(model.ModelEntity):
 
     @property
     def tag(self):
-        return 'unit-%s' % self.name.replace('/', '-')
+        return tag.unit(self.name)
 
     def add_storage(self, name, constraints=None):
         """Add unit storage dynamically.
@@ -279,3 +280,19 @@ class Unit(model.ModelEntity):
         """
         metrics = await self.model.get_metrics(self.tag)
         return metrics[self.name]
+
+    async def get_annotations(self):
+        """Get annotations on this unit.
+
+        :return dict: The annotations for this unit
+        """
+        return await _get_annotations(self.tag, self.connection)
+
+    async def set_annotations(self, annotations):
+        """Set annotations on this unit.
+
+        :param annotations map[string]string: the annotations as key/value
+            pairs.
+
+        """
+        return await _set_annotations(self.tag, annotations, self.connection)

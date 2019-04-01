@@ -459,3 +459,70 @@ async def test_set_constraints(event_loop):
 #        assert model.get_user('test-model-grant')['access'] == 'admin'
 #        await model.grant('test-model-grant', 'login')
 #        assert model.get_user('test-model-grant')['access'] == 'login'
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_model_annotations(event_loop):
+
+    async with base.CleanModel() as model:
+        annotations = await model.get_annotations()
+        assert len(annotations) == 0
+
+        expected = {"foo": "bar", "another": "value"}
+        await model.set_annotations(expected)
+
+        annotations = await model.get_annotations()
+        assert annotations == expected
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_machine_annotations(event_loop):
+
+    async with base.CleanModel() as model:
+        machine = await model.add_machine()
+
+        annotations = await machine.get_annotations()
+        assert len(annotations) == 0
+
+        expected = {"foo": "bar", "another": "value"}
+        await machine.set_annotations(expected)
+
+        annotations = await machine.get_annotations()
+        assert annotations == expected
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_application_annotations(event_loop):
+
+    async with base.CleanModel() as model:
+        app = await model.deploy('ubuntu')
+
+        annotations = await app.get_annotations()
+        assert len(annotations) == 0
+
+        expected = {"foo": "bar", "another": "value"}
+        await app.set_annotations(expected)
+
+        annotations = await app.get_annotations()
+        assert annotations == expected
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_unit_annotations(event_loop):
+
+    async with base.CleanModel() as model:
+        app = await model.deploy('ubuntu')
+        unit = app.units[0]
+
+        annotations = await unit.get_annotations()
+        assert len(annotations) == 0
+
+        expected = {"foo": "bar", "another": "value"}
+        await unit.set_annotations(expected)
+
+        annotations = await unit.get_annotations()
+        assert annotations == expected

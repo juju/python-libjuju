@@ -20,6 +20,7 @@ import websockets
 import yaml
 
 from . import tag, utils
+from .annotationhelper import _get_annotations, _set_annotations
 from .client import client, connector
 from .client.client import ConfigValue
 from .client.client import Value
@@ -576,6 +577,7 @@ class Model:
         await self._watch_received.wait()
 
         await self.get_info()
+        self.uuid = self.info.uuid
 
     async def disconnect(self):
         """Shut down the watcher task and close websockets.
@@ -690,6 +692,10 @@ class Model:
                                 loop=self.loop)
         if _disconnected():
             raise websockets.ConnectionClosed(1006, 'no reason')
+
+    @property
+    def tag(self):
+        return tag.model(self.uuid)
 
     @property
     def applications(self):
@@ -938,6 +944,22 @@ class Model:
             return delta.data['status'] in ('completed', 'failed')
 
         return await self._wait('action', action_id, None, predicate)
+
+    async def get_annotations(self):
+        """Get annotations on this model.
+
+        :return dict: The annotations for this model
+        """
+        return await _get_annotations(self.tag, self.connection())
+
+    async def set_annotations(self, annotations):
+        """Set annotations on this model.
+
+        :param annotations map[string]string: the annotations as key/value
+            pairs.
+
+        """
+        return await _set_annotations(self.tag, annotations, self.connection())
 
     async def add_machine(
             self, spec=None, constraints=None, disks=None, series=None):

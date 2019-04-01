@@ -4,7 +4,8 @@ import os
 
 import pyrfc3339
 
-from . import model, utils
+from . import model, tag, utils
+from .annotationhelper import _get_annotations, _set_annotations
 from .client import client
 from .errors import JujuError
 
@@ -120,6 +121,13 @@ class Machine(model.ModelEntity):
         """
         raise NotImplementedError()
 
+    async def get_annotations(self):
+        """Get annotations on this machine.
+
+        :return dict: The annotations for this application
+        """
+        return await _get_annotations(self.tag, self.connection)
+
     async def set_annotations(self, annotations):
         """Set annotations on this machine.
 
@@ -127,16 +135,7 @@ class Machine(model.ModelEntity):
             pairs.
 
         """
-        log.debug('Updating annotations on machine %s', self.id)
-
-        self.ann_facade = client.AnnotationsFacade.from_connection(
-            self.connection)
-
-        ann = client.EntityAnnotations(
-            entity=self.id,
-            annotations=annotations,
-        )
-        return await self.ann_facade.Set([ann])
+        return await _set_annotations(self.tag, annotations, self.connection)
 
     async def scp_to(self, source, destination, user='ubuntu', proxy=False,
                      scp_opts=''):
@@ -282,3 +281,7 @@ class Machine(model.ModelEntity):
 
         """
         return self.safe_data['series']
+
+    @property
+    def tag(self):
+        return tag.machine(self.id)
