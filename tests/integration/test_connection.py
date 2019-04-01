@@ -8,6 +8,7 @@ from pathlib import Path
 
 from juju.client import client
 from juju.client.connection import Connection
+from juju.client.jujudata import FileJujuData
 from juju.controller import Controller
 from juju.utils import run_with_interrupt
 
@@ -234,3 +235,46 @@ class RedirectServer:
             s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             s.bind(('', 0))
             return s.getsockname()[1]
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_verify_controller_cert(event_loop):
+    jujudata = FileJujuData()
+    controller_name = jujudata.current_controller()
+    endpoint = jujudata.controllers()[controller_name]['api-endpoints'][0]
+    account = jujudata.accounts()[controller_name]
+
+    my_random_selfsigned_cert = """-----BEGIN CERTIFICATE-----
+MIIDBzCCAe+gAwIBAgIUCHZdNBKftmvfofyqx7XM7oEEPFAwDQYJKoZIhvcNAQEL
+BQAwEzERMA8GA1UEAwwIY2xpZW50Y2EwHhcNMTkwMjA2MTU1NjMyWhcNMjExMTI2
+MTU1NjMyWjATMREwDwYDVQQDDAhjbGllbnRjYTCCASIwDQYJKoZIhvcNAQEBBQAD
+ggEPADCCAQoCggEBALS+dI1FngD9Df40Sz6Vdxk3q9Fa+q/rinG257BPwZ8efpKs
+gxyiGe+vfaUg6i9ST5uPtra4JeB//8qtebH7UhXpbk+kn3eGRuK56nqPA9QXBJ1X
+5WXCkEaT/RuIquV6x8bTy6IqDq83uR15Gdrw6FniLVsNKuumX4yWTBQRDljMYBkm
+MJtu/Aliz9885CfVQemqNWu/+XkHS6eCy4A2l1EYxO6YGtyX4hQNfCRLUw7L916k
+UdH4Y1Y5L+tD8P2lt1WZVuUcXkAPkhe0dUbCK1wTxj3vy1ASa4JaaszLGIyRPkxH
+0M4MGrISDdR36LxaQonGNs6YxphXtslWaSz7jycCAwEAAaNTMFEwHQYDVR0OBBYE
+FBbYLQ3o6aleQ4RoVy1ImI73jd3uMB8GA1UdIwQYMBaAFBbYLQ3o6aleQ4RoVy1I
+mI73jd3uMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEBAHCwhoZZ
+F1BsaQpA47Akq1Mvz8y18vYzMGpMQ3X89FG3A+Atyvz87BOAHh3sX0H523T0yN5B
+kN7Khl7AzNLGvrolqDBQoi0OlPz+cJkX0DB3LYbn7AJiHdvLB9OFpDta1gV4wUYg
+lztYDLJMTf2lXNRLG0ChrvbYoU/As4kcYbQ0ct6H5nxKi0P14PJQZ6b376ru0kIT
+Yq2KJhGKIZiGjJ/tekeLkJKR5NLiRZ5AhxYyZKYqK85wPPreMKxWbnDoLWY27FfB
++BmTKcx9ecWtNRFlYVhDW/UXBfL7siP6xQllyJphmO0SKe+vo07ohfSIn3OQVqYn
+6wnEIim+TFKbdS0=
+-----END CERTIFICATE-----
+"""
+
+    try:
+        connection = await Connection.connect(
+            endpoint=endpoint,
+            username=account['user'],
+            password=account['password'],
+            cacert=my_random_selfsigned_cert,
+        )
+        await connection.close()
+        raise RuntimeError("connection shouldn't be allowed with self signed cert.")
+    except ssl.SSLError:
+        # All good.
+        pass

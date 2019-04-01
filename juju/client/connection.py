@@ -190,7 +190,7 @@ class Connection:
 
     def _get_ssl(self, cert=None):
         return ssl.create_default_context(
-            purpose=ssl.Purpose.CLIENT_AUTH, cadata=cert)
+            purpose=ssl.Purpose.SERVER_AUTH, cadata=cert)
 
     async def _open(self, endpoint, cacert):
         if self.uuid:
