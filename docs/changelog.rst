@@ -1,6 +1,14 @@
 Changelog
 ---------
 
+0.11.5
+^^^^^^
+Monday April 1 2019
+
+* Handle deltas of unknown types. (#299)
+* Test fixes (#298)
+
+
 0.11.4
 ^^^^^^
 Monday April 1 2019
