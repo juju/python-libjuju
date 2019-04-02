@@ -19,6 +19,7 @@ env:
   global: >
     TEST_AGENTS='{"agents":[{"url":"https://api.staging.jujucharms.com/identity","username":"libjuju-ci@yellow"}],"key":{"private":"88OOCxIHQNguRG7zFg2y2Hx5Ob0SeVKKBRnjyehverc=","public":"fDn20+5FGyN2hYO7z0rFUyoHGUnfrleslUNtoYsjNSs="}}'
     PATH="/snap/bin:$PATH"
+    LXD_DIR="/var/snap/lxd/common/lxd"
 
 matrix:
   include:
@@ -31,19 +32,21 @@ matrix:
   - python: 3.7-dev
     env: JUJU_CHANNEL=edge
 before_script:
-  # Run lint before performing more expensive operations (fail fast/early)
-  - tox -e lint
+  - set -e
+  # Run lint and unit tests before performing more expensive operations (fail fast/early)
+  - tox -e lint,py3
 
   # init lxd for tests
   - sudo lxd waitready --timeout 30
   - sudo chmod 666 /var/snap/lxd/common/lxd/unix.socket
   - lxd init --auto --network-address='[::]' --network-port=8443 --storage-backend=dir
+  - lxc network set lxdbr0 ipv6.address none
 
   # Horrible workaround to LP Bug #1738614
   - sudo mkdir /var/snap/lxd/common/lxd/storage-pools/juju-zfs
   - lxc storage create juju-zfs dir source=/var/snap/lxd/common/lxd/storage-pools/juju-zfs
 
 script:
-  - dpkg -l lxd  # check if lxd somehow got reinstalled
+  - set -e
   - juju bootstrap localhost test --config 'identity-url=https://api.staging.jujucharms.com/identity' --config 'allow-model-access=true'
-  - tox -e py3,integration,serial
+  - tox -e integration,serial
