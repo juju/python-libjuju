@@ -20,6 +20,7 @@ class JujuAPIError(JujuError):
         self.error_code = result.get('error-code')
         self.response = result['response']
         self.request_id = result['request-id']
+        self.error_info = result['error-info'] if 'error-info' in result else None
         super().__init__(self.message)
 
 
@@ -33,8 +34,9 @@ class JujuAuthError(JujuConnectionError):
 
 class JujuRedirectException(Exception):
     """Exception indicating that a redirection was requested"""
-    def __init__(self, redirect_info):
+    def __init__(self, redirect_info, follow_redirect=True):
         self.redirect_info = redirect_info
+        self.follow_redirect = follow_redirect
 
     @property
     def ca_cert(self):
@@ -45,5 +47,5 @@ class JujuRedirectException(Exception):
         return [
             ('{value}:{port}'.format(**s), self.ca_cert)
             for servers in self.redirect_info['servers']
-            for s in servers if s['scope'] == 'public'
+            for s in servers if s['scope'] == 'public' or not self.follow_redirect
         ]

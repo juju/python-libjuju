@@ -534,6 +534,9 @@ class Connection:
         try:
             login_result = await self._connect_with_login(endpoints)
         except errors.JujuRedirectException as e:
+            # Bubble up exception if the client should not follow the redirect
+            if e.follow_redirect is False:
+                raise
             login_result = await self._connect_with_login(e.endpoints)
         self._build_facades(login_result.get('facades', {}))
         self._pinger_task.start()
@@ -565,6 +568,15 @@ class Connection:
             if e.error_code != 'redirection required':
                 raise
             log.info('Controller requested redirect')
+            # Check if the redirect error provides a payload with embedded
+            # redirection info (juju 2.6+ controller). In this case, return a
+            # redirect exception which the library should not automatically
+            # follow but rather bubble up to the user. This matches the
+            # behaviour of juju cli whereas for JAAS-like redirects we will
+            # need to make an extra RPC call to get the redirect info.
+            if e.error_info is not None:
+                raise errors.JujuRedirectException(e.error_info, False) from e
+
             # Fetch additional redirection information now so that
             # we can safely close the connection after login
             # fails.
@@ -573,7 +585,7 @@ class Connection:
                 "request": "RedirectInfo",
                 "version": 3,
             }))['response']
-            raise errors.JujuRedirectException(redirect_info) from e
+            raise errors.JujuRedirectException(redirect_info, True) from e
 
 
 class _Task:
