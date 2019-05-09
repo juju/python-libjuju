@@ -101,3 +101,4 @@ example, to run ``examples/connect_current_model.py``, use:
 .. code:: bash
 
   tox -e example -- examples/connect_current_model.py
+
