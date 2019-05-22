@@ -189,8 +189,17 @@ class Connection:
         return self.monitor.status == Monitor.CONNECTED
 
     def _get_ssl(self, cert=None):
-        return ssl.create_default_context(
+        context = ssl.create_default_context(
             purpose=ssl.Purpose.SERVER_AUTH, cadata=cert)
+        if cert:
+            # Disable hostname checking if and only if we have an explicit cert
+            # to validate against, because the cert doesn't contain the IP addr
+            # of the controller, which is what self-bootstrapped controllers
+            # use. And because we pre-share and trust both the cert and
+            # endpoint address anyway, it's safe to skip that check.
+            # See: https://github.com/juju/python-libjuju/issues/302
+            context.check_hostname = False
+        return context
 
     async def _open(self, endpoint, cacert):
         if self.uuid:
