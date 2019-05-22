@@ -1,6 +1,14 @@
 Changelog
 ---------
 
+0.11.6
+^^^^^^
+Wednesday May 22 2019
+
+* Disable hostname checking on controller connection (#305)
+* Handle RedirectError payloads returned by Login RPCs (#303)
+
+
 0.11.5
 ^^^^^^
 Monday April 1 2019
