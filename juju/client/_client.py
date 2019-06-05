@@ -3,18 +3,21 @@
 
 from juju.client._definitions import *
 
-from juju.client import _client2, _client1, _client3, _client4, _client5, _client8, _client7, _client9
+from juju.client import _client1, _client2, _client3, _client4, _client5, _client6, _client7, _client8, _client9, _client10, _client12
 
 
 CLIENTS = {
-    "2": _client2,
     "1": _client1,
+    "2": _client2,
     "3": _client3,
     "4": _client4,
     "5": _client5,
-    "8": _client8,
+    "6": _client6,
     "7": _client7,
-    "9": _client9
+    "8": _client8,
+    "9": _client9,
+    "10": _client10,
+    "12": _client12
 }
 
 
@@ -136,6 +139,10 @@ class CAASOperatorProvisionerFacade(TypeFactory):
     pass
 
 
+class CAASOperatorUpgraderFacade(TypeFactory):
+    pass
+
+
 class CAASUnitProvisionerFacade(TypeFactory):
     pass
 
@@ -232,6 +239,10 @@ class ImageMetadataFacade(TypeFactory):
     pass
 
 
+class InstanceMutaterFacade(TypeFactory):
+    pass
+
+
 class InstancePollerFacade(TypeFactory):
     pass
 
@@ -313,6 +324,10 @@ class MigrationTargetFacade(TypeFactory):
 
 
 class ModelConfigFacade(TypeFactory):
+    pass
+
+
+class ModelGenerationFacade(TypeFactory):
     pass
 
 
@@ -437,6 +452,10 @@ class UniterFacade(TypeFactory):
 
 
 class UpgradeSeriesFacade(TypeFactory):
+    pass
+
+
+class UpgradeStepsFacade(TypeFactory):
     pass
 
 

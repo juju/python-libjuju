@@ -165,8 +165,8 @@ class ActionFacade(Type):
     @ReturnMapping(ActionResults)
     async def Actions(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ActionResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ActionResult]<~ActionResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -183,8 +183,8 @@ class ActionFacade(Type):
     @ReturnMapping(ApplicationsCharmActionsResults)
     async def ApplicationsCharmsActions(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ApplicationCharmActionsResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ApplicationCharmActionsResult]<~ApplicationCharmActionsResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -201,8 +201,8 @@ class ActionFacade(Type):
     @ReturnMapping(ActionResults)
     async def Cancel(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ActionResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ActionResult]<~ActionResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -219,8 +219,8 @@ class ActionFacade(Type):
     @ReturnMapping(ActionResults)
     async def Enqueue(self, actions):
         '''
-        actions : typing.Sequence[~Action]
-        Returns -> typing.Sequence[~ActionResult]
+        actions : typing.Sequence<+T_co>[~Action]<~Action>
+        Returns -> typing.Sequence<+T_co>[~ActionResult]<~ActionResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -237,8 +237,8 @@ class ActionFacade(Type):
     @ReturnMapping(FindTagsResults)
     async def FindActionTagsByPrefix(self, prefixes):
         '''
-        prefixes : typing.Sequence[str]
-        Returns -> typing.Sequence[~Entity]
+        prefixes : typing.Sequence<+T_co>[str]
+        Returns -> typing.Sequence<+T_co>[~Entity]<~Entity>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -255,8 +255,8 @@ class ActionFacade(Type):
     @ReturnMapping(ActionsByNames)
     async def FindActionsByNames(self, names):
         '''
-        names : typing.Sequence[str]
-        Returns -> typing.Sequence[~ActionsByName]
+        names : typing.Sequence<+T_co>[str]
+        Returns -> typing.Sequence<+T_co>[~ActionsByName]<~ActionsByName>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -273,8 +273,8 @@ class ActionFacade(Type):
     @ReturnMapping(ActionsByReceivers)
     async def ListAll(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ActionsByReceiver]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ActionsByReceiver]<~ActionsByReceiver>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -291,8 +291,8 @@ class ActionFacade(Type):
     @ReturnMapping(ActionsByReceivers)
     async def ListCompleted(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ActionsByReceiver]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ActionsByReceiver]<~ActionsByReceiver>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -309,8 +309,8 @@ class ActionFacade(Type):
     @ReturnMapping(ActionsByReceivers)
     async def ListPending(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ActionsByReceiver]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ActionsByReceiver]<~ActionsByReceiver>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -327,8 +327,8 @@ class ActionFacade(Type):
     @ReturnMapping(ActionsByReceivers)
     async def ListRunning(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ActionsByReceiver]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ActionsByReceiver]<~ActionsByReceiver>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -345,12 +345,12 @@ class ActionFacade(Type):
     @ReturnMapping(ActionResults)
     async def Run(self, applications, commands, machines, timeout, units):
         '''
-        applications : typing.Sequence[str]
+        applications : typing.Sequence<+T_co>[str]
         commands : str
-        machines : typing.Sequence[str]
+        machines : typing.Sequence<+T_co>[str]
         timeout : int
-        units : typing.Sequence[str]
-        Returns -> typing.Sequence[~ActionResult]
+        units : typing.Sequence<+T_co>[str]
+        Returns -> typing.Sequence<+T_co>[~ActionResult]<~ActionResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -371,12 +371,12 @@ class ActionFacade(Type):
     @ReturnMapping(ActionResults)
     async def RunOnAllMachines(self, applications, commands, machines, timeout, units):
         '''
-        applications : typing.Sequence[str]
+        applications : typing.Sequence<+T_co>[str]
         commands : str
-        machines : typing.Sequence[str]
+        machines : typing.Sequence<+T_co>[str]
         timeout : int
-        units : typing.Sequence[str]
-        Returns -> typing.Sequence[~ActionResult]
+        units : typing.Sequence<+T_co>[str]
+        Returns -> typing.Sequence<+T_co>[~ActionResult]<~ActionResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -480,14 +480,12 @@ class AgentFacade(Type):
                                          'type': 'object'},
                      'Error': {'additionalProperties': False,
                                'properties': {'code': {'type': 'string'},
-                                              'info': {'$ref': '#/definitions/ErrorInfo'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
                                               'message': {'type': 'string'}},
                                'required': ['message', 'code'],
                                'type': 'object'},
-                     'ErrorInfo': {'additionalProperties': False,
-                                   'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
-                                                  'macaroon-path': {'type': 'string'}},
-                                   'type': 'object'},
                      'ErrorResult': {'additionalProperties': False,
                                      'properties': {'error': {'$ref': '#/definitions/Error'}},
                                      'type': 'object'},
@@ -500,7 +498,6 @@ class AgentFacade(Type):
                                         'properties': {'master': {'type': 'boolean'}},
                                         'required': ['master'],
                                         'type': 'object'},
-                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
                      'ModelConfigResult': {'additionalProperties': False,
                                            'properties': {'config': {'patternProperties': {'.*': {'additionalProperties': True,
                                                                                                   'type': 'object'}},
@@ -561,6 +558,9 @@ class AgentFacade(Type):
                                      'type': 'object'},
                     'StateServingInfo': {'properties': {'Result': {'$ref': '#/definitions/StateServingInfo'}},
                                          'type': 'object'},
+                    'WatchCloudSpecsChanges': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                              'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
+                                               'type': 'object'},
                     'WatchCredentials': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                         'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
                                          'type': 'object'},
@@ -572,8 +572,8 @@ class AgentFacade(Type):
     @ReturnMapping(ErrorResults)
     async def ClearReboot(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -590,8 +590,8 @@ class AgentFacade(Type):
     @ReturnMapping(CloudSpecResults)
     async def CloudSpec(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~CloudSpecResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~CloudSpecResult]<~CloudSpecResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -608,8 +608,8 @@ class AgentFacade(Type):
     @ReturnMapping(ControllerAPIInfoResults)
     async def ControllerAPIInfoForModels(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ControllerAPIInfoResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ControllerAPIInfoResult]<~ControllerAPIInfoResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -627,7 +627,7 @@ class AgentFacade(Type):
     async def ControllerConfig(self):
         '''
 
-        Returns -> typing.Mapping[str, typing.Any]
+        Returns -> typing.Mapping<~KT, +VT_co>[str, typing.Any]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -662,8 +662,8 @@ class AgentFacade(Type):
     @ReturnMapping(AgentGetEntitiesResults)
     async def GetEntities(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~AgentGetEntitiesResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~AgentGetEntitiesResult]<~AgentGetEntitiesResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -699,7 +699,7 @@ class AgentFacade(Type):
     async def ModelConfig(self):
         '''
 
-        Returns -> typing.Mapping[str, typing.Any]
+        Returns -> typing.Mapping<~KT, +VT_co>[str, typing.Any]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -716,8 +716,8 @@ class AgentFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetPasswords(self, changes):
         '''
-        changes : typing.Sequence[~EntityPassword]
-        Returns -> typing.Sequence[~ErrorResult]
+        changes : typing.Sequence<+T_co>[~EntityPassword]<~EntityPassword>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -750,10 +750,28 @@ class AgentFacade(Type):
 
 
     @ReturnMapping(NotifyWatchResults)
+    async def WatchCloudSpecsChanges(self, entities):
+        '''
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Agent',
+                   request='WatchCloudSpecsChanges',
+                   version=2,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResults)
     async def WatchCredentials(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~NotifyWatchResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -809,7 +827,7 @@ class AllModelWatcherFacade(Type):
     async def Next(self):
         '''
 
-        Returns -> typing.Sequence[~Delta]
+        Returns -> typing.Sequence<+T_co>[~Delta]<~Delta>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -878,14 +896,12 @@ class AnnotationsFacade(Type):
                                            'type': 'object'},
                      'Error': {'additionalProperties': False,
                                'properties': {'code': {'type': 'string'},
-                                              'info': {'$ref': '#/definitions/ErrorInfo'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
                                               'message': {'type': 'string'}},
                                'required': ['message', 'code'],
                                'type': 'object'},
-                     'ErrorInfo': {'additionalProperties': False,
-                                   'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
-                                                  'macaroon-path': {'type': 'string'}},
-                                   'type': 'object'},
                      'ErrorResult': {'additionalProperties': False,
                                      'properties': {'error': {'$ref': '#/definitions/Error'}},
                                      'type': 'object'},
@@ -893,8 +909,7 @@ class AnnotationsFacade(Type):
                                       'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
                                                                  'type': 'array'}},
                                       'required': ['results'],
-                                      'type': 'object'},
-                     'Macaroon': {'additionalProperties': False, 'type': 'object'}},
+                                      'type': 'object'}},
      'properties': {'Get': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                            'Result': {'$ref': '#/definitions/AnnotationsGetResults'}},
                             'type': 'object'},
@@ -907,8 +922,8 @@ class AnnotationsFacade(Type):
     @ReturnMapping(AnnotationsGetResults)
     async def Get(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~AnnotationsGetResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~AnnotationsGetResult]<~AnnotationsGetResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -925,8 +940,8 @@ class AnnotationsFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Set(self, annotations):
         '''
-        annotations : typing.Sequence[~EntityAnnotations]
-        Returns -> typing.Sequence[~ErrorResult]
+        annotations : typing.Sequence<+T_co>[~EntityAnnotations]<~EntityAnnotations>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -1237,8 +1252,8 @@ class ApplicationFacade(Type):
     @ReturnMapping(AddRelationResults)
     async def AddRelation(self, endpoints):
         '''
-        endpoints : typing.Sequence[str]
-        Returns -> typing.Mapping[str, ~CharmRelation]
+        endpoints : typing.Sequence<+T_co>[str]
+        Returns -> typing.Mapping<~KT, +VT_co>[str, ~CharmRelation]<~CharmRelation>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -1257,8 +1272,8 @@ class ApplicationFacade(Type):
         '''
         application : str
         num_units : int
-        placement : typing.Sequence[~Placement]
-        Returns -> typing.Sequence[str]
+        placement : typing.Sequence<+T_co>[~Placement]<~Placement>
+        Returns -> typing.Sequence<+T_co>[str]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -1278,7 +1293,7 @@ class ApplicationFacade(Type):
     async def CharmRelations(self, application):
         '''
         application : str
-        Returns -> typing.Sequence[str]
+        Returns -> typing.Sequence<+T_co>[str]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -1295,8 +1310,8 @@ class ApplicationFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Deploy(self, applications):
         '''
-        applications : typing.Sequence[~ApplicationDeploy]
-        Returns -> typing.Sequence[~ErrorResult]
+        applications : typing.Sequence<+T_co>[~ApplicationDeploy]<~ApplicationDeploy>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -1331,7 +1346,7 @@ class ApplicationFacade(Type):
     @ReturnMapping(None)
     async def DestroyRelation(self, endpoints):
         '''
-        endpoints : typing.Sequence[str]
+        endpoints : typing.Sequence<+T_co>[str]
         Returns -> None
         '''
         # map input types to rpc msg
@@ -1349,7 +1364,7 @@ class ApplicationFacade(Type):
     @ReturnMapping(None)
     async def DestroyUnits(self, unit_names):
         '''
-        unit_names : typing.Sequence[str]
+        unit_names : typing.Sequence<+T_co>[str]
         Returns -> None
         '''
         # map input types to rpc msg
@@ -1386,7 +1401,7 @@ class ApplicationFacade(Type):
     async def Get(self, application):
         '''
         application : str
-        Returns -> typing.Union[str, typing.Mapping[str, typing.Any], _ForwardRef('Value')]
+        Returns -> typing.Union[str, typing.Mapping<~KT, +VT_co>[str, typing.Any], _ForwardRef('Value')]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -1440,7 +1455,7 @@ class ApplicationFacade(Type):
     async def Set(self, application, options):
         '''
         application : str
-        options : typing.Mapping[str, str]
+        options : typing.Mapping<~KT, +VT_co>[str, str]
         Returns -> None
         '''
         # map input types to rpc msg
@@ -1462,12 +1477,12 @@ class ApplicationFacade(Type):
         application : str
         channel : str
         charm_url : str
-        config_settings : typing.Mapping[str, str]
+        config_settings : typing.Mapping<~KT, +VT_co>[str, str]
         config_settings_yaml : str
         force_series : bool
         force_units : bool
-        resource_ids : typing.Mapping[str, str]
-        storage_constraints : typing.Mapping[str, ~StorageConstraints]
+        resource_ids : typing.Mapping<~KT, +VT_co>[str, str]
+        storage_constraints : typing.Mapping<~KT, +VT_co>[str, ~StorageConstraints]<~StorageConstraints>
         Returns -> None
         '''
         # map input types to rpc msg
@@ -1513,8 +1528,8 @@ class ApplicationFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetMetricCredentials(self, creds):
         '''
-        creds : typing.Sequence[~ApplicationMetricCredential]
-        Returns -> typing.Sequence[~ErrorResult]
+        creds : typing.Sequence<+T_co>[~ApplicationMetricCredential]<~ApplicationMetricCredential>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -1550,7 +1565,7 @@ class ApplicationFacade(Type):
     async def Unset(self, application, options):
         '''
         application : str
-        options : typing.Sequence[str]
+        options : typing.Sequence<+T_co>[str]
         Returns -> None
         '''
         # map input types to rpc msg
@@ -1575,7 +1590,7 @@ class ApplicationFacade(Type):
         force_charm_url : bool
         force_series : bool
         min_units : int
-        settings : typing.Mapping[str, str]
+        settings : typing.Mapping<~KT, +VT_co>[str, str]
         settings_yaml : str
         Returns -> None
         '''
@@ -1697,14 +1712,12 @@ class ApplicationOffersFacade(Type):
                                       'type': 'object'},
                      'Error': {'additionalProperties': False,
                                'properties': {'code': {'type': 'string'},
-                                              'info': {'$ref': '#/definitions/ErrorInfo'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
                                               'message': {'type': 'string'}},
                                'required': ['message', 'code'],
                                'type': 'object'},
-                     'ErrorInfo': {'additionalProperties': False,
-                                   'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
-                                                  'macaroon-path': {'type': 'string'}},
-                                   'type': 'object'},
                      'ErrorResult': {'additionalProperties': False,
                                      'properties': {'error': {'$ref': '#/definitions/Error'}},
                                      'type': 'object'},
@@ -1897,8 +1910,8 @@ class ApplicationOffersFacade(Type):
     @ReturnMapping(ApplicationOffersResults)
     async def ApplicationOffers(self, offer_urls):
         '''
-        offer_urls : typing.Sequence[str]
-        Returns -> typing.Sequence[~ApplicationOfferResult]
+        offer_urls : typing.Sequence<+T_co>[str]
+        Returns -> typing.Sequence<+T_co>[~ApplicationOfferResult]<~ApplicationOfferResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -1916,8 +1929,8 @@ class ApplicationOffersFacade(Type):
     async def DestroyOffers(self, force, offer_urls):
         '''
         force : bool
-        offer_urls : typing.Sequence[str]
-        Returns -> typing.Sequence[~ErrorResult]
+        offer_urls : typing.Sequence<+T_co>[str]
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -1935,8 +1948,8 @@ class ApplicationOffersFacade(Type):
     @ReturnMapping(QueryApplicationOffersResults)
     async def FindApplicationOffers(self, filters):
         '''
-        filters : typing.Sequence[~OfferFilter]
-        Returns -> typing.Sequence[~ApplicationOfferAdminDetails]
+        filters : typing.Sequence<+T_co>[~OfferFilter]<~OfferFilter>
+        Returns -> typing.Sequence<+T_co>[~ApplicationOfferAdminDetails]<~ApplicationOfferAdminDetails>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -1953,8 +1966,8 @@ class ApplicationOffersFacade(Type):
     @ReturnMapping(ConsumeOfferDetailsResults)
     async def GetConsumeDetails(self, offer_urls):
         '''
-        offer_urls : typing.Sequence[str]
-        Returns -> typing.Sequence[~ConsumeOfferDetailsResult]
+        offer_urls : typing.Sequence<+T_co>[str]
+        Returns -> typing.Sequence<+T_co>[~ConsumeOfferDetailsResult]<~ConsumeOfferDetailsResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -1971,8 +1984,8 @@ class ApplicationOffersFacade(Type):
     @ReturnMapping(QueryApplicationOffersResults)
     async def ListApplicationOffers(self, filters):
         '''
-        filters : typing.Sequence[~OfferFilter]
-        Returns -> typing.Sequence[~ApplicationOfferAdminDetails]
+        filters : typing.Sequence<+T_co>[~OfferFilter]<~OfferFilter>
+        Returns -> typing.Sequence<+T_co>[~ApplicationOfferAdminDetails]<~ApplicationOfferAdminDetails>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -1989,8 +2002,8 @@ class ApplicationOffersFacade(Type):
     @ReturnMapping(ErrorResults)
     async def ModifyOfferAccess(self, changes):
         '''
-        changes : typing.Sequence[~ModifyOfferAccess]
-        Returns -> typing.Sequence[~ErrorResult]
+        changes : typing.Sequence<+T_co>[~ModifyOfferAccess]<~ModifyOfferAccess>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -2007,8 +2020,8 @@ class ApplicationOffersFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Offer(self, offers):
         '''
-        offers : typing.Sequence[~AddApplicationOffer]
-        Returns -> typing.Sequence[~ErrorResult]
+        offers : typing.Sequence<+T_co>[~AddApplicationOffer]<~AddApplicationOffer>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -2025,8 +2038,8 @@ class ApplicationOffersFacade(Type):
     @ReturnMapping(RemoteApplicationInfoResults)
     async def RemoteApplicationInfo(self, offer_urls):
         '''
-        offer_urls : typing.Sequence[str]
-        Returns -> typing.Sequence[~RemoteApplicationInfoResult]
+        offer_urls : typing.Sequence<+T_co>[str]
+        Returns -> typing.Sequence<+T_co>[~RemoteApplicationInfoResult]<~RemoteApplicationInfoResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -2106,14 +2119,12 @@ class BackupsFacade(Type):
                                            'type': 'object'},
                      'Error': {'additionalProperties': False,
                                'properties': {'code': {'type': 'string'},
-                                              'info': {'$ref': '#/definitions/ErrorInfo'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
                                               'message': {'type': 'string'}},
                                'required': ['message', 'code'],
                                'type': 'object'},
-                     'ErrorInfo': {'additionalProperties': False,
-                                   'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
-                                                  'macaroon-path': {'type': 'string'}},
-                                   'type': 'object'},
                      'ErrorResult': {'additionalProperties': False,
                                      'properties': {'error': {'$ref': '#/definitions/Error'}},
                                      'type': 'object'},
@@ -2122,7 +2133,6 @@ class BackupsFacade(Type):
                                                                  'type': 'array'}},
                                       'required': ['results'],
                                       'type': 'object'},
-                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
                      'Number': {'additionalProperties': False,
                                 'properties': {'Build': {'type': 'integer'},
                                                'Major': {'type': 'integer'},
@@ -2216,7 +2226,7 @@ class BackupsFacade(Type):
     async def List(self):
         '''
 
-        Returns -> typing.Sequence[~BackupsMetadataResult]
+        Returns -> typing.Sequence<+T_co>[~BackupsMetadataResult]<~BackupsMetadataResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -2252,7 +2262,7 @@ class BackupsFacade(Type):
     async def Remove(self, id_):
         '''
         id_ : str
-        Returns -> typing.Sequence[~ErrorResult]
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -2310,18 +2320,15 @@ class BlockFacade(Type):
                                            'type': 'object'},
                      'Error': {'additionalProperties': False,
                                'properties': {'code': {'type': 'string'},
-                                              'info': {'$ref': '#/definitions/ErrorInfo'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
                                               'message': {'type': 'string'}},
                                'required': ['message', 'code'],
                                'type': 'object'},
-                     'ErrorInfo': {'additionalProperties': False,
-                                   'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
-                                                  'macaroon-path': {'type': 'string'}},
-                                   'type': 'object'},
                      'ErrorResult': {'additionalProperties': False,
                                      'properties': {'error': {'$ref': '#/definitions/Error'}},
-                                     'type': 'object'},
-                     'Macaroon': {'additionalProperties': False, 'type': 'object'}},
+                                     'type': 'object'}},
      'properties': {'List': {'properties': {'Result': {'$ref': '#/definitions/BlockResults'}},
                              'type': 'object'},
                     'SwitchBlockOff': {'properties': {'Params': {'$ref': '#/definitions/BlockSwitchParams'},
@@ -2337,7 +2344,7 @@ class BlockFacade(Type):
     async def List(self):
         '''
 
-        Returns -> typing.Sequence[~BlockResult]
+        Returns -> typing.Sequence<+T_co>[~BlockResult]<~BlockResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -2420,15 +2427,12 @@ class BundleFacade(Type):
                                               'type': 'object'},
                      'Error': {'additionalProperties': False,
                                'properties': {'code': {'type': 'string'},
-                                              'info': {'$ref': '#/definitions/ErrorInfo'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
                                               'message': {'type': 'string'}},
                                'required': ['message', 'code'],
                                'type': 'object'},
-                     'ErrorInfo': {'additionalProperties': False,
-                                   'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
-                                                  'macaroon-path': {'type': 'string'}},
-                                   'type': 'object'},
-                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
                      'StringResult': {'additionalProperties': False,
                                       'properties': {'error': {'$ref': '#/definitions/Error'},
                                                      'result': {'type': 'string'}},
@@ -2464,7 +2468,7 @@ class BundleFacade(Type):
     async def GetChanges(self, yaml):
         '''
         yaml : str
-        Returns -> typing.Union[typing.Sequence[~BundleChange], typing.Sequence[str]]
+        Returns -> typing.Sequence<+T_co>[~BundleChange]<~BundleChange>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -2483,18 +2487,15 @@ class CharmRevisionUpdaterFacade(Type):
     version = 2
     schema =     {'definitions': {'Error': {'additionalProperties': False,
                                'properties': {'code': {'type': 'string'},
-                                              'info': {'$ref': '#/definitions/ErrorInfo'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
                                               'message': {'type': 'string'}},
                                'required': ['message', 'code'],
                                'type': 'object'},
-                     'ErrorInfo': {'additionalProperties': False,
-                                   'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
-                                                  'macaroon-path': {'type': 'string'}},
-                                   'type': 'object'},
                      'ErrorResult': {'additionalProperties': False,
                                      'properties': {'error': {'$ref': '#/definitions/Error'}},
-                                     'type': 'object'},
-                     'Macaroon': {'additionalProperties': False, 'type': 'object'}},
+                                     'type': 'object'}},
      'properties': {'UpdateLatestRevisions': {'properties': {'Result': {'$ref': '#/definitions/ErrorResult'}},
                                               'type': 'object'}},
      'type': 'object'}
@@ -2707,7 +2708,7 @@ class CharmsFacade(Type):
     async def CharmInfo(self, url):
         '''
         url : str
-        Returns -> typing.Union[_ForwardRef('CharmActions'), typing.Mapping[str, ~CharmOption], _ForwardRef('CharmMeta'), _ForwardRef('CharmMetrics'), int, str]
+        Returns -> typing.Union[_ForwardRef('CharmActions'), typing.Mapping<~KT, +VT_co>[str, ~CharmOption]<~CharmOption>, _ForwardRef('CharmMeta'), _ForwardRef('CharmMetrics'), int, str]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -2742,8 +2743,8 @@ class CharmsFacade(Type):
     @ReturnMapping(CharmsListResult)
     async def List(self, names):
         '''
-        names : typing.Sequence[str]
-        Returns -> typing.Sequence[str]
+        names : typing.Sequence<+T_co>[str]
+        Returns -> typing.Sequence<+T_co>[str]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -2762,15 +2763,12 @@ class CleanerFacade(Type):
     version = 2
     schema =     {'definitions': {'Error': {'additionalProperties': False,
                                'properties': {'code': {'type': 'string'},
-                                              'info': {'$ref': '#/definitions/ErrorInfo'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
                                               'message': {'type': 'string'}},
                                'required': ['message', 'code'],
                                'type': 'object'},
-                     'ErrorInfo': {'additionalProperties': False,
-                                   'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
-                                                  'macaroon-path': {'type': 'string'}},
-                                   'type': 'object'},
-                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
                      'NotifyWatchResult': {'additionalProperties': False,
                                            'properties': {'NotifyWatcherId': {'type': 'string'},
                                                           'error': {'$ref': '#/definitions/Error'}},
@@ -2885,6 +2883,7 @@ class ClientFacade(Type):
                                             'type': 'object'},
                      'Address': {'additionalProperties': False,
                                  'properties': {'scope': {'type': 'string'},
+                                                'space-id': {'type': 'string'},
                                                 'space-name': {'type': 'string'},
                                                 'type': {'type': 'string'},
                                                 'value': {'type': 'string'}},
@@ -2904,8 +2903,7 @@ class ClientFacade(Type):
                                                                'charm': {'type': 'string'},
                                                                'endpoints': {'patternProperties': {'.*': {'$ref': '#/definitions/RemoteEndpoint'}},
                                                                              'type': 'object'},
-                                                               'err': {'additionalProperties': True,
-                                                                       'type': 'object'},
+                                                               'err': {'$ref': '#/definitions/Error'},
                                                                'offer-name': {'type': 'string'},
                                                                'total-connected-count': {'type': 'integer'}},
                                                 'required': ['offer-name',
@@ -2918,11 +2916,11 @@ class ClientFacade(Type):
                      'ApplicationStatus': {'additionalProperties': False,
                                            'properties': {'can-upgrade-to': {'type': 'string'},
                                                           'charm': {'type': 'string'},
+                                                          'charm-profile': {'type': 'string'},
                                                           'charm-verion': {'type': 'string'},
                                                           'endpoint-bindings': {'patternProperties': {'.*': {'type': 'string'}},
                                                                                 'type': 'object'},
-                                                          'err': {'additionalProperties': True,
-                                                                  'type': 'object'},
+                                                          'err': {'$ref': '#/definitions/Error'},
                                                           'exposed': {'type': 'boolean'},
                                                           'int': {'type': 'integer'},
                                                           'life': {'type': 'string'},
@@ -2935,7 +2933,6 @@ class ClientFacade(Type):
                                                                         'type': 'object'},
                                                           'series': {'type': 'string'},
                                                           'status': {'$ref': '#/definitions/DetailedStatus'},
-                                                          'string': {'type': 'string'},
                                                           'subordinate-to': {'items': {'type': 'string'},
                                                                              'type': 'array'},
                                                           'units': {'patternProperties': {'.*': {'$ref': '#/definitions/UnitStatus'}},
@@ -2953,6 +2950,7 @@ class ClientFacade(Type):
                                                         'status',
                                                         'workload-version',
                                                         'charm-verion',
+                                                        'charm-profile',
                                                         'endpoint-bindings',
                                                         'public-address'],
                                            'type': 'object'},
@@ -3013,8 +3011,7 @@ class ClientFacade(Type):
                                         'properties': {'data': {'patternProperties': {'.*': {'additionalProperties': True,
                                                                                              'type': 'object'}},
                                                                 'type': 'object'},
-                                                       'err': {'additionalProperties': True,
-                                                               'type': 'object'},
+                                                       'err': {'$ref': '#/definitions/Error'},
                                                        'info': {'type': 'string'},
                                                        'kind': {'type': 'string'},
                                                        'life': {'type': 'string'},
@@ -3061,14 +3058,12 @@ class ClientFacade(Type):
                                       'type': 'object'},
                      'Error': {'additionalProperties': False,
                                'properties': {'code': {'type': 'string'},
-                                              'info': {'$ref': '#/definitions/ErrorInfo'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
                                               'message': {'type': 'string'}},
                                'required': ['message', 'code'],
                                'type': 'object'},
-                     'ErrorInfo': {'additionalProperties': False,
-                                   'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
-                                                  'macaroon-path': {'type': 'string'}},
-                                   'type': 'object'},
                      'ErrorResult': {'additionalProperties': False,
                                      'properties': {'error': {'$ref': '#/definitions/Error'}},
                                      'type': 'object'},
@@ -3130,6 +3125,7 @@ class ClientFacade(Type):
                                                                 'cpu-power': {'type': 'integer'},
                                                                 'mem': {'type': 'integer'},
                                                                 'root-disk': {'type': 'integer'},
+                                                                'root-disk-source': {'type': 'string'},
                                                                 'tags': {'items': {'type': 'string'},
                                                                          'type': 'array'}},
                                                  'type': 'object'},
@@ -3171,6 +3167,7 @@ class ClientFacade(Type):
                                                       'constraints': {'type': 'string'},
                                                       'containers': {'patternProperties': {'.*': {'$ref': '#/definitions/MachineStatus'}},
                                                                      'type': 'object'},
+                                                      'display-name': {'type': 'string'},
                                                       'dns-name': {'type': 'string'},
                                                       'hardware': {'type': 'string'},
                                                       'has-vote': {'type': 'boolean'},
@@ -3183,14 +3180,17 @@ class ClientFacade(Type):
                                                                'type': 'array'},
                                                       'lxd-profiles': {'patternProperties': {'.*': {'$ref': '#/definitions/LXDProfile'}},
                                                                        'type': 'object'},
+                                                      'modification-status': {'$ref': '#/definitions/DetailedStatus'},
                                                       'network-interfaces': {'patternProperties': {'.*': {'$ref': '#/definitions/NetworkInterface'}},
                                                                              'type': 'object'},
                                                       'series': {'type': 'string'},
                                                       'wants-vote': {'type': 'boolean'}},
                                        'required': ['agent-status',
                                                     'instance-status',
+                                                    'modification-status',
                                                     'dns-name',
                                                     'instance-id',
+                                                    'display-name',
                                                     'series',
                                                     'id',
                                                     'containers',
@@ -3217,6 +3217,7 @@ class ClientFacade(Type):
                                                   'cloud-tag': {'type': 'string'},
                                                   'controller-uuid': {'type': 'string'},
                                                   'default-series': {'type': 'string'},
+                                                  'is-controller': {'type': 'boolean'},
                                                   'life': {'type': 'string'},
                                                   'machines': {'items': {'$ref': '#/definitions/ModelMachineInfo'},
                                                                'type': 'array'},
@@ -3234,6 +3235,7 @@ class ClientFacade(Type):
                                                 'type',
                                                 'uuid',
                                                 'controller-uuid',
+                                                'is-controller',
                                                 'cloud-tag',
                                                 'owner-tag',
                                                 'life',
@@ -3243,7 +3245,8 @@ class ClientFacade(Type):
                                                 'agent-version'],
                                    'type': 'object'},
                      'ModelMachineInfo': {'additionalProperties': False,
-                                          'properties': {'hardware': {'$ref': '#/definitions/MachineHardware'},
+                                          'properties': {'display-name': {'type': 'string'},
+                                                         'hardware': {'$ref': '#/definitions/MachineHardware'},
                                                          'has-vote': {'type': 'boolean'},
                                                          'id': {'type': 'string'},
                                                          'instance-id': {'type': 'string'},
@@ -3399,8 +3402,7 @@ class ClientFacade(Type):
                      'RemoteApplicationStatus': {'additionalProperties': False,
                                                  'properties': {'endpoints': {'items': {'$ref': '#/definitions/RemoteEndpoint'},
                                                                               'type': 'array'},
-                                                                'err': {'additionalProperties': True,
-                                                                        'type': 'object'},
+                                                                'err': {'$ref': '#/definitions/Error'},
                                                                 'life': {'type': 'string'},
                                                                 'offer-name': {'type': 'string'},
                                                                 'offer-url': {'type': 'string'},
@@ -3539,6 +3541,7 @@ class ClientFacade(Type):
                                               'instance-type': {'type': 'string'},
                                               'mem': {'type': 'integer'},
                                               'root-disk': {'type': 'integer'},
+                                              'root-disk-source': {'type': 'string'},
                                               'spaces': {'items': {'type': 'string'},
                                                          'type': 'array'},
                                               'tags': {'items': {'type': 'string'},
@@ -3627,7 +3630,7 @@ class ClientFacade(Type):
     async def APIHostPorts(self):
         '''
 
-        Returns -> typing.Sequence[~HostPort]
+        Returns -> typing.Sequence<+T_co>[~HostPort]<~HostPort>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -3704,8 +3707,8 @@ class ClientFacade(Type):
     @ReturnMapping(AddMachinesResults)
     async def AddMachines(self, params):
         '''
-        params : typing.Sequence[~AddMachineParams]
-        Returns -> typing.Sequence[~AddMachinesResult]
+        params : typing.Sequence<+T_co>[~AddMachineParams]<~AddMachineParams>
+        Returns -> typing.Sequence<+T_co>[~AddMachinesResult]<~AddMachinesResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -3722,8 +3725,8 @@ class ClientFacade(Type):
     @ReturnMapping(AddMachinesResults)
     async def AddMachinesV2(self, params):
         '''
-        params : typing.Sequence[~AddMachineParams]
-        Returns -> typing.Sequence[~AddMachinesResult]
+        params : typing.Sequence<+T_co>[~AddMachineParams]<~AddMachineParams>
+        Returns -> typing.Sequence<+T_co>[~AddMachinesResult]<~AddMachinesResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -3759,7 +3762,7 @@ class ClientFacade(Type):
     async def CACert(self):
         '''
 
-        Returns -> typing.Sequence[int]
+        Returns -> typing.Sequence<+T_co>[int]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -3777,7 +3780,7 @@ class ClientFacade(Type):
     async def DestroyMachines(self, force, machine_names):
         '''
         force : bool
-        machine_names : typing.Sequence[str]
+        machine_names : typing.Sequence<+T_co>[str]
         Returns -> None
         '''
         # map input types to rpc msg
@@ -3801,7 +3804,7 @@ class ClientFacade(Type):
         minor : int
         number : Number
         series : str
-        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence[~Tools]]
+        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence<+T_co>[~Tools]<~Tools>]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -3822,8 +3825,8 @@ class ClientFacade(Type):
     @ReturnMapping(FullStatus)
     async def FullStatus(self, patterns):
         '''
-        patterns : typing.Sequence[str]
-        Returns -> typing.Union[typing.Mapping[str, ~ApplicationStatus], str, typing.Mapping[str, ~MachineStatus], _ForwardRef('ModelStatusInfo'), typing.Mapping[str, ~ApplicationOfferStatus], typing.Sequence[~RelationStatus], typing.Mapping[str, ~RemoteApplicationStatus]]
+        patterns : typing.Sequence<+T_co>[str]
+        Returns -> typing.Union[_ForwardRef('ModelStatusInfo'), typing.Sequence<+T_co>[~RelationStatus]<~RelationStatus>, typing.Mapping<~KT, +VT_co>[str, ~RemoteApplicationStatus]<~RemoteApplicationStatus>]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -3841,7 +3844,7 @@ class ClientFacade(Type):
     async def GetBundleChanges(self, yaml):
         '''
         yaml : str
-        Returns -> typing.Union[typing.Sequence[~BundleChange], typing.Sequence[str]]
+        Returns -> typing.Sequence<+T_co>[~BundleChange]<~BundleChange>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -3876,8 +3879,8 @@ class ClientFacade(Type):
     @ReturnMapping(AddMachinesResults)
     async def InjectMachines(self, params):
         '''
-        params : typing.Sequence[~AddMachineParams]
-        Returns -> typing.Sequence[~AddMachinesResult]
+        params : typing.Sequence<+T_co>[~AddMachineParams]<~AddMachineParams>
+        Returns -> typing.Sequence<+T_co>[~AddMachinesResult]<~AddMachinesResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -3895,7 +3898,7 @@ class ClientFacade(Type):
     async def ModelGet(self):
         '''
 
-        Returns -> typing.Mapping[str, ~ConfigValue]
+        Returns -> typing.Mapping<~KT, +VT_co>[str, ~ConfigValue]<~ConfigValue>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -3913,7 +3916,7 @@ class ClientFacade(Type):
     async def ModelInfo(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Number'), str, typing.Sequence[~ModelMachineInfo], _ForwardRef('ModelMigrationStatus'), _ForwardRef('ModelSLAInfo'), _ForwardRef('EntityStatus'), typing.Sequence[~ModelUserInfo]]
+        Returns -> typing.Union[_ForwardRef('Number'), bool, _ForwardRef('ModelMigrationStatus'), _ForwardRef('ModelSLAInfo'), _ForwardRef('EntityStatus'), typing.Sequence<+T_co>[~ModelUserInfo]<~ModelUserInfo>]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -3930,7 +3933,7 @@ class ClientFacade(Type):
     @ReturnMapping(None)
     async def ModelSet(self, config):
         '''
-        config : typing.Mapping[str, typing.Any]
+        config : typing.Mapping<~KT, +VT_co>[str, typing.Any]
         Returns -> None
         '''
         # map input types to rpc msg
@@ -3948,7 +3951,7 @@ class ClientFacade(Type):
     @ReturnMapping(None)
     async def ModelUnset(self, keys):
         '''
-        keys : typing.Sequence[str]
+        keys : typing.Sequence<+T_co>[str]
         Returns -> None
         '''
         # map input types to rpc msg
@@ -3967,7 +3970,7 @@ class ClientFacade(Type):
     async def ModelUserInfo(self):
         '''
 
-        Returns -> typing.Sequence[~ModelUserInfoResult]
+        Returns -> typing.Sequence<+T_co>[~ModelUserInfoResult]<~ModelUserInfoResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -4044,8 +4047,8 @@ class ClientFacade(Type):
     @ReturnMapping(ResolveCharmResults)
     async def ResolveCharms(self, references):
         '''
-        references : typing.Sequence[str]
-        Returns -> typing.Sequence[~ResolveCharmResult]
+        references : typing.Sequence<+T_co>[str]
+        Returns -> typing.Sequence<+T_co>[~ResolveCharmResult]<~ResolveCharmResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -4082,8 +4085,8 @@ class ClientFacade(Type):
     @ReturnMapping(ErrorResults)
     async def RetryProvisioning(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -4156,7 +4159,7 @@ class ClientFacade(Type):
     @ReturnMapping(None)
     async def SetSLALevel(self, creds, level):
         '''
-        creds : typing.Sequence[int]
+        creds : typing.Sequence<+T_co>[int]
         level : str
         Returns -> None
         '''
@@ -4176,8 +4179,8 @@ class ClientFacade(Type):
     @ReturnMapping(StatusHistoryResults)
     async def StatusHistory(self, requests):
         '''
-        requests : typing.Sequence[~StatusHistoryRequest]
-        Returns -> typing.Sequence[~StatusHistoryResult]
+        requests : typing.Sequence<+T_co>[~StatusHistoryRequest]<~StatusHistoryRequest>
+        Returns -> typing.Sequence<+T_co>[~StatusHistoryResult]<~StatusHistoryResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -4218,21 +4221,18 @@ class CredentialValidatorFacade(Type):
                                 'type': 'object'},
                      'Error': {'additionalProperties': False,
                                'properties': {'code': {'type': 'string'},
-                                              'info': {'$ref': '#/definitions/ErrorInfo'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
                                               'message': {'type': 'string'}},
                                'required': ['message', 'code'],
                                'type': 'object'},
-                     'ErrorInfo': {'additionalProperties': False,
-                                   'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
-                                                  'macaroon-path': {'type': 'string'}},
-                                   'type': 'object'},
                      'ErrorResult': {'additionalProperties': False,
                                      'properties': {'error': {'$ref': '#/definitions/Error'}},
                                      'type': 'object'},
                      'InvalidateCredentialArg': {'additionalProperties': False,
                                                  'properties': {'reason': {'type': 'string'}},
                                                  'type': 'object'},
-                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
                      'ModelCredential': {'additionalProperties': False,
                                          'properties': {'credential-tag': {'type': 'string'},
                                                         'exists': {'type': 'boolean'},
@@ -4449,8 +4449,8 @@ class DiscoverSpacesFacade(Type):
     @ReturnMapping(ErrorResults)
     async def AddSubnets(self, subnets):
         '''
-        subnets : typing.Sequence[~AddSubnetParams]
-        Returns -> typing.Sequence[~ErrorResult]
+        subnets : typing.Sequence<+T_co>[~AddSubnetParams]<~AddSubnetParams>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -4467,8 +4467,8 @@ class DiscoverSpacesFacade(Type):
     @ReturnMapping(ErrorResults)
     async def CreateSpaces(self, spaces):
         '''
-        spaces : typing.Sequence[~CreateSpaceParams]
-        Returns -> typing.Sequence[~ErrorResult]
+        spaces : typing.Sequence<+T_co>[~CreateSpaceParams]<~CreateSpaceParams>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -4486,7 +4486,7 @@ class DiscoverSpacesFacade(Type):
     async def ListSpaces(self):
         '''
 
-        Returns -> typing.Sequence[~ProviderSpace]
+        Returns -> typing.Sequence<+T_co>[~ProviderSpace]<~ProviderSpace>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -4505,7 +4505,7 @@ class DiscoverSpacesFacade(Type):
         '''
         space_tag : str
         zone : str
-        Returns -> typing.Sequence[~Subnet]
+        Returns -> typing.Sequence<+T_co>[~Subnet]<~Subnet>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -4524,7 +4524,7 @@ class DiscoverSpacesFacade(Type):
     async def ModelConfig(self):
         '''
 
-        Returns -> typing.Mapping[str, typing.Any]
+        Returns -> typing.Mapping<~KT, +VT_co>[str, typing.Any]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -4568,14 +4568,12 @@ class DiskManagerFacade(Type):
                                      'type': 'object'},
                      'Error': {'additionalProperties': False,
                                'properties': {'code': {'type': 'string'},
-                                              'info': {'$ref': '#/definitions/ErrorInfo'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
                                               'message': {'type': 'string'}},
                                'required': ['message', 'code'],
                                'type': 'object'},
-                     'ErrorInfo': {'additionalProperties': False,
-                                   'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
-                                                  'macaroon-path': {'type': 'string'}},
-                                   'type': 'object'},
                      'ErrorResult': {'additionalProperties': False,
                                      'properties': {'error': {'$ref': '#/definitions/Error'}},
                                      'type': 'object'},
@@ -4584,7 +4582,6 @@ class DiskManagerFacade(Type):
                                                                  'type': 'array'}},
                                       'required': ['results'],
                                       'type': 'object'},
-                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
                      'MachineBlockDevices': {'additionalProperties': False,
                                              'properties': {'block-devices': {'items': {'$ref': '#/definitions/BlockDevice'},
                                                                               'type': 'array'},
@@ -4605,8 +4602,8 @@ class DiskManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetMachineBlockDevices(self, machine_block_devices):
         '''
-        machine_block_devices : typing.Sequence[~MachineBlockDevices]
-        Returns -> typing.Sequence[~ErrorResult]
+        machine_block_devices : typing.Sequence<+T_co>[~MachineBlockDevices]<~MachineBlockDevices>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -4632,15 +4629,12 @@ class EntityWatcherFacade(Type):
                                              'type': 'object'},
                      'Error': {'additionalProperties': False,
                                'properties': {'code': {'type': 'string'},
-                                              'info': {'$ref': '#/definitions/ErrorInfo'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
                                               'message': {'type': 'string'}},
                                'required': ['message', 'code'],
-                               'type': 'object'},
-                     'ErrorInfo': {'additionalProperties': False,
-                                   'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
-                                                  'macaroon-path': {'type': 'string'}},
-                                   'type': 'object'},
-                     'Macaroon': {'additionalProperties': False, 'type': 'object'}},
+                               'type': 'object'}},
      'properties': {'Next': {'properties': {'Result': {'$ref': '#/definitions/EntitiesWatchResult'}},
                              'type': 'object'},
                     'Stop': {'type': 'object'}},
@@ -4651,7 +4645,7 @@ class EntityWatcherFacade(Type):
     async def Next(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error'), str]
+        Returns -> typing.Union[typing.Sequence<+T_co>[str], _ForwardRef('Error')]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -4688,15 +4682,12 @@ class FilesystemAttachmentsWatcherFacade(Type):
     version = 2
     schema =     {'definitions': {'Error': {'additionalProperties': False,
                                'properties': {'code': {'type': 'string'},
-                                              'info': {'$ref': '#/definitions/ErrorInfo'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
                                               'message': {'type': 'string'}},
                                'required': ['message', 'code'],
                                'type': 'object'},
-                     'ErrorInfo': {'additionalProperties': False,
-                                   'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
-                                                  'macaroon-path': {'type': 'string'}},
-                                   'type': 'object'},
-                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
                      'MachineStorageId': {'additionalProperties': False,
                                           'properties': {'attachment-tag': {'type': 'string'},
                                                          'machine-tag': {'type': 'string'}},
@@ -4721,7 +4712,7 @@ class FilesystemAttachmentsWatcherFacade(Type):
     async def Next(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence[~MachineStorageId], _ForwardRef('Error'), str]
+        Returns -> typing.Union[typing.Sequence<+T_co>[~MachineStorageId]<~MachineStorageId>, _ForwardRef('Error')]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -4807,32 +4798,37 @@ class HighAvailabilityFacade(Type):
                                           'type': 'object'},
                      'Error': {'additionalProperties': False,
                                'properties': {'code': {'type': 'string'},
-                                              'info': {'$ref': '#/definitions/ErrorInfo'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
                                               'message': {'type': 'string'}},
                                'required': ['message', 'code'],
                                'type': 'object'},
-                     'ErrorInfo': {'additionalProperties': False,
-                                   'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
-                                                  'macaroon-path': {'type': 'string'}},
-                                   'type': 'object'},
                      'HAMember': {'additionalProperties': False,
                                   'properties': {'public-address': {'$ref': '#/definitions/Address'},
                                                  'series': {'type': 'string'},
                                                  'tag': {'type': 'string'}},
                                   'required': ['tag', 'public-address', 'series'],
                                   'type': 'object'},
-                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
                      'Member': {'additionalProperties': False,
                                 'properties': {'Address': {'type': 'string'},
+                                               'Arbiter': {'type': 'boolean'},
+                                               'BuildIndexes': {'type': 'boolean'},
+                                               'Hidden': {'type': 'boolean'},
                                                'Id': {'type': 'integer'},
                                                'Priority': {'type': 'number'},
+                                               'SlaveDelay': {'type': 'integer'},
                                                'Tags': {'patternProperties': {'.*': {'type': 'string'}},
                                                         'type': 'object'},
                                                'Votes': {'type': 'integer'}},
                                 'required': ['Id',
                                              'Address',
+                                             'Arbiter',
+                                             'BuildIndexes',
+                                             'Hidden',
                                              'Priority',
                                              'Tags',
+                                             'SlaveDelay',
                                              'Votes'],
                                 'type': 'object'},
                      'MongoUpgradeResults': {'additionalProperties': False,
@@ -4872,6 +4868,7 @@ class HighAvailabilityFacade(Type):
                                               'instance-type': {'type': 'string'},
                                               'mem': {'type': 'integer'},
                                               'root-disk': {'type': 'integer'},
+                                              'root-disk-source': {'type': 'string'},
                                               'spaces': {'items': {'type': 'string'},
                                                          'type': 'array'},
                                               'tags': {'items': {'type': 'string'},
@@ -4894,8 +4891,8 @@ class HighAvailabilityFacade(Type):
     @ReturnMapping(ControllersChangeResults)
     async def EnableHA(self, specs):
         '''
-        specs : typing.Sequence[~ControllersSpec]
-        Returns -> typing.Sequence[~ControllersChangeResult]
+        specs : typing.Sequence<+T_co>[~ControllersSpec]<~ControllersSpec>
+        Returns -> typing.Sequence<+T_co>[~ControllersChangeResult]<~ControllersChangeResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -4912,7 +4909,7 @@ class HighAvailabilityFacade(Type):
     @ReturnMapping(None)
     async def ResumeHAReplicationAfterUpgrade(self, members):
         '''
-        members : typing.Sequence[~Member]
+        members : typing.Sequence<+T_co>[~Member]<~Member>
         Returns -> None
         '''
         # map input types to rpc msg
@@ -4931,7 +4928,7 @@ class HighAvailabilityFacade(Type):
     async def StopHAReplicationForUpgrade(self, target):
         '''
         target : MongoVersion
-        Returns -> typing.Union[typing.Sequence[~HAMember], _ForwardRef('HAMember'), typing.Sequence[~Member]]
+        Returns -> typing.Union[_ForwardRef('HAMember'), typing.Sequence<+T_co>[~Member]<~Member>]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -4950,14 +4947,12 @@ class ImageManagerFacade(Type):
     version = 2
     schema =     {'definitions': {'Error': {'additionalProperties': False,
                                'properties': {'code': {'type': 'string'},
-                                              'info': {'$ref': '#/definitions/ErrorInfo'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
                                               'message': {'type': 'string'}},
                                'required': ['message', 'code'],
                                'type': 'object'},
-                     'ErrorInfo': {'additionalProperties': False,
-                                   'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
-                                                  'macaroon-path': {'type': 'string'}},
-                                   'type': 'object'},
                      'ErrorResult': {'additionalProperties': False,
                                      'properties': {'error': {'$ref': '#/definitions/Error'}},
                                      'type': 'object'},
@@ -4994,8 +4989,7 @@ class ImageManagerFacade(Type):
                                          'properties': {'result': {'items': {'$ref': '#/definitions/ImageMetadata'},
                                                                    'type': 'array'}},
                                          'required': ['result'],
-                                         'type': 'object'},
-                     'Macaroon': {'additionalProperties': False, 'type': 'object'}},
+                                         'type': 'object'}},
      'properties': {'DeleteImages': {'properties': {'Params': {'$ref': '#/definitions/ImageFilterParams'},
                                                     'Result': {'$ref': '#/definitions/ErrorResults'}},
                                      'type': 'object'},
@@ -5008,8 +5002,8 @@ class ImageManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def DeleteImages(self, images):
         '''
-        images : typing.Sequence[~ImageSpec]
-        Returns -> typing.Sequence[~ErrorResult]
+        images : typing.Sequence<+T_co>[~ImageSpec]<~ImageSpec>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -5026,8 +5020,8 @@ class ImageManagerFacade(Type):
     @ReturnMapping(ListImageResult)
     async def ListImages(self, images):
         '''
-        images : typing.Sequence[~ImageSpec]
-        Returns -> typing.Sequence[~ImageMetadata]
+        images : typing.Sequence<+T_co>[~ImageSpec]<~ImageSpec>
+        Returns -> typing.Sequence<+T_co>[~ImageMetadata]<~ImageMetadata>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -5127,8 +5121,8 @@ class ImageMetadataFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Delete(self, image_ids):
         '''
-        image_ids : typing.Sequence[str]
-        Returns -> typing.Sequence[~ErrorResult]
+        image_ids : typing.Sequence<+T_co>[str]
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -5145,13 +5139,13 @@ class ImageMetadataFacade(Type):
     @ReturnMapping(ListCloudImageMetadataResult)
     async def List(self, arches, region, root_storage_type, series, stream, virt_type):
         '''
-        arches : typing.Sequence[str]
+        arches : typing.Sequence<+T_co>[str]
         region : str
         root_storage_type : str
-        series : typing.Sequence[str]
+        series : typing.Sequence<+T_co>[str]
         stream : str
         virt_type : str
-        Returns -> typing.Sequence[~CloudImageMetadata]
+        Returns -> typing.Sequence<+T_co>[~CloudImageMetadata]<~CloudImageMetadata>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -5173,8 +5167,8 @@ class ImageMetadataFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Save(self, metadata):
         '''
-        metadata : typing.Sequence[~CloudImageMetadataList]
-        Returns -> typing.Sequence[~ErrorResult]
+        metadata : typing.Sequence<+T_co>[~CloudImageMetadataList]<~CloudImageMetadataList>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -5198,6 +5192,296 @@ class ImageMetadataFacade(Type):
         _params = dict()
         msg = dict(type='ImageMetadata',
                    request='UpdateFromPublishedImages',
+                   version=2,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+class InstanceMutaterFacade(Type):
+    name = 'InstanceMutater'
+    version = 2
+    schema =     {'definitions': {'CharmLXDProfile': {'additionalProperties': False,
+                                         'properties': {'config': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                   'type': 'object'},
+                                                        'description': {'type': 'string'},
+                                                        'devices': {'patternProperties': {'.*': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                                                 'type': 'object'}},
+                                                                    'type': 'object'}},
+                                         'required': ['config',
+                                                      'description',
+                                                      'devices'],
+                                         'type': 'object'},
+                     'CharmProfilingInfoResult': {'additionalProperties': False,
+                                                  'properties': {'current-profiles': {'items': {'type': 'string'},
+                                                                                      'type': 'array'},
+                                                                 'error': {'$ref': '#/definitions/Error'},
+                                                                 'instance-id': {'type': 'string'},
+                                                                 'model-name': {'type': 'string'},
+                                                                 'profile-changes': {'items': {'$ref': '#/definitions/ProfileInfoResult'},
+                                                                                     'type': 'array'}},
+                                                  'required': ['instance-id',
+                                                               'model-name',
+                                                               'profile-changes',
+                                                               'current-profiles',
+                                                               'error'],
+                                                  'type': 'object'},
+                     'ContainerTypeResult': {'additionalProperties': False,
+                                             'properties': {'container-type': {'type': 'string'},
+                                                            'error': {'$ref': '#/definitions/Error'}},
+                                             'required': ['container-type',
+                                                          'error'],
+                                             'type': 'object'},
+                     'Entities': {'additionalProperties': False,
+                                  'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
+                                                              'type': 'array'}},
+                                  'required': ['entities'],
+                                  'type': 'object'},
+                     'Entity': {'additionalProperties': False,
+                                'properties': {'tag': {'type': 'string'}},
+                                'required': ['tag'],
+                                'type': 'object'},
+                     'EntityStatusArgs': {'additionalProperties': False,
+                                          'properties': {'data': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                               'type': 'object'}},
+                                                                  'type': 'object'},
+                                                         'info': {'type': 'string'},
+                                                         'status': {'type': 'string'},
+                                                         'tag': {'type': 'string'}},
+                                          'required': ['tag',
+                                                       'status',
+                                                       'info',
+                                                       'data'],
+                                          'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ErrorResult': {'additionalProperties': False,
+                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
+                                     'type': 'object'},
+                     'ErrorResults': {'additionalProperties': False,
+                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
+                                                                 'type': 'array'}},
+                                      'required': ['results'],
+                                      'type': 'object'},
+                     'LifeResult': {'additionalProperties': False,
+                                    'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                   'life': {'type': 'string'}},
+                                    'required': ['life'],
+                                    'type': 'object'},
+                     'LifeResults': {'additionalProperties': False,
+                                     'properties': {'results': {'items': {'$ref': '#/definitions/LifeResult'},
+                                                                'type': 'array'}},
+                                     'required': ['results'],
+                                     'type': 'object'},
+                     'NotifyWatchResult': {'additionalProperties': False,
+                                           'properties': {'NotifyWatcherId': {'type': 'string'},
+                                                          'error': {'$ref': '#/definitions/Error'}},
+                                           'required': ['NotifyWatcherId'],
+                                           'type': 'object'},
+                     'NotifyWatchResults': {'additionalProperties': False,
+                                            'properties': {'results': {'items': {'$ref': '#/definitions/NotifyWatchResult'},
+                                                                       'type': 'array'}},
+                                            'required': ['results'],
+                                            'type': 'object'},
+                     'ProfileInfoResult': {'additionalProperties': False,
+                                           'properties': {'application-name': {'type': 'string'},
+                                                          'error': {'$ref': '#/definitions/Error'},
+                                                          'profile': {'$ref': '#/definitions/CharmLXDProfile'},
+                                                          'revision': {'type': 'integer'}},
+                                           'type': 'object'},
+                     'SetProfileArg': {'additionalProperties': False,
+                                       'properties': {'entity': {'$ref': '#/definitions/Entity'},
+                                                      'profiles': {'items': {'type': 'string'},
+                                                                   'type': 'array'}},
+                                       'required': ['entity', 'profiles'],
+                                       'type': 'object'},
+                     'SetProfileArgs': {'additionalProperties': False,
+                                        'properties': {'args': {'items': {'$ref': '#/definitions/SetProfileArg'},
+                                                                'type': 'array'}},
+                                        'required': ['args'],
+                                        'type': 'object'},
+                     'SetStatus': {'additionalProperties': False,
+                                   'properties': {'entities': {'items': {'$ref': '#/definitions/EntityStatusArgs'},
+                                                               'type': 'array'}},
+                                   'required': ['entities'],
+                                   'type': 'object'},
+                     'StringsWatchResult': {'additionalProperties': False,
+                                            'properties': {'changes': {'items': {'type': 'string'},
+                                                                       'type': 'array'},
+                                                           'error': {'$ref': '#/definitions/Error'},
+                                                           'watcher-id': {'type': 'string'}},
+                                            'required': ['watcher-id'],
+                                            'type': 'object'}},
+     'properties': {'CharmProfilingInfo': {'properties': {'Params': {'$ref': '#/definitions/Entity'},
+                                                          'Result': {'$ref': '#/definitions/CharmProfilingInfoResult'}},
+                                           'type': 'object'},
+                    'ContainerType': {'properties': {'Params': {'$ref': '#/definitions/Entity'},
+                                                     'Result': {'$ref': '#/definitions/ContainerTypeResult'}},
+                                      'type': 'object'},
+                    'Life': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                            'Result': {'$ref': '#/definitions/LifeResults'}},
+                             'type': 'object'},
+                    'SetCharmProfiles': {'properties': {'Params': {'$ref': '#/definitions/SetProfileArgs'},
+                                                        'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                         'type': 'object'},
+                    'SetModificationStatus': {'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
+                                                             'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                              'type': 'object'},
+                    'WatchContainers': {'properties': {'Params': {'$ref': '#/definitions/Entity'},
+                                                       'Result': {'$ref': '#/definitions/StringsWatchResult'}},
+                                        'type': 'object'},
+                    'WatchLXDProfileVerificationNeeded': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                                         'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
+                                                          'type': 'object'},
+                    'WatchMachines': {'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
+                                      'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(CharmProfilingInfoResult)
+    async def CharmProfilingInfo(self, tag):
+        '''
+        tag : str
+        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence<+T_co>[~ProfileInfoResult]<~ProfileInfoResult>]
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='InstanceMutater',
+                   request='CharmProfilingInfo',
+                   version=2,
+                   params=_params)
+        _params['tag'] = tag
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ContainerTypeResult)
+    async def ContainerType(self, tag):
+        '''
+        tag : str
+        Returns -> typing.Union[str, _ForwardRef('Error')]
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='InstanceMutater',
+                   request='ContainerType',
+                   version=2,
+                   params=_params)
+        _params['tag'] = tag
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(LifeResults)
+    async def Life(self, entities):
+        '''
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~LifeResult]<~LifeResult>
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='InstanceMutater',
+                   request='Life',
+                   version=2,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def SetCharmProfiles(self, args):
+        '''
+        args : typing.Sequence<+T_co>[~SetProfileArg]<~SetProfileArg>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='InstanceMutater',
+                   request='SetCharmProfiles',
+                   version=2,
+                   params=_params)
+        _params['args'] = args
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def SetModificationStatus(self, entities):
+        '''
+        entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='InstanceMutater',
+                   request='SetModificationStatus',
+                   version=2,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResult)
+    async def WatchContainers(self, tag):
+        '''
+        tag : str
+        Returns -> typing.Union[typing.Sequence<+T_co>[str], _ForwardRef('Error')]
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='InstanceMutater',
+                   request='WatchContainers',
+                   version=2,
+                   params=_params)
+        _params['tag'] = tag
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResults)
+    async def WatchLXDProfileVerificationNeeded(self, entities):
+        '''
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='InstanceMutater',
+                   request='WatchLXDProfileVerificationNeeded',
+                   version=2,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResult)
+    async def WatchMachines(self):
+        '''
+
+        Returns -> typing.Union[typing.Sequence<+T_co>[str], _ForwardRef('Error')]
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='InstanceMutater',
+                   request='WatchMachines',
                    version=2,
                    params=_params)
 
@@ -5233,18 +5517,15 @@ class LeadershipServiceFacade(Type):
                                                'type': 'object'},
                      'Error': {'additionalProperties': False,
                                'properties': {'code': {'type': 'string'},
-                                              'info': {'$ref': '#/definitions/ErrorInfo'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
                                               'message': {'type': 'string'}},
                                'required': ['message', 'code'],
                                'type': 'object'},
-                     'ErrorInfo': {'additionalProperties': False,
-                                   'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
-                                                  'macaroon-path': {'type': 'string'}},
-                                   'type': 'object'},
                      'ErrorResult': {'additionalProperties': False,
                                      'properties': {'error': {'$ref': '#/definitions/Error'}},
-                                     'type': 'object'},
-                     'Macaroon': {'additionalProperties': False, 'type': 'object'}},
+                                     'type': 'object'}},
      'properties': {'BlockUntilLeadershipReleased': {'properties': {'Params': {'$ref': '#/definitions/ApplicationTag'},
                                                                     'Result': {'$ref': '#/definitions/ErrorResult'}},
                                                      'type': 'object'},
@@ -5275,8 +5556,8 @@ class LeadershipServiceFacade(Type):
     @ReturnMapping(ClaimLeadershipBulkResults)
     async def ClaimLeadership(self, params):
         '''
-        params : typing.Sequence[~ClaimLeadershipParams]
-        Returns -> typing.Sequence[~ErrorResult]
+        params : typing.Sequence<+T_co>[~ClaimLeadershipParams]<~ClaimLeadershipParams>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -5431,8 +5712,8 @@ class MachineManagerFacade(Type):
     @ReturnMapping(AddMachinesResults)
     async def AddMachines(self, params):
         '''
-        params : typing.Sequence[~AddMachineParams]
-        Returns -> typing.Sequence[~AddMachinesResult]
+        params : typing.Sequence<+T_co>[~AddMachineParams]<~AddMachineParams>
+        Returns -> typing.Sequence<+T_co>[~AddMachinesResult]<~AddMachinesResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -5449,8 +5730,8 @@ class MachineManagerFacade(Type):
     @ReturnMapping(InstanceTypesResults)
     async def InstanceTypes(self, constraints):
         '''
-        constraints : typing.Sequence[~ModelInstanceTypesConstraint]
-        Returns -> typing.Sequence[~InstanceTypesResult]
+        constraints : typing.Sequence<+T_co>[~ModelInstanceTypesConstraint]<~ModelInstanceTypesConstraint>
+        Returns -> typing.Sequence<+T_co>[~InstanceTypesResult]<~InstanceTypesResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -5469,14 +5750,12 @@ class MetricsAdderFacade(Type):
     version = 2
     schema =     {'definitions': {'Error': {'additionalProperties': False,
                                'properties': {'code': {'type': 'string'},
-                                              'info': {'$ref': '#/definitions/ErrorInfo'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
                                               'message': {'type': 'string'}},
                                'required': ['message', 'code'],
                                'type': 'object'},
-                     'ErrorInfo': {'additionalProperties': False,
-                                   'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
-                                                  'macaroon-path': {'type': 'string'}},
-                                   'type': 'object'},
                      'ErrorResult': {'additionalProperties': False,
                                      'properties': {'error': {'$ref': '#/definitions/Error'}},
                                      'type': 'object'},
@@ -5485,7 +5764,6 @@ class MetricsAdderFacade(Type):
                                                                  'type': 'array'}},
                                       'required': ['results'],
                                       'type': 'object'},
-                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
                      'Metric': {'additionalProperties': False,
                                 'properties': {'key': {'type': 'string'},
                                                'labels': {'patternProperties': {'.*': {'type': 'string'}},
@@ -5526,8 +5804,8 @@ class MetricsAdderFacade(Type):
     @ReturnMapping(ErrorResults)
     async def AddMetricBatches(self, batches):
         '''
-        batches : typing.Sequence[~MetricBatchParam]
-        Returns -> typing.Sequence[~ErrorResult]
+        batches : typing.Sequence<+T_co>[~MetricBatchParam]<~MetricBatchParam>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -5560,14 +5838,12 @@ class MetricsDebugFacade(Type):
                                        'type': 'object'},
                      'Error': {'additionalProperties': False,
                                'properties': {'code': {'type': 'string'},
-                                              'info': {'$ref': '#/definitions/ErrorInfo'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
                                               'message': {'type': 'string'}},
                                'required': ['message', 'code'],
                                'type': 'object'},
-                     'ErrorInfo': {'additionalProperties': False,
-                                   'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
-                                                  'macaroon-path': {'type': 'string'}},
-                                   'type': 'object'},
                      'ErrorResult': {'additionalProperties': False,
                                      'properties': {'error': {'$ref': '#/definitions/Error'}},
                                      'type': 'object'},
@@ -5576,7 +5852,6 @@ class MetricsDebugFacade(Type):
                                                                  'type': 'array'}},
                                       'required': ['results'],
                                       'type': 'object'},
-                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
                      'MeterStatusParam': {'additionalProperties': False,
                                           'properties': {'code': {'type': 'string'},
                                                          'info': {'type': 'string'},
@@ -5619,8 +5894,8 @@ class MetricsDebugFacade(Type):
     @ReturnMapping(MetricResults)
     async def GetMetrics(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~EntityMetrics]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~EntityMetrics]<~EntityMetrics>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -5637,8 +5912,8 @@ class MetricsDebugFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetMeterStatus(self, statues):
         '''
-        statues : typing.Sequence[~MeterStatusParam]
-        Returns -> typing.Sequence[~ErrorResult]
+        statues : typing.Sequence<+T_co>[~MeterStatusParam]<~MeterStatusParam>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -5663,15 +5938,12 @@ class ModelConfigFacade(Type):
                                      'type': 'object'},
                      'Error': {'additionalProperties': False,
                                'properties': {'code': {'type': 'string'},
-                                              'info': {'$ref': '#/definitions/ErrorInfo'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
                                               'message': {'type': 'string'}},
                                'required': ['message', 'code'],
                                'type': 'object'},
-                     'ErrorInfo': {'additionalProperties': False,
-                                   'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
-                                                  'macaroon-path': {'type': 'string'}},
-                                   'type': 'object'},
-                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
                      'ModelConfigResults': {'additionalProperties': False,
                                             'properties': {'config': {'patternProperties': {'.*': {'$ref': '#/definitions/ConfigValue'}},
                                                                       'type': 'object'}},
@@ -5728,7 +6000,7 @@ class ModelConfigFacade(Type):
     async def ModelGet(self):
         '''
 
-        Returns -> typing.Mapping[str, ~ConfigValue]
+        Returns -> typing.Mapping<~KT, +VT_co>[str, ~ConfigValue]<~ConfigValue>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -5745,7 +6017,7 @@ class ModelConfigFacade(Type):
     @ReturnMapping(None)
     async def ModelSet(self, config):
         '''
-        config : typing.Mapping[str, typing.Any]
+        config : typing.Mapping<~KT, +VT_co>[str, typing.Any]
         Returns -> None
         '''
         # map input types to rpc msg
@@ -5763,7 +6035,7 @@ class ModelConfigFacade(Type):
     @ReturnMapping(None)
     async def ModelUnset(self, keys):
         '''
-        keys : typing.Sequence[str]
+        keys : typing.Sequence<+T_co>[str]
         Returns -> None
         '''
         # map input types to rpc msg
@@ -5800,7 +6072,7 @@ class ModelConfigFacade(Type):
     async def Sequences(self):
         '''
 
-        Returns -> typing.Mapping[str, int]
+        Returns -> typing.Mapping<~KT, +VT_co>[str, int]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -5817,7 +6089,7 @@ class ModelConfigFacade(Type):
     @ReturnMapping(None)
     async def SetSLALevel(self, creds, level):
         '''
-        creds : typing.Sequence[int]
+        creds : typing.Sequence<+T_co>[int]
         level : str
         Returns -> None
         '''
@@ -6126,12 +6398,12 @@ class ModelManagerFacade(Type):
     async def CreateModel(self, cloud_tag, config, credential, name, owner_tag, region):
         '''
         cloud_tag : str
-        config : typing.Mapping[str, typing.Any]
+        config : typing.Mapping<~KT, +VT_co>[str, typing.Any]
         credential : str
         name : str
         owner_tag : str
         region : str
-        Returns -> typing.Union[_ForwardRef('Number'), str, typing.Sequence[~ModelMachineInfo], _ForwardRef('ModelMigrationStatus'), _ForwardRef('ModelSLAInfo'), _ForwardRef('EntityStatus'), typing.Sequence[~ModelUserInfo]]
+        Returns -> typing.Union[_ForwardRef('Number'), bool, _ForwardRef('ModelMigrationStatus'), _ForwardRef('ModelSLAInfo'), _ForwardRef('EntityStatus'), typing.Sequence<+T_co>[~ModelUserInfo]<~ModelUserInfo>]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6153,8 +6425,8 @@ class ModelManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def DestroyModels(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6171,8 +6443,8 @@ class ModelManagerFacade(Type):
     @ReturnMapping(MapResults)
     async def DumpModels(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~MapResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~MapResult]<~MapResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6189,8 +6461,8 @@ class ModelManagerFacade(Type):
     @ReturnMapping(MapResults)
     async def DumpModelsDB(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~MapResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~MapResult]<~MapResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6208,7 +6480,7 @@ class ModelManagerFacade(Type):
     async def ListModels(self, tag):
         '''
         tag : str
-        Returns -> typing.Sequence[~UserModel]
+        Returns -> typing.Sequence<+T_co>[~UserModel]<~UserModel>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6226,7 +6498,7 @@ class ModelManagerFacade(Type):
     async def ModelDefaults(self):
         '''
 
-        Returns -> typing.Mapping[str, ~ModelDefaults]
+        Returns -> typing.Mapping<~KT, +VT_co>[str, ~ModelDefaults]<~ModelDefaults>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6243,8 +6515,8 @@ class ModelManagerFacade(Type):
     @ReturnMapping(ModelInfoResults)
     async def ModelInfo(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ModelInfoResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ModelInfoResult]<~ModelInfoResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6261,8 +6533,8 @@ class ModelManagerFacade(Type):
     @ReturnMapping(ModelStatusResults)
     async def ModelStatus(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ModelStatus]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ModelStatus]<~ModelStatus>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6279,8 +6551,8 @@ class ModelManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def ModifyModelAccess(self, changes):
         '''
-        changes : typing.Sequence[~ModifyModelAccess]
-        Returns -> typing.Sequence[~ErrorResult]
+        changes : typing.Sequence<+T_co>[~ModifyModelAccess]<~ModifyModelAccess>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6297,8 +6569,8 @@ class ModelManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetModelDefaults(self, config):
         '''
-        config : typing.Sequence[~ModelDefaultValues]
-        Returns -> typing.Sequence[~ErrorResult]
+        config : typing.Sequence<+T_co>[~ModelDefaultValues]<~ModelDefaultValues>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6315,8 +6587,8 @@ class ModelManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def UnsetModelDefaults(self, keys):
         '''
-        keys : typing.Sequence[~ModelUnsetKeys]
-        Returns -> typing.Sequence[~ErrorResult]
+        keys : typing.Sequence<+T_co>[~ModelUnsetKeys]<~ModelUnsetKeys>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6344,15 +6616,12 @@ class ProxyUpdaterFacade(Type):
                                 'type': 'object'},
                      'Error': {'additionalProperties': False,
                                'properties': {'code': {'type': 'string'},
-                                              'info': {'$ref': '#/definitions/ErrorInfo'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
                                               'message': {'type': 'string'}},
                                'required': ['message', 'code'],
                                'type': 'object'},
-                     'ErrorInfo': {'additionalProperties': False,
-                                   'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
-                                                  'macaroon-path': {'type': 'string'}},
-                                   'type': 'object'},
-                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
                      'NotifyWatchResult': {'additionalProperties': False,
                                            'properties': {'NotifyWatcherId': {'type': 'string'},
                                                           'error': {'$ref': '#/definitions/Error'}},
@@ -6401,8 +6670,8 @@ class ProxyUpdaterFacade(Type):
     @ReturnMapping(ProxyConfigResults)
     async def ProxyConfig(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ProxyConfigResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ProxyConfigResult]<~ProxyConfigResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6419,8 +6688,8 @@ class ProxyUpdaterFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def WatchForProxyConfigAndAPIHostPortChanges(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~NotifyWatchResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6448,14 +6717,12 @@ class RebootFacade(Type):
                                 'type': 'object'},
                      'Error': {'additionalProperties': False,
                                'properties': {'code': {'type': 'string'},
-                                              'info': {'$ref': '#/definitions/ErrorInfo'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
                                               'message': {'type': 'string'}},
                                'required': ['message', 'code'],
                                'type': 'object'},
-                     'ErrorInfo': {'additionalProperties': False,
-                                   'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
-                                                  'macaroon-path': {'type': 'string'}},
-                                   'type': 'object'},
                      'ErrorResult': {'additionalProperties': False,
                                      'properties': {'error': {'$ref': '#/definitions/Error'}},
                                      'type': 'object'},
@@ -6464,7 +6731,6 @@ class RebootFacade(Type):
                                                                  'type': 'array'}},
                                       'required': ['results'],
                                       'type': 'object'},
-                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
                      'NotifyWatchResult': {'additionalProperties': False,
                                            'properties': {'NotifyWatcherId': {'type': 'string'},
                                                           'error': {'$ref': '#/definitions/Error'}},
@@ -6495,8 +6761,8 @@ class RebootFacade(Type):
     @ReturnMapping(ErrorResults)
     async def ClearReboot(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6513,8 +6779,8 @@ class RebootFacade(Type):
     @ReturnMapping(RebootActionResults)
     async def GetRebootAction(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~RebootActionResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~RebootActionResult]<~RebootActionResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6531,8 +6797,8 @@ class RebootFacade(Type):
     @ReturnMapping(ErrorResults)
     async def RequestReboot(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6602,15 +6868,12 @@ class SSHClientFacade(Type):
                                 'type': 'object'},
                      'Error': {'additionalProperties': False,
                                'properties': {'code': {'type': 'string'},
-                                              'info': {'$ref': '#/definitions/ErrorInfo'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
                                               'message': {'type': 'string'}},
                                'required': ['message', 'code'],
                                'type': 'object'},
-                     'ErrorInfo': {'additionalProperties': False,
-                                   'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
-                                                  'macaroon-path': {'type': 'string'}},
-                                   'type': 'object'},
-                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
                      'SSHAddressResult': {'additionalProperties': False,
                                           'properties': {'address': {'type': 'string'},
                                                          'error': {'$ref': '#/definitions/Error'}},
@@ -6665,8 +6928,8 @@ class SSHClientFacade(Type):
     @ReturnMapping(SSHAddressesResults)
     async def AllAddresses(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~SSHAddressesResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~SSHAddressesResult]<~SSHAddressesResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6683,8 +6946,8 @@ class SSHClientFacade(Type):
     @ReturnMapping(SSHAddressResults)
     async def PrivateAddress(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~SSHAddressResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~SSHAddressResult]<~SSHAddressResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6719,8 +6982,8 @@ class SSHClientFacade(Type):
     @ReturnMapping(SSHAddressResults)
     async def PublicAddress(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~SSHAddressResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~SSHAddressResult]<~SSHAddressResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6737,8 +7000,8 @@ class SSHClientFacade(Type):
     @ReturnMapping(SSHPublicKeysResults)
     async def PublicKeys(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~SSHPublicKeysResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~SSHPublicKeysResult]<~SSHPublicKeysResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6766,14 +7029,12 @@ class SingularFacade(Type):
                                 'type': 'object'},
                      'Error': {'additionalProperties': False,
                                'properties': {'code': {'type': 'string'},
-                                              'info': {'$ref': '#/definitions/ErrorInfo'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
                                               'message': {'type': 'string'}},
                                'required': ['message', 'code'],
                                'type': 'object'},
-                     'ErrorInfo': {'additionalProperties': False,
-                                   'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
-                                                  'macaroon-path': {'type': 'string'}},
-                                   'type': 'object'},
                      'ErrorResult': {'additionalProperties': False,
                                      'properties': {'error': {'$ref': '#/definitions/Error'}},
                                      'type': 'object'},
@@ -6782,7 +7043,6 @@ class SingularFacade(Type):
                                                                  'type': 'array'}},
                                       'required': ['results'],
                                       'type': 'object'},
-                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
                      'SingularClaim': {'additionalProperties': False,
                                        'properties': {'claimant-tag': {'type': 'string'},
                                                       'duration': {'type': 'integer'},
@@ -6808,8 +7068,8 @@ class SingularFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Claim(self, claims):
         '''
-        claims : typing.Sequence[~SingularClaim]
-        Returns -> typing.Sequence[~ErrorResult]
+        claims : typing.Sequence<+T_co>[~SingularClaim]<~SingularClaim>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6826,8 +7086,8 @@ class SingularFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Wait(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6918,8 +7178,8 @@ class SpacesFacade(Type):
     @ReturnMapping(ErrorResults)
     async def CreateSpaces(self, spaces):
         '''
-        spaces : typing.Sequence[~CreateSpaceParams]
-        Returns -> typing.Sequence[~ErrorResult]
+        spaces : typing.Sequence<+T_co>[~CreateSpaceParams]<~CreateSpaceParams>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6937,7 +7197,7 @@ class SpacesFacade(Type):
     async def ListSpaces(self):
         '''
 
-        Returns -> typing.Sequence[~Space]
+        Returns -> typing.Sequence<+T_co>[~Space]<~Space>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6956,15 +7216,12 @@ class StatusHistoryFacade(Type):
     version = 2
     schema =     {'definitions': {'Error': {'additionalProperties': False,
                                'properties': {'code': {'type': 'string'},
-                                              'info': {'$ref': '#/definitions/ErrorInfo'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
                                               'message': {'type': 'string'}},
                                'required': ['message', 'code'],
                                'type': 'object'},
-                     'ErrorInfo': {'additionalProperties': False,
-                                   'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
-                                                  'macaroon-path': {'type': 'string'}},
-                                   'type': 'object'},
-                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
                      'ModelConfigResult': {'additionalProperties': False,
                                            'properties': {'config': {'patternProperties': {'.*': {'additionalProperties': True,
                                                                                                   'type': 'object'}},
@@ -6995,7 +7252,7 @@ class StatusHistoryFacade(Type):
     async def ModelConfig(self):
         '''
 
-        Returns -> typing.Mapping[str, typing.Any]
+        Returns -> typing.Mapping<~KT, +VT_co>[str, typing.Any]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -7067,14 +7324,12 @@ class SubnetsFacade(Type):
                                           'type': 'object'},
                      'Error': {'additionalProperties': False,
                                'properties': {'code': {'type': 'string'},
-                                              'info': {'$ref': '#/definitions/ErrorInfo'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
                                               'message': {'type': 'string'}},
                                'required': ['message', 'code'],
                                'type': 'object'},
-                     'ErrorInfo': {'additionalProperties': False,
-                                   'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
-                                                  'macaroon-path': {'type': 'string'}},
-                                   'type': 'object'},
                      'ErrorResult': {'additionalProperties': False,
                                      'properties': {'error': {'$ref': '#/definitions/Error'}},
                                      'type': 'object'},
@@ -7088,7 +7343,6 @@ class SubnetsFacade(Type):
                                                                        'type': 'array'}},
                                             'required': ['results'],
                                             'type': 'object'},
-                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
                      'SpaceResult': {'additionalProperties': False,
                                      'properties': {'error': {'$ref': '#/definitions/Error'},
                                                     'tag': {'type': 'string'}},
@@ -7147,8 +7401,8 @@ class SubnetsFacade(Type):
     @ReturnMapping(ErrorResults)
     async def AddSubnets(self, subnets):
         '''
-        subnets : typing.Sequence[~AddSubnetParams]
-        Returns -> typing.Sequence[~ErrorResult]
+        subnets : typing.Sequence<+T_co>[~AddSubnetParams]<~AddSubnetParams>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -7166,7 +7420,7 @@ class SubnetsFacade(Type):
     async def AllSpaces(self):
         '''
 
-        Returns -> typing.Sequence[~SpaceResult]
+        Returns -> typing.Sequence<+T_co>[~SpaceResult]<~SpaceResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -7184,7 +7438,7 @@ class SubnetsFacade(Type):
     async def AllZones(self):
         '''
 
-        Returns -> typing.Sequence[~ZoneResult]
+        Returns -> typing.Sequence<+T_co>[~ZoneResult]<~ZoneResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -7203,7 +7457,7 @@ class SubnetsFacade(Type):
         '''
         space_tag : str
         zone : str
-        Returns -> typing.Sequence[~Subnet]
+        Returns -> typing.Sequence<+T_co>[~Subnet]<~Subnet>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -7264,14 +7518,12 @@ class UserManagerFacade(Type):
                                          'type': 'object'},
                      'Error': {'additionalProperties': False,
                                'properties': {'code': {'type': 'string'},
-                                              'info': {'$ref': '#/definitions/ErrorInfo'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
                                               'message': {'type': 'string'}},
                                'required': ['message', 'code'],
                                'type': 'object'},
-                     'ErrorInfo': {'additionalProperties': False,
-                                   'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
-                                                  'macaroon-path': {'type': 'string'}},
-                                   'type': 'object'},
                      'ErrorResult': {'additionalProperties': False,
                                      'properties': {'error': {'$ref': '#/definitions/Error'}},
                                      'type': 'object'},
@@ -7280,7 +7532,6 @@ class UserManagerFacade(Type):
                                                                  'type': 'array'}},
                                       'required': ['results'],
                                       'type': 'object'},
-                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
                      'UserInfo': {'additionalProperties': False,
                                   'properties': {'access': {'type': 'string'},
                                                  'created-by': {'type': 'string'},
@@ -7341,8 +7592,8 @@ class UserManagerFacade(Type):
     @ReturnMapping(AddUserResults)
     async def AddUser(self, users):
         '''
-        users : typing.Sequence[~AddUser]
-        Returns -> typing.Sequence[~AddUserResult]
+        users : typing.Sequence<+T_co>[~AddUser]<~AddUser>
+        Returns -> typing.Sequence<+T_co>[~AddUserResult]<~AddUserResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -7359,8 +7610,8 @@ class UserManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def DisableUser(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -7377,8 +7628,8 @@ class UserManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def EnableUser(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -7395,8 +7646,8 @@ class UserManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def RemoveUser(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -7413,8 +7664,8 @@ class UserManagerFacade(Type):
     @ReturnMapping(AddUserResults)
     async def ResetPassword(self, entities):
         '''
-        entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~AddUserResult]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~AddUserResult]<~AddUserResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -7431,8 +7682,8 @@ class UserManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetPassword(self, changes):
         '''
-        changes : typing.Sequence[~EntityPassword]
-        Returns -> typing.Sequence[~ErrorResult]
+        changes : typing.Sequence<+T_co>[~EntityPassword]<~EntityPassword>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -7449,9 +7700,9 @@ class UserManagerFacade(Type):
     @ReturnMapping(UserInfoResults)
     async def UserInfo(self, entities, include_disabled):
         '''
-        entities : typing.Sequence[~Entity]
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         include_disabled : bool
-        Returns -> typing.Sequence[~UserInfoResult]
+        Returns -> typing.Sequence<+T_co>[~UserInfoResult]<~UserInfoResult>
         '''
         # map input types to rpc msg
         _params = dict()
@@ -7471,15 +7722,12 @@ class VolumeAttachmentsWatcherFacade(Type):
     version = 2
     schema =     {'definitions': {'Error': {'additionalProperties': False,
                                'properties': {'code': {'type': 'string'},
-                                              'info': {'$ref': '#/definitions/ErrorInfo'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
                                               'message': {'type': 'string'}},
                                'required': ['message', 'code'],
                                'type': 'object'},
-                     'ErrorInfo': {'additionalProperties': False,
-                                   'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
-                                                  'macaroon-path': {'type': 'string'}},
-                                   'type': 'object'},
-                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
                      'MachineStorageId': {'additionalProperties': False,
                                           'properties': {'attachment-tag': {'type': 'string'},
                                                          'machine-tag': {'type': 'string'}},
@@ -7504,7 +7752,7 @@ class VolumeAttachmentsWatcherFacade(Type):
     async def Next(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence[~MachineStorageId], _ForwardRef('Error'), str]
+        Returns -> typing.Union[typing.Sequence<+T_co>[~MachineStorageId]<~MachineStorageId>, _ForwardRef('Error')]
         '''
         # map input types to rpc msg
         _params = dict()
