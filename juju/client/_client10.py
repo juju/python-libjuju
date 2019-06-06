@@ -7,7 +7,7 @@ from juju.client._definitions import *
 
 class ApplicationFacade(Type):
     name = 'Application'
-    version = 8
+    version = 10
     schema =     {'definitions': {'AddApplicationUnits': {'additionalProperties': False,
                                              'properties': {'application': {'type': 'string'},
                                                             'attach-storage': {'items': {'type': 'string'},
@@ -49,8 +49,11 @@ class ApplicationFacade(Type):
                      'ApplicationConfigSet': {'additionalProperties': False,
                                               'properties': {'application': {'type': 'string'},
                                                              'config': {'patternProperties': {'.*': {'type': 'string'}},
-                                                                        'type': 'object'}},
-                                              'required': ['application', 'config'],
+                                                                        'type': 'object'},
+                                                             'generation': {'type': 'string'}},
+                                              'required': ['application',
+                                                           'generation',
+                                                           'config'],
                                               'type': 'object'},
                      'ApplicationConfigSetArgs': {'additionalProperties': False,
                                                   'properties': {'Args': {'items': {'$ref': '#/definitions/ApplicationConfigSet'},
@@ -107,9 +110,15 @@ class ApplicationFacade(Type):
                                            'required': ['application'],
                                            'type': 'object'},
                      'ApplicationGet': {'additionalProperties': False,
-                                        'properties': {'application': {'type': 'string'}},
-                                        'required': ['application'],
+                                        'properties': {'application': {'type': 'string'},
+                                                       'branch': {'type': 'string'}},
+                                        'required': ['application', 'branch'],
                                         'type': 'object'},
+                     'ApplicationGetArgs': {'additionalProperties': False,
+                                            'properties': {'args': {'items': {'$ref': '#/definitions/ApplicationGet'},
+                                                                    'type': 'array'}},
+                                            'required': ['args'],
+                                            'type': 'object'},
                      'ApplicationGetConfigResults': {'additionalProperties': False,
                                                      'properties': {'Results': {'items': {'$ref': '#/definitions/ConfigResult'},
                                                                                 'type': 'array'}},
@@ -125,6 +134,7 @@ class ApplicationFacade(Type):
                                                               'application-config': {'patternProperties': {'.*': {'additionalProperties': True,
                                                                                                                   'type': 'object'}},
                                                                                      'type': 'object'},
+                                                              'channel': {'type': 'string'},
                                                               'charm': {'type': 'string'},
                                                               'config': {'patternProperties': {'.*': {'additionalProperties': True,
                                                                                                       'type': 'object'}},
@@ -135,8 +145,34 @@ class ApplicationFacade(Type):
                                                             'charm',
                                                             'config',
                                                             'constraints',
-                                                            'series'],
+                                                            'series',
+                                                            'channel'],
                                                'type': 'object'},
+                     'ApplicationInfo': {'additionalProperties': False,
+                                         'properties': {'channel': {'type': 'string'},
+                                                        'charm': {'type': 'string'},
+                                                        'constraints': {'$ref': '#/definitions/Value'},
+                                                        'endpoint-bindings': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                              'type': 'object'},
+                                                        'exposed': {'type': 'boolean'},
+                                                        'principal': {'type': 'boolean'},
+                                                        'remote': {'type': 'boolean'},
+                                                        'series': {'type': 'string'},
+                                                        'tag': {'type': 'string'}},
+                                         'required': ['tag',
+                                                      'principal',
+                                                      'exposed',
+                                                      'remote'],
+                                         'type': 'object'},
+                     'ApplicationInfoResult': {'additionalProperties': False,
+                                               'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                              'result': {'$ref': '#/definitions/ApplicationInfo'}},
+                                               'type': 'object'},
+                     'ApplicationInfoResults': {'additionalProperties': False,
+                                                'properties': {'results': {'items': {'$ref': '#/definitions/ApplicationInfoResult'},
+                                                                           'type': 'array'}},
+                                                'required': ['results'],
+                                                'type': 'object'},
                      'ApplicationMetricCredential': {'additionalProperties': False,
                                                      'properties': {'application': {'type': 'string'},
                                                                     'metrics-credentials': {'items': {'type': 'integer'},
@@ -171,9 +207,12 @@ class ApplicationFacade(Type):
                                                  'type': 'object'},
                      'ApplicationSet': {'additionalProperties': False,
                                         'properties': {'application': {'type': 'string'},
+                                                       'branch': {'type': 'string'},
                                                        'options': {'patternProperties': {'.*': {'type': 'string'}},
                                                                    'type': 'object'}},
-                                        'required': ['application', 'options'],
+                                        'required': ['application',
+                                                     'branch',
+                                                     'options'],
                                         'type': 'object'},
                      'ApplicationSetCharm': {'additionalProperties': False,
                                              'properties': {'application': {'type': 'string'},
@@ -185,32 +224,31 @@ class ApplicationFacade(Type):
                                                             'force': {'type': 'boolean'},
                                                             'force-series': {'type': 'boolean'},
                                                             'force-units': {'type': 'boolean'},
+                                                            'generation': {'type': 'string'},
                                                             'resource-ids': {'patternProperties': {'.*': {'type': 'string'}},
                                                                              'type': 'object'},
                                                             'storage-constraints': {'patternProperties': {'.*': {'$ref': '#/definitions/StorageConstraints'}},
                                                                                     'type': 'object'}},
                                              'required': ['application',
+                                                          'generation',
                                                           'charm-url',
                                                           'channel',
                                                           'force',
                                                           'force-units',
                                                           'force-series'],
                                              'type': 'object'},
-                     'ApplicationSetCharmProfile': {'additionalProperties': False,
-                                                    'properties': {'application': {'type': 'string'},
-                                                                   'charm-url': {'type': 'string'}},
-                                                    'required': ['application',
-                                                                 'charm-url'],
-                                                    'type': 'object'},
                      'ApplicationUnexpose': {'additionalProperties': False,
                                              'properties': {'application': {'type': 'string'}},
                                              'required': ['application'],
                                              'type': 'object'},
                      'ApplicationUnset': {'additionalProperties': False,
                                           'properties': {'application': {'type': 'string'},
+                                                         'branch': {'type': 'string'},
                                                          'options': {'items': {'type': 'string'},
                                                                      'type': 'array'}},
-                                          'required': ['application', 'options'],
+                                          'required': ['application',
+                                                       'branch',
+                                                       'options'],
                                           'type': 'object'},
                      'ApplicationUpdate': {'additionalProperties': False,
                                            'properties': {'application': {'type': 'string'},
@@ -219,6 +257,7 @@ class ApplicationFacade(Type):
                                                           'force': {'type': 'boolean'},
                                                           'force-charm-url': {'type': 'boolean'},
                                                           'force-series': {'type': 'boolean'},
+                                                          'generation': {'type': 'string'},
                                                           'min-units': {'type': 'integer'},
                                                           'settings': {'patternProperties': {'.*': {'type': 'string'}},
                                                                        'type': 'object'},
@@ -228,7 +267,8 @@ class ApplicationFacade(Type):
                                                         'force-charm-url',
                                                         'force-series',
                                                         'force',
-                                                        'settings-yaml'],
+                                                        'settings-yaml',
+                                                        'generation'],
                                            'type': 'object'},
                      'ApplicationsDeploy': {'additionalProperties': False,
                                             'properties': {'applications': {'items': {'$ref': '#/definitions/ApplicationDeploy'},
@@ -283,8 +323,11 @@ class ApplicationFacade(Type):
                                                 'type': 'object'},
                      'DestroyApplicationParams': {'additionalProperties': False,
                                                   'properties': {'application-tag': {'type': 'string'},
-                                                                 'destroy-storage': {'type': 'boolean'}},
-                                                  'required': ['application-tag'],
+                                                                 'destroy-storage': {'type': 'boolean'},
+                                                                 'force': {'type': 'boolean'},
+                                                                 'max-wait': {'type': 'integer'}},
+                                                  'required': ['application-tag',
+                                                               'force'],
                                                   'type': 'object'},
                      'DestroyApplicationResult': {'additionalProperties': False,
                                                   'properties': {'error': {'$ref': '#/definitions/Error'},
@@ -305,7 +348,9 @@ class ApplicationFacade(Type):
                                                    'required': ['applications'],
                                                    'type': 'object'},
                      'DestroyConsumedApplicationParams': {'additionalProperties': False,
-                                                          'properties': {'application-tag': {'type': 'string'}},
+                                                          'properties': {'application-tag': {'type': 'string'},
+                                                                         'force': {'type': 'boolean'},
+                                                                         'max-wait': {'type': 'integer'}},
                                                           'required': ['application-tag'],
                                                           'type': 'object'},
                      'DestroyConsumedApplicationsParams': {'additionalProperties': False,
@@ -316,6 +361,8 @@ class ApplicationFacade(Type):
                      'DestroyRelation': {'additionalProperties': False,
                                          'properties': {'endpoints': {'items': {'type': 'string'},
                                                                       'type': 'array'},
+                                                        'force': {'type': 'boolean'},
+                                                        'max-wait': {'type': 'integer'},
                                                         'relation-id': {'type': 'integer'}},
                                          'required': ['relation-id'],
                                          'type': 'object'},
@@ -327,8 +374,10 @@ class ApplicationFacade(Type):
                                          'type': 'object'},
                      'DestroyUnitParams': {'additionalProperties': False,
                                            'properties': {'destroy-storage': {'type': 'boolean'},
+                                                          'force': {'type': 'boolean'},
+                                                          'max-wait': {'type': 'integer'},
                                                           'unit-tag': {'type': 'string'}},
-                                           'required': ['unit-tag'],
+                                           'required': ['unit-tag', 'force'],
                                            'type': 'object'},
                      'DestroyUnitResult': {'additionalProperties': False,
                                            'properties': {'error': {'$ref': '#/definitions/Error'},
@@ -354,14 +403,12 @@ class ApplicationFacade(Type):
                                 'type': 'object'},
                      'Error': {'additionalProperties': False,
                                'properties': {'code': {'type': 'string'},
-                                              'info': {'$ref': '#/definitions/ErrorInfo'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
                                               'message': {'type': 'string'}},
                                'required': ['message', 'code'],
                                'type': 'object'},
-                     'ErrorInfo': {'additionalProperties': False,
-                                   'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
-                                                  'macaroon-path': {'type': 'string'}},
-                                   'type': 'object'},
                      'ErrorResult': {'additionalProperties': False,
                                      'properties': {'error': {'$ref': '#/definitions/Error'}},
                                      'type': 'object'},
@@ -381,30 +428,7 @@ class ApplicationFacade(Type):
                                                              'addrs',
                                                              'ca-cert'],
                                                 'type': 'object'},
-                     'LXDProfileUpgradeMessages': {'additionalProperties': False,
-                                                   'properties': {'application': {'$ref': '#/definitions/Entity'},
-                                                                  'watcher-id': {'type': 'string'}},
-                                                   'required': ['application',
-                                                                'watcher-id'],
-                                                   'type': 'object'},
-                     'LXDProfileUpgradeMessagesResult': {'additionalProperties': False,
-                                                         'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                                        'message': {'type': 'string'},
-                                                                        'unit-name': {'type': 'string'}},
-                                                         'required': ['unit-name',
-                                                                      'message'],
-                                                         'type': 'object'},
-                     'LXDProfileUpgradeMessagesResults': {'additionalProperties': False,
-                                                          'properties': {'args': {'items': {'$ref': '#/definitions/LXDProfileUpgradeMessagesResult'},
-                                                                                  'type': 'array'}},
-                                                          'required': ['args'],
-                                                          'type': 'object'},
                      'Macaroon': {'additionalProperties': False, 'type': 'object'},
-                     'NotifyWatchResult': {'additionalProperties': False,
-                                           'properties': {'NotifyWatcherId': {'type': 'string'},
-                                                          'error': {'$ref': '#/definitions/Error'}},
-                                           'required': ['NotifyWatcherId'],
-                                           'type': 'object'},
                      'OfferUserDetails': {'additionalProperties': False,
                                           'properties': {'access': {'type': 'string'},
                                                          'display-name': {'type': 'string'},
@@ -462,10 +486,12 @@ class ApplicationFacade(Type):
                                               'type': 'object'},
                      'ScaleApplicationParams': {'additionalProperties': False,
                                                 'properties': {'application-tag': {'type': 'string'},
+                                                               'force': {'type': 'boolean'},
                                                                'scale': {'type': 'integer'},
                                                                'scale-change': {'type': 'integer'}},
                                                 'required': ['application-tag',
-                                                             'scale'],
+                                                             'scale',
+                                                             'force'],
                                                 'type': 'object'},
                      'ScaleApplicationResult': {'additionalProperties': False,
                                                 'properties': {'error': {'$ref': '#/definitions/Error'},
@@ -536,6 +562,7 @@ class ApplicationFacade(Type):
                                               'instance-type': {'type': 'string'},
                                               'mem': {'type': 'integer'},
                                               'root-disk': {'type': 'integer'},
+                                              'root-disk-source': {'type': 'string'},
                                               'spaces': {'items': {'type': 'string'},
                                                          'type': 'array'},
                                               'tags': {'items': {'type': 'string'},
@@ -550,7 +577,10 @@ class ApplicationFacade(Type):
                     'AddUnits': {'properties': {'Params': {'$ref': '#/definitions/AddApplicationUnits'},
                                                 'Result': {'$ref': '#/definitions/AddApplicationUnitsResults'}},
                                  'type': 'object'},
-                    'CharmConfig': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'ApplicationsInfo': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                        'Result': {'$ref': '#/definitions/ApplicationInfoResults'}},
+                                         'type': 'object'},
+                    'CharmConfig': {'properties': {'Params': {'$ref': '#/definitions/ApplicationGetArgs'},
                                                    'Result': {'$ref': '#/definitions/ApplicationGetConfigResults'}},
                                     'type': 'object'},
                     'CharmRelations': {'properties': {'Params': {'$ref': '#/definitions/ApplicationCharmRelations'},
@@ -591,9 +621,6 @@ class ApplicationFacade(Type):
                     'GetConstraints': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                       'Result': {'$ref': '#/definitions/ApplicationGetConstraintsResults'}},
                                        'type': 'object'},
-                    'GetLXDProfileUpgradeMessages': {'properties': {'Params': {'$ref': '#/definitions/LXDProfileUpgradeMessages'},
-                                                                    'Result': {'$ref': '#/definitions/LXDProfileUpgradeMessagesResults'}},
-                                                     'type': 'object'},
                     'ResolveUnitErrors': {'properties': {'Params': {'$ref': '#/definitions/UnitsResolved'},
                                                          'Result': {'$ref': '#/definitions/ErrorResults'}},
                                           'type': 'object'},
@@ -607,8 +634,6 @@ class ApplicationFacade(Type):
                                               'type': 'object'},
                     'SetCharm': {'properties': {'Params': {'$ref': '#/definitions/ApplicationSetCharm'}},
                                  'type': 'object'},
-                    'SetCharmProfile': {'properties': {'Params': {'$ref': '#/definitions/ApplicationSetCharmProfile'}},
-                                        'type': 'object'},
                     'SetConstraints': {'properties': {'Params': {'$ref': '#/definitions/SetConstraints'}},
                                        'type': 'object'},
                     'SetMetricCredentials': {'properties': {'Params': {'$ref': '#/definitions/ApplicationMetricCredentials'},
@@ -628,10 +653,7 @@ class ApplicationFacade(Type):
                                'type': 'object'},
                     'UpdateApplicationSeries': {'properties': {'Params': {'$ref': '#/definitions/UpdateSeriesArgs'},
                                                                'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                                'type': 'object'},
-                    'WatchLXDProfileUpgradeNotifications': {'properties': {'Params': {'$ref': '#/definitions/Entity'},
-                                                                           'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
-                                                            'type': 'object'}},
+                                                'type': 'object'}},
      'type': 'object'}
     
 
@@ -645,7 +667,7 @@ class ApplicationFacade(Type):
         _params = dict()
         msg = dict(type='Application',
                    request='AddRelation',
-                   version=8,
+                   version=10,
                    params=_params)
         _params['endpoints'] = endpoints
         reply = await self.rpc(msg)
@@ -665,7 +687,7 @@ class ApplicationFacade(Type):
         _params = dict()
         msg = dict(type='Application',
                    request='AddUnits',
-                   version=8,
+                   version=10,
                    params=_params)
         _params['application'] = application
         _params['num-units'] = num_units
@@ -675,19 +697,37 @@ class ApplicationFacade(Type):
 
 
 
-    @ReturnMapping(ApplicationGetConfigResults)
-    async def CharmConfig(self, entities):
+    @ReturnMapping(ApplicationInfoResults)
+    async def ApplicationsInfo(self, entities):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ApplicationInfoResult]<~ApplicationInfoResult>
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='ApplicationsInfo',
+                   version=10,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ApplicationGetConfigResults)
+    async def CharmConfig(self, args):
+        '''
+        args : typing.Sequence<+T_co>[~ApplicationGet]<~ApplicationGet>
         Returns -> typing.Sequence<+T_co>[~ConfigResult]<~ConfigResult>
         '''
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application',
                    request='CharmConfig',
-                   version=8,
+                   version=10,
                    params=_params)
-        _params['entities'] = entities
+        _params['args'] = args
         reply = await self.rpc(msg)
         return reply
 
@@ -703,7 +743,7 @@ class ApplicationFacade(Type):
         _params = dict()
         msg = dict(type='Application',
                    request='CharmRelations',
-                   version=8,
+                   version=10,
                    params=_params)
         _params['application'] = application
         reply = await self.rpc(msg)
@@ -721,7 +761,7 @@ class ApplicationFacade(Type):
         _params = dict()
         msg = dict(type='Application',
                    request='Consume',
-                   version=8,
+                   version=10,
                    params=_params)
         _params['args'] = args
         reply = await self.rpc(msg)
@@ -739,7 +779,7 @@ class ApplicationFacade(Type):
         _params = dict()
         msg = dict(type='Application',
                    request='Deploy',
-                   version=8,
+                   version=10,
                    params=_params)
         _params['applications'] = applications
         reply = await self.rpc(msg)
@@ -757,7 +797,7 @@ class ApplicationFacade(Type):
         _params = dict()
         msg = dict(type='Application',
                    request='Destroy',
-                   version=8,
+                   version=10,
                    params=_params)
         _params['application'] = application
         reply = await self.rpc(msg)
@@ -775,7 +815,7 @@ class ApplicationFacade(Type):
         _params = dict()
         msg = dict(type='Application',
                    request='DestroyApplication',
-                   version=8,
+                   version=10,
                    params=_params)
         _params['applications'] = applications
         reply = await self.rpc(msg)
@@ -793,7 +833,7 @@ class ApplicationFacade(Type):
         _params = dict()
         msg = dict(type='Application',
                    request='DestroyConsumedApplications',
-                   version=8,
+                   version=10,
                    params=_params)
         _params['applications'] = applications
         reply = await self.rpc(msg)
@@ -811,7 +851,7 @@ class ApplicationFacade(Type):
         _params = dict()
         msg = dict(type='Application',
                    request='DestroyRelation',
-                   version=8,
+                   version=10,
                    params=_params)
         _params['endpoints'] = endpoints
         reply = await self.rpc(msg)
@@ -829,7 +869,7 @@ class ApplicationFacade(Type):
         _params = dict()
         msg = dict(type='Application',
                    request='DestroyUnit',
-                   version=8,
+                   version=10,
                    params=_params)
         _params['units'] = units
         reply = await self.rpc(msg)
@@ -847,7 +887,7 @@ class ApplicationFacade(Type):
         _params = dict()
         msg = dict(type='Application',
                    request='DestroyUnits',
-                   version=8,
+                   version=10,
                    params=_params)
         _params['unit-names'] = unit_names
         reply = await self.rpc(msg)
@@ -865,7 +905,7 @@ class ApplicationFacade(Type):
         _params = dict()
         msg = dict(type='Application',
                    request='Expose',
-                   version=8,
+                   version=10,
                    params=_params)
         _params['application'] = application
         reply = await self.rpc(msg)
@@ -883,7 +923,7 @@ class ApplicationFacade(Type):
         _params = dict()
         msg = dict(type='Application',
                    request='Get',
-                   version=8,
+                   version=10,
                    params=_params)
         _params['application'] = application
         reply = await self.rpc(msg)
@@ -901,7 +941,7 @@ class ApplicationFacade(Type):
         _params = dict()
         msg = dict(type='Application',
                    request='GetCharmURL',
-                   version=8,
+                   version=10,
                    params=_params)
         _params['application'] = application
         reply = await self.rpc(msg)
@@ -919,7 +959,7 @@ class ApplicationFacade(Type):
         _params = dict()
         msg = dict(type='Application',
                    request='GetConfig',
-                   version=8,
+                   version=10,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -937,29 +977,9 @@ class ApplicationFacade(Type):
         _params = dict()
         msg = dict(type='Application',
                    request='GetConstraints',
-                   version=8,
+                   version=10,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(LXDProfileUpgradeMessagesResults)
-    async def GetLXDProfileUpgradeMessages(self, application, watcher_id):
-        '''
-        application : Entity
-        watcher_id : str
-        Returns -> typing.Sequence<+T_co>[~LXDProfileUpgradeMessagesResult]<~LXDProfileUpgradeMessagesResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Application',
-                   request='GetLXDProfileUpgradeMessages',
-                   version=8,
-                   params=_params)
-        _params['application'] = application
-        _params['watcher-id'] = watcher_id
         reply = await self.rpc(msg)
         return reply
 
@@ -977,7 +997,7 @@ class ApplicationFacade(Type):
         _params = dict()
         msg = dict(type='Application',
                    request='ResolveUnitErrors',
-                   version=8,
+                   version=10,
                    params=_params)
         _params['all'] = all_
         _params['retry'] = retry
@@ -997,7 +1017,7 @@ class ApplicationFacade(Type):
         _params = dict()
         msg = dict(type='Application',
                    request='ScaleApplications',
-                   version=8,
+                   version=10,
                    params=_params)
         _params['applications'] = applications
         reply = await self.rpc(msg)
@@ -1016,7 +1036,7 @@ class ApplicationFacade(Type):
         _params = dict()
         msg = dict(type='Application',
                    request='Set',
-                   version=8,
+                   version=10,
                    params=_params)
         _params['application'] = application
         _params['options'] = options
@@ -1035,7 +1055,7 @@ class ApplicationFacade(Type):
         _params = dict()
         msg = dict(type='Application',
                    request='SetApplicationsConfig',
-                   version=8,
+                   version=10,
                    params=_params)
         _params['Args'] = args
         reply = await self.rpc(msg)
@@ -1061,7 +1081,7 @@ class ApplicationFacade(Type):
         _params = dict()
         msg = dict(type='Application',
                    request='SetCharm',
-                   version=8,
+                   version=10,
                    params=_params)
         _params['application'] = application
         _params['channel'] = channel
@@ -1078,26 +1098,6 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(None)
-    async def SetCharmProfile(self, application, charm_url):
-        '''
-        application : str
-        charm_url : str
-        Returns -> None
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Application',
-                   request='SetCharmProfile',
-                   version=8,
-                   params=_params)
-        _params['application'] = application
-        _params['charm-url'] = charm_url
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(None)
     async def SetConstraints(self, application, constraints):
         '''
         application : str
@@ -1108,7 +1108,7 @@ class ApplicationFacade(Type):
         _params = dict()
         msg = dict(type='Application',
                    request='SetConstraints',
-                   version=8,
+                   version=10,
                    params=_params)
         _params['application'] = application
         _params['constraints'] = constraints
@@ -1127,7 +1127,7 @@ class ApplicationFacade(Type):
         _params = dict()
         msg = dict(type='Application',
                    request='SetMetricCredentials',
-                   version=8,
+                   version=10,
                    params=_params)
         _params['creds'] = creds
         reply = await self.rpc(msg)
@@ -1145,7 +1145,7 @@ class ApplicationFacade(Type):
         _params = dict()
         msg = dict(type='Application',
                    request='SetRelationsSuspended',
-                   version=8,
+                   version=10,
                    params=_params)
         _params['args'] = args
         reply = await self.rpc(msg)
@@ -1163,7 +1163,7 @@ class ApplicationFacade(Type):
         _params = dict()
         msg = dict(type='Application',
                    request='Unexpose',
-                   version=8,
+                   version=10,
                    params=_params)
         _params['application'] = application
         reply = await self.rpc(msg)
@@ -1182,7 +1182,7 @@ class ApplicationFacade(Type):
         _params = dict()
         msg = dict(type='Application',
                    request='Unset',
-                   version=8,
+                   version=10,
                    params=_params)
         _params['application'] = application
         _params['options'] = options
@@ -1201,7 +1201,7 @@ class ApplicationFacade(Type):
         _params = dict()
         msg = dict(type='Application',
                    request='UnsetApplicationsConfig',
-                   version=8,
+                   version=10,
                    params=_params)
         _params['Args'] = args
         reply = await self.rpc(msg)
@@ -1226,7 +1226,7 @@ class ApplicationFacade(Type):
         _params = dict()
         msg = dict(type='Application',
                    request='Update',
-                   version=8,
+                   version=10,
                    params=_params)
         _params['application'] = application
         _params['charm-url'] = charm_url
@@ -1251,27 +1251,9 @@ class ApplicationFacade(Type):
         _params = dict()
         msg = dict(type='Application',
                    request='UpdateApplicationSeries',
-                   version=8,
+                   version=10,
                    params=_params)
         _params['args'] = args
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(NotifyWatchResult)
-    async def WatchLXDProfileUpgradeNotifications(self, tag):
-        '''
-        tag : str
-        Returns -> typing.Union[str, _ForwardRef('Error')]
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Application',
-                   request='WatchLXDProfileUpgradeNotifications',
-                   version=8,
-                   params=_params)
-        _params['tag'] = tag
         reply = await self.rpc(msg)
         return reply
 
