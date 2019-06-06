@@ -14,24 +14,22 @@ from concurrent.futures import CancelledError
 from functools import partial
 from pathlib import Path
 
+import yaml
+
 import theblues.charmstore
 import theblues.errors
 import websockets
-import yaml
 
-from . import tag, utils
+from . import provisioner, tag, utils
 from .annotationhelper import _get_annotations, _set_annotations
 from .client import client, connector
-from .client.client import ConfigValue
-from .client.client import Value
-from .constraints import parse as parse_constraints
+from .client.client import ConfigValue, Value
 from .constraints import normalize_key
+from .constraints import parse as parse_constraints
 from .delta import get_entity_class, get_entity_delta
 from .errors import JujuAPIError, JujuError
 from .exceptions import DeadEntityException
 from .placement import parse as parse_placement
-from . import provisioner
-
 
 log = logging.getLogger(__name__)
 
@@ -1240,7 +1238,7 @@ class Model:
             self, entity_url, application_name=None, bind=None, budget=None,
             channel=None, config=None, constraints=None, force=False,
             num_units=1, plan=None, resources=None, series=None, storage=None,
-            to=None, devices=None):
+            to=None, devices=None, trust=False):
         """Deploy a new service or bundle.
 
         :param str entity_url: Charm or bundle url
@@ -1266,7 +1264,9 @@ class Model:
             '24/lxd/3' - place in container 3 on machine 24
 
             If None, a new machine is provisioned.
-
+        :param bool trust: Trust signifies that the charm should be deployed 
+            with access to trusted credentials. Hooks run by the charm can access
+            cloud credentials and other trusted access credentials.
 
         TODO::
 
@@ -1303,7 +1303,7 @@ class Model:
                      (not is_local and 'bundle/' in entity_id))
 
         if is_bundle:
-            handler = BundleHandler(self)
+            handler = BundleHandler(self, trusted=trust, forced=force)
             await handler.fetch_plan(entity_id)
             await handler.execute_plan()
             extant_apps = {app for app in self.applications}
@@ -1345,11 +1345,15 @@ class Model:
                         "Pass a 'series' kwarg to Model.deploy().".format(
                             charm_dir))
                 entity_id = await self.add_local_charm_dir(charm_dir, series)
+            if config is None:
+                config = {}
+            if trust:
+                config["trust"] = "true"
             return await self._deploy(
                 charm_url=entity_id,
                 application=application_name,
                 series=series,
-                config=config or {},
+                config=config,
                 constraints=constraints,
                 endpoint_bindings=bind,
                 resources=resources,
@@ -1898,12 +1902,16 @@ class BundleHandler:
     Handle bundles by using the API to translate bundle YAML into a plan of
     steps and then dispatching each of those using the API.
     """
-    def __init__(self, model):
+    def __init__(self, model, trusted=False, forced=False):
         self.model = model
+        self.trusted = trusted
+        self.forced = forced
+
         self.charmstore = model.charmstore
         self.plan = []
         self.references = {}
         self._units_by_app = {}
+        
         for unit_name, unit in model.units.items():
             app_units = self._units_by_app.setdefault(unit.application, [])
             app_units.append(unit_name)
@@ -1946,6 +1954,13 @@ class BundleHandler:
                     "Couldn't determine series for charm at {}. "
                     "Add a 'series' key to the bundle.".format(charm_dir))
 
+            app_trusted = app_dict.get('trust')
+            if (not self.trusted and not self.forced) and app_trusted:
+                raise JujuError(
+                    "Bundle cannot be deployed without trusting applications with your cloud credentials. "
+                    "Please repeat the deploy command with the --trust argument if you consent to trust the following application"
+                    " - {}".format(app_name)
+                )
             # Keep track of what we need to update. We keep a list of apps
             # that need to be updated, and a corresponding list of args
             # needed to update those apps.
@@ -2146,6 +2161,10 @@ class BundleHandler:
             # There might be placement but we need to ignore that.
             devices, resources, num_units = args[:3]
 
+        if options is None:
+            options = {}
+        if self.trusted:
+            options["trust"] = "true"
         if not charm.startswith('local:'):
             resources = await self.model._add_store_resources(
                 application, charm, overrides=resources)
