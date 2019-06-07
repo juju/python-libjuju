@@ -100,6 +100,10 @@ async def test_deploy_trusted_bundle(event_loop):
         for app in ('ubuntu', 'ubuntu-lite'):
             assert app in model.applications
 
+        ubuntu_app = model.applications['ubuntu']
+        trusted = await ubuntu_app.get_trusted()
+        assert trusted == True
+
 
 @base.bootstrapped
 @pytest.mark.asyncio

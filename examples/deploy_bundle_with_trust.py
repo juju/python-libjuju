@@ -9,7 +9,6 @@ This example:
 from juju import loop
 from juju.model import Model
 
-
 async def main():
     model = Model()
     print('Connecting to model')

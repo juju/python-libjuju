@@ -12,6 +12,7 @@ class APIHostPortsResult(Type):
         servers : typing.Sequence<+T_co>[~HostPort]<~HostPort>
         '''
         self.servers = [HostPort.from_json(o) for o in servers or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -29,6 +30,7 @@ class Action(Type):
         self.parameters = parameters
         self.receiver = receiver
         self.tag = tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -46,6 +48,7 @@ class ActionExecutionResult(Type):
         self.message = message
         self.results = results
         self.status = status
+        self.unknown_fields = unknown_fields
 
 
 
@@ -57,6 +60,7 @@ class ActionExecutionResults(Type):
         results : typing.Sequence<+T_co>[~ActionExecutionResult]<~ActionExecutionResult>
         '''
         self.results = [ActionExecutionResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -70,6 +74,7 @@ class ActionPruneArgs(Type):
         '''
         self.max_history_mb = max_history_mb
         self.max_history_time = max_history_time
+        self.unknown_fields = unknown_fields
 
 
 
@@ -95,6 +100,7 @@ class ActionResult(Type):
         self.output = output
         self.started = started
         self.status = status
+        self.unknown_fields = unknown_fields
 
 
 
@@ -106,6 +112,7 @@ class ActionResults(Type):
         results : typing.Sequence<+T_co>[~ActionResult]<~ActionResult>
         '''
         self.results = [ActionResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -119,6 +126,7 @@ class ActionSpec(Type):
         '''
         self.description = description
         self.params = params
+        self.unknown_fields = unknown_fields
 
 
 
@@ -130,6 +138,7 @@ class Actions(Type):
         actions : typing.Sequence<+T_co>[~Action]<~Action>
         '''
         self.actions = [Action.from_json(o) for o in actions or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -145,6 +154,7 @@ class ActionsByName(Type):
         self.actions = [ActionResult.from_json(o) for o in actions or []]
         self.error = Error.from_json(error) if error else None
         self.name = name
+        self.unknown_fields = unknown_fields
 
 
 
@@ -156,6 +166,7 @@ class ActionsByNames(Type):
         actions : typing.Sequence<+T_co>[~ActionsByName]<~ActionsByName>
         '''
         self.actions = [ActionsByName.from_json(o) for o in actions or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -171,6 +182,7 @@ class ActionsByReceiver(Type):
         self.actions = [ActionResult.from_json(o) for o in actions or []]
         self.error = Error.from_json(error) if error else None
         self.receiver = receiver
+        self.unknown_fields = unknown_fields
 
 
 
@@ -182,6 +194,7 @@ class ActionsByReceivers(Type):
         actions : typing.Sequence<+T_co>[~ActionsByReceiver]<~ActionsByReceiver>
         '''
         self.actions = [ActionsByReceiver.from_json(o) for o in actions or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -201,6 +214,7 @@ class AddApplicationOffer(Type):
         self.endpoints = endpoints
         self.model_tag = model_tag
         self.offer_name = offer_name
+        self.unknown_fields = unknown_fields
 
 
 
@@ -212,6 +226,7 @@ class AddApplicationOffers(Type):
         offers : typing.Sequence<+T_co>[~AddApplicationOffer]<~AddApplicationOffer>
         '''
         self.offers = [AddApplicationOffer.from_json(o) for o in offers or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -227,6 +242,7 @@ class AddApplicationUnits(Type):
         self.application = application
         self.num_units = num_units
         self.placement = [Placement.from_json(o) for o in placement or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -238,6 +254,7 @@ class AddApplicationUnitsResults(Type):
         units : typing.Sequence<+T_co>[str]
         '''
         self.units = units
+        self.unknown_fields = unknown_fields
 
 
 
@@ -251,6 +268,7 @@ class AddCharm(Type):
         '''
         self.channel = channel
         self.url = url
+        self.unknown_fields = unknown_fields
 
 
 
@@ -266,6 +284,7 @@ class AddCharmWithAuthorization(Type):
         self.channel = channel
         self.macaroon = Macaroon.from_json(macaroon) if macaroon else None
         self.url = url
+        self.unknown_fields = unknown_fields
 
 
 
@@ -279,6 +298,7 @@ class AddCloudArgs(Type):
         '''
         self.cloud = Cloud.from_json(cloud) if cloud else None
         self.name = name
+        self.unknown_fields = unknown_fields
 
 
 
@@ -310,6 +330,7 @@ class AddMachineParams(Type):
         self.parent_id = parent_id
         self.placement = Placement.from_json(placement) if placement else None
         self.series = series
+        self.unknown_fields = unknown_fields
 
 
 
@@ -321,6 +342,7 @@ class AddMachines(Type):
         params : typing.Sequence<+T_co>[~AddMachineParams]<~AddMachineParams>
         '''
         self.params = [AddMachineParams.from_json(o) for o in params or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -334,6 +356,7 @@ class AddMachinesResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.machine = machine
+        self.unknown_fields = unknown_fields
 
 
 
@@ -345,6 +368,7 @@ class AddMachinesResults(Type):
         machines : typing.Sequence<+T_co>[~AddMachinesResult]<~AddMachinesResult>
         '''
         self.machines = [AddMachinesResult.from_json(o) for o in machines or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -360,6 +384,7 @@ class AddPendingResourcesArgs(Type):
         self.addcharmwithauthorization = AddCharmWithAuthorization.from_json(addcharmwithauthorization) if addcharmwithauthorization else None
         self.entity = Entity.from_json(entity) if entity else None
         self.resources = [CharmResource.from_json(o) for o in resources or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -373,6 +398,7 @@ class AddPendingResourcesResult(Type):
         '''
         self.errorresult = ErrorResult.from_json(errorresult) if errorresult else None
         self.pending_ids = pending_ids
+        self.unknown_fields = unknown_fields
 
 
 
@@ -384,6 +410,7 @@ class AddRelation(Type):
         endpoints : typing.Sequence<+T_co>[str]
         '''
         self.endpoints = endpoints
+        self.unknown_fields = unknown_fields
 
 
 
@@ -395,6 +422,7 @@ class AddRelationResults(Type):
         endpoints : typing.Mapping<~KT, +VT_co>[str, ~CharmRelation]<~CharmRelation>
         '''
         self.endpoints = endpoints
+        self.unknown_fields = unknown_fields
 
 
 
@@ -406,6 +434,7 @@ class AddStorageDetails(Type):
         storage_tags : typing.Sequence<+T_co>[str]
         '''
         self.storage_tags = storage_tags
+        self.unknown_fields = unknown_fields
 
 
 
@@ -419,6 +448,7 @@ class AddStorageResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = AddStorageDetails.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -430,6 +460,7 @@ class AddStorageResults(Type):
         results : typing.Sequence<+T_co>[~AddStorageResult]<~AddStorageResult>
         '''
         self.results = [AddStorageResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -447,6 +478,7 @@ class AddSubnetParams(Type):
         self.subnet_provider_id = subnet_provider_id
         self.subnet_tag = subnet_tag
         self.zones = zones
+        self.unknown_fields = unknown_fields
 
 
 
@@ -458,6 +490,7 @@ class AddSubnetsParams(Type):
         subnets : typing.Sequence<+T_co>[~AddSubnetParams]<~AddSubnetParams>
         '''
         self.subnets = [AddSubnetParams.from_json(o) for o in subnets or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -473,6 +506,7 @@ class AddUser(Type):
         self.display_name = display_name
         self.password = password
         self.username = username
+        self.unknown_fields = unknown_fields
 
 
 
@@ -488,6 +522,7 @@ class AddUserResult(Type):
         self.error = Error.from_json(error) if error else None
         self.secret_key = secret_key
         self.tag = tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -499,6 +534,7 @@ class AddUserResults(Type):
         results : typing.Sequence<+T_co>[~AddUserResult]<~AddUserResult>
         '''
         self.results = [AddUserResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -510,6 +546,7 @@ class AddUsers(Type):
         users : typing.Sequence<+T_co>[~AddUser]<~AddUser>
         '''
         self.users = [AddUser.from_json(o) for o in users or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -527,6 +564,7 @@ class Address(Type):
         self.space_name = space_name
         self.type_ = type_
         self.value = value
+        self.unknown_fields = unknown_fields
 
 
 
@@ -540,6 +578,7 @@ class AdoptResourcesArgs(Type):
         '''
         self.model_tag = model_tag
         self.source_controller_version = Number.from_json(source_controller_version) if source_controller_version else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -557,6 +596,7 @@ class AgentGetEntitiesResult(Type):
         self.error = Error.from_json(error) if error else None
         self.jobs = jobs
         self.life = life
+        self.unknown_fields = unknown_fields
 
 
 
@@ -568,6 +608,7 @@ class AgentGetEntitiesResults(Type):
         entities : typing.Sequence<+T_co>[~AgentGetEntitiesResult]<~AgentGetEntitiesResult>
         '''
         self.entities = [AgentGetEntitiesResult.from_json(o) for o in entities or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -579,6 +620,7 @@ class AgentVersionResult(Type):
         version : Number
         '''
         self.version = Number.from_json(version) if version else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -590,6 +632,7 @@ class AllWatcherId(Type):
         watcher_id : str
         '''
         self.watcher_id = watcher_id
+        self.unknown_fields = unknown_fields
 
 
 
@@ -601,6 +644,7 @@ class AllWatcherNextResults(Type):
         deltas : typing.Sequence<+T_co>[~Delta]<~Delta>
         '''
         self.deltas = [Delta.from_json(o) for o in deltas or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -616,6 +660,7 @@ class AnnotationsGetResult(Type):
         self.annotations = annotations
         self.entity = entity
         self.error = ErrorResult.from_json(error) if error else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -627,6 +672,7 @@ class AnnotationsGetResults(Type):
         results : typing.Sequence<+T_co>[~AnnotationsGetResult]<~AnnotationsGetResult>
         '''
         self.results = [AnnotationsGetResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -638,6 +684,7 @@ class AnnotationsSet(Type):
         annotations : typing.Sequence<+T_co>[~EntityAnnotations]<~EntityAnnotations>
         '''
         self.annotations = [EntityAnnotations.from_json(o) for o in annotations or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -655,6 +702,7 @@ class ApplicationCharm(Type):
         self.force_upgrade = force_upgrade
         self.sha256 = sha256
         self.url = url
+        self.unknown_fields = unknown_fields
 
 
 
@@ -670,6 +718,7 @@ class ApplicationCharmActionsResult(Type):
         self.actions = actions
         self.application_tag = application_tag
         self.error = Error.from_json(error) if error else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -681,6 +730,7 @@ class ApplicationCharmRelations(Type):
         application : str
         '''
         self.application = application
+        self.unknown_fields = unknown_fields
 
 
 
@@ -692,6 +742,7 @@ class ApplicationCharmRelationsResults(Type):
         charm_relations : typing.Sequence<+T_co>[str]
         '''
         self.charm_relations = charm_relations
+        self.unknown_fields = unknown_fields
 
 
 
@@ -705,6 +756,7 @@ class ApplicationCharmResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = ApplicationCharm.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -716,6 +768,7 @@ class ApplicationCharmResults(Type):
         results : typing.Sequence<+T_co>[~ApplicationCharmResult]<~ApplicationCharmResult>
         '''
         self.results = [ApplicationCharmResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -729,6 +782,7 @@ class ApplicationConfigSet(Type):
         '''
         self.application = application
         self.config = config
+        self.unknown_fields = unknown_fields
 
 
 
@@ -740,6 +794,7 @@ class ApplicationConfigSetArgs(Type):
         args : typing.Sequence<+T_co>[~ApplicationConfigSet]<~ApplicationConfigSet>
         '''
         self.args = [ApplicationConfigSet.from_json(o) for o in args or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -751,6 +806,7 @@ class ApplicationConfigUnsetArgs(Type):
         args : typing.Sequence<+T_co>[~ApplicationUnset]<~ApplicationUnset>
         '''
         self.args = [ApplicationUnset.from_json(o) for o in args or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -764,6 +820,7 @@ class ApplicationConstraint(Type):
         '''
         self.constraints = Value.from_json(constraints) if constraints else None
         self.error = Error.from_json(error) if error else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -803,6 +860,7 @@ class ApplicationDeploy(Type):
         self.resources = resources
         self.series = series
         self.storage = storage
+        self.unknown_fields = unknown_fields
 
 
 
@@ -814,6 +872,7 @@ class ApplicationDestroy(Type):
         application : str
         '''
         self.application = application
+        self.unknown_fields = unknown_fields
 
 
 
@@ -825,6 +884,7 @@ class ApplicationExpose(Type):
         application : str
         '''
         self.application = application
+        self.unknown_fields = unknown_fields
 
 
 
@@ -836,6 +896,7 @@ class ApplicationGet(Type):
         application : str
         '''
         self.application = application
+        self.unknown_fields = unknown_fields
 
 
 
@@ -847,6 +908,7 @@ class ApplicationGetArgs(Type):
         args : typing.Sequence<+T_co>[~ApplicationGet]<~ApplicationGet>
         '''
         self.args = [ApplicationGet.from_json(o) for o in args or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -858,6 +920,7 @@ class ApplicationGetConfigResults(Type):
         results : typing.Sequence<+T_co>[~ConfigResult]<~ConfigResult>
         '''
         self.results = [ConfigResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -869,6 +932,7 @@ class ApplicationGetConstraintsResults(Type):
         results : typing.Sequence<+T_co>[~ApplicationConstraint]<~ApplicationConstraint>
         '''
         self.results = [ApplicationConstraint.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -888,6 +952,7 @@ class ApplicationGetResults(Type):
         self.config = config
         self.constraints = Value.from_json(constraints) if constraints else None
         self.series = series
+        self.unknown_fields = unknown_fields
 
 
 
@@ -915,6 +980,7 @@ class ApplicationInfo(Type):
         self.remote = remote
         self.series = series
         self.tag = tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -928,6 +994,7 @@ class ApplicationInfoResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = ApplicationInfo.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -939,6 +1006,7 @@ class ApplicationInfoResults(Type):
         results : typing.Sequence<+T_co>[~ApplicationInfoResult]<~ApplicationInfoResult>
         '''
         self.results = [ApplicationInfoResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -952,6 +1020,7 @@ class ApplicationMetricCredential(Type):
         '''
         self.application = application
         self.metrics_credentials = metrics_credentials
+        self.unknown_fields = unknown_fields
 
 
 
@@ -963,6 +1032,7 @@ class ApplicationMetricCredentials(Type):
         creds : typing.Sequence<+T_co>[~ApplicationMetricCredential]<~ApplicationMetricCredential>
         '''
         self.creds = [ApplicationMetricCredential.from_json(o) for o in creds or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -988,6 +1058,7 @@ class ApplicationOffer(Type):
         self.offer_url = offer_url
         self.source_model_tag = source_model_tag
         self.spaces = [RemoteSpace.from_json(o) for o in spaces or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1005,6 +1076,7 @@ class ApplicationOfferAdminDetails(Type):
         self.application_name = application_name
         self.charm_url = charm_url
         self.connections = [OfferConnection.from_json(o) for o in connections or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1032,6 +1104,7 @@ class ApplicationOfferDetails(Type):
         self.source_model_tag = source_model_tag
         self.spaces = [RemoteSpace.from_json(o) for o in spaces or []]
         self.users = [OfferUserDetails.from_json(o) for o in users or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1045,6 +1118,7 @@ class ApplicationOfferResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = ApplicationOfferAdminDetails.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1068,6 +1142,7 @@ class ApplicationOfferStatus(Type):
         self.err = err
         self.offer_name = offer_name
         self.total_connected_count = total_connected_count
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1079,6 +1154,7 @@ class ApplicationOffersResults(Type):
         results : typing.Sequence<+T_co>[~ApplicationOfferResult]<~ApplicationOfferResult>
         '''
         self.results = [ApplicationOfferResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1092,6 +1168,7 @@ class ApplicationRelationsChange(Type):
         '''
         self.changed = [RelationChange.from_json(o) for o in changed or []]
         self.removed = removed
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1107,6 +1184,7 @@ class ApplicationRelationsWatchResult(Type):
         self.applicationrelationswatcherid = applicationrelationswatcherid
         self.changes = ApplicationRelationsChange.from_json(changes) if changes else None
         self.error = Error.from_json(error) if error else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1120,6 +1198,7 @@ class ApplicationSet(Type):
         '''
         self.application = application
         self.options = options
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1147,6 +1226,7 @@ class ApplicationSetCharm(Type):
         self.force_units = force_units
         self.resource_ids = resource_ids
         self.storage_constraints = storage_constraints
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1160,6 +1240,7 @@ class ApplicationSetCharmProfile(Type):
         '''
         self.application = application
         self.charm_url = charm_url
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1193,6 +1274,7 @@ class ApplicationStatus(Type):
         self.subordinate_to = subordinate_to
         self.units = units
         self.workload_version = workload_version
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1208,6 +1290,7 @@ class ApplicationStatusResult(Type):
         self.application = StatusResult.from_json(application) if application else None
         self.error = Error.from_json(error) if error else None
         self.units = units
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1219,6 +1302,7 @@ class ApplicationStatusResults(Type):
         results : typing.Sequence<+T_co>[~ApplicationStatusResult]<~ApplicationStatusResult>
         '''
         self.results = [ApplicationStatusResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1230,6 +1314,7 @@ class ApplicationTag(Type):
         name : str
         '''
         self.name = name
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1241,6 +1326,7 @@ class ApplicationURLs(Type):
         application_urls : typing.Sequence<+T_co>[str]
         '''
         self.application_urls = application_urls
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1252,6 +1338,7 @@ class ApplicationUnexpose(Type):
         application : str
         '''
         self.application = application
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1277,6 +1364,7 @@ class ApplicationUnitParams(Type):
         self.provider_id = provider_id
         self.status = status
         self.unit_tag = unit_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1290,6 +1378,7 @@ class ApplicationUnset(Type):
         '''
         self.application = application
         self.options = options
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1315,6 +1404,7 @@ class ApplicationUpdate(Type):
         self.min_units = min_units
         self.settings = settings
         self.settings_yaml = settings_yaml
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1326,6 +1416,7 @@ class ApplicationsCharmActionsResults(Type):
         results : typing.Sequence<+T_co>[~ApplicationCharmActionsResult]<~ApplicationCharmActionsResult>
         '''
         self.results = [ApplicationCharmActionsResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1337,6 +1428,7 @@ class ApplicationsDeploy(Type):
         applications : typing.Sequence<+T_co>[~ApplicationDeploy]<~ApplicationDeploy>
         '''
         self.applications = [ApplicationDeploy.from_json(o) for o in applications or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1348,6 +1440,7 @@ class BackupsCreateArgs(Type):
         notes : str
         '''
         self.notes = notes
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1359,6 +1452,7 @@ class BackupsInfoArgs(Type):
         id_ : str
         '''
         self.id_ = id_
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1381,6 +1475,7 @@ class BackupsListResult(Type):
         list_ : typing.Sequence<+T_co>[~BackupsMetadataResult]<~BackupsMetadataResult>
         '''
         self.list_ = [BackupsMetadataResult.from_json(o) for o in list_ or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1420,6 +1515,7 @@ class BackupsMetadataResult(Type):
         self.started = started
         self.stored = stored
         self.version = Number.from_json(version) if version else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1431,6 +1527,7 @@ class BackupsRemoveArgs(Type):
         id_ : str
         '''
         self.id_ = id_
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1446,6 +1543,7 @@ class Binary(Type):
         self.arch = arch
         self.number = Number.from_json(number) if number else None
         self.series = series
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1463,6 +1561,7 @@ class Block(Type):
         self.message = message
         self.tag = tag
         self.type_ = type_
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1492,6 +1591,7 @@ class BlockDevice(Type):
         self.mountpoint = mountpoint
         self.size = size
         self.uuid = uuid
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1505,6 +1605,7 @@ class BlockDeviceResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = BlockDevice.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1516,6 +1617,7 @@ class BlockDeviceResults(Type):
         results : typing.Sequence<+T_co>[~BlockDeviceResult]<~BlockDeviceResult>
         '''
         self.results = [BlockDeviceResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1529,6 +1631,7 @@ class BlockResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = Block.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1540,6 +1643,7 @@ class BlockResults(Type):
         results : typing.Sequence<+T_co>[~BlockResult]<~BlockResult>
         '''
         self.results = [BlockResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1553,6 +1657,7 @@ class BlockSwitchParams(Type):
         '''
         self.message = message
         self.type_ = type_
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1566,6 +1671,7 @@ class BoolResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = result
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1577,6 +1683,7 @@ class BoolResults(Type):
         results : typing.Sequence<+T_co>[~BoolResult]<~BoolResult>
         '''
         self.results = [BoolResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1588,6 +1695,7 @@ class BranchArg(Type):
         branch : str
         '''
         self.branch = branch
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1601,6 +1709,7 @@ class BranchInfoArgs(Type):
         '''
         self.branches = branches
         self.detailed = detailed
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1614,6 +1723,7 @@ class BranchTrackArg(Type):
         '''
         self.branch = branch
         self.entities = [Entity.from_json(o) for o in entities or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1625,6 +1735,7 @@ class BulkImportStorageParams(Type):
         storage : typing.Sequence<+T_co>[~ImportStorageParams]<~ImportStorageParams>
         '''
         self.storage = [ImportStorageParams.from_json(o) for o in storage or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1642,6 +1753,7 @@ class BundleChange(Type):
         self.id_ = id_
         self.method = method
         self.requires = requires
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1653,6 +1765,7 @@ class BundleChangesParams(Type):
         yaml : str
         '''
         self.yaml = yaml
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1666,6 +1779,7 @@ class BundleChangesResults(Type):
         '''
         self.changes = [BundleChange.from_json(o) for o in changes or []]
         self.errors = errors
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1677,6 +1791,7 @@ class BytesResult(Type):
         result : typing.Sequence<+T_co>[int]
         '''
         self.result = result
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1690,6 +1805,7 @@ class ChangeModelCredentialParams(Type):
         '''
         self.credential_tag = credential_tag
         self.model_tag = model_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1701,6 +1817,7 @@ class ChangeModelCredentialsParams(Type):
         model_credentials : typing.Sequence<+T_co>[~ChangeModelCredentialParams]<~ChangeModelCredentialParams>
         '''
         self.model_credentials = [ChangeModelCredentialParams.from_json(o) for o in model_credentials or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1714,6 +1831,7 @@ class CharmActionSpec(Type):
         '''
         self.description = description
         self.params = params
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1725,6 +1843,7 @@ class CharmActions(Type):
         specs : typing.Mapping<~KT, +VT_co>[str, ~CharmActionSpec]<~CharmActionSpec>
         '''
         self.specs = specs
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1744,6 +1863,7 @@ class CharmDevice(Type):
         self.description = description
         self.name = name
         self.type_ = type_
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1765,6 +1885,7 @@ class CharmInfo(Type):
         self.metrics = CharmMetrics.from_json(metrics) if metrics else None
         self.revision = revision
         self.url = url
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1780,6 +1901,7 @@ class CharmLXDProfile(Type):
         self.config = config
         self.description = description
         self.devices = devices
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1821,6 +1943,7 @@ class CharmMeta(Type):
         self.summary = summary
         self.tags = tags
         self.terms = terms
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1834,6 +1957,7 @@ class CharmMetric(Type):
         '''
         self.description = description
         self.type_ = type_
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1847,6 +1971,7 @@ class CharmMetrics(Type):
         '''
         self.metrics = metrics
         self.plan = CharmPlan.from_json(plan) if plan else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1862,6 +1987,7 @@ class CharmOption(Type):
         self.default = default
         self.description = description
         self.type_ = type_
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1875,6 +2001,7 @@ class CharmPayloadClass(Type):
         '''
         self.name = name
         self.type_ = type_
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1886,6 +2013,7 @@ class CharmPlan(Type):
         required : bool
         '''
         self.required = required
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1905,6 +2033,7 @@ class CharmProfilingInfoResult(Type):
         self.instance_id = instance_id
         self.model_name = model_name
         self.profile_changes = [ProfileInfoResult.from_json(o) for o in profile_changes or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1926,6 +2055,7 @@ class CharmRelation(Type):
         self.optional = optional
         self.role = role
         self.scope = scope
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1951,6 +2081,7 @@ class CharmResource(Type):
         self.revision = revision
         self.size = size
         self.type_ = type_
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1968,6 +2099,7 @@ class CharmResourceMeta(Type):
         self.name = name
         self.path = path
         self.type_ = type_
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1997,6 +2129,7 @@ class CharmStorage(Type):
         self.read_only = read_only
         self.shared = shared
         self.type_ = type_
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2008,6 +2141,7 @@ class CharmURL(Type):
         url : str
         '''
         self.url = url
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2019,6 +2153,7 @@ class CharmURLs(Type):
         urls : typing.Sequence<+T_co>[~CharmURL]<~CharmURL>
         '''
         self.urls = [CharmURL.from_json(o) for o in urls or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2030,6 +2165,7 @@ class CharmsList(Type):
         names : typing.Sequence<+T_co>[str]
         '''
         self.names = names
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2041,6 +2177,7 @@ class CharmsListResult(Type):
         charm_urls : typing.Sequence<+T_co>[str]
         '''
         self.charm_urls = charm_urls
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2052,6 +2189,7 @@ class ClaimLeadershipBulkParams(Type):
         params : typing.Sequence<+T_co>[~ClaimLeadershipParams]<~ClaimLeadershipParams>
         '''
         self.params = [ClaimLeadershipParams.from_json(o) for o in params or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2063,6 +2201,7 @@ class ClaimLeadershipBulkResults(Type):
         results : typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         self.results = [ErrorResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2078,6 +2217,7 @@ class ClaimLeadershipParams(Type):
         self.application_tag = application_tag
         self.duration = duration
         self.unit_tag = unit_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2099,6 +2239,7 @@ class Cloud(Type):
         self.regions = [CloudRegion.from_json(o) for o in regions or []]
         self.storage_endpoint = storage_endpoint
         self.type_ = type_
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2114,6 +2255,7 @@ class CloudCredential(Type):
         self.attrs = attrs
         self.auth_type = auth_type
         self.redacted = redacted
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2127,6 +2269,7 @@ class CloudCredentialArg(Type):
         '''
         self.cloud_name = cloud_name
         self.credential_name = credential_name
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2140,6 +2283,7 @@ class CloudCredentialArgs(Type):
         '''
         self.credentials = [CloudCredentialArg.from_json(o) for o in credentials or []]
         self.include_secrets = include_secrets
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2153,6 +2297,7 @@ class CloudCredentialResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = CloudCredential.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2164,6 +2309,7 @@ class CloudCredentialResults(Type):
         results : typing.Sequence<+T_co>[~CloudCredentialResult]<~CloudCredentialResult>
         '''
         self.results = [CloudCredentialResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2185,6 +2331,7 @@ class CloudDetails(Type):
         self.regions = [CloudRegion.from_json(o) for o in regions or []]
         self.storage_endpoint = storage_endpoint
         self.type_ = type_
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2216,6 +2363,7 @@ class CloudImageMetadata(Type):
         self.stream = stream
         self.version = version
         self.virt_type = virt_type
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2227,6 +2375,7 @@ class CloudImageMetadataList(Type):
         metadata : typing.Sequence<+T_co>[~CloudImageMetadata]<~CloudImageMetadata>
         '''
         self.metadata = [CloudImageMetadata.from_json(o) for o in metadata or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2240,6 +2389,7 @@ class CloudInfo(Type):
         '''
         self.clouddetails = CloudDetails.from_json(clouddetails) if clouddetails else None
         self.users = [CloudUserInfo.from_json(o) for o in users or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2253,6 +2403,7 @@ class CloudInfoResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = CloudInfo.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2264,6 +2415,7 @@ class CloudInfoResults(Type):
         results : typing.Sequence<+T_co>[~CloudInfoResult]<~CloudInfoResult>
         '''
         self.results = [CloudInfoResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2279,6 +2431,7 @@ class CloudInstanceTypesConstraint(Type):
         self.cloud_tag = cloud_tag
         self.constraints = Value.from_json(constraints) if constraints else None
         self.region = region
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2290,6 +2443,7 @@ class CloudInstanceTypesConstraints(Type):
         constraints : typing.Sequence<+T_co>[~CloudInstanceTypesConstraint]<~CloudInstanceTypesConstraint>
         '''
         self.constraints = [CloudInstanceTypesConstraint.from_json(o) for o in constraints or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2307,6 +2461,7 @@ class CloudRegion(Type):
         self.identity_endpoint = identity_endpoint
         self.name = name
         self.storage_endpoint = storage_endpoint
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2320,6 +2475,7 @@ class CloudResult(Type):
         '''
         self.cloud = Cloud.from_json(cloud) if cloud else None
         self.error = Error.from_json(error) if error else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2331,6 +2487,7 @@ class CloudResults(Type):
         results : typing.Sequence<+T_co>[~CloudResult]<~CloudResult>
         '''
         self.results = [CloudResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2354,6 +2511,7 @@ class CloudSpec(Type):
         self.region = region
         self.storage_endpoint = storage_endpoint
         self.type_ = type_
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2367,6 +2525,7 @@ class CloudSpecResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = CloudSpec.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2378,6 +2537,7 @@ class CloudSpecResults(Type):
         results : typing.Sequence<+T_co>[~CloudSpecResult]<~CloudSpecResult>
         '''
         self.results = [CloudSpecResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2393,6 +2553,7 @@ class CloudUserInfo(Type):
         self.access = access
         self.display_name = display_name
         self.user = user
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2404,6 +2565,7 @@ class CloudsResult(Type):
         clouds : typing.Mapping<~KT, +VT_co>[str, ~Cloud]<~Cloud>
         '''
         self.clouds = clouds
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2417,6 +2579,7 @@ class ConfigResult(Type):
         '''
         self.config = config
         self.error = Error.from_json(error) if error else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2430,6 +2593,7 @@ class ConfigSettingsResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.settings = settings
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2441,6 +2605,7 @@ class ConfigSettingsResults(Type):
         results : typing.Sequence<+T_co>[~ConfigSettingsResult]<~ConfigSettingsResult>
         '''
         self.results = [ConfigSettingsResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2454,6 +2619,7 @@ class ConfigValue(Type):
         '''
         self.source = source
         self.value = value
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2469,6 +2635,7 @@ class Constraints(Type):
         self.count = count
         self.pool = pool
         self.size = size
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2482,6 +2649,7 @@ class ConstraintsResult(Type):
         '''
         self.constraints = Value.from_json(constraints) if constraints else None
         self.error = Error.from_json(error) if error else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2493,6 +2661,7 @@ class ConstraintsResults(Type):
         results : typing.Sequence<+T_co>[~ConstraintsResult]<~ConstraintsResult>
         '''
         self.results = [ConstraintsResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2506,6 +2675,7 @@ class ConsumeApplicationArg(Type):
         '''
         self.application_alias = application_alias
         self.application_url = application_url
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2517,6 +2687,7 @@ class ConsumeApplicationArgs(Type):
         args : typing.Sequence<+T_co>[~ConsumeApplicationArg]<~ConsumeApplicationArg>
         '''
         self.args = [ConsumeApplicationArg.from_json(o) for o in args or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2530,6 +2701,7 @@ class ConsumeApplicationResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.local_name = local_name
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2541,6 +2713,7 @@ class ConsumeApplicationResults(Type):
         results : typing.Sequence<+T_co>[~ConsumeApplicationResult]<~ConsumeApplicationResult>
         '''
         self.results = [ConsumeApplicationResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2556,6 +2729,7 @@ class ConsumeOfferDetails(Type):
         self.external_controller = ExternalControllerInfo.from_json(external_controller) if external_controller else None
         self.macaroon = Macaroon.from_json(macaroon) if macaroon else None
         self.offer = ApplicationOfferDetails.from_json(offer) if offer else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2569,6 +2743,7 @@ class ConsumeOfferDetailsResult(Type):
         '''
         self.consumeofferdetails = ConsumeOfferDetails.from_json(consumeofferdetails) if consumeofferdetails else None
         self.error = Error.from_json(error) if error else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2580,6 +2755,7 @@ class ConsumeOfferDetailsResults(Type):
         results : typing.Sequence<+T_co>[~ConsumeOfferDetailsResult]<~ConsumeOfferDetailsResult>
         '''
         self.results = [ConsumeOfferDetailsResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2603,6 +2779,7 @@ class ContainerConfig(Type):
         self.provider_type = provider_type
         self.proxy = Settings.from_json(proxy) if proxy else None
         self.ssl_hostname_verification = ssl_hostname_verification
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2616,6 +2793,7 @@ class ContainerLXDProfile(Type):
         '''
         self.name = name
         self.profile = CharmLXDProfile.from_json(profile) if profile else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2627,6 +2805,7 @@ class ContainerManagerConfig(Type):
         config : typing.Mapping<~KT, +VT_co>[str, str]
         '''
         self.config = config
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2638,6 +2817,7 @@ class ContainerManagerConfigParams(Type):
         type_ : str
         '''
         self.type_ = type_
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2651,6 +2831,7 @@ class ContainerProfileResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.lxd_profiles = [ContainerLXDProfile.from_json(o) for o in lxd_profiles or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2662,6 +2843,7 @@ class ContainerProfileResults(Type):
         results : typing.Sequence<+T_co>[~ContainerProfileResult]<~ContainerProfileResult>
         '''
         self.results = [ContainerProfileResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2675,6 +2857,7 @@ class ContainerTypeResult(Type):
         '''
         self.container_type = container_type
         self.error = Error.from_json(error) if error else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2690,6 +2873,7 @@ class ControllerAPIInfoResult(Type):
         self.addresses = addresses
         self.cacert = cacert
         self.error = Error.from_json(error) if error else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2701,6 +2885,7 @@ class ControllerAPIInfoResults(Type):
         results : typing.Sequence<+T_co>[~ControllerAPIInfoResult]<~ControllerAPIInfoResult>
         '''
         self.results = [ControllerAPIInfoResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2712,6 +2897,7 @@ class ControllerConfigResult(Type):
         config : typing.Mapping<~KT, +VT_co>[str, typing.Any]
         '''
         self.config = config
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2723,6 +2909,7 @@ class ControllerConfigSet(Type):
         config : typing.Mapping<~KT, +VT_co>[str, typing.Any]
         '''
         self.config = config
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2736,6 +2923,7 @@ class ControllerCredentialInfo(Type):
         '''
         self.content = CredentialContent.from_json(content) if content else None
         self.models = [ModelAccess.from_json(o) for o in models or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2749,6 +2937,7 @@ class ControllersChangeResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = ControllersChanges.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2760,6 +2949,7 @@ class ControllersChangeResults(Type):
         results : typing.Sequence<+T_co>[~ControllersChangeResult]<~ControllersChangeResult>
         '''
         self.results = [ControllersChangeResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2781,6 +2971,7 @@ class ControllersChanges(Type):
         self.maintained = maintained
         self.promoted = promoted
         self.removed = removed
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2798,6 +2989,7 @@ class ControllersSpec(Type):
         self.num_controllers = num_controllers
         self.placement = placement
         self.series = series
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2809,6 +3001,7 @@ class ControllersSpecs(Type):
         specs : typing.Sequence<+T_co>[~ControllersSpec]<~ControllersSpec>
         '''
         self.specs = [ControllersSpec.from_json(o) for o in specs or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2826,6 +3019,7 @@ class CreateSpaceParams(Type):
         self.public = public
         self.space_tag = space_tag
         self.subnet_tags = subnet_tags
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2837,6 +3031,7 @@ class CreateSpacesParams(Type):
         spaces : typing.Sequence<+T_co>[~CreateSpaceParams]<~CreateSpaceParams>
         '''
         self.spaces = [CreateSpaceParams.from_json(o) for o in spaces or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2854,6 +3049,7 @@ class CredentialContent(Type):
         self.auth_type = auth_type
         self.cloud = cloud
         self.name = name
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2867,6 +3063,7 @@ class CredentialContentResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = ControllerCredentialInfo.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2878,6 +3075,7 @@ class CredentialContentResults(Type):
         results : typing.Sequence<+T_co>[~CredentialContentResult]<~CredentialContentResult>
         '''
         self.results = [CredentialContentResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2891,6 +3089,7 @@ class Delta(Type):
         '''
         self.entity = entity
         self.removed = removed
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2904,6 +3103,7 @@ class DeployerConnectionValues(Type):
         '''
         self.api_addresses = api_addresses
         self.state_addresses = state_addresses
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2919,6 +3119,7 @@ class DestroyApplicationInfo(Type):
         self.destroyed_storage = [Entity.from_json(o) for o in destroyed_storage or []]
         self.destroyed_units = [Entity.from_json(o) for o in destroyed_units or []]
         self.detached_storage = [Entity.from_json(o) for o in detached_storage or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2932,6 +3133,7 @@ class DestroyApplicationOffers(Type):
         '''
         self.force = force
         self.offer_urls = offer_urls
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2945,6 +3147,7 @@ class DestroyApplicationParams(Type):
         '''
         self.application_tag = application_tag
         self.destroy_storage = destroy_storage
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2958,6 +3161,7 @@ class DestroyApplicationResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.info = DestroyApplicationInfo.from_json(info) if info else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2969,6 +3173,7 @@ class DestroyApplicationResults(Type):
         results : typing.Sequence<+T_co>[~DestroyApplicationResult]<~DestroyApplicationResult>
         '''
         self.results = [DestroyApplicationResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2980,6 +3185,7 @@ class DestroyApplicationUnits(Type):
         unit_names : typing.Sequence<+T_co>[str]
         '''
         self.unit_names = unit_names
+        self.unknown_fields = unknown_fields
 
 
 
@@ -2991,6 +3197,7 @@ class DestroyApplicationsParams(Type):
         applications : typing.Sequence<+T_co>[~DestroyApplicationParams]<~DestroyApplicationParams>
         '''
         self.applications = [DestroyApplicationParams.from_json(o) for o in applications or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3002,6 +3209,7 @@ class DestroyConsumedApplicationParams(Type):
         application_tag : str
         '''
         self.application_tag = application_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3013,6 +3221,7 @@ class DestroyConsumedApplicationsParams(Type):
         applications : typing.Sequence<+T_co>[~DestroyConsumedApplicationParams]<~DestroyConsumedApplicationParams>
         '''
         self.applications = [DestroyConsumedApplicationParams.from_json(o) for o in applications or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3024,6 +3233,7 @@ class DestroyControllerArgs(Type):
         destroy_models : bool
         '''
         self.destroy_models = destroy_models
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3039,6 +3249,7 @@ class DestroyMachineInfo(Type):
         self.destroyed_storage = [Entity.from_json(o) for o in destroyed_storage or []]
         self.destroyed_units = [Entity.from_json(o) for o in destroyed_units or []]
         self.detached_storage = [Entity.from_json(o) for o in detached_storage or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3052,6 +3263,7 @@ class DestroyMachineResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.info = DestroyMachineInfo.from_json(info) if info else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3063,6 +3275,7 @@ class DestroyMachineResults(Type):
         results : typing.Sequence<+T_co>[~DestroyMachineResult]<~DestroyMachineResult>
         '''
         self.results = [DestroyMachineResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3076,6 +3289,7 @@ class DestroyMachines(Type):
         '''
         self.force = force
         self.machine_names = machine_names
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3091,6 +3305,7 @@ class DestroyMachinesParams(Type):
         self.force = force
         self.keep = keep
         self.machine_tags = machine_tags
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3104,6 +3319,7 @@ class DestroyModelParams(Type):
         '''
         self.destroy_storage = destroy_storage
         self.model_tag = model_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3115,6 +3331,7 @@ class DestroyModelsParams(Type):
         models : typing.Sequence<+T_co>[~DestroyModelParams]<~DestroyModelParams>
         '''
         self.models = [DestroyModelParams.from_json(o) for o in models or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3126,6 +3343,7 @@ class DestroyRelation(Type):
         endpoints : typing.Sequence<+T_co>[str]
         '''
         self.endpoints = endpoints
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3139,6 +3357,7 @@ class DestroyUnitInfo(Type):
         '''
         self.destroyed_storage = [Entity.from_json(o) for o in destroyed_storage or []]
         self.detached_storage = [Entity.from_json(o) for o in detached_storage or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3152,6 +3371,7 @@ class DestroyUnitParams(Type):
         '''
         self.destroy_storage = destroy_storage
         self.unit_tag = unit_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3165,6 +3385,7 @@ class DestroyUnitResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.info = DestroyUnitInfo.from_json(info) if info else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3176,6 +3397,7 @@ class DestroyUnitResults(Type):
         results : typing.Sequence<+T_co>[~DestroyUnitResult]<~DestroyUnitResult>
         '''
         self.results = [DestroyUnitResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3187,6 +3409,7 @@ class DestroyUnitsParams(Type):
         units : typing.Sequence<+T_co>[~DestroyUnitParams]<~DestroyUnitParams>
         '''
         self.units = [DestroyUnitParams.from_json(o) for o in units or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3212,6 +3435,7 @@ class DetailedStatus(Type):
         self.since = since
         self.status = status
         self.version = version
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3225,6 +3449,7 @@ class DeviceBridgeInfo(Type):
         '''
         self.bridge_name = bridge_name
         self.host_device_name = host_device_name
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3236,6 +3461,7 @@ class DiscoverSpacesResults(Type):
         results : typing.Sequence<+T_co>[~ProviderSpace]<~ProviderSpace>
         '''
         self.results = [ProviderSpace.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3249,6 +3475,7 @@ class DistributionGroupResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = result
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3260,6 +3487,7 @@ class DistributionGroupResults(Type):
         results : typing.Sequence<+T_co>[~DistributionGroupResult]<~DistributionGroupResult>
         '''
         self.results = [DistributionGroupResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3273,6 +3501,7 @@ class DumpModelRequest(Type):
         '''
         self.entities = [Entity.from_json(o) for o in entities or []]
         self.simplified = simplified
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3286,6 +3515,7 @@ class Endpoint(Type):
         '''
         self.application_name = application_name
         self.relation = CharmRelation.from_json(relation) if relation else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3301,6 +3531,7 @@ class EndpointFilterAttributes(Type):
         self.interface = interface
         self.name = name
         self.role = role
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3318,6 +3549,7 @@ class EndpointStatus(Type):
         self.name = name
         self.role = role
         self.subordinate = subordinate
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3329,6 +3561,7 @@ class Entities(Type):
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         '''
         self.entities = [Entity.from_json(o) for o in entities or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3340,6 +3573,7 @@ class EntitiesCharmURL(Type):
         entities : typing.Sequence<+T_co>[~EntityCharmURL]<~EntityCharmURL>
         '''
         self.entities = [EntityCharmURL.from_json(o) for o in entities or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3351,6 +3585,7 @@ class EntitiesPortRanges(Type):
         entities : typing.Sequence<+T_co>[~EntityPortRange]<~EntityPortRange>
         '''
         self.entities = [EntityPortRange.from_json(o) for o in entities or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3364,6 +3599,7 @@ class EntitiesResult(Type):
         '''
         self.entities = [Entity.from_json(o) for o in entities or []]
         self.error = Error.from_json(error) if error else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3375,6 +3611,7 @@ class EntitiesResults(Type):
         results : typing.Sequence<+T_co>[~EntitiesResult]<~EntitiesResult>
         '''
         self.results = [EntitiesResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3386,6 +3623,7 @@ class EntitiesVersion(Type):
         agent_tools : typing.Sequence<+T_co>[~EntityVersion]<~EntityVersion>
         '''
         self.agent_tools = [EntityVersion.from_json(o) for o in agent_tools or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3401,6 +3639,7 @@ class EntitiesWatchResult(Type):
         self.changes = changes
         self.error = Error.from_json(error) if error else None
         self.watcher_id = watcher_id
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3412,6 +3651,7 @@ class Entity(Type):
         tag : str
         '''
         self.tag = tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3425,6 +3665,7 @@ class EntityAnnotations(Type):
         '''
         self.annotations = annotations
         self.entity = entity
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3438,6 +3679,7 @@ class EntityCharmURL(Type):
         '''
         self.charm_url = charm_url
         self.tag = tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3451,6 +3693,7 @@ class EntityMacaroonArg(Type):
         '''
         self.macaroon = Macaroon.from_json(macaroon) if macaroon else None
         self.tag = tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3462,6 +3705,7 @@ class EntityMacaroonArgs(Type):
         args : typing.Sequence<+T_co>[~EntityMacaroonArg]<~EntityMacaroonArg>
         '''
         self.args = [EntityMacaroonArg.from_json(o) for o in args or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3475,6 +3719,7 @@ class EntityMetrics(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.metrics = [MetricResult.from_json(o) for o in metrics or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3488,6 +3733,7 @@ class EntityPassword(Type):
         '''
         self.password = password
         self.tag = tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3499,6 +3745,7 @@ class EntityPasswords(Type):
         changes : typing.Sequence<+T_co>[~EntityPassword]<~EntityPassword>
         '''
         self.changes = [EntityPassword.from_json(o) for o in changes or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3516,6 +3763,7 @@ class EntityPortRange(Type):
         self.protocol = protocol
         self.tag = tag
         self.to_port = to_port
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3533,6 +3781,7 @@ class EntityStatus(Type):
         self.info = info
         self.since = since
         self.status = status
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3550,6 +3799,7 @@ class EntityStatusArgs(Type):
         self.info = info
         self.status = status
         self.tag = tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3563,6 +3813,7 @@ class EntityString(Type):
         '''
         self.tag = tag
         self.value = value
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3576,6 +3827,7 @@ class EntityVersion(Type):
         '''
         self.tag = tag
         self.tools = Version.from_json(tools) if tools else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3589,6 +3841,7 @@ class EntityWorkloadVersion(Type):
         '''
         self.tag = tag
         self.workload_version = workload_version
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3600,6 +3853,7 @@ class EntityWorkloadVersions(Type):
         entities : typing.Sequence<+T_co>[~EntityWorkloadVersion]<~EntityWorkloadVersion>
         '''
         self.entities = [EntityWorkloadVersion.from_json(o) for o in entities or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3611,6 +3865,7 @@ class EnvListArgs(Type):
         patterns : typing.Sequence<+T_co>[str]
         '''
         self.patterns = patterns
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3622,6 +3877,7 @@ class EnvListResults(Type):
         results : typing.Sequence<+T_co>[~Payload]<~Payload>
         '''
         self.results = [Payload.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3637,6 +3893,7 @@ class Error(Type):
         self.code = code
         self.info = ErrorInfo.from_json(info) if info else None
         self.message = message
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3650,6 +3907,7 @@ class ErrorInfo(Type):
         '''
         self.macaroon = Macaroon.from_json(macaroon) if macaroon else None
         self.macaroon_path = macaroon_path
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3661,6 +3919,7 @@ class ErrorResult(Type):
         error : Error
         '''
         self.error = Error.from_json(error) if error else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3672,6 +3931,7 @@ class ErrorResults(Type):
         results : typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
         '''
         self.results = [ErrorResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3689,6 +3949,7 @@ class ExternalControllerInfo(Type):
         self.ca_cert = ca_cert
         self.controller_alias = controller_alias
         self.controller_tag = controller_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3702,6 +3963,7 @@ class ExternalControllerInfoResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = ExternalControllerInfo.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3713,6 +3975,7 @@ class ExternalControllerInfoResults(Type):
         results : typing.Sequence<+T_co>[~ExternalControllerInfoResult]<~ExternalControllerInfoResult>
         '''
         self.results = [ExternalControllerInfoResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3726,6 +3989,7 @@ class FanConfigEntry(Type):
         '''
         self.overlay = overlay
         self.underlay = underlay
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3737,6 +4001,7 @@ class FanConfigResult(Type):
         fans : typing.Sequence<+T_co>[~FanConfigEntry]<~FanConfigEntry>
         '''
         self.fans = [FanConfigEntry.from_json(o) for o in fans or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3752,6 +4017,7 @@ class Filesystem(Type):
         self.filesystem_tag = filesystem_tag
         self.info = FilesystemInfo.from_json(info) if info else None
         self.volume_tag = volume_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3767,6 +4033,7 @@ class FilesystemAttachment(Type):
         self.filesystem_tag = filesystem_tag
         self.info = FilesystemAttachmentInfo.from_json(info) if info else None
         self.machine_tag = machine_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3780,6 +4047,7 @@ class FilesystemAttachmentDetails(Type):
         '''
         self.filesystemattachmentinfo = FilesystemAttachmentInfo.from_json(filesystemattachmentinfo) if filesystemattachmentinfo else None
         self.life = life
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3793,6 +4061,7 @@ class FilesystemAttachmentInfo(Type):
         '''
         self.mount_point = mount_point
         self.read_only = read_only
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3816,6 +4085,7 @@ class FilesystemAttachmentParams(Type):
         self.mount_point = mount_point
         self.provider = provider
         self.read_only = read_only
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3829,6 +4099,7 @@ class FilesystemAttachmentParamsResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = FilesystemAttachmentParams.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3840,6 +4111,7 @@ class FilesystemAttachmentParamsResults(Type):
         results : typing.Sequence<+T_co>[~FilesystemAttachmentParamsResult]<~FilesystemAttachmentParamsResult>
         '''
         self.results = [FilesystemAttachmentParamsResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3853,6 +4125,7 @@ class FilesystemAttachmentResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = FilesystemAttachment.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3864,6 +4137,7 @@ class FilesystemAttachmentResults(Type):
         results : typing.Sequence<+T_co>[~FilesystemAttachmentResult]<~FilesystemAttachmentResult>
         '''
         self.results = [FilesystemAttachmentResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3875,6 +4149,7 @@ class FilesystemAttachments(Type):
         filesystem_attachments : typing.Sequence<+T_co>[~FilesystemAttachment]<~FilesystemAttachment>
         '''
         self.filesystem_attachments = [FilesystemAttachment.from_json(o) for o in filesystem_attachments or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3896,6 +4171,7 @@ class FilesystemDetails(Type):
         self.status = EntityStatus.from_json(status) if status else None
         self.storage = StorageDetails.from_json(storage) if storage else None
         self.volume_tag = volume_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3909,6 +4185,7 @@ class FilesystemDetailsListResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = [FilesystemDetails.from_json(o) for o in result or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3920,6 +4197,7 @@ class FilesystemDetailsListResults(Type):
         results : typing.Sequence<+T_co>[~FilesystemDetailsListResult]<~FilesystemDetailsListResult>
         '''
         self.results = [FilesystemDetailsListResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3931,6 +4209,7 @@ class FilesystemFilter(Type):
         machines : typing.Sequence<+T_co>[str]
         '''
         self.machines = machines
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3942,6 +4221,7 @@ class FilesystemFilters(Type):
         filters : typing.Sequence<+T_co>[~FilesystemFilter]<~FilesystemFilter>
         '''
         self.filters = [FilesystemFilter.from_json(o) for o in filters or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3955,6 +4235,7 @@ class FilesystemInfo(Type):
         '''
         self.filesystem_id = filesystem_id
         self.size = size
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3978,6 +4259,7 @@ class FilesystemParams(Type):
         self.size = size
         self.tags = tags
         self.volume_tag = volume_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -3991,6 +4273,7 @@ class FilesystemParamsResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = FilesystemParams.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4002,6 +4285,7 @@ class FilesystemParamsResults(Type):
         results : typing.Sequence<+T_co>[~FilesystemParamsResult]<~FilesystemParamsResult>
         '''
         self.results = [FilesystemParamsResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4015,6 +4299,7 @@ class FilesystemResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = Filesystem.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4026,6 +4311,7 @@ class FilesystemResults(Type):
         results : typing.Sequence<+T_co>[~FilesystemResult]<~FilesystemResult>
         '''
         self.results = [FilesystemResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4037,6 +4323,7 @@ class Filesystems(Type):
         filesystems : typing.Sequence<+T_co>[~Filesystem]<~Filesystem>
         '''
         self.filesystems = [Filesystem.from_json(o) for o in filesystems or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4048,6 +4335,7 @@ class FindActionsByNames(Type):
         names : typing.Sequence<+T_co>[str]
         '''
         self.names = names
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4059,6 +4347,7 @@ class FindTags(Type):
         prefixes : typing.Sequence<+T_co>[str]
         '''
         self.prefixes = prefixes
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4070,6 +4359,7 @@ class FindTagsResults(Type):
         matches : typing.Sequence<+T_co>[~Entity]<~Entity>
         '''
         self.matches = [Entity.from_json(o) for o in matches or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4089,6 +4379,7 @@ class FindToolsParams(Type):
         self.minor = minor
         self.number = Number.from_json(number) if number else None
         self.series = series
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4102,6 +4393,7 @@ class FindToolsResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.list_ = [Tools.from_json(o) for o in list_ or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4115,6 +4407,7 @@ class FirewallRule(Type):
         '''
         self.known_service = known_service
         self.whitelist_cidrs = whitelist_cidrs
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4126,6 +4419,7 @@ class FirewallRuleArgs(Type):
         args : typing.Sequence<+T_co>[~FirewallRule]<~FirewallRule>
         '''
         self.args = [FirewallRule.from_json(o) for o in args or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4149,6 +4443,7 @@ class FullStatus(Type):
         self.offers = offers
         self.relations = [RelationStatus.from_json(o) for o in relations or []]
         self.remote_applications = remote_applications
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4166,6 +4461,7 @@ class Generation(Type):
         self.branch = branch
         self.created = created
         self.created_by = created_by
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4185,6 +4481,7 @@ class GenerationApplication(Type):
         self.pending = pending
         self.progress = progress
         self.tracking = tracking
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4198,6 +4495,7 @@ class GenerationResults(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.generations = [Generation.from_json(o) for o in generations or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4209,6 +4507,7 @@ class GetApplicationConstraints(Type):
         application : str
         '''
         self.application = application
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4220,6 +4519,7 @@ class GetConstraintsResults(Type):
         constraints : Value
         '''
         self.constraints = Value.from_json(constraints) if constraints else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4231,6 +4531,7 @@ class GetLeadershipSettingsBulkResults(Type):
         results : typing.Sequence<+T_co>[~GetLeadershipSettingsResult]<~GetLeadershipSettingsResult>
         '''
         self.results = [GetLeadershipSettingsResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4244,6 +4545,7 @@ class GetLeadershipSettingsResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.settings = settings
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4255,6 +4557,7 @@ class GetTokenArg(Type):
         tag : str
         '''
         self.tag = tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4266,6 +4569,7 @@ class GetTokenArgs(Type):
         args : typing.Sequence<+T_co>[~GetTokenArg]<~GetTokenArg>
         '''
         self.args = [GetTokenArg.from_json(o) for o in args or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4279,6 +4583,7 @@ class GoalState(Type):
         '''
         self.relations = relations
         self.units = units
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4292,6 +4597,7 @@ class GoalStateResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = GoalState.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4303,6 +4609,7 @@ class GoalStateResults(Type):
         results : typing.Sequence<+T_co>[~GoalStateResult]<~GoalStateResult>
         '''
         self.results = [GoalStateResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4316,6 +4623,7 @@ class GoalStateStatus(Type):
         '''
         self.since = since
         self.status = status
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4331,6 +4639,7 @@ class HAMember(Type):
         self.public_address = Address.from_json(public_address) if public_address else None
         self.series = series
         self.tag = tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4354,6 +4663,7 @@ class HardwareCharacteristics(Type):
         self.mem = mem
         self.root_disk = root_disk
         self.tags = tags
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4367,6 +4677,7 @@ class History(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.statuses = [DetailedStatus.from_json(o) for o in statuses or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4382,6 +4693,7 @@ class HostNetworkChange(Type):
         self.error = Error.from_json(error) if error else None
         self.new_bridges = [DeviceBridgeInfo.from_json(o) for o in new_bridges or []]
         self.reconfigure_delay = reconfigure_delay
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4393,6 +4705,7 @@ class HostNetworkChangeResults(Type):
         results : typing.Sequence<+T_co>[~HostNetworkChange]<~HostNetworkChange>
         '''
         self.results = [HostNetworkChange.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4406,6 +4719,7 @@ class HostPort(Type):
         '''
         self.address = Address.from_json(address) if address else None
         self.port = port
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4425,6 +4739,7 @@ class HostedModelConfig(Type):
         self.error = Error.from_json(error) if error else None
         self.name = name
         self.owner = owner
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4436,6 +4751,7 @@ class HostedModelConfigsResults(Type):
         models : typing.Sequence<+T_co>[~HostedModelConfig]<~HostedModelConfig>
         '''
         self.models = [HostedModelConfig.from_json(o) for o in models or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4447,6 +4763,7 @@ class ImageFilterParams(Type):
         images : typing.Sequence<+T_co>[~ImageSpec]<~ImageSpec>
         '''
         self.images = [ImageSpec.from_json(o) for o in images or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4466,6 +4783,7 @@ class ImageMetadata(Type):
         self.kind = kind
         self.series = series
         self.url = url
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4487,6 +4805,7 @@ class ImageMetadataFilter(Type):
         self.series = series
         self.stream = stream
         self.virt_type = virt_type
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4502,6 +4821,7 @@ class ImageSpec(Type):
         self.arch = arch
         self.kind = kind
         self.series = series
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4513,6 +4833,7 @@ class ImportStorageDetails(Type):
         storage_tag : str
         '''
         self.storage_tag = storage_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4530,6 +4851,7 @@ class ImportStorageParams(Type):
         self.pool = pool
         self.provider_id = provider_id
         self.storage_name = storage_name
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4543,6 +4865,7 @@ class ImportStorageResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = ImportStorageDetails.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4554,6 +4877,7 @@ class ImportStorageResults(Type):
         results : typing.Sequence<+T_co>[~ImportStorageResult]<~ImportStorageResult>
         '''
         self.results = [ImportStorageResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4573,6 +4897,7 @@ class IngressNetworksChangeEvent(Type):
         self.macaroons = [Macaroon.from_json(o) for o in macaroons or []]
         self.networks = networks
         self.relation_token = relation_token
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4584,6 +4909,7 @@ class IngressNetworksChanges(Type):
         changes : typing.Sequence<+T_co>[~IngressNetworksChangeEvent]<~IngressNetworksChangeEvent>
         '''
         self.changes = [IngressNetworksChangeEvent.from_json(o) for o in changes or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4595,6 +4921,7 @@ class InitiateMigrationArgs(Type):
         specs : typing.Sequence<+T_co>[~MigrationSpec]<~MigrationSpec>
         '''
         self.specs = [MigrationSpec.from_json(o) for o in specs or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4610,6 +4937,7 @@ class InitiateMigrationResult(Type):
         self.error = Error.from_json(error) if error else None
         self.migration_id = migration_id
         self.model_tag = model_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4621,6 +4949,7 @@ class InitiateMigrationResults(Type):
         results : typing.Sequence<+T_co>[~InitiateMigrationResult]<~InitiateMigrationResult>
         '''
         self.results = [InitiateMigrationResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4644,6 +4973,7 @@ class InstanceInfo(Type):
         self.tag = tag
         self.volume_attachments = volume_attachments
         self.volumes = [Volume.from_json(o) for o in volumes or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4669,6 +4999,7 @@ class InstanceType(Type):
         self.name = name
         self.root_disk = root_disk
         self.virt_type = virt_type
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4688,6 +5019,7 @@ class InstanceTypesResult(Type):
         self.cost_unit = cost_unit
         self.error = Error.from_json(error) if error else None
         self.instance_types = [InstanceType.from_json(o) for o in instance_types or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4699,6 +5031,7 @@ class InstanceTypesResults(Type):
         results : typing.Sequence<+T_co>[~InstanceTypesResult]<~InstanceTypesResult>
         '''
         self.results = [InstanceTypesResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4710,6 +5043,7 @@ class InstancesInfo(Type):
         machines : typing.Sequence<+T_co>[~InstanceInfo]<~InstanceInfo>
         '''
         self.machines = [InstanceInfo.from_json(o) for o in machines or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4723,6 +5057,7 @@ class IntResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = result
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4734,6 +5069,7 @@ class IntResults(Type):
         results : typing.Sequence<+T_co>[~IntResult]<~IntResult>
         '''
         self.results = [IntResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4747,6 +5083,7 @@ class InterfaceAddress(Type):
         '''
         self.cidr = cidr
         self.value = value
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4758,6 +5095,7 @@ class InvalidateCredentialArg(Type):
         reason : str
         '''
         self.reason = reason
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4769,6 +5107,7 @@ class IsMasterResult(Type):
         master : bool
         '''
         self.master = master
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4780,6 +5119,7 @@ class IsMeteredResult(Type):
         metered : bool
         '''
         self.metered = metered
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4793,6 +5133,7 @@ class JobsResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.jobs = jobs
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4804,6 +5145,7 @@ class JobsResults(Type):
         results : typing.Sequence<+T_co>[~JobsResult]<~JobsResult>
         '''
         self.results = [JobsResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4815,6 +5157,7 @@ class KnownServiceArgs(Type):
         known_services : typing.Sequence<+T_co>[str]
         '''
         self.known_services = known_services
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4828,6 +5171,7 @@ class KubernetesDeploymentInfo(Type):
         '''
         self.deployment_type = deployment_type
         self.service_type = service_type
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4843,6 +5187,7 @@ class KubernetesDeviceParams(Type):
         self.attributes = attributes
         self.count = count
         self.type_ = type_
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4858,6 +5203,7 @@ class KubernetesFilesystemAttachmentParams(Type):
         self.mount_point = mount_point
         self.provider = provider
         self.read_only = read_only
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4887,6 +5233,7 @@ class KubernetesFilesystemInfo(Type):
         self.status = status
         self.storagename = storagename
         self.volume = KubernetesVolumeInfo.from_json(volume) if volume else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4908,6 +5255,7 @@ class KubernetesFilesystemParams(Type):
         self.size = size
         self.storagename = storagename
         self.tags = tags
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4931,6 +5279,7 @@ class KubernetesProvisioningInfo(Type):
         self.pod_spec = pod_spec
         self.tags = tags
         self.volumes = [KubernetesVolumeParams.from_json(o) for o in volumes or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4944,6 +5293,7 @@ class KubernetesProvisioningInfoResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = KubernetesProvisioningInfo.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4955,6 +5305,7 @@ class KubernetesProvisioningInfoResults(Type):
         results : typing.Sequence<+T_co>[~KubernetesProvisioningInfoResult]<~KubernetesProvisioningInfoResult>
         '''
         self.results = [KubernetesProvisioningInfoResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4968,6 +5319,7 @@ class KubernetesUpgradeArg(Type):
         '''
         self.agent_tag = agent_tag
         self.version = Number.from_json(version) if version else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -4981,6 +5333,7 @@ class KubernetesVolumeAttachmentParams(Type):
         '''
         self.provider = provider
         self.read_only = read_only
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5004,6 +5357,7 @@ class KubernetesVolumeInfo(Type):
         self.size = size
         self.status = status
         self.volume_id = volume_id
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5025,6 +5379,7 @@ class KubernetesVolumeParams(Type):
         self.size = size
         self.storagename = storagename
         self.tags = tags
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5040,6 +5395,7 @@ class LXDProfile(Type):
         self.config = config
         self.description = description
         self.devices = devices
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5053,6 +5409,7 @@ class LXDProfileUpgradeMessages(Type):
         '''
         self.application = Entity.from_json(application) if application else None
         self.watcher_id = watcher_id
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5068,6 +5425,7 @@ class LXDProfileUpgradeMessagesResult(Type):
         self.error = Error.from_json(error) if error else None
         self.message = message
         self.unit_name = unit_name
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5079,6 +5437,7 @@ class LXDProfileUpgradeMessagesResults(Type):
         args : typing.Sequence<+T_co>[~LXDProfileUpgradeMessagesResult]<~LXDProfileUpgradeMessagesResult>
         '''
         self.args = [LXDProfileUpgradeMessagesResult.from_json(o) for o in args or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5092,6 +5451,7 @@ class LifeResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.life = life
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5103,6 +5463,7 @@ class LifeResults(Type):
         results : typing.Sequence<+T_co>[~LifeResult]<~LifeResult>
         '''
         self.results = [LifeResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5114,6 +5475,7 @@ class ListCloudImageMetadataResult(Type):
         result : typing.Sequence<+T_co>[~CloudImageMetadata]<~CloudImageMetadata>
         '''
         self.result = [CloudImageMetadata.from_json(o) for o in result or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5127,6 +5489,7 @@ class ListCloudInfo(Type):
         '''
         self.clouddetails = CloudDetails.from_json(clouddetails) if clouddetails else None
         self.user_access = user_access
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5140,6 +5503,7 @@ class ListCloudInfoResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = ListCloudInfo.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5151,6 +5515,7 @@ class ListCloudInfoResults(Type):
         results : typing.Sequence<+T_co>[~ListCloudInfoResult]<~ListCloudInfoResult>
         '''
         self.results = [ListCloudInfoResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5164,6 +5529,7 @@ class ListCloudsRequest(Type):
         '''
         self.all_ = all_
         self.user_tag = user_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5175,6 +5541,7 @@ class ListFirewallRulesResults(Type):
         rules : typing.Sequence<+T_co>[~FirewallRule]<~FirewallRule>
         '''
         self.rules = [FirewallRule.from_json(o) for o in rules or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5186,6 +5553,7 @@ class ListImageResult(Type):
         result : typing.Sequence<+T_co>[~ImageMetadata]<~ImageMetadata>
         '''
         self.result = [ImageMetadata.from_json(o) for o in result or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5197,6 +5565,7 @@ class ListResourcesArgs(Type):
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         '''
         self.entities = [Entity.from_json(o) for o in entities or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5210,6 +5579,7 @@ class ListSSHKeys(Type):
         '''
         self.entities = Entities.from_json(entities) if entities else None
         self.mode = mode
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5221,6 +5591,7 @@ class ListSpacesResults(Type):
         results : typing.Sequence<+T_co>[~Space]<~Space>
         '''
         self.results = [Space.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5232,6 +5603,7 @@ class ListSubnetsResults(Type):
         results : typing.Sequence<+T_co>[~Subnet]<~Subnet>
         '''
         self.results = [Subnet.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5243,6 +5615,7 @@ class ListUnitResourcesArgs(Type):
         resource_names : typing.Sequence<+T_co>[str]
         '''
         self.resource_names = resource_names
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5254,6 +5627,7 @@ class LogForwardingGetLastSentParams(Type):
         ids : typing.Sequence<+T_co>[~LogForwardingID]<~LogForwardingID>
         '''
         self.ids = [LogForwardingID.from_json(o) for o in ids or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5269,6 +5643,7 @@ class LogForwardingGetLastSentResult(Type):
         self.err = Error.from_json(err) if err else None
         self.record_id = record_id
         self.record_timestamp = record_timestamp
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5280,6 +5655,7 @@ class LogForwardingGetLastSentResults(Type):
         results : typing.Sequence<+T_co>[~LogForwardingGetLastSentResult]<~LogForwardingGetLastSentResult>
         '''
         self.results = [LogForwardingGetLastSentResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5293,6 +5669,7 @@ class LogForwardingID(Type):
         '''
         self.model = model
         self.sink = sink
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5308,6 +5685,7 @@ class LogForwardingSetLastSentParam(Type):
         self.logforwardingid = LogForwardingID.from_json(logforwardingid) if logforwardingid else None
         self.record_id = record_id
         self.record_timestamp = record_timestamp
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5319,6 +5697,7 @@ class LogForwardingSetLastSentParams(Type):
         params : typing.Sequence<+T_co>[~LogForwardingSetLastSentParam]<~LogForwardingSetLastSentParam>
         '''
         self.params = [LogForwardingSetLastSentParam.from_json(o) for o in params or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5332,6 +5711,7 @@ class LookUpArg(Type):
         '''
         self.id_ = id_
         self.name = name
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5343,6 +5723,7 @@ class LookUpArgs(Type):
         args : typing.Sequence<+T_co>[~LookUpArg]<~LookUpArg>
         '''
         self.args = [LookUpArg.from_json(o) for o in args or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5356,6 +5737,7 @@ class LookUpPayloadArg(Type):
         '''
         self.id_ = id_
         self.name = name
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5367,6 +5749,7 @@ class LookUpPayloadArgs(Type):
         args : typing.Sequence<+T_co>[~LookUpPayloadArg]<~LookUpPayloadArg>
         '''
         self.args = [LookUpPayloadArg.from_json(o) for o in args or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5391,6 +5774,7 @@ class MacaroonResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = Macaroon.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5402,6 +5786,7 @@ class MacaroonResults(Type):
         results : typing.Sequence<+T_co>[~MacaroonResult]<~MacaroonResult>
         '''
         self.results = [MacaroonResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5415,6 +5800,7 @@ class MachineAddresses(Type):
         '''
         self.addresses = [Address.from_json(o) for o in addresses or []]
         self.tag = tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5428,6 +5814,7 @@ class MachineAddressesResult(Type):
         '''
         self.addresses = [Address.from_json(o) for o in addresses or []]
         self.error = Error.from_json(error) if error else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5439,6 +5826,7 @@ class MachineAddressesResults(Type):
         results : typing.Sequence<+T_co>[~MachineAddressesResult]<~MachineAddressesResult>
         '''
         self.results = [MachineAddressesResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5452,6 +5840,7 @@ class MachineBlockDevices(Type):
         '''
         self.block_devices = [BlockDevice.from_json(o) for o in block_devices or []]
         self.machine = machine
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5467,6 +5856,7 @@ class MachineContainerResult(Type):
         self.container_types = container_types
         self.determined = determined
         self.error = Error.from_json(error) if error else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5478,6 +5868,7 @@ class MachineContainerResults(Type):
         results : typing.Sequence<+T_co>[~MachineContainerResult]<~MachineContainerResult>
         '''
         self.results = [MachineContainerResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5491,6 +5882,7 @@ class MachineContainers(Type):
         '''
         self.container_types = container_types
         self.machine_tag = machine_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5502,6 +5894,7 @@ class MachineContainersParams(Type):
         params : typing.Sequence<+T_co>[~MachineContainers]<~MachineContainers>
         '''
         self.params = [MachineContainers.from_json(o) for o in params or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5525,6 +5918,7 @@ class MachineHardware(Type):
         self.mem = mem
         self.root_disk = root_disk
         self.tags = tags
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5538,6 +5932,7 @@ class MachineNetworkConfigResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.info = [NetworkConfig.from_json(o) for o in info or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5549,6 +5944,7 @@ class MachineNetworkConfigResults(Type):
         results : typing.Sequence<+T_co>[~MachineNetworkConfigResult]<~MachineNetworkConfigResult>
         '''
         self.results = [MachineNetworkConfigResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5564,6 +5960,7 @@ class MachinePortRange(Type):
         self.port_range = PortRange.from_json(port_range) if port_range else None
         self.relation_tag = relation_tag
         self.unit_tag = unit_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5577,6 +5974,7 @@ class MachinePorts(Type):
         '''
         self.machine_tag = machine_tag
         self.subnet_tag = subnet_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5588,6 +5986,7 @@ class MachinePortsParams(Type):
         params : typing.Sequence<+T_co>[~MachinePorts]<~MachinePorts>
         '''
         self.params = [MachinePorts.from_json(o) for o in params or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5601,6 +6000,7 @@ class MachinePortsResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.ports = [MachinePortRange.from_json(o) for o in ports or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5612,6 +6012,7 @@ class MachinePortsResults(Type):
         results : typing.Sequence<+T_co>[~MachinePortsResult]<~MachinePortsResult>
         '''
         self.results = [MachinePortsResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5645,6 +6046,7 @@ class MachineStatus(Type):
         self.jobs = jobs
         self.series = series
         self.wants_vote = wants_vote
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5658,6 +6060,7 @@ class MachineStorageId(Type):
         '''
         self.attachment_tag = attachment_tag
         self.machine_tag = machine_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5669,6 +6072,7 @@ class MachineStorageIds(Type):
         ids : typing.Sequence<+T_co>[~MachineStorageId]<~MachineStorageId>
         '''
         self.ids = [MachineStorageId.from_json(o) for o in ids or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5684,6 +6088,7 @@ class MachineStorageIdsWatchResult(Type):
         self.changes = [MachineStorageId.from_json(o) for o in changes or []]
         self.error = Error.from_json(error) if error else None
         self.watcher_id = watcher_id
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5695,6 +6100,7 @@ class MachineStorageIdsWatchResults(Type):
         results : typing.Sequence<+T_co>[~MachineStorageIdsWatchResult]<~MachineStorageIdsWatchResult>
         '''
         self.results = [MachineStorageIdsWatchResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5708,6 +6114,7 @@ class MapResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = result
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5719,6 +6126,7 @@ class MapResults(Type):
         results : typing.Sequence<+T_co>[~MapResult]<~MapResult>
         '''
         self.results = [MapResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5736,6 +6144,7 @@ class MasterMigrationStatus(Type):
         self.phase = phase
         self.phase_changed_time = phase_changed_time
         self.spec = MigrationSpec.from_json(spec) if spec else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5763,6 +6172,7 @@ class Member(Type):
         self.slavedelay = slavedelay
         self.tags = tags
         self.votes = votes
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5774,6 +6184,7 @@ class MergeLeadershipSettingsBulkParams(Type):
         params : typing.Sequence<+T_co>[~MergeLeadershipSettingsParam]<~MergeLeadershipSettingsParam>
         '''
         self.params = [MergeLeadershipSettingsParam.from_json(o) for o in params or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5787,6 +6198,7 @@ class MergeLeadershipSettingsParam(Type):
         '''
         self.application_tag = application_tag
         self.settings = settings
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5798,6 +6210,7 @@ class MetadataImageIds(Type):
         image_ids : typing.Sequence<+T_co>[str]
         '''
         self.image_ids = image_ids
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5809,6 +6222,7 @@ class MetadataSaveParams(Type):
         metadata : typing.Sequence<+T_co>[~CloudImageMetadataList]<~CloudImageMetadataList>
         '''
         self.metadata = [CloudImageMetadataList.from_json(o) for o in metadata or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5822,6 +6236,7 @@ class MeterStatus(Type):
         '''
         self.color = color
         self.message = message
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5837,6 +6252,7 @@ class MeterStatusParam(Type):
         self.code = code
         self.info = info
         self.tag = tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5848,6 +6264,7 @@ class MeterStatusParams(Type):
         statues : typing.Sequence<+T_co>[~MeterStatusParam]<~MeterStatusParam>
         '''
         self.statues = [MeterStatusParam.from_json(o) for o in statues or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5863,6 +6280,7 @@ class MeterStatusResult(Type):
         self.code = code
         self.error = Error.from_json(error) if error else None
         self.info = info
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5874,6 +6292,7 @@ class MeterStatusResults(Type):
         results : typing.Sequence<+T_co>[~MeterStatusResult]<~MeterStatusResult>
         '''
         self.results = [MeterStatusResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5889,6 +6308,7 @@ class Metric(Type):
         self.key = key
         self.time = time
         self.value = value
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5906,6 +6326,7 @@ class MetricBatch(Type):
         self.created = created
         self.metrics = [Metric.from_json(o) for o in metrics or []]
         self.uuid = uuid
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5919,6 +6340,7 @@ class MetricBatchParam(Type):
         '''
         self.batch = MetricBatch.from_json(batch) if batch else None
         self.tag = tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5930,6 +6352,7 @@ class MetricBatchParams(Type):
         batches : typing.Sequence<+T_co>[~MetricBatchParam]<~MetricBatchParam>
         '''
         self.batches = [MetricBatchParam.from_json(o) for o in batches or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5947,6 +6370,7 @@ class MetricResult(Type):
         self.time = time
         self.unit = unit
         self.value = value
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5958,6 +6382,7 @@ class MetricResults(Type):
         results : typing.Sequence<+T_co>[~EntityMetrics]<~EntityMetrics>
         '''
         self.results = [EntityMetrics.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5975,6 +6400,7 @@ class MigrationModelInfo(Type):
         self.name = name
         self.owner_tag = owner_tag
         self.uuid = uuid
+        self.unknown_fields = unknown_fields
 
 
 
@@ -5992,6 +6418,7 @@ class MigrationSpec(Type):
         self.model_tag = model_tag
         self.skip_initial_prechecks = skip_initial_prechecks
         self.target_info = MigrationTargetInfo.from_json(target_info) if target_info else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6017,6 +6444,7 @@ class MigrationStatus(Type):
         self.source_ca_cert = source_ca_cert
         self.target_api_addrs = target_api_addrs
         self.target_ca_cert = target_ca_cert
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6038,6 +6466,7 @@ class MigrationTargetInfo(Type):
         self.controller_tag = controller_tag
         self.macaroons = macaroons
         self.password = password
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6053,6 +6482,7 @@ class MinionReport(Type):
         self.migration_id = migration_id
         self.phase = phase
         self.success = success
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6074,6 +6504,7 @@ class MinionReports(Type):
         self.success_count = success_count
         self.unknown_count = unknown_count
         self.unknown_sample = unknown_sample
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6089,6 +6520,7 @@ class Model(Type):
         self.name = name
         self.owner_tag = owner_tag
         self.uuid = uuid
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6102,6 +6534,7 @@ class ModelAccess(Type):
         '''
         self.access = access
         self.model = model
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6113,6 +6546,7 @@ class ModelArgs(Type):
         model_tag : str
         '''
         self.model_tag = model_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6130,6 +6564,7 @@ class ModelBlockInfo(Type):
         self.model_uuid = model_uuid
         self.name = name
         self.owner_tag = owner_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6141,6 +6576,7 @@ class ModelBlockInfoList(Type):
         models : typing.Sequence<+T_co>[~ModelBlockInfo]<~ModelBlockInfo>
         '''
         self.models = [ModelBlockInfo.from_json(o) for o in models or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6152,6 +6588,7 @@ class ModelConfigResult(Type):
         config : typing.Mapping<~KT, +VT_co>[str, typing.Any]
         '''
         self.config = config
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6163,6 +6600,7 @@ class ModelConfigResults(Type):
         config : typing.Mapping<~KT, +VT_co>[str, ~ConfigValue]<~ConfigValue>
         '''
         self.config = config
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6184,6 +6622,7 @@ class ModelCreateArgs(Type):
         self.name = name
         self.owner_tag = owner_tag
         self.region = region
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6201,6 +6640,7 @@ class ModelCredential(Type):
         self.exists = exists
         self.model_tag = model_tag
         self.valid = valid
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6216,6 +6656,7 @@ class ModelDefaultValues(Type):
         self.cloud_region = cloud_region
         self.cloud_tag = cloud_tag
         self.config = config
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6231,6 +6672,7 @@ class ModelDefaults(Type):
         self.controller = controller
         self.default = default
         self.regions = [RegionDefaults.from_json(o) for o in regions or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6242,6 +6684,7 @@ class ModelDefaultsResult(Type):
         config : typing.Mapping<~KT, +VT_co>[str, ~ModelDefaults]<~ModelDefaults>
         '''
         self.config = config
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6253,6 +6696,7 @@ class ModelDefaultsResults(Type):
         results : typing.Sequence<+T_co>[~ModelDefaultsResult]<~ModelDefaultsResult>
         '''
         self.results = [ModelDefaultsResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6266,6 +6710,7 @@ class ModelEntityCount(Type):
         '''
         self.count = count
         self.entity = entity
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6285,6 +6730,7 @@ class ModelFilesystemInfo(Type):
         self.message = message
         self.provider_id = provider_id
         self.status = status
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6330,6 +6776,7 @@ class ModelInfo(Type):
         self.type_ = type_
         self.users = [ModelUserInfo.from_json(o) for o in users or []]
         self.uuid = uuid
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6343,6 +6790,7 @@ class ModelInfoResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = ModelInfo.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6354,6 +6802,7 @@ class ModelInfoResults(Type):
         results : typing.Sequence<+T_co>[~ModelInfoResult]<~ModelInfoResult>
         '''
         self.results = [ModelInfoResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6365,6 +6814,7 @@ class ModelInstanceTypesConstraint(Type):
         value : Value
         '''
         self.value = Value.from_json(value) if value else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6376,6 +6826,7 @@ class ModelInstanceTypesConstraints(Type):
         constraints : typing.Sequence<+T_co>[~ModelInstanceTypesConstraint]<~ModelInstanceTypesConstraint>
         '''
         self.constraints = [ModelInstanceTypesConstraint.from_json(o) for o in constraints or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6397,6 +6848,7 @@ class ModelMachineInfo(Type):
         self.instance_id = instance_id
         self.status = status
         self.wants_vote = wants_vote
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6412,6 +6864,7 @@ class ModelMigrationStatus(Type):
         self.end = end
         self.start = start
         self.status = status
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6427,6 +6880,7 @@ class ModelResult(Type):
         self.error = Error.from_json(error) if error else None
         self.name = name
         self.uuid = uuid
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6440,6 +6894,7 @@ class ModelSLA(Type):
         '''
         self.creds = creds
         self.level = level
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6453,6 +6908,7 @@ class ModelSLAInfo(Type):
         '''
         self.level = level
         self.owner = owner
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6464,6 +6920,7 @@ class ModelSequencesResult(Type):
         sequences : typing.Mapping<~KT, +VT_co>[str, int]
         '''
         self.sequences = sequences
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6475,6 +6932,7 @@ class ModelSet(Type):
         config : typing.Mapping<~KT, +VT_co>[str, typing.Any]
         '''
         self.config = config
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6496,6 +6954,7 @@ class ModelStatus(Type):
         self.machines = [ModelMachineInfo.from_json(o) for o in machines or []]
         self.model_tag = model_tag
         self.owner_tag = owner_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6523,6 +6982,7 @@ class ModelStatusInfo(Type):
         self.sla = sla
         self.type_ = type_
         self.version = version
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6534,6 +6994,7 @@ class ModelStatusResults(Type):
         models : typing.Sequence<+T_co>[~ModelStatus]<~ModelStatus>
         '''
         self.models = [ModelStatus.from_json(o) for o in models or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6547,6 +7008,7 @@ class ModelSummariesRequest(Type):
         '''
         self.all_ = all_
         self.user_tag = user_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6592,6 +7054,7 @@ class ModelSummary(Type):
         self.type_ = type_
         self.user_access = user_access
         self.uuid = uuid
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6605,6 +7068,7 @@ class ModelSummaryResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = ModelSummary.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6616,6 +7080,7 @@ class ModelSummaryResults(Type):
         results : typing.Sequence<+T_co>[~ModelSummaryResult]<~ModelSummaryResult>
         '''
         self.results = [ModelSummaryResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6638,6 +7103,7 @@ class ModelUnset(Type):
         keys : typing.Sequence<+T_co>[str]
         '''
         self.keys = keys
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6653,6 +7119,7 @@ class ModelUnsetKeys(Type):
         self.cloud_region = cloud_region
         self.cloud_tag = cloud_tag
         self.keys = keys
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6670,6 +7137,7 @@ class ModelUserInfo(Type):
         self.display_name = display_name
         self.last_connection = last_connection
         self.user = user
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6683,6 +7151,7 @@ class ModelUserInfoResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = ModelUserInfo.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6694,6 +7163,7 @@ class ModelUserInfoResults(Type):
         results : typing.Sequence<+T_co>[~ModelUserInfoResult]<~ModelUserInfoResult>
         '''
         self.results = [ModelUserInfoResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6713,6 +7183,7 @@ class ModelVolumeInfo(Type):
         self.message = message
         self.provider_id = provider_id
         self.status = status
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6730,6 +7201,7 @@ class ModifyCloudAccess(Type):
         self.action = action
         self.cloud_tag = cloud_tag
         self.user_tag = user_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6741,6 +7213,7 @@ class ModifyCloudAccessRequest(Type):
         changes : typing.Sequence<+T_co>[~ModifyCloudAccess]<~ModifyCloudAccess>
         '''
         self.changes = [ModifyCloudAccess.from_json(o) for o in changes or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6756,6 +7229,7 @@ class ModifyControllerAccess(Type):
         self.access = access
         self.action = action
         self.user_tag = user_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6767,6 +7241,7 @@ class ModifyControllerAccessRequest(Type):
         changes : typing.Sequence<+T_co>[~ModifyControllerAccess]<~ModifyControllerAccess>
         '''
         self.changes = [ModifyControllerAccess.from_json(o) for o in changes or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6784,6 +7259,7 @@ class ModifyModelAccess(Type):
         self.action = action
         self.model_tag = model_tag
         self.user_tag = user_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6795,6 +7271,7 @@ class ModifyModelAccessRequest(Type):
         changes : typing.Sequence<+T_co>[~ModifyModelAccess]<~ModifyModelAccess>
         '''
         self.changes = [ModifyModelAccess.from_json(o) for o in changes or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6812,6 +7289,7 @@ class ModifyOfferAccess(Type):
         self.action = action
         self.offer_url = offer_url
         self.user_tag = user_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6823,6 +7301,7 @@ class ModifyOfferAccessRequest(Type):
         changes : typing.Sequence<+T_co>[~ModifyOfferAccess]<~ModifyOfferAccess>
         '''
         self.changes = [ModifyOfferAccess.from_json(o) for o in changes or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6836,6 +7315,7 @@ class ModifyUserSSHKeys(Type):
         '''
         self.ssh_keys = ssh_keys
         self.user = user
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6851,6 +7331,7 @@ class MongoUpgradeResults(Type):
         self.ha_members = [HAMember.from_json(o) for o in ha_members or []]
         self.master = HAMember.from_json(master) if master else None
         self.rs_members = [Member.from_json(o) for o in rs_members or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6868,6 +7349,7 @@ class MongoVersion(Type):
         self.major = major
         self.minor = minor
         self.patch = patch
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6917,6 +7399,7 @@ class NetworkConfig(Type):
         self.provider_subnet_id = provider_subnet_id
         self.provider_vlan_id = provider_vlan_id
         self.vlan_tag = vlan_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6932,6 +7415,7 @@ class NetworkInfo(Type):
         self.addresses = [InterfaceAddress.from_json(o) for o in addresses or []]
         self.interface_name = interface_name
         self.mac_address = mac_address
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6945,6 +7429,7 @@ class NetworkInfoParams(Type):
         '''
         self.bindings = bindings
         self.unit = unit
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6958,6 +7443,7 @@ class NetworkInfoResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.network_info = [NetworkInfo.from_json(o) for o in network_info or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6969,6 +7455,7 @@ class NetworkInfoResults(Type):
         results : typing.Mapping<~KT, +VT_co>[str, ~NetworkInfoResult]<~NetworkInfoResult>
         '''
         self.results = results
+        self.unknown_fields = unknown_fields
 
 
 
@@ -6990,6 +7477,7 @@ class NetworkInterface(Type):
         self.is_up = is_up
         self.mac_address = mac_address
         self.space = space
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7005,6 +7493,7 @@ class NetworkRoute(Type):
         self.destination_cidr = destination_cidr
         self.gateway_ip = gateway_ip
         self.metric = metric
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7018,6 +7507,7 @@ class NotifyWatchResult(Type):
         '''
         self.notifywatcherid = notifywatcherid
         self.error = Error.from_json(error) if error else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7029,6 +7519,7 @@ class NotifyWatchResults(Type):
         results : typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
         '''
         self.results = [NotifyWatchResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7048,6 +7539,7 @@ class Number(Type):
         self.minor = minor
         self.patch = patch
         self.tag = tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7061,6 +7553,7 @@ class OfferArg(Type):
         '''
         self.macaroons = [Macaroon.from_json(o) for o in macaroons or []]
         self.offer_uuid = offer_uuid
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7072,6 +7565,7 @@ class OfferArgs(Type):
         args : typing.Sequence<+T_co>[~OfferArg]<~OfferArg>
         '''
         self.args = [OfferArg.from_json(o) for o in args or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7093,6 +7587,7 @@ class OfferConnection(Type):
         self.source_model_tag = source_model_tag
         self.status = EntityStatus.from_json(status) if status else None
         self.username = username
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7120,6 +7615,7 @@ class OfferFilter(Type):
         self.model_name = model_name
         self.offer_name = offer_name
         self.owner_name = owner_name
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7131,6 +7627,7 @@ class OfferFilters(Type):
         filters : typing.Sequence<+T_co>[~OfferFilter]<~OfferFilter>
         '''
         self.filters = [OfferFilter.from_json(o) for o in filters or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7144,6 +7641,7 @@ class OfferStatusChange(Type):
         '''
         self.offer_name = offer_name
         self.status = EntityStatus.from_json(status) if status else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7159,6 +7657,7 @@ class OfferStatusWatchResult(Type):
         self.changes = [OfferStatusChange.from_json(o) for o in changes or []]
         self.error = Error.from_json(error) if error else None
         self.watcher_id = watcher_id
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7170,6 +7669,7 @@ class OfferStatusWatchResults(Type):
         results : typing.Sequence<+T_co>[~OfferStatusWatchResult]<~OfferStatusWatchResult>
         '''
         self.results = [OfferStatusWatchResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7181,6 +7681,7 @@ class OfferURLs(Type):
         offer_urls : typing.Sequence<+T_co>[str]
         '''
         self.offer_urls = offer_urls
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7196,6 +7697,7 @@ class OfferUserDetails(Type):
         self.access = access
         self.display_name = display_name
         self.user = user
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7215,6 +7717,7 @@ class OperatorProvisioningInfo(Type):
         self.image_path = image_path
         self.tags = tags
         self.version = Number.from_json(version) if version else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7238,6 +7741,7 @@ class Payload(Type):
         self.status = status
         self.type_ = type_
         self.unit = unit
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7249,6 +7753,7 @@ class PayloadListArgs(Type):
         patterns : typing.Sequence<+T_co>[str]
         '''
         self.patterns = patterns
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7260,6 +7765,7 @@ class PayloadListResults(Type):
         results : typing.Sequence<+T_co>[~Payload]<~Payload>
         '''
         self.results = [Payload.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7277,6 +7783,7 @@ class PayloadResult(Type):
         self.error = Error.from_json(error) if error else None
         self.not_found = not_found
         self.payload = Payload.from_json(payload) if payload else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7288,6 +7795,7 @@ class PayloadResults(Type):
         results : typing.Sequence<+T_co>[~PayloadResult]<~PayloadResult>
         '''
         self.results = [PayloadResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7301,6 +7809,7 @@ class PhaseResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.phase = phase
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7312,6 +7821,7 @@ class PhaseResults(Type):
         results : typing.Sequence<+T_co>[~PhaseResult]<~PhaseResult>
         '''
         self.results = [PhaseResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7325,6 +7835,7 @@ class PinApplicationResult(Type):
         '''
         self.application_name = application_name
         self.error = Error.from_json(error) if error else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7336,6 +7847,7 @@ class PinApplicationsResults(Type):
         results : typing.Sequence<+T_co>[~PinApplicationResult]<~PinApplicationResult>
         '''
         self.results = [PinApplicationResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7347,6 +7859,7 @@ class PinnedLeadershipResult(Type):
         result : typing.Sequence<+T_co>[str]
         '''
         self.result = result
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7360,6 +7873,7 @@ class Placement(Type):
         '''
         self.directive = directive
         self.scope = scope
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7375,6 +7889,7 @@ class PortRange(Type):
         self.from_port = from_port
         self.protocol = protocol
         self.to_port = to_port
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7386,6 +7901,7 @@ class PrivateAddress(Type):
         target : str
         '''
         self.target = target
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7397,6 +7913,7 @@ class PrivateAddressResults(Type):
         private_address : str
         '''
         self.private_address = private_address
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7416,6 +7933,7 @@ class ProfileChangeResult(Type):
         self.old_profile_name = old_profile_name
         self.profile = CharmLXDProfile.from_json(profile) if profile else None
         self.subordinate = subordinate
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7427,6 +7945,7 @@ class ProfileChangeResults(Type):
         results : typing.Sequence<+T_co>[~ProfileChangeResult]<~ProfileChangeResult>
         '''
         self.results = [ProfileChangeResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7444,6 +7963,7 @@ class ProfileInfoResult(Type):
         self.error = Error.from_json(error) if error else None
         self.profile = CharmLXDProfile.from_json(profile) if profile else None
         self.revision = revision
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7459,6 +7979,7 @@ class ProviderInterfaceInfo(Type):
         self.interface_name = interface_name
         self.mac_address = mac_address
         self.provider_id = provider_id
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7474,6 +7995,7 @@ class ProviderInterfaceInfoResult(Type):
         self.error = Error.from_json(error) if error else None
         self.interfaces = [ProviderInterfaceInfo.from_json(o) for o in interfaces or []]
         self.machine_tag = machine_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7485,6 +8007,7 @@ class ProviderInterfaceInfoResults(Type):
         results : typing.Sequence<+T_co>[~ProviderInterfaceInfoResult]<~ProviderInterfaceInfoResult>
         '''
         self.results = [ProviderInterfaceInfoResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7502,6 +8025,7 @@ class ProviderSpace(Type):
         self.name = name
         self.provider_id = provider_id
         self.subnets = [Subnet.from_json(o) for o in subnets or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7531,6 +8055,7 @@ class ProvisioningInfo(Type):
         self.subnets_to_zones = subnets_to_zones
         self.tags = tags
         self.volumes = [VolumeParams.from_json(o) for o in volumes or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7544,6 +8069,7 @@ class ProvisioningInfoResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = ProvisioningInfo.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7555,6 +8081,7 @@ class ProvisioningInfoResults(Type):
         results : typing.Sequence<+T_co>[~ProvisioningInfoResult]<~ProvisioningInfoResult>
         '''
         self.results = [ProvisioningInfoResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7572,6 +8099,7 @@ class ProvisioningScriptParams(Type):
         self.disable_package_commands = disable_package_commands
         self.machine_id = machine_id
         self.nonce = nonce
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7583,6 +8111,7 @@ class ProvisioningScriptResult(Type):
         script : str
         '''
         self.script = script
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7600,6 +8129,7 @@ class ProxyConfig(Type):
         self.http = http
         self.https = https
         self.no_proxy = no_proxy
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7615,6 +8145,7 @@ class ProxyConfigResult(Type):
         self.apt_proxy_settings = ProxyConfig.from_json(apt_proxy_settings) if apt_proxy_settings else None
         self.error = Error.from_json(error) if error else None
         self.proxy_settings = ProxyConfig.from_json(proxy_settings) if proxy_settings else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7626,6 +8157,7 @@ class ProxyConfigResults(Type):
         results : typing.Sequence<+T_co>[~ProxyConfigResult]<~ProxyConfigResult>
         '''
         self.results = [ProxyConfigResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7637,6 +8169,7 @@ class PublicAddress(Type):
         target : str
         '''
         self.target = target
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7648,6 +8181,7 @@ class PublicAddressResults(Type):
         public_address : str
         '''
         self.public_address = public_address
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7659,6 +8193,7 @@ class QueryApplicationOffersResults(Type):
         results : typing.Sequence<+T_co>[~ApplicationOfferAdminDetails]<~ApplicationOfferAdminDetails>
         '''
         self.results = [ApplicationOfferAdminDetails.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7672,6 +8207,7 @@ class RebootActionResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = result
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7683,6 +8219,7 @@ class RebootActionResults(Type):
         results : typing.Sequence<+T_co>[~RebootActionResult]<~RebootActionResult>
         '''
         self.results = [RebootActionResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7696,6 +8233,7 @@ class RegionDefaults(Type):
         '''
         self.region_name = region_name
         self.value = value
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7721,6 +8259,7 @@ class RegisterRemoteRelationArg(Type):
         self.remote_endpoint = RemoteEndpoint.from_json(remote_endpoint) if remote_endpoint else None
         self.remote_space = RemoteSpace.from_json(remote_space) if remote_space else None
         self.source_model_tag = source_model_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7732,6 +8271,7 @@ class RegisterRemoteRelationArgs(Type):
         relations : typing.Sequence<+T_co>[~RegisterRemoteRelationArg]<~RegisterRemoteRelationArg>
         '''
         self.relations = [RegisterRemoteRelationArg.from_json(o) for o in relations or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7745,6 +8285,7 @@ class RegisterRemoteRelationResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = RemoteRelationDetails.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7756,6 +8297,7 @@ class RegisterRemoteRelationResults(Type):
         results : typing.Sequence<+T_co>[~RegisterRemoteRelationResult]<~RegisterRemoteRelationResult>
         '''
         self.results = [RegisterRemoteRelationResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7773,6 +8315,7 @@ class RelationChange(Type):
         self.departedunits = departedunits
         self.id_ = id_
         self.life = life
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7784,6 +8327,7 @@ class RelationIds(Type):
         relation_ids : typing.Sequence<+T_co>[int]
         '''
         self.relation_ids = relation_ids
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7801,6 +8345,7 @@ class RelationLifeSuspendedStatusChange(Type):
         self.life = life
         self.suspended = suspended
         self.suspended_reason = suspended_reason
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7816,6 +8361,7 @@ class RelationLifeSuspendedStatusWatchResult(Type):
         self.changes = [RelationLifeSuspendedStatusChange.from_json(o) for o in changes or []]
         self.error = Error.from_json(error) if error else None
         self.watcher_id = watcher_id
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7835,6 +8381,7 @@ class RelationResult(Type):
         self.id_ = id_
         self.key = key
         self.life = life
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7846,6 +8393,7 @@ class RelationResults(Type):
         results : typing.Sequence<+T_co>[~RelationResult]<~RelationResult>
         '''
         self.results = [RelationResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7865,6 +8413,7 @@ class RelationStatus(Type):
         self.interface = interface
         self.key = key
         self.scope = scope
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7882,6 +8431,7 @@ class RelationStatusArg(Type):
         self.relation_id = relation_id
         self.status = status
         self.unit_tag = unit_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7893,6 +8443,7 @@ class RelationStatusArgs(Type):
         args : typing.Sequence<+T_co>[~RelationStatusArg]<~RelationStatusArg>
         '''
         self.args = [RelationStatusArg.from_json(o) for o in args or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7904,6 +8455,7 @@ class RelationStatusWatchResults(Type):
         results : typing.Sequence<+T_co>[~RelationLifeSuspendedStatusWatchResult]<~RelationLifeSuspendedStatusWatchResult>
         '''
         self.results = [RelationLifeSuspendedStatusWatchResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7919,6 +8471,7 @@ class RelationSuspendedArg(Type):
         self.message = message
         self.relation_id = relation_id
         self.suspended = suspended
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7930,6 +8483,7 @@ class RelationSuspendedArgs(Type):
         args : typing.Sequence<+T_co>[~RelationSuspendedArg]<~RelationSuspendedArg>
         '''
         self.args = [RelationSuspendedArg.from_json(o) for o in args or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7943,6 +8497,7 @@ class RelationUnit(Type):
         '''
         self.relation = relation
         self.unit = unit
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7954,6 +8509,7 @@ class RelationUnitChange(Type):
         settings : typing.Mapping<~KT, +VT_co>[str, typing.Any]
         '''
         self.settings = settings
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7969,6 +8525,7 @@ class RelationUnitPair(Type):
         self.local_unit = local_unit
         self.relation = relation
         self.remote_unit = remote_unit
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7980,6 +8537,7 @@ class RelationUnitPairs(Type):
         relation_unit_pairs : typing.Sequence<+T_co>[~RelationUnitPair]<~RelationUnitPair>
         '''
         self.relation_unit_pairs = [RelationUnitPair.from_json(o) for o in relation_unit_pairs or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7995,6 +8553,7 @@ class RelationUnitSettings(Type):
         self.relation = relation
         self.settings = settings
         self.unit = unit
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8010,6 +8569,7 @@ class RelationUnitStatus(Type):
         self.in_scope = in_scope
         self.relation_tag = relation_tag
         self.suspended = suspended
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8023,6 +8583,7 @@ class RelationUnitStatusResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.results = [RelationUnitStatus.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8034,6 +8595,7 @@ class RelationUnitStatusResults(Type):
         results : typing.Sequence<+T_co>[~RelationUnitStatusResult]<~RelationUnitStatusResult>
         '''
         self.results = [RelationUnitStatusResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8045,6 +8607,7 @@ class RelationUnits(Type):
         relation_units : typing.Sequence<+T_co>[~RelationUnit]<~RelationUnit>
         '''
         self.relation_units = [RelationUnit.from_json(o) for o in relation_units or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8058,6 +8621,7 @@ class RelationUnitsChange(Type):
         '''
         self.changed = changed
         self.departed = departed
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8069,6 +8633,7 @@ class RelationUnitsSettings(Type):
         relation_units : typing.Sequence<+T_co>[~RelationUnitSettings]<~RelationUnitSettings>
         '''
         self.relation_units = [RelationUnitSettings.from_json(o) for o in relation_units or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8084,6 +8649,7 @@ class RelationUnitsWatchResult(Type):
         self.changes = RelationUnitsChange.from_json(changes) if changes else None
         self.error = Error.from_json(error) if error else None
         self.watcher_id = watcher_id
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8095,6 +8661,7 @@ class RelationUnitsWatchResults(Type):
         results : typing.Sequence<+T_co>[~RelationUnitsWatchResult]<~RelationUnitsWatchResult>
         '''
         self.results = [RelationUnitsWatchResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8118,6 +8685,7 @@ class RemoteApplication(Type):
         self.name = name
         self.offer_uuid = offer_uuid
         self.status = status
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8133,6 +8701,7 @@ class RemoteApplicationChange(Type):
         self.application_tag = application_tag
         self.life = life
         self.relations = RemoteRelationsChange.from_json(relations) if relations else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8156,6 +8725,7 @@ class RemoteApplicationInfo(Type):
         self.model_tag = model_tag
         self.name = name
         self.source_model_label = source_model_label
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8169,6 +8739,7 @@ class RemoteApplicationInfoResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = RemoteApplicationInfo.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8180,6 +8751,7 @@ class RemoteApplicationInfoResults(Type):
         results : typing.Sequence<+T_co>[~RemoteApplicationInfoResult]<~RemoteApplicationInfoResult>
         '''
         self.results = [RemoteApplicationInfoResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8193,6 +8765,7 @@ class RemoteApplicationResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = RemoteApplication.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8204,6 +8777,7 @@ class RemoteApplicationResults(Type):
         results : typing.Sequence<+T_co>[~RemoteApplicationResult]<~RemoteApplicationResult>
         '''
         self.results = [RemoteApplicationResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8227,6 +8801,7 @@ class RemoteApplicationStatus(Type):
         self.life = life
         self.relations = relations
         self.status = DetailedStatus.from_json(status) if status else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8242,6 +8817,7 @@ class RemoteApplicationWatchResult(Type):
         self.change = RemoteApplicationChange.from_json(change) if change else None
         self.error = Error.from_json(error) if error else None
         self.id_ = id_
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8261,6 +8837,7 @@ class RemoteEndpoint(Type):
         self.name = name
         self.role = role
         self.scope = scope
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8274,6 +8851,7 @@ class RemoteEntityArg(Type):
         '''
         self.macaroons = [Macaroon.from_json(o) for o in macaroons or []]
         self.relation_token = relation_token
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8285,6 +8863,7 @@ class RemoteEntityArgs(Type):
         args : typing.Sequence<+T_co>[~RemoteEntityArg]<~RemoteEntityArg>
         '''
         self.args = [RemoteEntityArg.from_json(o) for o in args or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8298,6 +8877,7 @@ class RemoteEntityId(Type):
         '''
         self.model_uuid = model_uuid
         self.token = token
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8311,6 +8891,7 @@ class RemoteEntityTokenArg(Type):
         '''
         self.tag = tag
         self.token = token
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8322,6 +8903,7 @@ class RemoteEntityTokenArgs(Type):
         args : typing.Sequence<+T_co>[~RemoteEntityTokenArg]<~RemoteEntityTokenArg>
         '''
         self.args = [RemoteEntityTokenArg.from_json(o) for o in args or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8349,6 +8931,7 @@ class RemoteRelation(Type):
         self.remote_endpoint_name = remote_endpoint_name
         self.source_model_uuid = source_model_uuid
         self.suspended = suspended
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8366,6 +8949,7 @@ class RemoteRelationChange(Type):
         self.departed_units = departed_units
         self.id_ = id_
         self.life = life
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8393,6 +8977,7 @@ class RemoteRelationChangeEvent(Type):
         self.relation_token = relation_token
         self.suspended = suspended
         self.suspended_reason = suspended_reason
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8406,6 +8991,7 @@ class RemoteRelationDetails(Type):
         '''
         self.macaroon = Macaroon.from_json(macaroon) if macaroon else None
         self.relation_token = relation_token
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8419,6 +9005,7 @@ class RemoteRelationResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = RemoteRelation.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8430,6 +9017,7 @@ class RemoteRelationResults(Type):
         results : typing.Sequence<+T_co>[~RemoteRelationResult]<~RemoteRelationResult>
         '''
         self.results = [RemoteRelationResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8445,6 +9033,7 @@ class RemoteRelationUnit(Type):
         self.macaroons = [Macaroon.from_json(o) for o in macaroons or []]
         self.relation_token = relation_token
         self.unit = unit
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8458,6 +9047,7 @@ class RemoteRelationUnitChange(Type):
         '''
         self.settings = settings
         self.unit_id = RemoteEntityId.from_json(unit_id) if unit_id else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8469,6 +9059,7 @@ class RemoteRelationUnits(Type):
         relation_units : typing.Sequence<+T_co>[~RemoteRelationUnit]<~RemoteRelationUnit>
         '''
         self.relation_units = [RemoteRelationUnit.from_json(o) for o in relation_units or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8484,6 +9075,7 @@ class RemoteRelationsChange(Type):
         self.changed = [RemoteRelationChange.from_json(o) for o in changed or []]
         self.initial = initial
         self.removed = removed
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8495,6 +9087,7 @@ class RemoteRelationsChanges(Type):
         changes : typing.Sequence<+T_co>[~RemoteRelationChangeEvent]<~RemoteRelationChangeEvent>
         '''
         self.changes = [RemoteRelationChangeEvent.from_json(o) for o in changes or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8510,6 +9103,7 @@ class RemoteRelationsWatchResult(Type):
         self.remoterelationswatcherid = remoterelationswatcherid
         self.change = RemoteRelationsChange.from_json(change) if change else None
         self.error = Error.from_json(error) if error else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8529,6 +9123,7 @@ class RemoteSpace(Type):
         self.provider_attributes = provider_attributes
         self.provider_id = provider_id
         self.subnets = [Subnet.from_json(o) for o in subnets or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8540,6 +9135,7 @@ class RemoveBlocksArgs(Type):
         all_ : bool
         '''
         self.all_ = all_
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8555,6 +9151,7 @@ class RemoveFilesystemParams(Type):
         self.destroy = destroy
         self.filesystem_id = filesystem_id
         self.provider = provider
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8568,6 +9165,7 @@ class RemoveFilesystemParamsResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = RemoveFilesystemParams.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8579,6 +9177,7 @@ class RemoveFilesystemParamsResults(Type):
         results : typing.Sequence<+T_co>[~RemoveFilesystemParamsResult]<~RemoveFilesystemParamsResult>
         '''
         self.results = [RemoveFilesystemParamsResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8590,6 +9189,7 @@ class RemoveStorage(Type):
         storage : typing.Sequence<+T_co>[~RemoveStorageInstance]<~RemoveStorageInstance>
         '''
         self.storage = [RemoveStorageInstance.from_json(o) for o in storage or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8605,6 +9205,7 @@ class RemoveStorageInstance(Type):
         self.destroy_attachments = destroy_attachments
         self.destroy_storage = destroy_storage
         self.tag = tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8620,6 +9221,7 @@ class RemoveVolumeParams(Type):
         self.destroy = destroy
         self.provider = provider
         self.volume_id = volume_id
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8633,6 +9235,7 @@ class RemoveVolumeParamsResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = RemoveVolumeParams.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8644,6 +9247,7 @@ class RemoveVolumeParamsResults(Type):
         results : typing.Sequence<+T_co>[~RemoveVolumeParamsResult]<~RemoveVolumeParamsResult>
         '''
         self.results = [RemoveVolumeParamsResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8657,6 +9261,7 @@ class ResolveCharmResult(Type):
         '''
         self.error = error
         self.url = url
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8668,6 +9273,7 @@ class ResolveCharmResults(Type):
         urls : typing.Sequence<+T_co>[~ResolveCharmResult]<~ResolveCharmResult>
         '''
         self.urls = [ResolveCharmResult.from_json(o) for o in urls or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8679,6 +9285,7 @@ class ResolveCharms(Type):
         references : typing.Sequence<+T_co>[str]
         '''
         self.references = references
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8692,6 +9299,7 @@ class Resolved(Type):
         '''
         self.retry = retry
         self.unit_name = unit_name
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8705,6 +9313,7 @@ class ResolvedModeResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.mode = mode
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8716,6 +9325,7 @@ class ResolvedModeResults(Type):
         results : typing.Sequence<+T_co>[~ResolvedModeResult]<~ResolvedModeResult>
         '''
         self.results = [ResolvedModeResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8737,6 +9347,7 @@ class Resource(Type):
         self.pending_id = pending_id
         self.timestamp = timestamp
         self.username = username
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8750,6 +9361,7 @@ class ResourceResult(Type):
         '''
         self.errorresult = ErrorResult.from_json(errorresult) if errorresult else None
         self.resource = Resource.from_json(resource) if resource else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8767,6 +9379,7 @@ class ResourcesResult(Type):
         self.charm_store_resources = [CharmResource.from_json(o) for o in charm_store_resources or []]
         self.resources = [Resource.from_json(o) for o in resources or []]
         self.unit_resources = [UnitResources.from_json(o) for o in unit_resources or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8778,6 +9391,7 @@ class ResourcesResults(Type):
         results : typing.Sequence<+T_co>[~ResourcesResult]<~ResourcesResult>
         '''
         self.results = [ResourcesResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8789,6 +9403,7 @@ class RestoreArgs(Type):
         backup_id : str
         '''
         self.backup_id = backup_id
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8800,6 +9415,7 @@ class ResumeReplicationParams(Type):
         members : typing.Sequence<+T_co>[~Member]<~Member>
         '''
         self.members = [Member.from_json(o) for o in members or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8819,6 +9435,7 @@ class RetryStrategy(Type):
         self.min_retry_time = min_retry_time
         self.retry_time_factor = retry_time_factor
         self.should_retry = should_retry
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8832,6 +9449,7 @@ class RetryStrategyResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = RetryStrategy.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8843,6 +9461,7 @@ class RetryStrategyResults(Type):
         results : typing.Sequence<+T_co>[~RetryStrategyResult]<~RetryStrategyResult>
         '''
         self.results = [RetryStrategyResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8856,6 +9475,7 @@ class RevokeCredentialArg(Type):
         '''
         self.force = force
         self.tag = tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8867,6 +9487,7 @@ class RevokeCredentialArgs(Type):
         credentials : typing.Sequence<+T_co>[~RevokeCredentialArg]<~RevokeCredentialArg>
         '''
         self.credentials = [RevokeCredentialArg.from_json(o) for o in credentials or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8886,6 +9507,7 @@ class RunParams(Type):
         self.machines = machines
         self.timeout = timeout
         self.units = units
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8899,6 +9521,7 @@ class SSHAddressResult(Type):
         '''
         self.address = address
         self.error = Error.from_json(error) if error else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8910,6 +9533,7 @@ class SSHAddressResults(Type):
         results : typing.Sequence<+T_co>[~SSHAddressResult]<~SSHAddressResult>
         '''
         self.results = [SSHAddressResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8923,6 +9547,7 @@ class SSHAddressesResult(Type):
         '''
         self.addresses = addresses
         self.error = Error.from_json(error) if error else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8934,6 +9559,7 @@ class SSHAddressesResults(Type):
         results : typing.Sequence<+T_co>[~SSHAddressesResult]<~SSHAddressesResult>
         '''
         self.results = [SSHAddressesResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8945,6 +9571,7 @@ class SSHHostKeySet(Type):
         entity_keys : typing.Sequence<+T_co>[~SSHHostKeys]<~SSHHostKeys>
         '''
         self.entity_keys = [SSHHostKeys.from_json(o) for o in entity_keys or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8958,6 +9585,7 @@ class SSHHostKeys(Type):
         '''
         self.public_keys = public_keys
         self.tag = tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8969,6 +9597,7 @@ class SSHProxyResult(Type):
         use_proxy : bool
         '''
         self.use_proxy = use_proxy
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8982,6 +9611,7 @@ class SSHPublicKeysResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.public_keys = public_keys
+        self.unknown_fields = unknown_fields
 
 
 
@@ -8993,6 +9623,7 @@ class SSHPublicKeysResults(Type):
         results : typing.Sequence<+T_co>[~SSHPublicKeysResult]<~SSHPublicKeysResult>
         '''
         self.results = [SSHPublicKeysResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9004,6 +9635,7 @@ class ScaleApplicationInfo(Type):
         num_units : int
         '''
         self.num_units = num_units
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9019,6 +9651,7 @@ class ScaleApplicationParams(Type):
         self.application_tag = application_tag
         self.scale = scale
         self.scale_change = scale_change
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9032,6 +9665,7 @@ class ScaleApplicationResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.info = ScaleApplicationInfo.from_json(info) if info else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9043,6 +9677,7 @@ class ScaleApplicationResults(Type):
         results : typing.Sequence<+T_co>[~ScaleApplicationResult]<~ScaleApplicationResult>
         '''
         self.results = [ScaleApplicationResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9054,6 +9689,7 @@ class ScaleApplicationsParams(Type):
         applications : typing.Sequence<+T_co>[~ScaleApplicationParams]<~ScaleApplicationParams>
         '''
         self.applications = [ScaleApplicationParams.from_json(o) for o in applications or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9069,6 +9705,7 @@ class SerializedModel(Type):
         self.bytes_ = bytes_
         self.charms = charms
         self.tools = [SerializedModelTools.from_json(o) for o in tools or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9088,6 +9725,7 @@ class SerializedModelResource(Type):
         self.charmstore_revision = SerializedModelResourceRevision.from_json(charmstore_revision) if charmstore_revision else None
         self.name = name
         self.unit_revisions = unit_revisions
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9115,6 +9753,7 @@ class SerializedModelResourceRevision(Type):
         self.timestamp = timestamp
         self.type_ = type_
         self.username = username
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9128,6 +9767,7 @@ class SerializedModelTools(Type):
         '''
         self.uri = uri
         self.version = version
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9141,6 +9781,7 @@ class SetConstraints(Type):
         '''
         self.application = application
         self.constraints = Value.from_json(constraints) if constraints else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9152,6 +9793,7 @@ class SetExternalControllerInfoParams(Type):
         info : ExternalControllerInfo
         '''
         self.info = ExternalControllerInfo.from_json(info) if info else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9163,6 +9805,7 @@ class SetExternalControllersInfoParams(Type):
         controllers : typing.Sequence<+T_co>[~SetExternalControllerInfoParams]<~SetExternalControllerInfoParams>
         '''
         self.controllers = [SetExternalControllerInfoParams.from_json(o) for o in controllers or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9174,6 +9817,7 @@ class SetMachineBlockDevices(Type):
         machine_block_devices : typing.Sequence<+T_co>[~MachineBlockDevices]<~MachineBlockDevices>
         '''
         self.machine_block_devices = [MachineBlockDevices.from_json(o) for o in machine_block_devices or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9187,6 +9831,7 @@ class SetMachineNetworkConfig(Type):
         '''
         self.config = [NetworkConfig.from_json(o) for o in config or []]
         self.tag = tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9198,6 +9843,7 @@ class SetMachinesAddresses(Type):
         machine_addresses : typing.Sequence<+T_co>[~MachineAddresses]<~MachineAddresses>
         '''
         self.machine_addresses = [MachineAddresses.from_json(o) for o in machine_addresses or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9209,6 +9855,7 @@ class SetMigrationPhaseArgs(Type):
         phase : str
         '''
         self.phase = phase
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9220,6 +9867,7 @@ class SetMigrationStatusMessageArgs(Type):
         message : str
         '''
         self.message = message
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9231,6 +9879,7 @@ class SetModelAgentVersion(Type):
         version : Number
         '''
         self.version = Number.from_json(version) if version else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9242,6 +9891,7 @@ class SetModelDefaults(Type):
         config : typing.Sequence<+T_co>[~ModelDefaultValues]<~ModelDefaultValues>
         '''
         self.config = [ModelDefaultValues.from_json(o) for o in config or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9255,6 +9905,7 @@ class SetModelEnvironVersion(Type):
         '''
         self.model_tag = model_tag
         self.version = version
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9266,6 +9917,7 @@ class SetModelEnvironVersions(Type):
         models : typing.Sequence<+T_co>[~SetModelEnvironVersion]<~SetModelEnvironVersion>
         '''
         self.models = [SetModelEnvironVersion.from_json(o) for o in models or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9279,6 +9931,7 @@ class SetPayloadStatusArg(Type):
         '''
         self.entity = Entity.from_json(entity) if entity else None
         self.status = status
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9290,6 +9943,7 @@ class SetPayloadStatusArgs(Type):
         args : typing.Sequence<+T_co>[~SetPayloadStatusArg]<~SetPayloadStatusArg>
         '''
         self.args = [SetPayloadStatusArg.from_json(o) for o in args or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9301,6 +9955,7 @@ class SetPodSpecParams(Type):
         specs : typing.Sequence<+T_co>[~EntityString]<~EntityString>
         '''
         self.specs = [EntityString.from_json(o) for o in specs or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9314,6 +9969,7 @@ class SetProfileArg(Type):
         '''
         self.entity = Entity.from_json(entity) if entity else None
         self.profiles = profiles
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9325,6 +9981,7 @@ class SetProfileArgs(Type):
         args : typing.Sequence<+T_co>[~SetProfileArg]<~SetProfileArg>
         '''
         self.args = [SetProfileArg.from_json(o) for o in args or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9338,6 +9995,7 @@ class SetProfileUpgradeCompleteArg(Type):
         '''
         self.entity = Entity.from_json(entity) if entity else None
         self.message = message
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9349,6 +10007,7 @@ class SetProfileUpgradeCompleteArgs(Type):
         args : typing.Sequence<+T_co>[~SetProfileUpgradeCompleteArg]<~SetProfileUpgradeCompleteArg>
         '''
         self.args = [SetProfileUpgradeCompleteArg.from_json(o) for o in args or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9360,6 +10019,7 @@ class SetStatus(Type):
         entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
         '''
         self.entities = [EntityStatusArgs.from_json(o) for o in entities or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9373,6 +10033,7 @@ class SetStatusArg(Type):
         '''
         self.entity = Entity.from_json(entity) if entity else None
         self.status = status
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9384,6 +10045,7 @@ class SetStatusArgs(Type):
         args : typing.Sequence<+T_co>[~SetStatusArg]<~SetStatusArg>
         '''
         self.args = [SetStatusArg.from_json(o) for o in args or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9401,6 +10063,7 @@ class Settings(Type):
         self.http = http
         self.https = https
         self.noproxy = noproxy
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9414,6 +10077,7 @@ class SettingsResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.settings = settings
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9425,6 +10089,7 @@ class SettingsResults(Type):
         results : typing.Sequence<+T_co>[~SettingsResult]<~SettingsResult>
         '''
         self.results = [SettingsResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9440,6 +10105,7 @@ class SingularClaim(Type):
         self.controller_tag = controller_tag
         self.duration = duration
         self.model_tag = model_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9451,6 +10117,7 @@ class SingularClaims(Type):
         claims : typing.Sequence<+T_co>[~SingularClaim]<~SingularClaim>
         '''
         self.claims = [SingularClaim.from_json(o) for o in claims or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9466,6 +10133,7 @@ class Space(Type):
         self.error = Error.from_json(error) if error else None
         self.name = name
         self.subnets = [Subnet.from_json(o) for o in subnets or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9479,6 +10147,7 @@ class SpaceResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.tag = tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9490,6 +10159,7 @@ class SpaceResults(Type):
         results : typing.Sequence<+T_co>[~SpaceResult]<~SpaceResult>
         '''
         self.results = [SpaceResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9513,6 +10183,7 @@ class StateServingInfo(Type):
         self.shared_secret = shared_secret
         self.state_port = state_port
         self.system_identity = system_identity
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9528,6 +10199,7 @@ class StatusHistoryFilter(Type):
         self.date = date
         self.delta = delta
         self.size = size
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9541,6 +10213,7 @@ class StatusHistoryPruneArgs(Type):
         '''
         self.max_history_mb = max_history_mb
         self.max_history_time = max_history_time
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9558,6 +10231,7 @@ class StatusHistoryRequest(Type):
         self.historykind = historykind
         self.size = size
         self.tag = tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9569,6 +10243,7 @@ class StatusHistoryRequests(Type):
         requests : typing.Sequence<+T_co>[~StatusHistoryRequest]<~StatusHistoryRequest>
         '''
         self.requests = [StatusHistoryRequest.from_json(o) for o in requests or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9582,6 +10257,7 @@ class StatusHistoryResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.history = History.from_json(history) if history else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9593,6 +10269,7 @@ class StatusHistoryResults(Type):
         results : typing.Sequence<+T_co>[~StatusHistoryResult]<~StatusHistoryResult>
         '''
         self.results = [StatusHistoryResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9604,6 +10281,7 @@ class StatusParams(Type):
         patterns : typing.Sequence<+T_co>[str]
         '''
         self.patterns = patterns
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9627,6 +10305,7 @@ class StatusResult(Type):
         self.life = life
         self.since = since
         self.status = status
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9638,6 +10317,7 @@ class StatusResults(Type):
         results : typing.Sequence<+T_co>[~StatusResult]<~StatusResult>
         '''
         self.results = [StatusResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9653,6 +10333,7 @@ class StorageAddParams(Type):
         self.name = name
         self.storage = StorageConstraints.from_json(storage) if storage else None
         self.unit = unit
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9674,6 +10355,7 @@ class StorageAttachment(Type):
         self.owner_tag = owner_tag
         self.storage_tag = storage_tag
         self.unit_tag = unit_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9691,6 +10373,7 @@ class StorageAttachmentDetails(Type):
         self.machine_tag = machine_tag
         self.storage_tag = storage_tag
         self.unit_tag = unit_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9704,6 +10387,7 @@ class StorageAttachmentId(Type):
         '''
         self.storage_tag = storage_tag
         self.unit_tag = unit_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9715,6 +10399,7 @@ class StorageAttachmentIds(Type):
         ids : typing.Sequence<+T_co>[~StorageAttachmentId]<~StorageAttachmentId>
         '''
         self.ids = [StorageAttachmentId.from_json(o) for o in ids or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9728,6 +10413,7 @@ class StorageAttachmentIdsResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = StorageAttachmentIds.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9739,6 +10425,7 @@ class StorageAttachmentIdsResults(Type):
         results : typing.Sequence<+T_co>[~StorageAttachmentIdsResult]<~StorageAttachmentIdsResult>
         '''
         self.results = [StorageAttachmentIdsResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9752,6 +10439,7 @@ class StorageAttachmentResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = StorageAttachment.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9763,6 +10451,7 @@ class StorageAttachmentResults(Type):
         results : typing.Sequence<+T_co>[~StorageAttachmentResult]<~StorageAttachmentResult>
         '''
         self.results = [StorageAttachmentResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9778,6 +10467,7 @@ class StorageConstraints(Type):
         self.count = count
         self.pool = pool
         self.size = size
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9793,6 +10483,7 @@ class StorageDetachmentParams(Type):
         self.force = force
         self.ids = StorageAttachmentIds.from_json(ids) if ids else None
         self.max_wait = max_wait
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9814,6 +10505,7 @@ class StorageDetails(Type):
         self.persistent = persistent
         self.status = EntityStatus.from_json(status) if status else None
         self.storage_tag = storage_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9827,6 +10519,7 @@ class StorageDetailsListResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = [StorageDetails.from_json(o) for o in result or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9838,6 +10531,7 @@ class StorageDetailsListResults(Type):
         results : typing.Sequence<+T_co>[~StorageDetailsListResult]<~StorageDetailsListResult>
         '''
         self.results = [StorageDetailsListResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9851,6 +10545,7 @@ class StorageDetailsResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = StorageDetails.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9862,6 +10557,7 @@ class StorageDetailsResults(Type):
         results : typing.Sequence<+T_co>[~StorageDetailsResult]<~StorageDetailsResult>
         '''
         self.results = [StorageDetailsResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9884,6 +10580,7 @@ class StorageFilters(Type):
         filters : typing.Sequence<+T_co>[~StorageFilter]<~StorageFilter>
         '''
         self.filters = [StorageFilter.from_json(o) for o in filters or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9899,6 +10596,7 @@ class StoragePool(Type):
         self.attrs = attrs
         self.name = name
         self.provider = provider
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9910,6 +10608,7 @@ class StoragePoolArgs(Type):
         pools : typing.Sequence<+T_co>[~StoragePool]<~StoragePool>
         '''
         self.pools = [StoragePool.from_json(o) for o in pools or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9921,6 +10620,7 @@ class StoragePoolDeleteArg(Type):
         name : str
         '''
         self.name = name
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9932,6 +10632,7 @@ class StoragePoolDeleteArgs(Type):
         pools : typing.Sequence<+T_co>[~StoragePoolDeleteArg]<~StoragePoolDeleteArg>
         '''
         self.pools = [StoragePoolDeleteArg.from_json(o) for o in pools or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9945,6 +10646,7 @@ class StoragePoolFilter(Type):
         '''
         self.names = names
         self.providers = providers
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9956,6 +10658,7 @@ class StoragePoolFilters(Type):
         filters : typing.Sequence<+T_co>[~StoragePoolFilter]<~StoragePoolFilter>
         '''
         self.filters = [StoragePoolFilter.from_json(o) for o in filters or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9969,6 +10672,7 @@ class StoragePoolsResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.storage_pools = [StoragePool.from_json(o) for o in storage_pools or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9980,6 +10684,7 @@ class StoragePoolsResults(Type):
         results : typing.Sequence<+T_co>[~StoragePoolsResult]<~StoragePoolsResult>
         '''
         self.results = [StoragePoolsResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -9991,6 +10696,7 @@ class StoragesAddParams(Type):
         storages : typing.Sequence<+T_co>[~StorageAddParams]<~StorageAddParams>
         '''
         self.storages = [StorageAddParams.from_json(o) for o in storages or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10006,6 +10712,7 @@ class StringBoolResult(Type):
         self.error = Error.from_json(error) if error else None
         self.ok = ok
         self.result = result
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10017,6 +10724,7 @@ class StringBoolResults(Type):
         results : typing.Sequence<+T_co>[~StringBoolResult]<~StringBoolResult>
         '''
         self.results = [StringBoolResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10030,6 +10738,7 @@ class StringResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = result
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10041,6 +10750,7 @@ class StringResults(Type):
         results : typing.Sequence<+T_co>[~StringResult]<~StringResult>
         '''
         self.results = [StringResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10054,6 +10764,7 @@ class StringsResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = result
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10065,6 +10776,7 @@ class StringsResults(Type):
         results : typing.Sequence<+T_co>[~StringsResult]<~StringsResult>
         '''
         self.results = [StringsResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10080,6 +10792,7 @@ class StringsWatchResult(Type):
         self.changes = changes
         self.error = Error.from_json(error) if error else None
         self.watcher_id = watcher_id
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10091,6 +10804,7 @@ class StringsWatchResults(Type):
         results : typing.Sequence<+T_co>[~StringsWatchResult]<~StringsWatchResult>
         '''
         self.results = [StringsWatchResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10114,6 +10828,7 @@ class Subnet(Type):
         self.status = status
         self.vlan_tag = vlan_tag
         self.zones = zones
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10127,6 +10842,7 @@ class SubnetsFilters(Type):
         '''
         self.space_tag = space_tag
         self.zone = zone
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10140,6 +10856,7 @@ class TaggedCredential(Type):
         '''
         self.credential = CloudCredential.from_json(credential) if credential else None
         self.tag = tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10151,6 +10868,7 @@ class TaggedCredentials(Type):
         credentials : typing.Sequence<+T_co>[~TaggedCredential]<~TaggedCredential>
         '''
         self.credentials = [TaggedCredential.from_json(o) for o in credentials or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10164,6 +10882,7 @@ class TokenResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.token = token
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10175,6 +10894,7 @@ class TokenResults(Type):
         results : typing.Sequence<+T_co>[~TokenResult]<~TokenResult>
         '''
         self.results = [TokenResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10192,6 +10912,7 @@ class Tools(Type):
         self.size = size
         self.url = url
         self.version = Binary.from_json(version) if version else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10207,6 +10928,7 @@ class ToolsResult(Type):
         self.disable_ssl_hostname_verification = disable_ssl_hostname_verification
         self.error = Error.from_json(error) if error else None
         self.tools = [Tools.from_json(o) for o in tools or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10218,6 +10940,7 @@ class ToolsResults(Type):
         results : typing.Sequence<+T_co>[~ToolsResult]<~ToolsResult>
         '''
         self.results = [ToolsResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10229,6 +10952,7 @@ class TrackArgs(Type):
         payloads : typing.Sequence<+T_co>[~Payload]<~Payload>
         '''
         self.payloads = [Payload.from_json(o) for o in payloads or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10240,6 +10964,7 @@ class TrackPayloadArgs(Type):
         payloads : typing.Sequence<+T_co>[~Payload]<~Payload>
         '''
         self.payloads = [Payload.from_json(o) for o in payloads or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10259,6 +10984,7 @@ class UndertakerModelInfo(Type):
         self.life = life
         self.name = name
         self.uuid = uuid
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10272,6 +10998,7 @@ class UndertakerModelInfoResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = UndertakerModelInfo.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10285,6 +11012,7 @@ class UnitNetworkConfig(Type):
         '''
         self.binding_name = binding_name
         self.unit_tag = unit_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10298,6 +11026,7 @@ class UnitNetworkConfigResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.info = [NetworkConfig.from_json(o) for o in info or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10309,6 +11038,7 @@ class UnitNetworkConfigResults(Type):
         results : typing.Sequence<+T_co>[~UnitNetworkConfigResult]<~UnitNetworkConfigResult>
         '''
         self.results = [UnitNetworkConfigResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10324,6 +11054,7 @@ class UnitRefreshResult(Type):
         self.error = Error.from_json(error) if error else None
         self.life = life
         self.resolved = resolved
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10335,6 +11066,7 @@ class UnitRefreshResults(Type):
         results : typing.Sequence<+T_co>[~UnitRefreshResult]<~UnitRefreshResult>
         '''
         self.results = [UnitRefreshResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10348,6 +11080,7 @@ class UnitResourceResult(Type):
         '''
         self.errorresult = ErrorResult.from_json(errorresult) if errorresult else None
         self.resource = Resource.from_json(resource) if resource else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10363,6 +11096,7 @@ class UnitResources(Type):
         self.entity = Entity.from_json(entity) if entity else None
         self.download_progress = download_progress
         self.resources = [Resource.from_json(o) for o in resources or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10376,6 +11110,7 @@ class UnitResourcesResult(Type):
         '''
         self.errorresult = ErrorResult.from_json(errorresult) if errorresult else None
         self.resources = [UnitResourceResult.from_json(o) for o in resources or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10387,6 +11122,7 @@ class UnitSettings(Type):
         version : int
         '''
         self.version = version
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10414,6 +11150,7 @@ class UnitStatus(Type):
         self.subordinates = subordinates
         self.workload_status = DetailedStatus.from_json(workload_status) if workload_status else None
         self.workload_version = workload_version
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10425,6 +11162,7 @@ class UnitsNetworkConfig(Type):
         args : typing.Sequence<+T_co>[~UnitNetworkConfig]<~UnitNetworkConfig>
         '''
         self.args = [UnitNetworkConfig.from_json(o) for o in args or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10440,6 +11178,7 @@ class UnitsResolved(Type):
         self.all_ = all_
         self.retry = retry
         self.tags = Entities.from_json(tags) if tags else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10451,6 +11190,7 @@ class UnsetModelDefaults(Type):
         keys : typing.Sequence<+T_co>[~ModelUnsetKeys]<~ModelUnsetKeys>
         '''
         self.keys = [ModelUnsetKeys.from_json(o) for o in keys or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10466,6 +11206,7 @@ class UpdateApplicationServiceArg(Type):
         self.addresses = [Address.from_json(o) for o in addresses or []]
         self.application_tag = application_tag
         self.provider_id = provider_id
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10477,6 +11218,7 @@ class UpdateApplicationServiceArgs(Type):
         args : typing.Sequence<+T_co>[~UpdateApplicationServiceArg]<~UpdateApplicationServiceArg>
         '''
         self.args = [UpdateApplicationServiceArg.from_json(o) for o in args or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10488,6 +11230,7 @@ class UpdateApplicationUnitArgs(Type):
         args : typing.Sequence<+T_co>[~UpdateApplicationUnits]<~UpdateApplicationUnits>
         '''
         self.args = [UpdateApplicationUnits.from_json(o) for o in args or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10501,6 +11244,7 @@ class UpdateApplicationUnits(Type):
         '''
         self.application_tag = application_tag
         self.units = [ApplicationUnitParams.from_json(o) for o in units or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10514,6 +11258,7 @@ class UpdateBehavior(Type):
         '''
         self.enable_os_refresh_update = enable_os_refresh_update
         self.enable_os_upgrade = enable_os_upgrade
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10525,6 +11270,7 @@ class UpdateCloudArgs(Type):
         clouds : typing.Sequence<+T_co>[~AddCloudArgs]<~AddCloudArgs>
         '''
         self.clouds = [AddCloudArgs.from_json(o) for o in clouds or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10538,6 +11284,7 @@ class UpdateCloudCredential(Type):
         '''
         self.credential = CloudCredential.from_json(credential) if credential else None
         self.tag = tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10549,6 +11296,7 @@ class UpdateCloudCredentials(Type):
         credentials : typing.Sequence<+T_co>[~UpdateCloudCredential]<~UpdateCloudCredential>
         '''
         self.credentials = [UpdateCloudCredential.from_json(o) for o in credentials or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10562,6 +11310,7 @@ class UpdateCredentialArgs(Type):
         '''
         self.credentials = [TaggedCredential.from_json(o) for o in credentials or []]
         self.force = force
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10577,6 +11326,7 @@ class UpdateCredentialModelResult(Type):
         self.errors = [ErrorResult.from_json(o) for o in errors or []]
         self.name = name
         self.uuid = uuid
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10592,6 +11342,7 @@ class UpdateCredentialResult(Type):
         self.error = Error.from_json(error) if error else None
         self.models = [UpdateCredentialModelResult.from_json(o) for o in models or []]
         self.tag = tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10603,6 +11354,7 @@ class UpdateCredentialResults(Type):
         results : typing.Sequence<+T_co>[~UpdateCredentialResult]<~UpdateCredentialResult>
         '''
         self.results = [UpdateCredentialResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10618,6 +11370,7 @@ class UpdateSeriesArg(Type):
         self.force = force
         self.series = series
         self.tag = Entity.from_json(tag) if tag else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10629,6 +11382,7 @@ class UpdateSeriesArgs(Type):
         args : typing.Sequence<+T_co>[~UpdateSeriesArg]<~UpdateSeriesArg>
         '''
         self.args = [UpdateSeriesArg.from_json(o) for o in args or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10640,6 +11394,7 @@ class UpgradeMongoParams(Type):
         target : MongoVersion
         '''
         self.target = MongoVersion.from_json(target) if target else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10653,6 +11408,7 @@ class UpgradeSeriesNotificationParam(Type):
         '''
         self.entity = Entity.from_json(entity) if entity else None
         self.watcher_id = watcher_id
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10664,6 +11420,7 @@ class UpgradeSeriesNotificationParams(Type):
         params : typing.Sequence<+T_co>[~UpgradeSeriesNotificationParam]<~UpgradeSeriesNotificationParam>
         '''
         self.params = [UpgradeSeriesNotificationParam.from_json(o) for o in params or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10677,6 +11434,7 @@ class UpgradeSeriesStartUnitCompletionParam(Type):
         '''
         self.entities = [Entity.from_json(o) for o in entities or []]
         self.message = message
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10692,6 +11450,7 @@ class UpgradeSeriesStatusParam(Type):
         self.entity = Entity.from_json(entity) if entity else None
         self.message = message
         self.status = status
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10703,6 +11462,7 @@ class UpgradeSeriesStatusParams(Type):
         params : typing.Sequence<+T_co>[~UpgradeSeriesStatusParam]<~UpgradeSeriesStatusParam>
         '''
         self.params = [UpgradeSeriesStatusParam.from_json(o) for o in params or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10716,6 +11476,7 @@ class UpgradeSeriesStatusResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.status = status
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10727,6 +11488,7 @@ class UpgradeSeriesStatusResults(Type):
         results : typing.Sequence<+T_co>[~UpgradeSeriesStatusResult]<~UpgradeSeriesStatusResult>
         '''
         self.results = [UpgradeSeriesStatusResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10740,6 +11502,7 @@ class UpgradeSeriesUnitsResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.unit_names = unit_names
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10751,6 +11514,7 @@ class UpgradeSeriesUnitsResults(Type):
         results : typing.Sequence<+T_co>[~UpgradeSeriesUnitsResult]<~UpgradeSeriesUnitsResult>
         '''
         self.results = [UpgradeSeriesUnitsResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10764,6 +11528,7 @@ class UserAccess(Type):
         '''
         self.access = access
         self.user_tag = user_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10777,6 +11542,7 @@ class UserAccessResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = UserAccess.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10788,6 +11554,7 @@ class UserAccessResults(Type):
         results : typing.Sequence<+T_co>[~UserAccessResult]<~UserAccessResult>
         '''
         self.results = [UserAccessResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10801,6 +11568,7 @@ class UserCloud(Type):
         '''
         self.cloud_tag = cloud_tag
         self.user_tag = user_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10812,6 +11580,7 @@ class UserClouds(Type):
         user_clouds : typing.Sequence<+T_co>[~UserCloud]<~UserCloud>
         '''
         self.user_clouds = [UserCloud.from_json(o) for o in user_clouds or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10835,6 +11604,7 @@ class UserInfo(Type):
         self.display_name = display_name
         self.last_connection = last_connection
         self.username = username
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10848,6 +11618,7 @@ class UserInfoRequest(Type):
         '''
         self.entities = [Entity.from_json(o) for o in entities or []]
         self.include_disabled = include_disabled
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10861,6 +11632,7 @@ class UserInfoResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = UserInfo.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10872,6 +11644,7 @@ class UserInfoResults(Type):
         results : typing.Sequence<+T_co>[~UserInfoResult]<~UserInfoResult>
         '''
         self.results = [UserInfoResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10885,6 +11658,7 @@ class UserModel(Type):
         '''
         self.last_connection = last_connection
         self.model = Model.from_json(model) if model else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10896,6 +11670,7 @@ class UserModelList(Type):
         user_models : typing.Sequence<+T_co>[~UserModel]<~UserModel>
         '''
         self.user_models = [UserModel.from_json(o) for o in user_models or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10925,6 +11700,7 @@ class Value(Type):
         self.spaces = spaces
         self.tags = tags
         self.virt_type = virt_type
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10936,6 +11712,7 @@ class Version(Type):
         version : Binary
         '''
         self.version = Binary.from_json(version) if version else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10949,6 +11726,7 @@ class VersionResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.version = Number.from_json(version) if version else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10960,6 +11738,7 @@ class VersionResults(Type):
         results : typing.Sequence<+T_co>[~VersionResult]<~VersionResult>
         '''
         self.results = [VersionResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10973,6 +11752,7 @@ class Volume(Type):
         '''
         self.info = VolumeInfo.from_json(info) if info else None
         self.volume_tag = volume_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -10988,6 +11768,7 @@ class VolumeAttachment(Type):
         self.info = VolumeAttachmentInfo.from_json(info) if info else None
         self.machine_tag = machine_tag
         self.volume_tag = volume_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -11001,6 +11782,7 @@ class VolumeAttachmentDetails(Type):
         '''
         self.volumeattachmentinfo = VolumeAttachmentInfo.from_json(volumeattachmentinfo) if volumeattachmentinfo else None
         self.life = life
+        self.unknown_fields = unknown_fields
 
 
 
@@ -11018,6 +11800,7 @@ class VolumeAttachmentInfo(Type):
         self.device_link = device_link
         self.device_name = device_name
         self.read_only = read_only
+        self.unknown_fields = unknown_fields
 
 
 
@@ -11039,6 +11822,7 @@ class VolumeAttachmentParams(Type):
         self.read_only = read_only
         self.volume_id = volume_id
         self.volume_tag = volume_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -11052,6 +11836,7 @@ class VolumeAttachmentParamsResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = VolumeAttachmentParams.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -11063,6 +11848,7 @@ class VolumeAttachmentParamsResults(Type):
         results : typing.Sequence<+T_co>[~VolumeAttachmentParamsResult]<~VolumeAttachmentParamsResult>
         '''
         self.results = [VolumeAttachmentParamsResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -11082,6 +11868,7 @@ class VolumeAttachmentPlan(Type):
         self.machine_tag = machine_tag
         self.plan_info = VolumeAttachmentPlanInfo.from_json(plan_info) if plan_info else None
         self.volume_tag = volume_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -11095,6 +11882,7 @@ class VolumeAttachmentPlanInfo(Type):
         '''
         self.device_attributes = device_attributes
         self.device_type = device_type
+        self.unknown_fields = unknown_fields
 
 
 
@@ -11108,6 +11896,7 @@ class VolumeAttachmentPlanResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = VolumeAttachmentPlan.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -11119,6 +11908,7 @@ class VolumeAttachmentPlanResults(Type):
         results : typing.Sequence<+T_co>[~VolumeAttachmentPlanResult]<~VolumeAttachmentPlanResult>
         '''
         self.results = [VolumeAttachmentPlanResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -11130,6 +11920,7 @@ class VolumeAttachmentPlans(Type):
         volume_plans : typing.Sequence<+T_co>[~VolumeAttachmentPlan]<~VolumeAttachmentPlan>
         '''
         self.volume_plans = [VolumeAttachmentPlan.from_json(o) for o in volume_plans or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -11143,6 +11934,7 @@ class VolumeAttachmentResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = VolumeAttachment.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -11154,6 +11946,7 @@ class VolumeAttachmentResults(Type):
         results : typing.Sequence<+T_co>[~VolumeAttachmentResult]<~VolumeAttachmentResult>
         '''
         self.results = [VolumeAttachmentResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -11165,6 +11958,7 @@ class VolumeAttachments(Type):
         volume_attachments : typing.Sequence<+T_co>[~VolumeAttachment]<~VolumeAttachment>
         '''
         self.volume_attachments = [VolumeAttachment.from_json(o) for o in volume_attachments or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -11184,6 +11978,7 @@ class VolumeDetails(Type):
         self.status = EntityStatus.from_json(status) if status else None
         self.storage = StorageDetails.from_json(storage) if storage else None
         self.volume_tag = volume_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -11197,6 +11992,7 @@ class VolumeDetailsListResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = [VolumeDetails.from_json(o) for o in result or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -11208,6 +12004,7 @@ class VolumeDetailsListResults(Type):
         results : typing.Sequence<+T_co>[~VolumeDetailsListResult]<~VolumeDetailsListResult>
         '''
         self.results = [VolumeDetailsListResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -11219,6 +12016,7 @@ class VolumeFilter(Type):
         machines : typing.Sequence<+T_co>[str]
         '''
         self.machines = machines
+        self.unknown_fields = unknown_fields
 
 
 
@@ -11230,6 +12028,7 @@ class VolumeFilters(Type):
         filters : typing.Sequence<+T_co>[~VolumeFilter]<~VolumeFilter>
         '''
         self.filters = [VolumeFilter.from_json(o) for o in filters or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -11247,6 +12046,7 @@ class VolumeInfo(Type):
         self.persistent = persistent
         self.size = size
         self.volume_id = volume_id
+        self.unknown_fields = unknown_fields
 
 
 
@@ -11268,6 +12068,7 @@ class VolumeParams(Type):
         self.size = size
         self.tags = tags
         self.volume_tag = volume_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -11281,6 +12082,7 @@ class VolumeParamsResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = VolumeParams.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -11292,6 +12094,7 @@ class VolumeParamsResults(Type):
         results : typing.Sequence<+T_co>[~VolumeParamsResult]<~VolumeParamsResult>
         '''
         self.results = [VolumeParamsResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -11305,6 +12108,7 @@ class VolumeResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = Volume.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
 
 
 
@@ -11316,6 +12120,7 @@ class VolumeResults(Type):
         results : typing.Sequence<+T_co>[~VolumeResult]<~VolumeResult>
         '''
         self.results = [VolumeResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -11327,6 +12132,7 @@ class Volumes(Type):
         volumes : typing.Sequence<+T_co>[~Volume]<~Volume>
         '''
         self.volumes = [Volume.from_json(o) for o in volumes or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -11340,6 +12146,7 @@ class WatchContainer(Type):
         '''
         self.container_type = container_type
         self.machine_tag = machine_tag
+        self.unknown_fields = unknown_fields
 
 
 
@@ -11351,6 +12158,7 @@ class WatchContainers(Type):
         params : typing.Sequence<+T_co>[~WatchContainer]<~WatchContainer>
         '''
         self.params = [WatchContainer.from_json(o) for o in params or []]
+        self.unknown_fields = unknown_fields
 
 
 
@@ -11366,6 +12174,7 @@ class ZoneResult(Type):
         self.available = available
         self.error = Error.from_json(error) if error else None
         self.name = name
+        self.unknown_fields = unknown_fields
 
 
 
@@ -11377,5 +12186,6 @@ class ZoneResults(Type):
         results : typing.Sequence<+T_co>[~ZoneResult]<~ZoneResult>
         '''
         self.results = [ZoneResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
 
 

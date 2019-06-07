@@ -13,6 +13,7 @@
 #     limitations under the License.
 
 import asyncio
+import json
 import logging
 
 from . import model, tag
@@ -241,6 +242,41 @@ class Application(model.ModelEntity):
             'Getting config for %s', self.name)
 
         return (await app_facade.Get(self.name)).config
+
+    async def get_trusted(self):
+        """Return the trusted configuration setting for this application.
+
+        """
+        app_facade = client.ApplicationFacade.from_connection(self.connection)
+
+        log.debug(
+            'Getting config for %s', self.name)
+
+        config = await app_facade.Get(self.name)
+        if 'trust' in config.config:
+            return config.config['trust']['value'] == True
+        if 'application-config' in config.unknown_fields:
+            app_config = config.unknown_fields['application-config']
+            return app_config['trust']['value'] == True
+        return False
+
+    async def set_trusted(self, trust):
+        """Set the trusted configuration of the application.
+
+        :param bool trust: Trust the application or not
+        """
+        # clamp trust to exactly the value juju expects, rather than allowing
+        # anything in the config.
+        app_facade = client.ApplicationFacade.from_connection(self.connection)
+
+        config = {'trust': json.dumps(True if trust == True else False)}
+        log.debug(
+            'Setting config for %s: %s', self.name, config)
+
+        return await app_facade.SetApplicationsConfig([{
+            "application": self.name,
+            "config": config,
+        }])
 
     async def get_constraints(self):
         """Return the machine constraints dict for this application.
