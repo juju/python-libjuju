@@ -1924,6 +1924,22 @@ class BundleHandler:
         self.ann_facade = client.AnnotationsFacade.from_connection(
             model.connection())
 
+    async def _validate_bundle(self, bundle):
+        """Validate the bundle for known issues, raises an error if it
+        encounters a known problem
+        """
+        apps_dict = bundle.get('applications', bundle.get('services', {}))
+        for app_name in self.applications:
+            app_dict = apps_dict[app_name]
+            app_trusted = app_dict.get('trust')
+            if (not self.trusted and not self.forced) and app_trusted:
+                raise JujuError(
+                    "Bundle cannot be deployed without trusting applications with your cloud credentials.\n"
+                    "Please repeat the deploy command with the --trust argument if you consent to trust the following application\n"
+                    " - {}\n".format(app_name)
+                )
+        return bundle
+
     async def _handle_local_charms(self, bundle):
         """Search for references to local charms (i.e. filesystem paths)
         in the bundle. Upload the local charms to the model, and replace
@@ -1953,14 +1969,6 @@ class BundleHandler:
                 raise JujuError(
                     "Couldn't determine series for charm at {}. "
                     "Add a 'series' key to the bundle.".format(charm_dir))
-
-            app_trusted = app_dict.get('trust')
-            if (not self.trusted and not self.forced) and app_trusted:
-                raise JujuError(
-                    "Bundle cannot be deployed without trusting applications with your cloud credentials. "
-                    "Please repeat the deploy command with the --trust argument if you consent to trust the following application"
-                    " - {}".format(app_name)
-                )
             # Keep track of what we need to update. We keep a list of apps
             # that need to be updated, and a corresponding list of args
             # needed to update those apps.
@@ -1992,6 +2000,7 @@ class BundleHandler:
                                                       filename='bundle.yaml',
                                                       read_file=True)
         self.bundle = yaml.safe_load(bundle_yaml)
+        self.bundle = await self._validate_bundle(self.bundle)
         self.bundle = await self._handle_local_charms(self.bundle)
 
         self.plan = await self.bundle_facade.GetChanges(

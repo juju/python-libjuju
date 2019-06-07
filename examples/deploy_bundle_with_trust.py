@@ -3,7 +3,7 @@ This example:
 
 1. Connects to the current model
 2. Deploy a bundle with trust and waits until it reports itself active
-3. Destroys the unit and application
+3. Destroys the units and applications
 
 """
 from juju import loop
@@ -19,12 +19,11 @@ async def main():
     try:
         print('Deploying trusted bundle')
         applications = await model.deploy(
-            'cs:~juju-qa/bundle/aws-integrator-trust-single-1',
-            series='xenial',
+            'cs:~juju-qa/bundle/basic-trusted-1',
+            series='bionic',
             channel='beta',
             trust=True,
         )
-        print("apps {}".format(applications))
 
         print('Waiting for active')
         await model.block_until(
@@ -33,7 +32,8 @@ async def main():
                             for unit in application.units))
 
         print('Removing bundle')
-        await (application.remove() for application in applications)
+        for application in applications:
+            await application.remove()
     finally:
         print('Disconnecting from model')
         await model.disconnect()
