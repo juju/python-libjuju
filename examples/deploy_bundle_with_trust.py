@@ -13,14 +13,13 @@ from juju.model import Model
 async def main():
     model = Model()
     print('Connecting to model')
-    # connect to current model with current user, per Juju CLI
+    # Connect to current model with current user, per Juju CLI
     await model.connect()
 
     try:
-        print('Deploying trusted bundle')
+        print('Deploying trusted bundle application ubuntu')
         applications = await model.deploy(
             'cs:~juju-qa/bundle/basic-trusted-1',
-            series='bionic',
             channel='beta',
             trust=True,
         )
@@ -30,7 +29,7 @@ async def main():
             lambda: all(unit.workload_status == 'active'
                         for application in applications
                             for unit in application.units))
-
+        print("Successfully deployed!")
         print('Removing bundle')
         for application in applications:
             await application.remove()
