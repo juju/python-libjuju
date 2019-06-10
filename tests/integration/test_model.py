@@ -1,23 +1,21 @@
 import asyncio
-import mock
-from concurrent.futures import ThreadPoolExecutor
-from pathlib import Path
-import paramiko
-
-from juju.client.client import ConfigValue, ApplicationFacade
-from juju.model import Model, ModelObserver
-from juju.utils import block_until, run_with_interrupt
-from juju.errors import JujuError
-
 import os
-import pylxd
 import time
 import uuid
+from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
 
+import mock
+import paramiko
+
+import pylxd
 import pytest
+from juju.client.client import ApplicationFacade, ConfigValue
+from juju.errors import JujuError
+from juju.model import Model, ModelObserver
+from juju.utils import block_until, run_with_interrupt
 
 from .. import base
-
 
 MB = 1
 GB = 1024
@@ -91,6 +89,20 @@ async def test_deploy_bundle(event_loop):
 
         for app in ('wiki', 'mysql'):
             assert app in model.applications
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_deploy_trusted_bundle(event_loop):
+    async with base.CleanModel() as model:
+        await model.deploy('cs:~juju-qa/bundle/basic-trusted-1', trust=True)
+
+        for app in ('ubuntu', 'ubuntu-lite'):
+            assert app in model.applications
+
+        ubuntu_app = model.applications['ubuntu']
+        trusted = await ubuntu_app.get_trusted()
+        assert trusted is True
 
 
 @base.bootstrapped

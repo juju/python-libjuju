@@ -345,6 +345,9 @@ class {}(Type):
                     source.append("{}self.{} = {}".format(INDENT * 2,
                                                           arg_name,
                                                           arg_name))
+            # Ensure that we take the kwargs (unknown_fields) and put it on the
+            # Results/Params so we can inspect it.
+            source.append("{}self.unknown_fields = unknown_fields".format(INDENT * 2))
 
         source = "\n".join(source)
         capture.clear(name)
