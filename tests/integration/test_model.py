@@ -102,7 +102,7 @@ async def test_deploy_trusted_bundle(event_loop):
 
         ubuntu_app = model.applications['ubuntu']
         trusted = await ubuntu_app.get_trusted()
-        assert trusted == True
+        assert trusted is True
 
 
 @base.bootstrapped

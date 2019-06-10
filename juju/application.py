@@ -254,10 +254,10 @@ class Application(model.ModelEntity):
 
         config = await app_facade.Get(self.name)
         if 'trust' in config.config:
-            return config.config['trust']['value'] == True
+            return config.config['trust']['value'] is True
         if 'application-config' in config.unknown_fields:
             app_config = config.unknown_fields['application-config']
-            return app_config['trust']['value'] == True
+            return app_config['trust']['value'] is True
         return False
 
     async def set_trusted(self, trust):
@@ -269,7 +269,7 @@ class Application(model.ModelEntity):
         # anything in the config.
         app_facade = client.ApplicationFacade.from_connection(self.connection)
 
-        config = {'trust': json.dumps(True if trust == True else False)}
+        config = {'trust': json.dumps(True if trust is True else False)}
         log.debug(
             'Setting config for %s: %s', self.name, config)
 

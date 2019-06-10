@@ -141,6 +141,7 @@ async def test_upgrade_charm_resource(event_loop):
         expected_message = 'My resource: I am the resource.'
         assert app.units[0].workload_status_message == expected_message
 
+
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_trusted(event_loop):
@@ -149,8 +150,8 @@ async def test_trusted(event_loop):
 
         ubuntu_app = model.applications['ubuntu']
         trusted = await ubuntu_app.get_trusted()
-        assert trusted == True
+        assert trusted is True
 
         await ubuntu_app.set_trusted(False)
         trusted = await ubuntu_app.get_trusted()
-        assert trusted == False
+        assert trusted is False

@@ -1264,7 +1264,7 @@ class Model:
             '24/lxd/3' - place in container 3 on machine 24
 
             If None, a new machine is provisioned.
-        :param bool trust: Trust signifies that the charm should be deployed 
+        :param bool trust: Trust signifies that the charm should be deployed
             with access to trusted credentials. Hooks run by the charm can access
             cloud credentials and other trusted access credentials.
 
@@ -1911,7 +1911,7 @@ class BundleHandler:
         self.plan = []
         self.references = {}
         self._units_by_app = {}
-        
+
         for unit_name, unit in model.units.items():
             app_units = self._units_by_app.setdefault(unit.application, [])
             app_units.append(unit_name)
