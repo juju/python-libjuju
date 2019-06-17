@@ -1,7 +1,6 @@
 BIN := .tox/py3/bin
 PY := $(BIN)/python
 PIP := $(BIN)/pip
-SCHEMAGEN := $(shell which schemagen)
 VERSION=$(shell cat VERSION)
 
 clean:
@@ -14,9 +13,6 @@ clean:
 	tox -r --notest
 
 client: .tox
-ifndef SCHEMAGEN
-	$(error "schemagen is not available, please install from https://github.com/juju/schemagen")
-endif
 	$(PY) -m juju.client.facade -s "juju/client/schemas*" -o juju/client/
 
 test:
