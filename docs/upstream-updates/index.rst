@@ -7,45 +7,52 @@ to reflect changes in upstream Juju consists of two steps:
 * Creating a new `schemas-juju-<version>.json` file from the Juju code-base
 * Generating the libjuju Python code from that schema
 
-Rarely, you may also have to add or update an override.
+Additionally changes, although rare may be also required to add or
+update an override.
 
 
 Creating a Schema File
 ----------------------
 
-First, you will need to fetch SchemaGen_ and a copy of the Juju source.
-Once your copy of the Juju source is at the version you want to update to
-(probably the `develop` branch, or a release tag) and you have updated
-and reinstalled SchemaGen to reflect those changes, you just need to send
-the output into a file in the libjuju repository:
+Firstly, checkout the Juju_ project and correctly set it up according to
+it's documentation. Juju_ has the ability to generate the schema and stores
+it in version control (git). Copy that file from Juju_ to libjuju repository
+to make sure it can be picked up for construction of the libjuju client.
+
+From inside Juju_:
 
 .. code:: bash
 
-  schemagen > juju/client/schemas-juju-2.2-rc1.json
+  make rebuild-schema
 
-The version number you use in the filename should match the upstream
-version of Juju.  You should then also move the `latest` pointer to
-the new file:
+The version number used in the filename should match the upstream
+version of Juju. To ensure that the client picks up the new change, the
+`latest` pointer (schemas-juju-latest.json) should be pointed to the
+versioned file:
+
+From inside libjuju:
 
 .. code:: bash
 
+  cp ${GOPATH}/src/github.com/juju/juju/apiserver/facades/schema.json \
+      juju/client/schemas-juju-2.6.4.json
   rm juju/client/schemas-juju-latest.json
-  ln -s schemas-juju-2.2-rc1.json juju/client/schemas-juju-latest.json
+  ln -s schemas-juju-2.6.4.json juju/client/schemas-juju-latest.json
 
 
 Generating the Python Code
 --------------------------
 
-Once you have a new schema file, you can update the Python code
-using the `client` make target:
+Creating a new client requires the building of the Python code from
+the schema and doing so is a make target:
 
 .. code:: bash
 
   make client
 
-You should expect to see updates to the `juju/client/_definitions.py` file,
-as well as one or more of the `juju/client/_clientX.py` files, depending on
-which facades were touched.
+Changes to `juju/client/_definitions.py` and `juju/client/_clientX.py`
+files are expected, along with any facades files, depending what was
+changed in Juju_.
 
 
 Integrating into the Object Layer
@@ -111,4 +118,4 @@ the attributes of the override classes into the matching generated class,
 leaving the rest of the generated class untouched.
 
 
-.. _SchemaGen: https://github.com/juju/schemagen
+.. _Juju: https://github.com/juju/juju
