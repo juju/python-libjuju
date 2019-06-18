@@ -13,24 +13,30 @@ Rarely, you may also have to add or update an override.
 Creating a Schema File
 ----------------------
 
-First, you will need to fetch SchemaGen_ and a copy of the Juju source.
-Once your copy of the Juju source is at the version you want to update to
-(probably the `develop` branch, or a release tag) and you have updated
-and reinstalled SchemaGen to reflect those changes, you just need to send
-the output into a file in the libjuju repository:
+Firstly, you'll need to checkout the Juju_ project and correctly have it
+setup according to it's documentation. Juju_ has the ability to generate
+the schema and stores it in version control (git). Copying that file from
+Juju_ to libjuju repository to make sure it can be picked up for
+construction of the libjuju client.
+
+From inside Juju_:
 
 .. code:: bash
 
-  schemagen > juju/client/schemas-juju-2.2-rc1.json
+  make rebuild-schema
 
 The version number you use in the filename should match the upstream
 version of Juju.  You should then also move the `latest` pointer to
 the new file:
 
+From inside libjuju:
+
 .. code:: bash
 
+  cp ${GOPATH}/src/github.com/juju/juju/apiserver/facades/schema.json \
+      juju/client/schemas-juju-2.6.4.json
   rm juju/client/schemas-juju-latest.json
-  ln -s schemas-juju-2.2-rc1.json juju/client/schemas-juju-latest.json
+  ln -s schemas-juju-2.6.4.json juju/client/schemas-juju-latest.json
 
 
 Generating the Python Code
@@ -111,4 +117,4 @@ the attributes of the override classes into the matching generated class,
 leaving the rest of the generated class untouched.
 
 
-.. _SchemaGen: https://github.com/juju/schemagen
+.. _Juju: https://github.com/juju/juju
