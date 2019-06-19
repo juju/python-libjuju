@@ -5,7 +5,7 @@ Changelog
 ^^^^^^
 Wednesday April 19 2019
 
-* Update facade methods for Juju 2.6
+* Update facade methods for Juju 2.6.4
 * Support for trusted bundles and charms (See: Trust_ documentation)
 
 .. _Trust: https://discourse.jujucharms.com/t/deploying-applications-advanced/1061#heading--trusting-an-application-with-a-credential
