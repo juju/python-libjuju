@@ -276,15 +276,15 @@ async def test_relate(event_loop):
 
     async with base.CleanModel() as model:
         await model.deploy(
-            'ubuntu',
+            'cs:~jameinel/ubuntu-lite-7',
             application_name='ubuntu',
-            series='trusty',
+            series='bionic',
             channel='stable',
         )
         await model.deploy(
             'nrpe',
             application_name='nrpe',
-            series='trusty',
+            series='bionic',
             channel='stable',
             # subordinates must be deployed without units
             num_units=0,
@@ -298,7 +298,7 @@ async def test_relate(event_loop):
                 if set(new.key.split()) == {'nrpe:general-info',
                                             'ubuntu:juju-info'}:
                     relation_added.set()
-                    event_loop.call_later(2, timeout.set)
+                    event_loop.call_later(10, timeout.set)
 
         model.add_observer(TestObserver())
 

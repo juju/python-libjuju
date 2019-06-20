@@ -117,7 +117,7 @@ async def test_upgrade_charm_switch(event_loop):
 @pytest.mark.asyncio
 async def test_upgrade_charm_resource(event_loop):
     async with base.CleanModel() as model:
-        app = await model.deploy('cs:~cynerva/upgrade-charm-resource-test-1')
+        app = await model.deploy('cs:~juju-qa/bionic/upgrade-charm-resource-test-0')
 
         def units_ready():
             if not app.units:
@@ -131,7 +131,7 @@ async def test_upgrade_charm_resource(event_loop):
         expected_message = 'I have no resource.'
         assert unit.workload_status_message == expected_message
 
-        await app.upgrade_charm(revision=2)
+        await app.upgrade_charm(revision=1)
         await asyncio.wait_for(
             model.block_until(
                 lambda: unit.workload_status_message != 'I have no resource.'

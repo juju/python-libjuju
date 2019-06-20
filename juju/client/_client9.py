@@ -5,6 +5,1258 @@ from juju.client.facade import Type, ReturnMapping
 from juju.client._definitions import *
 
 
+class ApplicationFacade(Type):
+    name = 'Application'
+    version = 9
+    schema =     {'definitions': {'AddApplicationUnits': {'additionalProperties': False,
+                                             'properties': {'application': {'type': 'string'},
+                                                            'attach-storage': {'items': {'type': 'string'},
+                                                                               'type': 'array'},
+                                                            'num-units': {'type': 'integer'},
+                                                            'placement': {'items': {'$ref': '#/definitions/Placement'},
+                                                                          'type': 'array'},
+                                                            'policy': {'type': 'string'}},
+                                             'required': ['application',
+                                                          'num-units',
+                                                          'placement'],
+                                             'type': 'object'},
+                     'AddApplicationUnitsResults': {'additionalProperties': False,
+                                                    'properties': {'units': {'items': {'type': 'string'},
+                                                                             'type': 'array'}},
+                                                    'required': ['units'],
+                                                    'type': 'object'},
+                     'AddRelation': {'additionalProperties': False,
+                                     'properties': {'endpoints': {'items': {'type': 'string'},
+                                                                  'type': 'array'},
+                                                    'via-cidrs': {'items': {'type': 'string'},
+                                                                  'type': 'array'}},
+                                     'required': ['endpoints'],
+                                     'type': 'object'},
+                     'AddRelationResults': {'additionalProperties': False,
+                                            'properties': {'endpoints': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmRelation'}},
+                                                                         'type': 'object'}},
+                                            'required': ['endpoints'],
+                                            'type': 'object'},
+                     'ApplicationCharmRelations': {'additionalProperties': False,
+                                                   'properties': {'application': {'type': 'string'}},
+                                                   'required': ['application'],
+                                                   'type': 'object'},
+                     'ApplicationCharmRelationsResults': {'additionalProperties': False,
+                                                          'properties': {'charm-relations': {'items': {'type': 'string'},
+                                                                                             'type': 'array'}},
+                                                          'required': ['charm-relations'],
+                                                          'type': 'object'},
+                     'ApplicationConfigSet': {'additionalProperties': False,
+                                              'properties': {'application': {'type': 'string'},
+                                                             'config': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                        'type': 'object'},
+                                                             'generation': {'type': 'string'}},
+                                              'required': ['application',
+                                                           'generation',
+                                                           'config'],
+                                              'type': 'object'},
+                     'ApplicationConfigSetArgs': {'additionalProperties': False,
+                                                  'properties': {'Args': {'items': {'$ref': '#/definitions/ApplicationConfigSet'},
+                                                                          'type': 'array'}},
+                                                  'required': ['Args'],
+                                                  'type': 'object'},
+                     'ApplicationConfigUnsetArgs': {'additionalProperties': False,
+                                                    'properties': {'Args': {'items': {'$ref': '#/definitions/ApplicationUnset'},
+                                                                            'type': 'array'}},
+                                                    'required': ['Args'],
+                                                    'type': 'object'},
+                     'ApplicationConstraint': {'additionalProperties': False,
+                                               'properties': {'constraints': {'$ref': '#/definitions/Value'},
+                                                              'error': {'$ref': '#/definitions/Error'}},
+                                               'required': ['constraints'],
+                                               'type': 'object'},
+                     'ApplicationDeploy': {'additionalProperties': False,
+                                           'properties': {'application': {'type': 'string'},
+                                                          'attach-storage': {'items': {'type': 'string'},
+                                                                             'type': 'array'},
+                                                          'channel': {'type': 'string'},
+                                                          'charm-url': {'type': 'string'},
+                                                          'config': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                     'type': 'object'},
+                                                          'config-yaml': {'type': 'string'},
+                                                          'constraints': {'$ref': '#/definitions/Value'},
+                                                          'devices': {'patternProperties': {'.*': {'$ref': '#/definitions/Constraints'}},
+                                                                      'type': 'object'},
+                                                          'endpoint-bindings': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                                'type': 'object'},
+                                                          'num-units': {'type': 'integer'},
+                                                          'placement': {'items': {'$ref': '#/definitions/Placement'},
+                                                                        'type': 'array'},
+                                                          'policy': {'type': 'string'},
+                                                          'resources': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                        'type': 'object'},
+                                                          'series': {'type': 'string'},
+                                                          'storage': {'patternProperties': {'.*': {'$ref': '#/definitions/Constraints'}},
+                                                                      'type': 'object'}},
+                                           'required': ['application',
+                                                        'series',
+                                                        'charm-url',
+                                                        'channel',
+                                                        'num-units',
+                                                        'config-yaml',
+                                                        'constraints'],
+                                           'type': 'object'},
+                     'ApplicationDestroy': {'additionalProperties': False,
+                                            'properties': {'application': {'type': 'string'}},
+                                            'required': ['application'],
+                                            'type': 'object'},
+                     'ApplicationExpose': {'additionalProperties': False,
+                                           'properties': {'application': {'type': 'string'}},
+                                           'required': ['application'],
+                                           'type': 'object'},
+                     'ApplicationGet': {'additionalProperties': False,
+                                        'properties': {'application': {'type': 'string'},
+                                                       'branch': {'type': 'string'}},
+                                        'required': ['application', 'branch'],
+                                        'type': 'object'},
+                     'ApplicationGetArgs': {'additionalProperties': False,
+                                            'properties': {'args': {'items': {'$ref': '#/definitions/ApplicationGet'},
+                                                                    'type': 'array'}},
+                                            'required': ['args'],
+                                            'type': 'object'},
+                     'ApplicationGetConfigResults': {'additionalProperties': False,
+                                                     'properties': {'Results': {'items': {'$ref': '#/definitions/ConfigResult'},
+                                                                                'type': 'array'}},
+                                                     'required': ['Results'],
+                                                     'type': 'object'},
+                     'ApplicationGetConstraintsResults': {'additionalProperties': False,
+                                                          'properties': {'results': {'items': {'$ref': '#/definitions/ApplicationConstraint'},
+                                                                                     'type': 'array'}},
+                                                          'required': ['results'],
+                                                          'type': 'object'},
+                     'ApplicationGetResults': {'additionalProperties': False,
+                                               'properties': {'application': {'type': 'string'},
+                                                              'application-config': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                                  'type': 'object'}},
+                                                                                     'type': 'object'},
+                                                              'channel': {'type': 'string'},
+                                                              'charm': {'type': 'string'},
+                                                              'config': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                      'type': 'object'}},
+                                                                         'type': 'object'},
+                                                              'constraints': {'$ref': '#/definitions/Value'},
+                                                              'series': {'type': 'string'}},
+                                               'required': ['application',
+                                                            'charm',
+                                                            'config',
+                                                            'constraints',
+                                                            'series',
+                                                            'channel'],
+                                               'type': 'object'},
+                     'ApplicationInfo': {'additionalProperties': False,
+                                         'properties': {'channel': {'type': 'string'},
+                                                        'charm': {'type': 'string'},
+                                                        'constraints': {'$ref': '#/definitions/Value'},
+                                                        'endpoint-bindings': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                              'type': 'object'},
+                                                        'exposed': {'type': 'boolean'},
+                                                        'principal': {'type': 'boolean'},
+                                                        'remote': {'type': 'boolean'},
+                                                        'series': {'type': 'string'},
+                                                        'tag': {'type': 'string'}},
+                                         'required': ['tag',
+                                                      'principal',
+                                                      'exposed',
+                                                      'remote'],
+                                         'type': 'object'},
+                     'ApplicationInfoResult': {'additionalProperties': False,
+                                               'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                              'result': {'$ref': '#/definitions/ApplicationInfo'}},
+                                               'type': 'object'},
+                     'ApplicationInfoResults': {'additionalProperties': False,
+                                                'properties': {'results': {'items': {'$ref': '#/definitions/ApplicationInfoResult'},
+                                                                           'type': 'array'}},
+                                                'required': ['results'],
+                                                'type': 'object'},
+                     'ApplicationMetricCredential': {'additionalProperties': False,
+                                                     'properties': {'application': {'type': 'string'},
+                                                                    'metrics-credentials': {'items': {'type': 'integer'},
+                                                                                            'type': 'array'}},
+                                                     'required': ['application',
+                                                                  'metrics-credentials'],
+                                                     'type': 'object'},
+                     'ApplicationMetricCredentials': {'additionalProperties': False,
+                                                      'properties': {'creds': {'items': {'$ref': '#/definitions/ApplicationMetricCredential'},
+                                                                               'type': 'array'}},
+                                                      'required': ['creds'],
+                                                      'type': 'object'},
+                     'ApplicationOfferDetails': {'additionalProperties': False,
+                                                 'properties': {'application-description': {'type': 'string'},
+                                                                'bindings': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                             'type': 'object'},
+                                                                'endpoints': {'items': {'$ref': '#/definitions/RemoteEndpoint'},
+                                                                              'type': 'array'},
+                                                                'offer-name': {'type': 'string'},
+                                                                'offer-url': {'type': 'string'},
+                                                                'offer-uuid': {'type': 'string'},
+                                                                'source-model-tag': {'type': 'string'},
+                                                                'spaces': {'items': {'$ref': '#/definitions/RemoteSpace'},
+                                                                           'type': 'array'},
+                                                                'users': {'items': {'$ref': '#/definitions/OfferUserDetails'},
+                                                                          'type': 'array'}},
+                                                 'required': ['source-model-tag',
+                                                              'offer-uuid',
+                                                              'offer-url',
+                                                              'offer-name',
+                                                              'application-description'],
+                                                 'type': 'object'},
+                     'ApplicationSet': {'additionalProperties': False,
+                                        'properties': {'application': {'type': 'string'},
+                                                       'branch': {'type': 'string'},
+                                                       'options': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                   'type': 'object'}},
+                                        'required': ['application',
+                                                     'branch',
+                                                     'options'],
+                                        'type': 'object'},
+                     'ApplicationSetCharm': {'additionalProperties': False,
+                                             'properties': {'application': {'type': 'string'},
+                                                            'channel': {'type': 'string'},
+                                                            'charm-url': {'type': 'string'},
+                                                            'config-settings': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                                'type': 'object'},
+                                                            'config-settings-yaml': {'type': 'string'},
+                                                            'force': {'type': 'boolean'},
+                                                            'force-series': {'type': 'boolean'},
+                                                            'force-units': {'type': 'boolean'},
+                                                            'generation': {'type': 'string'},
+                                                            'resource-ids': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                             'type': 'object'},
+                                                            'storage-constraints': {'patternProperties': {'.*': {'$ref': '#/definitions/StorageConstraints'}},
+                                                                                    'type': 'object'}},
+                                             'required': ['application',
+                                                          'generation',
+                                                          'charm-url',
+                                                          'channel',
+                                                          'force',
+                                                          'force-units',
+                                                          'force-series'],
+                                             'type': 'object'},
+                     'ApplicationUnexpose': {'additionalProperties': False,
+                                             'properties': {'application': {'type': 'string'}},
+                                             'required': ['application'],
+                                             'type': 'object'},
+                     'ApplicationUnset': {'additionalProperties': False,
+                                          'properties': {'application': {'type': 'string'},
+                                                         'branch': {'type': 'string'},
+                                                         'options': {'items': {'type': 'string'},
+                                                                     'type': 'array'}},
+                                          'required': ['application',
+                                                       'branch',
+                                                       'options'],
+                                          'type': 'object'},
+                     'ApplicationUpdate': {'additionalProperties': False,
+                                           'properties': {'application': {'type': 'string'},
+                                                          'charm-url': {'type': 'string'},
+                                                          'constraints': {'$ref': '#/definitions/Value'},
+                                                          'force': {'type': 'boolean'},
+                                                          'force-charm-url': {'type': 'boolean'},
+                                                          'force-series': {'type': 'boolean'},
+                                                          'generation': {'type': 'string'},
+                                                          'min-units': {'type': 'integer'},
+                                                          'settings': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                       'type': 'object'},
+                                                          'settings-yaml': {'type': 'string'}},
+                                           'required': ['application',
+                                                        'charm-url',
+                                                        'force-charm-url',
+                                                        'force-series',
+                                                        'force',
+                                                        'settings-yaml',
+                                                        'generation'],
+                                           'type': 'object'},
+                     'ApplicationsDeploy': {'additionalProperties': False,
+                                            'properties': {'applications': {'items': {'$ref': '#/definitions/ApplicationDeploy'},
+                                                                            'type': 'array'}},
+                                            'required': ['applications'],
+                                            'type': 'object'},
+                     'CharmRelation': {'additionalProperties': False,
+                                       'properties': {'interface': {'type': 'string'},
+                                                      'limit': {'type': 'integer'},
+                                                      'name': {'type': 'string'},
+                                                      'optional': {'type': 'boolean'},
+                                                      'role': {'type': 'string'},
+                                                      'scope': {'type': 'string'}},
+                                       'required': ['name',
+                                                    'role',
+                                                    'interface',
+                                                    'optional',
+                                                    'limit',
+                                                    'scope'],
+                                       'type': 'object'},
+                     'ConfigResult': {'additionalProperties': False,
+                                      'properties': {'config': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                             'type': 'object'}},
+                                                                'type': 'object'},
+                                                     'error': {'$ref': '#/definitions/Error'}},
+                                      'required': ['config'],
+                                      'type': 'object'},
+                     'Constraints': {'additionalProperties': False,
+                                     'properties': {'Count': {'type': 'integer'},
+                                                    'Pool': {'type': 'string'},
+                                                    'Size': {'type': 'integer'}},
+                                     'required': ['Pool', 'Size', 'Count'],
+                                     'type': 'object'},
+                     'ConsumeApplicationArg': {'additionalProperties': False,
+                                               'properties': {'ApplicationOfferDetails': {'$ref': '#/definitions/ApplicationOfferDetails'},
+                                                              'application-alias': {'type': 'string'},
+                                                              'external-controller': {'$ref': '#/definitions/ExternalControllerInfo'},
+                                                              'macaroon': {'$ref': '#/definitions/Macaroon'}},
+                                               'required': ['ApplicationOfferDetails'],
+                                               'type': 'object'},
+                     'ConsumeApplicationArgs': {'additionalProperties': False,
+                                                'properties': {'args': {'items': {'$ref': '#/definitions/ConsumeApplicationArg'},
+                                                                        'type': 'array'}},
+                                                'type': 'object'},
+                     'DestroyApplicationInfo': {'additionalProperties': False,
+                                                'properties': {'destroyed-storage': {'items': {'$ref': '#/definitions/Entity'},
+                                                                                     'type': 'array'},
+                                                               'destroyed-units': {'items': {'$ref': '#/definitions/Entity'},
+                                                                                   'type': 'array'},
+                                                               'detached-storage': {'items': {'$ref': '#/definitions/Entity'},
+                                                                                    'type': 'array'}},
+                                                'type': 'object'},
+                     'DestroyApplicationParams': {'additionalProperties': False,
+                                                  'properties': {'application-tag': {'type': 'string'},
+                                                                 'destroy-storage': {'type': 'boolean'},
+                                                                 'force': {'type': 'boolean'},
+                                                                 'max-wait': {'type': 'integer'}},
+                                                  'required': ['application-tag',
+                                                               'force'],
+                                                  'type': 'object'},
+                     'DestroyApplicationResult': {'additionalProperties': False,
+                                                  'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                                 'info': {'$ref': '#/definitions/DestroyApplicationInfo'}},
+                                                  'type': 'object'},
+                     'DestroyApplicationResults': {'additionalProperties': False,
+                                                   'properties': {'results': {'items': {'$ref': '#/definitions/DestroyApplicationResult'},
+                                                                              'type': 'array'}},
+                                                   'type': 'object'},
+                     'DestroyApplicationUnits': {'additionalProperties': False,
+                                                 'properties': {'unit-names': {'items': {'type': 'string'},
+                                                                               'type': 'array'}},
+                                                 'required': ['unit-names'],
+                                                 'type': 'object'},
+                     'DestroyApplicationsParams': {'additionalProperties': False,
+                                                   'properties': {'applications': {'items': {'$ref': '#/definitions/DestroyApplicationParams'},
+                                                                                   'type': 'array'}},
+                                                   'required': ['applications'],
+                                                   'type': 'object'},
+                     'DestroyConsumedApplicationParams': {'additionalProperties': False,
+                                                          'properties': {'application-tag': {'type': 'string'}},
+                                                          'required': ['application-tag'],
+                                                          'type': 'object'},
+                     'DestroyConsumedApplicationsParams': {'additionalProperties': False,
+                                                           'properties': {'applications': {'items': {'$ref': '#/definitions/DestroyConsumedApplicationParams'},
+                                                                                           'type': 'array'}},
+                                                           'required': ['applications'],
+                                                           'type': 'object'},
+                     'DestroyRelation': {'additionalProperties': False,
+                                         'properties': {'endpoints': {'items': {'type': 'string'},
+                                                                      'type': 'array'},
+                                                        'force': {'type': 'boolean'},
+                                                        'max-wait': {'type': 'integer'},
+                                                        'relation-id': {'type': 'integer'}},
+                                         'required': ['relation-id'],
+                                         'type': 'object'},
+                     'DestroyUnitInfo': {'additionalProperties': False,
+                                         'properties': {'destroyed-storage': {'items': {'$ref': '#/definitions/Entity'},
+                                                                              'type': 'array'},
+                                                        'detached-storage': {'items': {'$ref': '#/definitions/Entity'},
+                                                                             'type': 'array'}},
+                                         'type': 'object'},
+                     'DestroyUnitParams': {'additionalProperties': False,
+                                           'properties': {'destroy-storage': {'type': 'boolean'},
+                                                          'force': {'type': 'boolean'},
+                                                          'max-wait': {'type': 'integer'},
+                                                          'unit-tag': {'type': 'string'}},
+                                           'required': ['unit-tag', 'force'],
+                                           'type': 'object'},
+                     'DestroyUnitResult': {'additionalProperties': False,
+                                           'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                          'info': {'$ref': '#/definitions/DestroyUnitInfo'}},
+                                           'type': 'object'},
+                     'DestroyUnitResults': {'additionalProperties': False,
+                                            'properties': {'results': {'items': {'$ref': '#/definitions/DestroyUnitResult'},
+                                                                       'type': 'array'}},
+                                            'type': 'object'},
+                     'DestroyUnitsParams': {'additionalProperties': False,
+                                            'properties': {'units': {'items': {'$ref': '#/definitions/DestroyUnitParams'},
+                                                                     'type': 'array'}},
+                                            'required': ['units'],
+                                            'type': 'object'},
+                     'Entities': {'additionalProperties': False,
+                                  'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
+                                                              'type': 'array'}},
+                                  'required': ['entities'],
+                                  'type': 'object'},
+                     'Entity': {'additionalProperties': False,
+                                'properties': {'tag': {'type': 'string'}},
+                                'required': ['tag'],
+                                'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ErrorResult': {'additionalProperties': False,
+                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
+                                     'type': 'object'},
+                     'ErrorResults': {'additionalProperties': False,
+                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
+                                                                 'type': 'array'}},
+                                      'required': ['results'],
+                                      'type': 'object'},
+                     'ExternalControllerInfo': {'additionalProperties': False,
+                                                'properties': {'addrs': {'items': {'type': 'string'},
+                                                                         'type': 'array'},
+                                                               'ca-cert': {'type': 'string'},
+                                                               'controller-alias': {'type': 'string'},
+                                                               'controller-tag': {'type': 'string'}},
+                                                'required': ['controller-tag',
+                                                             'controller-alias',
+                                                             'addrs',
+                                                             'ca-cert'],
+                                                'type': 'object'},
+                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
+                     'OfferUserDetails': {'additionalProperties': False,
+                                          'properties': {'access': {'type': 'string'},
+                                                         'display-name': {'type': 'string'},
+                                                         'user': {'type': 'string'}},
+                                          'required': ['user',
+                                                       'display-name',
+                                                       'access'],
+                                          'type': 'object'},
+                     'Placement': {'additionalProperties': False,
+                                   'properties': {'directive': {'type': 'string'},
+                                                  'scope': {'type': 'string'}},
+                                   'required': ['scope', 'directive'],
+                                   'type': 'object'},
+                     'RelationSuspendedArg': {'additionalProperties': False,
+                                              'properties': {'message': {'type': 'string'},
+                                                             'relation-id': {'type': 'integer'},
+                                                             'suspended': {'type': 'boolean'}},
+                                              'required': ['relation-id',
+                                                           'message',
+                                                           'suspended'],
+                                              'type': 'object'},
+                     'RelationSuspendedArgs': {'additionalProperties': False,
+                                               'properties': {'args': {'items': {'$ref': '#/definitions/RelationSuspendedArg'},
+                                                                       'type': 'array'}},
+                                               'required': ['args'],
+                                               'type': 'object'},
+                     'RemoteEndpoint': {'additionalProperties': False,
+                                        'properties': {'interface': {'type': 'string'},
+                                                       'limit': {'type': 'integer'},
+                                                       'name': {'type': 'string'},
+                                                       'role': {'type': 'string'}},
+                                        'required': ['name',
+                                                     'role',
+                                                     'interface',
+                                                     'limit'],
+                                        'type': 'object'},
+                     'RemoteSpace': {'additionalProperties': False,
+                                     'properties': {'cloud-type': {'type': 'string'},
+                                                    'name': {'type': 'string'},
+                                                    'provider-attributes': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                         'type': 'object'}},
+                                                                            'type': 'object'},
+                                                    'provider-id': {'type': 'string'},
+                                                    'subnets': {'items': {'$ref': '#/definitions/Subnet'},
+                                                                'type': 'array'}},
+                                     'required': ['cloud-type',
+                                                  'name',
+                                                  'provider-id',
+                                                  'provider-attributes',
+                                                  'subnets'],
+                                     'type': 'object'},
+                     'ScaleApplicationInfo': {'additionalProperties': False,
+                                              'properties': {'num-units': {'type': 'integer'}},
+                                              'required': ['num-units'],
+                                              'type': 'object'},
+                     'ScaleApplicationParams': {'additionalProperties': False,
+                                                'properties': {'application-tag': {'type': 'string'},
+                                                               'force': {'type': 'boolean'},
+                                                               'scale': {'type': 'integer'},
+                                                               'scale-change': {'type': 'integer'}},
+                                                'required': ['application-tag',
+                                                             'scale',
+                                                             'force'],
+                                                'type': 'object'},
+                     'ScaleApplicationResult': {'additionalProperties': False,
+                                                'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                               'info': {'$ref': '#/definitions/ScaleApplicationInfo'}},
+                                                'type': 'object'},
+                     'ScaleApplicationResults': {'additionalProperties': False,
+                                                 'properties': {'results': {'items': {'$ref': '#/definitions/ScaleApplicationResult'},
+                                                                            'type': 'array'}},
+                                                 'type': 'object'},
+                     'ScaleApplicationsParams': {'additionalProperties': False,
+                                                 'properties': {'applications': {'items': {'$ref': '#/definitions/ScaleApplicationParams'},
+                                                                                 'type': 'array'}},
+                                                 'required': ['applications'],
+                                                 'type': 'object'},
+                     'SetConstraints': {'additionalProperties': False,
+                                        'properties': {'application': {'type': 'string'},
+                                                       'constraints': {'$ref': '#/definitions/Value'}},
+                                        'required': ['application', 'constraints'],
+                                        'type': 'object'},
+                     'StorageConstraints': {'additionalProperties': False,
+                                            'properties': {'count': {'type': 'integer'},
+                                                           'pool': {'type': 'string'},
+                                                           'size': {'type': 'integer'}},
+                                            'type': 'object'},
+                     'StringResult': {'additionalProperties': False,
+                                      'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                     'result': {'type': 'string'}},
+                                      'required': ['result'],
+                                      'type': 'object'},
+                     'Subnet': {'additionalProperties': False,
+                                'properties': {'cidr': {'type': 'string'},
+                                               'life': {'type': 'string'},
+                                               'provider-id': {'type': 'string'},
+                                               'provider-network-id': {'type': 'string'},
+                                               'provider-space-id': {'type': 'string'},
+                                               'space-tag': {'type': 'string'},
+                                               'status': {'type': 'string'},
+                                               'vlan-tag': {'type': 'integer'},
+                                               'zones': {'items': {'type': 'string'},
+                                                         'type': 'array'}},
+                                'required': ['cidr',
+                                             'vlan-tag',
+                                             'life',
+                                             'space-tag',
+                                             'zones'],
+                                'type': 'object'},
+                     'UnitsResolved': {'additionalProperties': False,
+                                       'properties': {'all': {'type': 'boolean'},
+                                                      'retry': {'type': 'boolean'},
+                                                      'tags': {'$ref': '#/definitions/Entities'}},
+                                       'type': 'object'},
+                     'UpdateSeriesArg': {'additionalProperties': False,
+                                         'properties': {'force': {'type': 'boolean'},
+                                                        'series': {'type': 'string'},
+                                                        'tag': {'$ref': '#/definitions/Entity'}},
+                                         'required': ['tag', 'force', 'series'],
+                                         'type': 'object'},
+                     'UpdateSeriesArgs': {'additionalProperties': False,
+                                          'properties': {'args': {'items': {'$ref': '#/definitions/UpdateSeriesArg'},
+                                                                  'type': 'array'}},
+                                          'required': ['args'],
+                                          'type': 'object'},
+                     'Value': {'additionalProperties': False,
+                               'properties': {'arch': {'type': 'string'},
+                                              'container': {'type': 'string'},
+                                              'cores': {'type': 'integer'},
+                                              'cpu-power': {'type': 'integer'},
+                                              'instance-type': {'type': 'string'},
+                                              'mem': {'type': 'integer'},
+                                              'root-disk': {'type': 'integer'},
+                                              'root-disk-source': {'type': 'string'},
+                                              'spaces': {'items': {'type': 'string'},
+                                                         'type': 'array'},
+                                              'tags': {'items': {'type': 'string'},
+                                                       'type': 'array'},
+                                              'virt-type': {'type': 'string'},
+                                              'zones': {'items': {'type': 'string'},
+                                                        'type': 'array'}},
+                               'type': 'object'}},
+     'properties': {'AddRelation': {'properties': {'Params': {'$ref': '#/definitions/AddRelation'},
+                                                   'Result': {'$ref': '#/definitions/AddRelationResults'}},
+                                    'type': 'object'},
+                    'AddUnits': {'properties': {'Params': {'$ref': '#/definitions/AddApplicationUnits'},
+                                                'Result': {'$ref': '#/definitions/AddApplicationUnitsResults'}},
+                                 'type': 'object'},
+                    'ApplicationsInfo': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                        'Result': {'$ref': '#/definitions/ApplicationInfoResults'}},
+                                         'type': 'object'},
+                    'CharmConfig': {'properties': {'Params': {'$ref': '#/definitions/ApplicationGetArgs'},
+                                                   'Result': {'$ref': '#/definitions/ApplicationGetConfigResults'}},
+                                    'type': 'object'},
+                    'CharmRelations': {'properties': {'Params': {'$ref': '#/definitions/ApplicationCharmRelations'},
+                                                      'Result': {'$ref': '#/definitions/ApplicationCharmRelationsResults'}},
+                                       'type': 'object'},
+                    'Consume': {'properties': {'Params': {'$ref': '#/definitions/ConsumeApplicationArgs'},
+                                               'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                'type': 'object'},
+                    'Deploy': {'properties': {'Params': {'$ref': '#/definitions/ApplicationsDeploy'},
+                                              'Result': {'$ref': '#/definitions/ErrorResults'}},
+                               'type': 'object'},
+                    'Destroy': {'properties': {'Params': {'$ref': '#/definitions/ApplicationDestroy'}},
+                                'type': 'object'},
+                    'DestroyApplication': {'properties': {'Params': {'$ref': '#/definitions/DestroyApplicationsParams'},
+                                                          'Result': {'$ref': '#/definitions/DestroyApplicationResults'}},
+                                           'type': 'object'},
+                    'DestroyConsumedApplications': {'properties': {'Params': {'$ref': '#/definitions/DestroyConsumedApplicationsParams'},
+                                                                   'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                                    'type': 'object'},
+                    'DestroyRelation': {'properties': {'Params': {'$ref': '#/definitions/DestroyRelation'}},
+                                        'type': 'object'},
+                    'DestroyUnit': {'properties': {'Params': {'$ref': '#/definitions/DestroyUnitsParams'},
+                                                   'Result': {'$ref': '#/definitions/DestroyUnitResults'}},
+                                    'type': 'object'},
+                    'DestroyUnits': {'properties': {'Params': {'$ref': '#/definitions/DestroyApplicationUnits'}},
+                                     'type': 'object'},
+                    'Expose': {'properties': {'Params': {'$ref': '#/definitions/ApplicationExpose'}},
+                               'type': 'object'},
+                    'Get': {'properties': {'Params': {'$ref': '#/definitions/ApplicationGet'},
+                                           'Result': {'$ref': '#/definitions/ApplicationGetResults'}},
+                            'type': 'object'},
+                    'GetCharmURL': {'properties': {'Params': {'$ref': '#/definitions/ApplicationGet'},
+                                                   'Result': {'$ref': '#/definitions/StringResult'}},
+                                    'type': 'object'},
+                    'GetConfig': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                 'Result': {'$ref': '#/definitions/ApplicationGetConfigResults'}},
+                                  'type': 'object'},
+                    'GetConstraints': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                      'Result': {'$ref': '#/definitions/ApplicationGetConstraintsResults'}},
+                                       'type': 'object'},
+                    'ResolveUnitErrors': {'properties': {'Params': {'$ref': '#/definitions/UnitsResolved'},
+                                                         'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                          'type': 'object'},
+                    'ScaleApplications': {'properties': {'Params': {'$ref': '#/definitions/ScaleApplicationsParams'},
+                                                         'Result': {'$ref': '#/definitions/ScaleApplicationResults'}},
+                                          'type': 'object'},
+                    'Set': {'properties': {'Params': {'$ref': '#/definitions/ApplicationSet'}},
+                            'type': 'object'},
+                    'SetApplicationsConfig': {'properties': {'Params': {'$ref': '#/definitions/ApplicationConfigSetArgs'},
+                                                             'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                              'type': 'object'},
+                    'SetCharm': {'properties': {'Params': {'$ref': '#/definitions/ApplicationSetCharm'}},
+                                 'type': 'object'},
+                    'SetConstraints': {'properties': {'Params': {'$ref': '#/definitions/SetConstraints'}},
+                                       'type': 'object'},
+                    'SetMetricCredentials': {'properties': {'Params': {'$ref': '#/definitions/ApplicationMetricCredentials'},
+                                                            'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                             'type': 'object'},
+                    'SetRelationsSuspended': {'properties': {'Params': {'$ref': '#/definitions/RelationSuspendedArgs'},
+                                                             'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                              'type': 'object'},
+                    'Unexpose': {'properties': {'Params': {'$ref': '#/definitions/ApplicationUnexpose'}},
+                                 'type': 'object'},
+                    'Unset': {'properties': {'Params': {'$ref': '#/definitions/ApplicationUnset'}},
+                              'type': 'object'},
+                    'UnsetApplicationsConfig': {'properties': {'Params': {'$ref': '#/definitions/ApplicationConfigUnsetArgs'},
+                                                               'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                                'type': 'object'},
+                    'Update': {'properties': {'Params': {'$ref': '#/definitions/ApplicationUpdate'}},
+                               'type': 'object'},
+                    'UpdateApplicationSeries': {'properties': {'Params': {'$ref': '#/definitions/UpdateSeriesArgs'},
+                                                               'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                                'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(AddRelationResults)
+    async def AddRelation(self, endpoints):
+        '''
+        endpoints : typing.Sequence<+T_co>[str]
+        Returns -> typing.Mapping<~KT, +VT_co>[str, ~CharmRelation]<~CharmRelation>
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='AddRelation',
+                   version=9,
+                   params=_params)
+        _params['endpoints'] = endpoints
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(AddApplicationUnitsResults)
+    async def AddUnits(self, application, num_units, placement):
+        '''
+        application : str
+        num_units : int
+        placement : typing.Sequence<+T_co>[~Placement]<~Placement>
+        Returns -> typing.Sequence<+T_co>[str]
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='AddUnits',
+                   version=9,
+                   params=_params)
+        _params['application'] = application
+        _params['num-units'] = num_units
+        _params['placement'] = placement
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ApplicationInfoResults)
+    async def ApplicationsInfo(self, entities):
+        '''
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ApplicationInfoResult]<~ApplicationInfoResult>
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='ApplicationsInfo',
+                   version=9,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ApplicationGetConfigResults)
+    async def CharmConfig(self, args):
+        '''
+        args : typing.Sequence<+T_co>[~ApplicationGet]<~ApplicationGet>
+        Returns -> typing.Sequence<+T_co>[~ConfigResult]<~ConfigResult>
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='CharmConfig',
+                   version=9,
+                   params=_params)
+        _params['args'] = args
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ApplicationCharmRelationsResults)
+    async def CharmRelations(self, application):
+        '''
+        application : str
+        Returns -> typing.Sequence<+T_co>[str]
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='CharmRelations',
+                   version=9,
+                   params=_params)
+        _params['application'] = application
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def Consume(self, args):
+        '''
+        args : typing.Sequence<+T_co>[~ConsumeApplicationArg]<~ConsumeApplicationArg>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='Consume',
+                   version=9,
+                   params=_params)
+        _params['args'] = args
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def Deploy(self, applications):
+        '''
+        applications : typing.Sequence<+T_co>[~ApplicationDeploy]<~ApplicationDeploy>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='Deploy',
+                   version=9,
+                   params=_params)
+        _params['applications'] = applications
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def Destroy(self, application):
+        '''
+        application : str
+        Returns -> None
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='Destroy',
+                   version=9,
+                   params=_params)
+        _params['application'] = application
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(DestroyApplicationResults)
+    async def DestroyApplication(self, applications):
+        '''
+        applications : typing.Sequence<+T_co>[~DestroyApplicationParams]<~DestroyApplicationParams>
+        Returns -> typing.Sequence<+T_co>[~DestroyApplicationResult]<~DestroyApplicationResult>
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='DestroyApplication',
+                   version=9,
+                   params=_params)
+        _params['applications'] = applications
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def DestroyConsumedApplications(self, applications):
+        '''
+        applications : typing.Sequence<+T_co>[~DestroyConsumedApplicationParams]<~DestroyConsumedApplicationParams>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='DestroyConsumedApplications',
+                   version=9,
+                   params=_params)
+        _params['applications'] = applications
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def DestroyRelation(self, endpoints):
+        '''
+        endpoints : typing.Sequence<+T_co>[str]
+        Returns -> None
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='DestroyRelation',
+                   version=9,
+                   params=_params)
+        _params['endpoints'] = endpoints
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(DestroyUnitResults)
+    async def DestroyUnit(self, units):
+        '''
+        units : typing.Sequence<+T_co>[~DestroyUnitParams]<~DestroyUnitParams>
+        Returns -> typing.Sequence<+T_co>[~DestroyUnitResult]<~DestroyUnitResult>
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='DestroyUnit',
+                   version=9,
+                   params=_params)
+        _params['units'] = units
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def DestroyUnits(self, unit_names):
+        '''
+        unit_names : typing.Sequence<+T_co>[str]
+        Returns -> None
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='DestroyUnits',
+                   version=9,
+                   params=_params)
+        _params['unit-names'] = unit_names
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def Expose(self, application):
+        '''
+        application : str
+        Returns -> None
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='Expose',
+                   version=9,
+                   params=_params)
+        _params['application'] = application
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ApplicationGetResults)
+    async def Get(self, application):
+        '''
+        application : str
+        Returns -> typing.Union[str, typing.Mapping<~KT, +VT_co>[str, typing.Any], _ForwardRef('Value')]
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='Get',
+                   version=9,
+                   params=_params)
+        _params['application'] = application
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResult)
+    async def GetCharmURL(self, application):
+        '''
+        application : str
+        Returns -> typing.Union[_ForwardRef('Error'), str]
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='GetCharmURL',
+                   version=9,
+                   params=_params)
+        _params['application'] = application
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ApplicationGetConfigResults)
+    async def GetConfig(self, entities):
+        '''
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ConfigResult]<~ConfigResult>
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='GetConfig',
+                   version=9,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ApplicationGetConstraintsResults)
+    async def GetConstraints(self, entities):
+        '''
+        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        Returns -> typing.Sequence<+T_co>[~ApplicationConstraint]<~ApplicationConstraint>
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='GetConstraints',
+                   version=9,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def ResolveUnitErrors(self, all_, retry, tags):
+        '''
+        all_ : bool
+        retry : bool
+        tags : Entities
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='ResolveUnitErrors',
+                   version=9,
+                   params=_params)
+        _params['all'] = all_
+        _params['retry'] = retry
+        _params['tags'] = tags
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ScaleApplicationResults)
+    async def ScaleApplications(self, applications):
+        '''
+        applications : typing.Sequence<+T_co>[~ScaleApplicationParams]<~ScaleApplicationParams>
+        Returns -> typing.Sequence<+T_co>[~ScaleApplicationResult]<~ScaleApplicationResult>
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='ScaleApplications',
+                   version=9,
+                   params=_params)
+        _params['applications'] = applications
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def Set(self, application, options):
+        '''
+        application : str
+        options : typing.Mapping<~KT, +VT_co>[str, str]
+        Returns -> None
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='Set',
+                   version=9,
+                   params=_params)
+        _params['application'] = application
+        _params['options'] = options
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def SetApplicationsConfig(self, args):
+        '''
+        args : typing.Sequence<+T_co>[~ApplicationConfigSet]<~ApplicationConfigSet>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='SetApplicationsConfig',
+                   version=9,
+                   params=_params)
+        _params['Args'] = args
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def SetCharm(self, application, channel, charm_url, config_settings, config_settings_yaml, force_series, force_units, resource_ids, storage_constraints):
+        '''
+        application : str
+        channel : str
+        charm_url : str
+        config_settings : typing.Mapping<~KT, +VT_co>[str, str]
+        config_settings_yaml : str
+        force_series : bool
+        force_units : bool
+        resource_ids : typing.Mapping<~KT, +VT_co>[str, str]
+        storage_constraints : typing.Mapping<~KT, +VT_co>[str, ~StorageConstraints]<~StorageConstraints>
+        Returns -> None
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='SetCharm',
+                   version=9,
+                   params=_params)
+        _params['application'] = application
+        _params['channel'] = channel
+        _params['charm-url'] = charm_url
+        _params['config-settings'] = config_settings
+        _params['config-settings-yaml'] = config_settings_yaml
+        _params['force-series'] = force_series
+        _params['force-units'] = force_units
+        _params['resource-ids'] = resource_ids
+        _params['storage-constraints'] = storage_constraints
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def SetConstraints(self, application, constraints):
+        '''
+        application : str
+        constraints : Value
+        Returns -> None
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='SetConstraints',
+                   version=9,
+                   params=_params)
+        _params['application'] = application
+        _params['constraints'] = constraints
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def SetMetricCredentials(self, creds):
+        '''
+        creds : typing.Sequence<+T_co>[~ApplicationMetricCredential]<~ApplicationMetricCredential>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='SetMetricCredentials',
+                   version=9,
+                   params=_params)
+        _params['creds'] = creds
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def SetRelationsSuspended(self, args):
+        '''
+        args : typing.Sequence<+T_co>[~RelationSuspendedArg]<~RelationSuspendedArg>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='SetRelationsSuspended',
+                   version=9,
+                   params=_params)
+        _params['args'] = args
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def Unexpose(self, application):
+        '''
+        application : str
+        Returns -> None
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='Unexpose',
+                   version=9,
+                   params=_params)
+        _params['application'] = application
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def Unset(self, application, options):
+        '''
+        application : str
+        options : typing.Sequence<+T_co>[str]
+        Returns -> None
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='Unset',
+                   version=9,
+                   params=_params)
+        _params['application'] = application
+        _params['options'] = options
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def UnsetApplicationsConfig(self, args):
+        '''
+        args : typing.Sequence<+T_co>[~ApplicationUnset]<~ApplicationUnset>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='UnsetApplicationsConfig',
+                   version=9,
+                   params=_params)
+        _params['Args'] = args
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def Update(self, application, charm_url, constraints, force_charm_url, force_series, min_units, settings, settings_yaml):
+        '''
+        application : str
+        charm_url : str
+        constraints : Value
+        force_charm_url : bool
+        force_series : bool
+        min_units : int
+        settings : typing.Mapping<~KT, +VT_co>[str, str]
+        settings_yaml : str
+        Returns -> None
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='Update',
+                   version=9,
+                   params=_params)
+        _params['application'] = application
+        _params['charm-url'] = charm_url
+        _params['constraints'] = constraints
+        _params['force-charm-url'] = force_charm_url
+        _params['force-series'] = force_series
+        _params['min-units'] = min_units
+        _params['settings'] = settings
+        _params['settings-yaml'] = settings_yaml
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def UpdateApplicationSeries(self, args):
+        '''
+        args : typing.Sequence<+T_co>[~UpdateSeriesArg]<~UpdateSeriesArg>
+        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        '''
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='UpdateApplicationSeries',
+                   version=9,
+                   params=_params)
+        _params['args'] = args
+        reply = await self.rpc(msg)
+        return reply
+
+
+
 class ProvisionerFacade(Type):
     name = 'Provisioner'
     version = 9
