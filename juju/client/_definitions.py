@@ -11675,9 +11675,9 @@ class UserModelList(Type):
 
 
 class Value(Type):
-    _toSchema = {'arch': 'arch', 'container': 'container', 'cores': 'cores', 'cpu_power': 'cpu-power', 'instance_type': 'instance-type', 'mem': 'mem', 'root_disk': 'root-disk', 'spaces': 'spaces', 'tags': 'tags', 'virt_type': 'virt-type'}
-    _toPy = {'arch': 'arch', 'container': 'container', 'cores': 'cores', 'cpu-power': 'cpu_power', 'instance-type': 'instance_type', 'mem': 'mem', 'root-disk': 'root_disk', 'spaces': 'spaces', 'tags': 'tags', 'virt-type': 'virt_type'}
-    def __init__(self, arch=None, container=None, cores=None, cpu_power=None, instance_type=None, mem=None, root_disk=None, spaces=None, tags=None, virt_type=None, **unknown_fields):
+    _toSchema = {'arch': 'arch', 'container': 'container', 'cores': 'cores', 'cpu_power': 'cpu-power', 'instance_type': 'instance-type', 'mem': 'mem', 'root_disk': 'root-disk', 'spaces': 'spaces', 'tags': 'tags', 'virt_type': 'virt-type', 'root_disk_source': 'root-disk-source'}
+    _toPy = {'arch': 'arch', 'container': 'container', 'cores': 'cores', 'cpu-power': 'cpu_power', 'instance-type': 'instance_type', 'mem': 'mem', 'root-disk': 'root_disk', 'spaces': 'spaces', 'tags': 'tags', 'virt-type': 'virt_type', 'root-disk-source': 'root_disk_source'}
+    def __init__(self, arch=None, container=None, cores=None, cpu_power=None, instance_type=None, mem=None, root_disk=None, spaces=None, tags=None, virt_type=None, root_disk_source=None, **unknown_fields):
         '''
         arch : str
         container : str
@@ -11689,6 +11689,7 @@ class Value(Type):
         spaces : typing.Sequence<+T_co>[str]
         tags : typing.Sequence<+T_co>[str]
         virt_type : str
+        root_disk_source : str
         '''
         self.arch = arch
         self.container = container
@@ -11700,6 +11701,7 @@ class Value(Type):
         self.spaces = spaces
         self.tags = tags
         self.virt_type = virt_type
+        self.root_disk_source = root_disk_source
         self.unknown_fields = unknown_fields
 
 
