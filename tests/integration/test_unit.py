@@ -97,3 +97,34 @@ async def test_scp(event_loop):
         with NamedTemporaryFile() as f:
             await unit.scp_from('testfile', f.name)
             assert f.read() == b'testcontents'
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_ssh(event_loop):
+    # ensure that asyncio.subprocess will work;
+    try:
+        asyncio.get_child_watcher().attach_loop(event_loop)
+    except RuntimeError:
+        pytest.skip('test_ssh will always fail outside of MainThread')
+    async with base.CleanModel() as model:
+        app = await model.deploy('ubuntu')
+
+        await asyncio.wait_for(
+            model.block_until(lambda: app.units),
+            timeout=60)
+        unit = app.units[0]
+        await asyncio.wait_for(
+            model.block_until(lambda: unit.machine),
+            timeout=60)
+        machine = unit.machine
+        await asyncio.wait_for(
+            model.block_until(lambda: (machine.status == 'running' and
+                                       machine.agent_status == 'started')),
+            timeout=480)
+
+        unit.ssh("cat 'test' > ~/test.touch")
+
+        with NamedTemporaryFile() as f:
+            await unit.ssh_from('~/test.touch', f.name)
+            assert f.read() == b'test'

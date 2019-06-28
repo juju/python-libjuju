@@ -228,17 +228,6 @@ class Unit(model.ModelEntity):
         """
         raise NotImplementedError()
 
-    def ssh(
-            self, command, user=None, proxy=False, ssh_opts=None):
-        """Execute a command over SSH on this unit.
-
-        :param str command: Command to execute
-        :param str user: Remote username
-        :param bool proxy: Proxy through the Juju API server
-        :param str ssh_opts: Additional options to the `ssh` command
-
-        """
-        raise NotImplementedError()
 
     def status_history(self, num=20, utc=False):
         """Get status history for this unit.
