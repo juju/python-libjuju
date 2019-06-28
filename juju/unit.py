@@ -195,8 +195,7 @@ class Unit(model.ModelEntity):
                                   scp_opts=scp_opts)
 
 
-    async def ssh(self, command, user='ubuntu', proxy=False,
-        ssh_opts=''):
+    async def ssh(self, command, user='ubuntu', proxy=False, ssh_opts=''):
         """Transfer files to this unit.
 
         :param str command: Remote command to execute
@@ -205,8 +204,7 @@ class Unit(model.ModelEntity):
         :param ssh_opts: Additional options to the `scp` command
         :type ssh_opts: str or list
         """
-        await self.machine.ssh(command, user=user, proxy=proxy,
-                                  ssh_opts=ssh_opts)
+        await self.machine.ssh(command, user=user, proxy=proxy, ssh_opts=ssh_opts)
 
     async def scp_from(self, source, destination, user='ubuntu', proxy=False,
                        scp_opts=''):

@@ -199,8 +199,7 @@ class Machine(model.ModelEntity):
             'ssh',
             '-i', os.path.expanduser('~/.local/share/juju/ssh/juju_id_rsa'),
             '-o', 'StrictHostKeyChecking=no',
-            '-q',
-            '-B'
+            '-q'
         ]
         cmd.extend(ssh_opts.split() if isinstance(ssh_opts, str) else ssh_opts)
         cmd.extend([source, command])
@@ -211,7 +210,7 @@ class Machine(model.ModelEntity):
             raise JujuError("command failed: %s" % cmd)
 
 
-    def ssh(self, command, user='ubuntu', proxy=False, ssh_opts=''):
+    async def ssh(self, command, user='ubuntu', proxy=False, ssh_opts=''):
         """Execute a command over SSH on this machine.
 
         :param str command: Command to execute
