@@ -192,6 +192,25 @@ class Machine(model.ModelEntity):
         if process.returncode != 0:
             raise JujuError("command failed: %s" % cmd)
 
+
+    async def _ssh(self, source, command, ssh_opts):
+        """ Execute an ssh command. Does not currently return output."""
+        cmd = [
+            'ssh',
+            '-i', os.path.expanduser('~/.local/share/juju/ssh/juju_id_rsa'),
+            '-o', 'StrictHostKeyChecking=no',
+            '-q',
+            '-B'
+        ]
+        cmd.extend(ssh_opts.split() if isinstance(ssh_opts, str) else ssh_opts)
+        cmd.extend([source, command])
+        loop = self.model.loop
+        process = await asyncio.create_subprocess_exec(*cmd, loop=loop)
+        await process.wait()
+        if process.returncode != 0:
+            raise JujuError("command failed: %s" % cmd)
+
+
     def ssh(
             self, command, user=None, proxy=False, ssh_opts=None):
         """Execute a command over SSH on this machine.
@@ -202,7 +221,10 @@ class Machine(model.ModelEntity):
         :param str ssh_opts: Additional options to the `ssh` command
 
         """
-        raise NotImplementedError()
+        address = self.dns_name
+        source = '%s@%s' % (user, address)
+
+
 
     def status_history(self, num=20, utc=False):
         """Get status history for this machine.
