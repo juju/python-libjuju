@@ -211,8 +211,7 @@ class Machine(model.ModelEntity):
             raise JujuError("command failed: %s" % cmd)
 
 
-    def ssh(
-            self, command, user=None, proxy=False, ssh_opts=None):
+    def ssh(self, command, user='ubuntu', proxy=False, ssh_opts=''):
         """Execute a command over SSH on this machine.
 
         :param str command: Command to execute
