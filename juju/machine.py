@@ -223,7 +223,7 @@ class Machine(model.ModelEntity):
         """
         address = self.dns_name
         source = '%s@%s' % (user, address)
-
+        self._ssh(source, command, ssh_opts)
 
 
     def status_history(self, num=20, utc=False):
