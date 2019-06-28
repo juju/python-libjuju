@@ -192,7 +192,6 @@ class Machine(model.ModelEntity):
         if process.returncode != 0:
             raise JujuError("command failed: %s" % cmd)
 
-
     async def _ssh(self, source, command, ssh_opts):
         """ Execute an ssh command. Does not currently return output."""
         cmd = [
@@ -209,7 +208,6 @@ class Machine(model.ModelEntity):
         if process.returncode != 0:
             raise JujuError("command failed: %s" % cmd)
 
-
     async def ssh(self, command, user='ubuntu', proxy=False, ssh_opts=''):
         """Execute a command over SSH on this machine.
 
@@ -222,7 +220,6 @@ class Machine(model.ModelEntity):
         address = self.dns_name
         source = '%s@%s' % (user, address)
         await self._ssh(source, command, ssh_opts)
-
 
     def status_history(self, num=20, utc=False):
         """Get status history for this machine.

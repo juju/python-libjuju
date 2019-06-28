@@ -194,7 +194,6 @@ class Unit(model.ModelEntity):
         await self.machine.scp_to(source, destination, user=user, proxy=proxy,
                                   scp_opts=scp_opts)
 
-
     async def ssh(self, command, user='ubuntu', proxy=False, ssh_opts=''):
         """Transfer files to this unit.
 
@@ -225,7 +224,6 @@ class Unit(model.ModelEntity):
 
         """
         raise NotImplementedError()
-
 
     def status_history(self, num=20, utc=False):
         """Get status history for this unit.
