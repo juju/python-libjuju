@@ -123,8 +123,8 @@ async def test_ssh(event_loop):
                                        machine.agent_status == 'started')),
             timeout=480)
 
-        await unit.ssh("\"echo 'test' > ~/test.txt\"")
+        await unit.ssh("\"echo 'test' > test.txt\"")
 
         with NamedTemporaryFile() as f:
-            await unit.scp_from('~/test.txt', f.name)
+            await unit.scp_from('test.txt', f.name)
             assert f.read() == b'test'
