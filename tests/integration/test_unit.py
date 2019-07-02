@@ -120,7 +120,7 @@ async def test_ssh(event_loop):
         machine = unit.machine
         await asyncio.wait_for(
             model.block_until(lambda: (machine.status == 'running' and
-                            machine.agent_status == 'started')),
+                                       machine.agent_status == 'started')),
             timeout=480)
 
         unit.ssh("\"echo 'test' > ~/test.txt\"")
