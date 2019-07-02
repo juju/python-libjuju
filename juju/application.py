@@ -102,7 +102,7 @@ class Application(model.ModelEntity):
 
         return await self.model.add_relation(local_relation, remote_relation)
 
-    async def add_unit(self, count=1, to=None):
+    async def add_unit(self, count=1, to=None, attach_storage=None, policy=''):
         """Add one or more units to this application.
 
         :param int count: Number of units to add
@@ -124,6 +124,8 @@ class Application(model.ModelEntity):
             application=self.name,
             placement=parse_placement(to) if to else None,
             num_units=count,
+            attach_storage=attach_storage,
+            policy=policy,
         )
 
         return await asyncio.gather(*[
@@ -241,7 +243,7 @@ class Application(model.ModelEntity):
         log.debug(
             'Getting config for %s', self.name)
 
-        return (await app_facade.Get(self.name)).config
+        return (await app_facade.Get(self.name, branch='master')).config
 
     async def get_trusted(self):
         """Return the trusted configuration setting for this application.
@@ -252,13 +254,12 @@ class Application(model.ModelEntity):
         log.debug(
             'Getting config for %s', self.name)
 
-        config = await app_facade.Get(self.name)
+        config = await app_facade.Get(self.name, branch='master')
         if 'trust' in config.config:
             return config.config['trust']['value'] is True
-        if 'application-config' in config.unknown_fields:
-            app_config = config.unknown_fields['application-config']
-            return app_config['trust']['value'] is True
-        return False
+
+        app_config = config.application_config
+        return app_config['trust']['value'] is True
 
     async def set_trusted(self, trust):
         """Set the trusted configuration of the application.
@@ -287,7 +288,7 @@ class Application(model.ModelEntity):
         log.debug(
             'Getting constraints for %s', self.name)
 
-        result = (await app_facade.Get(self.name)).constraints
+        result = (await app_facade.Get(self.name, branch='master')).constraints
         return vars(result) if result else result
 
     async def get_actions(self, schema=False):
@@ -375,7 +376,7 @@ class Application(model.ModelEntity):
         log.debug(
             'Setting config for %s: %s', self.name, config)
 
-        return await app_facade.Set(self.name, config)
+        return await app_facade.Set(self.name, 'master', config)
 
     async def reset_config(self, to_default):
         """
@@ -389,7 +390,7 @@ class Application(model.ModelEntity):
         log.debug(
             'Restoring default config for %s: %s', self.name, to_default)
 
-        return await app_facade.Unset(self.name, to_default)
+        return await app_facade.Unset(self.name, 'master', to_default)
 
     async def set_constraints(self, constraints):
         """Set machine constraints for this application.
@@ -441,7 +442,7 @@ class Application(model.ModelEntity):
         raise NotImplementedError()
 
     async def upgrade_charm(
-            self, channel=None, force_series=False, force_units=False,
+            self, channel=None, force=False, force_series=False, force_units=False,
             path=None, resources=None, revision=None, switch=None):
         """Upgrade the charm for this application.
 
@@ -494,6 +495,7 @@ class Application(model.ModelEntity):
         # Update charm
         await client_facade.AddCharm(
             url=charm_url,
+            force=force,
             channel=channel
         )
 
@@ -549,10 +551,12 @@ class Application(model.ModelEntity):
             charm_url=charm_url,
             config_settings=None,
             config_settings_yaml=None,
+            force=force,
             force_series=force_series,
             force_units=force_units,
             resource_ids=resource_ids,
-            storage_constraints=None
+            storage_constraints=None,
+            generation="",
         )
 
         await self.model.block_until(

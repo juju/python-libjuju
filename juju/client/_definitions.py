@@ -6865,35 +6865,45 @@ class ModelFilesystemInfo(Type):
 
 
 class ModelInfo(Type):
-    _toSchema = {'cloud_credential_tag': 'cloud-credential-tag', 'cloud_region': 'cloud-region', 'cloud_tag': 'cloud-tag', 'controller_uuid': 'controller-uuid', 'default_series': 'default-series', 'life': 'life', 'machines': 'machines', 'name': 'name', 'owner_tag': 'owner-tag', 'provider_type': 'provider-type', 'status': 'status', 'users': 'users', 'uuid': 'uuid'}
-    _toPy = {'cloud-credential-tag': 'cloud_credential_tag', 'cloud-region': 'cloud_region', 'cloud-tag': 'cloud_tag', 'controller-uuid': 'controller_uuid', 'default-series': 'default_series', 'life': 'life', 'machines': 'machines', 'name': 'name', 'owner-tag': 'owner_tag', 'provider-type': 'provider_type', 'status': 'status', 'users': 'users', 'uuid': 'uuid'}
-    def __init__(self, cloud_credential_tag=None, cloud_region=None, cloud_tag=None, controller_uuid=None, default_series=None, life=None, machines=None, name=None, owner_tag=None, provider_type=None, status=None, users=None, uuid=None, **unknown_fields):
+    _toSchema = {'agent_version': 'agent-version', 'cloud_credential_tag': 'cloud-credential-tag', 'cloud_region': 'cloud-region', 'cloud_tag': 'cloud-tag', 'controller_uuid': 'controller-uuid', 'default_series': 'default-series', 'is_controller': 'is-controller', 'life': 'life', 'machines': 'machines', 'migration': 'migration', 'name': 'name', 'owner_tag': 'owner-tag', 'provider_type': 'provider-type', 'sla': 'sla', 'status': 'status', 'type_': 'type', 'users': 'users', 'uuid': 'uuid'}
+    _toPy = {'agent-version': 'agent_version', 'cloud-credential-tag': 'cloud_credential_tag', 'cloud-region': 'cloud_region', 'cloud-tag': 'cloud_tag', 'controller-uuid': 'controller_uuid', 'default-series': 'default_series', 'is-controller': 'is_controller', 'life': 'life', 'machines': 'machines', 'migration': 'migration', 'name': 'name', 'owner-tag': 'owner_tag', 'provider-type': 'provider_type', 'sla': 'sla', 'status': 'status', 'type': 'type_', 'users': 'users', 'uuid': 'uuid'}
+    def __init__(self, agent_version=None, cloud_credential_tag=None, cloud_region=None, cloud_tag=None, controller_uuid=None, default_series=None, is_controller=None, life=None, machines=None, migration=None, name=None, owner_tag=None, provider_type=None, sla=None, status=None, type_=None, users=None, uuid=None, **unknown_fields):
         '''
+        agent_version : Number
         cloud_credential_tag : str
         cloud_region : str
         cloud_tag : str
         controller_uuid : str
         default_series : str
+        is_controller : bool
         life : str
         machines : typing.Sequence<+T_co>[~ModelMachineInfo]<~ModelMachineInfo>
+        migration : ModelMigrationStatus
         name : str
         owner_tag : str
         provider_type : str
+        sla : ModelSLAInfo
         status : EntityStatus
+        type_ : str
         users : typing.Sequence<+T_co>[~ModelUserInfo]<~ModelUserInfo>
         uuid : str
         '''
+        self.agent_version = Number.from_json(agent_version) if agent_version else None
         self.cloud_credential_tag = cloud_credential_tag
         self.cloud_region = cloud_region
         self.cloud_tag = cloud_tag
         self.controller_uuid = controller_uuid
         self.default_series = default_series
+        self.is_controller = is_controller
         self.life = life
         self.machines = [ModelMachineInfo.from_json(o) for o in machines or []]
+        self.migration = ModelMigrationStatus.from_json(migration) if migration else None
         self.name = name
         self.owner_tag = owner_tag
         self.provider_type = provider_type
+        self.sla = ModelSLAInfo.from_json(sla) if sla else None
         self.status = EntityStatus.from_json(status) if status else None
+        self.type_ = type_
         self.users = [ModelUserInfo.from_json(o) for o in users or []]
         self.uuid = uuid
         self.unknown_fields = unknown_fields

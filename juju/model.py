@@ -1094,7 +1094,7 @@ class Model:
             return None
 
         try:
-            result = await app_facade.AddRelation([relation1, relation2])
+            result = await app_facade.AddRelation([relation1, relation2], None)
         except JujuAPIError as e:
             if 'relation already exists' not in e.message:
                 raise
@@ -1325,7 +1325,7 @@ class Model:
                     application_name = entity['Meta']['charm-metadata']['Name']
                 if not series:
                     series = self._get_series(entity_url, entity)
-                await client_facade.AddCharm(channel, entity_id)
+                await client_facade.AddCharm(channel, False, entity_id)
                 # XXX: we're dropping local resources here, but we don't
                 # actually support them yet anyway
                 resources = await self._add_store_resources(application_name,
@@ -2004,6 +2004,7 @@ class BundleHandler:
         self.bundle = await self._handle_local_charms(self.bundle)
 
         self.plan = await self.bundle_facade.GetChanges(
+            entity_id,
             yaml.dump(self.bundle))
 
         if self.plan.errors:
@@ -2042,7 +2043,7 @@ class BundleHandler:
 
         entity_id = await self.charmstore.entityId(charm)
         log.debug('Adding %s', entity_id)
-        await self.client_facade.AddCharm(None, entity_id)
+        await self.client_facade.AddCharm(None, False, entity_id)
         return entity_id
 
     async def addMachines(self, params=None):
