@@ -843,38 +843,32 @@ class ApplicationConstraint(Type):
 
 
 class ApplicationDeploy(Type):
-    _toSchema = {'application': 'application', 'attach_storage': 'attach-storage', 'channel': 'channel', 'charm_url': 'charm-url', 'config': 'config', 'config_yaml': 'config-yaml', 'constraints': 'constraints', 'devices': 'devices', 'endpoint_bindings': 'endpoint-bindings', 'num_units': 'num-units', 'placement': 'placement', 'policy': 'policy', 'resources': 'resources', 'series': 'series', 'storage': 'storage'}
-    _toPy = {'application': 'application', 'attach-storage': 'attach_storage', 'channel': 'channel', 'charm-url': 'charm_url', 'config': 'config', 'config-yaml': 'config_yaml', 'constraints': 'constraints', 'devices': 'devices', 'endpoint-bindings': 'endpoint_bindings', 'num-units': 'num_units', 'placement': 'placement', 'policy': 'policy', 'resources': 'resources', 'series': 'series', 'storage': 'storage'}
-    def __init__(self, application=None, attach_storage=None, channel=None, charm_url=None, config=None, config_yaml=None, constraints=None, devices=None, endpoint_bindings=None, num_units=None, placement=None, policy=None, resources=None, series=None, storage=None, **unknown_fields):
+    _toSchema = {'application': 'application', 'channel': 'channel', 'charm_url': 'charm-url', 'config': 'config', 'config_yaml': 'config-yaml', 'constraints': 'constraints', 'endpoint_bindings': 'endpoint-bindings', 'num_units': 'num-units', 'placement': 'placement', 'resources': 'resources', 'series': 'series', 'storage': 'storage'}
+    _toPy = {'application': 'application', 'channel': 'channel', 'charm-url': 'charm_url', 'config': 'config', 'config-yaml': 'config_yaml', 'constraints': 'constraints', 'endpoint-bindings': 'endpoint_bindings', 'num-units': 'num_units', 'placement': 'placement', 'resources': 'resources', 'series': 'series', 'storage': 'storage'}
+    def __init__(self, application=None, channel=None, charm_url=None, config=None, config_yaml=None, constraints=None, endpoint_bindings=None, num_units=None, placement=None, resources=None, series=None, storage=None, **unknown_fields):
         '''
         application : str
-        attach_storage : typing.Sequence<+T_co>[str]
         channel : str
         charm_url : str
         config : typing.Mapping<~KT, +VT_co>[str, str]
         config_yaml : str
         constraints : Value
-        devices : typing.Mapping<~KT, +VT_co>[str, ~Constraints]<~Constraints>
         endpoint_bindings : typing.Mapping<~KT, +VT_co>[str, str]
         num_units : int
         placement : typing.Sequence<+T_co>[~Placement]<~Placement>
-        policy : str
         resources : typing.Mapping<~KT, +VT_co>[str, str]
         series : str
         storage : typing.Mapping<~KT, +VT_co>[str, ~Constraints]<~Constraints>
         '''
         self.application = application
-        self.attach_storage = attach_storage
         self.channel = channel
         self.charm_url = charm_url
         self.config = config
         self.config_yaml = config_yaml
         self.constraints = Value.from_json(constraints) if constraints else None
-        self.devices = devices
         self.endpoint_bindings = endpoint_bindings
         self.num_units = num_units
         self.placement = [Placement.from_json(o) for o in placement or []]
-        self.policy = policy
         self.resources = resources
         self.series = series
         self.storage = storage
@@ -1060,6 +1054,32 @@ class ApplicationMetricCredentials(Type):
 
 
 
+class ApplicationOffer(Type):
+    _toSchema = {'access': 'access', 'application_description': 'application-description', 'bindings': 'bindings', 'endpoints': 'endpoints', 'offer_name': 'offer-name', 'offer_url': 'offer-url', 'source_model_tag': 'source-model-tag', 'spaces': 'spaces'}
+    _toPy = {'access': 'access', 'application-description': 'application_description', 'bindings': 'bindings', 'endpoints': 'endpoints', 'offer-name': 'offer_name', 'offer-url': 'offer_url', 'source-model-tag': 'source_model_tag', 'spaces': 'spaces'}
+    def __init__(self, access=None, application_description=None, bindings=None, endpoints=None, offer_name=None, offer_url=None, source_model_tag=None, spaces=None, **unknown_fields):
+        '''
+        access : str
+        application_description : str
+        bindings : typing.Mapping<~KT, +VT_co>[str, str]
+        endpoints : typing.Sequence<+T_co>[~RemoteEndpoint]<~RemoteEndpoint>
+        offer_name : str
+        offer_url : str
+        source_model_tag : str
+        spaces : typing.Sequence<+T_co>[~RemoteSpace]<~RemoteSpace>
+        '''
+        self.access = access
+        self.application_description = application_description
+        self.bindings = bindings
+        self.endpoints = [RemoteEndpoint.from_json(o) for o in endpoints or []]
+        self.offer_name = offer_name
+        self.offer_url = offer_url
+        self.source_model_tag = source_model_tag
+        self.spaces = [RemoteSpace.from_json(o) for o in spaces or []]
+        self.unknown_fields = unknown_fields
+
+
+
 class ApplicationOfferAdminDetails(Type):
     _toSchema = {'application_name': 'application-name', 'applicationofferdetails': 'ApplicationOfferDetails', 'charm_url': 'charm-url', 'connections': 'connections'}
     _toPy = {'ApplicationOfferDetails': 'applicationofferdetails', 'application-name': 'application_name', 'charm-url': 'charm_url', 'connections': 'connections'}
@@ -1156,6 +1176,36 @@ class ApplicationOffersResults(Type):
 
 
 
+class ApplicationRelationsChange(Type):
+    _toSchema = {'changed': 'changed', 'removed': 'removed'}
+    _toPy = {'changed': 'changed', 'removed': 'removed'}
+    def __init__(self, changed=None, removed=None, **unknown_fields):
+        '''
+        changed : typing.Sequence<+T_co>[~RelationChange]<~RelationChange>
+        removed : typing.Sequence<+T_co>[int]
+        '''
+        self.changed = [RelationChange.from_json(o) for o in changed or []]
+        self.removed = removed
+        self.unknown_fields = unknown_fields
+
+
+
+class ApplicationRelationsWatchResult(Type):
+    _toSchema = {'applicationrelationswatcherid': 'ApplicationRelationsWatcherId', 'changes': 'changes', 'error': 'error'}
+    _toPy = {'ApplicationRelationsWatcherId': 'applicationrelationswatcherid', 'changes': 'changes', 'error': 'error'}
+    def __init__(self, applicationrelationswatcherid=None, changes=None, error=None, **unknown_fields):
+        '''
+        applicationrelationswatcherid : str
+        changes : ApplicationRelationsChange
+        error : Error
+        '''
+        self.applicationrelationswatcherid = applicationrelationswatcherid
+        self.changes = ApplicationRelationsChange.from_json(changes) if changes else None
+        self.error = Error.from_json(error) if error else None
+        self.unknown_fields = unknown_fields
+
+
+
 class ApplicationSet(Type):
     _toSchema = {'application': 'application', 'branch': 'branch', 'options': 'options'}
     _toPy = {'application': 'application', 'branch': 'branch', 'options': 'options'}
@@ -1200,6 +1250,20 @@ class ApplicationSetCharm(Type):
         self.generation = generation
         self.resource_ids = resource_ids
         self.storage_constraints = storage_constraints
+        self.unknown_fields = unknown_fields
+
+
+
+class ApplicationSetCharmProfile(Type):
+    _toSchema = {'application': 'application', 'charm_url': 'charm-url'}
+    _toPy = {'application': 'application', 'charm-url': 'charm_url'}
+    def __init__(self, application=None, charm_url=None, **unknown_fields):
+        '''
+        application : str
+        charm_url : str
+        '''
+        self.application = application
+        self.charm_url = charm_url
         self.unknown_fields = unknown_fields
 
 
@@ -1286,6 +1350,18 @@ class ApplicationTag(Type):
         name : str
         '''
         self.name = name
+        self.unknown_fields = unknown_fields
+
+
+
+class ApplicationURLs(Type):
+    _toSchema = {'application_urls': 'application-urls'}
+    _toPy = {'application-urls': 'application_urls'}
+    def __init__(self, application_urls=None, **unknown_fields):
+        '''
+        application_urls : typing.Sequence<+T_co>[str]
+        '''
+        self.application_urls = application_urls
         self.unknown_fields = unknown_fields
 
 
@@ -2357,6 +2433,18 @@ class CloudImageMetadata(Type):
 
 
 
+class CloudImageMetadataList(Type):
+    _toSchema = {'metadata': 'metadata'}
+    _toPy = {'metadata': 'metadata'}
+    def __init__(self, metadata=None, **unknown_fields):
+        '''
+        metadata : typing.Sequence<+T_co>[~CloudImageMetadata]<~CloudImageMetadata>
+        '''
+        self.metadata = [CloudImageMetadata.from_json(o) for o in metadata or []]
+        self.unknown_fields = unknown_fields
+
+
+
 class CloudInfo(Type):
     _toSchema = {'clouddetails': 'CloudDetails', 'users': 'users'}
     _toPy = {'CloudDetails': 'clouddetails', 'users': 'users'}
@@ -2671,6 +2759,32 @@ class ConsumeApplicationArgs(Type):
         args : typing.Sequence<+T_co>[~ConsumeApplicationArg]<~ConsumeApplicationArg>
         '''
         self.args = [ConsumeApplicationArg.from_json(o) for o in args or []]
+        self.unknown_fields = unknown_fields
+
+
+
+class ConsumeApplicationResult(Type):
+    _toSchema = {'error': 'error', 'local_name': 'local-name'}
+    _toPy = {'error': 'error', 'local-name': 'local_name'}
+    def __init__(self, error=None, local_name=None, **unknown_fields):
+        '''
+        error : Error
+        local_name : str
+        '''
+        self.error = Error.from_json(error) if error else None
+        self.local_name = local_name
+        self.unknown_fields = unknown_fields
+
+
+
+class ConsumeApplicationResults(Type):
+    _toSchema = {'results': 'results'}
+    _toPy = {'results': 'results'}
+    def __init__(self, results=None, **unknown_fields):
+        '''
+        results : typing.Sequence<+T_co>[~ConsumeApplicationResult]<~ConsumeApplicationResult>
+        '''
+        self.results = [ConsumeApplicationResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
 
 
@@ -3441,6 +3555,18 @@ class DeviceBridgeInfo(Type):
 
 
 
+class DiscoverSpacesResults(Type):
+    _toSchema = {'results': 'results'}
+    _toPy = {'results': 'results'}
+    def __init__(self, results=None, **unknown_fields):
+        '''
+        results : typing.Sequence<+T_co>[~ProviderSpace]<~ProviderSpace>
+        '''
+        self.results = [ProviderSpace.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
+
+
+
 class DistributionGroupResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
@@ -3833,6 +3959,30 @@ class EntityWorkloadVersions(Type):
 
 
 
+class EnvListArgs(Type):
+    _toSchema = {'patterns': 'patterns'}
+    _toPy = {'patterns': 'patterns'}
+    def __init__(self, patterns=None, **unknown_fields):
+        '''
+        patterns : typing.Sequence<+T_co>[str]
+        '''
+        self.patterns = patterns
+        self.unknown_fields = unknown_fields
+
+
+
+class EnvListResults(Type):
+    _toSchema = {'results': 'results'}
+    _toPy = {'results': 'results'}
+    def __init__(self, results=None, **unknown_fields):
+        '''
+        results : typing.Sequence<+T_co>[~Payload]<~Payload>
+        '''
+        self.results = [Payload.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
+
+
+
 class Error(Type):
     _toSchema = {'code': 'code', 'info': 'info', 'message': 'message'}
     _toPy = {'code': 'code', 'info': 'info', 'message': 'message'}
@@ -3845,6 +3995,20 @@ class Error(Type):
         self.code = code
         self.info = info
         self.message = message
+        self.unknown_fields = unknown_fields
+
+
+
+class ErrorInfo(Type):
+    _toSchema = {'macaroon': 'macaroon', 'macaroon_path': 'macaroon-path'}
+    _toPy = {'macaroon': 'macaroon', 'macaroon-path': 'macaroon_path'}
+    def __init__(self, macaroon=None, macaroon_path=None, **unknown_fields):
+        '''
+        macaroon : Macaroon
+        macaroon_path : str
+        '''
+        self.macaroon = Macaroon.from_json(macaroon) if macaroon else None
+        self.macaroon_path = macaroon_path
         self.unknown_fields = unknown_fields
 
 
@@ -4370,25 +4534,19 @@ class FirewallRuleArgs(Type):
 
 
 class FullStatus(Type):
-    _toSchema = {'applications': 'applications', 'controller_timestamp': 'controller-timestamp', 'machines': 'machines', 'model': 'model', 'offers': 'offers', 'relations': 'relations', 'remote_applications': 'remote-applications'}
-    _toPy = {'applications': 'applications', 'controller-timestamp': 'controller_timestamp', 'machines': 'machines', 'model': 'model', 'offers': 'offers', 'relations': 'relations', 'remote-applications': 'remote_applications'}
-    def __init__(self, applications=None, controller_timestamp=None, machines=None, model=None, offers=None, relations=None, remote_applications=None, **unknown_fields):
+    _toSchema = {'applications': 'applications', 'machines': 'machines', 'model': 'model', 'relations': 'relations'}
+    _toPy = {'applications': 'applications', 'machines': 'machines', 'model': 'model', 'relations': 'relations'}
+    def __init__(self, applications=None, machines=None, model=None, relations=None, **unknown_fields):
         '''
         applications : typing.Mapping<~KT, +VT_co>[str, ~ApplicationStatus]<~ApplicationStatus>
-        controller_timestamp : str
         machines : typing.Mapping<~KT, +VT_co>[str, ~MachineStatus]<~MachineStatus>
         model : ModelStatusInfo
-        offers : typing.Mapping<~KT, +VT_co>[str, ~ApplicationOfferStatus]<~ApplicationOfferStatus>
         relations : typing.Sequence<+T_co>[~RelationStatus]<~RelationStatus>
-        remote_applications : typing.Mapping<~KT, +VT_co>[str, ~RemoteApplicationStatus]<~RemoteApplicationStatus>
         '''
         self.applications = applications
-        self.controller_timestamp = controller_timestamp
         self.machines = machines
         self.model = ModelStatusInfo.from_json(model) if model else None
-        self.offers = offers
         self.relations = [RelationStatus.from_json(o) for o in relations or []]
-        self.remote_applications = remote_applications
         self.unknown_fields = unknown_fields
 
 
@@ -4441,6 +4599,18 @@ class GenerationResults(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.generations = [Generation.from_json(o) for o in generations or []]
+        self.unknown_fields = unknown_fields
+
+
+
+class GetApplicationConstraints(Type):
+    _toSchema = {'application': 'application'}
+    _toPy = {'application': 'application'}
+    def __init__(self, application=None, **unknown_fields):
+        '''
+        application : str
+        '''
+        self.application = application
         self.unknown_fields = unknown_fields
 
 
@@ -4719,6 +4889,28 @@ class ImageMetadata(Type):
         self.kind = kind
         self.series = series
         self.url = url
+        self.unknown_fields = unknown_fields
+
+
+
+class ImageMetadataFilter(Type):
+    _toSchema = {'arches': 'arches', 'region': 'region', 'root_storage_type': 'root-storage-type', 'series': 'series', 'stream': 'stream', 'virt_type': 'virt-type'}
+    _toPy = {'arches': 'arches', 'region': 'region', 'root-storage-type': 'root_storage_type', 'series': 'series', 'stream': 'stream', 'virt-type': 'virt_type'}
+    def __init__(self, arches=None, region=None, root_storage_type=None, series=None, stream=None, virt_type=None, **unknown_fields):
+        '''
+        arches : typing.Sequence<+T_co>[str]
+        region : str
+        root_storage_type : str
+        series : typing.Sequence<+T_co>[str]
+        stream : str
+        virt_type : str
+        '''
+        self.arches = arches
+        self.region = region
+        self.root_storage_type = root_storage_type
+        self.series = series
+        self.stream = stream
+        self.virt_type = virt_type
         self.unknown_fields = unknown_fields
 
 
@@ -5319,6 +5511,48 @@ class LXDProfile(Type):
 
 
 
+class LXDProfileUpgradeMessages(Type):
+    _toSchema = {'application': 'application', 'watcher_id': 'watcher-id'}
+    _toPy = {'application': 'application', 'watcher-id': 'watcher_id'}
+    def __init__(self, application=None, watcher_id=None, **unknown_fields):
+        '''
+        application : Entity
+        watcher_id : str
+        '''
+        self.application = Entity.from_json(application) if application else None
+        self.watcher_id = watcher_id
+        self.unknown_fields = unknown_fields
+
+
+
+class LXDProfileUpgradeMessagesResult(Type):
+    _toSchema = {'error': 'error', 'message': 'message', 'unit_name': 'unit-name'}
+    _toPy = {'error': 'error', 'message': 'message', 'unit-name': 'unit_name'}
+    def __init__(self, error=None, message=None, unit_name=None, **unknown_fields):
+        '''
+        error : Error
+        message : str
+        unit_name : str
+        '''
+        self.error = Error.from_json(error) if error else None
+        self.message = message
+        self.unit_name = unit_name
+        self.unknown_fields = unknown_fields
+
+
+
+class LXDProfileUpgradeMessagesResults(Type):
+    _toSchema = {'args': 'args'}
+    _toPy = {'args': 'args'}
+    def __init__(self, args=None, **unknown_fields):
+        '''
+        args : typing.Sequence<+T_co>[~LXDProfileUpgradeMessagesResult]<~LXDProfileUpgradeMessagesResult>
+        '''
+        self.args = [LXDProfileUpgradeMessagesResult.from_json(o) for o in args or []]
+        self.unknown_fields = unknown_fields
+
+
+
 class LifeResult(Type):
     _toSchema = {'error': 'error', 'life': 'life'}
     _toPy = {'error': 'error', 'life': 'life'}
@@ -5341,6 +5575,18 @@ class LifeResults(Type):
         results : typing.Sequence<+T_co>[~LifeResult]<~LifeResult>
         '''
         self.results = [LifeResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
+
+
+
+class ListCloudImageMetadataResult(Type):
+    _toSchema = {'result': 'result'}
+    _toPy = {'result': 'result'}
+    def __init__(self, result=None, **unknown_fields):
+        '''
+        result : typing.Sequence<+T_co>[~CloudImageMetadata]<~CloudImageMetadata>
+        '''
+        self.result = [CloudImageMetadata.from_json(o) for o in result or []]
         self.unknown_fields = unknown_fields
 
 
@@ -5563,6 +5809,32 @@ class LogForwardingSetLastSentParams(Type):
         params : typing.Sequence<+T_co>[~LogForwardingSetLastSentParam]<~LogForwardingSetLastSentParam>
         '''
         self.params = [LogForwardingSetLastSentParam.from_json(o) for o in params or []]
+        self.unknown_fields = unknown_fields
+
+
+
+class LookUpArg(Type):
+    _toSchema = {'id_': 'id', 'name': 'name'}
+    _toPy = {'id': 'id_', 'name': 'name'}
+    def __init__(self, id_=None, name=None, **unknown_fields):
+        '''
+        id_ : str
+        name : str
+        '''
+        self.id_ = id_
+        self.name = name
+        self.unknown_fields = unknown_fields
+
+
+
+class LookUpArgs(Type):
+    _toSchema = {'args': 'args'}
+    _toPy = {'args': 'args'}
+    def __init__(self, args=None, **unknown_fields):
+        '''
+        args : typing.Sequence<+T_co>[~LookUpArg]<~LookUpArg>
+        '''
+        self.args = [LookUpArg.from_json(o) for o in args or []]
         self.unknown_fields = unknown_fields
 
 
@@ -6050,6 +6322,30 @@ class MergeLeadershipSettingsParam(Type):
         self.application_tag = application_tag
         self.settings = settings
         self.unit_tag = unit_tag
+        self.unknown_fields = unknown_fields
+
+
+
+class MetadataImageIds(Type):
+    _toSchema = {'image_ids': 'image-ids'}
+    _toPy = {'image-ids': 'image_ids'}
+    def __init__(self, image_ids=None, **unknown_fields):
+        '''
+        image_ids : typing.Sequence<+T_co>[str]
+        '''
+        self.image_ids = image_ids
+        self.unknown_fields = unknown_fields
+
+
+
+class MetadataSaveParams(Type):
+    _toSchema = {'metadata': 'metadata'}
+    _toPy = {'metadata': 'metadata'}
+    def __init__(self, metadata=None, **unknown_fields):
+        '''
+        metadata : typing.Sequence<+T_co>[~CloudImageMetadataList]<~CloudImageMetadataList>
+        '''
+        self.metadata = [CloudImageMetadataList.from_json(o) for o in metadata or []]
         self.unknown_fields = unknown_fields
 
 
@@ -6569,45 +6865,35 @@ class ModelFilesystemInfo(Type):
 
 
 class ModelInfo(Type):
-    _toSchema = {'agent_version': 'agent-version', 'cloud_credential_tag': 'cloud-credential-tag', 'cloud_region': 'cloud-region', 'cloud_tag': 'cloud-tag', 'controller_uuid': 'controller-uuid', 'default_series': 'default-series', 'is_controller': 'is-controller', 'life': 'life', 'machines': 'machines', 'migration': 'migration', 'name': 'name', 'owner_tag': 'owner-tag', 'provider_type': 'provider-type', 'sla': 'sla', 'status': 'status', 'type_': 'type', 'users': 'users', 'uuid': 'uuid'}
-    _toPy = {'agent-version': 'agent_version', 'cloud-credential-tag': 'cloud_credential_tag', 'cloud-region': 'cloud_region', 'cloud-tag': 'cloud_tag', 'controller-uuid': 'controller_uuid', 'default-series': 'default_series', 'is-controller': 'is_controller', 'life': 'life', 'machines': 'machines', 'migration': 'migration', 'name': 'name', 'owner-tag': 'owner_tag', 'provider-type': 'provider_type', 'sla': 'sla', 'status': 'status', 'type': 'type_', 'users': 'users', 'uuid': 'uuid'}
-    def __init__(self, agent_version=None, cloud_credential_tag=None, cloud_region=None, cloud_tag=None, controller_uuid=None, default_series=None, is_controller=None, life=None, machines=None, migration=None, name=None, owner_tag=None, provider_type=None, sla=None, status=None, type_=None, users=None, uuid=None, **unknown_fields):
+    _toSchema = {'cloud_credential_tag': 'cloud-credential-tag', 'cloud_region': 'cloud-region', 'cloud_tag': 'cloud-tag', 'controller_uuid': 'controller-uuid', 'default_series': 'default-series', 'life': 'life', 'machines': 'machines', 'name': 'name', 'owner_tag': 'owner-tag', 'provider_type': 'provider-type', 'status': 'status', 'users': 'users', 'uuid': 'uuid'}
+    _toPy = {'cloud-credential-tag': 'cloud_credential_tag', 'cloud-region': 'cloud_region', 'cloud-tag': 'cloud_tag', 'controller-uuid': 'controller_uuid', 'default-series': 'default_series', 'life': 'life', 'machines': 'machines', 'name': 'name', 'owner-tag': 'owner_tag', 'provider-type': 'provider_type', 'status': 'status', 'users': 'users', 'uuid': 'uuid'}
+    def __init__(self, cloud_credential_tag=None, cloud_region=None, cloud_tag=None, controller_uuid=None, default_series=None, life=None, machines=None, name=None, owner_tag=None, provider_type=None, status=None, users=None, uuid=None, **unknown_fields):
         '''
-        agent_version : Number
         cloud_credential_tag : str
         cloud_region : str
         cloud_tag : str
         controller_uuid : str
         default_series : str
-        is_controller : bool
         life : str
         machines : typing.Sequence<+T_co>[~ModelMachineInfo]<~ModelMachineInfo>
-        migration : ModelMigrationStatus
         name : str
         owner_tag : str
         provider_type : str
-        sla : ModelSLAInfo
         status : EntityStatus
-        type_ : str
         users : typing.Sequence<+T_co>[~ModelUserInfo]<~ModelUserInfo>
         uuid : str
         '''
-        self.agent_version = Number.from_json(agent_version) if agent_version else None
         self.cloud_credential_tag = cloud_credential_tag
         self.cloud_region = cloud_region
         self.cloud_tag = cloud_tag
         self.controller_uuid = controller_uuid
         self.default_series = default_series
-        self.is_controller = is_controller
         self.life = life
         self.machines = [ModelMachineInfo.from_json(o) for o in machines or []]
-        self.migration = ModelMigrationStatus.from_json(migration) if migration else None
         self.name = name
         self.owner_tag = owner_tag
         self.provider_type = provider_type
-        self.sla = ModelSLAInfo.from_json(sla) if sla else None
         self.status = EntityStatus.from_json(status) if status else None
-        self.type_ = type_
         self.users = [ModelUserInfo.from_json(o) for o in users or []]
         self.uuid = uuid
         self.unknown_fields = unknown_fields
@@ -6809,28 +7095,22 @@ class ModelStatus(Type):
 
 
 class ModelStatusInfo(Type):
-    _toSchema = {'available_version': 'available-version', 'cloud_tag': 'cloud-tag', 'meter_status': 'meter-status', 'model_status': 'model-status', 'name': 'name', 'region': 'region', 'sla': 'sla', 'type_': 'type', 'version': 'version'}
-    _toPy = {'available-version': 'available_version', 'cloud-tag': 'cloud_tag', 'meter-status': 'meter_status', 'model-status': 'model_status', 'name': 'name', 'region': 'region', 'sla': 'sla', 'type': 'type_', 'version': 'version'}
-    def __init__(self, available_version=None, cloud_tag=None, meter_status=None, model_status=None, name=None, region=None, sla=None, type_=None, version=None, **unknown_fields):
+    _toSchema = {'available_version': 'available-version', 'cloud_tag': 'cloud-tag', 'migration': 'migration', 'name': 'name', 'region': 'region', 'version': 'version'}
+    _toPy = {'available-version': 'available_version', 'cloud-tag': 'cloud_tag', 'migration': 'migration', 'name': 'name', 'region': 'region', 'version': 'version'}
+    def __init__(self, available_version=None, cloud_tag=None, migration=None, name=None, region=None, version=None, **unknown_fields):
         '''
         available_version : str
         cloud_tag : str
-        meter_status : MeterStatus
-        model_status : DetailedStatus
+        migration : str
         name : str
         region : str
-        sla : str
-        type_ : str
         version : str
         '''
         self.available_version = available_version
         self.cloud_tag = cloud_tag
-        self.meter_status = MeterStatus.from_json(meter_status) if meter_status else None
-        self.model_status = DetailedStatus.from_json(model_status) if model_status else None
+        self.migration = migration
         self.name = name
         self.region = region
-        self.sla = sla
-        self.type_ = type_
         self.version = version
         self.unknown_fields = unknown_fields
 
@@ -7779,6 +8059,38 @@ class PrivateAddressResults(Type):
 
 
 
+class ProfileChangeResult(Type):
+    _toSchema = {'error': 'error', 'new_profile_name': 'new-profile-name', 'old_profile_name': 'old-profile-name', 'profile': 'profile', 'subordinate': 'subordinate'}
+    _toPy = {'error': 'error', 'new-profile-name': 'new_profile_name', 'old-profile-name': 'old_profile_name', 'profile': 'profile', 'subordinate': 'subordinate'}
+    def __init__(self, error=None, new_profile_name=None, old_profile_name=None, profile=None, subordinate=None, **unknown_fields):
+        '''
+        error : Error
+        new_profile_name : str
+        old_profile_name : str
+        profile : CharmLXDProfile
+        subordinate : bool
+        '''
+        self.error = Error.from_json(error) if error else None
+        self.new_profile_name = new_profile_name
+        self.old_profile_name = old_profile_name
+        self.profile = CharmLXDProfile.from_json(profile) if profile else None
+        self.subordinate = subordinate
+        self.unknown_fields = unknown_fields
+
+
+
+class ProfileChangeResults(Type):
+    _toSchema = {'results': 'results'}
+    _toPy = {'results': 'results'}
+    def __init__(self, results=None, **unknown_fields):
+        '''
+        results : typing.Sequence<+T_co>[~ProfileChangeResult]<~ProfileChangeResult>
+        '''
+        self.results = [ProfileChangeResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
+
+
+
 class ProfileInfoResult(Type):
     _toSchema = {'application_name': 'application-name', 'error': 'error', 'profile': 'profile', 'revision': 'revision'}
     _toPy = {'application-name': 'application_name', 'error': 'error', 'profile': 'profile', 'revision': 'revision'}
@@ -7837,6 +8149,24 @@ class ProviderInterfaceInfoResults(Type):
         results : typing.Sequence<+T_co>[~ProviderInterfaceInfoResult]<~ProviderInterfaceInfoResult>
         '''
         self.results = [ProviderInterfaceInfoResult.from_json(o) for o in results or []]
+        self.unknown_fields = unknown_fields
+
+
+
+class ProviderSpace(Type):
+    _toSchema = {'error': 'error', 'name': 'name', 'provider_id': 'provider-id', 'subnets': 'subnets'}
+    _toPy = {'error': 'error', 'name': 'name', 'provider-id': 'provider_id', 'subnets': 'subnets'}
+    def __init__(self, error=None, name=None, provider_id=None, subnets=None, **unknown_fields):
+        '''
+        error : Error
+        name : str
+        provider_id : str
+        subnets : typing.Sequence<+T_co>[~Subnet]<~Subnet>
+        '''
+        self.error = Error.from_json(error) if error else None
+        self.name = name
+        self.provider_id = provider_id
+        self.subnets = [Subnet.from_json(o) for o in subnets or []]
         self.unknown_fields = unknown_fields
 
 
@@ -8127,6 +8457,24 @@ class RegisterRemoteRelationResults(Type):
 
 
 
+class RelationChange(Type):
+    _toSchema = {'changedunits': 'changedunits', 'departedunits': 'departedunits', 'id_': 'id', 'life': 'life'}
+    _toPy = {'changedunits': 'changedunits', 'departedunits': 'departedunits', 'id': 'id_', 'life': 'life'}
+    def __init__(self, changedunits=None, departedunits=None, id_=None, life=None, **unknown_fields):
+        '''
+        changedunits : typing.Mapping<~KT, +VT_co>[str, ~RelationUnitChange]<~RelationUnitChange>
+        departedunits : typing.Sequence<+T_co>[str]
+        id_ : int
+        life : str
+        '''
+        self.changedunits = changedunits
+        self.departedunits = departedunits
+        self.id_ = id_
+        self.life = life
+        self.unknown_fields = unknown_fields
+
+
+
 class RelationIds(Type):
     _toSchema = {'relation_ids': 'relation-ids'}
     _toPy = {'relation-ids': 'relation_ids'}
@@ -8315,6 +8663,18 @@ class RelationUnit(Type):
 
 
 
+class RelationUnitChange(Type):
+    _toSchema = {'settings': 'settings'}
+    _toPy = {'settings': 'settings'}
+    def __init__(self, settings=None, **unknown_fields):
+        '''
+        settings : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        '''
+        self.settings = settings
+        self.unknown_fields = unknown_fields
+
+
+
 class RelationUnitPair(Type):
     _toSchema = {'local_unit': 'local-unit', 'relation': 'relation', 'remote_unit': 'remote-unit'}
     _toPy = {'local-unit': 'local_unit', 'relation': 'relation', 'remote-unit': 'remote_unit'}
@@ -8491,6 +8851,22 @@ class RemoteApplication(Type):
 
 
 
+class RemoteApplicationChange(Type):
+    _toSchema = {'application_tag': 'application-tag', 'life': 'life', 'relations': 'relations'}
+    _toPy = {'application-tag': 'application_tag', 'life': 'life', 'relations': 'relations'}
+    def __init__(self, application_tag=None, life=None, relations=None, **unknown_fields):
+        '''
+        application_tag : str
+        life : str
+        relations : RemoteRelationsChange
+        '''
+        self.application_tag = application_tag
+        self.life = life
+        self.relations = RemoteRelationsChange.from_json(relations) if relations else None
+        self.unknown_fields = unknown_fields
+
+
+
 class RemoteApplicationInfo(Type):
     _toSchema = {'description': 'description', 'endpoints': 'endpoints', 'icon_url_path': 'icon-url-path', 'model_tag': 'model-tag', 'name': 'name', 'offer_url': 'offer-url', 'source_model_label': 'source-model-label'}
     _toPy = {'description': 'description', 'endpoints': 'endpoints', 'icon-url-path': 'icon_url_path', 'model-tag': 'model_tag', 'name': 'name', 'offer-url': 'offer_url', 'source-model-label': 'source_model_label'}
@@ -8591,6 +8967,22 @@ class RemoteApplicationStatus(Type):
 
 
 
+class RemoteApplicationWatchResult(Type):
+    _toSchema = {'change': 'change', 'error': 'error', 'id_': 'id'}
+    _toPy = {'change': 'change', 'error': 'error', 'id': 'id_'}
+    def __init__(self, change=None, error=None, id_=None, **unknown_fields):
+        '''
+        change : RemoteApplicationChange
+        error : Error
+        id_ : str
+        '''
+        self.change = RemoteApplicationChange.from_json(change) if change else None
+        self.error = Error.from_json(error) if error else None
+        self.id_ = id_
+        self.unknown_fields = unknown_fields
+
+
+
 class RemoteEndpoint(Type):
     _toSchema = {'interface': 'interface', 'limit': 'limit', 'name': 'name', 'role': 'role'}
     _toPy = {'interface': 'interface', 'limit': 'limit', 'name': 'name', 'role': 'role'}
@@ -8631,6 +9023,20 @@ class RemoteEntityArgs(Type):
         args : typing.Sequence<+T_co>[~RemoteEntityArg]<~RemoteEntityArg>
         '''
         self.args = [RemoteEntityArg.from_json(o) for o in args or []]
+        self.unknown_fields = unknown_fields
+
+
+
+class RemoteEntityId(Type):
+    _toSchema = {'model_uuid': 'model-uuid', 'token': 'token'}
+    _toPy = {'model-uuid': 'model_uuid', 'token': 'token'}
+    def __init__(self, model_uuid=None, token=None, **unknown_fields):
+        '''
+        model_uuid : str
+        token : str
+        '''
+        self.model_uuid = model_uuid
+        self.token = token
         self.unknown_fields = unknown_fields
 
 
@@ -8685,6 +9091,24 @@ class RemoteRelation(Type):
         self.remote_endpoint_name = remote_endpoint_name
         self.source_model_uuid = source_model_uuid
         self.suspended = suspended
+        self.unknown_fields = unknown_fields
+
+
+
+class RemoteRelationChange(Type):
+    _toSchema = {'changed_units': 'changed-units', 'departed_units': 'departed-units', 'id_': 'id', 'life': 'life'}
+    _toPy = {'changed-units': 'changed_units', 'departed-units': 'departed_units', 'id': 'id_', 'life': 'life'}
+    def __init__(self, changed_units=None, departed_units=None, id_=None, life=None, **unknown_fields):
+        '''
+        changed_units : typing.Mapping<~KT, +VT_co>[str, ~RemoteRelationUnitChange]<~RemoteRelationUnitChange>
+        departed_units : typing.Sequence<+T_co>[str]
+        id_ : int
+        life : str
+        '''
+        self.changed_units = changed_units
+        self.departed_units = departed_units
+        self.id_ = id_
+        self.life = life
         self.unknown_fields = unknown_fields
 
 
@@ -8799,6 +9223,22 @@ class RemoteRelationUnits(Type):
 
 
 
+class RemoteRelationsChange(Type):
+    _toSchema = {'changed': 'changed', 'initial': 'initial', 'removed': 'removed'}
+    _toPy = {'changed': 'changed', 'initial': 'initial', 'removed': 'removed'}
+    def __init__(self, changed=None, initial=None, removed=None, **unknown_fields):
+        '''
+        changed : typing.Sequence<+T_co>[~RemoteRelationChange]<~RemoteRelationChange>
+        initial : bool
+        removed : typing.Sequence<+T_co>[int]
+        '''
+        self.changed = [RemoteRelationChange.from_json(o) for o in changed or []]
+        self.initial = initial
+        self.removed = removed
+        self.unknown_fields = unknown_fields
+
+
+
 class RemoteRelationsChanges(Type):
     _toSchema = {'changes': 'changes'}
     _toPy = {'changes': 'changes'}
@@ -8807,6 +9247,22 @@ class RemoteRelationsChanges(Type):
         changes : typing.Sequence<+T_co>[~RemoteRelationChangeEvent]<~RemoteRelationChangeEvent>
         '''
         self.changes = [RemoteRelationChangeEvent.from_json(o) for o in changes or []]
+        self.unknown_fields = unknown_fields
+
+
+
+class RemoteRelationsWatchResult(Type):
+    _toSchema = {'change': 'change', 'error': 'error', 'remoterelationswatcherid': 'RemoteRelationsWatcherId'}
+    _toPy = {'RemoteRelationsWatcherId': 'remoterelationswatcherid', 'change': 'change', 'error': 'error'}
+    def __init__(self, remoterelationswatcherid=None, change=None, error=None, **unknown_fields):
+        '''
+        remoterelationswatcherid : str
+        change : RemoteRelationsChange
+        error : Error
+        '''
+        self.remoterelationswatcherid = remoterelationswatcherid
+        self.change = RemoteRelationsChange.from_json(change) if change else None
+        self.error = Error.from_json(error) if error else None
         self.unknown_fields = unknown_fields
 
 
@@ -9055,6 +9511,20 @@ class Resource(Type):
         self.pending_id = pending_id
         self.timestamp = timestamp
         self.username = username
+        self.unknown_fields = unknown_fields
+
+
+
+class ResourceResult(Type):
+    _toSchema = {'errorresult': 'ErrorResult', 'resource': 'resource'}
+    _toPy = {'ErrorResult': 'errorresult', 'resource': 'resource'}
+    def __init__(self, errorresult=None, resource=None, **unknown_fields):
+        '''
+        errorresult : ErrorResult
+        resource : Resource
+        '''
+        self.errorresult = ErrorResult.from_json(errorresult) if errorresult else None
+        self.resource = Resource.from_json(resource) if resource else None
         self.unknown_fields = unknown_fields
 
 
@@ -9685,6 +10155,32 @@ class SetProfileArgs(Type):
 
 
 
+class SetProfileUpgradeCompleteArg(Type):
+    _toSchema = {'entity': 'entity', 'message': 'message'}
+    _toPy = {'entity': 'entity', 'message': 'message'}
+    def __init__(self, entity=None, message=None, **unknown_fields):
+        '''
+        entity : Entity
+        message : str
+        '''
+        self.entity = Entity.from_json(entity) if entity else None
+        self.message = message
+        self.unknown_fields = unknown_fields
+
+
+
+class SetProfileUpgradeCompleteArgs(Type):
+    _toSchema = {'args': 'args'}
+    _toPy = {'args': 'args'}
+    def __init__(self, args=None, **unknown_fields):
+        '''
+        args : typing.Sequence<+T_co>[~SetProfileUpgradeCompleteArg]<~SetProfileUpgradeCompleteArg>
+        '''
+        self.args = [SetProfileUpgradeCompleteArg.from_json(o) for o in args or []]
+        self.unknown_fields = unknown_fields
+
+
+
 class SetStatus(Type):
     _toSchema = {'entities': 'entities'}
     _toPy = {'entities': 'entities'}
@@ -9693,6 +10189,32 @@ class SetStatus(Type):
         entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
         '''
         self.entities = [EntityStatusArgs.from_json(o) for o in entities or []]
+        self.unknown_fields = unknown_fields
+
+
+
+class SetStatusArg(Type):
+    _toSchema = {'entity': 'Entity', 'status': 'status'}
+    _toPy = {'Entity': 'entity', 'status': 'status'}
+    def __init__(self, entity=None, status=None, **unknown_fields):
+        '''
+        entity : Entity
+        status : str
+        '''
+        self.entity = Entity.from_json(entity) if entity else None
+        self.status = status
+        self.unknown_fields = unknown_fields
+
+
+
+class SetStatusArgs(Type):
+    _toSchema = {'args': 'args'}
+    _toPy = {'args': 'args'}
+    def __init__(self, args=None, **unknown_fields):
+        '''
+        args : typing.Sequence<+T_co>[~SetStatusArg]<~SetStatusArg>
+        '''
+        self.args = [SetStatusArg.from_json(o) for o in args or []]
         self.unknown_fields = unknown_fields
 
 
@@ -10606,6 +11128,18 @@ class ToolsResults(Type):
 
 
 
+class TrackArgs(Type):
+    _toSchema = {'payloads': 'payloads'}
+    _toPy = {'payloads': 'payloads'}
+    def __init__(self, payloads=None, **unknown_fields):
+        '''
+        payloads : typing.Sequence<+T_co>[~Payload]<~Payload>
+        '''
+        self.payloads = [Payload.from_json(o) for o in payloads or []]
+        self.unknown_fields = unknown_fields
+
+
+
 class TrackPayloadArgs(Type):
     _toSchema = {'payloads': 'payloads'}
     _toPy = {'payloads': 'payloads'}
@@ -10650,6 +11184,46 @@ class UndertakerModelInfoResult(Type):
         '''
         self.error = Error.from_json(error) if error else None
         self.result = UndertakerModelInfo.from_json(result) if result else None
+        self.unknown_fields = unknown_fields
+
+
+
+class UnitNetworkConfig(Type):
+    _toSchema = {'binding_name': 'binding-name', 'unit_tag': 'unit-tag'}
+    _toPy = {'binding-name': 'binding_name', 'unit-tag': 'unit_tag'}
+    def __init__(self, binding_name=None, unit_tag=None, **unknown_fields):
+        '''
+        binding_name : str
+        unit_tag : str
+        '''
+        self.binding_name = binding_name
+        self.unit_tag = unit_tag
+        self.unknown_fields = unknown_fields
+
+
+
+class UnitNetworkConfigResult(Type):
+    _toSchema = {'error': 'error', 'info': 'info'}
+    _toPy = {'error': 'error', 'info': 'info'}
+    def __init__(self, error=None, info=None, **unknown_fields):
+        '''
+        error : Error
+        info : typing.Sequence<+T_co>[~NetworkConfig]<~NetworkConfig>
+        '''
+        self.error = Error.from_json(error) if error else None
+        self.info = [NetworkConfig.from_json(o) for o in info or []]
+        self.unknown_fields = unknown_fields
+
+
+
+class UnitNetworkConfigResults(Type):
+    _toSchema = {'results': 'results'}
+    _toPy = {'results': 'results'}
+    def __init__(self, results=None, **unknown_fields):
+        '''
+        results : typing.Sequence<+T_co>[~UnitNetworkConfigResult]<~UnitNetworkConfigResult>
+        '''
+        self.results = [UnitNetworkConfigResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
 
 
@@ -10770,6 +11344,18 @@ class UnitStatus(Type):
 
 
 
+class UnitsNetworkConfig(Type):
+    _toSchema = {'args': 'args'}
+    _toPy = {'args': 'args'}
+    def __init__(self, args=None, **unknown_fields):
+        '''
+        args : typing.Sequence<+T_co>[~UnitNetworkConfig]<~UnitNetworkConfig>
+        '''
+        self.args = [UnitNetworkConfig.from_json(o) for o in args or []]
+        self.unknown_fields = unknown_fields
+
+
+
 class UnitsResolved(Type):
     _toSchema = {'all_': 'all', 'retry': 'retry', 'tags': 'tags'}
     _toPy = {'all': 'all_', 'retry': 'retry', 'tags': 'tags'}
@@ -10884,6 +11470,32 @@ class UpdateCloudArgs(Type):
         clouds : typing.Sequence<+T_co>[~AddCloudArgs]<~AddCloudArgs>
         '''
         self.clouds = [AddCloudArgs.from_json(o) for o in clouds or []]
+        self.unknown_fields = unknown_fields
+
+
+
+class UpdateCloudCredential(Type):
+    _toSchema = {'credential': 'credential', 'tag': 'tag'}
+    _toPy = {'credential': 'credential', 'tag': 'tag'}
+    def __init__(self, credential=None, tag=None, **unknown_fields):
+        '''
+        credential : CloudCredential
+        tag : str
+        '''
+        self.credential = CloudCredential.from_json(credential) if credential else None
+        self.tag = tag
+        self.unknown_fields = unknown_fields
+
+
+
+class UpdateCloudCredentials(Type):
+    _toSchema = {'credentials': 'credentials'}
+    _toPy = {'credentials': 'credentials'}
+    def __init__(self, credentials=None, **unknown_fields):
+        '''
+        credentials : typing.Sequence<+T_co>[~UpdateCloudCredential]<~UpdateCloudCredential>
+        '''
+        self.credentials = [UpdateCloudCredential.from_json(o) for o in credentials or []]
         self.unknown_fields = unknown_fields
 
 

@@ -5,7 +5,6 @@ import json
 import keyword
 import pprint
 import re
-import sys
 import textwrap
 import typing
 from collections import defaultdict
@@ -269,7 +268,6 @@ def buildTypes(schema, capture):
     for kind in sorted((k for k in schema.types if not isinstance(k, str)),
                        key=lambda x: str(x)):
         name = schema.types[kind]
-        print("* build", name)
         if name in capture and name not in NAUGHTY_CLASSES:
             continue
         args = Args(schema, kind)
@@ -380,6 +378,7 @@ def retspec(schema, defs):
     if len(rtypes) > 1:
         return Union[tuple([strcast(r[1], True) for r in rtypes])]
     return strcast(rtypes[0][1], False)
+
 
 def ReturnMapping(cls):
     # Annotate the method with a return Type
@@ -569,6 +568,8 @@ class Schema(dict):
             return
         definitions = {}
         for d, data in defs.items():
+            if d in self.registry and d not in NAUGHTY_CLASSES:
+                continue
             if data.get("type") != "object":
                 continue
             definitions[d] = data
@@ -714,9 +715,15 @@ def generate_definitions(schemas):
     for juju_version in sorted(schemas.keys()):
         for schema in schemas[juju_version]:
             schema.buildDefinitions()
+
+    # ensure we write the latest ones first, so that earlier revisions
+    # get dropped.
+    for juju_version in sorted(schemas.keys(), reverse=True):
+        for schema in schemas[juju_version]:
             buildTypes(schema, definitions)
 
     return definitions
+
 
 def generate_facades(schemas):
     captures = defaultdict(codegen.Capture)
@@ -740,9 +747,10 @@ def generate_facades(schemas):
 
     return captures
 
+
 def load_schemas(options):
     schemas = {}
-    '''
+
     for p in sorted(glob(options.schema)):
         if 'latest' in p:
             juju_version = 'latest'
@@ -756,11 +764,8 @@ def load_schemas(options):
 
         new_schemas = json.loads(Path(p).read_text("utf-8"))
         schemas[juju_version] = [Schema(s) for s in new_schemas]
-    '''
-    new_schemas = json.loads(Path('juju/client/schemas-juju-latest.json').read_text("utf-8"))
-    schemas['latest'] = [Schema(s) for s in new_schemas]
-
     return schemas
+
 
 def setup():
     parser = argparse.ArgumentParser()
@@ -781,8 +786,8 @@ def main():
 
     # ... and write them out
     write_definitions(definitions, options)
-    #write_facades(captures, options)
-    #write_client(captures, options)
+    write_facades(captures, options)
+    write_client(captures, options)
 
 
 if __name__ == '__main__':

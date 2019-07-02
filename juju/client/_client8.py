@@ -636,9 +636,10 @@ class ApplicationFacade(Type):
     
 
     @ReturnMapping(AddRelationResults)
-    async def AddRelation(self, endpoints):
+    async def AddRelation(self, endpoints, via_cidrs):
         '''
         endpoints : typing.Sequence<+T_co>[str]
+        via_cidrs : typing.Sequence<+T_co>[str]
         Returns -> typing.Mapping<~KT, +VT_co>[str, ~CharmRelation]<~CharmRelation>
         '''
         # map input types to rpc msg
@@ -648,17 +649,20 @@ class ApplicationFacade(Type):
                    version=8,
                    params=_params)
         _params['endpoints'] = endpoints
+        _params['via-cidrs'] = via_cidrs
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(AddApplicationUnitsResults)
-    async def AddUnits(self, application, num_units, placement):
+    async def AddUnits(self, application, attach_storage, num_units, placement, policy):
         '''
         application : str
+        attach_storage : typing.Sequence<+T_co>[str]
         num_units : int
         placement : typing.Sequence<+T_co>[~Placement]<~Placement>
+        policy : str
         Returns -> typing.Sequence<+T_co>[str]
         '''
         # map input types to rpc msg
@@ -668,8 +672,10 @@ class ApplicationFacade(Type):
                    version=8,
                    params=_params)
         _params['application'] = application
+        _params['attach-storage'] = attach_storage
         _params['num-units'] = num_units
         _params['placement'] = placement
+        _params['policy'] = policy
         reply = await self.rpc(msg)
         return reply
 
@@ -802,9 +808,10 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(None)
-    async def DestroyRelation(self, endpoints):
+    async def DestroyRelation(self, endpoints, relation_id):
         '''
         endpoints : typing.Sequence<+T_co>[str]
+        relation_id : int
         Returns -> None
         '''
         # map input types to rpc msg
@@ -814,6 +821,7 @@ class ApplicationFacade(Type):
                    version=8,
                    params=_params)
         _params['endpoints'] = endpoints
+        _params['relation-id'] = relation_id
         reply = await self.rpc(msg)
         return reply
 
@@ -1044,13 +1052,14 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(None)
-    async def SetCharm(self, application, channel, charm_url, config_settings, config_settings_yaml, force_series, force_units, resource_ids, storage_constraints):
+    async def SetCharm(self, application, channel, charm_url, config_settings, config_settings_yaml, force, force_series, force_units, resource_ids, storage_constraints):
         '''
         application : str
         channel : str
         charm_url : str
         config_settings : typing.Mapping<~KT, +VT_co>[str, str]
         config_settings_yaml : str
+        force : bool
         force_series : bool
         force_units : bool
         resource_ids : typing.Mapping<~KT, +VT_co>[str, str]
@@ -1068,6 +1077,7 @@ class ApplicationFacade(Type):
         _params['charm-url'] = charm_url
         _params['config-settings'] = config_settings
         _params['config-settings-yaml'] = config_settings_yaml
+        _params['force'] = force
         _params['force-series'] = force_series
         _params['force-units'] = force_units
         _params['resource-ids'] = resource_ids
@@ -1210,11 +1220,12 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(None)
-    async def Update(self, application, charm_url, constraints, force_charm_url, force_series, min_units, settings, settings_yaml):
+    async def Update(self, application, charm_url, constraints, force, force_charm_url, force_series, min_units, settings, settings_yaml):
         '''
         application : str
         charm_url : str
         constraints : Value
+        force : bool
         force_charm_url : bool
         force_series : bool
         min_units : int
@@ -1231,6 +1242,7 @@ class ApplicationFacade(Type):
         _params['application'] = application
         _params['charm-url'] = charm_url
         _params['constraints'] = constraints
+        _params['force'] = force
         _params['force-charm-url'] = force_charm_url
         _params['force-series'] = force_series
         _params['min-units'] = min_units
