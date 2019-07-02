@@ -295,11 +295,12 @@ class MachineManagerFacade(Type):
 
 
     @ReturnMapping(DestroyMachineResults)
-    async def DestroyMachineWithParams(self, force, keep, machine_tags):
+    async def DestroyMachineWithParams(self, force, keep, machine_tags, max_wait):
         '''
         force : bool
         keep : bool
         machine_tags : typing.Sequence<+T_co>[str]
+        max_wait : int
         Returns -> typing.Sequence<+T_co>[~DestroyMachineResult]<~DestroyMachineResult>
         '''
         # map input types to rpc msg
@@ -311,6 +312,7 @@ class MachineManagerFacade(Type):
         _params['force'] = force
         _params['keep'] = keep
         _params['machine-tags'] = machine_tags
+        _params['max-wait'] = max_wait
         reply = await self.rpc(msg)
         return reply
 

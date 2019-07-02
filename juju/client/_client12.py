@@ -1573,9 +1573,10 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(NetworkInfoResults)
-    async def NetworkInfo(self, bindings, unit):
+    async def NetworkInfo(self, bindings, relation_id, unit):
         '''
         bindings : typing.Sequence<+T_co>[str]
+        relation_id : int
         unit : str
         Returns -> typing.Mapping<~KT, +VT_co>[str, ~NetworkInfoResult]<~NetworkInfoResult>
         '''
@@ -1586,6 +1587,7 @@ class UniterFacade(Type):
                    version=12,
                    params=_params)
         _params['bindings'] = bindings
+        _params['relation-id'] = relation_id
         _params['unit'] = unit
         reply = await self.rpc(msg)
         return reply
