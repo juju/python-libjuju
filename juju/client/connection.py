@@ -8,8 +8,8 @@ import weakref
 from concurrent.futures import CancelledError
 from http.client import HTTPSConnection
 
-import macaroonbakery.httpbakery as httpbakery
 import macaroonbakery.bakery as bakery
+import macaroonbakery.httpbakery as httpbakery
 import websockets
 from juju import errors, tag, utils
 from juju.client import client

@@ -18,3 +18,15 @@ class TestOfferEndpoint(unittest.TestCase):
                  (_("mysql:db,log"), result("mysql", ["db", "log"]))]
         for case in cases:
             self.assertEqual(case[0], case[1])
+
+class TestOfferURL(unittest.TestCase):
+
+    def test_parse(self):
+        _ = offerendpoints.parse_url
+        result = offerendpoints.OfferURL
+
+        cases = [(_("controller:user/modelname.applicationname"), result(source="controller", user="user", model="modelname", application="applicationname")), \
+                 (_("controller:user/modelname.applicationname:rel"), result(source="controller", user="user", model="modelname", application="applicationname:rel")) \
+                 ]
+        for case in cases:
+            self.assertEqual(case[0], case[1])
