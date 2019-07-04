@@ -29,6 +29,8 @@ from .constraints import parse as parse_constraints
 from .delta import get_entity_class, get_entity_delta
 from .errors import JujuAPIError, JujuError
 from .exceptions import DeadEntityException
+from .offerendpoints import ParseError as OfferParseError
+from .offerendpoints import parse as parse_endpoint
 from .placement import parse as parse_placement
 
 log = logging.getLogger(__name__)
@@ -1882,6 +1884,27 @@ class Model:
                 metrics[metric.unit].append(vars(metric))
 
         return metrics
+
+
+    async def offer(self, endpoint, offer_name=None):
+        """
+        """
+        try:
+            offer = parse_endpoint(endpoint)
+        except OfferParseError as e:
+            raise
+
+        if offer_name is None:
+            offer_name = offer.application
+
+        params = client.AddApplicationOffer()
+        params.application_name = offer.application
+        params.endpoints = offer.endpoints
+        params.offer_name = offer_name
+        params.model_tag = tag.model(self.info.uuid)
+
+        facade = client.ApplicationOffersFacade.from_connection(self.connection())
+        await facade.Offer([params])
 
 
 def get_charm_series(path):
