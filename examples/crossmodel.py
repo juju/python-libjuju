@@ -9,6 +9,7 @@ This example:
 
 """
 from juju import loop
+from juju.controller import Controller
 from juju.model import Model
 
 

@@ -5,6 +5,8 @@ from pathlib import Path
 
 from . import errors, tag, utils
 from .client import client, connector
+from .offerendpoints import ParseError as OfferParseError
+from .offerendpoints import parse as parse_endpoint
 from .user import User
 
 log = logging.getLogger(__name__)
@@ -631,3 +633,36 @@ class Controller:
         model = tag.model(model_uuid)
         changes = client.ModifyModelAccess(acl, 'revoke', model, user)
         return await model_facade.ModifyModelAccess([changes])
+
+    async def offer(self, model_uuid, endpoint, offer_name=None):
+        """
+        Offer a deployed application using a series of endpoints for use by
+        consumers.
+
+        @param endpoint: holds the application and endpoint you want to offer
+        @param offer_name: over ride the offer name to help the consumer
+        """
+        try:
+            offer = parse_endpoint(endpoint)
+        except OfferParseError as e:
+            raise
+
+        if offer_name is None:
+            offer_name = offer.application
+
+        params = client.AddApplicationOffer()
+        params.application_name = offer.application
+        params.endpoints = {name:name for name in offer.endpoints}
+        params.offer_name = offer_name
+        params.model_tag = tag.model(model_uuid)
+
+        facade = client.ApplicationOffersFacade.from_connection(self.connection())
+        return await facade.Offer([params])
+
+    async def remove_offer(self, endpoint, force=False):
+        """
+        Remove offer for an application.
+
+        Offers will also remove relations to those offers, use force to do
+        so, without an error.
+        """
