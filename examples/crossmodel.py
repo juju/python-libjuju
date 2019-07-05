@@ -8,6 +8,8 @@ This example:
 3. Destroys the unit and application
 
 """
+import asyncio
+
 from juju import loop
 from juju.controller import Controller
 from juju.model import Model
@@ -20,7 +22,6 @@ async def main():
     await model.connect()
 
     try:
-        '''
         print('Deploying mysql')
         application = await model.deploy(
             'mysql',
@@ -33,8 +34,14 @@ async def main():
         await model.block_until(
             lambda: all(unit.workload_status == 'active'
                         for unit in application.units))
-        '''
+
+        print('Adding offer')
         await model.offer("mysql:db")
+
+        await asyncio.sleep(10)
+
+        print('Removing offer')
+        await model.remove_offer("admin/default.mysql", force=True)
     finally:
         print('Disconnecting from model')
         await model.disconnect()
