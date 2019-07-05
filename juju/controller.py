@@ -7,10 +7,14 @@ from . import errors, tag, utils
 from .client import client, connector
 from .offerendpoints import ParseError as OfferParseError
 from .offerendpoints import parse as parse_endpoint
+from .offerendpoints import parse_url as parse_offer_url
 from .user import User
 
 log = logging.getLogger(__name__)
 
+class RemoveError(Exception):
+    def __init__(self, message):
+        self.message = message
 
 class Controller:
     def __init__(
@@ -645,6 +649,7 @@ class Controller:
         try:
             offer = parse_endpoint(endpoint)
         except OfferParseError as e:
+            log.error(e.message)
             raise
 
         if offer_name is None:
@@ -659,10 +664,27 @@ class Controller:
         facade = client.ApplicationOffersFacade.from_connection(self.connection())
         return await facade.Offer([params])
 
-    async def remove_offer(self, endpoint, force=False):
+    async def remove_offer(self, model_uuid, offer, force=False):
         """
         Remove offer for an application.
 
         Offers will also remove relations to those offers, use force to do
         so, without an error.
         """
+        url = None
+        try:
+            url = parse_offer_url(offer)
+        except OfferParseError as e:
+            log.error(e.message)
+            raise
+        if url is None:
+            raise Exception
+
+        offer_source = url.source
+        if offer_source == "":
+            offer_source = self.controller_name
+        if not force:
+            raise RemoveError("removing offer will also remove relations, use force and try again.")
+
+        facade = client.ApplicationOffersFacade.from_connection(self.connection())
+        return await facade.DestroyOffers(force, [url.string()])
