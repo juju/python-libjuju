@@ -636,7 +636,7 @@ class ApplicationFacade(Type):
     
 
     @ReturnMapping(AddRelationResults)
-    async def AddRelation(self, endpoints=None, via_cidrs=None, **kwargs):
+    async def AddRelation(self, endpoints=[], via_cidrs=[], **kwargs):
         '''
         endpoints : typing.Sequence<+T_co>[str]
         via_cidrs : typing.Sequence<+T_co>[str]
@@ -656,7 +656,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(AddApplicationUnitsResults)
-    async def AddUnits(self, application="", attach_storage=None, num_units=0, placement=None, policy="", **kwargs):
+    async def AddUnits(self, application="", attach_storage=[], num_units=0, placement=[], policy="", **kwargs):
         '''
         application : str
         attach_storage : typing.Sequence<+T_co>[str]
@@ -682,7 +682,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ApplicationGetConfigResults)
-    async def CharmConfig(self, entities=None, **kwargs):
+    async def CharmConfig(self, entities=[], **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ConfigResult]<~ConfigResult>
@@ -718,7 +718,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def Consume(self, args=None, **kwargs):
+    async def Consume(self, args=[], **kwargs):
         '''
         args : typing.Sequence<+T_co>[~ConsumeApplicationArg]<~ConsumeApplicationArg>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -736,7 +736,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def Deploy(self, applications=None, **kwargs):
+    async def Deploy(self, applications=[], **kwargs):
         '''
         applications : typing.Sequence<+T_co>[~ApplicationDeploy]<~ApplicationDeploy>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -772,7 +772,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(DestroyApplicationResults)
-    async def DestroyApplication(self, applications=None, **kwargs):
+    async def DestroyApplication(self, applications=[], **kwargs):
         '''
         applications : typing.Sequence<+T_co>[~DestroyApplicationParams]<~DestroyApplicationParams>
         Returns -> typing.Sequence<+T_co>[~DestroyApplicationResult]<~DestroyApplicationResult>
@@ -790,7 +790,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def DestroyConsumedApplications(self, applications=None, **kwargs):
+    async def DestroyConsumedApplications(self, applications=[], **kwargs):
         '''
         applications : typing.Sequence<+T_co>[~DestroyConsumedApplicationParams]<~DestroyConsumedApplicationParams>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -808,7 +808,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(None)
-    async def DestroyRelation(self, endpoints=None, relation_id=0, **kwargs):
+    async def DestroyRelation(self, endpoints=[], relation_id=0, **kwargs):
         '''
         endpoints : typing.Sequence<+T_co>[str]
         relation_id : int
@@ -828,7 +828,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(DestroyUnitResults)
-    async def DestroyUnit(self, units=None, **kwargs):
+    async def DestroyUnit(self, units=[], **kwargs):
         '''
         units : typing.Sequence<+T_co>[~DestroyUnitParams]<~DestroyUnitParams>
         Returns -> typing.Sequence<+T_co>[~DestroyUnitResult]<~DestroyUnitResult>
@@ -846,7 +846,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(None)
-    async def DestroyUnits(self, unit_names=None, **kwargs):
+    async def DestroyUnits(self, unit_names=[], **kwargs):
         '''
         unit_names : typing.Sequence<+T_co>[str]
         Returns -> None
@@ -918,7 +918,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ApplicationGetConfigResults)
-    async def GetConfig(self, entities=None, **kwargs):
+    async def GetConfig(self, entities=[], **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ConfigResult]<~ConfigResult>
@@ -936,7 +936,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ApplicationGetConstraintsResults)
-    async def GetConstraints(self, entities=None, **kwargs):
+    async def GetConstraints(self, entities=[], **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ApplicationConstraint]<~ApplicationConstraint>
@@ -996,7 +996,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ScaleApplicationResults)
-    async def ScaleApplications(self, applications=None, **kwargs):
+    async def ScaleApplications(self, applications=[], **kwargs):
         '''
         applications : typing.Sequence<+T_co>[~ScaleApplicationParams]<~ScaleApplicationParams>
         Returns -> typing.Sequence<+T_co>[~ScaleApplicationResult]<~ScaleApplicationResult>
@@ -1014,7 +1014,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(None)
-    async def Set(self, application="", options=None, **kwargs):
+    async def Set(self, application="", options={}, **kwargs):
         '''
         application : str
         options : typing.Mapping<~KT, +VT_co>[str, str]
@@ -1034,7 +1034,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def SetApplicationsConfig(self, args=None, **kwargs):
+    async def SetApplicationsConfig(self, args=[], **kwargs):
         '''
         args : typing.Sequence<+T_co>[~ApplicationConfigSet]<~ApplicationConfigSet>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -1052,7 +1052,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(None)
-    async def SetCharm(self, application="", channel="", charm_url="", config_settings=None, config_settings_yaml="", force=False, force_series=False, force_units=False, resource_ids=None, storage_constraints=None, **kwargs):
+    async def SetCharm(self, application="", channel="", charm_url="", config_settings={}, config_settings_yaml="", force=False, force_series=False, force_units=False, resource_ids={}, storage_constraints={}, **kwargs):
         '''
         application : str
         channel : str
@@ -1128,7 +1128,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def SetMetricCredentials(self, creds=None, **kwargs):
+    async def SetMetricCredentials(self, creds=[], **kwargs):
         '''
         creds : typing.Sequence<+T_co>[~ApplicationMetricCredential]<~ApplicationMetricCredential>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -1146,7 +1146,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def SetRelationsSuspended(self, args=None, **kwargs):
+    async def SetRelationsSuspended(self, args=[], **kwargs):
         '''
         args : typing.Sequence<+T_co>[~RelationSuspendedArg]<~RelationSuspendedArg>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -1182,7 +1182,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(None)
-    async def Unset(self, application="", options=None, **kwargs):
+    async def Unset(self, application="", options=[], **kwargs):
         '''
         application : str
         options : typing.Sequence<+T_co>[str]
@@ -1202,7 +1202,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def UnsetApplicationsConfig(self, args=None, **kwargs):
+    async def UnsetApplicationsConfig(self, args=[], **kwargs):
         '''
         args : typing.Sequence<+T_co>[~ApplicationUnset]<~ApplicationUnset>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -1220,7 +1220,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(None)
-    async def Update(self, application="", charm_url="", constraints=None, force=False, force_charm_url=False, force_series=False, min_units=0, settings=None, settings_yaml="", **kwargs):
+    async def Update(self, application="", charm_url="", constraints=None, force=False, force_charm_url=False, force_series=False, min_units=0, settings={}, settings_yaml="", **kwargs):
         '''
         application : str
         charm_url : str
@@ -1254,7 +1254,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def UpdateApplicationSeries(self, args=None, **kwargs):
+    async def UpdateApplicationSeries(self, args=[], **kwargs):
         '''
         args : typing.Sequence<+T_co>[~UpdateSeriesArg]<~UpdateSeriesArg>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>

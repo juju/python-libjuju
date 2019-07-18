@@ -175,6 +175,8 @@ basic_values = {
     'bool': 'False',
     'int': '0',
     'float': '0',
+    'sequence': '[]',
+    'mapping': '{}'
 }
 
 
@@ -187,9 +189,11 @@ def name_to_py(name):
 
 
 def var_type_to_py(kind):
-    var_name = ''
+    var_name = None
     if (kind in basic_types or type(kind) in basic_types):
         var_name = kind.__name__
+    if var_name is None and (issubclass(kind, typing.Sequence) or issubclass(kind, typing.Mapping)):
+        var_name = kind.__name__.lower()
     if var_name in basic_values:
         return basic_values[var_name]
     return 'None'
