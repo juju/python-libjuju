@@ -62,7 +62,7 @@ class ResourcesFacade(Type):
     """
 
     @ReturnMapping(_client.AddPendingResourcesResult)
-    async def AddPendingResources(self, application_tag, charm_url, resources):
+    async def AddPendingResources(self, application_tag="", charm_url="", resources=None):
         """Fix the calling signature of AddPendingResources.
 
         The ResourcesFacade doesn't conform to the standard facade pattern in
