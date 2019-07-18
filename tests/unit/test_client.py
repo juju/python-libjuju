@@ -4,6 +4,7 @@ Tests for generated client code
 """
 
 import mock
+
 from juju.client import client
 
 
@@ -22,5 +23,5 @@ def test_from_connection():
 
 def test_to_json():
     uml = client.UserModelList([client.UserModel()])
-    assert uml.to_json() == ('{"user-models": [{"last-connection": null, '
+    assert uml.to_json() == ('{"user-models": [{"last-connection": "", '
                              '"model": null}]}')

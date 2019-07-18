@@ -170,12 +170,29 @@ def booler(v):
 basic_types = [str, bool, int, float]
 
 
+basic_values = {
+    'str': '""',
+    'bool': 'False',
+    'int': '0',
+    'float': '0',
+}
+
+
 def name_to_py(name):
     result = name.replace("-", "_")
     result = result.lower()
     if keyword.iskeyword(result) or result in dir(builtins):
         result += "_"
     return result
+
+
+def var_type_to_py(kind):
+    var_name = ''
+    if (kind in basic_types or type(kind) in basic_types):
+        var_name = kind.__name__
+    if var_name in basic_values:
+        return basic_values[var_name]
+    return 'None'
 
 
 def strcast(kind, keep_builtins=False):
@@ -249,7 +266,9 @@ class Args(list):
         if self:
             parts = []
             for item in self:
-                parts.append('{}=None'.format(name_to_py(item[0])))
+                var_name = name_to_py(item[0])
+                var_type = var_type_to_py(item[1])
+                parts.append('{}={}'.format(var_name, var_type))
             return ', '.join(parts)
         return ''
 
@@ -426,7 +445,7 @@ def makeFunc(cls, name, params, result, _async=True):
     source = """
 
 @ReturnMapping({rettype})
-{_async}def {name}(self{argsep}{args}):
+{_async}def {name}(self{argsep}{args}, **kwargs):
     '''
 {docstring}
     Returns -> {res}
@@ -446,7 +465,7 @@ def makeFunc(cls, name, params, result, _async=True):
     fsource = source.format(_async="async " if _async else "",
                             name=name,
                             argsep=", " if args else "",
-                            args=args,
+                            args=args.as_kwargs(),
                             res=res,
                             rettype=result.__name__ if result else None,
                             docstring=textwrap.indent(args.get_doc(), INDENT),
