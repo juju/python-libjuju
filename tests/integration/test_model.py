@@ -133,6 +133,7 @@ async def test_add_machine(event_loop):
         # add a machine with constraints, disks, and series
         machine2 = await model.add_machine(
             constraints={
+                'arch': 'amd64',
                 'mem': 256 * MB,
             },
             disks=[{
@@ -424,7 +425,7 @@ async def test_ssh_key(event_loop):
         await model.remove_ssh_key('admin', SSH_KEY)
         result = await model.get_ssh_key(True)
         result = result.serialize()['results'][0].serialize()['result']
-        assert result is None
+        assert len(result) == 0
 
 
 @base.bootstrapped

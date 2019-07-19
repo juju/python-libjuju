@@ -20,6 +20,7 @@ async def test_action(event_loop):
                 'tuning-level': 'safest',
             },
             constraints={
+                'arch': 'amd64',
                 'mem': 256 * MB,
             },
         )
