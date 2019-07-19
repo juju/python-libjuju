@@ -1278,6 +1278,8 @@ class Model:
                 k: client.Constraints(**v)
                 for k, v in storage.items()
             }
+        if trust and (self.info.agent_version < client.Number.from_json('2.4.0')):
+            raise NotImplementedError("trusted is not supported on model version {}".format(self.info.agent_version))
 
         entity_path = Path(entity_url.replace('local:', ''))
         bundle_path = entity_path / 'bundle.yaml'
@@ -2174,6 +2176,8 @@ class BundleHandler:
         if options is None:
             options = {}
         if self.trusted:
+            if self.model.info.agent_version < client.Number.from_json('2.4.0'):
+                raise NotImplementedError("trusted is not supported on model version {}".format(self.model.info.agent_version))
             options["trust"] = "true"
         if not charm.startswith('local:'):
             resources = await self.model._add_store_resources(

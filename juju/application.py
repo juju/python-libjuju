@@ -249,6 +249,9 @@ class Application(model.ModelEntity):
         """Return the trusted configuration setting for this application.
 
         """
+        if self.model.info.agent_version < client.Number.from_json('2.4.0'):
+            raise NotImplementedError("trusted is not supported on model version {}".format(self.model.info.agent_version))
+
         app_facade = client.ApplicationFacade.from_connection(self.connection)
 
         log.debug(
@@ -266,6 +269,9 @@ class Application(model.ModelEntity):
 
         :param bool trust: Trust the application or not
         """
+        if self.model.info.agent_version < client.Number.from_json('2.4.0'):
+            raise NotImplementedError("trusted is not supported on model version {}".format(self.model.info.agent_version))
+
         # clamp trust to exactly the value juju expects, rather than allowing
         # anything in the config.
         app_facade = client.ApplicationFacade.from_connection(self.connection)
