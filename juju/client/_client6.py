@@ -259,7 +259,7 @@ class MachineManagerFacade(Type):
     
 
     @ReturnMapping(AddMachinesResults)
-    async def AddMachines(self, params=[], **kwargs):
+    async def AddMachines(self, params=None, **kwargs):
         '''
         params : typing.Sequence<+T_co>[~AddMachineParams]<~AddMachineParams>
         Returns -> typing.Sequence<+T_co>[~AddMachinesResult]<~AddMachinesResult>
@@ -277,7 +277,7 @@ class MachineManagerFacade(Type):
 
 
     @ReturnMapping(DestroyMachineResults)
-    async def DestroyMachine(self, entities=[], **kwargs):
+    async def DestroyMachine(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~DestroyMachineResult]<~DestroyMachineResult>
@@ -295,7 +295,7 @@ class MachineManagerFacade(Type):
 
 
     @ReturnMapping(DestroyMachineResults)
-    async def DestroyMachineWithParams(self, force=False, keep=False, machine_tags=[], max_wait=0, **kwargs):
+    async def DestroyMachineWithParams(self, force=False, keep=False, machine_tags=None, max_wait=0, **kwargs):
         '''
         force : bool
         keep : bool
@@ -319,7 +319,7 @@ class MachineManagerFacade(Type):
 
 
     @ReturnMapping(DestroyMachineResults)
-    async def ForceDestroyMachine(self, entities=[], **kwargs):
+    async def ForceDestroyMachine(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~DestroyMachineResult]<~DestroyMachineResult>
@@ -337,7 +337,7 @@ class MachineManagerFacade(Type):
 
 
     @ReturnMapping(StringsResults)
-    async def GetUpgradeSeriesMessages(self, params=[], **kwargs):
+    async def GetUpgradeSeriesMessages(self, params=None, **kwargs):
         '''
         params : typing.Sequence<+T_co>[~UpgradeSeriesNotificationParam]<~UpgradeSeriesNotificationParam>
         Returns -> typing.Sequence<+T_co>[~StringsResult]<~StringsResult>
@@ -355,7 +355,7 @@ class MachineManagerFacade(Type):
 
 
     @ReturnMapping(InstanceTypesResults)
-    async def InstanceTypes(self, constraints=[], **kwargs):
+    async def InstanceTypes(self, constraints=None, **kwargs):
         '''
         constraints : typing.Sequence<+T_co>[~ModelInstanceTypesConstraint]<~ModelInstanceTypesConstraint>
         Returns -> typing.Sequence<+T_co>[~InstanceTypesResult]<~InstanceTypesResult>
@@ -417,7 +417,7 @@ class MachineManagerFacade(Type):
 
 
     @ReturnMapping(UpgradeSeriesUnitsResults)
-    async def UpgradeSeriesValidate(self, args=[], **kwargs):
+    async def UpgradeSeriesValidate(self, args=None, **kwargs):
         '''
         args : typing.Sequence<+T_co>[~UpdateSeriesArg]<~UpdateSeriesArg>
         Returns -> typing.Sequence<+T_co>[~UpgradeSeriesUnitsResult]<~UpgradeSeriesUnitsResult>
@@ -435,7 +435,7 @@ class MachineManagerFacade(Type):
 
 
     @ReturnMapping(NotifyWatchResults)
-    async def WatchUpgradeSeriesNotifications(self, entities=[], **kwargs):
+    async def WatchUpgradeSeriesNotifications(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
@@ -814,7 +814,7 @@ class StorageFacade(Type):
     
 
     @ReturnMapping(AddStorageResults)
-    async def AddToUnit(self, storages=[], **kwargs):
+    async def AddToUnit(self, storages=None, **kwargs):
         '''
         storages : typing.Sequence<+T_co>[~StorageAddParams]<~StorageAddParams>
         Returns -> typing.Sequence<+T_co>[~AddStorageResult]<~AddStorageResult>
@@ -832,7 +832,7 @@ class StorageFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def Attach(self, ids=[], **kwargs):
+    async def Attach(self, ids=None, **kwargs):
         '''
         ids : typing.Sequence<+T_co>[~StorageAttachmentId]<~StorageAttachmentId>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -850,7 +850,7 @@ class StorageFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def CreatePool(self, pools=[], **kwargs):
+    async def CreatePool(self, pools=None, **kwargs):
         '''
         pools : typing.Sequence<+T_co>[~StoragePool]<~StoragePool>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -890,7 +890,7 @@ class StorageFacade(Type):
 
 
     @ReturnMapping(ImportStorageResults)
-    async def Import(self, storage=[], **kwargs):
+    async def Import(self, storage=None, **kwargs):
         '''
         storage : typing.Sequence<+T_co>[~ImportStorageParams]<~ImportStorageParams>
         Returns -> typing.Sequence<+T_co>[~ImportStorageResult]<~ImportStorageResult>
@@ -908,7 +908,7 @@ class StorageFacade(Type):
 
 
     @ReturnMapping(FilesystemDetailsListResults)
-    async def ListFilesystems(self, filters=[], **kwargs):
+    async def ListFilesystems(self, filters=None, **kwargs):
         '''
         filters : typing.Sequence<+T_co>[~FilesystemFilter]<~FilesystemFilter>
         Returns -> typing.Sequence<+T_co>[~FilesystemDetailsListResult]<~FilesystemDetailsListResult>
@@ -926,7 +926,7 @@ class StorageFacade(Type):
 
 
     @ReturnMapping(StoragePoolsResults)
-    async def ListPools(self, filters=[], **kwargs):
+    async def ListPools(self, filters=None, **kwargs):
         '''
         filters : typing.Sequence<+T_co>[~StoragePoolFilter]<~StoragePoolFilter>
         Returns -> typing.Sequence<+T_co>[~StoragePoolsResult]<~StoragePoolsResult>
@@ -944,7 +944,7 @@ class StorageFacade(Type):
 
 
     @ReturnMapping(StorageDetailsListResults)
-    async def ListStorageDetails(self, filters=[], **kwargs):
+    async def ListStorageDetails(self, filters=None, **kwargs):
         '''
         filters : typing.Sequence<+T_co>[~StorageFilter]<~StorageFilter>
         Returns -> typing.Sequence<+T_co>[~StorageDetailsListResult]<~StorageDetailsListResult>
@@ -962,7 +962,7 @@ class StorageFacade(Type):
 
 
     @ReturnMapping(VolumeDetailsListResults)
-    async def ListVolumes(self, filters=[], **kwargs):
+    async def ListVolumes(self, filters=None, **kwargs):
         '''
         filters : typing.Sequence<+T_co>[~VolumeFilter]<~VolumeFilter>
         Returns -> typing.Sequence<+T_co>[~VolumeDetailsListResult]<~VolumeDetailsListResult>
@@ -980,7 +980,7 @@ class StorageFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def Remove(self, storage=[], **kwargs):
+    async def Remove(self, storage=None, **kwargs):
         '''
         storage : typing.Sequence<+T_co>[~RemoveStorageInstance]<~RemoveStorageInstance>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -998,7 +998,7 @@ class StorageFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def RemovePool(self, pools=[], **kwargs):
+    async def RemovePool(self, pools=None, **kwargs):
         '''
         pools : typing.Sequence<+T_co>[~StoragePoolDeleteArg]<~StoragePoolDeleteArg>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -1016,7 +1016,7 @@ class StorageFacade(Type):
 
 
     @ReturnMapping(StorageDetailsResults)
-    async def StorageDetails(self, entities=[], **kwargs):
+    async def StorageDetails(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~StorageDetailsResult]<~StorageDetailsResult>
@@ -1034,7 +1034,7 @@ class StorageFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def UpdatePool(self, pools=[], **kwargs):
+    async def UpdatePool(self, pools=None, **kwargs):
         '''
         pools : typing.Sequence<+T_co>[~StoragePool]<~StoragePool>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>

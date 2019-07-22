@@ -656,7 +656,7 @@ class ApplicationFacade(Type):
     
 
     @ReturnMapping(AddRelationResults)
-    async def AddRelation(self, endpoints=[], via_cidrs=[], **kwargs):
+    async def AddRelation(self, endpoints=None, via_cidrs=None, **kwargs):
         '''
         endpoints : typing.Sequence<+T_co>[str]
         via_cidrs : typing.Sequence<+T_co>[str]
@@ -676,7 +676,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(AddApplicationUnitsResults)
-    async def AddUnits(self, application="", attach_storage=[], num_units=0, placement=[], policy="", **kwargs):
+    async def AddUnits(self, application="", attach_storage=None, num_units=0, placement=None, policy="", **kwargs):
         '''
         application : str
         attach_storage : typing.Sequence<+T_co>[str]
@@ -702,7 +702,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ApplicationInfoResults)
-    async def ApplicationsInfo(self, entities=[], **kwargs):
+    async def ApplicationsInfo(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ApplicationInfoResult]<~ApplicationInfoResult>
@@ -720,7 +720,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ApplicationGetConfigResults)
-    async def CharmConfig(self, args=[], **kwargs):
+    async def CharmConfig(self, args=None, **kwargs):
         '''
         args : typing.Sequence<+T_co>[~ApplicationGet]<~ApplicationGet>
         Returns -> typing.Sequence<+T_co>[~ConfigResult]<~ConfigResult>
@@ -756,7 +756,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def Consume(self, args=[], **kwargs):
+    async def Consume(self, args=None, **kwargs):
         '''
         args : typing.Sequence<+T_co>[~ConsumeApplicationArg]<~ConsumeApplicationArg>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -774,7 +774,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def Deploy(self, applications=[], **kwargs):
+    async def Deploy(self, applications=None, **kwargs):
         '''
         applications : typing.Sequence<+T_co>[~ApplicationDeploy]<~ApplicationDeploy>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -810,7 +810,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(DestroyApplicationResults)
-    async def DestroyApplication(self, applications=[], **kwargs):
+    async def DestroyApplication(self, applications=None, **kwargs):
         '''
         applications : typing.Sequence<+T_co>[~DestroyApplicationParams]<~DestroyApplicationParams>
         Returns -> typing.Sequence<+T_co>[~DestroyApplicationResult]<~DestroyApplicationResult>
@@ -828,7 +828,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def DestroyConsumedApplications(self, applications=[], **kwargs):
+    async def DestroyConsumedApplications(self, applications=None, **kwargs):
         '''
         applications : typing.Sequence<+T_co>[~DestroyConsumedApplicationParams]<~DestroyConsumedApplicationParams>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -846,7 +846,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(None)
-    async def DestroyRelation(self, endpoints=[], force=False, max_wait=0, relation_id=0, **kwargs):
+    async def DestroyRelation(self, endpoints=None, force=False, max_wait=0, relation_id=0, **kwargs):
         '''
         endpoints : typing.Sequence<+T_co>[str]
         force : bool
@@ -870,7 +870,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(DestroyUnitResults)
-    async def DestroyUnit(self, units=[], **kwargs):
+    async def DestroyUnit(self, units=None, **kwargs):
         '''
         units : typing.Sequence<+T_co>[~DestroyUnitParams]<~DestroyUnitParams>
         Returns -> typing.Sequence<+T_co>[~DestroyUnitResult]<~DestroyUnitResult>
@@ -888,7 +888,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(None)
-    async def DestroyUnits(self, unit_names=[], **kwargs):
+    async def DestroyUnits(self, unit_names=None, **kwargs):
         '''
         unit_names : typing.Sequence<+T_co>[str]
         Returns -> None
@@ -964,7 +964,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ApplicationGetConfigResults)
-    async def GetConfig(self, entities=[], **kwargs):
+    async def GetConfig(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ConfigResult]<~ConfigResult>
@@ -982,7 +982,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ApplicationGetConstraintsResults)
-    async def GetConstraints(self, entities=[], **kwargs):
+    async def GetConstraints(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ApplicationConstraint]<~ApplicationConstraint>
@@ -1022,7 +1022,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ScaleApplicationResults)
-    async def ScaleApplications(self, applications=[], **kwargs):
+    async def ScaleApplications(self, applications=None, **kwargs):
         '''
         applications : typing.Sequence<+T_co>[~ScaleApplicationParams]<~ScaleApplicationParams>
         Returns -> typing.Sequence<+T_co>[~ScaleApplicationResult]<~ScaleApplicationResult>
@@ -1040,7 +1040,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(None)
-    async def Set(self, application="", branch="", options={}, **kwargs):
+    async def Set(self, application="", branch="", options=None, **kwargs):
         '''
         application : str
         branch : str
@@ -1062,7 +1062,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def SetApplicationsConfig(self, args=[], **kwargs):
+    async def SetApplicationsConfig(self, args=None, **kwargs):
         '''
         args : typing.Sequence<+T_co>[~ApplicationConfigSet]<~ApplicationConfigSet>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -1080,7 +1080,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(None)
-    async def SetCharm(self, application="", channel="", charm_url="", config_settings={}, config_settings_yaml="", force=False, force_series=False, force_units=False, generation="", resource_ids={}, storage_constraints={}, **kwargs):
+    async def SetCharm(self, application="", channel="", charm_url="", config_settings=None, config_settings_yaml="", force=False, force_series=False, force_units=False, generation="", resource_ids=None, storage_constraints=None, **kwargs):
         '''
         application : str
         channel : str
@@ -1138,7 +1138,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def SetMetricCredentials(self, creds=[], **kwargs):
+    async def SetMetricCredentials(self, creds=None, **kwargs):
         '''
         creds : typing.Sequence<+T_co>[~ApplicationMetricCredential]<~ApplicationMetricCredential>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -1156,7 +1156,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def SetRelationsSuspended(self, args=[], **kwargs):
+    async def SetRelationsSuspended(self, args=None, **kwargs):
         '''
         args : typing.Sequence<+T_co>[~RelationSuspendedArg]<~RelationSuspendedArg>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -1192,7 +1192,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(None)
-    async def Unset(self, application="", branch="", options=[], **kwargs):
+    async def Unset(self, application="", branch="", options=None, **kwargs):
         '''
         application : str
         branch : str
@@ -1214,7 +1214,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def UnsetApplicationsConfig(self, args=[], **kwargs):
+    async def UnsetApplicationsConfig(self, args=None, **kwargs):
         '''
         args : typing.Sequence<+T_co>[~ApplicationUnset]<~ApplicationUnset>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -1232,7 +1232,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(None)
-    async def Update(self, application="", charm_url="", constraints=None, force=False, force_charm_url=False, force_series=False, generation="", min_units=0, settings={}, settings_yaml="", **kwargs):
+    async def Update(self, application="", charm_url="", constraints=None, force=False, force_charm_url=False, force_series=False, generation="", min_units=0, settings=None, settings_yaml="", **kwargs):
         '''
         application : str
         charm_url : str
@@ -1268,7 +1268,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def UpdateApplicationSeries(self, args=[], **kwargs):
+    async def UpdateApplicationSeries(self, args=None, **kwargs):
         '''
         args : typing.Sequence<+T_co>[~UpdateSeriesArg]<~UpdateSeriesArg>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -2104,7 +2104,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(StringResults)
-    async def AvailabilityZone(self, entities=[], **kwargs):
+    async def AvailabilityZone(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~StringResult]<~StringResult>
@@ -2140,7 +2140,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(ConstraintsResults)
-    async def Constraints(self, entities=[], **kwargs):
+    async def Constraints(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ConstraintsResult]<~ConstraintsResult>
@@ -2194,7 +2194,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(ControllerAPIInfoResults)
-    async def ControllerAPIInfoForModels(self, entities=[], **kwargs):
+    async def ControllerAPIInfoForModels(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ControllerAPIInfoResult]<~ControllerAPIInfoResult>
@@ -2230,7 +2230,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(DistributionGroupResults)
-    async def DistributionGroup(self, entities=[], **kwargs):
+    async def DistributionGroup(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~DistributionGroupResult]<~DistributionGroupResult>
@@ -2248,7 +2248,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(StringsResults)
-    async def DistributionGroupByMachineId(self, entities=[], **kwargs):
+    async def DistributionGroupByMachineId(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~StringsResult]<~StringsResult>
@@ -2266,7 +2266,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def EnsureDead(self, entities=[], **kwargs):
+    async def EnsureDead(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -2312,7 +2312,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(MachineNetworkConfigResults)
-    async def GetContainerInterfaceInfo(self, entities=[], **kwargs):
+    async def GetContainerInterfaceInfo(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~MachineNetworkConfigResult]<~MachineNetworkConfigResult>
@@ -2330,7 +2330,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(ContainerProfileResults)
-    async def GetContainerProfileInfo(self, entities=[], **kwargs):
+    async def GetContainerProfileInfo(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ContainerProfileResult]<~ContainerProfileResult>
@@ -2348,7 +2348,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(HostNetworkChangeResults)
-    async def HostChangesForContainers(self, entities=[], **kwargs):
+    async def HostChangesForContainers(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~HostNetworkChange]<~HostNetworkChange>
@@ -2366,7 +2366,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(StringResults)
-    async def InstanceId(self, entities=[], **kwargs):
+    async def InstanceId(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~StringResult]<~StringResult>
@@ -2384,7 +2384,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(StatusResults)
-    async def InstanceStatus(self, entities=[], **kwargs):
+    async def InstanceStatus(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~StatusResult]<~StatusResult>
@@ -2402,7 +2402,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(BoolResults)
-    async def KeepInstance(self, entities=[], **kwargs):
+    async def KeepInstance(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~BoolResult]<~BoolResult>
@@ -2420,7 +2420,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(LifeResults)
-    async def Life(self, entities=[], **kwargs):
+    async def Life(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~LifeResult]<~LifeResult>
@@ -2456,7 +2456,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def MarkMachinesForRemoval(self, entities=[], **kwargs):
+    async def MarkMachinesForRemoval(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -2510,7 +2510,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(MachineNetworkConfigResults)
-    async def PrepareContainerInterfaceInfo(self, entities=[], **kwargs):
+    async def PrepareContainerInterfaceInfo(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~MachineNetworkConfigResult]<~MachineNetworkConfigResult>
@@ -2528,7 +2528,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(ProvisioningInfoResults)
-    async def ProvisioningInfo(self, entities=[], **kwargs):
+    async def ProvisioningInfo(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ProvisioningInfoResult]<~ProvisioningInfoResult>
@@ -2546,7 +2546,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def ReleaseContainerAddresses(self, entities=[], **kwargs):
+    async def ReleaseContainerAddresses(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -2564,7 +2564,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def Remove(self, entities=[], **kwargs):
+    async def Remove(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -2582,7 +2582,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(StringResults)
-    async def Series(self, entities=[], **kwargs):
+    async def Series(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~StringResult]<~StringResult>
@@ -2600,7 +2600,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def SetCharmProfiles(self, args=[], **kwargs):
+    async def SetCharmProfiles(self, args=None, **kwargs):
         '''
         args : typing.Sequence<+T_co>[~SetProfileArg]<~SetProfileArg>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -2618,7 +2618,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(None)
-    async def SetHostMachineNetworkConfig(self, config=[], tag="", **kwargs):
+    async def SetHostMachineNetworkConfig(self, config=None, tag="", **kwargs):
         '''
         config : typing.Sequence<+T_co>[~NetworkConfig]<~NetworkConfig>
         tag : str
@@ -2638,7 +2638,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def SetInstanceInfo(self, machines=[], **kwargs):
+    async def SetInstanceInfo(self, machines=None, **kwargs):
         '''
         machines : typing.Sequence<+T_co>[~InstanceInfo]<~InstanceInfo>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -2656,7 +2656,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def SetInstanceStatus(self, entities=[], **kwargs):
+    async def SetInstanceStatus(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -2674,7 +2674,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def SetModificationStatus(self, entities=[], **kwargs):
+    async def SetModificationStatus(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -2692,7 +2692,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(None)
-    async def SetObservedNetworkConfig(self, config=[], tag="", **kwargs):
+    async def SetObservedNetworkConfig(self, config=None, tag="", **kwargs):
         '''
         config : typing.Sequence<+T_co>[~NetworkConfig]<~NetworkConfig>
         tag : str
@@ -2712,7 +2712,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def SetPasswords(self, changes=[], **kwargs):
+    async def SetPasswords(self, changes=None, **kwargs):
         '''
         changes : typing.Sequence<+T_co>[~EntityPassword]<~EntityPassword>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -2730,7 +2730,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def SetProviderNetworkConfig(self, entities=[], **kwargs):
+    async def SetProviderNetworkConfig(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -2748,7 +2748,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def SetStatus(self, entities=[], **kwargs):
+    async def SetStatus(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -2766,7 +2766,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def SetSupportedContainers(self, params=[], **kwargs):
+    async def SetSupportedContainers(self, params=None, **kwargs):
         '''
         params : typing.Sequence<+T_co>[~MachineContainers]<~MachineContainers>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -2802,7 +2802,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(StatusResults)
-    async def Status(self, entities=[], **kwargs):
+    async def Status(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~StatusResult]<~StatusResult>
@@ -2820,7 +2820,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(MachineContainerResults)
-    async def SupportedContainers(self, entities=[], **kwargs):
+    async def SupportedContainers(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~MachineContainerResult]<~MachineContainerResult>
@@ -2838,7 +2838,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(ToolsResults)
-    async def Tools(self, entities=[], **kwargs):
+    async def Tools(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ToolsResult]<~ToolsResult>
@@ -2856,7 +2856,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def UpdateStatus(self, entities=[], **kwargs):
+    async def UpdateStatus(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -2892,7 +2892,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(StringsWatchResults)
-    async def WatchAllContainers(self, params=[], **kwargs):
+    async def WatchAllContainers(self, params=None, **kwargs):
         '''
         params : typing.Sequence<+T_co>[~WatchContainer]<~WatchContainer>
         Returns -> typing.Sequence<+T_co>[~StringsWatchResult]<~StringsWatchResult>
@@ -2910,7 +2910,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(StringsWatchResults)
-    async def WatchContainers(self, params=[], **kwargs):
+    async def WatchContainers(self, params=None, **kwargs):
         '''
         params : typing.Sequence<+T_co>[~WatchContainer]<~WatchContainer>
         Returns -> typing.Sequence<+T_co>[~StringsWatchResult]<~StringsWatchResult>
@@ -3973,7 +3973,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ActionResults)
-    async def Actions(self, entities=[], **kwargs):
+    async def Actions(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ActionResult]<~ActionResult>
@@ -3991,7 +3991,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def AddMetricBatches(self, batches=[], **kwargs):
+    async def AddMetricBatches(self, batches=None, **kwargs):
         '''
         batches : typing.Sequence<+T_co>[~MetricBatchParam]<~MetricBatchParam>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -4009,7 +4009,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def AddUnitStorage(self, storages=[], **kwargs):
+    async def AddUnitStorage(self, storages=None, **kwargs):
         '''
         storages : typing.Sequence<+T_co>[~StorageAddParams]<~StorageAddParams>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -4027,7 +4027,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(MachinePortsResults)
-    async def AllMachinePorts(self, entities=[], **kwargs):
+    async def AllMachinePorts(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~MachinePortsResult]<~MachinePortsResult>
@@ -4045,7 +4045,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ApplicationStatusResults)
-    async def ApplicationStatus(self, entities=[], **kwargs):
+    async def ApplicationStatus(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ApplicationStatusResult]<~ApplicationStatusResult>
@@ -4063,7 +4063,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(StringResults)
-    async def AssignedMachine(self, entities=[], **kwargs):
+    async def AssignedMachine(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~StringResult]<~StringResult>
@@ -4081,7 +4081,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(StringResults)
-    async def AvailabilityZone(self, entities=[], **kwargs):
+    async def AvailabilityZone(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~StringResult]<~StringResult>
@@ -4099,7 +4099,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def BeginActions(self, entities=[], **kwargs):
+    async def BeginActions(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -4117,7 +4117,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(StringResults)
-    async def CharmArchiveSha256(self, urls=[], **kwargs):
+    async def CharmArchiveSha256(self, urls=None, **kwargs):
         '''
         urls : typing.Sequence<+T_co>[~CharmURL]<~CharmURL>
         Returns -> typing.Sequence<+T_co>[~StringResult]<~StringResult>
@@ -4135,7 +4135,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(IntResults)
-    async def CharmModifiedVersion(self, entities=[], **kwargs):
+    async def CharmModifiedVersion(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~IntResult]<~IntResult>
@@ -4153,7 +4153,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(StringBoolResults)
-    async def CharmURL(self, entities=[], **kwargs):
+    async def CharmURL(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~StringBoolResult]<~StringBoolResult>
@@ -4171,7 +4171,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def ClearResolved(self, entities=[], **kwargs):
+    async def ClearResolved(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -4189,7 +4189,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def ClosePorts(self, entities=[], **kwargs):
+    async def ClosePorts(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~EntityPortRange]<~EntityPortRange>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -4225,7 +4225,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ConfigSettingsResults)
-    async def ConfigSettings(self, entities=[], **kwargs):
+    async def ConfigSettings(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ConfigSettingsResult]<~ConfigSettingsResult>
@@ -4261,7 +4261,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def Destroy(self, entities=[], **kwargs):
+    async def Destroy(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -4279,7 +4279,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def DestroyAllSubordinates(self, entities=[], **kwargs):
+    async def DestroyAllSubordinates(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -4297,7 +4297,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def DestroyUnitStorageAttachments(self, entities=[], **kwargs):
+    async def DestroyUnitStorageAttachments(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -4315,7 +4315,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def EnsureDead(self, entities=[], **kwargs):
+    async def EnsureDead(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -4333,7 +4333,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def EnterScope(self, relation_units=[], **kwargs):
+    async def EnterScope(self, relation_units=None, **kwargs):
         '''
         relation_units : typing.Sequence<+T_co>[~RelationUnit]<~RelationUnit>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -4351,7 +4351,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def FinishActions(self, results=[], **kwargs):
+    async def FinishActions(self, results=None, **kwargs):
         '''
         results : typing.Sequence<+T_co>[~ActionExecutionResult]<~ActionExecutionResult>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -4369,7 +4369,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(MeterStatusResults)
-    async def GetMeterStatus(self, entities=[], **kwargs):
+    async def GetMeterStatus(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~MeterStatusResult]<~MeterStatusResult>
@@ -4387,7 +4387,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(StringBoolResults)
-    async def GetPrincipal(self, entities=[], **kwargs):
+    async def GetPrincipal(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~StringBoolResult]<~StringBoolResult>
@@ -4405,7 +4405,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(GoalStateResults)
-    async def GoalStates(self, entities=[], **kwargs):
+    async def GoalStates(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~GoalStateResult]<~GoalStateResult>
@@ -4423,7 +4423,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(BoolResults)
-    async def HasSubordinates(self, entities=[], **kwargs):
+    async def HasSubordinates(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~BoolResult]<~BoolResult>
@@ -4441,7 +4441,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def LeaveScope(self, relation_units=[], **kwargs):
+    async def LeaveScope(self, relation_units=None, **kwargs):
         '''
         relation_units : typing.Sequence<+T_co>[~RelationUnit]<~RelationUnit>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -4459,7 +4459,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(LifeResults)
-    async def Life(self, entities=[], **kwargs):
+    async def Life(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~LifeResult]<~LifeResult>
@@ -4477,7 +4477,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def Merge(self, params=[], **kwargs):
+    async def Merge(self, params=None, **kwargs):
         '''
         params : typing.Sequence<+T_co>[~MergeLeadershipSettingsParam]<~MergeLeadershipSettingsParam>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -4531,7 +4531,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(NetworkInfoResults)
-    async def NetworkInfo(self, bindings=[], relation_id=0, unit="", **kwargs):
+    async def NetworkInfo(self, bindings=None, relation_id=0, unit="", **kwargs):
         '''
         bindings : typing.Sequence<+T_co>[str]
         relation_id : int
@@ -4553,7 +4553,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def OpenPorts(self, entities=[], **kwargs):
+    async def OpenPorts(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~EntityPortRange]<~EntityPortRange>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -4571,7 +4571,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(StringResults)
-    async def PrivateAddress(self, entities=[], **kwargs):
+    async def PrivateAddress(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~StringResult]<~StringResult>
@@ -4607,7 +4607,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(StringResults)
-    async def PublicAddress(self, entities=[], **kwargs):
+    async def PublicAddress(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~StringResult]<~StringResult>
@@ -4625,7 +4625,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(GetLeadershipSettingsBulkResults)
-    async def Read(self, entities=[], **kwargs):
+    async def Read(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~GetLeadershipSettingsResult]<~GetLeadershipSettingsResult>
@@ -4643,7 +4643,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(SettingsResults)
-    async def ReadRemoteSettings(self, relation_unit_pairs=[], **kwargs):
+    async def ReadRemoteSettings(self, relation_unit_pairs=None, **kwargs):
         '''
         relation_unit_pairs : typing.Sequence<+T_co>[~RelationUnitPair]<~RelationUnitPair>
         Returns -> typing.Sequence<+T_co>[~SettingsResult]<~SettingsResult>
@@ -4661,7 +4661,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(SettingsResults)
-    async def ReadSettings(self, relation_units=[], **kwargs):
+    async def ReadSettings(self, relation_units=None, **kwargs):
         '''
         relation_units : typing.Sequence<+T_co>[~RelationUnit]<~RelationUnit>
         Returns -> typing.Sequence<+T_co>[~SettingsResult]<~SettingsResult>
@@ -4679,7 +4679,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(UnitRefreshResults)
-    async def Refresh(self, entities=[], **kwargs):
+    async def Refresh(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~UnitRefreshResult]<~UnitRefreshResult>
@@ -4697,7 +4697,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(RelationResults)
-    async def Relation(self, relation_units=[], **kwargs):
+    async def Relation(self, relation_units=None, **kwargs):
         '''
         relation_units : typing.Sequence<+T_co>[~RelationUnit]<~RelationUnit>
         Returns -> typing.Sequence<+T_co>[~RelationResult]<~RelationResult>
@@ -4715,7 +4715,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(RelationResults)
-    async def RelationById(self, relation_ids=[], **kwargs):
+    async def RelationById(self, relation_ids=None, **kwargs):
         '''
         relation_ids : typing.Sequence<+T_co>[int]
         Returns -> typing.Sequence<+T_co>[~RelationResult]<~RelationResult>
@@ -4733,7 +4733,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(RelationUnitStatusResults)
-    async def RelationsStatus(self, entities=[], **kwargs):
+    async def RelationsStatus(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~RelationUnitStatusResult]<~RelationUnitStatusResult>
@@ -4751,7 +4751,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def RemoveStorageAttachments(self, ids=[], **kwargs):
+    async def RemoveStorageAttachments(self, ids=None, **kwargs):
         '''
         ids : typing.Sequence<+T_co>[~StorageAttachmentId]<~StorageAttachmentId>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -4769,7 +4769,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def RequestReboot(self, entities=[], **kwargs):
+    async def RequestReboot(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -4787,7 +4787,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ResolvedModeResults)
-    async def Resolved(self, entities=[], **kwargs):
+    async def Resolved(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ResolvedModeResult]<~ResolvedModeResult>
@@ -4823,7 +4823,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def SetAgentStatus(self, entities=[], **kwargs):
+    async def SetAgentStatus(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -4841,7 +4841,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def SetApplicationStatus(self, entities=[], **kwargs):
+    async def SetApplicationStatus(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -4859,7 +4859,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def SetCharmURL(self, entities=[], **kwargs):
+    async def SetCharmURL(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~EntityCharmURL]<~EntityCharmURL>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -4877,7 +4877,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def SetPodSpec(self, specs=[], **kwargs):
+    async def SetPodSpec(self, specs=None, **kwargs):
         '''
         specs : typing.Sequence<+T_co>[~EntityString]<~EntityString>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -4895,7 +4895,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def SetRelationStatus(self, args=[], **kwargs):
+    async def SetRelationStatus(self, args=None, **kwargs):
         '''
         args : typing.Sequence<+T_co>[~RelationStatusArg]<~RelationStatusArg>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -4913,7 +4913,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def SetStatus(self, entities=[], **kwargs):
+    async def SetStatus(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -4931,7 +4931,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def SetUnitStatus(self, entities=[], **kwargs):
+    async def SetUnitStatus(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -4949,7 +4949,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def SetUpgradeSeriesUnitStatus(self, params=[], **kwargs):
+    async def SetUpgradeSeriesUnitStatus(self, params=None, **kwargs):
         '''
         params : typing.Sequence<+T_co>[~UpgradeSeriesStatusParam]<~UpgradeSeriesStatusParam>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -4967,7 +4967,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def SetWorkloadVersion(self, entities=[], **kwargs):
+    async def SetWorkloadVersion(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~EntityWorkloadVersion]<~EntityWorkloadVersion>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -4985,7 +4985,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(LifeResults)
-    async def StorageAttachmentLife(self, ids=[], **kwargs):
+    async def StorageAttachmentLife(self, ids=None, **kwargs):
         '''
         ids : typing.Sequence<+T_co>[~StorageAttachmentId]<~StorageAttachmentId>
         Returns -> typing.Sequence<+T_co>[~LifeResult]<~LifeResult>
@@ -5003,7 +5003,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(StorageAttachmentResults)
-    async def StorageAttachments(self, ids=[], **kwargs):
+    async def StorageAttachments(self, ids=None, **kwargs):
         '''
         ids : typing.Sequence<+T_co>[~StorageAttachmentId]<~StorageAttachmentId>
         Returns -> typing.Sequence<+T_co>[~StorageAttachmentResult]<~StorageAttachmentResult>
@@ -5021,7 +5021,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(StatusResults)
-    async def UnitStatus(self, entities=[], **kwargs):
+    async def UnitStatus(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~StatusResult]<~StatusResult>
@@ -5039,7 +5039,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(StorageAttachmentIdsResults)
-    async def UnitStorageAttachments(self, entities=[], **kwargs):
+    async def UnitStorageAttachments(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~StorageAttachmentIdsResult]<~StorageAttachmentIdsResult>
@@ -5057,7 +5057,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def UpdateSettings(self, relation_units=[], **kwargs):
+    async def UpdateSettings(self, relation_units=None, **kwargs):
         '''
         relation_units : typing.Sequence<+T_co>[~RelationUnitSettings]<~RelationUnitSettings>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -5075,7 +5075,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(UpgradeSeriesStatusResults)
-    async def UpgradeSeriesUnitStatus(self, entities=[], **kwargs):
+    async def UpgradeSeriesUnitStatus(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~UpgradeSeriesStatusResult]<~UpgradeSeriesStatusResult>
@@ -5093,7 +5093,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(NotifyWatchResults)
-    async def Watch(self, entities=[], **kwargs):
+    async def Watch(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
@@ -5129,7 +5129,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(StringsWatchResults)
-    async def WatchActionNotifications(self, entities=[], **kwargs):
+    async def WatchActionNotifications(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~StringsWatchResult]<~StringsWatchResult>
@@ -5147,7 +5147,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(StringsWatchResults)
-    async def WatchConfigSettingsHash(self, entities=[], **kwargs):
+    async def WatchConfigSettingsHash(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~StringsWatchResult]<~StringsWatchResult>
@@ -5183,7 +5183,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(NotifyWatchResults)
-    async def WatchLeadershipSettings(self, entities=[], **kwargs):
+    async def WatchLeadershipSettings(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
@@ -5201,7 +5201,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(NotifyWatchResults)
-    async def WatchMeterStatus(self, entities=[], **kwargs):
+    async def WatchMeterStatus(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
@@ -5219,7 +5219,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(RelationUnitsWatchResults)
-    async def WatchRelationUnits(self, relation_units=[], **kwargs):
+    async def WatchRelationUnits(self, relation_units=None, **kwargs):
         '''
         relation_units : typing.Sequence<+T_co>[~RelationUnit]<~RelationUnit>
         Returns -> typing.Sequence<+T_co>[~RelationUnitsWatchResult]<~RelationUnitsWatchResult>
@@ -5237,7 +5237,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(NotifyWatchResults)
-    async def WatchStorageAttachments(self, ids=[], **kwargs):
+    async def WatchStorageAttachments(self, ids=None, **kwargs):
         '''
         ids : typing.Sequence<+T_co>[~StorageAttachmentId]<~StorageAttachmentId>
         Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
@@ -5255,7 +5255,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(StringsWatchResults)
-    async def WatchTrustConfigSettingsHash(self, entities=[], **kwargs):
+    async def WatchTrustConfigSettingsHash(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~StringsWatchResult]<~StringsWatchResult>
@@ -5273,7 +5273,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(StringsWatchResults)
-    async def WatchUnitAddressesHash(self, entities=[], **kwargs):
+    async def WatchUnitAddressesHash(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~StringsWatchResult]<~StringsWatchResult>
@@ -5291,7 +5291,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(StringsWatchResults)
-    async def WatchUnitRelations(self, entities=[], **kwargs):
+    async def WatchUnitRelations(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~StringsWatchResult]<~StringsWatchResult>
@@ -5309,7 +5309,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(StringsWatchResults)
-    async def WatchUnitStorageAttachments(self, entities=[], **kwargs):
+    async def WatchUnitStorageAttachments(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~StringsWatchResult]<~StringsWatchResult>
@@ -5327,7 +5327,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(NotifyWatchResults)
-    async def WatchUpgradeSeriesNotifications(self, entities=[], **kwargs):
+    async def WatchUpgradeSeriesNotifications(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
@@ -5345,7 +5345,7 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(StringResults)
-    async def WorkloadVersion(self, entities=[], **kwargs):
+    async def WorkloadVersion(self, entities=None, **kwargs):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~StringResult]<~StringResult>
