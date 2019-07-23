@@ -445,7 +445,7 @@ def makeFunc(cls, name, params, result, _async=True):
     source = """
 
 @ReturnMapping({rettype})
-{_async}def {name}(self{argsep}{args}, **kwargs):
+{_async}def {name}(self{argsep}{args}):
     '''
 {docstring}
     Returns -> {res}
