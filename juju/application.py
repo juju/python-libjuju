@@ -102,7 +102,7 @@ class Application(model.ModelEntity):
 
         return await self.model.add_relation(local_relation, remote_relation)
 
-    async def add_unit(self, count=1, to=None, attach_storage=None, policy=''):
+    async def add_unit(self, count=1, to=None):
         """Add one or more units to this application.
 
         :param int count: Number of units to add
@@ -124,8 +124,6 @@ class Application(model.ModelEntity):
             application=self.name,
             placement=parse_placement(to) if to else None,
             num_units=count,
-            attach_storage=attach_storage,
-            policy=policy,
         )
 
         return await asyncio.gather(*[
@@ -243,7 +241,7 @@ class Application(model.ModelEntity):
         log.debug(
             'Getting config for %s', self.name)
 
-        return (await app_facade.Get(application=self.name, branch='master')).config
+        return (await app_facade.Get(application=self.name)).config
 
     async def get_trusted(self):
         """Return the trusted configuration setting for this application.
@@ -257,7 +255,7 @@ class Application(model.ModelEntity):
         log.debug(
             'Getting config for %s', self.name)
 
-        config = await app_facade.Get(application=self.name, branch='master')
+        config = await app_facade.Get(application=self.name)
         if 'trust' in config.config:
             return config.config['trust']['value'] is True
 
@@ -294,7 +292,7 @@ class Application(model.ModelEntity):
         log.debug(
             'Getting constraints for %s', self.name)
 
-        result = (await app_facade.Get(application=self.name, branch='master')).constraints
+        result = (await app_facade.Get(application=self.name)).constraints
         return vars(result) if result else result
 
     async def get_actions(self, schema=False):
@@ -382,7 +380,7 @@ class Application(model.ModelEntity):
         log.debug(
             'Setting config for %s: %s', self.name, config)
 
-        return await app_facade.Set(application=self.name, branch='master', options=config)
+        return await app_facade.Set(application=self.name, options=config)
 
     async def reset_config(self, to_default):
         """
@@ -396,7 +394,7 @@ class Application(model.ModelEntity):
         log.debug(
             'Restoring default config for %s: %s', self.name, to_default)
 
-        return await app_facade.Unset(application=self.name, branch='master', options=to_default)
+        return await app_facade.Unset(application=self.name, options=to_default)
 
     async def set_constraints(self, constraints):
         """Set machine constraints for this application.
@@ -562,7 +560,6 @@ class Application(model.ModelEntity):
             force_units=force_units,
             resource_ids=resource_ids,
             storage_constraints=None,
-            generation="",
         )
 
         await self.model.block_until(

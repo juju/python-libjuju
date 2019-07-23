@@ -329,7 +329,7 @@ class Controller:
         else:
             params = [client.Entity(tag.model(model)) for model in models]
 
-        await model_facade.DestroyModels(models=params)
+        await model_facade.DestroyModels(entities=params)
     destroy_model = destroy_models
 
     async def add_user(self, username, password=None, display_name=None):

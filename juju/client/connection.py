@@ -8,8 +8,8 @@ import weakref
 from concurrent.futures import CancelledError
 from http.client import HTTPSConnection
 
-import macaroonbakery.httpbakery as httpbakery
 import macaroonbakery.bakery as bakery
+import macaroonbakery.httpbakery as httpbakery
 import websockets
 from juju import errors, tag, utils
 from juju.client import client
@@ -17,6 +17,97 @@ from juju.utils import IdQueue
 
 log = logging.getLogger('juju.client.connection')
 
+client_facades = {
+    'Action': { 'version': 2 },
+    'ActionPruner': { 'version': 1 },
+    'Agent': { 'version': 2 },
+    'AgentTools': { 'version': 1 },
+    'Annotations': { 'version': 2 },
+    'Application': { 'version': 8 },
+    'ApplicationOffers': { 'version': 2 },
+    'ApplicationScaler': { 'version': 1 },
+    'Backups': { 'version': 2 },
+    'Block': { 'version': 2 },
+    'Bundle': { 'version': 2 },
+    'CharmRevisionUpdater': { 'version': 2 },
+    'Charms': { 'version': 2 },
+    'Cleaner': { 'version': 2 },
+    'Client': { 'version': 2 },
+    'Cloud': { 'version': 2 },
+    'CAASFirewaller': { 'version': 1 },
+    'CAASOperator': { 'version': 1 },
+    'CAASAgent': { 'version': 1 },
+    'CAASOperatorProvisioner': { 'version': 1 },
+    'CAASUnitProvisioner': { 'version': 1 },
+    'Controller': { 'version': 5 },
+    'CrossModelRelations': { 'version': 1 },
+    'CrossController': { 'version': 1 },
+    'CredentialValidator': { 'version': 1 },
+    'ExternalControllerUpdater': { 'version': 1 },
+    'Deployer': { 'version': 1 },
+    'DiskManager': { 'version': 2 },
+    'FanConfigurer': { 'version': 1 },
+    'Firewaller': { 'version': 5 },
+    'FirewallRules': { 'version': 1 },
+    'HighAvailability': { 'version': 2 },
+    'HostKeyReporter': { 'version': 1 },
+    'ImageManager': { 'version': 2 },
+    'ImageMetadata': { 'version': 3 },
+    'InstancePoller': { 'version': 3 },
+    'KeyManager': { 'version': 1 },
+    'KeyUpdater': { 'version': 1 },
+    'LeadershipService': { 'version': 2 },
+    'LifeFlag': { 'version': 1 },
+    'Logger': { 'version': 1 },
+    'LogForwarding': { 'version': 1 },
+    'MachineActions': { 'version': 1 },
+    'MachineManager': { 'version': 4 },
+    'MachineUndertaker': { 'version': 1 },
+    'Machiner': { 'version': 1 },
+    'MeterStatus': { 'version': 1 },
+    'MetricsAdder': { 'version': 2 },
+    'MetricsDebug': { 'version': 2 },
+    'MetricsManager': { 'version': 1 },
+    'MigrationFlag': { 'version': 1 },
+    'MigrationMaster': { 'version': 1 },
+    'MigrationMinion': { 'version': 1 },
+    'MigrationTarget': { 'version': 1 },
+    'ModelConfig': { 'version': 2 },
+    'ModelManager': { 'version': 4 },
+    'ModelUpgrader': { 'version': 1 },
+    'Payloads': { 'version': 1 },
+    'Pinger': { 'version': 1 },
+    'Provisioner': { 'version': 6 },
+    'ProxyUpdater': { 'version': 2 },
+    'Reboot': { 'version': 2 },
+    'RemoteRelations': { 'version': 1 },
+    'Resources': { 'version': 1 },
+    'Resumer': { 'version': 2 },
+    'RetryStrategy': { 'version': 1 },
+    'Singular': { 'version': 2 },
+    'SSHClient': { 'version': 2 },
+    'Spaces': { 'version': 3 },
+    'StatusHistory': { 'version': 2 },
+    'Storage': { 'version': 4 },
+    'StorageProvisioner': { 'version': 4 },
+    'Subnets': { 'version': 2 },
+    'Undertaker': { 'version': 1 },
+    'UnitAssigner': { 'version': 1 },
+    'Uniter': { 'version': 8 },
+    'Upgrader': { 'version': 1 },
+    'UserManager': { 'version': 2 },
+    'AllWatcher': {'version': 1 },
+    'AllModelWatcher': {'version': 2 },
+    'NotifyWatcher': {'version': 1 },
+    'StringsWatcher': {'version': 1 },
+    'OfferStatusWatcher': {'version': 1 },
+    'RelationStatusWatcher': {'version': 1 },
+    'RelationUnitsWatcher': {'version': 1 },
+    'VolumeAttachmentsWatcher': {'version': 2 },
+    'FilesystemAttachmentsWatcher': {'version': 2 },
+    'EntityWatcher': {'version': 2 },
+    'MigrationStatusWatcher': {'version': 1 }
+}
 
 class Monitor:
     """
@@ -553,7 +644,19 @@ class Connection:
     def _build_facades(self, facades):
         self.facades.clear()
         for facade in facades:
-            self.facades[facade['name']] = facade['versions'][-1]
+            name = facade['name']
+            # the following attempts to get the best facade version for the
+            # client. The client knows about the best facade versions it speaks,
+            # so in order to be compatible forwards and backwards we speak a
+            # common facade version.
+            if name in client_facades:
+                self.facades[name] = client_facades[name]['version']
+            else:
+                # if a facade is passed back that we don't know about, just use
+                # the latest version, so we don't break against new controller
+                # versions.
+                self.facades[name] = facade['versions'][-1]
+
 
     async def login(self):
         params = {}
