@@ -26,9 +26,12 @@ from .client import client, connector
 from .client.client import ConfigValue, Value
 from .constraints import normalize_key
 from .constraints import parse as parse_constraints
+from .controller import Controller
 from .delta import get_entity_class, get_entity_delta
 from .errors import JujuAPIError, JujuError
 from .exceptions import DeadEntityException
+from .offerendpoints import ParseError as OfferParseError
+from .offerendpoints import parse_url as parse_offer_url
 from .placement import parse as parse_placement
 
 log = logging.getLogger(__name__)
@@ -1898,13 +1901,7 @@ class Model:
         shared and who is connected.
         """
         controller = await self.get_controller()
-        offer_result = await controller.offers(self.info.name)
-
-        offers = []
-
-        for offer in offer_result.results:
-            offers.append(_offer_details(offer))
-        return offers
+        return await controller.offers(self.info.name)
 
     async def remove_offer(self, endpoint, force=False):
         """
@@ -1915,6 +1912,53 @@ class Model:
         """
         controller = await self.get_controller()
         return await controller.remove_offer(self.info.uuid, endpoint, force)
+
+    async def consume(self, endpoint):
+        """
+        Adds a remote offer to the model. Relations can be created later using
+        "juju relate".
+        """
+        try:
+            offer = parse_offer_url(endpoint)
+        except OfferParseError as e:
+            log.error(e.message)
+            raise
+        if offer.has_endpoint():
+            raise JujuError("remote offer {} should not include an endpoint".format(endpoint))
+
+        if offer.user == "":
+            offer.user = self.info.username
+            endpoint = offer.string()
+
+        source = self._get_source_api(offer)
+        consume_details = source.get_consume_details(offer.as_local().string())
+        offer_url = parse_offer_url(consume_details["offer"].offer_url)
+        offer_url.source = offer.source
+        consume_details["offer"].offer_url = offer_url.string()
+
+        params = client.ConsumeApplicationArgs()
+        params.offer = consume_details["offer"]
+        params.application_alias = ""
+        params.macaroon = consume_details["macaroon"]
+
+        if consume_details["controller_info"] is not None:
+            info = consume_details["controller_info"]
+            controller_info = client.ControllerInfo()
+            controller_info.controller_tag = info.controller_tag
+            controller_info.alias = info.alias
+            controller_info.addrs = info.addrs
+            controller_info.cacert = info.cacert
+
+        facade = client.ApplicationFacade.from_connection(self.connection())
+        return await facade.Consume(params)
+
+    async def _get_source_api(self, url):
+        controller = Controller()
+        if url.source == "":
+            current = await self.get_controller()
+            url.source = current.controller_name
+        await controller.connect(controller_name=url.source)
+        return controller
 
 
 def get_charm_series(path):
@@ -1930,54 +1974,6 @@ def get_charm_series(path):
     data = yaml.load(md.open())
     series = data.get('series')
     return series[0] if series else None
-
-
-def _offer_details(offer):
-    def get(key):
-        if offer.applicationofferdetails is not None and offer.applicationofferdetails[key] is not None:
-            return offer.applicationofferdetails[key]
-        return offer.unknown_fields[key]
-
-    details = {
-        "application_name": offer.application_name,
-        "application_description": get("application-description"),
-        "charm_url": offer.charm_url,
-        "offer_name": get("offer-name"),
-        "offer_url": get("offer-url")
-    }
-
-    endpoints = []
-    for ep in get("endpoints"):
-        endpoints.append({
-            "name": ep["name"],
-            "role": ep["role"],
-            "interface": ep["interface"]
-        })
-    details["endpoints"] = endpoints
-
-    connections = []
-    for oc in offer.connections:
-        connections.append({
-            "username": oc.username,
-            "endpoint": oc.endpoint,
-            "relation_id": oc.relation_id,
-            "status": oc.status.status,
-            "message": oc.status.info,
-            "since": oc.status.since,
-            "ingress_subnets": oc.ingress_subnets
-        })
-    details["connections"] = connections
-
-    users = []
-    for user in get("users"):
-        users.append({
-            "username": user["user"],
-            "display_name": user["display-name"],
-            "access": user["access"],
-        })
-    details["users"] = users
-
-    return details
 
 
 class BundleHandler:

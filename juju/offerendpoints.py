@@ -87,6 +87,12 @@ class OfferURL:
                 self.model == other.model and
                 self.application == other.application)
 
+    def has_endpoint(self):
+        return ":" in self.application
+
+    def as_local(self):
+        return OfferURL("", self.user, self.model, self.application)
+
     def string(self):
         parts = []
         if self.user != "":
@@ -127,7 +133,7 @@ def parse_url(url):
 
     app_name = result.application.split(":")[0]
     if app_name and not re.match(APPLICATION, app_name):
-        return ParseError("application name {} not valid".format(app_name))
+        raise ParseError("application name {} not valid".format(app_name))
 
     return result
 
