@@ -1,19 +1,4 @@
-import asyncio
-import os
-import time
-import uuid
-from concurrent.futures import ThreadPoolExecutor
-from pathlib import Path
-
-import mock
-import paramiko
-
-import pylxd
 import pytest
-from juju.client.client import ApplicationFacade, ConfigValue
-from juju.errors import JujuError
-from juju.model import Model, ModelObserver
-from juju.utils import block_until, run_with_interrupt
 
 from .. import base
 

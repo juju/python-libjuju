@@ -43,6 +43,8 @@ async def main():
             lambda: all(offer["application_name"] == 'mysql'
                         for offer in offers))
 
+        print('Show offers', offers)
+
         print('Removing offer')
         await model.remove_offer("admin/default.mysql", force=True)
     finally:

@@ -12,9 +12,11 @@ from .user import User
 
 log = logging.getLogger(__name__)
 
+
 class RemoveError(Exception):
     def __init__(self, message):
         self.message = message
+
 
 class Controller:
     def __init__(
@@ -657,7 +659,7 @@ class Controller:
 
         params = client.AddApplicationOffer()
         params.application_name = offer.application
-        params.endpoints = {name:name for name in offer.endpoints}
+        params.endpoints = {name: name for name in offer.endpoints}
         params.offer_name = offer_name
         params.model_tag = tag.model(model_uuid)
 

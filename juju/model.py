@@ -1881,7 +1881,6 @@ class Model:
 
         return metrics
 
-
     async def offer(self, endpoint, offer_name=None):
         """
         Offer a deployed application using a series of endpoints for use by
@@ -1893,10 +1892,9 @@ class Model:
         controller = await self.get_controller()
         return await controller.offer(self.info.uuid, endpoint, offer_name)
 
-
     async def offers(self):
         """
-        Offers list information about applications' endpoints that have been 
+        Offers list information about applications' endpoints that have been
         shared and who is connected.
         """
         controller = await self.get_controller()
@@ -1907,7 +1905,6 @@ class Model:
         for offer in offer_result.results:
             offers.append(_offer_details(offer))
         return offers
-
 
     async def remove_offer(self, endpoint, force=False):
         """
@@ -1936,10 +1933,28 @@ def get_charm_series(path):
 
 
 def _offer_details(offer):
+    def get(key):
+        if offer.applicationofferdetails is not None and offer.applicationofferdetails[key] is not None:
+            return offer.applicationofferdetails[key]
+        return offer.unknown_fields[key]
+
     details = {
         "application_name": offer.application_name,
-        "charm_url": offer.charm_url
+        "application_description": get("application-description"),
+        "charm_url": offer.charm_url,
+        "offer_name": get("offer-name"),
+        "offer_url": get("offer-url")
     }
+
+    endpoints = []
+    for ep in get("endpoints"):
+        endpoints.append({
+            "name": ep["name"],
+            "role": ep["role"],
+            "interface": ep["interface"]
+        })
+    details["endpoints"] = endpoints
+
     connections = []
     for oc in offer.connections:
         connections.append({
@@ -1952,6 +1967,16 @@ def _offer_details(offer):
             "ingress_subnets": oc.ingress_subnets
         })
     details["connections"] = connections
+
+    users = []
+    for user in get("users"):
+        users.append({
+            "username": user["user"],
+            "display_name": user["display-name"],
+            "access": user["access"],
+        })
+    details["users"] = users
+
     return details
 
 

@@ -8,10 +8,12 @@ MODEL = re.compile('^[a-z0-9]+[a-z0-9-]*$')
 APPLICATION = re.compile('^(?:[a-z][a-z0-9]*(?:-[a-z0-9]*[a-z][a-z0-9]*)*)$')
 ENDPOINT = re.compile('/?((?P<model>[^\\.]*)\\.)?(?P<appname>[^:]*)(:(?P<endpoints>.*))?')
 
+
 class ParseError(Exception):
     def __init__(self, message, *args, **kwargs):
         self.message = message
         super().__init__(*args, **kwargs)
+
 
 class OfferEndpoints:
     def __init__(self, application, endpoints, model=None, qualified_model_name=None):
@@ -23,10 +25,10 @@ class OfferEndpoints:
     def __eq__(self, other):
         if not isinstance(other, OfferEndpoints):
             return NotImplemented
-        return self.application == other.application and \
-               self.endpoints == other.endpoints and \
-               self.model == other.model and \
-               self.qualified_model_name == other.qualified_model_name
+        return (self.application == other.application and
+                self.endpoints == other.endpoints and
+                self.model == other.model and
+                self.qualified_model_name == other.qualified_model_name)
 
 
 def parse(endpoint):
@@ -41,7 +43,7 @@ def parse(endpoint):
     endpoints_group = matches.group("endpoints")
 
     qualified_model_name = None
-    if (model_group is not None) and (model_group is not ""):
+    if (model_group is not None) and (model_group != ""):
         if ("/" not in model_group):
             raise NotImplementedError()
         qualified_model_name = model_group
@@ -69,6 +71,7 @@ valid_user_name_snippet = "[a-zA-Z0-9][a-zA-Z0-9.+-]*[a-zA-Z0-9]"
 valid_user_snippet = "(?:{}(?:@{})?)".format(valid_user_name_snippet, valid_user_name_snippet)
 USER = re.compile("^(?P<name>{})(?:@(?P<domain>{}))?$".format(valid_user_name_snippet, valid_user_name_snippet))
 
+
 class OfferURL:
     def __init__(self, source="", user="", model="", application=""):
         self.source = source
@@ -79,20 +82,20 @@ class OfferURL:
     def __eq__(self, other):
         if not isinstance(other, OfferURL):
             return NotImplemented
-        return self.source == other.source and \
-               self.user == other.user and \
-               self.model == other.model and \
-               self.application == other.application
+        return (self.source == other.source and
+                self.user == other.user and
+                self.model == other.model and
+                self.application == other.application)
 
     def string(self):
         parts = []
-        if self.user is not "":
+        if self.user != "":
             parts.append(self.user)
-        if self.model is not "":
+        if self.model != "":
             parts.append(self.model)
         path = "/".join(parts)
         path = "{}.{}".format(path, self.application)
-        if self.source is "":
+        if self.source == "":
             return path
         return "{}:{}".format(self.source, path)
 
@@ -128,10 +131,12 @@ def parse_url(url):
 
     return result
 
+
 def always(val, res):
     if val is None:
         return res
     return val
+
 
 def maybe_parse_source(url):
     parts = url.split(":")
