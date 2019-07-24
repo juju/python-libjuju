@@ -18,3 +18,9 @@ async def test_offer(event_loop):
             lambda: all(unit.workload_status == 'active'
                         for unit in application.units))
         await model.offer("ubuntu:ubuntu")
+
+        offers = await model.offers()
+        await model.block_until(
+            lambda: all(offer["application_name"] == 'mysql'
+                        for offer in offers))
+        await model.remove("ubuntu", force=True)
