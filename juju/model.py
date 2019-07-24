@@ -1893,6 +1893,22 @@ class Model:
         controller = await self.get_controller()
         return await controller.offer(self.info.uuid, endpoint, offer_name)
 
+
+    async def offers(self):
+        """
+        Offers list information about applications' endpoints that have been 
+        shared and who is connected.
+        """
+        controller = await self.get_controller()
+        offer_result = await controller.offers(self.info.name)
+
+        offers = []
+
+        for offer in offer_result.results:
+            offers.append(_offer_details(offer))
+        return offers
+
+
     async def remove_offer(self, endpoint, force=False):
         """
         Remove offer for an application.
@@ -1917,6 +1933,26 @@ def get_charm_series(path):
     data = yaml.load(md.open())
     series = data.get('series')
     return series[0] if series else None
+
+
+def _offer_details(offer):
+    details = {
+        "application_name": offer.application_name,
+        "charm_url": offer.charm_url
+    }
+    connections = []
+    for oc in offer.connections:
+        connections.append({
+            "username": oc.username,
+            "endpoint": oc.endpoint,
+            "relation_id": oc.relation_id,
+            "status": oc.status.status,
+            "message": oc.status.info,
+            "since": oc.status.since,
+            "ingress_subnets": oc.ingress_subnets
+        })
+    details["connections"] = connections
+    return details
 
 
 class BundleHandler:

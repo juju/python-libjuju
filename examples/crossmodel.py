@@ -38,7 +38,10 @@ async def main():
         print('Adding offer')
         await model.offer("mysql:db")
 
-        await asyncio.sleep(10)
+        offers = await model.offers()
+        await model.block_until(
+            lambda: all(offer["application_name"] == 'mysql'
+                        for offer in offers))
 
         print('Removing offer')
         await model.remove_offer("admin/default.mysql", force=True)

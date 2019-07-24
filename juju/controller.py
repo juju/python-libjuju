@@ -664,6 +664,17 @@ class Controller:
         facade = client.ApplicationOffersFacade.from_connection(self.connection())
         return await facade.Offer([params])
 
+    async def offers(self, model_name):
+        """
+        Offers list information about applications' endpoints that have been
+        shared and who is connected.
+        """
+        params = client.OfferFilter()
+        params.model_name = model_name
+
+        facade = client.ApplicationOffersFacade.from_connection(self.connection())
+        return await facade.ListApplicationOffers([params])
+
     async def remove_offer(self, model_uuid, offer, force=False):
         """
         Remove offer for an application.
