@@ -1,14 +1,19 @@
 import inspect
+import logging
 import subprocess
 import uuid
 from contextlib import contextmanager
 from pathlib import Path
 
 import mock
+
+import pylxd
+import pytest
 from juju.client.jujudata import FileJujuData
 from juju.controller import Controller
+from pylxd import models as pylxdmodels
 
-import pytest
+log = logging.getLogger(__name__)
 
 
 def is_bootstrapped():
@@ -94,6 +99,7 @@ class CleanModel():
 
         # save the model UUID in case test closes model
         self._model_uuid = self._model.info.uuid
+        self._profile_model_name = 'juju-{}'.format(model_name)
 
         return self._model
 
@@ -101,6 +107,20 @@ class CleanModel():
         await self._model.disconnect()
         await self._controller.destroy_model(self._model_uuid)
         await self._controller.disconnect()
+
+        # ensure we clean up any lxd profiles we've installed for the model.
+        try:
+            client = pylxd.Client()
+        except pylxd.exceptions.ClientConnectionFailed:
+            try:
+                result = subprocess.run(['lxc', 'profile', 'delete', self._profile_model_name], stdout=subprocess.PIPE)
+                if result.returncode != 0:
+                    log.error("unable to remove profile {}".format(self._profile_model_name))
+            except FileNotFoundError:
+                raise Exception("lxc not found and unable to remove profile {}".format(self._profile_model_name))
+        else:
+            if pylxdmodels.Profile.exists(client, self._profile_model_name):
+                pylxdmodels.Profile.get(client, self._profile_model_name).delete()
 
 
 class TestJujuData(FileJujuData):
