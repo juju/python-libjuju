@@ -659,7 +659,7 @@ class Connection:
                     # this can occur if known is [1, 2] and discovered is [3, 4]
                     # there is just no way to know how to communicate with the
                     # facades we're trying to call.
-                    raise errors.JujuConnectionError('unknown common facade version')
+                    log.warning("unknown common facade version for {}".format(name))
                 else:
                     self.facades[name] = version
 
