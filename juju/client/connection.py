@@ -8,14 +8,106 @@ import weakref
 from concurrent.futures import CancelledError
 from http.client import HTTPSConnection
 
-import macaroonbakery.httpbakery as httpbakery
 import macaroonbakery.bakery as bakery
+import macaroonbakery.httpbakery as httpbakery
 import websockets
 from juju import errors, tag, utils
 from juju.client import client
 from juju.utils import IdQueue
 
 log = logging.getLogger('juju.client.connection')
+
+client_facades = {
+    'Action': {'versions': [2]},
+    'ActionPruner': {'versions': [1]},
+    'Agent': {'versions': [2]},
+    'AgentTools': {'versions': [1]},
+    'Annotations': {'versions': [2]},
+    'Application': {'versions': [1, 2, 3, 4, 5, 6, 7, 8]},
+    'ApplicationOffers': {'versions': [1, 2]},
+    'ApplicationScaler': {'versions': [1]},
+    'Backups': {'versions': [1, 2]},
+    'Block': {'versions': [2]},
+    'Bundle': {'versions': [1, 2]},
+    'CharmRevisionUpdater': {'versions': [2]},
+    'Charms': {'versions': [2]},
+    'Cleaner': {'versions': [2]},
+    'Client': {'versions': [1, 2]},
+    'Cloud': {'versions': [1, 2]},
+    'CAASFirewaller': {'versions': [1]},
+    'CAASOperator': {'versions': [1]},
+    'CAASAgent': {'versions': [1]},
+    'CAASOperatorProvisioner': {'versions': [1]},
+    'CAASUnitProvisioner': {'versions': [1]},
+    'Controller': {'versions': [3, 4, 5]},
+    'CrossModelRelations': {'versions': [1]},
+    'CrossController': {'versions': [1]},
+    'CredentialValidator': {'versions': [1]},
+    'ExternalControllerUpdater': {'versions': [1]},
+    'Deployer': {'versions': [1]},
+    'DiskManager': {'versions': [2]},
+    'FanConfigurer': {'versions': [1]},
+    'Firewaller': {'versions': [3, 4, 5]},
+    'FirewallRules': {'versions': [1]},
+    'HighAvailability': {'versions': [2]},
+    'HostKeyReporter': {'versions': [1]},
+    'ImageManager': {'versions': [2]},
+    'ImageMetadata': {'versions': [3]},
+    'InstancePoller': {'versions': [3]},
+    'KeyManager': {'versions': [1]},
+    'KeyUpdater': {'versions': [1]},
+    'LeadershipService': {'versions': [2]},
+    'LifeFlag': {'versions': [1]},
+    'Logger': {'versions': [1]},
+    'LogForwarding': {'versions': [1]},
+    'MachineActions': {'versions': [1]},
+    'MachineManager': {'versions': [2, 3, 4]},
+    'MachineUndertaker': {'versions': [1]},
+    'Machiner': {'versions': [1]},
+    'MeterStatus': {'versions': [1]},
+    'MetricsAdder': {'versions': [2]},
+    'MetricsDebug': {'versions': [2]},
+    'MetricsManager': {'versions': [1]},
+    'MigrationFlag': {'versions': [1]},
+    'MigrationMaster': {'versions': [1]},
+    'MigrationMinion': {'versions': [1]},
+    'MigrationTarget': {'versions': [1]},
+    'ModelConfig': {'versions': [1, 2]},
+    'ModelManager': {'versions': [2, 3, 4]},
+    'ModelUpgrader': {'versions': [1]},
+    'Payloads': {'versions': [1]},
+    'Pinger': {'versions': [1]},
+    'Provisioner': {'versions': [3, 4, 5, 6]},
+    'ProxyUpdater': {'versions': [1, 2]},
+    'Reboot': {'versions': [2]},
+    'RemoteRelations': {'versions': [1]},
+    'Resources': {'versions': [1]},
+    'Resumer': {'versions': [2]},
+    'RetryStrategy': {'versions': [1]},
+    'Singular': {'versions': [2]},
+    'SSHClient': {'versions': [1, 2]},
+    'Spaces': {'versions': [2, 3]},
+    'StatusHistory': {'versions': [2]},
+    'Storage': {'versions': [3, 4]},
+    'StorageProvisioner': {'versions': [3, 4]},
+    'Subnets': {'versions': [2]},
+    'Undertaker': {'versions': [1]},
+    'UnitAssigner': {'versions': [1]},
+    'Uniter': {'versions': [4, 5, 6, 7, 8]},
+    'Upgrader': {'versions': [1]},
+    'UserManager': {'versions': [1, 2]},
+    'AllWatcher': {'versions': [1]},
+    'AllModelWatcher': {'versions': [2]},
+    'NotifyWatcher': {'versions': [1]},
+    'StringsWatcher': {'versions': [1]},
+    'OfferStatusWatcher': {'versions': [1]},
+    'RelationStatusWatcher': {'versions': [1]},
+    'RelationUnitsWatcher': {'versions': [1]},
+    'VolumeAttachmentsWatcher': {'versions': [2]},
+    'FilesystemAttachmentsWatcher': {'versions': [2]},
+    'EntityWatcher': {'versions': [2]},
+    'MigrationStatusWatcher': {'versions': [1]}
+}
 
 
 class Monitor:
@@ -553,7 +645,23 @@ class Connection:
     def _build_facades(self, facades):
         self.facades.clear()
         for facade in facades:
-            self.facades[facade['name']] = facade['versions'][-1]
+            name = facade['name']
+            # the following attempts to get the best facade version for the
+            # client. The client knows about the best facade versions it speaks,
+            # so in order to be compatible forwards and backwards we speak a
+            # common facade versions.
+            if name in client_facades:
+                try:
+                    known = client_facades[name]['versions']
+                    discovered = facade['versions']
+                    version = max(set(known).intersection(set(discovered)))
+                except ValueError:
+                    # this can occur if known is [1, 2] and discovered is [3, 4]
+                    # there is just no way to know how to communicate with the
+                    # facades we're trying to call.
+                    log.warning("unknown common facade version for {}".format(name))
+                else:
+                    self.facades[name] = version
 
     async def login(self):
         params = {}

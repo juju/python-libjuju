@@ -1055,7 +1055,7 @@ class Model:
 
         # Submit the request.
         client_facade = client.ClientFacade.from_connection(self.connection())
-        results = await client_facade.AddMachines([params])
+        results = await client_facade.AddMachines(params=[params])
         error = results.machines[0].error
         if error:
             raise ValueError("Error adding machine: %s" % error.message)
@@ -1094,7 +1094,7 @@ class Model:
             return None
 
         try:
-            result = await app_facade.AddRelation([relation1, relation2])
+            result = await app_facade.AddRelation(endpoints=[relation1, relation2], via_cidrs=None)
         except JujuAPIError as e:
             if 'relation already exists' not in e.message:
                 raise
@@ -1130,7 +1130,7 @@ class Model:
 
         """
         key_facade = client.KeyManagerFacade.from_connection(self.connection())
-        return await key_facade.AddKeys([key], user)
+        return await key_facade.AddKeys(ssh_keys=[key], user=user)
     add_ssh_keys = add_ssh_key
 
     def add_subnet(self, cidr_or_id, space, *zones):
@@ -1278,6 +1278,8 @@ class Model:
                 k: client.Constraints(**v)
                 for k, v in storage.items()
             }
+        if trust and (self.info.agent_version < client.Number.from_json('2.4.0')):
+            raise NotImplementedError("trusted is not supported on model version {}".format(self.info.agent_version))
 
         entity_path = Path(entity_url.replace('local:', ''))
         bundle_path = entity_path / 'bundle.yaml'
@@ -1325,7 +1327,7 @@ class Model:
                     application_name = entity['Meta']['charm-metadata']['Name']
                 if not series:
                     series = self._get_series(entity_url, entity)
-                await client_facade.AddCharm(channel, entity_id)
+                await client_facade.AddCharm(channel=channel, url=entity_id, force=False)
                 # XXX: we're dropping local resources here, but we don't
                 # actually support them yet anyway
                 resources = await self._add_store_resources(application_name,
@@ -1400,9 +1402,9 @@ class Model:
         resources_facade = client.ResourcesFacade.from_connection(
             self.connection())
         response = await resources_facade.AddPendingResources(
-            tag.application(application),
-            entity_url,
-            [client.CharmResource(**resource) for resource in resources])
+            application_tag=tag.application(application),
+            charm_url=entity_url,
+            resources=[client.CharmResource(**resource) for resource in resources])
         resource_map = {resource['name']: pid
                         for resource, pid
                         in zip(resources, response.pending_ids)}
@@ -1438,7 +1440,7 @@ class Model:
             placement=placement,
             devices=devices,
         )
-        result = await app_facade.Deploy([app])
+        result = await app_facade.Deploy(applications=[app])
         errors = [r.error.message for r in result.results if r.error]
         if errors:
             raise JujuError('\n'.join(errors))
@@ -1462,7 +1464,7 @@ class Model:
             's' if len(unit_names) == 1 else '',
             ' '.join(unit_names))
 
-        return await app_facade.DestroyUnits(list(unit_names))
+        return await app_facade.DestroyUnits(unit_names=list(unit_names))
     destroy_units = destroy_unit
 
     def get_backup(self, archive_id):
@@ -1569,7 +1571,7 @@ class Model:
         key_facade = client.KeyManagerFacade.from_connection(self.connection())
         entity = {'tag': tag.model(self.info.uuid)}
         entities = client.Entities([entity])
-        return await key_facade.ListKeys(entities, raw_ssh)
+        return await key_facade.ListKeys(entities=entities, mode=raw_ssh)
     get_ssh_keys = get_ssh_key
 
     def get_storage(self, filesystem=False, volume=False):
@@ -1643,7 +1645,7 @@ class Model:
         key = base64.b64decode(bytes(key.strip().split()[1].encode('ascii')))
         key = hashlib.md5(key).hexdigest()
         key = ':'.join(a + b for a, b in zip(key[::2], key[1::2]))
-        await key_facade.DeleteKeys([key], user)
+        await key_facade.DeleteKeys(ssh_keys=[key], user=user)
     remove_ssh_keys = remove_ssh_key
 
     def restore_backup(
@@ -1688,7 +1690,7 @@ class Model:
         for key, value in config.items():
             if isinstance(value, ConfigValue):
                 config[key] = value.value
-        await config_facade.ModelSet(config)
+        await config_facade.ModelSet(config=config)
 
     async def set_constraints(self, constraints):
         """Set machine constraints on this model.
@@ -1719,7 +1721,7 @@ class Model:
 
         async def _wait_for_action_status():
             while True:
-                action_output = await action_facade.Actions(entity)
+                action_output = await action_facade.Actions(entities=entity)
                 if action_output.results[0].status in ('completed', 'failed'):
                     return
                 else:
@@ -1727,7 +1729,7 @@ class Model:
         await asyncio.wait_for(
             _wait_for_action_status(),
             timeout=wait)
-        action_output = await action_facade.Actions(entity)
+        action_output = await action_facade.Actions(entities=entity)
         # ActionResult.output is None if the action produced no output
         if action_output.results[0].output is None:
             output = {}
@@ -1748,17 +1750,17 @@ class Model:
             self.connection()
         )
         if name:
-            name_results = await action_facade.FindActionsByNames([name])
+            name_results = await action_facade.FindActionsByNames(names=[name])
             action_results.extend(name_results.actions[0].actions)
         if uuid_or_prefix:
             # Collect list of actions matching uuid or prefix
             matching_actions = await action_facade.FindActionTagsByPrefix(
-                [uuid_or_prefix])
+                prefixes=[uuid_or_prefix])
             entities = []
             for actions in matching_actions.matches.values():
                 entities = [{'tag': a.tag} for a in actions]
             # Get action results matching action tags
-            uuid_results = await action_facade.Actions(entities)
+            uuid_results = await action_facade.Actions(entities=entities)
             action_results.extend(uuid_results.results)
         for a in action_results:
             results[tag.untag('action-', a.action.tag)] = a.status
@@ -1781,7 +1783,7 @@ class Model:
 
         """
         client_facade = client.ClientFacade.from_connection(self.connection())
-        return await client_facade.FullStatus(filters)
+        return await client_facade.FullStatus(patterns=filters)
 
     def sync_tools(
             self, all_=False, destination=None, dry_run=False, public=False,
@@ -1864,7 +1866,7 @@ class Model:
             self.connection())
 
         entities = [client.Entity(tag) for tag in tags]
-        metrics_result = await metrics_facade.GetMetrics(entities)
+        metrics_result = await metrics_facade.GetMetrics(entities=entities)
 
         metrics = collections.defaultdict(list)
 
@@ -2004,7 +2006,8 @@ class BundleHandler:
         self.bundle = await self._handle_local_charms(self.bundle)
 
         self.plan = await self.bundle_facade.GetChanges(
-            yaml.dump(self.bundle))
+            bundleurl=entity_id,
+            yaml=yaml.dump(self.bundle))
 
         if self.plan.errors:
             raise JujuError(self.plan.errors)
@@ -2042,7 +2045,7 @@ class BundleHandler:
 
         entity_id = await self.charmstore.entityId(charm)
         log.debug('Adding %s', entity_id)
-        await self.client_facade.AddCharm(None, entity_id)
+        await self.client_facade.AddCharm(channel=None, url=entity_id, force=False)
         return entity_id
 
     async def addMachines(self, params=None):
@@ -2091,7 +2094,7 @@ class BundleHandler:
 
         # Submit the request.
         params = client.AddMachineParams(**params)
-        results = await self.client_facade.AddMachines([params])
+        results = await self.client_facade.AddMachines(params=[params])
         error = results.machines[0].error
         if error:
             raise ValueError("Error adding machine: %s" % error.message)
@@ -2173,6 +2176,8 @@ class BundleHandler:
         if options is None:
             options = {}
         if self.trusted:
+            if self.model.info.agent_version < client.Number.from_json('2.4.0'):
+                raise NotImplementedError("trusted is not supported on model version {}".format(self.model.info.agent_version))
             options["trust"] = "true"
         if not charm.startswith('local:'):
             resources = await self.model._add_store_resources(

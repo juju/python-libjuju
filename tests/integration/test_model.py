@@ -133,6 +133,7 @@ async def test_add_machine(event_loop):
         # add a machine with constraints, disks, and series
         machine2 = await model.add_machine(
             constraints={
+                'arch': 'amd64',
                 'mem': 256 * MB,
             },
             disks=[{
@@ -305,10 +306,10 @@ async def test_relate(event_loop):
         real_app_facade = ApplicationFacade.from_connection(model.connection())
         mock_app_facade = mock.MagicMock()
 
-        async def mock_AddRelation(*args):
+        async def mock_AddRelation(*args, **kwargs):
             # force response delay from AddRelation to test race condition
             # (see https://github.com/juju/python-libjuju/issues/191)
-            result = await real_app_facade.AddRelation(*args)
+            result = await real_app_facade.AddRelation(*args, **kwargs)
             await relation_added.wait()
             return result
 

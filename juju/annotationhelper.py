@@ -12,7 +12,7 @@ async def _get_annotations(entity_tag, connection):
     :return dict: The annotations for the entity
     """
     facade = client.AnnotationsFacade.from_connection(connection)
-    result = (await facade.Get([{"tag": entity_tag}])).results[0]
+    result = (await facade.Get(entities=[{"tag": entity_tag}])).results[0]
     if result.error is not None:
         raise JujuError(result.error)
     return result.annotations
@@ -32,4 +32,4 @@ async def _set_annotations(entity_tag, annotations, connection):
         entity=entity_tag,
         annotations=annotations,
     )
-    return await facade.Set([args])
+    return await facade.Set(annotations=[args])

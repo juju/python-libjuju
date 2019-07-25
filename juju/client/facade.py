@@ -19,7 +19,7 @@ _marker = object()
 JUJU_VERSION = re.compile(r'[0-9]+\.[0-9-]+[\.\-][0-9a-z]+(\.[0-9]+)?')
 # Workaround for https://bugs.launchpad.net/juju/+bug/1683906
 NAUGHTY_CLASSES = ['ClientFacade', 'Client', 'FullStatus', 'ModelStatusInfo',
-                   'ModelInfo', 'ApplicationDeploy']
+                   'ApplicationDeploy']
 
 
 # Map basic types to Python's typing with a callable
@@ -102,6 +102,7 @@ CLIENTS = {{
 
 
 class KindRegistry(dict):
+
     def register(self, name, version, obj):
         self[name] = {version: {
             "object": obj,
@@ -125,9 +126,13 @@ class KindRegistry(dict):
 
 
 class TypeRegistry(dict):
+
+    def __init__(self, schema):
+        self.schema = schema
+
     def get(self, name):
         # Two way mapping
-        refname = Schema.referenceName(name)
+        refname = self.schema.referenceName(name)
         if refname not in self:
             result = TypeVar(refname)
             self[refname] = result
@@ -135,9 +140,22 @@ class TypeRegistry(dict):
 
         return self[refname]
 
+    def getRefType(self, ref):
+        return self.get(ref)
 
-_types = TypeRegistry()
-_registry = KindRegistry()
+    def objType(self, obj):
+        kind = obj.get('type')
+        if not kind:
+            raise ValueError("%s has no type" % obj)
+        result = SCHEMA_TO_PYTHON.get(kind)
+        if not result:
+            raise ValueError("%s has type %s" % (obj, kind))
+        return result
+
+    def refType(self, obj):
+        return self.getRefType(obj["$ref"])
+
+
 CLASSES = {}
 factories = codegen.Capture()
 
@@ -149,25 +167,15 @@ def booler(v):
     return bool(v)
 
 
-def getRefType(ref):
-    return _types.get(ref)
-
-
-def refType(obj):
-    return getRefType(obj["$ref"])
-
-
-def objType(obj):
-    kind = obj.get('type')
-    if not kind:
-        raise ValueError("%s has no type" % obj)
-    result = SCHEMA_TO_PYTHON.get(kind)
-    if not result:
-        raise ValueError("%s has type %s" % (obj, kind))
-    return result
-
-
 basic_types = [str, bool, int, float]
+
+
+basic_values = {
+    'str': '""',
+    'bool': 'False',
+    'int': '0',
+    'float': '0',
+}
 
 
 def name_to_py(name):
@@ -176,6 +184,15 @@ def name_to_py(name):
     if keyword.iskeyword(result) or result in dir(builtins):
         result += "_"
     return result
+
+
+def var_type_to_py(kind):
+    var_name = None
+    if (kind in basic_types or type(kind) in basic_types):
+        var_name = kind.__name__
+    if var_name in basic_values:
+        return basic_values[var_name]
+    return 'None'
 
 
 def strcast(kind, keep_builtins=False):
@@ -190,10 +207,12 @@ def strcast(kind, keep_builtins=False):
 
 
 class Args(list):
-    def __init__(self, defs):
+
+    def __init__(self, schema, defs):
+        self.schema = schema
         self.defs = defs
         if defs:
-            rtypes = _registry.getObj(_types[defs])
+            rtypes = schema.registry.getObj(schema.types[defs])
             if len(rtypes) == 1:
                 if not self.do_explode(rtypes[0][1]):
                     for name, rtype in rtypes:
@@ -208,7 +227,7 @@ class Args(list):
         if not issubclass(kind, (typing.Sequence,
                                  typing.Mapping)):
             self.clear()
-            self.extend(Args(kind))
+            self.extend(Args(self.schema, kind))
             return True
         return False
 
@@ -247,7 +266,9 @@ class Args(list):
         if self:
             parts = []
             for item in self:
-                parts.append('{}=None'.format(name_to_py(item[0])))
+                var_name = name_to_py(item[0])
+                var_type = var_type_to_py(item[1])
+                parts.append('{}={}'.format(var_name, var_type))
             return ', '.join(parts)
         return ''
 
@@ -263,12 +284,12 @@ class Args(list):
 
 def buildTypes(schema, capture):
     INDENT = "    "
-    for kind in sorted((k for k in _types if not isinstance(k, str)),
+    for kind in sorted((k for k in schema.types if not isinstance(k, str)),
                        key=lambda x: str(x)):
-        name = _types[kind]
+        name = schema.types[kind]
         if name in capture and name not in NAUGHTY_CLASSES:
             continue
-        args = Args(kind)
+        args = Args(schema, kind)
         # Write Factory class for _client.py
         make_factory(name)
         # Write actual class
@@ -354,13 +375,13 @@ class {}(Type):
         capture[name].write(source)
         capture[name].write("\n\n")
         co = compile(source, __name__, "exec")
-        ns = _getns()
+        ns = _getns(schema)
         exec(co, ns)
         cls = ns[name]
         CLASSES[name] = cls
 
 
-def retspec(defs):
+def retspec(schema, defs):
     # return specs
     # only return 1, so if there is more than one type
     # we need to include a union
@@ -370,47 +391,12 @@ def retspec(defs):
         return None
     if defs in basic_types:
         return strcast(defs, False)
-    rtypes = _registry.getObj(_types[defs])
+    rtypes = schema.registry.getObj(schema.types[defs])
     if not rtypes:
         return None
     if len(rtypes) > 1:
         return Union[tuple([strcast(r[1], True) for r in rtypes])]
     return strcast(rtypes[0][1], False)
-
-
-def return_type(defs):
-    if not defs:
-        return None
-    rtypes = _registry.getObj(_types[defs])
-    if not rtypes:
-        return None
-    if len(rtypes) > 1:
-        for n, t in rtypes:
-            if n == "Error":
-                continue
-            return t
-    return rtypes[0][1]
-
-
-def type_anno_func(func, defs, is_result=False):
-    annos = {}
-    if not defs:
-        return func
-    rtypes = _registry.getObj(_types[defs])
-    if is_result:
-        kn = "return"
-        if not rtypes:
-            annos[kn] = None
-        elif len(rtypes) > 1:
-            annos[kn] = Union[tuple([r[1] for r in rtypes])]
-        else:
-            annos[kn] = rtypes[0][1]
-    else:
-        for name, rtype in rtypes:
-            name = name_to_py(name)
-            annos[name] = rtype
-    func.__annotations__.update(annos)
-    return func
 
 
 def ReturnMapping(cls):
@@ -447,7 +433,7 @@ def ReturnMapping(cls):
 
 def makeFunc(cls, name, params, result, _async=True):
     INDENT = "    "
-    args = Args(params)
+    args = Args(cls.schema, params)
     assignments = []
     toschema = args.PyToSchemaMapping()
     for arg in args._get_arg_str(False, False):
@@ -455,7 +441,7 @@ def makeFunc(cls, name, params, result, _async=True):
                                                            toschema[arg],
                                                            arg))
     assignments = "\n".join(assignments)
-    res = retspec(result)
+    res = retspec(cls.schema, result)
     source = """
 
 @ReturnMapping({rettype})
@@ -479,14 +465,14 @@ def makeFunc(cls, name, params, result, _async=True):
     fsource = source.format(_async="async " if _async else "",
                             name=name,
                             argsep=", " if args else "",
-                            args=args,
+                            args=args.as_kwargs(),
                             res=res,
                             rettype=result.__name__ if result else None,
                             docstring=textwrap.indent(args.get_doc(), INDENT),
                             cls=cls,
                             assignments=assignments,
                             _await="await " if _async else "")
-    ns = _getns()
+    ns = _getns(cls.schema)
     exec(fsource, ns)
     func = ns[name]
     return func, fsource
@@ -508,11 +494,11 @@ def _buildMethod(cls, name):
         prop = method['properties']
         spec = prop.get('Params')
         if spec:
-            params = _types.get(spec['$ref'])
+            params = cls.schema.types.get(spec['$ref'])
         spec = prop.get('Result')
         if spec:
             if '$ref' in spec:
-                result = _types.get(spec['$ref'])
+                result = cls.schema.types.get(spec['$ref'])
             else:
                 result = SCHEMA_TO_PYTHON[spec['type']]
     return makeFunc(cls, name, params, result)
@@ -582,23 +568,13 @@ class Schema(dict):
         self.version = schema['Version']
         self.update(schema['Schema'])
 
-    @classmethod
-    def referenceName(cls, ref):
+        self.registry = KindRegistry()
+        self.types = TypeRegistry(self)
+
+    def referenceName(self, ref):
         if ref.startswith("#/definitions/"):
             ref = ref.rsplit("/", 1)[-1]
         return ref
-
-    def resolveDefinition(self, ref):
-        return self['definitions'][self.referenceName(ref)]
-
-    def deref(self, prop, name):
-        if not isinstance(prop, dict):
-            raise TypeError(prop)
-        if "$ref" not in prop:
-            return prop
-
-        target = self.resolveDefinition(prop["$ref"])
-        return target
 
     def buildDefinitions(self):
         # here we are building the types out
@@ -609,22 +585,19 @@ class Schema(dict):
         defs = self.get('definitions')
         if not defs:
             return
+        definitions = {}
         for d, data in defs.items():
-            if d in _registry and d not in NAUGHTY_CLASSES:
+            if d in self.registry and d not in NAUGHTY_CLASSES:
                 continue
-            node = self.deref(data, d)
-            kind = node.get("type")
-            if kind == "object":
-                result = self.buildObject(node, d)
-            elif kind == "array":
-                pass
-            _registry.register(d, self.version, result)
-            # XXX: This makes sure that the type gets added to the global
-            # _types dict even if no other type in the schema has a ref
-            # to it.
-            getRefType(d)
+            if data.get("type") != "object":
+                continue
+            definitions[d] = data
+        for d, definition in definitions.items():
+            node = self.buildObject(definition, d)
+            self.registry.register(d, self.version, node)
+            self.types.getRefType(d)
 
-    def buildObject(self, node, name=None, d=0):
+    def buildObject(self, node, name=None):
         # we don't need to build types recursively here
         # they are all in definitions already
         # we only want to include the type reference
@@ -639,15 +612,15 @@ class Schema(dict):
             for p in sorted(props):
                 prop = props[p]
                 if "$ref" in prop:
-                    add((p, refType(prop)))
+                    add((p, self.types.refType(prop)))
                 else:
                     kind = prop['type']
                     if kind == "array":
-                        add((p, self.buildArray(prop, d + 1)))
+                        add((p, self.buildArray(prop)))
                     elif kind == "object":
-                        struct.extend(self.buildObject(prop, p, d + 1))
+                        struct.extend(self.buildObject(prop, p))
                     else:
-                        add((p, objType(prop)))
+                        add((p, self.types.objType(prop)))
         if pprops:
             if ".*" not in pprops:
                 raise ValueError(
@@ -655,11 +628,11 @@ class Schema(dict):
                     pprops)
             pprop = pprops[".*"]
             if "$ref" in pprop:
-                add((name, Mapping[str, refType(pprop)]))
+                add((name, Mapping[str, self.types.refType(pprop)]))
                 return struct
             ppkind = pprop["type"]
             if ppkind == "array":
-                add((name, self.buildArray(pprop, d + 1)))
+                add((name, self.buildArray(pprop)))
             else:
                 add((name, Mapping[str, SCHEMA_TO_PYTHON[ppkind]]))
 
@@ -668,27 +641,27 @@ class Schema(dict):
 
         return struct
 
-    def buildArray(self, obj, d=0):
+    def buildArray(self, obj):
         # return a sequence from an array in the schema
         if "$ref" in obj:
-            return Sequence[refType(obj)]
+            return Sequence[self.types.refType(obj)]
         else:
             kind = obj.get("type")
             if kind and kind == "array":
                 items = obj['items']
-                return self.buildArray(items, d + 1)
+                return self.buildArray(items)
             else:
-                return Sequence[objType(obj)]
+                return Sequence[self.types.objType(obj)]
 
 
-def _getns():
+def _getns(schema):
     ns = {'Type': Type,
           'typing': typing,
           'ReturnMapping': ReturnMapping
           }
     # Copy our types into the globals of the method
-    for facade in _registry:
-        ns[facade] = _registry.getObj(facade)
+    for facade in schema.registry:
+        ns[facade] = schema.registry.getObj(facade)
     return ns
 
 
@@ -717,7 +690,7 @@ def write_facades(captures, options):
     return version
 
 
-def write_definitions(captures, options, version):
+def write_definitions(captures, options):
     """
     Write auxillary (non versioned) classes to
     _definitions.py The auxillary classes currently get
@@ -729,8 +702,8 @@ def write_definitions(captures, options, version):
         f.write(HEADER)
         f.write("from juju.client.facade import Type, ReturnMapping\n\n")
         for key in sorted(
-                [k for k in captures[version].keys() if "Facade" not in k]):
-            print(captures[version][key], file=f)
+                [k for k in captures.keys() if "Facade" not in k]):
+            print(captures[key], file=f)
 
 
 def write_client(captures, options):
@@ -752,30 +725,27 @@ def write_client(captures, options):
             print(factories[key], file=f)
 
 
-def generate_facades(options):
-    captures = defaultdict(codegen.Capture)
-    schemas = {}
-    for p in sorted(glob(options.schema)):
-        if 'latest' in p:
-            juju_version = 'latest'
-        else:
-            try:
-                juju_version = re.search(JUJU_VERSION, p).group()
-            except AttributeError:
-                print("Cannot extract a juju version from {}".format(p))
-                print("Schemas must include a juju version in the filename")
-                raise SystemExit(1)
-
-        new_schemas = json.loads(Path(p).read_text("utf-8"))
-        schemas[juju_version] = [Schema(s) for s in new_schemas]
-
+def generate_definitions(schemas):
     # Build all of the auxillary (unversioned) classes
     # TODO: get rid of some of the excess trips through loops in the
     # called functions.
+    definitions = codegen.Capture()
+
     for juju_version in sorted(schemas.keys()):
         for schema in schemas[juju_version]:
             schema.buildDefinitions()
-            buildTypes(schema, captures[schema.version])
+
+    # ensure we write the latest ones first, so that earlier revisions
+    # get dropped.
+    for juju_version in sorted(schemas.keys(), reverse=True):
+        for schema in schemas[juju_version]:
+            buildTypes(schema, definitions)
+
+    return definitions
+
+
+def generate_facades(schemas):
+    captures = defaultdict(codegen.Capture)
 
     # Build the Facade classes
     for juju_version in sorted(schemas.keys()):
@@ -797,6 +767,25 @@ def generate_facades(options):
     return captures
 
 
+def load_schemas(options):
+    schemas = {}
+
+    for p in sorted(glob(options.schema)):
+        if 'latest' in p:
+            juju_version = 'latest'
+        else:
+            try:
+                juju_version = re.search(JUJU_VERSION, p).group()
+            except AttributeError:
+                print("Cannot extract a juju version from {}".format(p))
+                print("Schemas must include a juju version in the filename")
+                raise SystemExit(1)
+
+        new_schemas = json.loads(Path(p).read_text("utf-8"))
+        schemas[juju_version] = [Schema(s) for s in new_schemas]
+    return schemas
+
+
 def setup():
     parser = argparse.ArgumentParser()
     parser.add_argument("-s", "--schema", default="juju/client/schemas*")
@@ -808,12 +797,15 @@ def setup():
 def main():
     options = setup()
 
+    schemas = load_schemas(options)
+
     # Generate some text blobs
-    captures = generate_facades(options)
+    definitions = generate_definitions(schemas)
+    captures = generate_facades(schemas)
 
     # ... and write them out
-    last_version = write_facades(captures, options)
-    write_definitions(captures, options, last_version)
+    write_definitions(definitions, options)
+    write_facades(captures, options)
     write_client(captures, options)
 
 
