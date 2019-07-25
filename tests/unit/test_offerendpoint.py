@@ -45,7 +45,7 @@ class TestOfferURL(unittest.TestCase):
                  (lambda: _("controller:user/modelname"), "application offer URL is missing application"),
                  (lambda: _("modelname"), "application offer URL is missing application"),
                  (lambda: _("/user/modelname"), "application offer URL is missing application"),
-                 (lambda: _("modelname.applicationname@bad"), "application name application@bad not valid"),
+                 (lambda: _("modelname.applicationname@bad"), "application name applicationname@bad not valid"),
                  (lambda: _("user[bad/model.application"), "user name user[bad not valid"),
                  (lambda: _("user/[badmodel.application"), "model name [badmodel not valid"),
                  ]
