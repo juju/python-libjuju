@@ -6,8 +6,7 @@ from pathlib import Path
 from . import errors, tag, utils
 from .client import client, connector
 from .offerendpoints import ParseError as OfferParseError
-from .offerendpoints import parse as parse_endpoint
-from .offerendpoints import parse_url as parse_offer_url
+from .offerendpoints import parse_offer_endpoint, parse_offer_url
 from .user import User
 
 log = logging.getLogger(__name__)
@@ -650,7 +649,7 @@ class Controller:
         @param offer_name: over ride the offer name to help the consumer
         """
         try:
-            offer = parse_endpoint(endpoint)
+            offer = parse_offer_endpoint(endpoint)
         except OfferParseError as e:
             log.error(e.message)
             raise

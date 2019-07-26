@@ -2,11 +2,9 @@
 # Module that parses offer endpoints
 #
 
-import re
 
-MODEL = re.compile('^[a-z0-9]+[a-z0-9-]*$')
-APPLICATION = re.compile('^(?:[a-z][a-z0-9]*(?:-[a-z0-9]*[a-z][a-z0-9]*)*)$')
-ENDPOINT = re.compile('/?((?P<model>[^\\.]*)\\.)?(?P<appname>[^:]*)(:(?P<endpoints>.*))?')
+from .names import (MatchType, match_application, match_endpoint, match_model,
+                    match_model_application, match_source_endpoint, match_user)
 
 
 class ParseError(Exception):
@@ -31,13 +29,13 @@ class OfferEndpoints:
                 self.qualified_model_name == other.qualified_model_name)
 
 
-def parse(endpoint):
+def parse_offer_endpoint(endpoint):
     if ":" not in endpoint:
-        raise ParseError("endpoints must conform to format \"<application-name>:<endpoint-name>\"")
+        raise ParseError("endpoint must conform to format \"<application-name>:<endpoint-name>\"")
 
-    matches = re.search(ENDPOINT, endpoint)
+    matches = match_endpoint(endpoint, MatchType.SEARCH)
     if matches is None:
-        raise ParseError("endpoints must conform to format \"<application-name>:<endpoint-name>\"")
+        raise ParseError("endpoint must conform to format \"<application-name>:<endpoint-name>\"")
     model_group = matches.group("model")
     application_group = matches.group("appname")
     endpoints_group = matches.group("endpoints")
@@ -49,9 +47,9 @@ def parse(endpoint):
         qualified_model_name = model_group
         model_group = model_group.split("/")[0]
 
-    if (model_group is not None) and (not re.match(MODEL, model_group)):
+    if (model_group is not None) and (not match_model(model_group)):
         raise ParseError("model name {}".format(model_group))
-    if not re.match(APPLICATION, application_group):
+    if not match_application(application_group):
         raise ParseError("application name {}".format(application_group))
 
     model = model_group
@@ -62,14 +60,6 @@ def parse(endpoint):
         raise ParseError("specify endpoints for {}".format(application))
 
     return OfferEndpoints(application, endpoints, model=model, qualified_model_name=qualified_model_name)
-
-
-SOURCE_ENDPOINT = re.compile('^[a-zA-Z0-9]+$')
-MODEL_APPLICATION = re.compile('(/?((?P<user>[^/]+)/)?(?P<model>[^.]*)(.(?P<application>[^:]*(:.*)?))?)?')
-
-valid_user_name_snippet = "[a-zA-Z0-9][a-zA-Z0-9.+-]*[a-zA-Z0-9]"
-valid_user_snippet = "(?:{}(?:@{})?)".format(valid_user_name_snippet, valid_user_name_snippet)
-USER = re.compile("^(?P<name>{})(?:@(?P<domain>{}))?$".format(valid_user_name_snippet, valid_user_name_snippet))
 
 
 class OfferURL:
@@ -100,19 +90,19 @@ class OfferURL:
         return "{}:{}".format(self.source, path)
 
 
-def parse_url(url):
+def parse_offer_url(url):
     result = OfferURL()
-    source, rest = maybe_parse_source(url)
+    source, rest = maybe_parse_offer_url_source(url)
 
     valid = url[0] != ":"
-    valid = valid and re.match(MODEL_APPLICATION, rest)
+    valid = valid and match_model_application(rest)
     if valid:
         result.source = source
 
-        matches = re.search(MODEL_APPLICATION, rest)
-        result.user = always(matches.group("user"), "")
-        result.model = always(matches.group("model"), "")
-        result.application = always(matches.group("application"), "")
+        matches = match_model_application(rest, MatchType.SEARCH)
+        result.user = _get_or_else(matches.group("user"), "")
+        result.model = _get_or_else(matches.group("model"), "")
+        result.application = _get_or_else(matches.group("application"), "")
     if not valid or (valid and (("/" in result.model) or ("/" in result.application))):
         raise ParseError("application offer URL has invalid form, must be [<user/]<model>.<appname>: {}".format(url))
     if not result.model:
@@ -120,30 +110,30 @@ def parse_url(url):
     if not result.application:
         raise ParseError("application offer URL is missing application")
 
-    if result.user and not re.match(USER, result.user):
+    if result.user and not match_user(result.user):
         raise ParseError("user name {} not valid".format(result.user))
-    if result.model and not re.match(MODEL, result.model):
+    if result.model and not match_model(result.model):
         raise ParseError("model name {} not valid".format(result.model))
 
     app_name = result.application.split(":")[0]
-    if app_name and not re.match(APPLICATION, app_name):
+    if app_name and not match_application(app_name):
         raise ParseError("application name {} not valid".format(app_name))
 
     return result
 
 
-def always(val, res):
+def _get_or_else(val, res):
     if val is None:
         return res
     return val
 
 
-def maybe_parse_source(url):
+def maybe_parse_offer_url_source(url):
     parts = url.split(":")
     if len(parts) > 2:
         return parts[0], ":".join(parts[slice(1, len(parts))])
     elif len(parts) == 2:
-        if re.match(SOURCE_ENDPOINT, parts[1]):
+        if match_source_endpoint(parts[1]):
             return "", url
         return (parts[0], parts[1])
     return "", url
