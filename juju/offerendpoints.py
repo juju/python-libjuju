@@ -91,35 +91,38 @@ class OfferURL:
 
 
 def parse_offer_url(url):
-    result = OfferURL()
     source, rest = maybe_parse_offer_url_source(url)
 
     valid = url[0] != ":"
     valid = valid and match_model_application(rest)
-    if valid:
-        result.source = source
-
-        matches = match_model_application(rest, MatchType.SEARCH)
-        result.user = _get_or_else(matches.group("user"), "")
-        result.model = _get_or_else(matches.group("model"), "")
-        result.application = _get_or_else(matches.group("application"), "")
-    if not valid or (valid and (("/" in result.model) or ("/" in result.application))):
+    if not valid:
         raise ParseError("application offer URL has invalid form, must be [<user/]<model>.<appname>: {}".format(url))
-    if not result.model:
+
+    offer_source = source
+
+    matches = match_model_application(rest, MatchType.SEARCH)
+    offer_user = _get_or_else(matches.group("user"), "")
+    offer_model = _get_or_else(matches.group("model"), "")
+    offer_application = _get_or_else(matches.group("application"), "")
+
+    if valid and (("/" in offer_model) or ("/" in offer_application)):
+        raise ParseError("application offer URL has invalid form, must be [<user/]<model>.<appname>: {}".format(url))
+    if not offer_model:
         raise ParseError("application offer URL is missing model")
-    if not result.application:
+    if not offer_application:
         raise ParseError("application offer URL is missing application")
 
-    if result.user and not match_user(result.user):
-        raise ParseError("user name {} not valid".format(result.user))
-    if result.model and not match_model(result.model):
-        raise ParseError("model name {} not valid".format(result.model))
+    if offer_user and not match_user(offer_user):
+        raise ParseError("user name {} not valid".format(offer_user))
+    if offer_model and not match_model(offer_model):
+        raise ParseError("model name {} not valid".format(offer_model))
 
-    app_name = result.application.split(":")[0]
+    app_name = offer_application.split(":")[0]
     if app_name and not match_application(app_name):
         raise ParseError("application name {} not valid".format(app_name))
 
-    return result
+    return OfferURL(source=offer_source, user=offer_user, model=offer_model,
+                    application=offer_application)
 
 
 def _get_or_else(val, res):
