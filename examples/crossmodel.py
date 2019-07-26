@@ -19,7 +19,6 @@ async def main():
     await model.connect()
 
     try:
-        '''
         print('Deploying mysql')
         application = await model.deploy(
             'mysql',
@@ -32,8 +31,19 @@ async def main():
         await model.block_until(
             lambda: all(unit.workload_status == 'active'
                         for unit in application.units))
-        '''
+
+        print('Adding offer')
         await model.offer("mysql:db")
+
+        offers = await model.offers()
+        await model.block_until(
+            lambda: all(offer.application_name == 'mysql'
+                        for offer in offers))
+
+        print('Show offers', ', '.join("%s: %s" % item for offer in offers for item in vars(offer).items()))
+
+        print('Removing offer')
+        await model.remove_offer("admin/default.mysql", force=True)
     finally:
         print('Disconnecting from model')
         await model.disconnect()

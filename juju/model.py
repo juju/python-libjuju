@@ -29,8 +29,6 @@ from .constraints import parse as parse_constraints
 from .delta import get_entity_class, get_entity_delta
 from .errors import JujuAPIError, JujuError
 from .exceptions import DeadEntityException
-from .offerendpoints import ParseError as OfferParseError
-from .offerendpoints import parse as parse_endpoint
 from .placement import parse as parse_placement
 
 log = logging.getLogger(__name__)
@@ -1885,26 +1883,34 @@ class Model:
 
         return metrics
 
-
     async def offer(self, endpoint, offer_name=None):
         """
+        Offer a deployed application using a series of endpoints for use by
+        consumers.
+
+        @param endpoint: holds the application and endpoint you want to offer
+        @param offer_name: over ride the offer name to help the consumer
         """
-        try:
-            offer = parse_endpoint(endpoint)
-        except OfferParseError as e:
-            raise
+        controller = await self.get_controller()
+        return await controller.offer(self.info.uuid, endpoint, offer_name)
 
-        if offer_name is None:
-            offer_name = offer.application
+    async def offers(self):
+        """
+        Offers list information about applications' endpoints that have been
+        shared and who is connected.
+        """
+        controller = await self.get_controller()
+        return await controller.offers(self.info.name)
 
-        params = client.AddApplicationOffer()
-        params.application_name = offer.application
-        params.endpoints = offer.endpoints
-        params.offer_name = offer_name
-        params.model_tag = tag.model(self.info.uuid)
+    async def remove_offer(self, endpoint, force=False):
+        """
+        Remove offer for an application.
 
-        facade = client.ApplicationOffersFacade.from_connection(self.connection())
-        await facade.Offer([params])
+        Offers will also remove relations to those offers, use force to do
+        so, without an error.
+        """
+        controller = await self.get_controller()
+        return await controller.remove_offer(self.info.uuid, endpoint, force)
 
 
 def get_charm_series(path):
