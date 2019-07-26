@@ -33,9 +33,9 @@ async def main():
                         for unit in application.units))
 
         print('Adding offer')
-        await model.offer("mysql:db")
+        await model.create_offer("mysql:db")
 
-        offers = await model.offers()
+        offers = await model.list_offers()
         await model.block_until(
             lambda: all(offer.application_name == 'mysql'
                         for offer in offers))

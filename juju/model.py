@@ -1883,7 +1883,7 @@ class Model:
 
         return metrics
 
-    async def offer(self, endpoint, offer_name=None):
+    async def create_offer(self, endpoint, offer_name=None):
         """
         Offer a deployed application using a series of endpoints for use by
         consumers.
@@ -1892,9 +1892,9 @@ class Model:
         @param offer_name: over ride the offer name to help the consumer
         """
         controller = await self.get_controller()
-        return await controller.offer(self.info.uuid, endpoint, offer_name)
+        return await controller.create_offer(self.info.uuid, endpoint, offer_name)
 
-    async def offers(self):
+    async def list_offers(self):
         """
         Offers list information about applications' endpoints that have been
         shared and who is connected.

@@ -17,9 +17,9 @@ async def test_offer(event_loop):
         await model.block_until(
             lambda: all(unit.workload_status == 'active'
                         for unit in application.units))
-        await model.offer("ubuntu:ubuntu")
+        await model.create_offer("ubuntu:ubuntu")
 
-        offers = await model.offers()
+        offers = await model.list_offers()
         await model.block_until(
             lambda: all(offer.application_name == 'ubuntu'
                         for offer in offers))

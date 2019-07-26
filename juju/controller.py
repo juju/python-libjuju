@@ -641,7 +641,7 @@ class Controller:
         changes = client.ModifyModelAccess(acl, 'revoke', model, user)
         return await model_facade.ModifyModelAccess(changes=[changes])
 
-    async def offer(self, model_uuid, endpoint, offer_name=None):
+    async def create_offer(self, model_uuid, endpoint, offer_name=None):
         """
         Offer a deployed application using a series of endpoints for use by
         consumers.
@@ -667,7 +667,7 @@ class Controller:
         facade = client.ApplicationOffersFacade.from_connection(self.connection())
         return await facade.Offer([params])
 
-    async def offers(self, model_name):
+    async def list_offers(self, model_name):
         """
         Offers list information about applications' endpoints that have been
         shared and who is connected.
