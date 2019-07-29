@@ -5,9 +5,16 @@ from pathlib import Path
 
 from . import errors, tag, utils
 from .client import client, connector
+from .offerendpoints import ParseError as OfferParseError
+from .offerendpoints import parse_offer_endpoint, parse_offer_url
 from .user import User
 
 log = logging.getLogger(__name__)
+
+
+class RemoveError(Exception):
+    def __init__(self, message):
+        self.message = message
 
 
 class Controller:
@@ -632,3 +639,150 @@ class Controller:
         model = tag.model(model_uuid)
         changes = client.ModifyModelAccess(acl, 'revoke', model, user)
         return await model_facade.ModifyModelAccess(changes=[changes])
+
+    async def create_offer(self, model_uuid, endpoint, offer_name=None):
+        """
+        Offer a deployed application using a series of endpoints for use by
+        consumers.
+
+        @param endpoint: holds the application and endpoint you want to offer
+        @param offer_name: over ride the offer name to help the consumer
+        """
+        try:
+            offer = parse_offer_endpoint(endpoint)
+        except OfferParseError as e:
+            log.error(e.message)
+            raise
+
+        if offer_name is None:
+            offer_name = offer.application
+
+        params = client.AddApplicationOffer()
+        params.application_name = offer.application
+        params.endpoints = {name: name for name in offer.endpoints}
+        params.offer_name = offer_name
+        params.model_tag = tag.model(model_uuid)
+
+        facade = client.ApplicationOffersFacade.from_connection(self.connection())
+        return await facade.Offer([params])
+
+    async def list_offers(self, model_name):
+        """
+        Offers list information about applications' endpoints that have been
+        shared and who is connected.
+        """
+        params = client.OfferFilter()
+        params.model_name = model_name
+
+        facade = client.ApplicationOffersFacade.from_connection(self.connection())
+        offer_result = await facade.ListApplicationOffers([params])
+
+        offers = []
+        for offer in offer_result.results:
+            offers.append(_offer_details(offer))
+        return offers
+
+    async def remove_offer(self, model_uuid, offer, force=False):
+        """
+        Remove offer for an application.
+
+        Offers will also remove relations to those offers, use force to do
+        so, without an error.
+        """
+        url = None
+        try:
+            url = parse_offer_url(offer)
+        except OfferParseError as e:
+            log.error(e.message)
+            raise
+        if url is None:
+            raise Exception
+
+        offer_source = url.source
+        if offer_source == "":
+            offer_source = self.controller_name
+        if not force:
+            raise RemoveError("removing offer will also remove relations, use force and try again.")
+
+        facade = client.ApplicationOffersFacade.from_connection(self.connection())
+        return await facade.DestroyOffers(force, [url.string()])
+
+
+class OfferDetails:
+
+    def __init__(self, application_name, application_description, charm_url, offer_name, offer_url, endpoints=None, connections=None, users=None):
+        self.application_name = application_name
+        self.application_description = application_description
+        self.charm_url = charm_url
+        self.offer_url = offer_url
+        self.endpoints = endpoints
+        self.connections = connections
+        self.users = users
+
+
+class OfferEndpoint:
+
+    def __init__(self, name, role, interface):
+        self.name = name
+        self.role = role
+        self.interface = interface
+
+
+class OfferConnection:
+
+    def __init__(self, username, endpoint, relation_id, status, message, since, ingress_subnets):
+        self.username = username
+        self.endpoint = endpoint
+        self.relation_id = relation_id
+        self.status = status
+        self.message = message
+        self.since = since
+        self.ingress_subnets = ingress_subnets
+
+
+class OfferUser:
+
+    def __init__(self, username, display_name, access):
+        self.username = username
+        self.display_name = display_name
+        self.access = access
+
+
+def _offer_details(offer):
+    def get(key):
+        if offer.applicationofferdetails is not None and offer.applicationofferdetails[key] is not None:
+            return offer.applicationofferdetails[key]
+        return offer.unknown_fields[key]
+
+    details = OfferDetails(offer.application_name,
+                           get("application-description"),
+                           offer.charm_url,
+                           get("offer-name"),
+                           get("offer-url"))
+
+    endpoints = []
+    for ep in get("endpoints"):
+        endpoints.append(OfferEndpoint(ep["name"],
+                                       ep["role"],
+                                       ep["interface"]))
+    details.endpoints = endpoints
+
+    connections = []
+    for oc in offer.connections:
+        connections.append(OfferConnection(oc.username,
+                                           oc.endpoint,
+                                           oc.relation_id,
+                                           oc.status.status,
+                                           oc.status.info,
+                                           oc.status.since,
+                                           oc.ingress_subnets))
+    details.connections = connections
+
+    users = []
+    for user in get("users"):
+        users.append(OfferUser(user["user"],
+                               user["display-name"],
+                               user["access"]))
+    details.users = users
+
+    return details

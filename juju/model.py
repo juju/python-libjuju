@@ -1883,6 +1883,35 @@ class Model:
 
         return metrics
 
+    async def create_offer(self, endpoint, offer_name=None):
+        """
+        Offer a deployed application using a series of endpoints for use by
+        consumers.
+
+        @param endpoint: holds the application and endpoint you want to offer
+        @param offer_name: over ride the offer name to help the consumer
+        """
+        controller = await self.get_controller()
+        return await controller.create_offer(self.info.uuid, endpoint, offer_name)
+
+    async def list_offers(self):
+        """
+        Offers list information about applications' endpoints that have been
+        shared and who is connected.
+        """
+        controller = await self.get_controller()
+        return await controller.list_offers(self.info.name)
+
+    async def remove_offer(self, endpoint, force=False):
+        """
+        Remove offer for an application.
+
+        Offers will also remove relations to those offers, use force to do
+        so, without an error.
+        """
+        controller = await self.get_controller()
+        return await controller.remove_offer(self.info.uuid, endpoint, force)
+
 
 def get_charm_series(path):
     """Inspects the charm directory at ``path`` and returns a default

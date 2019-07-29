@@ -1,8 +1,7 @@
-import asyncio
-
-from juju.client.connection import Connection
-from juju.client.client import ClientFacade
 from juju import loop
+from juju.client.client import ClientFacade
+from juju.client.connection import Connection
+
 
 async def status():
     conn = await Connection.connect()
@@ -18,6 +17,6 @@ async def status():
 
     return status
 
+
 if __name__ == '__main__':
     loop.run(status())
-

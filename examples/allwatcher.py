@@ -7,12 +7,11 @@ This example:
 4. Runs forever (kill with Ctrl-C)
 
 """
-import asyncio
 import logging
 
-from juju.client.connection import Connection
-from juju.client import client
 from juju import loop
+from juju.client import client
+from juju.client.connection import Connection
 
 
 async def watch():
