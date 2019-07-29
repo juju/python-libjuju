@@ -1900,7 +1900,7 @@ class Model:
         shared and who is connected.
         """
         controller = await self.get_controller()
-        return await controller.offers(self.info.name)
+        return await controller.list_offers(self.info.name)
 
     async def remove_offer(self, endpoint, force=False):
         """
