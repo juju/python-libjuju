@@ -97,3 +97,21 @@ async def test_scp(event_loop):
         with NamedTemporaryFile() as f:
             await unit.scp_from('testfile', f.name)
             assert f.read() == b'testcontents'
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_resolve(event_loop):
+
+    async with base.CleanModel() as model:
+        app = await model.deploy(
+            'ubuntu-0',
+            application_name='ubuntu',
+            series='trusty',
+            channel='stable',
+        )
+
+        # Resolving a hook not in an error state is not a great test but at
+        # least it exercises the code.
+        for unit in app.units:
+            await unit.resolved()

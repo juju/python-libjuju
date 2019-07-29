@@ -111,13 +111,21 @@ class Unit(model.ModelEntity):
         """
         raise NotImplementedError()
 
-    def resolved(self, retry=False):
+    async def resolved(self, retry=False):
         """Mark unit errors resolved.
 
         :param bool retry: Re-execute failed hooks
-
+        :returns: A :class:`juju.client._definitions.ErrorResults` instance.
         """
-        raise NotImplementedError()
+        app_facade = client.ApplicationFacade.from_connection(self.connection)
+
+        log.debug(
+            'Resolving %s', self.name)
+
+        return await app_facade.ResolveUnitErrors(
+            all_=False,
+            retry=retry,
+            tags={'tag': [self.tag]})
 
     async def run(self, command, timeout=None):
         """Run command on this unit.
