@@ -23,4 +23,4 @@ async def test_offer(event_loop):
         await model.block_until(
             lambda: all(offer.application_name == 'ubuntu'
                         for offer in offers))
-        await model.remove_offer("ubuntu", force=True)
+        await model.remove_offer("admin/{}.ubuntu".format(model.info.name), force=True)
