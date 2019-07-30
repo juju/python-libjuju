@@ -363,3 +363,97 @@ class Resource(Type):
         self.username = username
         self.name = name
         self.origin = origin
+        self.unknown_fields = unknown_fields
+
+
+class ConsumeArg(Type):
+    _toSchema = {'application_description': 'application-description',
+                 'bindings': 'bindings',
+                 'endpoints': 'endpoints',
+                 'offer_name': 'offer-name',
+                 'offer_url': 'offer-url',
+                 'offer_uuid': 'offer-uuid',
+                 'source_model_tag': 'source-model-tag',
+                 'spaces': 'spaces',
+                 'users': 'users',
+                 'application_alias': 'application-alias',
+                 'external_controller': 'external-controller',
+                 'macaroon': 'macaroon'}
+    _toPy = {'application-description': 'application_description',
+             'bindings': 'bindings',
+             'endpoints': 'endpoints',
+             'offer-name': 'offer_name',
+             'offer-url': 'offer_url',
+             'offer-uuid': 'offer_uuid',
+             'source-model-tag': 'source_model_tag',
+             'spaces': 'spaces',
+             'users': 'users',
+             'application-alias': 'application_alias',
+             'external-controller': 'external_controller',
+             'macaroon': 'macaroon'}
+
+    def __init__(self, application_description="", bindings=None, endpoints=None, offer_name="", offer_url="", offer_uuid="", source_model_tag="", spaces=None, users=None,
+                 application_alias="", external_controller=None, macaroon=None, **unknown_fields):
+        '''
+        application_description : str
+        bindings : typing.Mapping<~KT, +VT_co>[str, str]
+        endpoints : typing.Sequence<+T_co>[~RemoteEndpoint]<~RemoteEndpoint>
+        offer_name : str
+        offer_url : str
+        offer_uuid : str
+        source_model_tag : str
+        spaces : typing.Sequence<+T_co>[~RemoteSpace]<~RemoteSpace>
+        users : typing.Sequence<+T_co>[~OfferUserDetails]<~OfferUserDetails>
+        application_alias : str
+        external_controller : str
+        macaroon : Macaroon
+        '''
+        self.application_description = application_description
+        self.bindings = bindings
+        self.endpoints = endpoints
+        self.offer_name = offer_name
+        self.offer_url = offer_url
+        self.offer_uuid = offer_uuid
+        self.source_model_tag = source_model_tag
+        self.spaces = [_definitions.RemoteSpace.from_json(o) for o in spaces or []]
+        self.users = [_definitions.OfferUserDetails.from_json(o) for o in users or []]
+        self.application_alias = application_alias
+        self.external_controller = external_controller
+        self.macaroon = macaroon
+        self.unknown_fields = unknown_fields
+
+
+class Macaroon(Type):
+    _toSchema = {'signature': 'signature',
+                 'caveats': 'caveats',
+                 'location': 'location',
+                 'identifier': 'identifier'}
+    _toPy = {'signature': 'signature',
+             'caveats': 'caveats',
+             'location': 'location',
+             'identifier': 'identifier'}
+
+    def __init__(self, signature="", caveats=None, location=None, identifier="", **unknown_fields):
+        '''
+        signature : str
+        caveats : typing.Sequence<+T_co>[~RemoteSpace]<~RemoteSpace>
+        location : str
+        identifier : str
+        '''
+        self.signature = signature
+        self.caveats = caveats
+        self.location = location
+        self.identifier = identifier
+        self.unknown_fields = unknown_fields
+
+
+class Caveat(Type):
+    _toSchema = {'cid': 'cid'}
+    _toPy = {'cid': 'cid'}
+
+    def __init__(self, cid="", **unknown_fields):
+        '''
+        cid : str
+        '''
+        self.cid = cid
+        self.unknown_fields = unknown_fields

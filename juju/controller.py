@@ -5,6 +5,7 @@ from pathlib import Path
 
 from . import errors, tag, utils
 from .client import client, connector
+from .errors import JujuAPIError
 from .offerendpoints import ParseError as OfferParseError
 from .offerendpoints import parse_offer_endpoint, parse_offer_url
 from .user import User
@@ -169,6 +170,10 @@ class Controller:
     @property
     def controller_name(self):
         return self._connector.controller_name
+
+    @property
+    def controller_uuid(self):
+        return self._connector.controller_uuid
 
     async def disconnect(self):
         """Shut down the watcher task and close websockets.
@@ -706,6 +711,127 @@ class Controller:
 
         facade = client.ApplicationOffersFacade.from_connection(self.connection())
         return await facade.DestroyOffers(force, [url.string()])
+
+    async def get_consume_details(self, endpoint):
+        """
+        get_consume_details returns the details necessary to pass to another
+        model to consume the specified offers represented by the urls.
+        """
+        facade = client.ApplicationOffersFacade.from_connection(self.connection())
+        offers = await facade.GetConsumeDetails([endpoint])
+        if len(offers.results) != 1:
+            raise JujuAPIError("expected to find one result")
+        result = offers.results[0]
+        if result.error is not None:
+            raise JujuAPIError(result.error)
+
+        def get(key):
+            if result.consumeofferdetails is not None and result.consumeofferdetails[key] is not None:
+                return result.consumeofferdetails[key]
+            return result.unknown_fields[key]
+
+        offer_info = get("offer")
+        offer_endpoints = []
+        for ep in offer_info["endpoints"]:
+            offer_endpoints.append(OfferInfoEndpoint(ep["name"],
+                                                     ep["interface"],
+                                                     ep["limit"],
+                                                     ep["role"]))
+        offer_users = []
+        for user in offer_info["users"]:
+            offer_users.append(OfferInfoUser(user["user"],
+                                             user["display-name"],
+                                             user["access"]))
+
+        offer = OfferInfo(offer_info["source-model-tag"],
+                          offer_info["offer-name"],
+                          offer_info["offer-url"],
+                          offer_info["application-description"],
+                          offer_info["offer-uuid"],
+                          offer_endpoints,
+                          offer_users)
+
+        macaroon_info = get("macaroon")
+        caveats = []
+        for caveat in macaroon_info["caveats"]:
+            caveats.append(CaveatInfo(caveat["cid"]))
+        macaroon = MacaroonInfo(macaroon_info["signature"],
+                                caveats,
+                                macaroon_info["location"],
+                                macaroon_info["identifier"])
+
+        external_controller_info = get("external-controller")
+
+        external_controller = ExternalControllerInfo(external_controller_info["controller-alias"],
+                                                     external_controller_info["controller-tag"],
+                                                     external_controller_info["addrs"],
+                                                     external_controller_info["ca-cert"])
+
+        return ConsumeDetails(offer,
+                              macaroon,
+                              external_controller)
+
+
+class ConsumeDetails:
+
+    def __init__(self, offer, macaroon, controller_info):
+        self.offer = offer
+        self.macaroon = macaroon
+        self.controller_info = controller_info
+
+
+class OfferInfo:
+
+    def __init__(self, source_model_tag, offer_name, offer_url, application_description, offer_uuid, endpoints, users, application_alias=""):
+        self.source_model_tag = source_model_tag
+        self.offer_name = offer_name
+        self.offer_url = offer_url
+        self.application_description = application_description
+        self.offer_uuid = offer_uuid
+        self.endpoints = endpoints
+        self.users = users
+        self.application_alias = application_alias
+
+
+class OfferInfoEndpoint:
+
+    def __init__(self, name, interface, limit, role):
+        self.name = name
+        self.interface = interface
+        self.limit = limit
+        self.role = role
+
+
+class OfferInfoUser:
+
+    def __init__(self, user, display_name, access):
+        self.user = user
+        self.display_name = display_name
+        self.access = access
+
+
+class ExternalControllerInfo:
+
+    def __init__(self, controller_alias, controller_tag, addrs, ca_cert):
+        self.controller_alias = controller_alias
+        self.controller_tag = controller_tag
+        self.addrs = addrs
+        self.ca_cert = ca_cert
+
+
+class MacaroonInfo:
+
+    def __init__(self, signature, caveats, location, identifier):
+        self.signature = signature
+        self.caveats = caveats
+        self.location = location
+        self.identifier = identifier
+
+
+class CaveatInfo:
+
+    def __init__(self, info):
+        self.info = info
 
 
 class OfferDetails:

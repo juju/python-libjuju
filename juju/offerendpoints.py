@@ -77,6 +77,12 @@ class OfferURL:
                 self.model == other.model and
                 self.application == other.application)
 
+    def has_endpoint(self):
+        return ":" in self.application
+
+    def as_local(self):
+        return OfferURL("", self.user, self.model, self.application)
+
     def string(self):
         parts = []
         if self.user != "":
