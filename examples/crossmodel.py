@@ -9,11 +9,13 @@ This example:
 
 """
 import time
+from logging import getLogger
 
 from juju import loop
 from juju.controller import Controller
 from juju.model import Model
 
+log = getLogger(__name__)
 
 async def main():
     controller = Controller()
@@ -44,9 +46,9 @@ async def main():
         offers = await model_1.list_offers()
         await model_1.block_until(
             lambda: all(offer.application_name == 'mysql'
-                        for offer in offers))
+                        for offer in offers.results))
 
-        print('Show offers', ', '.join("%s: %s" % item for offer in offers for item in vars(offer).items()))
+        print('Show offers', ', '.join("%s: %s" % item for offer in offers.results for item in vars(offer).items()))
 
         print('Consuming offer')
         await model_2.consume("admin/test-cmr-1.mysql")
@@ -55,10 +57,16 @@ async def main():
 
         print('Removing offer')
         await model_1.remove_offer("admin/test-cmr-1.mysql", force=True)
-    finally:
-        print('Disconnecting from controller')
+
+        print('Destroying models')
         await controller.destroy_model(model_1.info.uuid)
         await controller.destroy_model(model_2.info.uuid)
+
+    except Exception:
+        log.exception("Example failed!")
+
+    finally:
+        print('Disconnecting from controller')
         await controller.disconnect()
 
 

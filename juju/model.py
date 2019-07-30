@@ -1943,13 +1943,12 @@ class Model:
         consume_details.offer.offer_url = offer_url.string()
         consume_details.offer.application_alias = application_alias
 
-        # Unfortunately consume definition args fails us here, because the
-        # generated code doesn't compose well, so we need to create an overide
-        # parameter that we can use to fake them.
-        param = _create_consume_args(consume_details.offer, consume_details.macaroon,
-                                     consume_details.controller_info)
+        arg = _create_consume_args(consume_details.offer,
+                                   consume_details.macaroon,
+                                   consume_details.external_controller)
+
         facade = client.ApplicationFacade.from_connection(self.connection())
-        return await facade.Consume(args=[param])
+        return await facade.Consume(args=[arg])
 
     async def _get_source_api(self, url):
         controller = Controller()
@@ -1986,22 +1985,26 @@ def _create_consume_args(offer, macaroon, controller_info):
                                                         controller_alias=controller_info.controller_alias,
                                                         controller_tag=controller_info.controller_tag)
     caveats = []
-    for c in macaroon.caveats:
-        caveats.append(Caveat(cid=c.info))
-    macaroon = Macaroon(signature=macaroon.signature,
+    for c in macaroon.unknown_fields["caveats"]:
+        caveats.append(Caveat(cid=c["cid"]))
+    macaroon = Macaroon(signature=macaroon.unknown_fields["signature"],
                         caveats=caveats,
-                        location=macaroon.location,
-                        identifier=macaroon.identifier)
-    return ConsumeArg(application_description=offer.application_description,
-                      endpoints=endpoints,
-                      offer_name=offer.offer_name,
-                      offer_url=offer.offer_url,
-                      offer_uuid=offer.offer_uuid,
-                      source_model_tag=offer.source_model_tag,
-                      users=users,
-                      application_alias=offer.application_alias,
-                      external_controller=external_controller,
-                      macaroon=macaroon)
+                        location=macaroon.unknown_fields["location"],
+                        identifier=macaroon.unknown_fields["identifier"])
+
+    arg = client.ConsumeApplicationArg()
+    arg.application_description=offer.application_description
+    arg.endpoints=endpoints
+    arg.offer_name=offer.offer_name
+    arg.offer_url=offer.offer_url
+    arg.offer_uuid=offer.offer_uuid
+    arg.source_model_tag=offer.source_model_tag
+    arg.users=users
+    arg.application_alias=offer.application_alias
+    arg.external_controller=external_controller
+    arg.macaroon=macaroon
+
+    return arg
 
 
 def get_charm_series(path):

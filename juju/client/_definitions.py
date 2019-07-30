@@ -381,30 +381,42 @@ class AddMachinesResults(Type):
 
 
 class AddPendingResourcesArgs(Type):
-    _toSchema = {'addcharmwithauthorization': 'AddCharmWithAuthorization', 'entity': 'Entity', 'resources': 'resources'}
-    _toPy = {'AddCharmWithAuthorization': 'addcharmwithauthorization', 'Entity': 'entity', 'resources': 'resources'}
-    def __init__(self, addcharmwithauthorization=None, entity=None, resources=None, **unknown_fields):
+    _toSchema = {'addcharmwithauthorization': 'AddCharmWithAuthorization', 'channel': 'channel', 'entity': 'Entity', 'force': 'force', 'macaroon': 'macaroon', 'resources': 'resources', 'tag': 'tag', 'url': 'url'}
+    _toPy = {'AddCharmWithAuthorization': 'addcharmwithauthorization', 'Entity': 'entity', 'channel': 'channel', 'force': 'force', 'macaroon': 'macaroon', 'resources': 'resources', 'tag': 'tag', 'url': 'url'}
+    def __init__(self, addcharmwithauthorization=None, entity=None, channel="", force=False, macaroon=None, resources=None, tag="", url="", **unknown_fields):
         '''
         addcharmwithauthorization : AddCharmWithAuthorization
         entity : Entity
+        channel : str
+        force : bool
+        macaroon : Macaroon
         resources : typing.Sequence<+T_co>[~CharmResource]<~CharmResource>
+        tag : str
+        url : str
         '''
         self.addcharmwithauthorization = AddCharmWithAuthorization.from_json(addcharmwithauthorization) if addcharmwithauthorization else None
         self.entity = Entity.from_json(entity) if entity else None
+        self.channel = channel
+        self.force = force
+        self.macaroon = Macaroon.from_json(macaroon) if macaroon else None
         self.resources = [CharmResource.from_json(o) for o in resources or []]
+        self.tag = tag
+        self.url = url
         self.unknown_fields = unknown_fields
 
 
 
 class AddPendingResourcesResult(Type):
-    _toSchema = {'errorresult': 'ErrorResult', 'pending_ids': 'pending-ids'}
-    _toPy = {'ErrorResult': 'errorresult', 'pending-ids': 'pending_ids'}
-    def __init__(self, errorresult=None, pending_ids=None, **unknown_fields):
+    _toSchema = {'error': 'error', 'errorresult': 'ErrorResult', 'pending_ids': 'pending-ids'}
+    _toPy = {'ErrorResult': 'errorresult', 'error': 'error', 'pending-ids': 'pending_ids'}
+    def __init__(self, errorresult=None, error=None, pending_ids=None, **unknown_fields):
         '''
         errorresult : ErrorResult
+        error : Error
         pending_ids : typing.Sequence<+T_co>[str]
         '''
         self.errorresult = ErrorResult.from_json(errorresult) if errorresult else None
+        self.error = Error.from_json(error) if error else None
         self.pending_ids = pending_ids
         self.unknown_fields = unknown_fields
 
@@ -1081,19 +1093,37 @@ class ApplicationOffer(Type):
 
 
 class ApplicationOfferAdminDetails(Type):
-    _toSchema = {'application_name': 'application-name', 'applicationofferdetails': 'ApplicationOfferDetails', 'charm_url': 'charm-url', 'connections': 'connections'}
-    _toPy = {'ApplicationOfferDetails': 'applicationofferdetails', 'application-name': 'application_name', 'charm-url': 'charm_url', 'connections': 'connections'}
-    def __init__(self, applicationofferdetails=None, application_name="", charm_url="", connections=None, **unknown_fields):
+    _toSchema = {'application_description': 'application-description', 'application_name': 'application-name', 'applicationofferdetails': 'ApplicationOfferDetails', 'bindings': 'bindings', 'charm_url': 'charm-url', 'connections': 'connections', 'endpoints': 'endpoints', 'offer_name': 'offer-name', 'offer_url': 'offer-url', 'offer_uuid': 'offer-uuid', 'source_model_tag': 'source-model-tag', 'spaces': 'spaces', 'users': 'users'}
+    _toPy = {'ApplicationOfferDetails': 'applicationofferdetails', 'application-description': 'application_description', 'application-name': 'application_name', 'bindings': 'bindings', 'charm-url': 'charm_url', 'connections': 'connections', 'endpoints': 'endpoints', 'offer-name': 'offer_name', 'offer-url': 'offer_url', 'offer-uuid': 'offer_uuid', 'source-model-tag': 'source_model_tag', 'spaces': 'spaces', 'users': 'users'}
+    def __init__(self, applicationofferdetails=None, application_description="", application_name="", bindings=None, charm_url="", connections=None, endpoints=None, offer_name="", offer_url="", offer_uuid="", source_model_tag="", spaces=None, users=None, **unknown_fields):
         '''
         applicationofferdetails : ApplicationOfferDetails
+        application_description : str
         application_name : str
+        bindings : typing.Mapping<~KT, +VT_co>[str, str]
         charm_url : str
         connections : typing.Sequence<+T_co>[~OfferConnection]<~OfferConnection>
+        endpoints : typing.Sequence<+T_co>[~RemoteEndpoint]<~RemoteEndpoint>
+        offer_name : str
+        offer_url : str
+        offer_uuid : str
+        source_model_tag : str
+        spaces : typing.Sequence<+T_co>[~RemoteSpace]<~RemoteSpace>
+        users : typing.Sequence<+T_co>[~OfferUserDetails]<~OfferUserDetails>
         '''
         self.applicationofferdetails = ApplicationOfferDetails.from_json(applicationofferdetails) if applicationofferdetails else None
+        self.application_description = application_description
         self.application_name = application_name
+        self.bindings = bindings
         self.charm_url = charm_url
         self.connections = [OfferConnection.from_json(o) for o in connections or []]
+        self.endpoints = [RemoteEndpoint.from_json(o) for o in endpoints or []]
+        self.offer_name = offer_name
+        self.offer_url = offer_url
+        self.offer_uuid = offer_uuid
+        self.source_model_tag = source_model_tag
+        self.spaces = [RemoteSpace.from_json(o) for o in spaces or []]
+        self.users = [OfferUserDetails.from_json(o) for o in users or []]
         self.unknown_fields = unknown_fields
 
 
@@ -1511,7 +1541,7 @@ class BackupsListArgs(Type):
         '''
 
         '''
-        pass
+        self.unknown_fields = unknown_fields
 
 
 
@@ -1582,17 +1612,27 @@ class BackupsRemoveArgs(Type):
 
 
 class Binary(Type):
-    _toSchema = {'arch': 'Arch', 'number': 'Number', 'series': 'Series'}
-    _toPy = {'Arch': 'arch', 'Number': 'number', 'Series': 'series'}
-    def __init__(self, arch="", number=None, series="", **unknown_fields):
+    _toSchema = {'arch': 'Arch', 'build': 'Build', 'major': 'Major', 'minor': 'Minor', 'number': 'Number', 'patch': 'Patch', 'series': 'Series', 'tag': 'Tag'}
+    _toPy = {'Arch': 'arch', 'Build': 'build', 'Major': 'major', 'Minor': 'minor', 'Number': 'number', 'Patch': 'patch', 'Series': 'series', 'Tag': 'tag'}
+    def __init__(self, arch="", build=0, major=0, minor=0, number=None, patch=0, series="", tag="", **unknown_fields):
         '''
         arch : str
+        build : int
+        major : int
+        minor : int
         number : Number
+        patch : int
         series : str
+        tag : str
         '''
         self.arch = arch
+        self.build = build
+        self.major = major
+        self.minor = minor
         self.number = Number.from_json(number) if number else None
+        self.patch = patch
         self.series = series
+        self.tag = tag
         self.unknown_fields = unknown_fields
 
 
@@ -1761,6 +1801,20 @@ class BranchInfoArgs(Type):
         '''
         self.branches = branches
         self.detailed = detailed
+        self.unknown_fields = unknown_fields
+
+
+
+class BranchStatus(Type):
+    _toSchema = {'assigned_units': 'assigned-units', 'created': 'created'}
+    _toPy = {'assigned-units': 'assigned_units', 'created': 'created'}
+    def __init__(self, assigned_units=None, created=0, **unknown_fields):
+        '''
+        assigned_units : typing.Sequence<+T_co>[str]
+        created : int
+        '''
+        self.assigned_units = assigned_units
+        self.created = created
         self.unknown_fields = unknown_fields
 
 
@@ -2734,19 +2788,37 @@ class ConstraintsResults(Type):
 
 
 class ConsumeApplicationArg(Type):
-    _toSchema = {'application_alias': 'application-alias', 'applicationofferdetails': 'ApplicationOfferDetails', 'external_controller': 'external-controller', 'macaroon': 'macaroon'}
-    _toPy = {'ApplicationOfferDetails': 'applicationofferdetails', 'application-alias': 'application_alias', 'external-controller': 'external_controller', 'macaroon': 'macaroon'}
-    def __init__(self, applicationofferdetails=None, application_alias="", external_controller=None, macaroon=None, **unknown_fields):
+    _toSchema = {'application_alias': 'application-alias', 'application_description': 'application-description', 'applicationofferdetails': 'ApplicationOfferDetails', 'bindings': 'bindings', 'endpoints': 'endpoints', 'external_controller': 'external-controller', 'macaroon': 'macaroon', 'offer_name': 'offer-name', 'offer_url': 'offer-url', 'offer_uuid': 'offer-uuid', 'source_model_tag': 'source-model-tag', 'spaces': 'spaces', 'users': 'users'}
+    _toPy = {'ApplicationOfferDetails': 'applicationofferdetails', 'application-alias': 'application_alias', 'application-description': 'application_description', 'bindings': 'bindings', 'endpoints': 'endpoints', 'external-controller': 'external_controller', 'macaroon': 'macaroon', 'offer-name': 'offer_name', 'offer-url': 'offer_url', 'offer-uuid': 'offer_uuid', 'source-model-tag': 'source_model_tag', 'spaces': 'spaces', 'users': 'users'}
+    def __init__(self, applicationofferdetails=None, application_alias="", application_description="", bindings=None, endpoints=None, external_controller=None, macaroon=None, offer_name="", offer_url="", offer_uuid="", source_model_tag="", spaces=None, users=None, **unknown_fields):
         '''
         applicationofferdetails : ApplicationOfferDetails
         application_alias : str
+        application_description : str
+        bindings : typing.Mapping<~KT, +VT_co>[str, str]
+        endpoints : typing.Sequence<+T_co>[~RemoteEndpoint]<~RemoteEndpoint>
         external_controller : ExternalControllerInfo
         macaroon : Macaroon
+        offer_name : str
+        offer_url : str
+        offer_uuid : str
+        source_model_tag : str
+        spaces : typing.Sequence<+T_co>[~RemoteSpace]<~RemoteSpace>
+        users : typing.Sequence<+T_co>[~OfferUserDetails]<~OfferUserDetails>
         '''
         self.applicationofferdetails = ApplicationOfferDetails.from_json(applicationofferdetails) if applicationofferdetails else None
         self.application_alias = application_alias
+        self.application_description = application_description
+        self.bindings = bindings
+        self.endpoints = [RemoteEndpoint.from_json(o) for o in endpoints or []]
         self.external_controller = ExternalControllerInfo.from_json(external_controller) if external_controller else None
         self.macaroon = Macaroon.from_json(macaroon) if macaroon else None
+        self.offer_name = offer_name
+        self.offer_url = offer_url
+        self.offer_uuid = offer_uuid
+        self.source_model_tag = source_model_tag
+        self.spaces = [RemoteSpace.from_json(o) for o in spaces or []]
+        self.users = [OfferUserDetails.from_json(o) for o in users or []]
         self.unknown_fields = unknown_fields
 
 
@@ -2806,15 +2878,21 @@ class ConsumeOfferDetails(Type):
 
 
 class ConsumeOfferDetailsResult(Type):
-    _toSchema = {'consumeofferdetails': 'ConsumeOfferDetails', 'error': 'error'}
-    _toPy = {'ConsumeOfferDetails': 'consumeofferdetails', 'error': 'error'}
-    def __init__(self, consumeofferdetails=None, error=None, **unknown_fields):
+    _toSchema = {'consumeofferdetails': 'ConsumeOfferDetails', 'error': 'error', 'external_controller': 'external-controller', 'macaroon': 'macaroon', 'offer': 'offer'}
+    _toPy = {'ConsumeOfferDetails': 'consumeofferdetails', 'error': 'error', 'external-controller': 'external_controller', 'macaroon': 'macaroon', 'offer': 'offer'}
+    def __init__(self, consumeofferdetails=None, error=None, external_controller=None, macaroon=None, offer=None, **unknown_fields):
         '''
         consumeofferdetails : ConsumeOfferDetails
         error : Error
+        external_controller : ExternalControllerInfo
+        macaroon : Macaroon
+        offer : ApplicationOfferDetails
         '''
         self.consumeofferdetails = ConsumeOfferDetails.from_json(consumeofferdetails) if consumeofferdetails else None
         self.error = Error.from_json(error) if error else None
+        self.external_controller = ExternalControllerInfo.from_json(external_controller) if external_controller else None
+        self.macaroon = Macaroon.from_json(macaroon) if macaroon else None
+        self.offer = ApplicationOfferDetails.from_json(offer) if offer else None
         self.unknown_fields = unknown_fields
 
 
@@ -4140,15 +4218,19 @@ class FilesystemAttachment(Type):
 
 
 class FilesystemAttachmentDetails(Type):
-    _toSchema = {'filesystemattachmentinfo': 'FilesystemAttachmentInfo', 'life': 'life'}
-    _toPy = {'FilesystemAttachmentInfo': 'filesystemattachmentinfo', 'life': 'life'}
-    def __init__(self, filesystemattachmentinfo=None, life="", **unknown_fields):
+    _toSchema = {'filesystemattachmentinfo': 'FilesystemAttachmentInfo', 'life': 'life', 'mount_point': 'mount-point', 'read_only': 'read-only'}
+    _toPy = {'FilesystemAttachmentInfo': 'filesystemattachmentinfo', 'life': 'life', 'mount-point': 'mount_point', 'read-only': 'read_only'}
+    def __init__(self, filesystemattachmentinfo=None, life="", mount_point="", read_only=False, **unknown_fields):
         '''
         filesystemattachmentinfo : FilesystemAttachmentInfo
         life : str
+        mount_point : str
+        read_only : bool
         '''
         self.filesystemattachmentinfo = FilesystemAttachmentInfo.from_json(filesystemattachmentinfo) if filesystemattachmentinfo else None
         self.life = life
+        self.mount_point = mount_point
+        self.read_only = read_only
         self.unknown_fields = unknown_fields
 
 
@@ -4816,15 +4898,25 @@ class HostNetworkChangeResults(Type):
 
 
 class HostPort(Type):
-    _toSchema = {'address': 'Address', 'port': 'port'}
-    _toPy = {'Address': 'address', 'port': 'port'}
-    def __init__(self, address=None, port=0, **unknown_fields):
+    _toSchema = {'address': 'Address', 'port': 'port', 'scope': 'scope', 'space_id': 'space-id', 'space_name': 'space-name', 'type_': 'type', 'value': 'value'}
+    _toPy = {'Address': 'address', 'port': 'port', 'scope': 'scope', 'space-id': 'space_id', 'space-name': 'space_name', 'type': 'type_', 'value': 'value'}
+    def __init__(self, address=None, port=0, scope="", space_id="", space_name="", type_="", value="", **unknown_fields):
         '''
         address : Address
         port : int
+        scope : str
+        space_id : str
+        space_name : str
+        type_ : str
+        value : str
         '''
         self.address = Address.from_json(address) if address else None
         self.port = port
+        self.scope = scope
+        self.space_id = space_id
+        self.space_name = space_name
+        self.type_ = type_
+        self.value = value
         self.unknown_fields = unknown_fields
 
 
@@ -5786,17 +5878,21 @@ class LogForwardingID(Type):
 
 
 class LogForwardingSetLastSentParam(Type):
-    _toSchema = {'logforwardingid': 'LogForwardingID', 'record_id': 'record-id', 'record_timestamp': 'record-timestamp'}
-    _toPy = {'LogForwardingID': 'logforwardingid', 'record-id': 'record_id', 'record-timestamp': 'record_timestamp'}
-    def __init__(self, logforwardingid=None, record_id=0, record_timestamp=0, **unknown_fields):
+    _toSchema = {'logforwardingid': 'LogForwardingID', 'model': 'model', 'record_id': 'record-id', 'record_timestamp': 'record-timestamp', 'sink': 'sink'}
+    _toPy = {'LogForwardingID': 'logforwardingid', 'model': 'model', 'record-id': 'record_id', 'record-timestamp': 'record_timestamp', 'sink': 'sink'}
+    def __init__(self, logforwardingid=None, model="", record_id=0, record_timestamp=0, sink="", **unknown_fields):
         '''
         logforwardingid : LogForwardingID
+        model : str
         record_id : int
         record_timestamp : int
+        sink : str
         '''
         self.logforwardingid = LogForwardingID.from_json(logforwardingid) if logforwardingid else None
+        self.model = model
         self.record_id = record_id
         self.record_timestamp = record_timestamp
+        self.sink = sink
         self.unknown_fields = unknown_fields
 
 
@@ -5872,7 +5968,7 @@ class Macaroon(Type):
         '''
 
         '''
-        pass
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7021,15 +7117,19 @@ class ModelResult(Type):
 
 
 class ModelSLA(Type):
-    _toSchema = {'creds': 'creds', 'modelslainfo': 'ModelSLAInfo'}
-    _toPy = {'ModelSLAInfo': 'modelslainfo', 'creds': 'creds'}
-    def __init__(self, modelslainfo=None, creds=None, **unknown_fields):
+    _toSchema = {'creds': 'creds', 'level': 'level', 'modelslainfo': 'ModelSLAInfo', 'owner': 'owner'}
+    _toPy = {'ModelSLAInfo': 'modelslainfo', 'creds': 'creds', 'level': 'level', 'owner': 'owner'}
+    def __init__(self, modelslainfo=None, creds=None, level="", owner="", **unknown_fields):
         '''
         modelslainfo : ModelSLAInfo
         creds : typing.Sequence<+T_co>[int]
+        level : str
+        owner : str
         '''
         self.modelslainfo = ModelSLAInfo.from_json(modelslainfo) if modelslainfo else None
         self.creds = creds
+        self.level = level
+        self.owner = owner
         self.unknown_fields = unknown_fields
 
 
@@ -7233,7 +7333,7 @@ class ModelTag(Type):
         '''
 
         '''
-        pass
+        self.unknown_fields = unknown_fields
 
 
 
@@ -7922,19 +8022,21 @@ class PayloadListResults(Type):
 
 
 class PayloadResult(Type):
-    _toSchema = {'entity': 'Entity', 'error': 'error', 'not_found': 'not-found', 'payload': 'payload'}
-    _toPy = {'Entity': 'entity', 'error': 'error', 'not-found': 'not_found', 'payload': 'payload'}
-    def __init__(self, entity=None, error=None, not_found=False, payload=None, **unknown_fields):
+    _toSchema = {'entity': 'Entity', 'error': 'error', 'not_found': 'not-found', 'payload': 'payload', 'tag': 'tag'}
+    _toPy = {'Entity': 'entity', 'error': 'error', 'not-found': 'not_found', 'payload': 'payload', 'tag': 'tag'}
+    def __init__(self, entity=None, error=None, not_found=False, payload=None, tag="", **unknown_fields):
         '''
         entity : Entity
         error : Error
         not_found : bool
         payload : Payload
+        tag : str
         '''
         self.entity = Entity.from_json(entity) if entity else None
         self.error = Error.from_json(error) if error else None
         self.not_found = not_found
         self.payload = Payload.from_json(payload) if payload else None
+        self.tag = tag
         self.unknown_fields = unknown_fields
 
 
@@ -9504,22 +9606,38 @@ class ResolvedModeResults(Type):
 
 
 class Resource(Type):
-    _toSchema = {'application': 'application', 'charmresource': 'CharmResource', 'id_': 'id', 'pending_id': 'pending-id', 'timestamp': 'timestamp', 'username': 'username'}
-    _toPy = {'CharmResource': 'charmresource', 'application': 'application', 'id': 'id_', 'pending-id': 'pending_id', 'timestamp': 'timestamp', 'username': 'username'}
-    def __init__(self, charmresource=None, application="", id_="", pending_id="", timestamp="", username="", **unknown_fields):
+    _toSchema = {'application': 'application', 'charmresource': 'CharmResource', 'description': 'description', 'fingerprint': 'fingerprint', 'id_': 'id', 'name': 'name', 'origin': 'origin', 'path': 'path', 'pending_id': 'pending-id', 'revision': 'revision', 'size': 'size', 'timestamp': 'timestamp', 'type_': 'type', 'username': 'username'}
+    _toPy = {'CharmResource': 'charmresource', 'application': 'application', 'description': 'description', 'fingerprint': 'fingerprint', 'id': 'id_', 'name': 'name', 'origin': 'origin', 'path': 'path', 'pending-id': 'pending_id', 'revision': 'revision', 'size': 'size', 'timestamp': 'timestamp', 'type': 'type_', 'username': 'username'}
+    def __init__(self, charmresource=None, application="", description="", fingerprint=None, id_="", name="", origin="", path="", pending_id="", revision=0, size=0, timestamp="", type_="", username="", **unknown_fields):
         '''
         charmresource : CharmResource
         application : str
+        description : str
+        fingerprint : typing.Sequence<+T_co>[int]
         id_ : str
+        name : str
+        origin : str
+        path : str
         pending_id : str
+        revision : int
+        size : int
         timestamp : str
+        type_ : str
         username : str
         '''
         self.charmresource = CharmResource.from_json(charmresource) if charmresource else None
         self.application = application
+        self.description = description
+        self.fingerprint = fingerprint
         self.id_ = id_
+        self.name = name
+        self.origin = origin
+        self.path = path
         self.pending_id = pending_id
+        self.revision = revision
+        self.size = size
         self.timestamp = timestamp
+        self.type_ = type_
         self.username = username
         self.unknown_fields = unknown_fields
 
@@ -9540,17 +9658,19 @@ class ResourceResult(Type):
 
 
 class ResourcesResult(Type):
-    _toSchema = {'charm_store_resources': 'charm-store-resources', 'errorresult': 'ErrorResult', 'resources': 'resources', 'unit_resources': 'unit-resources'}
-    _toPy = {'ErrorResult': 'errorresult', 'charm-store-resources': 'charm_store_resources', 'resources': 'resources', 'unit-resources': 'unit_resources'}
-    def __init__(self, errorresult=None, charm_store_resources=None, resources=None, unit_resources=None, **unknown_fields):
+    _toSchema = {'charm_store_resources': 'charm-store-resources', 'error': 'error', 'errorresult': 'ErrorResult', 'resources': 'resources', 'unit_resources': 'unit-resources'}
+    _toPy = {'ErrorResult': 'errorresult', 'charm-store-resources': 'charm_store_resources', 'error': 'error', 'resources': 'resources', 'unit-resources': 'unit_resources'}
+    def __init__(self, errorresult=None, charm_store_resources=None, error=None, resources=None, unit_resources=None, **unknown_fields):
         '''
         errorresult : ErrorResult
         charm_store_resources : typing.Sequence<+T_co>[~CharmResource]<~CharmResource>
+        error : Error
         resources : typing.Sequence<+T_co>[~Resource]<~Resource>
         unit_resources : typing.Sequence<+T_co>[~UnitResources]<~UnitResources>
         '''
         self.errorresult = ErrorResult.from_json(errorresult) if errorresult else None
         self.charm_store_resources = [CharmResource.from_json(o) for o in charm_store_resources or []]
+        self.error = Error.from_json(error) if error else None
         self.resources = [Resource.from_json(o) for o in resources or []]
         self.unit_resources = [UnitResources.from_json(o) for o in unit_resources or []]
         self.unknown_fields = unknown_fields
@@ -10102,15 +10222,17 @@ class SetModelEnvironVersions(Type):
 
 
 class SetPayloadStatusArg(Type):
-    _toSchema = {'entity': 'Entity', 'status': 'status'}
-    _toPy = {'Entity': 'entity', 'status': 'status'}
-    def __init__(self, entity=None, status="", **unknown_fields):
+    _toSchema = {'entity': 'Entity', 'status': 'status', 'tag': 'tag'}
+    _toPy = {'Entity': 'entity', 'status': 'status', 'tag': 'tag'}
+    def __init__(self, entity=None, status="", tag="", **unknown_fields):
         '''
         entity : Entity
         status : str
+        tag : str
         '''
         self.entity = Entity.from_json(entity) if entity else None
         self.status = status
+        self.tag = tag
         self.unknown_fields = unknown_fields
 
 
@@ -10758,7 +10880,7 @@ class StorageFilter(Type):
         '''
 
         '''
-        pass
+        self.unknown_fields = unknown_fields
 
 
 
@@ -11267,44 +11389,50 @@ class UnitRefreshResults(Type):
 
 
 class UnitResourceResult(Type):
-    _toSchema = {'errorresult': 'ErrorResult', 'resource': 'resource'}
-    _toPy = {'ErrorResult': 'errorresult', 'resource': 'resource'}
-    def __init__(self, errorresult=None, resource=None, **unknown_fields):
+    _toSchema = {'error': 'error', 'errorresult': 'ErrorResult', 'resource': 'resource'}
+    _toPy = {'ErrorResult': 'errorresult', 'error': 'error', 'resource': 'resource'}
+    def __init__(self, errorresult=None, error=None, resource=None, **unknown_fields):
         '''
         errorresult : ErrorResult
+        error : Error
         resource : Resource
         '''
         self.errorresult = ErrorResult.from_json(errorresult) if errorresult else None
+        self.error = Error.from_json(error) if error else None
         self.resource = Resource.from_json(resource) if resource else None
         self.unknown_fields = unknown_fields
 
 
 
 class UnitResources(Type):
-    _toSchema = {'download_progress': 'download-progress', 'entity': 'Entity', 'resources': 'resources'}
-    _toPy = {'Entity': 'entity', 'download-progress': 'download_progress', 'resources': 'resources'}
-    def __init__(self, entity=None, download_progress=None, resources=None, **unknown_fields):
+    _toSchema = {'download_progress': 'download-progress', 'entity': 'Entity', 'resources': 'resources', 'tag': 'tag'}
+    _toPy = {'Entity': 'entity', 'download-progress': 'download_progress', 'resources': 'resources', 'tag': 'tag'}
+    def __init__(self, entity=None, download_progress=None, resources=None, tag="", **unknown_fields):
         '''
         entity : Entity
         download_progress : typing.Mapping<~KT, +VT_co>[str, int]
         resources : typing.Sequence<+T_co>[~Resource]<~Resource>
+        tag : str
         '''
         self.entity = Entity.from_json(entity) if entity else None
         self.download_progress = download_progress
         self.resources = [Resource.from_json(o) for o in resources or []]
+        self.tag = tag
         self.unknown_fields = unknown_fields
 
 
 
 class UnitResourcesResult(Type):
-    _toSchema = {'errorresult': 'ErrorResult', 'resources': 'resources'}
-    _toPy = {'ErrorResult': 'errorresult', 'resources': 'resources'}
-    def __init__(self, errorresult=None, resources=None, **unknown_fields):
+    _toSchema = {'error': 'error', 'errorresult': 'ErrorResult', 'resources': 'resources'}
+    _toPy = {'ErrorResult': 'errorresult', 'error': 'error', 'resources': 'resources'}
+    def __init__(self, errorresult=None, error=None, resources=None, **unknown_fields):
         '''
         errorresult : ErrorResult
+        error : Error
         resources : typing.Sequence<+T_co>[~UnitResourceResult]<~UnitResourceResult>
         '''
         self.errorresult = ErrorResult.from_json(errorresult) if errorresult else None
+        self.error = Error.from_json(error) if error else None
         self.resources = [UnitResourceResult.from_json(o) for o in resources or []]
         self.unknown_fields = unknown_fields
 
@@ -11987,15 +12115,25 @@ class VolumeAttachment(Type):
 
 
 class VolumeAttachmentDetails(Type):
-    _toSchema = {'life': 'life', 'volumeattachmentinfo': 'VolumeAttachmentInfo'}
-    _toPy = {'VolumeAttachmentInfo': 'volumeattachmentinfo', 'life': 'life'}
-    def __init__(self, volumeattachmentinfo=None, life="", **unknown_fields):
+    _toSchema = {'bus_address': 'bus-address', 'device_link': 'device-link', 'device_name': 'device-name', 'life': 'life', 'plan_info': 'plan-info', 'read_only': 'read-only', 'volumeattachmentinfo': 'VolumeAttachmentInfo'}
+    _toPy = {'VolumeAttachmentInfo': 'volumeattachmentinfo', 'bus-address': 'bus_address', 'device-link': 'device_link', 'device-name': 'device_name', 'life': 'life', 'plan-info': 'plan_info', 'read-only': 'read_only'}
+    def __init__(self, volumeattachmentinfo=None, bus_address="", device_link="", device_name="", life="", plan_info=None, read_only=False, **unknown_fields):
         '''
         volumeattachmentinfo : VolumeAttachmentInfo
+        bus_address : str
+        device_link : str
+        device_name : str
         life : str
+        plan_info : VolumeAttachmentPlanInfo
+        read_only : bool
         '''
         self.volumeattachmentinfo = VolumeAttachmentInfo.from_json(volumeattachmentinfo) if volumeattachmentinfo else None
+        self.bus_address = bus_address
+        self.device_link = device_link
+        self.device_name = device_name
         self.life = life
+        self.plan_info = VolumeAttachmentPlanInfo.from_json(plan_info) if plan_info else None
+        self.read_only = read_only
         self.unknown_fields = unknown_fields
 
 

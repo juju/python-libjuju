@@ -310,7 +310,7 @@ class {}(Type):
             textwrap.indent(args.get_doc(), INDENT * 2))]
 
         if not args:
-            source.append("{}pass".format(INDENT * 2))
+            source.append("{}self.unknown_fields = unknown_fields".format(INDENT * 2))
         else:
             for arg in args:
                 arg_name = name_to_py(arg[0])
