@@ -20,11 +20,11 @@ async def main():
     print("Connecting to controller")
     await controller.connect()
 
-    print('Creating models')
-    model_1 = await controller.add_model('test-cmr-1')
-    model_2 = await controller.add_model('test-cmr-2')
-
     try:
+        print('Creating models')
+        model_1 = await controller.add_model('test-cmr-1')
+        model_2 = await controller.add_model('test-cmr-2')
+
         print('Deploying mysql')
         application = await model_1.deploy(
             'mysql',
