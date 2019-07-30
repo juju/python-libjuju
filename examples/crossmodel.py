@@ -53,7 +53,9 @@ async def main():
         print('Consuming offer')
         await model_2.consume("admin/test-cmr-1.mysql")
 
-        time.sleep(20)
+        status = await model_2.get_status()
+        if 'mysql' not in status.remote_applications:
+            raise Exception("Expected mysql in saas")
 
         print('Removing offer')
         await model_1.remove_offer("admin/test-cmr-1.mysql", force=True)
@@ -64,6 +66,7 @@ async def main():
 
     except Exception:
         log.exception("Example failed!")
+        raise
 
     finally:
         print('Disconnecting from controller')

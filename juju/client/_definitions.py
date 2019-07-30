@@ -4616,19 +4616,27 @@ class FirewallRuleArgs(Type):
 
 
 class FullStatus(Type):
-    _toSchema = {'applications': 'applications', 'machines': 'machines', 'model': 'model', 'relations': 'relations'}
-    _toPy = {'applications': 'applications', 'machines': 'machines', 'model': 'model', 'relations': 'relations'}
-    def __init__(self, applications=None, machines=None, model=None, relations=None, **unknown_fields):
+    _toSchema = {'applications': 'applications', 'branches': 'branches', 'controller_timestamp': 'controller-timestamp', 'machines': 'machines', 'model': 'model', 'offers': 'offers', 'relations': 'relations', 'remote_applications': 'remote-applications'}
+    _toPy = {'applications': 'applications', 'branches': 'branches', 'controller-timestamp': 'controller_timestamp', 'machines': 'machines', 'model': 'model', 'offers': 'offers', 'relations': 'relations', 'remote-applications': 'remote_applications'}
+    def __init__(self, applications=None, branches=None, controller_timestamp="", machines=None, model=None, offers=None, relations=None, remote_applications=None, **unknown_fields):
         '''
         applications : typing.Mapping<~KT, +VT_co>[str, ~ApplicationStatus]<~ApplicationStatus>
+        branches : typing.Mapping<~KT, +VT_co>[str, ~BranchStatus]<~BranchStatus>
+        controller_timestamp : str
         machines : typing.Mapping<~KT, +VT_co>[str, ~MachineStatus]<~MachineStatus>
         model : ModelStatusInfo
+        offers : typing.Mapping<~KT, +VT_co>[str, ~ApplicationOfferStatus]<~ApplicationOfferStatus>
         relations : typing.Sequence<+T_co>[~RelationStatus]<~RelationStatus>
+        remote_applications : typing.Mapping<~KT, +VT_co>[str, ~RemoteApplicationStatus]<~RemoteApplicationStatus>
         '''
         self.applications = applications
+        self.branches = branches
+        self.controller_timestamp = controller_timestamp
         self.machines = machines
         self.model = ModelStatusInfo.from_json(model) if model else None
+        self.offers = offers
         self.relations = [RelationStatus.from_json(o) for o in relations or []]
+        self.remote_applications = remote_applications
         self.unknown_fields = unknown_fields
 
 

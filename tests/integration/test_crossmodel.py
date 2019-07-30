@@ -51,4 +51,8 @@ async def test_consume(event_loop):
         async with base.CleanModel() as model_2:
             await model_2.consume("admin/{}.ubuntu".format(model_1.info.name))
 
+            status = await model_2.get_status()
+            if 'ubuntu' not in status.remote_applications:
+                raise Exception("Expected ubuntu in saas")
+
         await model_1.remove_offer("admin/{}.ubuntu".format(model_1.info.name), force=True)
