@@ -24,16 +24,18 @@ from . import provisioner, tag, utils
 from .annotationhelper import _get_annotations, _set_annotations
 from .client import client, connector
 from .client.client import ConfigValue, Value
-from .client.overrides import Caveat, ConsumeArg, Macaroon
+from .client.overrides import Caveat, Macaroon
 from .constraints import normalize_key
 from .constraints import parse as parse_constraints
 from .controller import Controller
 from .delta import get_entity_class, get_entity_delta
 from .errors import JujuAPIError, JujuError
 from .exceptions import DeadEntityException
+from .names import is_valid_application
 from .offerendpoints import ParseError as OfferParseError
 from .offerendpoints import parse_offer_url
 from .placement import parse as parse_placement
+from .tag import application as application_tag
 
 log = logging.getLogger(__name__)
 
@@ -1950,6 +1952,21 @@ class Model:
         facade = client.ApplicationFacade.from_connection(self.connection())
         return await facade.Consume(args=[arg])
 
+    async def remove_saas(self, name):
+        """
+        Removing a consumed (SAAS) application will terminate any relations that
+        application has, potentially leaving any related local applications
+        in a non-functional state.
+        """
+        if not is_valid_application(name):
+            raise JujuError("invalid SAAS application name {}".format(name))
+
+        arg = client.DestroyConsumedApplicationParams()
+        arg.application_tag = application_tag(name)
+
+        facade = client.ApplicationFacade.from_connection(self.connection())
+        return await facade.DestroyConsumedApplications(applications=[arg])
+
     async def _get_source_api(self, url):
         controller = Controller()
         if url.source == "":
@@ -1993,16 +2010,16 @@ def _create_consume_args(offer, macaroon, controller_info):
                         identifier=macaroon.unknown_fields["identifier"])
 
     arg = client.ConsumeApplicationArg()
-    arg.application_description=offer.application_description
-    arg.endpoints=endpoints
-    arg.offer_name=offer.offer_name
-    arg.offer_url=offer.offer_url
-    arg.offer_uuid=offer.offer_uuid
-    arg.source_model_tag=offer.source_model_tag
-    arg.users=users
-    arg.application_alias=offer.application_alias
-    arg.external_controller=external_controller
-    arg.macaroon=macaroon
+    arg.application_description = offer.application_description
+    arg.endpoints = endpoints
+    arg.offer_name = offer.offer_name
+    arg.offer_url = offer.offer_url
+    arg.offer_uuid = offer.offer_uuid
+    arg.source_model_tag = offer.source_model_tag
+    arg.users = users
+    arg.application_alias = offer.application_alias
+    arg.external_controller = external_controller
+    arg.macaroon = macaroon
 
     return arg
 

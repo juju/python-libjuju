@@ -13,9 +13,9 @@ from logging import getLogger
 
 from juju import loop
 from juju.controller import Controller
-from juju.model import Model
 
 log = getLogger(__name__)
+
 
 async def main():
     controller = Controller()
@@ -56,6 +56,11 @@ async def main():
         status = await model_2.get_status()
         if 'mysql' not in status.remote_applications:
             raise Exception("Expected mysql in saas")
+
+        time.sleep(10)
+
+        print("Remove SAAS")
+        await model_2.remove_saas("mysql")
 
         print('Removing offer')
         await model_1.remove_offer("admin/test-cmr-1.mysql", force=True)
