@@ -89,6 +89,20 @@ class TypeFactory:
 
         return c
 
+    @classmethod
+    def best_facade_version(cls, connection):
+        """
+        Returns the best facade version for a given facade. This will help with
+        trying to provide different functionality for different facade versions.
+
+        @param connection: initialized Connection object.
+        """
+        facade_name = cls.__name__
+        if not facade_name.endswith('Facade'):
+           raise TypeError('Unexpected class name: {}'.format(facade_name))
+        facade_name = facade_name[:-len('Facade')]
+        return connection.facades.get(facade_name)
+
 
 '''
 
