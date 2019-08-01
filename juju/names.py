@@ -72,3 +72,13 @@ def match_user(val, match_type=None):
         return re.search(USER, val)
     else:
         return re.match(USER, val)
+
+
+RELATION = re.compile("[a-z][a-z0-9]*(?:[_-][a-z0-9]+)*")
+
+
+def match_relation(val, match_type=None):
+    if match_type is MatchType.SEARCH:
+        return re.search(RELATION, val)
+    else:
+        return re.match(RELATION, val)
