@@ -33,7 +33,7 @@ from .errors import JujuAPIError, JujuError
 from .exceptions import DeadEntityException
 from .names import is_valid_application
 from .offerendpoints import ParseError as OfferParseError
-from .offerendpoints import parse_offer_url
+from .offerendpoints import parse_offer_endpoint, parse_offer_url
 from .placement import parse as parse_placement
 from .tag import application as application_tag
 
@@ -1087,11 +1087,45 @@ class Model:
         :param str relation2: '<application>[:<relation_name>]'
 
         """
+        # attempt to validate any url that are passed in.
+        endpoints = []
+        remote_endpoint = None
+        for ep in [relation1, relation2]:
+            try:
+                url = parse_offer_url(ep)
+            except OfferParseError:
+                pass
+            else:
+                if remote_endpoint is not None:
+                    raise JujuError("move than one remote endpoints not supported")
+                remote_endpoint = url
+                endpoints.append(url.application)
+                continue
+
+            try:
+                parse_offer_endpoint(ep)
+            except OfferParseError:
+                raise
+            else:
+                endpoints.append(ep)
+        if len(endpoints) != 2:
+            raise JujuError("error validating one of the endpoints")
+
         connection = self.connection()
-        app_facade = client.ApplicationFacade.from_connection(connection)
+        facade_cls = client.ApplicationFacade
+        if remote_endpoint is not None:
+            if facade_cls.best_facade_version(connection) < 5:
+                # old clients don't support cross model capability
+                raise JujuError("cannot add relation to {}: remote endpoints not supported".format(remote_endpoint.string()))
+
+            if remote_endpoint.source == "":
+                current = await self.get_controller()
+                remote_endpoint.source = current.controller_name
+            # consume the remote endpoint
+            await self.consume(remote_endpoint.string(), application_alias=remote_endpoint.application)
 
         log.debug(
-            'Adding relation %s <-> %s', relation1, relation2)
+            'Adding relation %s <-> %s', endpoints[0], endpoints[1])
 
         def _find_relation(*specs):
             for rel in self.relations:
@@ -1099,16 +1133,17 @@ class Model:
                     return rel
             return None
 
+        app_facade = facade_cls.from_connection(connection)
         try:
-            result = await app_facade.AddRelation(endpoints=[relation1, relation2], via_cidrs=None)
+            result = await app_facade.AddRelation(endpoints=endpoints, via_cidrs=None)
         except JujuAPIError as e:
             if 'relation already exists' not in e.message:
                 raise
-            rel = _find_relation(relation1, relation2)
+            rel = _find_relation(endpoints[0], endpoints[1])
             if rel:
                 return rel
             raise JujuError('Relation {} {} exists but not in model'.format(
-                relation1, relation2))
+                endpoints[0], endpoints[1]))
 
         specs = ['{}:{}'.format(app, data['name'])
                  for app, data in result.endpoints.items()]
