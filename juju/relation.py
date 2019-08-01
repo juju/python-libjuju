@@ -15,7 +15,12 @@ class Endpoint:
 
     @property
     def application(self):
-        return self.model.applications[self.data['application-name']]
+        app_name = self.data['application-name']
+        if app_name in self.model.applications:
+            return self.model.applications[app_name]
+        if app_name in self.model.remote_applications:
+            return self.model.remote_applications[app_name]
+        raise KeyError(app_name)
 
     @property
     def name(self):
