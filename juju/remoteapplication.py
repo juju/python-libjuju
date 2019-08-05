@@ -18,6 +18,7 @@ from . import model, tag
 
 log = logging.getLogger(__name__)
 
+
 class RemoteApplication(model.ModelEntity):
 
     @property
