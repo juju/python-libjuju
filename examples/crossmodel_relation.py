@@ -24,11 +24,11 @@ async def main():
 
     try:
         print('Creating models')
-        model_1 = await controller.add_model('test-cmr-1')
-        model_2 = await controller.add_model('test-cmr-2')
+        offering_model = await controller.add_model('test-cmr-1')
+        consuming_model = await controller.add_model('test-cmr-2')
 
         print('Deploying mysql')
-        application_1 = await model_1.deploy(
+        application_1 = await offering_model.deploy(
             'cs:mysql-58',
             application_name='mysql',
             series='xenial',
@@ -36,22 +36,22 @@ async def main():
         )
 
         print('Waiting for active')
-        await model_1.block_until(
+        await offering_model.block_until(
             lambda: all(unit.workload_status == 'active'
                         for unit in application_1.units))
 
         print('Adding offer')
-        await model_1.create_offer("mysql:db")
+        await offering_model.create_offer("mysql:db")
 
-        offers = await model_1.list_offers()
-        await model_1.block_until(
+        offers = await offering_model.list_offers()
+        await offering_model.block_until(
             lambda: all(offer.application_name == 'mysql'
                         for offer in offers.results))
 
         print('Show offers', ', '.join("%s: %s" % item for offer in offers.results for item in vars(offer).items()))
 
         print('Deploying wordpress')
-        application_2 = await model_2.deploy(
+        application_2 = await consuming_model.deploy(
             'cs:trusty/wordpress-5',
             application_name='wordpress',
             series='xenial',
@@ -59,23 +59,23 @@ async def main():
         )
 
         print('Waiting for executing')
-        await model_2.block_until(
+        await consuming_model.block_until(
             lambda: all(unit.agent_status == 'executing'
                         for unit in application_2.units))
 
-        await model_2.add_relation('wordpress', 'admin/test-cmr-1.mysql')
+        await consuming_model.add_relation('wordpress', 'admin/test-cmr-1.mysql')
 
         time.sleep(10)
 
         print("Remove SAAS")
-        await model_2.remove_saas("mysql")
+        await consuming_model.remove_saas("mysql")
 
         print('Removing offer')
-        await model_1.remove_offer("admin/test-cmr-1.mysql", force=True)
+        await offering_model.remove_offer("admin/test-cmr-1.mysql", force=True)
 
         print('Destroying models')
-        await controller.destroy_model(model_1.info.uuid)
-        await controller.destroy_model(model_2.info.uuid)
+        await controller.destroy_model(offering_model.info.uuid)
+        await controller.destroy_model(consuming_model.info.uuid)
 
     except Exception:
         log.exception("Example failed!")
