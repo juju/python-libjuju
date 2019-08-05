@@ -645,7 +645,7 @@ class Controller:
         changes = client.ModifyModelAccess(acl, 'revoke', model, user)
         return await model_facade.ModifyModelAccess(changes=[changes])
 
-    async def create_offer(self, model_uuid, endpoint, offer_name=None):
+    async def create_offer(self, model_uuid, endpoint, offer_name=None, application_name=None):
         """
         Offer a deployed application using a series of endpoints for use by
         consumers.
@@ -662,8 +662,11 @@ class Controller:
         if offer_name is None:
             offer_name = offer.application
 
+        if application_name is None:
+            application_name = offer.application
+
         params = client.AddApplicationOffer()
-        params.application_name = offer.application
+        params.application_name = application_name
         params.endpoints = {name: name for name in offer.endpoints}
         params.offer_name = offer_name
         params.model_tag = tag.model(model_uuid)
