@@ -33,8 +33,7 @@ from .errors import JujuAPIError, JujuError
 from .exceptions import DeadEntityException
 from .names import is_valid_application
 from .offerendpoints import ParseError as OfferParseError
-from .offerendpoints import (parse_local_endpoint, parse_offer_endpoint,
-                             parse_offer_url)
+from .offerendpoints import parse_local_endpoint, parse_offer_url
 from .placement import parse as parse_placement
 from .tag import application as application_tag
 

@@ -58,14 +58,10 @@ async def main():
             channel='stable',
         )
 
-        def check():
-            for unit in application_2.units:
-                if unit.agent_status == 'executing':
-                    return True
-            return False
-
         print('Waiting for executing')
-        await model_2.block_until(check)
+        await model_2.block_until(
+            lambda: all(unit.agent_status == 'executing'
+                        for unit in application_2.units))
 
         await model_2.add_relation('wordpress', 'admin/test-cmr-1.mysql')
 
