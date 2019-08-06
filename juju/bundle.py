@@ -5,6 +5,8 @@ from pathlib import Path
 
 import yaml
 
+from toposort import toposort_flatten
+
 from .client import client
 from .constraints import normalize_key
 from .constraints import parse as parse_constraints
@@ -127,9 +129,11 @@ class BundleHandler:
             raise JujuError(self.plan.errors)
 
     async def execute_plan(self):
-        for step in self.plan.changes:
+        client.BundleChange.__repr__ = lambda self: "BundleChange({}, {})".format(self.id_, self.requires)
+        changes = ChangeSet(self.plan.changes)
+        for step in changes.sorted():
             method = getattr(self, step.method)
-            result = await method(*step.args)
+            result = await method(step.id_, *step.args)
             self.references[step.id_] = result
 
     @property
@@ -138,6 +142,13 @@ class BundleHandler:
                                     self.bundle.get('services', {}))
         return list(apps_dict.keys())
 
+    def resolveRelation(self, reference):
+        parts = reference.split(":", maxsplit=1)
+        application = self.resolve(parts[0])
+        if len(parts) == 1:
+            return application
+        return "{}:{}".format(application, parts[1])
+
     def resolve(self, reference):
         if reference and reference.startswith('$'):
             ref = self.references[reference[1:]]
@@ -145,7 +156,7 @@ class BundleHandler:
                 reference = ref
         return reference
 
-    async def addCharm(self, charm, series):
+    async def addCharm(self, change_id, charm, series):
         """
         :param charm string:
             Charm holds the URL of the charm to be added.
@@ -164,7 +175,7 @@ class BundleHandler:
         await self.client_facade.AddCharm(channel=None, url=entity_id, force=False)
         return entity_id
 
-    async def addMachines(self, params=None):
+    async def addMachines(self, change_id, params=None):
         """
         :param params dict:
             Dictionary specifying the machine to add. All keys are optional.
@@ -218,7 +229,7 @@ class BundleHandler:
         log.debug('Added new machine %s', machine)
         return machine
 
-    async def addRelation(self, endpoint1, endpoint2):
+    async def addRelation(self, change_id, endpoint1, endpoint2):
         """
         :param endpoint1 string:
         :param endpoint2 string:
@@ -227,21 +238,13 @@ class BundleHandler:
             placeholder pointing to an application change, and the interface is
             optional. Examples are "$deploy-42:web" or just "$deploy-42".
         """
-        endpoints = [endpoint1, endpoint2]
-        # resolve indirect references
-        for i in range(len(endpoints)):
-            parts = endpoints[i].split(':')
-            if len(parts) == 0:
-                continue
-            parts[0] = self.resolve(parts[0])
-            if parts[0] is None:
-                continue
-            endpoints[i] = ':'.join(parts)
+        ep1 = self.resolveRelation(endpoint1)
+        ep2 = self.resolveRelation(endpoint2)
 
-        log.info('Relating %s <-> %s', *endpoints)
-        return await self.model.add_relation(*endpoints)
+        log.info('Relating %s <-> %s', ep1, ep2)
+        return await self.model.add_relation(ep1, ep2)
 
-    async def deploy(self, charm, series, application, options, constraints,
+    async def deploy(self, change_id, charm, series, application, options, constraints,
                      storage, endpoint_bindings, *args):
         """
         :param charm string:
@@ -316,7 +319,7 @@ class BundleHandler:
         )
         return application
 
-    async def addUnit(self, application, to):
+    async def addUnit(self, change_id, application, to):
         """
         :param application string:
             Application holds the application placeholder name for which a unit
@@ -344,7 +347,7 @@ class BundleHandler:
             to=placement,
         )
 
-    async def scale(self, application, scale):
+    async def scale(self, change_id, application, scale):
         """
         Handle a change of scale to a k8s application.
 
@@ -358,7 +361,7 @@ class BundleHandler:
         application = self.resolve(application)
         return await self.model.applications[application].scale(scale=scale)
 
-    async def expose(self, application):
+    async def expose(self, change_id, application):
         """
         :param application string:
             Application holds the placeholder name of the application that must
@@ -368,7 +371,7 @@ class BundleHandler:
         log.info('Exposing %s', application)
         return await self.model.applications[application].expose()
 
-    async def setAnnotations(self, id_, entity_type, annotations):
+    async def setAnnotations(self, change_id, id_, entity_type, annotations):
         """
         :param id_ string:
             Id is the placeholder for the application or machine change
@@ -388,7 +391,7 @@ class BundleHandler:
             entity = await self.model._wait_for_new(entity_type, entity_id)
         return await entity.set_annotations(annotations)
 
-    async def createOffer(self, endpoints, application_name, offer_name):
+    async def createOffer(self, change_id, endpoints, application_name, offer_name):
         """
         :param application_name string:
             Application is the name of the application to create an offer for.
@@ -402,7 +405,7 @@ class BundleHandler:
         for ep in endpoints:
             await self.model.create_offer(ep, offer_name=offer_name, application_name=application)
 
-    async def consumeOffer(self, url, application_name):
+    async def consumeOffer(self, change_id, url, application_name):
         """
         :param application_name string:
             Application is the name of the application on offer.
@@ -410,9 +413,10 @@ class BundleHandler:
             URL contains the location of the offer
         """
         application = self.resolve(application_name)
-        await self.model.consume(url, application_alias=application)
+        local_name = await self.model.consume(url, application_alias=application)
+        return local_name
 
-    async def grantOfferAccess(self, user, access, offer_name):
+    async def grantOfferAccess(self, change_id, user, access, offer_name):
         """
         :param user string:
             User holds the user name to grant access to.
@@ -437,3 +441,26 @@ def get_charm_series(path):
     data = yaml.load(md.open())
     series = data.get('series')
     return series[0] if series else None
+
+
+class ChangeSet:
+
+    def __init__(self, changes):
+        self.changes = changes
+
+    # sorted does a topological sort of the changes
+    def sorted(self):
+        if len(self.changes) == 0:
+            return []
+
+        changes = {}
+        for change in self.changes:
+            changes[change.id_] = set(change.requires)
+        sorted_changes = toposort_flatten(changes)
+        results = []
+        for change_id in sorted_changes:
+            for change in self.changes:
+                if change_id == change.id_:
+                    results.append(change)
+                    break
+        return results

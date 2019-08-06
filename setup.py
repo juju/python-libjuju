@@ -13,7 +13,8 @@
 #     limitations under the License.
 
 from pathlib import Path
-from setuptools import setup, find_packages
+
+from setuptools import find_packages, setup
 
 here = Path(__file__).absolute().parent
 readme = here / 'docs' / 'readme.rst'
@@ -37,6 +38,7 @@ setup(
         'websockets>=7.0,<8.0',
         'paramiko>=2.4.0,<3.0.0',
         'pyasn1>=0.4.4',
+        'toposort>=1.5,<2'
     ],
     include_package_data=True,
     maintainer='Juju Ecosystem Engineering',

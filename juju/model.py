@@ -2010,7 +2010,15 @@ class Model:
                                    consume_details.external_controller)
 
         facade = client.ApplicationFacade.from_connection(self.connection())
-        return await facade.Consume(args=[arg])
+        results = await facade.Consume(args=[arg])
+        if len(results.results) != 1:
+            raise JujuAPIError("expected 1 result, recieved {}".format(len(results.results)))
+        if results.results[0].error is not None:
+            raise JujuAPIError(results.results[0].error)
+        local_name = offer_url.application
+        if application_alias != "":
+            local_name = application_alias
+        return local_name
 
     async def remove_saas(self, name):
         """
