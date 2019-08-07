@@ -10,6 +10,7 @@ This example:
 6. Destroys the units and applications
 
 """
+import time
 from logging import getLogger
 from pathlib import Path
 
@@ -46,7 +47,28 @@ async def main():
         await offering_model.create_offer("mysql:db")
 
         print('Deploying bundle')
-        await consuming_model.deploy(str('local:' / Path(__file__).absolute().parent / "cmr-bundle"))
+        applications = await consuming_model.deploy(str('local:' / Path(__file__).absolute().parent / "cmr-bundle"))
+
+        print('Waiting for application to start')
+        await consuming_model.block_until(
+            lambda: all(unit.agent_status == 'executing'
+                        for application in applications for unit in application.units))
+
+        print('Exporting bundle')
+        bundle = await consuming_model.export_bundle()
+        print(bundle)
+
+        time.sleep(10)
+
+        print("Remove SAAS")
+        await consuming_model.remove_saas("mysql")
+
+        print('Removing offer')
+        await offering_model.remove_offer("admin/test-cmr-1.mysql", force=True)
+
+        print('Destroying models')
+        await controller.destroy_model(offering_model.info.uuid)
+        await controller.destroy_model(consuming_model.info.uuid)
 
     except Exception:
         log.exception("Example failed!")
