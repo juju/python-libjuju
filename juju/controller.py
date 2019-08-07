@@ -5,6 +5,7 @@ from pathlib import Path
 
 from . import errors, tag, utils
 from .client import client, connector
+from .errors import JujuAPIError
 from .offerendpoints import ParseError as OfferParseError
 from .offerendpoints import parse_offer_endpoint, parse_offer_url
 from .user import User
@@ -169,6 +170,10 @@ class Controller:
     @property
     def controller_name(self):
         return self._connector.controller_name
+
+    @property
+    def controller_uuid(self):
+        return self._connector.controller_uuid
 
     async def disconnect(self):
         """Shut down the watcher task and close websockets.
@@ -675,12 +680,7 @@ class Controller:
         params.model_name = model_name
 
         facade = client.ApplicationOffersFacade.from_connection(self.connection())
-        offer_result = await facade.ListApplicationOffers([params])
-
-        offers = []
-        for offer in offer_result.results:
-            offers.append(_offer_details(offer))
-        return offers
+        return await facade.ListApplicationOffers([params])
 
     async def remove_offer(self, model_uuid, offer, force=False):
         """
@@ -707,82 +707,17 @@ class Controller:
         facade = client.ApplicationOffersFacade.from_connection(self.connection())
         return await facade.DestroyOffers(force, [url.string()])
 
+    async def get_consume_details(self, endpoint):
+        """
+        get_consume_details returns the details necessary to pass to another
+        model to consume the specified offers represented by the urls.
+        """
+        facade = client.ApplicationOffersFacade.from_connection(self.connection())
+        offers = await facade.GetConsumeDetails([endpoint])
+        if len(offers.results) != 1:
+            raise JujuAPIError("expected to find one result")
+        result = offers.results[0]
+        if result.error is not None:
+            raise JujuAPIError(result.error)
 
-class OfferDetails:
-
-    def __init__(self, application_name, application_description, charm_url, offer_name, offer_url, endpoints=None, connections=None, users=None):
-        self.application_name = application_name
-        self.application_description = application_description
-        self.charm_url = charm_url
-        self.offer_url = offer_url
-        self.endpoints = endpoints
-        self.connections = connections
-        self.users = users
-
-
-class OfferEndpoint:
-
-    def __init__(self, name, role, interface):
-        self.name = name
-        self.role = role
-        self.interface = interface
-
-
-class OfferConnection:
-
-    def __init__(self, username, endpoint, relation_id, status, message, since, ingress_subnets):
-        self.username = username
-        self.endpoint = endpoint
-        self.relation_id = relation_id
-        self.status = status
-        self.message = message
-        self.since = since
-        self.ingress_subnets = ingress_subnets
-
-
-class OfferUser:
-
-    def __init__(self, username, display_name, access):
-        self.username = username
-        self.display_name = display_name
-        self.access = access
-
-
-def _offer_details(offer):
-    def get(key):
-        if offer.applicationofferdetails is not None and offer.applicationofferdetails[key] is not None:
-            return offer.applicationofferdetails[key]
-        return offer.unknown_fields[key]
-
-    details = OfferDetails(offer.application_name,
-                           get("application-description"),
-                           offer.charm_url,
-                           get("offer-name"),
-                           get("offer-url"))
-
-    endpoints = []
-    for ep in get("endpoints"):
-        endpoints.append(OfferEndpoint(ep["name"],
-                                       ep["role"],
-                                       ep["interface"]))
-    details.endpoints = endpoints
-
-    connections = []
-    for oc in offer.connections:
-        connections.append(OfferConnection(oc.username,
-                                           oc.endpoint,
-                                           oc.relation_id,
-                                           oc.status.status,
-                                           oc.status.info,
-                                           oc.status.since,
-                                           oc.ingress_subnets))
-    details.connections = connections
-
-    users = []
-    for user in get("users"):
-        users.append(OfferUser(user["user"],
-                               user["display-name"],
-                               user["access"]))
-    details.users = users
-
-    return details
+        return result

@@ -19,6 +19,10 @@ def cloud(cloud_name):
     return _prefix('cloud-', cloud_name)
 
 
+def controller(controller_uuid):
+    return _prefix('controller-', controller_uuid)
+
+
 def credential(cloud, user, credential_name):
     credential_string = '{}_{}_{}'.format(cloud, user, credential_name)
     return _prefix('cloudcred-', credential_string)

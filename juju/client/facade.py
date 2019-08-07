@@ -18,7 +18,7 @@ _marker = object()
 
 JUJU_VERSION = re.compile(r'[0-9]+\.[0-9-]+[\.\-][0-9a-z]+(\.[0-9]+)?')
 # Workaround for https://bugs.launchpad.net/juju/+bug/1683906
-NAUGHTY_CLASSES = ['ClientFacade', 'Client', 'FullStatus', 'ModelStatusInfo',
+NAUGHTY_CLASSES = ['ClientFacade', 'Client', 'ModelStatusInfo',
                    'ApplicationDeploy']
 
 
@@ -88,6 +88,20 @@ class TypeFactory:
         c.connect(connection)
 
         return c
+
+    @classmethod
+    def best_facade_version(cls, connection):
+        """
+        Returns the best facade version for a given facade. This will help with
+        trying to provide different functionality for different facade versions.
+
+        @param connection: initialized Connection object.
+        """
+        facade_name = cls.__name__
+        if not facade_name.endswith('Facade'):
+           raise TypeError('Unexpected class name: {}'.format(facade_name))
+        facade_name = facade_name[:-len('Facade')]
+        return connection.facades.get(facade_name)
 
 
 '''
@@ -310,7 +324,7 @@ class {}(Type):
             textwrap.indent(args.get_doc(), INDENT * 2))]
 
         if not args:
-            source.append("{}pass".format(INDENT * 2))
+            source.append("{}self.unknown_fields = unknown_fields".format(INDENT * 2))
         else:
             for arg in args:
                 arg_name = name_to_py(arg[0])

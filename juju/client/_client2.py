@@ -1636,11 +1636,29 @@ class ApplicationOffersFacade(Type):
                                               'type': 'object'},
                      'ApplicationOfferAdminDetails': {'additionalProperties': False,
                                                       'properties': {'ApplicationOfferDetails': {'$ref': '#/definitions/ApplicationOfferDetails'},
+                                                                     'application-description': {'type': 'string'},
                                                                      'application-name': {'type': 'string'},
+                                                                     'bindings': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                                  'type': 'object'},
                                                                      'charm-url': {'type': 'string'},
                                                                      'connections': {'items': {'$ref': '#/definitions/OfferConnection'},
-                                                                                     'type': 'array'}},
-                                                      'required': ['ApplicationOfferDetails',
+                                                                                     'type': 'array'},
+                                                                     'endpoints': {'items': {'$ref': '#/definitions/RemoteEndpoint'},
+                                                                                   'type': 'array'},
+                                                                     'offer-name': {'type': 'string'},
+                                                                     'offer-url': {'type': 'string'},
+                                                                     'offer-uuid': {'type': 'string'},
+                                                                     'source-model-tag': {'type': 'string'},
+                                                                     'spaces': {'items': {'$ref': '#/definitions/RemoteSpace'},
+                                                                                'type': 'array'},
+                                                                     'users': {'items': {'$ref': '#/definitions/OfferUserDetails'},
+                                                                               'type': 'array'}},
+                                                      'required': ['source-model-tag',
+                                                                   'offer-uuid',
+                                                                   'offer-url',
+                                                                   'offer-name',
+                                                                   'application-description',
+                                                                   'ApplicationOfferDetails',
                                                                    'application-name',
                                                                    'charm-url'],
                                                       'type': 'object'},
@@ -1679,7 +1697,10 @@ class ApplicationOffersFacade(Type):
                                              'type': 'object'},
                      'ConsumeOfferDetailsResult': {'additionalProperties': False,
                                                    'properties': {'ConsumeOfferDetails': {'$ref': '#/definitions/ConsumeOfferDetails'},
-                                                                  'error': {'$ref': '#/definitions/Error'}},
+                                                                  'error': {'$ref': '#/definitions/Error'},
+                                                                  'external-controller': {'$ref': '#/definitions/ExternalControllerInfo'},
+                                                                  'macaroon': {'$ref': '#/definitions/Macaroon'},
+                                                                  'offer': {'$ref': '#/definitions/ApplicationOfferDetails'}},
                                                    'required': ['ConsumeOfferDetails'],
                                                    'type': 'object'},
                      'ConsumeOfferDetailsResults': {'additionalProperties': False,
@@ -2962,10 +2983,29 @@ class ClientFacade(Type):
                                            'type': 'object'},
                      'Binary': {'additionalProperties': False,
                                 'properties': {'Arch': {'type': 'string'},
+                                               'Build': {'type': 'integer'},
+                                               'Major': {'type': 'integer'},
+                                               'Minor': {'type': 'integer'},
                                                'Number': {'$ref': '#/definitions/Number'},
-                                               'Series': {'type': 'string'}},
-                                'required': ['Number', 'Series', 'Arch'],
+                                               'Patch': {'type': 'integer'},
+                                               'Series': {'type': 'string'},
+                                               'Tag': {'type': 'string'}},
+                                'required': ['Major',
+                                             'Minor',
+                                             'Tag',
+                                             'Patch',
+                                             'Build',
+                                             'Number',
+                                             'Series',
+                                             'Arch'],
                                 'type': 'object'},
+                     'BranchStatus': {'additionalProperties': False,
+                                      'properties': {'assigned-units': {'patternProperties': {'.*': {'items': {'type': 'string'},
+                                                                                                     'type': 'array'}},
+                                                                        'type': 'object'},
+                                                     'created': {'type': 'integer'}},
+                                      'required': ['assigned-units', 'created'],
+                                      'type': 'object'},
                      'BundleChange': {'additionalProperties': False,
                                       'properties': {'args': {'items': {'additionalProperties': True,
                                                                         'type': 'object'},
@@ -3101,6 +3141,8 @@ class ClientFacade(Type):
                      'FullStatus': {'additionalProperties': False,
                                     'properties': {'applications': {'patternProperties': {'.*': {'$ref': '#/definitions/ApplicationStatus'}},
                                                                     'type': 'object'},
+                                                   'branches': {'patternProperties': {'.*': {'$ref': '#/definitions/BranchStatus'}},
+                                                                'type': 'object'},
                                                    'controller-timestamp': {'format': 'date-time',
                                                                             'type': 'string'},
                                                    'machines': {'patternProperties': {'.*': {'$ref': '#/definitions/MachineStatus'}},
@@ -3118,7 +3160,8 @@ class ClientFacade(Type):
                                                  'remote-applications',
                                                  'offers',
                                                  'relations',
-                                                 'controller-timestamp'],
+                                                 'controller-timestamp',
+                                                 'branches'],
                                     'type': 'object'},
                      'GetConstraintsResults': {'additionalProperties': False,
                                                'properties': {'constraints': {'$ref': '#/definitions/Value'}},
@@ -3143,8 +3186,17 @@ class ClientFacade(Type):
                                  'type': 'object'},
                      'HostPort': {'additionalProperties': False,
                                   'properties': {'Address': {'$ref': '#/definitions/Address'},
-                                                 'port': {'type': 'integer'}},
-                                  'required': ['Address', 'port'],
+                                                 'port': {'type': 'integer'},
+                                                 'scope': {'type': 'string'},
+                                                 'space-id': {'type': 'string'},
+                                                 'space-name': {'type': 'string'},
+                                                 'type': {'type': 'string'},
+                                                 'value': {'type': 'string'}},
+                                  'required': ['value',
+                                               'type',
+                                               'scope',
+                                               'Address',
+                                               'port'],
                                   'type': 'object'},
                      'LXDProfile': {'additionalProperties': False,
                                     'properties': {'config': {'patternProperties': {'.*': {'type': 'string'}},
@@ -3272,8 +3324,13 @@ class ClientFacade(Type):
                      'ModelSLA': {'additionalProperties': False,
                                   'properties': {'ModelSLAInfo': {'$ref': '#/definitions/ModelSLAInfo'},
                                                  'creds': {'items': {'type': 'integer'},
-                                                           'type': 'array'}},
-                                  'required': ['ModelSLAInfo', 'creds'],
+                                                           'type': 'array'},
+                                                 'level': {'type': 'string'},
+                                                 'owner': {'type': 'string'}},
+                                  'required': ['level',
+                                               'owner',
+                                               'ModelSLAInfo',
+                                               'creds'],
                                   'type': 'object'},
                      'ModelSLAInfo': {'additionalProperties': False,
                                       'properties': {'level': {'type': 'string'},
@@ -4173,10 +4230,12 @@ class ClientFacade(Type):
 
 
     @ReturnMapping(None)
-    async def SetSLALevel(self, modelslainfo=None, creds=None):
+    async def SetSLALevel(self, modelslainfo=None, creds=None, level="", owner=""):
         '''
         modelslainfo : ModelSLAInfo
         creds : typing.Sequence<+T_co>[int]
+        level : str
+        owner : str
         Returns -> None
         '''
         # map input types to rpc msg
@@ -4187,6 +4246,8 @@ class ClientFacade(Type):
                    params=_params)
         _params['ModelSLAInfo'] = modelslainfo
         _params['creds'] = creds
+        _params['level'] = level
+        _params['owner'] = owner
         reply = await self.rpc(msg)
         return reply
 
@@ -5968,8 +6029,13 @@ class ModelConfigFacade(Type):
                      'ModelSLA': {'additionalProperties': False,
                                   'properties': {'ModelSLAInfo': {'$ref': '#/definitions/ModelSLAInfo'},
                                                  'creds': {'items': {'type': 'integer'},
-                                                           'type': 'array'}},
-                                  'required': ['ModelSLAInfo', 'creds'],
+                                                           'type': 'array'},
+                                                 'level': {'type': 'string'},
+                                                 'owner': {'type': 'string'}},
+                                  'required': ['level',
+                                               'owner',
+                                               'ModelSLAInfo',
+                                               'creds'],
                                   'type': 'object'},
                      'ModelSLAInfo': {'additionalProperties': False,
                                       'properties': {'level': {'type': 'string'},
@@ -6103,10 +6169,12 @@ class ModelConfigFacade(Type):
 
 
     @ReturnMapping(None)
-    async def SetSLALevel(self, modelslainfo=None, creds=None):
+    async def SetSLALevel(self, modelslainfo=None, creds=None, level="", owner=""):
         '''
         modelslainfo : ModelSLAInfo
         creds : typing.Sequence<+T_co>[int]
+        level : str
+        owner : str
         Returns -> None
         '''
         # map input types to rpc msg
@@ -6117,6 +6185,8 @@ class ModelConfigFacade(Type):
                    params=_params)
         _params['ModelSLAInfo'] = modelslainfo
         _params['creds'] = creds
+        _params['level'] = level
+        _params['owner'] = owner
         reply = await self.rpc(msg)
         return reply
 

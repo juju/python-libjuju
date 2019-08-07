@@ -28,6 +28,10 @@ def match_application(val, match_type=None):
         return re.match(APPLICATION, val)
 
 
+def is_valid_application(val):
+    return match_application(val) is not None
+
+
 ENDPOINT = re.compile('/?((?P<model>[^\\.]*)\\.)?(?P<appname>[^:]*)(:(?P<endpoints>.*))?')
 
 

@@ -24,12 +24,18 @@ from . import provisioner, tag, utils
 from .annotationhelper import _get_annotations, _set_annotations
 from .client import client, connector
 from .client.client import ConfigValue, Value
+from .client.overrides import Caveat, Macaroon
 from .constraints import normalize_key
 from .constraints import parse as parse_constraints
+from .controller import Controller
 from .delta import get_entity_class, get_entity_delta
 from .errors import JujuAPIError, JujuError
 from .exceptions import DeadEntityException
+from .names import is_valid_application
+from .offerendpoints import ParseError as OfferParseError
+from .offerendpoints import parse_offer_url
 from .placement import parse as parse_placement
+from .tag import application as application_tag
 
 log = logging.getLogger(__name__)
 
@@ -1911,6 +1917,111 @@ class Model:
         """
         controller = await self.get_controller()
         return await controller.remove_offer(self.info.uuid, endpoint, force)
+
+    async def consume(self, endpoint, application_alias=""):
+        """
+        Adds a remote offer to the model. Relations can be created later using
+        "juju relate".
+        """
+        try:
+            offer = parse_offer_url(endpoint)
+        except OfferParseError as e:
+            log.error(e.message)
+            raise
+        if offer.has_endpoint():
+            raise JujuError("remote offer {} should not include an endpoint".format(endpoint))
+        if offer.user == "":
+            offer.user = self.info.username
+            endpoint = offer.string()
+
+        source = await self._get_source_api(offer)
+        consume_details = await source.get_consume_details(offer.as_local().string())
+        if consume_details is None or consume_details.offer is None:
+            raise JujuAPIError("missing consuming offer url for {}".format(offer.string()))
+
+        offer_url = parse_offer_url(consume_details.offer.offer_url)
+        offer_url.source = offer.source
+
+        consume_details.offer.offer_url = offer_url.string()
+        consume_details.offer.application_alias = application_alias
+
+        arg = _create_consume_args(consume_details.offer,
+                                   consume_details.macaroon,
+                                   consume_details.external_controller)
+
+        facade = client.ApplicationFacade.from_connection(self.connection())
+        return await facade.Consume(args=[arg])
+
+    async def remove_saas(self, name):
+        """
+        Removing a consumed (SAAS) application will terminate any relations that
+        application has, potentially leaving any related local applications
+        in a non-functional state.
+        """
+        if not is_valid_application(name):
+            raise JujuError("invalid SAAS application name {}".format(name))
+
+        arg = client.DestroyConsumedApplicationParams()
+        arg.application_tag = application_tag(name)
+
+        facade = client.ApplicationFacade.from_connection(self.connection())
+        return await facade.DestroyConsumedApplications(applications=[arg])
+
+    async def _get_source_api(self, url):
+        controller = Controller()
+        if url.source == "":
+            current = await self.get_controller()
+            url.source = current.controller_name
+        await controller.connect(controller_name=url.source)
+        return controller
+
+
+def _create_consume_args(offer, macaroon, controller_info):
+    """
+    Convert a typed object that has been normalised to a overrided typed
+    definition.
+
+    @param offer: takes an offer and serialises it into a valid type
+    @param macaroon: takes a macaroon and serialises it into a valid type
+    @param controller_info: takes a controller information and serialises it into
+    a valid type.
+    """
+    endpoints = []
+    for ep in offer.endpoints:
+        endpoints.append(client.RemoteEndpoint(interface=ep.interface,
+                                               limit=ep.limit,
+                                               name=ep.name,
+                                               role=ep.role))
+    users = []
+    for u in offer.users:
+        users.append(client.OfferUserDetails(access=u.access,
+                                             display_name=u.display_name,
+                                             user=u.user))
+    external_controller = client.ExternalControllerInfo(addrs=controller_info.addrs,
+                                                        ca_cert=controller_info.ca_cert,
+                                                        controller_alias=controller_info.controller_alias,
+                                                        controller_tag=controller_info.controller_tag)
+    caveats = []
+    for c in macaroon.unknown_fields["caveats"]:
+        caveats.append(Caveat(cid=c["cid"]))
+    macaroon = Macaroon(signature=macaroon.unknown_fields["signature"],
+                        caveats=caveats,
+                        location=macaroon.unknown_fields["location"],
+                        identifier=macaroon.unknown_fields["identifier"])
+
+    arg = client.ConsumeApplicationArg()
+    arg.application_description = offer.application_description
+    arg.endpoints = endpoints
+    arg.offer_name = offer.offer_name
+    arg.offer_url = offer.offer_url
+    arg.offer_uuid = offer.offer_uuid
+    arg.source_model_tag = offer.source_model_tag
+    arg.users = users
+    arg.application_alias = offer.application_alias
+    arg.external_controller = external_controller
+    arg.macaroon = macaroon
+
+    return arg
 
 
 def get_charm_series(path):
