@@ -8,7 +8,6 @@ This example:
 3. Destroys the unit and application
 
 """
-import time
 from logging import getLogger
 
 from juju import loop
@@ -44,18 +43,10 @@ async def main():
         await offering_model.create_offer("mysql:db")
 
         offers = await offering_model.list_offers()
-        await offering_model.block_until(
-            lambda: all(offer.application_name == 'mysql'
-                        for offer in offers.results))
-
         print('Show offers', ', '.join("%s: %s" % item for offer in offers.results for item in vars(offer).items()))
 
         print('Consuming offer')
         await consuming_model.consume("admin/test-cmr-1.mysql")
-
-        status = await consuming_model.get_status()
-
-        time.sleep(10)
 
         print("Remove SAAS")
         await consuming_model.remove_saas("mysql")
