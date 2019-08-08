@@ -15,6 +15,7 @@ from logging import getLogger
 from pathlib import Path
 
 from juju import loop
+from juju.client.connection import facade_versions
 from juju.controller import Controller
 
 log = getLogger(__name__)
@@ -23,7 +24,7 @@ log = getLogger(__name__)
 async def main():
     controller = Controller()
     print("Connecting to controller")
-    await controller.connect()
+    await controller.connect(specified_facades=facade_versions("Bundle", [1, 2, 3]))
 
     try:
         print('Creating models')

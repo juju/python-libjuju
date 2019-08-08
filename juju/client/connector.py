@@ -76,7 +76,7 @@ class Connector:
             await self._connection.close()
             self._connection = None
 
-    async def connect_controller(self, controller_name=None):
+    async def connect_controller(self, controller_name=None, specified_facades=None):
         """Connect to a controller by name. If the name is empty, it
         connect to the current controller.
         """
@@ -98,6 +98,7 @@ class Connector:
             password=accounts.get('password'),
             cacert=controller.get('ca-cert'),
             bakery_client=self.bakery_client_for_controller(controller_name),
+            specified_facades=specified_facades,
         )
         self.controller_name = controller_name
         self.controller_uuid = controller["uuid"]

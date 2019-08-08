@@ -516,6 +516,8 @@ class Model:
         :param asyncio.BaseEventLoop loop: The event loop to use for async
             operations.
         :param int max_frame_size: The maximum websocket frame size to allow.
+        :param specified_facades: Overwrite the facades with a series of
+            specified facades.
         """
         await self.disconnect()
         if 'endpoint' not in kwargs and len(args) < 2:

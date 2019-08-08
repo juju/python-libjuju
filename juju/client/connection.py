@@ -28,7 +28,7 @@ client_facades = {
     'ApplicationScaler': {'versions': [1]},
     'Backups': {'versions': [1, 2]},
     'Block': {'versions': [2]},
-    'Bundle': {'versions': [1, 2]},
+    'Bundle': {'versions': [1, 2, 3]},
     'CharmRevisionUpdater': {'versions': [2]},
     'Charms': {'versions': [2]},
     'Cleaner': {'versions': [2]},
@@ -39,9 +39,11 @@ client_facades = {
     'CAASAgent': {'versions': [1]},
     'CAASOperatorProvisioner': {'versions': [1]},
     'CAASUnitProvisioner': {'versions': [1]},
+    'CAASOperatorUpgrader': {'versions': [1]},
     'Controller': {'versions': [3, 4, 5]},
     'CrossModelRelations': {'versions': [1]},
     'CrossController': {'versions': [1]},
+    'CredentialManager': {'versions': [1]},
     'CredentialValidator': {'versions': [1]},
     'ExternalControllerUpdater': {'versions': [1]},
     'Deployer': {'versions': [1]},
@@ -53,6 +55,7 @@ client_facades = {
     'HostKeyReporter': {'versions': [1]},
     'ImageManager': {'versions': [2]},
     'ImageMetadata': {'versions': [3]},
+    'InstanceMutater': {'versions': [2]},
     'InstancePoller': {'versions': [3]},
     'KeyManager': {'versions': [1]},
     'KeyUpdater': {'versions': [1]},
@@ -73,15 +76,18 @@ client_facades = {
     'MigrationMinion': {'versions': [1]},
     'MigrationTarget': {'versions': [1]},
     'ModelConfig': {'versions': [1, 2]},
+    'ModelGeneration': {'versions': [1, 2]},
     'ModelManager': {'versions': [2, 3, 4]},
     'ModelUpgrader': {'versions': [1]},
     'Payloads': {'versions': [1]},
+    'PayloadsHookContext': {'versions': [1]},
     'Pinger': {'versions': [1]},
     'Provisioner': {'versions': [3, 4, 5, 6]},
     'ProxyUpdater': {'versions': [1, 2]},
     'Reboot': {'versions': [2]},
     'RemoteRelations': {'versions': [1]},
     'Resources': {'versions': [1]},
+    'ResourcesHookContext': {'versions': [1]},
     'Resumer': {'versions': [2]},
     'RetryStrategy': {'versions': [1]},
     'Singular': {'versions': [2]},
@@ -95,6 +101,8 @@ client_facades = {
     'UnitAssigner': {'versions': [1]},
     'Uniter': {'versions': [4, 5, 6, 7, 8]},
     'Upgrader': {'versions': [1]},
+    'UpgradeSeries': {'versions': [1]},
+    'UpgradeSteps': {'versions': [1]},
     'UserManager': {'versions': [1, 2]},
     'AllWatcher': {'versions': [1]},
     'AllModelWatcher': {'versions': [2]},
@@ -104,10 +112,25 @@ client_facades = {
     'RelationStatusWatcher': {'versions': [1]},
     'RelationUnitsWatcher': {'versions': [1]},
     'VolumeAttachmentsWatcher': {'versions': [2]},
+    'VolumeAttachmentPlansWatcher': {'versions': [1]},
     'FilesystemAttachmentsWatcher': {'versions': [2]},
     'EntityWatcher': {'versions': [2]},
     'MigrationStatusWatcher': {'versions': [1]}
 }
+
+
+def facade_versions(name, versions):
+    """
+    facade_versions returns a new object that correctly returns a object in
+    format expected by the connection facades inspection.
+    :param name: name of the facade
+    :param versions: versions to support by the facade
+    """
+    if name.endswith('Facade'):
+        name = name[:-len('Facade')]
+    return {
+        name: {'versions': versions},
+    }
 
 
 class Monitor:
@@ -198,6 +221,7 @@ class Connection:
             max_frame_size=None,
             retries=3,
             retry_backoff=10,
+            specified_facades=None,
     ):
         """Connect to the websocket.
 
@@ -224,6 +248,8 @@ class Connection:
         :param int retry_backoff: Number of seconds to increase the wait
             between connection retry attempts (a backoff of 10 with 3 retries
             would wait 10s, 20s, and 30s).
+        :param specified_facades: Define a series of facade versions you wish to override
+            to prevent using the conservative client pinning with in the client.
         """
         self = cls()
         if endpoint is None:
@@ -262,6 +288,8 @@ class Connection:
         self._retry_backoff = retry_backoff
 
         self.facades = {}
+        self.specified_facades = specified_facades or {}
+
         self.messages = IdQueue(loop=self.loop)
         self.monitor = Monitor(connection=self)
         if max_frame_size is None:
@@ -650,18 +678,28 @@ class Connection:
             # client. The client knows about the best facade versions it speaks,
             # so in order to be compatible forwards and backwards we speak a
             # common facade versions.
-            if name in client_facades:
-                try:
-                    known = client_facades[name]['versions']
-                    discovered = facade['versions']
-                    version = max(set(known).intersection(set(discovered)))
-                except ValueError:
-                    # this can occur if known is [1, 2] and discovered is [3, 4]
-                    # there is just no way to know how to communicate with the
-                    # facades we're trying to call.
-                    log.warning("unknown common facade version for {}".format(name))
+            if (name not in client_facades) and (name not in self.specified_facades):
+                # if a facade is required but the client doesn't know about
+                # it, then log a warning.
+                log.warning('unknown facade {}'.format(name))
+
+            try:
+                known = []
+                # allow the ability to specify a set of facade versions, so the
+                # client can define the non-conservitive facade client pinning.
+                if name in self.specified_facades:
+                    known = self.specified_facades[name]['versions']
                 else:
-                    self.facades[name] = version
+                    known = client_facades[name]['versions']
+                discovered = facade['versions']
+                version = max(set(known).intersection(set(discovered)))
+            except ValueError:
+                # this can occur if known is [1, 2] and discovered is [3, 4]
+                # there is just no way to know how to communicate with the
+                # facades we're trying to call.
+                log.warning("unknown common facade version for {}".format(name))
+            else:
+                self.facades[name] = version
 
     async def login(self):
         params = {}
