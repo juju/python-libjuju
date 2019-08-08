@@ -1,3 +1,14 @@
+import asyncio
+import logging
+import os
+from pathlib import Path
+
+import yaml
+
+from .client import client
+from .constraints import normalize_key
+from .constraints import parse as parse_constraints
+from .errors import JujuError
 
 log = logging.getLogger(__name__)
 
@@ -129,7 +140,9 @@ class BundleHandler:
 
     def resolve(self, reference):
         if reference and reference.startswith('$'):
-            reference = self.references[reference[1:]]
+            ref = self.references[reference[1:]]
+            if ref is not None:
+                reference = ref
         return reference
 
     async def addCharm(self, charm, series):
@@ -218,7 +231,11 @@ class BundleHandler:
         # resolve indirect references
         for i in range(len(endpoints)):
             parts = endpoints[i].split(':')
+            if len(parts) == 0:
+                continue
             parts[0] = self.resolve(parts[0])
+            if parts[0] is None:
+                continue
             endpoints[i] = ':'.join(parts)
 
         log.info('Relating %s <-> %s', *endpoints)
@@ -405,3 +422,18 @@ class BundleHandler:
             The offer name to be granted access to.
         """
         raise NotImplementedError()
+
+
+def get_charm_series(path):
+    """Inspects the charm directory at ``path`` and returns a default
+    series from its metadata.yaml (the first item in the 'series' list).
+
+    Returns None if no series can be determined.
+
+    """
+    md = Path(path) / "metadata.yaml"
+    if not md.exists():
+        return None
+    data = yaml.load(md.open())
+    series = data.get('series')
+    return series[0] if series else None

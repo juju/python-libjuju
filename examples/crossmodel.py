@@ -8,6 +8,7 @@ This example:
 3. Destroys the unit and application
 
 """
+import tempfile
 from logging import getLogger
 
 from juju import loop
@@ -47,6 +48,10 @@ async def main():
 
         print('Consuming offer')
         await consuming_model.consume("admin/test-cmr-1.mysql")
+
+        print('Exporting bundle')
+        with tempfile.TemporaryDirectory() as dirpath:
+            await offering_model.export_bundle("{}/bundle.yaml".format(dirpath))
 
         print("Remove SAAS")
         await consuming_model.remove_saas("mysql")

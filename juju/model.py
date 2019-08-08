@@ -22,11 +22,10 @@ import websockets
 
 from . import provisioner, tag, utils
 from .annotationhelper import _get_annotations, _set_annotations
-from .bundle import BundleHandler
+from .bundle import BundleHandler, get_charm_series
 from .client import client, connector
 from .client.client import ConfigValue, Value
 from .client.overrides import Caveat, Macaroon
-from .constraints import normalize_key
 from .constraints import parse as parse_constraints
 from .controller import Controller
 from .delta import get_entity_class, get_entity_delta
@@ -1345,6 +1344,7 @@ class Model:
         if trust and (self.info.agent_version < client.Number.from_json('2.4.0')):
             raise NotImplementedError("trusted is not supported on model version {}".format(self.info.agent_version))
 
+        print(entity_url)
         entity_path = Path(entity_url.replace('local:', ''))
         bundle_path = entity_path / 'bundle.yaml'
         metadata_path = entity_path / 'metadata.yaml'
@@ -2027,6 +2027,24 @@ class Model:
         facade = client.ApplicationFacade.from_connection(self.connection())
         return await facade.DestroyConsumedApplications(applications=[arg])
 
+    async def export_bundle(self, filename=None):
+        """
+        Exports the current model configuration as a reusable bundle.
+        """
+        facade = client.BundleFacade.from_connection(self.connection())
+        result = await facade.ExportBundle()
+        if result.error is not None:
+            raise JujuAPIError(result.error)
+
+        if filename is None:
+            return result.result
+
+        try:
+            with open(filename, "w") as file:
+                file.write(result.result)
+        except IOError:
+            raise
+
     async def _get_source_api(self, url, controller_name=None):
         controller = Controller()
         if url.has_empty_source():
@@ -2083,21 +2101,6 @@ def _create_consume_args(offer, macaroon, controller_info):
     arg.macaroon = macaroon
 
     return arg
-
-
-def get_charm_series(path):
-    """Inspects the charm directory at ``path`` and returns a default
-    series from its metadata.yaml (the first item in the 'series' list).
-
-    Returns None if no series can be determined.
-
-    """
-    md = Path(path) / "metadata.yaml"
-    if not md.exists():
-        return None
-    data = yaml.load(md.open())
-    series = data.get('series')
-    return series[0] if series else None
 
 
 class CharmStore:
