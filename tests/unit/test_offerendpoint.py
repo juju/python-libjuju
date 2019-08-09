@@ -4,9 +4,10 @@
 
 import unittest
 
-from juju.offerendpoints import (OfferEndpoints, OfferURL, ParseError,
-                                 maybe_parse_offer_url_source,
-                                 parse_offer_endpoint, parse_offer_url)
+from juju.offerendpoints import (LocalEndpoint, OfferEndpoints, OfferURL,
+                                 ParseError, maybe_parse_offer_url_source,
+                                 parse_local_endpoint, parse_offer_endpoint,
+                                 parse_offer_url)
 
 
 class TestOfferEndpoint(unittest.TestCase):
@@ -61,3 +62,28 @@ class TestOfferURL(unittest.TestCase):
                  }
         for name, case in cases.items():
             self.assertEqual(maybe_parse_offer_url_source(name), case)
+
+
+class TestLocalEndpoint(unittest.TestCase):
+
+    def test_parse_local_endpoint(self):
+        cases = {"applicationname": LocalEndpoint(application="applicationname"),
+                 "applicationname:relation": LocalEndpoint(application="applicationname", relation="relation"),
+                 }
+        for name, case in cases.items():
+            self.assertEqual(parse_local_endpoint(name), case)
+
+    def test_parse_local_endpoint_failures(self):
+        cases = {":applicationname": "endpoint :applicationname not valid",
+                 "applicationname:": "endpoint applicationname: not valid",
+                 "applicationname:user:relation": "endpoint applicationname:user:relation not valid",
+                 "applicationname:_relation": "endpoint applicationname:_relation not valid",
+                 "applicationname:0relation": "endpoint applicationname:0relation not valid",
+                 }
+        for name, case in cases.items():
+            try:
+                parse_local_endpoint(name)
+            except ParseError as e:
+                self.assertEqual(e.message, case)
+            except Exception:
+                raise

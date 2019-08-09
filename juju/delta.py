@@ -69,6 +69,16 @@ class RelationDelta(EntityDelta):
         return Relation
 
 
+class RemoteApplicationDelta(EntityDelta):
+    def get_id(self):
+        return self.data['name']
+
+    @classmethod
+    def get_entity_class(self):
+        from .remoteapplication import RemoteApplication
+        return RemoteApplication
+
+
 _delta_types = {
     'action': ActionDelta,
     'application': ApplicationDelta,
@@ -76,4 +86,5 @@ _delta_types = {
     'machine': MachineDelta,
     'unit': UnitDelta,
     'relation': RelationDelta,
+    'remoteApplication': RemoteApplicationDelta,
 }

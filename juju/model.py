@@ -33,7 +33,7 @@ from .errors import JujuAPIError, JujuError
 from .exceptions import DeadEntityException
 from .names import is_valid_application
 from .offerendpoints import ParseError as OfferParseError
-from .offerendpoints import parse_offer_url
+from .offerendpoints import parse_local_endpoint, parse_offer_url
 from .placement import parse as parse_placement
 from .tag import application as application_tag
 
@@ -134,6 +134,14 @@ class ModelState:
 
         """
         return self._live_entity_map('application')
+
+    @property
+    def remote_applications(self):
+        """Return a map of application-name:Application for all remote
+        applications currently in the model.
+
+        """
+        return self._live_entity_map('remoteApplication')
 
     @property
     def machines(self):
@@ -286,7 +294,12 @@ class ModelEntity:
         'application' or 'unit', etc.
 
         """
-        return self.__class__.__name__.lower()
+        def first_lower(s):
+            if len(s) == 0:
+                return s
+            else:
+                return s[0].lower() + s[1:]
+        return first_lower(self.__class__.__name__)
 
     @property
     def current(self):
@@ -710,6 +723,14 @@ class Model:
         return self.state.applications
 
     @property
+    def remote_applications(self):
+        """Return a map of application-name:Application for all remote
+        applications currently in the model.
+
+        """
+        return self.state.remote_applications
+
+    @property
     def machines(self):
         """Return a map of machine-id:Machine for all machines currently in
         the model.
@@ -1087,11 +1108,46 @@ class Model:
         :param str relation2: '<application>[:<relation_name>]'
 
         """
-        connection = self.connection()
-        app_facade = client.ApplicationFacade.from_connection(connection)
+        # attempt to validate any url that are passed in.
+        endpoints = []
+        remote_endpoint = None
+        for ep in [relation1, relation2]:
+            try:
+                url = parse_offer_url(ep)
+            except OfferParseError:
+                pass
+            else:
+                if remote_endpoint is not None:
+                    raise JujuError("move than one remote endpoints not supported")
+                remote_endpoint = url
+                endpoints.append(url.application)
+                continue
+
+            try:
+                parse_local_endpoint(ep)
+            except OfferParseError:
+                raise
+            else:
+                endpoints.append(ep)
+        if len(endpoints) != 2:
+            raise JujuError("error validating one of the endpoints")
+
+        facade_cls = client.ApplicationFacade
+        if remote_endpoint is not None:
+            if facade_cls.best_facade_version(self.connection()) < 5:
+                # old clients don't support cross model capability
+                raise JujuError("cannot add relation to {}: remote endpoints not supported".format(remote_endpoint.string()))
+
+            if remote_endpoint.has_empty_source():
+                current = await self.get_controller()
+                remote_endpoint.source = current.controller_name
+            # consume the remote endpoint
+            await self.consume(remote_endpoint.string(),
+                               application_alias=remote_endpoint.application,
+                               controller_name=remote_endpoint.source)
 
         log.debug(
-            'Adding relation %s <-> %s', relation1, relation2)
+            'Adding relation %s <-> %s', endpoints[0], endpoints[1])
 
         def _find_relation(*specs):
             for rel in self.relations:
@@ -1099,16 +1155,17 @@ class Model:
                     return rel
             return None
 
+        app_facade = facade_cls.from_connection(self.connection())
         try:
-            result = await app_facade.AddRelation(endpoints=[relation1, relation2], via_cidrs=None)
+            result = await app_facade.AddRelation(endpoints=endpoints, via_cidrs=None)
         except JujuAPIError as e:
             if 'relation already exists' not in e.message:
                 raise
-            rel = _find_relation(relation1, relation2)
+            rel = _find_relation(endpoints[0], endpoints[1])
             if rel:
                 return rel
             raise JujuError('Relation {} {} exists but not in model'.format(
-                relation1, relation2))
+                endpoints[0], endpoints[1]))
 
         specs = ['{}:{}'.format(app, data['name'])
                  for app, data in result.endpoints.items()]
@@ -1918,7 +1975,7 @@ class Model:
         controller = await self.get_controller()
         return await controller.remove_offer(self.info.uuid, endpoint, force)
 
-    async def consume(self, endpoint, application_alias=""):
+    async def consume(self, endpoint, application_alias="", controller_name=None):
         """
         Adds a remote offer to the model. Relations can be created later using
         "juju relate".
@@ -1934,7 +1991,7 @@ class Model:
             offer.user = self.info.username
             endpoint = offer.string()
 
-        source = await self._get_source_api(offer)
+        source = await self._get_source_api(offer, controller_name=controller_name)
         consume_details = await source.get_consume_details(offer.as_local().string())
         if consume_details is None or consume_details.offer is None:
             raise JujuAPIError("missing consuming offer url for {}".format(offer.string()))
@@ -1967,12 +2024,13 @@ class Model:
         facade = client.ApplicationFacade.from_connection(self.connection())
         return await facade.DestroyConsumedApplications(applications=[arg])
 
-    async def _get_source_api(self, url):
+    async def _get_source_api(self, url, controller_name=None):
         controller = Controller()
-        if url.source == "":
+        if url.has_empty_source():
             current = await self.get_controller()
-            url.source = current.controller_name
-        await controller.connect(controller_name=url.source)
+            if current.controller_name is not None:
+                controller_name = current.controller_name
+        await controller.connect(controller_name=controller_name)
         return controller
 
 

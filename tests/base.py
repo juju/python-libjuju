@@ -5,10 +5,10 @@ from contextlib import contextmanager
 from pathlib import Path
 
 import mock
-from juju.client.jujudata import FileJujuData
-from juju.controller import Controller
 
 import pytest
+from juju.client.jujudata import FileJujuData
+from juju.controller import Controller
 
 
 def is_bootstrapped():

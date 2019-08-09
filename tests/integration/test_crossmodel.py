@@ -94,3 +94,51 @@ async def test_remove_saas(event_loop):
                 raise Exception("Expected ubuntu not to be in saas")
 
         await model_1.remove_offer("admin/{}.ubuntu".format(model_1.info.name), force=True)
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_add_relation_with_offer(event_loop):
+    async with base.CleanModel() as model_1:
+        application = await model_1.deploy(
+            'cs:mysql-58',
+            application_name='mysql',
+            series='bionic',
+            channel='stable',
+        )
+        assert 'mysql' in model_1.applications
+        await model_1.block_until(
+            lambda: all(unit.workload_status == 'active'
+                        for unit in application.units))
+        await model_1.create_offer("mysql:db")
+
+        offers = await model_1.list_offers()
+        await model_1.block_until(
+            lambda: all(offer.application_name == 'mysql'
+                        for offer in offers.results))
+
+        # farm off a new model to test the consumption
+        async with base.CleanModel() as model_2:
+            await model_2.deploy(
+                'cs:trusty/wordpress-5',
+                application_name='wordpress',
+                series='xenial',
+                channel='stable',
+            )
+            await model_2.block_until(
+                lambda: all(unit.agent_status == 'executing'
+                            for unit in application.units))
+
+            await model_2.add_relation("wordpress", "admin/{}.mysql".format(model_1.info.name))
+
+            status = await model_2.get_status()
+            if 'mysql' not in status.remote_applications:
+                raise Exception("Expected mysql in saas")
+
+            await model_2.remove_saas('mysql')
+
+            status = await model_2.get_status()
+            if 'mysql' in status.remote_applications:
+                raise Exception("Expected mysql not to be in saas")
+
+        await model_1.remove_offer("admin/{}.mysql".format(model_1.info.name), force=True)

@@ -4,7 +4,8 @@
 
 
 from .names import (MatchType, match_application, match_endpoint, match_model,
-                    match_model_application, match_source_endpoint, match_user)
+                    match_model_application, match_relation,
+                    match_source_endpoint, match_user)
 
 
 class ParseError(Exception):
@@ -77,6 +78,9 @@ class OfferURL:
                 self.model == other.model and
                 self.application == other.application)
 
+    def has_empty_source(self):
+        return self.source is None or self.source == ""
+
     def has_endpoint(self):
         return ":" in self.application
 
@@ -91,7 +95,7 @@ class OfferURL:
             parts.append(self.model)
         path = "/".join(parts)
         path = "{}.{}".format(path, self.application)
-        if self.source == "":
+        if self.has_empty_source():
             return path
         return "{}:{}".format(self.source, path)
 
@@ -146,3 +150,40 @@ def maybe_parse_offer_url_source(url):
             return "", url
         return (parts[0], parts[1])
     return "", url
+
+
+class LocalEndpoint:
+    def __init__(self, application="", relation=None):
+        self.application = application
+        self.relation = relation
+
+    def __eq__(self, other):
+        if not isinstance(other, LocalEndpoint):
+            return NotImplemented
+        return (self.relation == other.relation and
+                self.application == other.application)
+
+
+def parse_local_endpoint(url):
+    application_name = url
+    relation = None
+
+    if ":" in url:
+        if url[0] == ":" or url[-1] == ":":
+            raise ParseError("endpoint {} not valid".format(url))
+
+        parts = url.split(":")
+        if len(parts) != 2:
+            raise ParseError("endpoint {} not valid".format(url))
+
+        application_name = parts[0]
+
+        if not match_relation(parts[1]):
+            raise ParseError("endpoint {} not valid".format(url))
+
+        relation = parts[1]
+
+    if not match_application(application_name):
+        raise ParseError("endpoint {} not valid".format(application_name))
+
+    return LocalEndpoint(application=application_name, relation=relation)
