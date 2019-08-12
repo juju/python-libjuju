@@ -153,28 +153,21 @@ class SSHProvisioner:
             if the authentication fails
         """
 
-        # TODO: Test this on an image without the ubuntu user setup.
-
-        auth_user = self.user
         ssh = None
         try:
             # Run w/o allocating a pty, so we fail if sudo prompts for a passwd
             ssh = self._get_ssh_client(
                 self.host,
-                "ubuntu",
+                self.user,
                 self.private_key_path,
             )
-
             stdout, stderr = self._run_command(ssh, "sudo -n true", pty=False)
         except paramiko.ssh_exception.AuthenticationException as e:
+            sys.stderr.write(e)
             raise e
-        else:
-            auth_user = "ubuntu"
         finally:
             if ssh:
                 ssh.close()
-
-        # if the above fails, run the init script as the authenticated user
 
         # Infer the public key
         public_key = None
@@ -193,7 +186,7 @@ class SSHProvisioner:
         try:
             ssh = self._get_ssh_client(
                 self.host,
-                auth_user,
+                self.user,
                 self.private_key_path,
             )
 
