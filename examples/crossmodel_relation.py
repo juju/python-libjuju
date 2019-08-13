@@ -1,13 +1,16 @@
 """
 This example:
 
-1. Connects to the current model
+1. Connects to the current controller
+2. Creates two models for consuming and offering
 2. Deploys a charm and waits until it reports itself active
 3. Creates an offer
 4. Lists the offer
-3. Destroys the unit and application
+5. Deploys a charm and adds relation to the offering url
+6. Destroys the units and applications
 
 """
+import tempfile
 import time
 from logging import getLogger
 
@@ -64,6 +67,10 @@ async def main():
                         for unit in application_2.units))
 
         await consuming_model.add_relation('wordpress', 'admin/test-cmr-1.mysql')
+
+        print('Exporting bundle')
+        with tempfile.TemporaryDirectory() as dirpath:
+            await offering_model.export_bundle("{}/bundle.yaml".format(dirpath))
 
         time.sleep(10)
 

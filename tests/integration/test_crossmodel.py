@@ -1,3 +1,6 @@
+import tempfile
+from pathlib import Path
+
 import pytest
 
 from .. import base
@@ -142,3 +145,54 @@ async def test_add_relation_with_offer(event_loop):
                 raise Exception("Expected mysql not to be in saas")
 
         await model_1.remove_offer("admin/{}.mysql".format(model_1.info.name), force=True)
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_add_bundle(event_loop):
+    tests_dir = Path(__file__).absolute().parent
+    bundle_path = tests_dir / 'bundle'
+    cmr_bundle_path = str(bundle_path / 'cmr-bundle.yaml')
+
+    file_contents = None
+    try:
+        with open(cmr_bundle_path, "r") as file:
+            file_contents = file.read()
+    except IOError:
+        raise
+
+    async with base.CleanModel() as model_1:
+        tmp_path = None
+        with tempfile.TemporaryDirectory() as dirpath:
+            try:
+                tmp_path = str(Path(dirpath) / 'bundle.yaml')
+                with open(tmp_path, "w") as file:
+                    file.write(file_contents.format(model_1.info.name))
+            except IOError:
+                raise
+
+            application = await model_1.deploy(
+                'cs:mysql-58',
+                application_name='mysql',
+                series='bionic',
+                channel='stable',
+            )
+            assert 'mysql' in model_1.applications
+            await model_1.block_until(
+                lambda: all(unit.workload_status == 'active'
+                            for unit in application.units))
+            await model_1.create_offer("mysql:db")
+
+            offers = await model_1.list_offers()
+            await model_1.block_until(
+                lambda: all(offer.application_name == 'mysql'
+                            for offer in offers.results))
+
+            # farm off a new model to test the consumption
+            async with base.CleanModel() as model_2:
+                await model_2.deploy('local:{}'.format(tmp_path))
+                await model_2.block_until(
+                    lambda: all(unit.agent_status == 'executing'
+                                for unit in application.units))
+
+            await model_1.remove_offer("admin/{}.mysql".format(model_1.info.name), force=True)
