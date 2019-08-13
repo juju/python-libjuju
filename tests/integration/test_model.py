@@ -16,7 +16,6 @@ from juju.model import Model, ModelObserver
 from juju.utils import block_until, run_with_interrupt
 import random
 import string
-import sys
 from .. import base
 
 MB = 1
@@ -397,6 +396,7 @@ async def test_add_manual_machine_ssh_root(event_loop):
         container.delete(wait=True)
 
         profile.delete()
+
 
 @base.bootstrapped
 @pytest.mark.asyncio

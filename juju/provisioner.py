@@ -163,7 +163,6 @@ class SSHProvisioner:
             )
             stdout, stderr = self._run_command(ssh, "sudo -n true", pty=False)
         except paramiko.ssh_exception.AuthenticationException as e:
-            sys.stderr.write(e)
             raise e
         finally:
             if ssh:
