@@ -1346,7 +1346,6 @@ class Model:
         if trust and (self.info.agent_version < client.Number.from_json('2.4.0')):
             raise NotImplementedError("trusted is not supported on model version {}".format(self.info.agent_version))
 
-        print(entity_url)
         entity_path = Path(entity_url.replace('local:', ''))
         bundle_path = entity_path / 'bundle.yaml'
         metadata_path = entity_path / 'metadata.yaml'
