@@ -1,6 +1,29 @@
 Changelog
 ---------
 
+2.6.6
+^^^^^
+Wednesday August 14 2019
+
+* Update facade methods for Juju 2.6.6
+* Pylibjuju release now follows the cadence of Juju releases, which also
+  includes bumping the version number to follow suit.
+* Pinned API facades. All facades in Pylibjuju are now pinned to a set of
+  facade versions that is more conservative to prevent breakages against new
+  features. The ability to override the pinned facades and specify your own
+  facade versions is possible upon connection to a controller or model.
+* Cross model relations (CMR) when deploying and adding relations. Additionally
+  getting information about the CMR offers are available on the model.
+* Cross model relations (CMR) in bundles.
+* Ability to export bundle including overlays.
+* Manual provisioning without a ubuntu user (#335)
+* Addition of remote applications when adding relations via SAAS blocks
+* Applying topological sorting to bundle changes API response, allows deployment
+  of complex bundles possible.
+* Updated definitions types to include the latest information from Juju.
+* Keyword arguments (`unknown_field` in code) are now available on Juju
+  responses.
+
 0.11.7
 ^^^^^^
 Wednesday April 19 2019
