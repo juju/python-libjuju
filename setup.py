@@ -34,7 +34,7 @@ setup(
         'macaroonbakery>=1.1,<2.0',
         'pyRFC3339>=1.0,<2.0',
         'pyyaml>=3.0,<=4.2',
-        'theblues>=0.3.8,<1.0',
+        'theblues>=0.5.1,<1.0',
         'websockets>=7.0,<8.0',
         'paramiko>=2.4.0,<3.0.0',
         'pyasn1>=0.4.4',
