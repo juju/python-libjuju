@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-2.6.6
+2.6.0
 ^^^^^
 Wednesday August 14 2019
 
