@@ -6,11 +6,10 @@ This example shows how to deploy a local charm. It:
 3. Deploys the uploaded charm.
 
 """
-import asyncio
 import logging
 
-from juju.model import Model
 from juju import loop
+from juju.model import Model
 
 
 async def main():

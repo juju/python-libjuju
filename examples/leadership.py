@@ -6,10 +6,9 @@ This example:
 3. Cleanly disconnects.
 
 """
-import asyncio
-
-from juju.model import Model
 from juju import loop
+from juju.model import Model
+
 
 async def report_leadership():
     model = Model()

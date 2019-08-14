@@ -1,10 +1,11 @@
-import asynctest
-import mock
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
-from juju.controller import Controller
+import mock
+
+import asynctest
 from juju.client import client
+from juju.controller import Controller
 
 from .. import base
 
@@ -107,7 +108,7 @@ class TestControllerConnect(asynctest.TestCase):
                 owner='owner',
             )
             assert up_creds.called
-            new_cred = up_creds.call_args[0][0][0].credential
+            new_cred = up_creds.call_args[1]['credentials'][0].credential
             assert cred.attrs['file'] == tempfile.name
             assert new_cred.attrs['file'] == 'cred-test'
 

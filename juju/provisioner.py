@@ -1,15 +1,13 @@
-from .client import client
-
-import paramiko
 import os
 import re
-import tempfile
 import shlex
-from subprocess import (
-    CalledProcessError,
-)
+import tempfile
 import uuid
+from subprocess import CalledProcessError
 
+import paramiko
+
+from .client import client
 
 arches = [
     [re.compile(r"amd64|x86_64"), "amd64"],
@@ -310,10 +308,10 @@ class SSHProvisioner:
 
         client_facade = client.ClientFacade.from_connection(connection)
         results = await client_facade.ProvisioningScript(
-            data_dir,
-            disable_package_commands,
-            machine_id,
-            nonce,
+            data_dir=data_dir,
+            disable_package_commands=disable_package_commands,
+            machine_id=machine_id,
+            nonce=nonce,
         )
 
         self._run_configure_script(results.script)

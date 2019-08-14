@@ -152,7 +152,7 @@ class Application(model.ModelEntity):
             'Scaling application %s %s %s',
             self.name, 'to' if scale else 'by', scale or scale_change)
 
-        await app_facade.ScaleApplications([
+        await app_facade.ScaleApplications(applications=[
             client.ScaleApplicationParam(application_tag=self.tag,
                                          scale=scale,
                                          scale_change=scale_change)
@@ -198,7 +198,7 @@ class Application(model.ModelEntity):
         log.debug(
             'Destroying relation %s <-> %s', local_relation, remote_relation)
 
-        return await app_facade.DestroyRelation([
+        return await app_facade.DestroyRelation(endpoints=[
             local_relation, remote_relation])
     remove_relation = destroy_relation
 
@@ -218,7 +218,7 @@ class Application(model.ModelEntity):
         log.debug(
             'Destroying %s', self.name)
 
-        return await app_facade.Destroy(self.name)
+        return await app_facade.Destroy(application=self.name)
     remove = destroy
 
     async def expose(self):
@@ -230,7 +230,7 @@ class Application(model.ModelEntity):
         log.debug(
             'Exposing %s', self.name)
 
-        return await app_facade.Expose(self.name)
+        return await app_facade.Expose(application=self.name)
 
     async def get_config(self):
         """Return the configuration settings dict for this application.
@@ -241,30 +241,35 @@ class Application(model.ModelEntity):
         log.debug(
             'Getting config for %s', self.name)
 
-        return (await app_facade.Get(self.name)).config
+        return (await app_facade.Get(application=self.name)).config
 
     async def get_trusted(self):
         """Return the trusted configuration setting for this application.
 
         """
+        if self.model.info.agent_version < client.Number.from_json('2.4.0'):
+            raise NotImplementedError("trusted is not supported on model version {}".format(self.model.info.agent_version))
+
         app_facade = client.ApplicationFacade.from_connection(self.connection)
 
         log.debug(
             'Getting config for %s', self.name)
 
-        config = await app_facade.Get(self.name)
+        config = await app_facade.Get(application=self.name)
         if 'trust' in config.config:
             return config.config['trust']['value'] is True
-        if 'application-config' in config.unknown_fields:
-            app_config = config.unknown_fields['application-config']
-            return app_config['trust']['value'] is True
-        return False
+
+        app_config = config.application_config
+        return app_config['trust']['value'] is True
 
     async def set_trusted(self, trust):
         """Set the trusted configuration of the application.
 
         :param bool trust: Trust the application or not
         """
+        if self.model.info.agent_version < client.Number.from_json('2.4.0'):
+            raise NotImplementedError("trusted is not supported on model version {}".format(self.model.info.agent_version))
+
         # clamp trust to exactly the value juju expects, rather than allowing
         # anything in the config.
         app_facade = client.ApplicationFacade.from_connection(self.connection)
@@ -273,7 +278,7 @@ class Application(model.ModelEntity):
         log.debug(
             'Setting config for %s: %s', self.name, config)
 
-        return await app_facade.SetApplicationsConfig([{
+        return await app_facade.SetApplicationsConfig(args=[{
             "application": self.name,
             "config": config,
         }])
@@ -287,7 +292,7 @@ class Application(model.ModelEntity):
         log.debug(
             'Getting constraints for %s', self.name)
 
-        result = (await app_facade.Get(self.name)).constraints
+        result = (await app_facade.Get(application=self.name)).constraints
         return vars(result) if result else result
 
     async def get_actions(self, schema=False):
@@ -300,7 +305,7 @@ class Application(model.ModelEntity):
         entity = [{"tag": self.tag}]
         action_facade = client.ActionFacade.from_connection(self.connection)
         results = (
-            await action_facade.ApplicationsCharmsActions(entity)).results
+            await action_facade.ApplicationsCharmsActions(entities=entity)).results
         for result in results:
             if result.application_tag == self.tag and result.actions:
                 actions = result.actions
@@ -316,7 +321,7 @@ class Application(model.ModelEntity):
         :class:`~juju._definitions.CharmResource` instances.
         """
         facade = client.ResourcesFacade.from_connection(self.connection)
-        response = await facade.ListResources([client.Entity(self.tag)])
+        response = await facade.ListResources(entities=[client.Entity(self.tag)])
 
         resources = dict()
         for result in response.results:
@@ -342,11 +347,11 @@ class Application(model.ModelEntity):
 
         # TODO this should return a list of Actions
         return await action.Run(
-            [self.name],
-            command,
-            [],
-            timeout,
-            [],
+            applications=[self.name],
+            commands=command,
+            machines=[],
+            timeout=timeout,
+            units=[],
         )
 
     async def get_annotations(self):
@@ -375,7 +380,7 @@ class Application(model.ModelEntity):
         log.debug(
             'Setting config for %s: %s', self.name, config)
 
-        return await app_facade.Set(self.name, config)
+        return await app_facade.Set(application=self.name, options=config)
 
     async def reset_config(self, to_default):
         """
@@ -389,7 +394,7 @@ class Application(model.ModelEntity):
         log.debug(
             'Restoring default config for %s: %s', self.name, to_default)
 
-        return await app_facade.Unset(self.name, to_default)
+        return await app_facade.Unset(application=self.name, options=to_default)
 
     async def set_constraints(self, constraints):
         """Set machine constraints for this application.
@@ -402,7 +407,7 @@ class Application(model.ModelEntity):
         log.debug(
             'Setting constraints for %s: %s', self.name, constraints)
 
-        return await app_facade.SetConstraints(self.name, constraints)
+        return await app_facade.SetConstraints(application=self.name, constraints=constraints)
 
     def set_meter_status(self, status, info=None):
         """Set the meter status on this status.
@@ -430,7 +435,7 @@ class Application(model.ModelEntity):
         log.debug(
             'Unexposing %s', self.name)
 
-        return await app_facade.Unexpose(self.name)
+        return await app_facade.Unexpose(application=self.name)
 
     def update_allocation(self, allocation):
         """Update existing allocation for this application.
@@ -441,7 +446,7 @@ class Application(model.ModelEntity):
         raise NotImplementedError()
 
     async def upgrade_charm(
-            self, channel=None, force_series=False, force_units=False,
+            self, channel=None, force=False, force_series=False, force_units=False,
             path=None, resources=None, revision=None, switch=None):
         """Upgrade the charm for this application.
 
@@ -494,6 +499,7 @@ class Application(model.ModelEntity):
         # Update charm
         await client_facade.AddCharm(
             url=charm_url,
+            force=force,
             channel=channel
         )
 
@@ -504,7 +510,7 @@ class Application(model.ModelEntity):
         store_resources = charmstore_entity['Meta']['resources']
 
         request_data = [client.Entity(self.tag)]
-        response = await resources_facade.ListResources(request_data)
+        response = await resources_facade.ListResources(entities=request_data)
         existing_resources = {
             resource.name: resource
             for resource in response.results[0].resources
@@ -530,9 +536,9 @@ class Application(model.ModelEntity):
                 ) for resource in resources_to_update
             ]
             response = await resources_facade.AddPendingResources(
-                self.tag,
-                charm_url,
-                request_data
+                application_tag=self.tag,
+                charm_url=charm_url,
+                resources=request_data
             )
             pending_ids = response.pending_ids
             resource_ids = {
@@ -549,10 +555,11 @@ class Application(model.ModelEntity):
             charm_url=charm_url,
             config_settings=None,
             config_settings_yaml=None,
+            force=force,
             force_series=force_series,
             force_units=force_units,
             resource_ids=resource_ids,
-            storage_constraints=None
+            storage_constraints=None,
         )
 
         await self.model.block_until(

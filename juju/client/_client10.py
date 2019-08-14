@@ -658,9 +658,10 @@ class ApplicationFacade(Type):
     
 
     @ReturnMapping(AddRelationResults)
-    async def AddRelation(self, endpoints):
+    async def AddRelation(self, endpoints=None, via_cidrs=None):
         '''
         endpoints : typing.Sequence<+T_co>[str]
+        via_cidrs : typing.Sequence<+T_co>[str]
         Returns -> typing.Mapping<~KT, +VT_co>[str, ~CharmRelation]<~CharmRelation>
         '''
         # map input types to rpc msg
@@ -670,17 +671,20 @@ class ApplicationFacade(Type):
                    version=10,
                    params=_params)
         _params['endpoints'] = endpoints
+        _params['via-cidrs'] = via_cidrs
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(AddApplicationUnitsResults)
-    async def AddUnits(self, application, num_units, placement):
+    async def AddUnits(self, application="", attach_storage=None, num_units=0, placement=None, policy=""):
         '''
         application : str
+        attach_storage : typing.Sequence<+T_co>[str]
         num_units : int
         placement : typing.Sequence<+T_co>[~Placement]<~Placement>
+        policy : str
         Returns -> typing.Sequence<+T_co>[str]
         '''
         # map input types to rpc msg
@@ -690,15 +694,17 @@ class ApplicationFacade(Type):
                    version=10,
                    params=_params)
         _params['application'] = application
+        _params['attach-storage'] = attach_storage
         _params['num-units'] = num_units
         _params['placement'] = placement
+        _params['policy'] = policy
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ApplicationInfoResults)
-    async def ApplicationsInfo(self, entities):
+    async def ApplicationsInfo(self, entities=None):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ApplicationInfoResult]<~ApplicationInfoResult>
@@ -716,7 +722,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ApplicationGetConfigResults)
-    async def CharmConfig(self, args):
+    async def CharmConfig(self, args=None):
         '''
         args : typing.Sequence<+T_co>[~ApplicationGet]<~ApplicationGet>
         Returns -> typing.Sequence<+T_co>[~ConfigResult]<~ConfigResult>
@@ -734,7 +740,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ApplicationCharmRelationsResults)
-    async def CharmRelations(self, application):
+    async def CharmRelations(self, application=""):
         '''
         application : str
         Returns -> typing.Sequence<+T_co>[str]
@@ -752,7 +758,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def Consume(self, args):
+    async def Consume(self, args=None):
         '''
         args : typing.Sequence<+T_co>[~ConsumeApplicationArg]<~ConsumeApplicationArg>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -770,7 +776,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def Deploy(self, applications):
+    async def Deploy(self, applications=None):
         '''
         applications : typing.Sequence<+T_co>[~ApplicationDeploy]<~ApplicationDeploy>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -788,7 +794,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(None)
-    async def Destroy(self, application):
+    async def Destroy(self, application=""):
         '''
         application : str
         Returns -> None
@@ -806,7 +812,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(DestroyApplicationResults)
-    async def DestroyApplication(self, applications):
+    async def DestroyApplication(self, applications=None):
         '''
         applications : typing.Sequence<+T_co>[~DestroyApplicationParams]<~DestroyApplicationParams>
         Returns -> typing.Sequence<+T_co>[~DestroyApplicationResult]<~DestroyApplicationResult>
@@ -824,7 +830,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def DestroyConsumedApplications(self, applications):
+    async def DestroyConsumedApplications(self, applications=None):
         '''
         applications : typing.Sequence<+T_co>[~DestroyConsumedApplicationParams]<~DestroyConsumedApplicationParams>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -842,9 +848,12 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(None)
-    async def DestroyRelation(self, endpoints):
+    async def DestroyRelation(self, endpoints=None, force=False, max_wait=0, relation_id=0):
         '''
         endpoints : typing.Sequence<+T_co>[str]
+        force : bool
+        max_wait : int
+        relation_id : int
         Returns -> None
         '''
         # map input types to rpc msg
@@ -854,13 +863,16 @@ class ApplicationFacade(Type):
                    version=10,
                    params=_params)
         _params['endpoints'] = endpoints
+        _params['force'] = force
+        _params['max-wait'] = max_wait
+        _params['relation-id'] = relation_id
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(DestroyUnitResults)
-    async def DestroyUnit(self, units):
+    async def DestroyUnit(self, units=None):
         '''
         units : typing.Sequence<+T_co>[~DestroyUnitParams]<~DestroyUnitParams>
         Returns -> typing.Sequence<+T_co>[~DestroyUnitResult]<~DestroyUnitResult>
@@ -878,7 +890,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(None)
-    async def DestroyUnits(self, unit_names):
+    async def DestroyUnits(self, unit_names=None):
         '''
         unit_names : typing.Sequence<+T_co>[str]
         Returns -> None
@@ -896,7 +908,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(None)
-    async def Expose(self, application):
+    async def Expose(self, application=""):
         '''
         application : str
         Returns -> None
@@ -914,9 +926,10 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ApplicationGetResults)
-    async def Get(self, application):
+    async def Get(self, application="", branch=""):
         '''
         application : str
+        branch : str
         Returns -> typing.Union[str, typing.Mapping<~KT, +VT_co>[str, typing.Any], _ForwardRef('Value')]
         '''
         # map input types to rpc msg
@@ -926,15 +939,17 @@ class ApplicationFacade(Type):
                    version=10,
                    params=_params)
         _params['application'] = application
+        _params['branch'] = branch
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringResult)
-    async def GetCharmURL(self, application):
+    async def GetCharmURL(self, application="", branch=""):
         '''
         application : str
+        branch : str
         Returns -> typing.Union[_ForwardRef('Error'), str]
         '''
         # map input types to rpc msg
@@ -944,13 +959,14 @@ class ApplicationFacade(Type):
                    version=10,
                    params=_params)
         _params['application'] = application
+        _params['branch'] = branch
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ApplicationGetConfigResults)
-    async def GetConfig(self, entities):
+    async def GetConfig(self, entities=None):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ConfigResult]<~ConfigResult>
@@ -968,7 +984,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ApplicationGetConstraintsResults)
-    async def GetConstraints(self, entities):
+    async def GetConstraints(self, entities=None):
         '''
         entities : typing.Sequence<+T_co>[~Entity]<~Entity>
         Returns -> typing.Sequence<+T_co>[~ApplicationConstraint]<~ApplicationConstraint>
@@ -986,7 +1002,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def ResolveUnitErrors(self, all_, retry, tags):
+    async def ResolveUnitErrors(self, all_=False, retry=False, tags=None):
         '''
         all_ : bool
         retry : bool
@@ -1008,7 +1024,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ScaleApplicationResults)
-    async def ScaleApplications(self, applications):
+    async def ScaleApplications(self, applications=None):
         '''
         applications : typing.Sequence<+T_co>[~ScaleApplicationParams]<~ScaleApplicationParams>
         Returns -> typing.Sequence<+T_co>[~ScaleApplicationResult]<~ScaleApplicationResult>
@@ -1026,9 +1042,10 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(None)
-    async def Set(self, application, options):
+    async def Set(self, application="", branch="", options=None):
         '''
         application : str
+        branch : str
         options : typing.Mapping<~KT, +VT_co>[str, str]
         Returns -> None
         '''
@@ -1039,6 +1056,7 @@ class ApplicationFacade(Type):
                    version=10,
                    params=_params)
         _params['application'] = application
+        _params['branch'] = branch
         _params['options'] = options
         reply = await self.rpc(msg)
         return reply
@@ -1046,7 +1064,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def SetApplicationsConfig(self, args):
+    async def SetApplicationsConfig(self, args=None):
         '''
         args : typing.Sequence<+T_co>[~ApplicationConfigSet]<~ApplicationConfigSet>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -1064,15 +1082,17 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(None)
-    async def SetCharm(self, application, channel, charm_url, config_settings, config_settings_yaml, force_series, force_units, resource_ids, storage_constraints):
+    async def SetCharm(self, application="", channel="", charm_url="", config_settings=None, config_settings_yaml="", force=False, force_series=False, force_units=False, generation="", resource_ids=None, storage_constraints=None):
         '''
         application : str
         channel : str
         charm_url : str
         config_settings : typing.Mapping<~KT, +VT_co>[str, str]
         config_settings_yaml : str
+        force : bool
         force_series : bool
         force_units : bool
+        generation : str
         resource_ids : typing.Mapping<~KT, +VT_co>[str, str]
         storage_constraints : typing.Mapping<~KT, +VT_co>[str, ~StorageConstraints]<~StorageConstraints>
         Returns -> None
@@ -1088,8 +1108,10 @@ class ApplicationFacade(Type):
         _params['charm-url'] = charm_url
         _params['config-settings'] = config_settings
         _params['config-settings-yaml'] = config_settings_yaml
+        _params['force'] = force
         _params['force-series'] = force_series
         _params['force-units'] = force_units
+        _params['generation'] = generation
         _params['resource-ids'] = resource_ids
         _params['storage-constraints'] = storage_constraints
         reply = await self.rpc(msg)
@@ -1098,7 +1120,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(None)
-    async def SetConstraints(self, application, constraints):
+    async def SetConstraints(self, application="", constraints=None):
         '''
         application : str
         constraints : Value
@@ -1118,7 +1140,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def SetMetricCredentials(self, creds):
+    async def SetMetricCredentials(self, creds=None):
         '''
         creds : typing.Sequence<+T_co>[~ApplicationMetricCredential]<~ApplicationMetricCredential>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -1136,7 +1158,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def SetRelationsSuspended(self, args):
+    async def SetRelationsSuspended(self, args=None):
         '''
         args : typing.Sequence<+T_co>[~RelationSuspendedArg]<~RelationSuspendedArg>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -1154,7 +1176,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(None)
-    async def Unexpose(self, application):
+    async def Unexpose(self, application=""):
         '''
         application : str
         Returns -> None
@@ -1172,9 +1194,10 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(None)
-    async def Unset(self, application, options):
+    async def Unset(self, application="", branch="", options=None):
         '''
         application : str
+        branch : str
         options : typing.Sequence<+T_co>[str]
         Returns -> None
         '''
@@ -1185,6 +1208,7 @@ class ApplicationFacade(Type):
                    version=10,
                    params=_params)
         _params['application'] = application
+        _params['branch'] = branch
         _params['options'] = options
         reply = await self.rpc(msg)
         return reply
@@ -1192,7 +1216,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def UnsetApplicationsConfig(self, args):
+    async def UnsetApplicationsConfig(self, args=None):
         '''
         args : typing.Sequence<+T_co>[~ApplicationUnset]<~ApplicationUnset>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
@@ -1210,13 +1234,15 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(None)
-    async def Update(self, application, charm_url, constraints, force_charm_url, force_series, min_units, settings, settings_yaml):
+    async def Update(self, application="", charm_url="", constraints=None, force=False, force_charm_url=False, force_series=False, generation="", min_units=0, settings=None, settings_yaml=""):
         '''
         application : str
         charm_url : str
         constraints : Value
+        force : bool
         force_charm_url : bool
         force_series : bool
+        generation : str
         min_units : int
         settings : typing.Mapping<~KT, +VT_co>[str, str]
         settings_yaml : str
@@ -1231,8 +1257,10 @@ class ApplicationFacade(Type):
         _params['application'] = application
         _params['charm-url'] = charm_url
         _params['constraints'] = constraints
+        _params['force'] = force
         _params['force-charm-url'] = force_charm_url
         _params['force-series'] = force_series
+        _params['generation'] = generation
         _params['min-units'] = min_units
         _params['settings'] = settings
         _params['settings-yaml'] = settings_yaml
@@ -1242,7 +1270,7 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def UpdateApplicationSeries(self, args):
+    async def UpdateApplicationSeries(self, args=None):
         '''
         args : typing.Sequence<+T_co>[~UpdateSeriesArg]<~UpdateSeriesArg>
         Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>

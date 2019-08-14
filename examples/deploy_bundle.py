@@ -6,8 +6,6 @@ This example:
 3. Destroys the units and applications
 
 """
-import asyncio
-
 from juju import loop
 from juju.model import Model
 
@@ -28,8 +26,7 @@ async def main():
         print('Waiting for active')
         await model.block_until(
             lambda: all(unit.workload_status == 'active'
-                        for application in applications
-                            for unit in application.units))
+                        for application in applications for unit in application.units))
         print("Successfully deployed!")
         print('Removing bundle')
         for application in applications:

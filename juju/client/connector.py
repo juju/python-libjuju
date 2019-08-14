@@ -1,10 +1,10 @@
 import asyncio
-import logging
 import copy
+import logging
 
 import macaroonbakery.httpbakery as httpbakery
 from juju.client.connection import Connection
-from juju.client.gocookies import go_to_py_cookie, GoCookieJar
+from juju.client.gocookies import GoCookieJar, go_to_py_cookie
 from juju.client.jujudata import FileJujuData
 from juju.errors import JujuConnectionError, JujuError
 
@@ -35,6 +35,7 @@ class Connector:
         self.bakery_client = bakery_client
         self._connection = None
         self.controller_name = None
+        self.controller_uuid = None
         self.model_name = None
         self.jujudata = jujudata or FileJujuData()
 
@@ -75,7 +76,7 @@ class Connector:
             await self._connection.close()
             self._connection = None
 
-    async def connect_controller(self, controller_name=None):
+    async def connect_controller(self, controller_name=None, specified_facades=None):
         """Connect to a controller by name. If the name is empty, it
         connect to the current controller.
         """
@@ -97,8 +98,10 @@ class Connector:
             password=accounts.get('password'),
             cacert=controller.get('ca-cert'),
             bakery_client=self.bakery_client_for_controller(controller_name),
+            specified_facades=specified_facades,
         )
         self.controller_name = controller_name
+        self.controller_uuid = controller["uuid"]
 
     async def connect_model(self, model_name=None):
         """Connect to a model by name. If either controller or model

@@ -134,6 +134,7 @@ async def test_add_machine(event_loop):
         # add a machine with constraints, disks, and series
         machine2 = await model.add_machine(
             constraints={
+                'arch': 'amd64',
                 'mem': 256 * MB,
             },
             disks=[{
@@ -404,15 +405,15 @@ async def test_relate(event_loop):
 
     async with base.CleanModel() as model:
         await model.deploy(
-            'ubuntu',
+            'cs:~jameinel/ubuntu-lite-7',
             application_name='ubuntu',
-            series='trusty',
+            series='bionic',
             channel='stable',
         )
         await model.deploy(
             'nrpe',
             application_name='nrpe',
-            series='trusty',
+            series='bionic',
             channel='stable',
             # subordinates must be deployed without units
             num_units=0,
@@ -426,17 +427,17 @@ async def test_relate(event_loop):
                 if set(new.key.split()) == {'nrpe:general-info',
                                             'ubuntu:juju-info'}:
                     relation_added.set()
-                    event_loop.call_later(2, timeout.set)
+                    event_loop.call_later(10, timeout.set)
 
         model.add_observer(TestObserver())
 
         real_app_facade = ApplicationFacade.from_connection(model.connection())
         mock_app_facade = mock.MagicMock()
 
-        async def mock_AddRelation(*args):
+        async def mock_AddRelation(*args, **kwargs):
             # force response delay from AddRelation to test race condition
             # (see https://github.com/juju/python-libjuju/issues/191)
-            result = await real_app_facade.AddRelation(*args)
+            result = await real_app_facade.AddRelation(*args, **kwargs)
             await relation_added.wait()
             return result
 

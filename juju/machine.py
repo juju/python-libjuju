@@ -107,7 +107,7 @@ class Machine(model.ModelEntity):
         log.debug(
             'Destroying machine %s', self.id)
 
-        await facade.DestroyMachines(force, [self.id])
+        await facade.DestroyMachines(force=force, machine_names=[self.id])
         return await self.model._wait(
             'machine', self.id, 'remove')
     remove = destroy

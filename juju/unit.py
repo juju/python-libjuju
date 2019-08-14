@@ -146,11 +146,11 @@ class Unit(model.ModelEntity):
             timeout = int(timeout * 1000000000)
 
         res = await action.Run(
-            [],
-            command,
-            [],
-            timeout,
-            [self.name],
+            applications=[],
+            commands=command,
+            machines=[],
+            timeout=timeout,
+            units=[self.name],
         )
         return await self.model.wait_for_action(res.results[0].action.tag)
 
@@ -170,7 +170,7 @@ class Unit(model.ModelEntity):
 
         log.debug('Starting action `%s` on %s', action_name, self.name)
 
-        res = await action_facade.Enqueue([client.Action(
+        res = await action_facade.Enqueue(actions=[client.Action(
             name=action_name,
             parameters=params,
             receiver=self.tag,
@@ -260,7 +260,7 @@ class Unit(model.ModelEntity):
 
         c = client.ClientFacade.from_connection(self.connection)
 
-        status = await c.FullStatus(None)
+        status = await c.FullStatus(patterns=None)
 
         # FullStatus may be more up to date than our model, and the
         # unit may have gone away, or we may be doing something silly,

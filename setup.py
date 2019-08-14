@@ -13,7 +13,8 @@
 #     limitations under the License.
 
 from pathlib import Path
-from setuptools import setup, find_packages
+
+from setuptools import find_packages, setup
 
 here = Path(__file__).absolute().parent
 readme = here / 'docs' / 'readme.rst'
@@ -33,10 +34,11 @@ setup(
         'macaroonbakery>=1.1,<2.0',
         'pyRFC3339>=1.0,<2.0',
         'pyyaml>=3.0,<=4.2',
-        'theblues>=0.3.8,<1.0',
+        'theblues>=0.5.1,<1.0',
         'websockets>=7.0,<8.0',
         'paramiko>=2.4.0,<3.0.0',
         'pyasn1>=0.4.4',
+        'toposort>=1.5,<2'
     ],
     include_package_data=True,
     maintainer='Juju Ecosystem Engineering',

@@ -5,9 +5,17 @@ from pathlib import Path
 
 from . import errors, tag, utils
 from .client import client, connector
+from .errors import JujuAPIError
+from .offerendpoints import ParseError as OfferParseError
+from .offerendpoints import parse_offer_endpoint, parse_offer_url
 from .user import User
 
 log = logging.getLogger(__name__)
+
+
+class RemoveError(Exception):
+    def __init__(self, message):
+        self.message = message
 
 
 class Controller:
@@ -88,6 +96,8 @@ class Controller:
         :param asyncio.BaseEventLoop loop: The event loop to use for async
             operations.
         :param int max_frame_size: The maximum websocket frame size to allow.
+        :param specified_facades: Overwrite the facades with a series of
+            specified facades.
         """
         await self.disconnect()
         if 'endpoint' not in kwargs and len(args) < 2:
@@ -163,6 +173,10 @@ class Controller:
     def controller_name(self):
         return self._connector.controller_name
 
+    @property
+    def controller_uuid(self):
+        return self._connector.controller_uuid
+
     async def disconnect(self):
         """Shut down the watcher task and close websockets.
 
@@ -232,7 +246,7 @@ class Controller:
                 credentials=tagged_credentials, force=force,
             )
         else:
-            await cloud_facade.UpdateCredentials(tagged_credentials)
+            await cloud_facade.UpdateCredentials(credentials=tagged_credentials)
         return name
 
     async def add_model(
@@ -285,12 +299,12 @@ class Controller:
                 loop=self._connector.loop)
 
         model_info = await model_facade.CreateModel(
-            tag.cloud(cloud_name),
-            config,
-            credential,
-            model_name,
-            owner,
-            region
+            cloud_tag=tag.cloud(cloud_name),
+            config=config,
+            credential=credential,
+            name=model_name,
+            owner_tag=owner,
+            region=region
         )
         from juju.model import Model
         model = Model(jujudata=self._connector.jujudata)
@@ -329,7 +343,7 @@ class Controller:
         else:
             params = [client.Entity(tag.model(model)) for model in models]
 
-        await model_facade.DestroyModels(params)
+        await model_facade.DestroyModels(entities=params)
     destroy_model = destroy_models
 
     async def add_user(self, username, password=None, display_name=None):
@@ -347,7 +361,7 @@ class Controller:
         users = [client.AddUser(display_name=display_name,
                                 username=username,
                                 password=password)]
-        results = await user_facade.AddUser(users)
+        results = await user_facade.AddUser(users=users)
         secret_key = results.results[0].secret_key
         return await self.get_user(username, secret_key=secret_key)
 
@@ -357,7 +371,7 @@ class Controller:
         client_facade = client.UserManagerFacade.from_connection(
             self.connection())
         user = tag.user(username)
-        await client_facade.RemoveUser([client.Entity(user)])
+        await client_facade.RemoveUser(entities=[client.Entity(user)])
 
     async def change_user_password(self, username, password):
         """Change the password for a user in this controller.
@@ -368,8 +382,8 @@ class Controller:
         """
         user_facade = client.UserManagerFacade.from_connection(
             self.connection())
-        entity = client.EntityPassword(password, tag.user(username))
-        return await user_facade.SetPassword([entity])
+        entity = client.EntityPassword(password=password, tag=tag.user(username))
+        return await user_facade.SetPassword(changes=[entity])
 
     async def reset_user_password(self, username):
         """Reset user password.
@@ -384,16 +398,17 @@ class Controller:
         secret_key = results.results[0].secret_key
         return await self.get_user(username, secret_key=secret_key)
 
-    async def destroy(self, destroy_all_models=False):
+    async def destroy(self, destroy_all_models=False, destroy_storage=False):
         """Destroy this controller.
 
         :param bool destroy_all_models: Destroy all hosted models in the
             controller.
-
+        :param bool destroy_storage: Destory all hosted storage in the
+            controller.
         """
         controller_facade = client.ControllerFacade.from_connection(
             self.connection())
-        return await controller_facade.DestroyController(destroy_all_models)
+        return await controller_facade.DestroyController(destroy_models=destroy_all_models, destroy_storage=destroy_storage)
 
     async def disable_user(self, username):
         """Disable a user.
@@ -404,7 +419,7 @@ class Controller:
         user_facade = client.UserManagerFacade.from_connection(
             self.connection())
         entity = client.Entity(tag.user(username))
-        return await user_facade.DisableUser([entity])
+        return await user_facade.DisableUser(entities=[entity])
 
     async def enable_user(self, username):
         """Re-enable a previously disabled user.
@@ -413,7 +428,7 @@ class Controller:
         user_facade = client.UserManagerFacade.from_connection(
             self.connection())
         entity = client.Entity(tag.user(username))
-        return await user_facade.EnableUser([entity])
+        return await user_facade.EnableUser(entities=[entity])
 
     def kill(self):
         """Forcibly terminate all machines and other associated resources for
@@ -538,7 +553,7 @@ class Controller:
         user = tag.user(username)
         args = [client.Entity(user)]
         try:
-            response = await client_facade.UserInfo(args, True)
+            response = await client_facade.UserInfo(entities=args, include_disabled=True)
         except errors.JujuError as e:
             if 'permission denied' in e.errors:
                 # apparently, trying to get info for a nonexistent user returns
@@ -557,7 +572,7 @@ class Controller:
         """
         client_facade = client.UserManagerFacade.from_connection(
             self.connection())
-        response = await client_facade.UserInfo(None, include_disabled)
+        response = await client_facade.UserInfo(entities=None, include_disabled=include_disabled)
         return [User(self, r.result) for r in response.results]
 
     async def grant(self, username, acl='login'):
@@ -575,7 +590,7 @@ class Controller:
         user = tag.user(username)
         changes = client.ModifyControllerAccess(acl, 'grant', user)
         try:
-            await controller_facade.ModifyControllerAccess([changes])
+            await controller_facade.ModifyControllerAccess(changes=[changes])
             return True
         except errors.JujuError as e:
             if 'user already has' in str(e):
@@ -596,7 +611,7 @@ class Controller:
             self.connection())
         user = tag.user(username)
         changes = client.ModifyControllerAccess('login', 'revoke', user)
-        return await controller_facade.ModifyControllerAccess([changes])
+        return await controller_facade.ModifyControllerAccess(changes=[changes])
 
     async def grant_model(self, username, model_uuid, acl='read'):
         """Grant a user access to a model. Note that if the user
@@ -613,7 +628,7 @@ class Controller:
         user = tag.user(username)
         model = tag.model(model_uuid)
         changes = client.ModifyModelAccess(acl, 'grant', model, user)
-        return await model_facade.ModifyModelAccess([changes])
+        return await model_facade.ModifyModelAccess(changes=[changes])
 
     async def revoke_model(self, username, model_uuid, acl='read'):
         """Revoke some or all of a user's access to a model.
@@ -630,4 +645,84 @@ class Controller:
         user = tag.user(username)
         model = tag.model(model_uuid)
         changes = client.ModifyModelAccess(acl, 'revoke', model, user)
-        return await model_facade.ModifyModelAccess([changes])
+        return await model_facade.ModifyModelAccess(changes=[changes])
+
+    async def create_offer(self, model_uuid, endpoint, offer_name=None, application_name=None):
+        """
+        Offer a deployed application using a series of endpoints for use by
+        consumers.
+
+        @param endpoint: holds the application and endpoint you want to offer
+        @param offer_name: over ride the offer name to help the consumer
+        """
+        try:
+            offer = parse_offer_endpoint(endpoint)
+        except OfferParseError as e:
+            log.error(e.message)
+            raise
+
+        if offer_name is None:
+            offer_name = offer.application
+
+        if application_name is None:
+            application_name = offer.application
+
+        params = client.AddApplicationOffer()
+        params.application_name = application_name
+        params.endpoints = {name: name for name in offer.endpoints}
+        params.offer_name = offer_name
+        params.model_tag = tag.model(model_uuid)
+
+        facade = client.ApplicationOffersFacade.from_connection(self.connection())
+        return await facade.Offer([params])
+
+    async def list_offers(self, model_name):
+        """
+        Offers list information about applications' endpoints that have been
+        shared and who is connected.
+        """
+        params = client.OfferFilter()
+        params.model_name = model_name
+
+        facade = client.ApplicationOffersFacade.from_connection(self.connection())
+        return await facade.ListApplicationOffers([params])
+
+    async def remove_offer(self, model_uuid, offer, force=False):
+        """
+        Remove offer for an application.
+
+        Offers will also remove relations to those offers, use force to do
+        so, without an error.
+        """
+        url = None
+        try:
+            url = parse_offer_url(offer)
+        except OfferParseError as e:
+            log.error(e.message)
+            raise
+        if url is None:
+            raise Exception
+
+        offer_source = url.source
+        if offer_source == "":
+            offer_source = self.controller_name
+        if not force:
+            raise RemoveError("removing offer will also remove relations, use force and try again.")
+
+        facade = client.ApplicationOffersFacade.from_connection(self.connection())
+        return await facade.DestroyOffers(force, [url.string()])
+
+    async def get_consume_details(self, endpoint):
+        """
+        get_consume_details returns the details necessary to pass to another
+        model to consume the specified offers represented by the urls.
+        """
+        facade = client.ApplicationOffersFacade.from_connection(self.connection())
+        offers = await facade.GetConsumeDetails([endpoint])
+        if len(offers.results) != 1:
+            raise JujuAPIError("expected to find one result")
+        result = offers.results[0]
+        if result.error is not None:
+            raise JujuAPIError(result.error)
+
+        return result

@@ -62,7 +62,7 @@ class ResourcesFacade(Type):
     """
 
     @ReturnMapping(_client.AddPendingResourcesResult)
-    async def AddPendingResources(self, application_tag, charm_url, resources):
+    async def AddPendingResources(self, application_tag="", charm_url="", resources=None):
         """Fix the calling signature of AddPendingResources.
 
         The ResourcesFacade doesn't conform to the standard facade pattern in
@@ -363,3 +363,40 @@ class Resource(Type):
         self.username = username
         self.name = name
         self.origin = origin
+        self.unknown_fields = unknown_fields
+
+
+class Macaroon(Type):
+    _toSchema = {'signature': 'signature',
+                 'caveats': 'caveats',
+                 'location': 'location',
+                 'identifier': 'identifier'}
+    _toPy = {'signature': 'signature',
+             'caveats': 'caveats',
+             'location': 'location',
+             'identifier': 'identifier'}
+
+    def __init__(self, signature="", caveats=None, location=None, identifier="", **unknown_fields):
+        '''
+        signature : str
+        caveats : typing.Sequence<+T_co>[~RemoteSpace]<~RemoteSpace>
+        location : str
+        identifier : str
+        '''
+        self.signature = signature
+        self.caveats = caveats
+        self.location = location
+        self.identifier = identifier
+        self.unknown_fields = unknown_fields
+
+
+class Caveat(Type):
+    _toSchema = {'cid': 'cid'}
+    _toPy = {'cid': 'cid'}
+
+    def __init__(self, cid="", **unknown_fields):
+        '''
+        cid : str
+        '''
+        self.cid = cid
+        self.unknown_fields = unknown_fields
