@@ -101,3 +101,10 @@ example, to run ``examples/connect_current_model.py``, use:
 .. code:: bash
 
   tox -e example -- examples/connect_current_model.py
+
+
+Versioning
+----------
+
+Pylibjuju releases now track the Juju release cadence. New generated schemas
+will be updated per Juju releases.
