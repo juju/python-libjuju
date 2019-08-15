@@ -156,7 +156,7 @@ class BundleHandler:
                 reference = ref
         return reference
 
-    async def addCharm(self, change_id, charm, series):
+    async def addCharm(self, change_id, charm, series, channel=None):
         """
         :param charm string:
             Charm holds the URL of the charm to be added.
@@ -164,15 +164,24 @@ class BundleHandler:
         :param series string:
             Series holds the series of the charm to be added
             if the charm default is not sufficient.
+
+        :param channel string:
+            Channel holds the preferred channel for retrieving a
+            charm.
         """
         # We don't add local charms because they've already been added
         # by self._handle_local_charms
         if charm.startswith('local:'):
             return charm
 
-        entity_id = await self.charmstore.entityId(charm)
+        # theblues package is not smart enough to ignore empty channel args
+        if channel == '':
+            channel = None
+
+        entity_id = await self.charmstore.entityId(charm, channel=channel)
         log.debug('Adding %s', entity_id)
-        await self.client_facade.AddCharm(channel=None, url=entity_id, force=False)
+        await self.client_facade.AddCharm(channel=channel, url=entity_id,
+                                          force=False)
         return entity_id
 
     async def addMachines(self, change_id, params=None):
