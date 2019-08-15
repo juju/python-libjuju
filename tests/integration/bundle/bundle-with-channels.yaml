@@ -1,0 +1,12 @@
+applications:
+  dummy-in-edge:
+    charm: cs:~juju-qa/bionic/dummy-in-edge
+    channel: edge
+    num_units: 1
+  other-dummy-in-beta:
+    charm: cs:~juju-qa/bionic/other-dummy-in-beta
+    channel: beta
+    num_units: 1
+  wordpress:
+    charm: wordpress
+    num_units: 1
