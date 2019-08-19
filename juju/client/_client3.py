@@ -165,6 +165,9 @@ class ActionFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~ActionResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Action',
@@ -183,6 +186,9 @@ class ActionFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~ApplicationCharmActionsResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Action',
@@ -201,6 +207,9 @@ class ActionFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~ActionResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Action',
@@ -219,6 +228,9 @@ class ActionFacade(Type):
         actions : typing.Sequence[~Action]
         Returns -> typing.Sequence[~ActionResult]
         '''
+        if actions is not None and not isinstance(actions, list):
+            raise Exception('Expected actions to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Action',
@@ -237,6 +249,9 @@ class ActionFacade(Type):
         prefixes : typing.Sequence[str]
         Returns -> typing.Sequence[~Entity]
         '''
+        if prefixes is not None and not isinstance(prefixes, list):
+            raise Exception('Expected prefixes to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Action',
@@ -255,6 +270,9 @@ class ActionFacade(Type):
         names : typing.Sequence[str]
         Returns -> typing.Sequence[~ActionsByName]
         '''
+        if names is not None and not isinstance(names, list):
+            raise Exception('Expected names to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Action',
@@ -273,6 +291,9 @@ class ActionFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~ActionsByReceiver]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Action',
@@ -291,6 +312,9 @@ class ActionFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~ActionsByReceiver]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Action',
@@ -309,6 +333,9 @@ class ActionFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~ActionsByReceiver]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Action',
@@ -327,6 +354,9 @@ class ActionFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~ActionsByReceiver]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Action',
@@ -349,6 +379,21 @@ class ActionFacade(Type):
         units : typing.Sequence[str]
         Returns -> typing.Sequence[~ActionResult]
         '''
+        if applications is not None and not isinstance(applications, list):
+            raise Exception('Expected applications to be of type Sequence')
+
+        if commands is not None and not isinstance(commands, (bytes, str)):
+            raise Exception('Expected commands to be of type str')
+
+        if machines is not None and not isinstance(machines, list):
+            raise Exception('Expected machines to be of type Sequence')
+
+        if timeout is not None and not isinstance(timeout, int):
+            raise Exception('Expected timeout to be of type int')
+
+        if units is not None and not isinstance(units, list):
+            raise Exception('Expected units to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Action',
@@ -375,6 +420,21 @@ class ActionFacade(Type):
         units : typing.Sequence[str]
         Returns -> typing.Sequence[~ActionResult]
         '''
+        if applications is not None and not isinstance(applications, list):
+            raise Exception('Expected applications to be of type Sequence')
+
+        if commands is not None and not isinstance(commands, (bytes, str)):
+            raise Exception('Expected commands to be of type str')
+
+        if machines is not None and not isinstance(machines, list):
+            raise Exception('Expected machines to be of type Sequence')
+
+        if timeout is not None and not isinstance(timeout, int):
+            raise Exception('Expected timeout to be of type int')
+
+        if units is not None and not isinstance(units, list):
+            raise Exception('Expected units to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Action',
@@ -691,6 +751,9 @@ class ApplicationFacade(Type):
         endpoints : typing.Sequence[str]
         Returns -> typing.Mapping[str, ~CharmRelation]
         '''
+        if endpoints is not None and not isinstance(endpoints, list):
+            raise Exception('Expected endpoints to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application',
@@ -711,6 +774,15 @@ class ApplicationFacade(Type):
         placement : typing.Sequence[~Placement]
         Returns -> typing.Sequence[str]
         '''
+        if application is not None and not isinstance(application, (bytes, str)):
+            raise Exception('Expected application to be of type str')
+
+        if num_units is not None and not isinstance(num_units, int):
+            raise Exception('Expected num_units to be of type int')
+
+        if placement is not None and not isinstance(placement, list):
+            raise Exception('Expected placement to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application',
@@ -731,6 +803,9 @@ class ApplicationFacade(Type):
         application : str
         Returns -> typing.Sequence[str]
         '''
+        if application is not None and not isinstance(application, (bytes, str)):
+            raise Exception('Expected application to be of type str')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application',
@@ -749,6 +824,9 @@ class ApplicationFacade(Type):
         applications : typing.Sequence[~ApplicationDeploy]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if applications is not None and not isinstance(applications, list):
+            raise Exception('Expected applications to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application',
@@ -767,6 +845,9 @@ class ApplicationFacade(Type):
         application : str
         Returns -> None
         '''
+        if application is not None and not isinstance(application, (bytes, str)):
+            raise Exception('Expected application to be of type str')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application',
@@ -785,6 +866,9 @@ class ApplicationFacade(Type):
         endpoints : typing.Sequence[str]
         Returns -> None
         '''
+        if endpoints is not None and not isinstance(endpoints, list):
+            raise Exception('Expected endpoints to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application',
@@ -803,6 +887,9 @@ class ApplicationFacade(Type):
         unit_names : typing.Sequence[str]
         Returns -> None
         '''
+        if unit_names is not None and not isinstance(unit_names, list):
+            raise Exception('Expected unit_names to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application',
@@ -821,6 +908,9 @@ class ApplicationFacade(Type):
         application : str
         Returns -> None
         '''
+        if application is not None and not isinstance(application, (bytes, str)):
+            raise Exception('Expected application to be of type str')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application',
@@ -839,6 +929,9 @@ class ApplicationFacade(Type):
         application : str
         Returns -> typing.Union[str, typing.Mapping[str, typing.Any], _ForwardRef('Value')]
         '''
+        if application is not None and not isinstance(application, (bytes, str)):
+            raise Exception('Expected application to be of type str')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application',
@@ -857,6 +950,9 @@ class ApplicationFacade(Type):
         application : str
         Returns -> typing.Union[_ForwardRef('Error'), str]
         '''
+        if application is not None and not isinstance(application, (bytes, str)):
+            raise Exception('Expected application to be of type str')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application',
@@ -875,6 +971,9 @@ class ApplicationFacade(Type):
         application : str
         Returns -> Value
         '''
+        if application is not None and not isinstance(application, (bytes, str)):
+            raise Exception('Expected application to be of type str')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application',
@@ -894,6 +993,12 @@ class ApplicationFacade(Type):
         options : typing.Mapping[str, str]
         Returns -> None
         '''
+        if application is not None and not isinstance(application, (bytes, str)):
+            raise Exception('Expected application to be of type str')
+
+        if options is not None and not isinstance(options, dict):
+            raise Exception('Expected options to be of type Mapping')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application',
@@ -921,6 +1026,33 @@ class ApplicationFacade(Type):
         storage_constraints : typing.Mapping[str, ~StorageConstraints]
         Returns -> None
         '''
+        if application is not None and not isinstance(application, (bytes, str)):
+            raise Exception('Expected application to be of type str')
+
+        if channel is not None and not isinstance(channel, (bytes, str)):
+            raise Exception('Expected channel to be of type str')
+
+        if charm_url is not None and not isinstance(charm_url, (bytes, str)):
+            raise Exception('Expected charm_url to be of type str')
+
+        if config_settings is not None and not isinstance(config_settings, dict):
+            raise Exception('Expected config_settings to be of type Mapping')
+
+        if config_settings_yaml is not None and not isinstance(config_settings_yaml, (bytes, str)):
+            raise Exception('Expected config_settings_yaml to be of type str')
+
+        if force_series is not None and not isinstance(force_series, bool):
+            raise Exception('Expected force_series to be of type bool')
+
+        if force_units is not None and not isinstance(force_units, bool):
+            raise Exception('Expected force_units to be of type bool')
+
+        if resource_ids is not None and not isinstance(resource_ids, dict):
+            raise Exception('Expected resource_ids to be of type Mapping')
+
+        if storage_constraints is not None and not isinstance(storage_constraints, dict):
+            raise Exception('Expected storage_constraints to be of type Mapping')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application',
@@ -948,6 +1080,12 @@ class ApplicationFacade(Type):
         constraints : Value
         Returns -> None
         '''
+        if application is not None and not isinstance(application, (bytes, str)):
+            raise Exception('Expected application to be of type str')
+
+        if constraints is not None and not isinstance(constraints, Value):
+            raise Exception('Expected constraints to be of type Value')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application',
@@ -967,6 +1105,9 @@ class ApplicationFacade(Type):
         creds : typing.Sequence[~ApplicationMetricCredential]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if creds is not None and not isinstance(creds, list):
+            raise Exception('Expected creds to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application',
@@ -985,6 +1126,9 @@ class ApplicationFacade(Type):
         application : str
         Returns -> None
         '''
+        if application is not None and not isinstance(application, (bytes, str)):
+            raise Exception('Expected application to be of type str')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application',
@@ -1004,6 +1148,12 @@ class ApplicationFacade(Type):
         options : typing.Sequence[str]
         Returns -> None
         '''
+        if application is not None and not isinstance(application, (bytes, str)):
+            raise Exception('Expected application to be of type str')
+
+        if options is not None and not isinstance(options, list):
+            raise Exception('Expected options to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application',
@@ -1030,6 +1180,30 @@ class ApplicationFacade(Type):
         settings_yaml : str
         Returns -> None
         '''
+        if application is not None and not isinstance(application, (bytes, str)):
+            raise Exception('Expected application to be of type str')
+
+        if charm_url is not None and not isinstance(charm_url, (bytes, str)):
+            raise Exception('Expected charm_url to be of type str')
+
+        if constraints is not None and not isinstance(constraints, Value):
+            raise Exception('Expected constraints to be of type Value')
+
+        if force_charm_url is not None and not isinstance(force_charm_url, bool):
+            raise Exception('Expected force_charm_url to be of type bool')
+
+        if force_series is not None and not isinstance(force_series, bool):
+            raise Exception('Expected force_series to be of type bool')
+
+        if min_units is not None and not isinstance(min_units, int):
+            raise Exception('Expected min_units to be of type int')
+
+        if settings is not None and not isinstance(settings, dict):
+            raise Exception('Expected settings to be of type Mapping')
+
+        if settings_yaml is not None and not isinstance(settings_yaml, (bytes, str)):
+            raise Exception('Expected settings_yaml to be of type str')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Application',
@@ -1103,6 +1277,7 @@ class BundleFacade(Type):
 
         Returns -> typing.Union[_ForwardRef('Error'), str]
         '''
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Bundle',
@@ -1122,6 +1297,12 @@ class BundleFacade(Type):
         yaml : str
         Returns -> typing.Union[typing.Sequence[~BundleChange], typing.Sequence[str]]
         '''
+        if bundleurl is not None and not isinstance(bundleurl, (bytes, str)):
+            raise Exception('Expected bundleurl to be of type str')
+
+        if yaml is not None and not isinstance(yaml, (bytes, str)):
+            raise Exception('Expected yaml to be of type str')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Bundle',
@@ -1501,6 +1682,12 @@ class CloudFacade(Type):
         name : str
         Returns -> None
         '''
+        if cloud is not None and not isinstance(cloud, Cloud):
+            raise Exception('Expected cloud to be of type Cloud')
+
+        if name is not None and not isinstance(name, (bytes, str)):
+            raise Exception('Expected name to be of type str')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Cloud',
@@ -1520,6 +1707,9 @@ class CloudFacade(Type):
         credentials : typing.Sequence[~TaggedCredential]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if credentials is not None and not isinstance(credentials, list):
+            raise Exception('Expected credentials to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Cloud',
@@ -1538,6 +1728,9 @@ class CloudFacade(Type):
         credentials : typing.Sequence[~TaggedCredential]
         Returns -> typing.Sequence[~UpdateCredentialResult]
         '''
+        if credentials is not None and not isinstance(credentials, list):
+            raise Exception('Expected credentials to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Cloud',
@@ -1556,6 +1749,9 @@ class CloudFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~CloudResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Cloud',
@@ -1574,6 +1770,9 @@ class CloudFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~CloudInfoResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Cloud',
@@ -1592,6 +1791,7 @@ class CloudFacade(Type):
 
         Returns -> typing.Mapping[str, ~Cloud]
         '''
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Cloud',
@@ -1610,6 +1810,9 @@ class CloudFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~CloudCredentialResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Cloud',
@@ -1629,6 +1832,12 @@ class CloudFacade(Type):
         include_secrets : bool
         Returns -> typing.Sequence[~CredentialContentResult]
         '''
+        if credentials is not None and not isinstance(credentials, list):
+            raise Exception('Expected credentials to be of type Sequence')
+
+        if include_secrets is not None and not isinstance(include_secrets, bool):
+            raise Exception('Expected include_secrets to be of type bool')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Cloud',
@@ -1648,6 +1857,7 @@ class CloudFacade(Type):
 
         Returns -> typing.Union[_ForwardRef('Error'), str]
         '''
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Cloud',
@@ -1666,6 +1876,9 @@ class CloudFacade(Type):
         constraints : typing.Sequence[~CloudInstanceTypesConstraint]
         Returns -> typing.Sequence[~InstanceTypesResult]
         '''
+        if constraints is not None and not isinstance(constraints, list):
+            raise Exception('Expected constraints to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Cloud',
@@ -1685,6 +1898,12 @@ class CloudFacade(Type):
         user_tag : str
         Returns -> typing.Sequence[~ListCloudInfoResult]
         '''
+        if all_ is not None and not isinstance(all_, bool):
+            raise Exception('Expected all_ to be of type bool')
+
+        if user_tag is not None and not isinstance(user_tag, (bytes, str)):
+            raise Exception('Expected user_tag to be of type str')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Cloud',
@@ -1704,6 +1923,9 @@ class CloudFacade(Type):
         changes : typing.Sequence[~ModifyCloudAccess]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if changes is not None and not isinstance(changes, list):
+            raise Exception('Expected changes to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Cloud',
@@ -1722,6 +1944,9 @@ class CloudFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Cloud',
@@ -1740,6 +1965,9 @@ class CloudFacade(Type):
         credentials : typing.Sequence[~RevokeCredentialArg]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if credentials is not None and not isinstance(credentials, list):
+            raise Exception('Expected credentials to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Cloud',
@@ -1759,6 +1987,12 @@ class CloudFacade(Type):
         force : bool
         Returns -> typing.Sequence[~UpdateCredentialResult]
         '''
+        if credentials is not None and not isinstance(credentials, list):
+            raise Exception('Expected credentials to be of type Sequence')
+
+        if force is not None and not isinstance(force, bool):
+            raise Exception('Expected force to be of type bool')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Cloud',
@@ -1778,6 +2012,9 @@ class CloudFacade(Type):
         user_clouds : typing.Sequence[~UserCloud]
         Returns -> typing.Sequence[~StringsResult]
         '''
+        if user_clouds is not None and not isinstance(user_clouds, list):
+            raise Exception('Expected user_clouds to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Cloud',
@@ -2066,6 +2303,7 @@ class ControllerFacade(Type):
 
         Returns -> typing.Sequence[~UserModel]
         '''
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Controller',
@@ -2084,6 +2322,9 @@ class ControllerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~CloudSpecResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Controller',
@@ -2102,6 +2343,7 @@ class ControllerFacade(Type):
 
         Returns -> typing.Mapping[str, typing.Any]
         '''
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Controller',
@@ -2120,6 +2362,9 @@ class ControllerFacade(Type):
         destroy_models : bool
         Returns -> None
         '''
+        if destroy_models is not None and not isinstance(destroy_models, bool):
+            raise Exception('Expected destroy_models to be of type bool')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Controller',
@@ -2138,6 +2383,7 @@ class ControllerFacade(Type):
 
         Returns -> typing.Union[_ForwardRef('Error'), _ForwardRef('CloudSpec')]
         '''
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Controller',
@@ -2156,6 +2402,9 @@ class ControllerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~UserAccessResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Controller',
@@ -2174,6 +2423,7 @@ class ControllerFacade(Type):
 
         Returns -> typing.Sequence[~HostedModelConfig]
         '''
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Controller',
@@ -2192,6 +2442,9 @@ class ControllerFacade(Type):
         specs : typing.Sequence[~MigrationSpec]
         Returns -> typing.Sequence[~InitiateMigrationResult]
         '''
+        if specs is not None and not isinstance(specs, list):
+            raise Exception('Expected specs to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Controller',
@@ -2210,6 +2463,7 @@ class ControllerFacade(Type):
 
         Returns -> typing.Sequence[~ModelBlockInfo]
         '''
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Controller',
@@ -2228,6 +2482,7 @@ class ControllerFacade(Type):
 
         Returns -> typing.Mapping[str, ~ConfigValue]
         '''
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Controller',
@@ -2246,6 +2501,9 @@ class ControllerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~ModelStatus]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Controller',
@@ -2264,6 +2522,9 @@ class ControllerFacade(Type):
         changes : typing.Sequence[~ModifyControllerAccess]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if changes is not None and not isinstance(changes, list):
+            raise Exception('Expected changes to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Controller',
@@ -2282,6 +2543,9 @@ class ControllerFacade(Type):
         all_ : bool
         Returns -> None
         '''
+        if all_ is not None and not isinstance(all_, bool):
+            raise Exception('Expected all_ to be of type bool')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Controller',
@@ -2300,6 +2564,7 @@ class ControllerFacade(Type):
 
         Returns -> str
         '''
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Controller',
@@ -2513,6 +2778,9 @@ class FirewallerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~CloudSpecResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Firewaller',
@@ -2531,6 +2799,9 @@ class FirewallerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~StringResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Firewaller',
@@ -2549,6 +2820,7 @@ class FirewallerFacade(Type):
 
         Returns -> typing.Union[_ForwardRef('Error'), _ForwardRef('CloudSpec')]
         '''
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Firewaller',
@@ -2567,6 +2839,9 @@ class FirewallerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~BoolResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Firewaller',
@@ -2585,6 +2860,9 @@ class FirewallerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~StringsResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Firewaller',
@@ -2603,6 +2881,9 @@ class FirewallerFacade(Type):
         params : typing.Sequence[~MachinePorts]
         Returns -> typing.Sequence[~MachinePortsResult]
         '''
+        if params is not None and not isinstance(params, list):
+            raise Exception('Expected params to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Firewaller',
@@ -2621,6 +2902,9 @@ class FirewallerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~StringResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Firewaller',
@@ -2639,6 +2923,9 @@ class FirewallerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~LifeResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Firewaller',
@@ -2657,6 +2944,7 @@ class FirewallerFacade(Type):
 
         Returns -> typing.Mapping[str, typing.Any]
         '''
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Firewaller',
@@ -2675,6 +2963,9 @@ class FirewallerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~NotifyWatchResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Firewaller',
@@ -2693,6 +2984,7 @@ class FirewallerFacade(Type):
 
         Returns -> typing.Union[str, _ForwardRef('Error')]
         '''
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Firewaller',
@@ -2711,6 +3003,7 @@ class FirewallerFacade(Type):
 
         Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error'), str]
         '''
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Firewaller',
@@ -2729,6 +3022,9 @@ class FirewallerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~StringsWatchResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Firewaller',
@@ -2747,6 +3043,9 @@ class FirewallerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~StringsWatchResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Firewaller',
@@ -2772,6 +3071,7 @@ class ImageMetadataFacade(Type):
 
         Returns -> None
         '''
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='ImageMetadata',
@@ -2969,6 +3269,9 @@ class InstancePollerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~BoolResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='InstancePoller',
@@ -2987,6 +3290,9 @@ class InstancePollerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~StringResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='InstancePoller',
@@ -3005,6 +3311,9 @@ class InstancePollerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~StatusResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='InstancePoller',
@@ -3023,6 +3332,9 @@ class InstancePollerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~LifeResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='InstancePoller',
@@ -3041,6 +3353,7 @@ class InstancePollerFacade(Type):
 
         Returns -> typing.Mapping[str, typing.Any]
         '''
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='InstancePoller',
@@ -3059,6 +3372,9 @@ class InstancePollerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~MachineAddressesResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='InstancePoller',
@@ -3077,6 +3393,9 @@ class InstancePollerFacade(Type):
         entities : typing.Sequence[~EntityStatusArgs]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='InstancePoller',
@@ -3095,6 +3414,9 @@ class InstancePollerFacade(Type):
         machine_addresses : typing.Sequence[~MachineAddresses]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if machine_addresses is not None and not isinstance(machine_addresses, list):
+            raise Exception('Expected machine_addresses to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='InstancePoller',
@@ -3113,6 +3435,9 @@ class InstancePollerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~StatusResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='InstancePoller',
@@ -3131,6 +3456,7 @@ class InstancePollerFacade(Type):
 
         Returns -> typing.Union[str, _ForwardRef('Error')]
         '''
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='InstancePoller',
@@ -3149,6 +3475,7 @@ class InstancePollerFacade(Type):
 
         Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error'), str]
         '''
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='InstancePoller',
@@ -3336,6 +3663,9 @@ class MachineManagerFacade(Type):
         params : typing.Sequence[~AddMachineParams]
         Returns -> typing.Sequence[~AddMachinesResult]
         '''
+        if params is not None and not isinstance(params, list):
+            raise Exception('Expected params to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='MachineManager',
@@ -3354,6 +3684,9 @@ class MachineManagerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~DestroyMachineResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='MachineManager',
@@ -3372,6 +3705,9 @@ class MachineManagerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~DestroyMachineResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='MachineManager',
@@ -3390,6 +3726,9 @@ class MachineManagerFacade(Type):
         constraints : typing.Sequence[~ModelInstanceTypesConstraint]
         Returns -> typing.Sequence[~InstanceTypesResult]
         '''
+        if constraints is not None and not isinstance(constraints, list):
+            raise Exception('Expected constraints to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='MachineManager',
@@ -3717,6 +4056,24 @@ class ModelManagerFacade(Type):
         region : str
         Returns -> typing.Union[_ForwardRef('Number'), str, typing.Sequence[~ModelMachineInfo], _ForwardRef('ModelMigrationStatus'), _ForwardRef('ModelSLAInfo'), _ForwardRef('EntityStatus'), typing.Sequence[~ModelUserInfo]]
         '''
+        if cloud_tag is not None and not isinstance(cloud_tag, (bytes, str)):
+            raise Exception('Expected cloud_tag to be of type str')
+
+        if config is not None and not isinstance(config, dict):
+            raise Exception('Expected config to be of type Mapping')
+
+        if credential is not None and not isinstance(credential, (bytes, str)):
+            raise Exception('Expected credential to be of type str')
+
+        if name is not None and not isinstance(name, (bytes, str)):
+            raise Exception('Expected name to be of type str')
+
+        if owner_tag is not None and not isinstance(owner_tag, (bytes, str)):
+            raise Exception('Expected owner_tag to be of type str')
+
+        if region is not None and not isinstance(region, (bytes, str)):
+            raise Exception('Expected region to be of type str')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='ModelManager',
@@ -3740,6 +4097,9 @@ class ModelManagerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='ModelManager',
@@ -3759,6 +4119,12 @@ class ModelManagerFacade(Type):
         simplified : bool
         Returns -> typing.Sequence[~StringResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
+        if simplified is not None and not isinstance(simplified, bool):
+            raise Exception('Expected simplified to be of type bool')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='ModelManager',
@@ -3778,6 +4144,9 @@ class ModelManagerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~MapResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='ModelManager',
@@ -3796,6 +4165,9 @@ class ModelManagerFacade(Type):
         tag : str
         Returns -> typing.Sequence[~UserModel]
         '''
+        if tag is not None and not isinstance(tag, (bytes, str)):
+            raise Exception('Expected tag to be of type str')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='ModelManager',
@@ -3814,6 +4186,7 @@ class ModelManagerFacade(Type):
 
         Returns -> typing.Mapping[str, ~ModelDefaults]
         '''
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='ModelManager',
@@ -3832,6 +4205,9 @@ class ModelManagerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~ModelInfoResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='ModelManager',
@@ -3850,6 +4226,9 @@ class ModelManagerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~ModelStatus]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='ModelManager',
@@ -3868,6 +4247,9 @@ class ModelManagerFacade(Type):
         changes : typing.Sequence[~ModifyModelAccess]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if changes is not None and not isinstance(changes, list):
+            raise Exception('Expected changes to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='ModelManager',
@@ -3886,6 +4268,9 @@ class ModelManagerFacade(Type):
         config : typing.Sequence[~ModelDefaultValues]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if config is not None and not isinstance(config, list):
+            raise Exception('Expected config to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='ModelManager',
@@ -3904,6 +4289,9 @@ class ModelManagerFacade(Type):
         keys : typing.Sequence[~ModelUnsetKeys]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if keys is not None and not isinstance(keys, list):
+            raise Exception('Expected keys to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='ModelManager',
@@ -4571,6 +4959,7 @@ class ProvisionerFacade(Type):
 
         Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence[str]]
         '''
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -4589,6 +4978,7 @@ class ProvisionerFacade(Type):
 
         Returns -> typing.Sequence[~HostPort]
         '''
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -4607,6 +4997,7 @@ class ProvisionerFacade(Type):
 
         Returns -> typing.Sequence[int]
         '''
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -4625,6 +5016,9 @@ class ProvisionerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~ConstraintsResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -4643,6 +5037,7 @@ class ProvisionerFacade(Type):
 
         Returns -> typing.Union[_ForwardRef('UpdateBehavior'), str, _ForwardRef('Settings'), bool]
         '''
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -4661,6 +5056,9 @@ class ProvisionerFacade(Type):
         type_ : str
         Returns -> typing.Mapping[str, str]
         '''
+        if type_ is not None and not isinstance(type_, (bytes, str)):
+            raise Exception('Expected type_ to be of type str')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -4679,6 +5077,7 @@ class ProvisionerFacade(Type):
 
         Returns -> typing.Mapping[str, typing.Any]
         '''
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -4697,6 +5096,9 @@ class ProvisionerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~DistributionGroupResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -4715,6 +5117,9 @@ class ProvisionerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -4737,6 +5142,21 @@ class ProvisionerFacade(Type):
         series : str
         Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence[~Tools]]
         '''
+        if arch is not None and not isinstance(arch, (bytes, str)):
+            raise Exception('Expected arch to be of type str')
+
+        if major is not None and not isinstance(major, int):
+            raise Exception('Expected major to be of type int')
+
+        if minor is not None and not isinstance(minor, int):
+            raise Exception('Expected minor to be of type int')
+
+        if number is not None and not isinstance(number, Number):
+            raise Exception('Expected number to be of type Number')
+
+        if series is not None and not isinstance(series, (bytes, str)):
+            raise Exception('Expected series to be of type str')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -4759,6 +5179,9 @@ class ProvisionerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~MachineNetworkConfigResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -4777,6 +5200,9 @@ class ProvisionerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~HostNetworkChange]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -4795,6 +5221,9 @@ class ProvisionerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~StringResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -4813,6 +5242,9 @@ class ProvisionerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~StatusResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -4831,6 +5263,9 @@ class ProvisionerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~LifeResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -4849,6 +5284,7 @@ class ProvisionerFacade(Type):
 
         Returns -> typing.Sequence[~StatusResult]
         '''
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -4867,6 +5303,9 @@ class ProvisionerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -4885,6 +5324,7 @@ class ProvisionerFacade(Type):
 
         Returns -> typing.Mapping[str, typing.Any]
         '''
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -4903,6 +5343,7 @@ class ProvisionerFacade(Type):
 
         Returns -> typing.Union[_ForwardRef('Error'), str]
         '''
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -4921,6 +5362,9 @@ class ProvisionerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~MachineNetworkConfigResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -4939,6 +5383,9 @@ class ProvisionerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~ProvisioningInfoResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -4957,6 +5404,9 @@ class ProvisionerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -4975,6 +5425,9 @@ class ProvisionerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -4993,6 +5446,9 @@ class ProvisionerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~StringResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -5012,6 +5468,12 @@ class ProvisionerFacade(Type):
         tag : str
         Returns -> None
         '''
+        if config is not None and not isinstance(config, list):
+            raise Exception('Expected config to be of type Sequence')
+
+        if tag is not None and not isinstance(tag, (bytes, str)):
+            raise Exception('Expected tag to be of type str')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -5031,6 +5493,9 @@ class ProvisionerFacade(Type):
         machines : typing.Sequence[~InstanceInfo]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if machines is not None and not isinstance(machines, list):
+            raise Exception('Expected machines to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -5049,6 +5514,9 @@ class ProvisionerFacade(Type):
         entities : typing.Sequence[~EntityStatusArgs]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -5068,6 +5536,12 @@ class ProvisionerFacade(Type):
         tag : str
         Returns -> None
         '''
+        if config is not None and not isinstance(config, list):
+            raise Exception('Expected config to be of type Sequence')
+
+        if tag is not None and not isinstance(tag, (bytes, str)):
+            raise Exception('Expected tag to be of type str')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -5087,6 +5561,9 @@ class ProvisionerFacade(Type):
         changes : typing.Sequence[~EntityPassword]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if changes is not None and not isinstance(changes, list):
+            raise Exception('Expected changes to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -5105,6 +5582,9 @@ class ProvisionerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -5123,6 +5603,9 @@ class ProvisionerFacade(Type):
         entities : typing.Sequence[~EntityStatusArgs]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -5141,6 +5624,9 @@ class ProvisionerFacade(Type):
         params : typing.Sequence[~MachineContainers]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if params is not None and not isinstance(params, list):
+            raise Exception('Expected params to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -5159,6 +5645,7 @@ class ProvisionerFacade(Type):
 
         Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence[str]]
         '''
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -5177,6 +5664,9 @@ class ProvisionerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~StatusResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -5195,6 +5685,9 @@ class ProvisionerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~ToolsResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -5213,6 +5706,9 @@ class ProvisionerFacade(Type):
         entities : typing.Sequence[~EntityStatusArgs]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -5231,6 +5727,7 @@ class ProvisionerFacade(Type):
 
         Returns -> typing.Union[str, _ForwardRef('Error')]
         '''
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -5249,6 +5746,9 @@ class ProvisionerFacade(Type):
         params : typing.Sequence[~WatchContainer]
         Returns -> typing.Sequence[~StringsWatchResult]
         '''
+        if params is not None and not isinstance(params, list):
+            raise Exception('Expected params to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -5267,6 +5767,9 @@ class ProvisionerFacade(Type):
         params : typing.Sequence[~WatchContainer]
         Returns -> typing.Sequence[~StringsWatchResult]
         '''
+        if params is not None and not isinstance(params, list):
+            raise Exception('Expected params to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -5285,6 +5788,7 @@ class ProvisionerFacade(Type):
 
         Returns -> typing.Union[str, _ForwardRef('Error')]
         '''
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -5303,6 +5807,7 @@ class ProvisionerFacade(Type):
 
         Returns -> typing.Union[str, _ForwardRef('Error')]
         '''
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -5321,6 +5826,7 @@ class ProvisionerFacade(Type):
 
         Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error'), str]
         '''
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -5411,6 +5917,9 @@ class SpacesFacade(Type):
         spaces : typing.Sequence[~CreateSpaceParams]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if spaces is not None and not isinstance(spaces, list):
+            raise Exception('Expected spaces to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Spaces',
@@ -5429,6 +5938,7 @@ class SpacesFacade(Type):
 
         Returns -> typing.Sequence[~Space]
         '''
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Spaces',
@@ -5447,6 +5957,7 @@ class SpacesFacade(Type):
 
         Returns -> None
         '''
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Spaces',
@@ -5734,6 +6245,9 @@ class StorageFacade(Type):
         storages : typing.Sequence[~StorageAddParams]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if storages is not None and not isinstance(storages, list):
+            raise Exception('Expected storages to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Storage',
@@ -5752,6 +6266,9 @@ class StorageFacade(Type):
         ids : typing.Sequence[~StorageAttachmentId]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if ids is not None and not isinstance(ids, list):
+            raise Exception('Expected ids to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Storage',
@@ -5772,6 +6289,15 @@ class StorageFacade(Type):
         provider : str
         Returns -> None
         '''
+        if attrs is not None and not isinstance(attrs, dict):
+            raise Exception('Expected attrs to be of type Mapping')
+
+        if name is not None and not isinstance(name, (bytes, str)):
+            raise Exception('Expected name to be of type str')
+
+        if provider is not None and not isinstance(provider, (bytes, str)):
+            raise Exception('Expected provider to be of type str')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Storage',
@@ -5792,6 +6318,9 @@ class StorageFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Storage',
@@ -5810,6 +6339,9 @@ class StorageFacade(Type):
         ids : typing.Sequence[~StorageAttachmentId]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if ids is not None and not isinstance(ids, list):
+            raise Exception('Expected ids to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Storage',
@@ -5828,6 +6360,9 @@ class StorageFacade(Type):
         filters : typing.Sequence[~FilesystemFilter]
         Returns -> typing.Sequence[~FilesystemDetailsListResult]
         '''
+        if filters is not None and not isinstance(filters, list):
+            raise Exception('Expected filters to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Storage',
@@ -5846,6 +6381,9 @@ class StorageFacade(Type):
         filters : typing.Sequence[~StoragePoolFilter]
         Returns -> typing.Sequence[~StoragePoolsResult]
         '''
+        if filters is not None and not isinstance(filters, list):
+            raise Exception('Expected filters to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Storage',
@@ -5864,6 +6402,9 @@ class StorageFacade(Type):
         filters : typing.Sequence[~StorageFilter]
         Returns -> typing.Sequence[~StorageDetailsListResult]
         '''
+        if filters is not None and not isinstance(filters, list):
+            raise Exception('Expected filters to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Storage',
@@ -5882,6 +6423,9 @@ class StorageFacade(Type):
         filters : typing.Sequence[~VolumeFilter]
         Returns -> typing.Sequence[~VolumeDetailsListResult]
         '''
+        if filters is not None and not isinstance(filters, list):
+            raise Exception('Expected filters to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Storage',
@@ -5900,6 +6444,9 @@ class StorageFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~StorageDetailsResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Storage',
@@ -6348,6 +6895,9 @@ class StorageProvisionerFacade(Type):
         ids : typing.Sequence[~MachineStorageId]
         Returns -> typing.Sequence[~LifeResult]
         '''
+        if ids is not None and not isinstance(ids, list):
+            raise Exception('Expected ids to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -6366,6 +6916,9 @@ class StorageProvisionerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -6384,6 +6937,9 @@ class StorageProvisionerFacade(Type):
         ids : typing.Sequence[~MachineStorageId]
         Returns -> typing.Sequence[~FilesystemAttachmentParamsResult]
         '''
+        if ids is not None and not isinstance(ids, list):
+            raise Exception('Expected ids to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -6402,6 +6958,9 @@ class StorageProvisionerFacade(Type):
         ids : typing.Sequence[~MachineStorageId]
         Returns -> typing.Sequence[~FilesystemAttachmentResult]
         '''
+        if ids is not None and not isinstance(ids, list):
+            raise Exception('Expected ids to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -6420,6 +6979,9 @@ class StorageProvisionerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~FilesystemParamsResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -6438,6 +7000,9 @@ class StorageProvisionerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~FilesystemResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -6456,6 +7021,9 @@ class StorageProvisionerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~StringResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -6474,6 +7042,9 @@ class StorageProvisionerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~LifeResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -6492,6 +7063,9 @@ class StorageProvisionerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -6510,6 +7084,9 @@ class StorageProvisionerFacade(Type):
         ids : typing.Sequence[~MachineStorageId]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if ids is not None and not isinstance(ids, list):
+            raise Exception('Expected ids to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -6528,6 +7105,9 @@ class StorageProvisionerFacade(Type):
         filesystem_attachments : typing.Sequence[~FilesystemAttachment]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if filesystem_attachments is not None and not isinstance(filesystem_attachments, list):
+            raise Exception('Expected filesystem_attachments to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -6546,6 +7126,9 @@ class StorageProvisionerFacade(Type):
         filesystems : typing.Sequence[~Filesystem]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if filesystems is not None and not isinstance(filesystems, list):
+            raise Exception('Expected filesystems to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -6564,6 +7147,9 @@ class StorageProvisionerFacade(Type):
         entities : typing.Sequence[~EntityStatusArgs]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -6582,6 +7168,9 @@ class StorageProvisionerFacade(Type):
         volume_attachments : typing.Sequence[~VolumeAttachment]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if volume_attachments is not None and not isinstance(volume_attachments, list):
+            raise Exception('Expected volume_attachments to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -6600,6 +7189,9 @@ class StorageProvisionerFacade(Type):
         volumes : typing.Sequence[~Volume]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if volumes is not None and not isinstance(volumes, list):
+            raise Exception('Expected volumes to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -6618,6 +7210,9 @@ class StorageProvisionerFacade(Type):
         entities : typing.Sequence[~EntityStatusArgs]
         Returns -> typing.Sequence[~ErrorResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -6636,6 +7231,9 @@ class StorageProvisionerFacade(Type):
         ids : typing.Sequence[~MachineStorageId]
         Returns -> typing.Sequence[~VolumeAttachmentParamsResult]
         '''
+        if ids is not None and not isinstance(ids, list):
+            raise Exception('Expected ids to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -6654,6 +7252,9 @@ class StorageProvisionerFacade(Type):
         ids : typing.Sequence[~MachineStorageId]
         Returns -> typing.Sequence[~VolumeAttachmentResult]
         '''
+        if ids is not None and not isinstance(ids, list):
+            raise Exception('Expected ids to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -6672,6 +7273,9 @@ class StorageProvisionerFacade(Type):
         ids : typing.Sequence[~MachineStorageId]
         Returns -> typing.Sequence[~BlockDeviceResult]
         '''
+        if ids is not None and not isinstance(ids, list):
+            raise Exception('Expected ids to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -6690,6 +7294,9 @@ class StorageProvisionerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~VolumeParamsResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -6708,6 +7315,9 @@ class StorageProvisionerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~VolumeResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -6726,6 +7336,9 @@ class StorageProvisionerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~NotifyWatchResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -6744,6 +7357,9 @@ class StorageProvisionerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~MachineStorageIdsWatchResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -6762,6 +7378,9 @@ class StorageProvisionerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~StringsWatchResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -6780,6 +7399,9 @@ class StorageProvisionerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~NotifyWatchResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -6798,6 +7420,9 @@ class StorageProvisionerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~MachineStorageIdsWatchResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -6816,6 +7441,9 @@ class StorageProvisionerFacade(Type):
         entities : typing.Sequence[~Entity]
         Returns -> typing.Sequence[~StringsWatchResult]
         '''
+        if entities is not None and not isinstance(entities, list):
+            raise Exception('Expected entities to be of type Sequence')
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',

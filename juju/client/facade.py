@@ -185,11 +185,11 @@ def booler(v):
 basic_types = [str, bool, int, float]
 
 
-basic_values = {
-    'str': '""',
-    'bool': 'False',
-    'int': '0',
-    'float': '0',
+type_mapping = {
+    'str': '(bytes, str)',
+    'Sequence': 'list',
+    'Union': 'dict',
+    'Mapping': 'dict',
 }
 
 
@@ -202,16 +202,20 @@ def name_to_py(name):
 
 
 def var_type_to_py(kind):
-    # Experimental behaviour where types are filled in from the values assigned
-    # via the type. This can be useful for better type handling, but should be
-    # experimented only with a feature flag.
-    if feature_enabled(DEFAULT_VALUES_FLAG):
-        var_name = None
-        if (kind in basic_types or type(kind) in basic_types):
-            var_name = kind.__name__
-        if var_name in basic_values:
-            return basic_values[var_name]
     return 'None'
+
+
+def kind_to_py(kind):
+    if kind is None:
+        return 'None', False
+    name = kind.__name__
+    if (kind in basic_types or type(kind) in basic_types):
+        return name, type_mapping.get(name) or name, True
+    if (name in type_mapping):
+        return name, type_mapping[name], True
+
+    suffix = name.lstrip("~")
+    return suffix, suffix, True
 
 
 def strcast(kind, keep_builtins=False):
@@ -291,6 +295,20 @@ class Args(list):
             return ', '.join(parts)
         return ''
 
+    def as_validation(self):
+        if self:
+            parts = []
+            for item in self:
+                ''' if name is not None and not isinstance(name, type):
+                        raise JujuError("Expected {} to be of type {}".format(name, type))
+                '''
+                var_name = name_to_py(item[0])
+                var_type, var_sub_type, ok = kind_to_py(item[1])
+                if ok:
+                    parts.append('{}'.format(buildValidation(var_name, var_type, var_sub_type)))
+            return '\n'.join(parts)
+        return ''
+
     def typed(self):
         return self._get_arg_str(True)
 
@@ -299,6 +317,17 @@ class Args(list):
 
     def get_doc(self):
         return self._get_arg_str(True, "\n")
+
+
+def buildValidation(name, instance_type, instance_sub_type, ident=None):
+    INDENT = ident or "    "
+    source = """{ident}if {name} is not None and not isinstance({name}, {instance_sub_type}):
+{ident}    raise Exception('Expected {name} to be of type {instance_type}')
+""".format(ident=INDENT,
+           name=name,
+           instance_type=instance_type,
+           instance_sub_type=instance_sub_type)
+    return source
 
 
 def buildTypes(schema, capture):
@@ -331,6 +360,13 @@ class {}(Type):
         if not args:
             source.append("{}self.unknown_fields = unknown_fields".format(INDENT * 2))
         else:
+            # do the validation first, before setting the variables
+            for arg in args:
+                arg_name = name_to_py(arg[0])
+                arg_type, arg_sub_type, ok = kind_to_py(arg[1])
+                if ok:
+                    source.append('{}'.format(buildValidation(arg_name, arg_type, arg_sub_type, ident=INDENT*2)))
+
             for arg in args:
                 arg_name = name_to_py(arg[0])
                 arg_type = arg[1]
@@ -469,6 +505,7 @@ def makeFunc(cls, name, params, result, _async=True):
 {docstring}
     Returns -> {res}
     '''
+{validation}
     # map input types to rpc msg
     _params = dict()
     msg = dict(type='{cls.name}',
@@ -486,6 +523,7 @@ def makeFunc(cls, name, params, result, _async=True):
                             argsep=", " if args else "",
                             args=args.as_kwargs(),
                             res=res,
+                            validation=args.as_validation(),
                             rettype=result.__name__ if result else None,
                             docstring=textwrap.indent(args.get_doc(), INDENT),
                             cls=cls,
