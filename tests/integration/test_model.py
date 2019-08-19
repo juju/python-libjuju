@@ -108,6 +108,26 @@ async def test_deploy_trusted_bundle(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_deploy_local_bundle_file_with_per_charm_channels(event_loop):
+    tests_dir = Path(__file__).absolute().parent.parent
+    bundle_path = tests_dir / 'integration' / 'bundle'
+    mini_bundle_file_path = bundle_path / 'bundle-with-channels.yaml'
+
+    async with base.CleanModel() as model:
+        await model.deploy(str(mini_bundle_file_path))
+
+        dummy_in_edge = model.applications.get('dummy-in-edge')
+        dummy_in_beta = model.applications.get('other-dummy-in-beta')
+        wordpress_in_stable = model.applications.get('wordpress')
+        assert dummy_in_beta and dummy_in_beta and wordpress_in_stable
+        await block_until(lambda: (len(dummy_in_edge.units) == 1 and
+                                   len(dummy_in_beta.units) == 1 and
+                                   len(wordpress_in_stable.units) == 1),
+                          timeout=60 * 4)
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_deploy_channels_revs(event_loop):
     async with base.CleanModel() as model:
         charm = 'cs:~johnsca/libjuju-test'

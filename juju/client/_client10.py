@@ -305,9 +305,27 @@ class ApplicationFacade(Type):
                      'ConsumeApplicationArg': {'additionalProperties': False,
                                                'properties': {'ApplicationOfferDetails': {'$ref': '#/definitions/ApplicationOfferDetails'},
                                                               'application-alias': {'type': 'string'},
+                                                              'application-description': {'type': 'string'},
+                                                              'bindings': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                           'type': 'object'},
+                                                              'endpoints': {'items': {'$ref': '#/definitions/RemoteEndpoint'},
+                                                                            'type': 'array'},
                                                               'external-controller': {'$ref': '#/definitions/ExternalControllerInfo'},
-                                                              'macaroon': {'$ref': '#/definitions/Macaroon'}},
-                                               'required': ['ApplicationOfferDetails'],
+                                                              'macaroon': {'$ref': '#/definitions/Macaroon'},
+                                                              'offer-name': {'type': 'string'},
+                                                              'offer-url': {'type': 'string'},
+                                                              'offer-uuid': {'type': 'string'},
+                                                              'source-model-tag': {'type': 'string'},
+                                                              'spaces': {'items': {'$ref': '#/definitions/RemoteSpace'},
+                                                                         'type': 'array'},
+                                                              'users': {'items': {'$ref': '#/definitions/OfferUserDetails'},
+                                                                        'type': 'array'}},
+                                               'required': ['source-model-tag',
+                                                            'offer-uuid',
+                                                            'offer-url',
+                                                            'offer-name',
+                                                            'application-description',
+                                                            'ApplicationOfferDetails'],
                                                'type': 'object'},
                      'ConsumeApplicationArgs': {'additionalProperties': False,
                                                 'properties': {'args': {'items': {'$ref': '#/definitions/ConsumeApplicationArg'},
@@ -660,9 +678,9 @@ class ApplicationFacade(Type):
     @ReturnMapping(AddRelationResults)
     async def AddRelation(self, endpoints=None, via_cidrs=None):
         '''
-        endpoints : typing.Sequence<+T_co>[str]
-        via_cidrs : typing.Sequence<+T_co>[str]
-        Returns -> typing.Mapping<~KT, +VT_co>[str, ~CharmRelation]<~CharmRelation>
+        endpoints : typing.Sequence[str]
+        via_cidrs : typing.Sequence[str]
+        Returns -> typing.Mapping[str, ~CharmRelation]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -681,11 +699,11 @@ class ApplicationFacade(Type):
     async def AddUnits(self, application="", attach_storage=None, num_units=0, placement=None, policy=""):
         '''
         application : str
-        attach_storage : typing.Sequence<+T_co>[str]
+        attach_storage : typing.Sequence[str]
         num_units : int
-        placement : typing.Sequence<+T_co>[~Placement]<~Placement>
+        placement : typing.Sequence[~Placement]
         policy : str
-        Returns -> typing.Sequence<+T_co>[str]
+        Returns -> typing.Sequence[str]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -706,8 +724,8 @@ class ApplicationFacade(Type):
     @ReturnMapping(ApplicationInfoResults)
     async def ApplicationsInfo(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~ApplicationInfoResult]<~ApplicationInfoResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~ApplicationInfoResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -724,8 +742,8 @@ class ApplicationFacade(Type):
     @ReturnMapping(ApplicationGetConfigResults)
     async def CharmConfig(self, args=None):
         '''
-        args : typing.Sequence<+T_co>[~ApplicationGet]<~ApplicationGet>
-        Returns -> typing.Sequence<+T_co>[~ConfigResult]<~ConfigResult>
+        args : typing.Sequence[~ApplicationGet]
+        Returns -> typing.Sequence[~ConfigResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -743,7 +761,7 @@ class ApplicationFacade(Type):
     async def CharmRelations(self, application=""):
         '''
         application : str
-        Returns -> typing.Sequence<+T_co>[str]
+        Returns -> typing.Sequence[str]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -760,8 +778,8 @@ class ApplicationFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Consume(self, args=None):
         '''
-        args : typing.Sequence<+T_co>[~ConsumeApplicationArg]<~ConsumeApplicationArg>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        args : typing.Sequence[~ConsumeApplicationArg]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -778,8 +796,8 @@ class ApplicationFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Deploy(self, applications=None):
         '''
-        applications : typing.Sequence<+T_co>[~ApplicationDeploy]<~ApplicationDeploy>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        applications : typing.Sequence[~ApplicationDeploy]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -814,8 +832,8 @@ class ApplicationFacade(Type):
     @ReturnMapping(DestroyApplicationResults)
     async def DestroyApplication(self, applications=None):
         '''
-        applications : typing.Sequence<+T_co>[~DestroyApplicationParams]<~DestroyApplicationParams>
-        Returns -> typing.Sequence<+T_co>[~DestroyApplicationResult]<~DestroyApplicationResult>
+        applications : typing.Sequence[~DestroyApplicationParams]
+        Returns -> typing.Sequence[~DestroyApplicationResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -832,8 +850,8 @@ class ApplicationFacade(Type):
     @ReturnMapping(ErrorResults)
     async def DestroyConsumedApplications(self, applications=None):
         '''
-        applications : typing.Sequence<+T_co>[~DestroyConsumedApplicationParams]<~DestroyConsumedApplicationParams>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        applications : typing.Sequence[~DestroyConsumedApplicationParams]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -850,7 +868,7 @@ class ApplicationFacade(Type):
     @ReturnMapping(None)
     async def DestroyRelation(self, endpoints=None, force=False, max_wait=0, relation_id=0):
         '''
-        endpoints : typing.Sequence<+T_co>[str]
+        endpoints : typing.Sequence[str]
         force : bool
         max_wait : int
         relation_id : int
@@ -874,8 +892,8 @@ class ApplicationFacade(Type):
     @ReturnMapping(DestroyUnitResults)
     async def DestroyUnit(self, units=None):
         '''
-        units : typing.Sequence<+T_co>[~DestroyUnitParams]<~DestroyUnitParams>
-        Returns -> typing.Sequence<+T_co>[~DestroyUnitResult]<~DestroyUnitResult>
+        units : typing.Sequence[~DestroyUnitParams]
+        Returns -> typing.Sequence[~DestroyUnitResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -892,7 +910,7 @@ class ApplicationFacade(Type):
     @ReturnMapping(None)
     async def DestroyUnits(self, unit_names=None):
         '''
-        unit_names : typing.Sequence<+T_co>[str]
+        unit_names : typing.Sequence[str]
         Returns -> None
         '''
         # map input types to rpc msg
@@ -930,7 +948,7 @@ class ApplicationFacade(Type):
         '''
         application : str
         branch : str
-        Returns -> typing.Union[str, typing.Mapping<~KT, +VT_co>[str, typing.Any], _ForwardRef('Value')]
+        Returns -> typing.Union[str, typing.Mapping[str, typing.Any], _ForwardRef('Value')]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -968,8 +986,8 @@ class ApplicationFacade(Type):
     @ReturnMapping(ApplicationGetConfigResults)
     async def GetConfig(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~ConfigResult]<~ConfigResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~ConfigResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -986,8 +1004,8 @@ class ApplicationFacade(Type):
     @ReturnMapping(ApplicationGetConstraintsResults)
     async def GetConstraints(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~ApplicationConstraint]<~ApplicationConstraint>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~ApplicationConstraint]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -1007,7 +1025,7 @@ class ApplicationFacade(Type):
         all_ : bool
         retry : bool
         tags : Entities
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -1026,8 +1044,8 @@ class ApplicationFacade(Type):
     @ReturnMapping(ScaleApplicationResults)
     async def ScaleApplications(self, applications=None):
         '''
-        applications : typing.Sequence<+T_co>[~ScaleApplicationParams]<~ScaleApplicationParams>
-        Returns -> typing.Sequence<+T_co>[~ScaleApplicationResult]<~ScaleApplicationResult>
+        applications : typing.Sequence[~ScaleApplicationParams]
+        Returns -> typing.Sequence[~ScaleApplicationResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -1046,7 +1064,7 @@ class ApplicationFacade(Type):
         '''
         application : str
         branch : str
-        options : typing.Mapping<~KT, +VT_co>[str, str]
+        options : typing.Mapping[str, str]
         Returns -> None
         '''
         # map input types to rpc msg
@@ -1066,8 +1084,8 @@ class ApplicationFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetApplicationsConfig(self, args=None):
         '''
-        args : typing.Sequence<+T_co>[~ApplicationConfigSet]<~ApplicationConfigSet>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        args : typing.Sequence[~ApplicationConfigSet]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -1087,14 +1105,14 @@ class ApplicationFacade(Type):
         application : str
         channel : str
         charm_url : str
-        config_settings : typing.Mapping<~KT, +VT_co>[str, str]
+        config_settings : typing.Mapping[str, str]
         config_settings_yaml : str
         force : bool
         force_series : bool
         force_units : bool
         generation : str
-        resource_ids : typing.Mapping<~KT, +VT_co>[str, str]
-        storage_constraints : typing.Mapping<~KT, +VT_co>[str, ~StorageConstraints]<~StorageConstraints>
+        resource_ids : typing.Mapping[str, str]
+        storage_constraints : typing.Mapping[str, ~StorageConstraints]
         Returns -> None
         '''
         # map input types to rpc msg
@@ -1142,8 +1160,8 @@ class ApplicationFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetMetricCredentials(self, creds=None):
         '''
-        creds : typing.Sequence<+T_co>[~ApplicationMetricCredential]<~ApplicationMetricCredential>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        creds : typing.Sequence[~ApplicationMetricCredential]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -1160,8 +1178,8 @@ class ApplicationFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetRelationsSuspended(self, args=None):
         '''
-        args : typing.Sequence<+T_co>[~RelationSuspendedArg]<~RelationSuspendedArg>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        args : typing.Sequence[~RelationSuspendedArg]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -1198,7 +1216,7 @@ class ApplicationFacade(Type):
         '''
         application : str
         branch : str
-        options : typing.Sequence<+T_co>[str]
+        options : typing.Sequence[str]
         Returns -> None
         '''
         # map input types to rpc msg
@@ -1218,8 +1236,8 @@ class ApplicationFacade(Type):
     @ReturnMapping(ErrorResults)
     async def UnsetApplicationsConfig(self, args=None):
         '''
-        args : typing.Sequence<+T_co>[~ApplicationUnset]<~ApplicationUnset>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        args : typing.Sequence[~ApplicationUnset]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -1244,7 +1262,7 @@ class ApplicationFacade(Type):
         force_series : bool
         generation : str
         min_units : int
-        settings : typing.Mapping<~KT, +VT_co>[str, str]
+        settings : typing.Mapping[str, str]
         settings_yaml : str
         Returns -> None
         '''
@@ -1272,8 +1290,8 @@ class ApplicationFacade(Type):
     @ReturnMapping(ErrorResults)
     async def UpdateApplicationSeries(self, args=None):
         '''
-        args : typing.Sequence<+T_co>[~UpdateSeriesArg]<~UpdateSeriesArg>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        args : typing.Sequence[~UpdateSeriesArg]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()

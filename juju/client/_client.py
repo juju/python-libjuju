@@ -3,20 +3,20 @@
 
 from juju.client._definitions import *
 
-from juju.client import _client1, _client2, _client3, _client4, _client5, _client6, _client7, _client8, _client9, _client10, _client12
+from juju.client import _client2, _client1, _client3, _client4, _client5, _client8, _client7, _client9, _client10, _client6, _client12
 
 
 CLIENTS = {
-    "1": _client1,
     "2": _client2,
+    "1": _client1,
     "3": _client3,
     "4": _client4,
     "5": _client5,
-    "6": _client6,
-    "7": _client7,
     "8": _client8,
+    "7": _client7,
     "9": _client9,
     "10": _client10,
+    "6": _client6,
     "12": _client12
 }
 

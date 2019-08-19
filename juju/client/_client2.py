@@ -165,8 +165,8 @@ class ActionFacade(Type):
     @ReturnMapping(ActionResults)
     async def Actions(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~ActionResult]<~ActionResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~ActionResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -183,8 +183,8 @@ class ActionFacade(Type):
     @ReturnMapping(ApplicationsCharmActionsResults)
     async def ApplicationsCharmsActions(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~ApplicationCharmActionsResult]<~ApplicationCharmActionsResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~ApplicationCharmActionsResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -201,8 +201,8 @@ class ActionFacade(Type):
     @ReturnMapping(ActionResults)
     async def Cancel(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~ActionResult]<~ActionResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~ActionResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -219,8 +219,8 @@ class ActionFacade(Type):
     @ReturnMapping(ActionResults)
     async def Enqueue(self, actions=None):
         '''
-        actions : typing.Sequence<+T_co>[~Action]<~Action>
-        Returns -> typing.Sequence<+T_co>[~ActionResult]<~ActionResult>
+        actions : typing.Sequence[~Action]
+        Returns -> typing.Sequence[~ActionResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -237,8 +237,8 @@ class ActionFacade(Type):
     @ReturnMapping(FindTagsResults)
     async def FindActionTagsByPrefix(self, prefixes=None):
         '''
-        prefixes : typing.Sequence<+T_co>[str]
-        Returns -> typing.Sequence<+T_co>[~Entity]<~Entity>
+        prefixes : typing.Sequence[str]
+        Returns -> typing.Sequence[~Entity]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -255,8 +255,8 @@ class ActionFacade(Type):
     @ReturnMapping(ActionsByNames)
     async def FindActionsByNames(self, names=None):
         '''
-        names : typing.Sequence<+T_co>[str]
-        Returns -> typing.Sequence<+T_co>[~ActionsByName]<~ActionsByName>
+        names : typing.Sequence[str]
+        Returns -> typing.Sequence[~ActionsByName]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -273,8 +273,8 @@ class ActionFacade(Type):
     @ReturnMapping(ActionsByReceivers)
     async def ListAll(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~ActionsByReceiver]<~ActionsByReceiver>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~ActionsByReceiver]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -291,8 +291,8 @@ class ActionFacade(Type):
     @ReturnMapping(ActionsByReceivers)
     async def ListCompleted(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~ActionsByReceiver]<~ActionsByReceiver>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~ActionsByReceiver]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -309,8 +309,8 @@ class ActionFacade(Type):
     @ReturnMapping(ActionsByReceivers)
     async def ListPending(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~ActionsByReceiver]<~ActionsByReceiver>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~ActionsByReceiver]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -327,8 +327,8 @@ class ActionFacade(Type):
     @ReturnMapping(ActionsByReceivers)
     async def ListRunning(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~ActionsByReceiver]<~ActionsByReceiver>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~ActionsByReceiver]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -345,12 +345,12 @@ class ActionFacade(Type):
     @ReturnMapping(ActionResults)
     async def Run(self, applications=None, commands="", machines=None, timeout=0, units=None):
         '''
-        applications : typing.Sequence<+T_co>[str]
+        applications : typing.Sequence[str]
         commands : str
-        machines : typing.Sequence<+T_co>[str]
+        machines : typing.Sequence[str]
         timeout : int
-        units : typing.Sequence<+T_co>[str]
-        Returns -> typing.Sequence<+T_co>[~ActionResult]<~ActionResult>
+        units : typing.Sequence[str]
+        Returns -> typing.Sequence[~ActionResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -371,12 +371,12 @@ class ActionFacade(Type):
     @ReturnMapping(ActionResults)
     async def RunOnAllMachines(self, applications=None, commands="", machines=None, timeout=0, units=None):
         '''
-        applications : typing.Sequence<+T_co>[str]
+        applications : typing.Sequence[str]
         commands : str
-        machines : typing.Sequence<+T_co>[str]
+        machines : typing.Sequence[str]
         timeout : int
-        units : typing.Sequence<+T_co>[str]
-        Returns -> typing.Sequence<+T_co>[~ActionResult]<~ActionResult>
+        units : typing.Sequence[str]
+        Returns -> typing.Sequence[~ActionResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -572,8 +572,8 @@ class AgentFacade(Type):
     @ReturnMapping(ErrorResults)
     async def ClearReboot(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -590,8 +590,8 @@ class AgentFacade(Type):
     @ReturnMapping(CloudSpecResults)
     async def CloudSpec(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~CloudSpecResult]<~CloudSpecResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~CloudSpecResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -608,8 +608,8 @@ class AgentFacade(Type):
     @ReturnMapping(ControllerAPIInfoResults)
     async def ControllerAPIInfoForModels(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~ControllerAPIInfoResult]<~ControllerAPIInfoResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~ControllerAPIInfoResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -627,7 +627,7 @@ class AgentFacade(Type):
     async def ControllerConfig(self):
         '''
 
-        Returns -> typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        Returns -> typing.Mapping[str, typing.Any]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -662,8 +662,8 @@ class AgentFacade(Type):
     @ReturnMapping(AgentGetEntitiesResults)
     async def GetEntities(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~AgentGetEntitiesResult]<~AgentGetEntitiesResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~AgentGetEntitiesResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -699,7 +699,7 @@ class AgentFacade(Type):
     async def ModelConfig(self):
         '''
 
-        Returns -> typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        Returns -> typing.Mapping[str, typing.Any]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -716,8 +716,8 @@ class AgentFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetPasswords(self, changes=None):
         '''
-        changes : typing.Sequence<+T_co>[~EntityPassword]<~EntityPassword>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        changes : typing.Sequence[~EntityPassword]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -752,8 +752,8 @@ class AgentFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def WatchCloudSpecsChanges(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~NotifyWatchResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -770,8 +770,8 @@ class AgentFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def WatchCredentials(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~NotifyWatchResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -827,7 +827,7 @@ class AllModelWatcherFacade(Type):
     async def Next(self):
         '''
 
-        Returns -> typing.Sequence<+T_co>[~Delta]<~Delta>
+        Returns -> typing.Sequence[~Delta]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -922,8 +922,8 @@ class AnnotationsFacade(Type):
     @ReturnMapping(AnnotationsGetResults)
     async def Get(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~AnnotationsGetResult]<~AnnotationsGetResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~AnnotationsGetResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -940,8 +940,8 @@ class AnnotationsFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Set(self, annotations=None):
         '''
-        annotations : typing.Sequence<+T_co>[~EntityAnnotations]<~EntityAnnotations>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        annotations : typing.Sequence[~EntityAnnotations]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -1252,8 +1252,8 @@ class ApplicationFacade(Type):
     @ReturnMapping(AddRelationResults)
     async def AddRelation(self, endpoints=None):
         '''
-        endpoints : typing.Sequence<+T_co>[str]
-        Returns -> typing.Mapping<~KT, +VT_co>[str, ~CharmRelation]<~CharmRelation>
+        endpoints : typing.Sequence[str]
+        Returns -> typing.Mapping[str, ~CharmRelation]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -1272,8 +1272,8 @@ class ApplicationFacade(Type):
         '''
         application : str
         num_units : int
-        placement : typing.Sequence<+T_co>[~Placement]<~Placement>
-        Returns -> typing.Sequence<+T_co>[str]
+        placement : typing.Sequence[~Placement]
+        Returns -> typing.Sequence[str]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -1293,7 +1293,7 @@ class ApplicationFacade(Type):
     async def CharmRelations(self, application=""):
         '''
         application : str
-        Returns -> typing.Sequence<+T_co>[str]
+        Returns -> typing.Sequence[str]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -1310,8 +1310,8 @@ class ApplicationFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Deploy(self, applications=None):
         '''
-        applications : typing.Sequence<+T_co>[~ApplicationDeploy]<~ApplicationDeploy>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        applications : typing.Sequence[~ApplicationDeploy]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -1346,7 +1346,7 @@ class ApplicationFacade(Type):
     @ReturnMapping(None)
     async def DestroyRelation(self, endpoints=None):
         '''
-        endpoints : typing.Sequence<+T_co>[str]
+        endpoints : typing.Sequence[str]
         Returns -> None
         '''
         # map input types to rpc msg
@@ -1364,7 +1364,7 @@ class ApplicationFacade(Type):
     @ReturnMapping(None)
     async def DestroyUnits(self, unit_names=None):
         '''
-        unit_names : typing.Sequence<+T_co>[str]
+        unit_names : typing.Sequence[str]
         Returns -> None
         '''
         # map input types to rpc msg
@@ -1401,7 +1401,7 @@ class ApplicationFacade(Type):
     async def Get(self, application=""):
         '''
         application : str
-        Returns -> typing.Union[str, typing.Mapping<~KT, +VT_co>[str, typing.Any], _ForwardRef('Value')]
+        Returns -> typing.Union[str, typing.Mapping[str, typing.Any], _ForwardRef('Value')]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -1455,7 +1455,7 @@ class ApplicationFacade(Type):
     async def Set(self, application="", options=None):
         '''
         application : str
-        options : typing.Mapping<~KT, +VT_co>[str, str]
+        options : typing.Mapping[str, str]
         Returns -> None
         '''
         # map input types to rpc msg
@@ -1477,12 +1477,12 @@ class ApplicationFacade(Type):
         application : str
         channel : str
         charm_url : str
-        config_settings : typing.Mapping<~KT, +VT_co>[str, str]
+        config_settings : typing.Mapping[str, str]
         config_settings_yaml : str
         force_series : bool
         force_units : bool
-        resource_ids : typing.Mapping<~KT, +VT_co>[str, str]
-        storage_constraints : typing.Mapping<~KT, +VT_co>[str, ~StorageConstraints]<~StorageConstraints>
+        resource_ids : typing.Mapping[str, str]
+        storage_constraints : typing.Mapping[str, ~StorageConstraints]
         Returns -> None
         '''
         # map input types to rpc msg
@@ -1528,8 +1528,8 @@ class ApplicationFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetMetricCredentials(self, creds=None):
         '''
-        creds : typing.Sequence<+T_co>[~ApplicationMetricCredential]<~ApplicationMetricCredential>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        creds : typing.Sequence[~ApplicationMetricCredential]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -1565,7 +1565,7 @@ class ApplicationFacade(Type):
     async def Unset(self, application="", options=None):
         '''
         application : str
-        options : typing.Sequence<+T_co>[str]
+        options : typing.Sequence[str]
         Returns -> None
         '''
         # map input types to rpc msg
@@ -1590,7 +1590,7 @@ class ApplicationFacade(Type):
         force_charm_url : bool
         force_series : bool
         min_units : int
-        settings : typing.Mapping<~KT, +VT_co>[str, str]
+        settings : typing.Mapping[str, str]
         settings_yaml : str
         Returns -> None
         '''
@@ -1931,8 +1931,8 @@ class ApplicationOffersFacade(Type):
     @ReturnMapping(ApplicationOffersResults)
     async def ApplicationOffers(self, offer_urls=None):
         '''
-        offer_urls : typing.Sequence<+T_co>[str]
-        Returns -> typing.Sequence<+T_co>[~ApplicationOfferResult]<~ApplicationOfferResult>
+        offer_urls : typing.Sequence[str]
+        Returns -> typing.Sequence[~ApplicationOfferResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -1950,8 +1950,8 @@ class ApplicationOffersFacade(Type):
     async def DestroyOffers(self, force=False, offer_urls=None):
         '''
         force : bool
-        offer_urls : typing.Sequence<+T_co>[str]
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        offer_urls : typing.Sequence[str]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -1969,8 +1969,8 @@ class ApplicationOffersFacade(Type):
     @ReturnMapping(QueryApplicationOffersResults)
     async def FindApplicationOffers(self, filters=None):
         '''
-        filters : typing.Sequence<+T_co>[~OfferFilter]<~OfferFilter>
-        Returns -> typing.Sequence<+T_co>[~ApplicationOfferAdminDetails]<~ApplicationOfferAdminDetails>
+        filters : typing.Sequence[~OfferFilter]
+        Returns -> typing.Sequence[~ApplicationOfferAdminDetails]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -1987,8 +1987,8 @@ class ApplicationOffersFacade(Type):
     @ReturnMapping(ConsumeOfferDetailsResults)
     async def GetConsumeDetails(self, offer_urls=None):
         '''
-        offer_urls : typing.Sequence<+T_co>[str]
-        Returns -> typing.Sequence<+T_co>[~ConsumeOfferDetailsResult]<~ConsumeOfferDetailsResult>
+        offer_urls : typing.Sequence[str]
+        Returns -> typing.Sequence[~ConsumeOfferDetailsResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -2005,8 +2005,8 @@ class ApplicationOffersFacade(Type):
     @ReturnMapping(QueryApplicationOffersResults)
     async def ListApplicationOffers(self, filters=None):
         '''
-        filters : typing.Sequence<+T_co>[~OfferFilter]<~OfferFilter>
-        Returns -> typing.Sequence<+T_co>[~ApplicationOfferAdminDetails]<~ApplicationOfferAdminDetails>
+        filters : typing.Sequence[~OfferFilter]
+        Returns -> typing.Sequence[~ApplicationOfferAdminDetails]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -2023,8 +2023,8 @@ class ApplicationOffersFacade(Type):
     @ReturnMapping(ErrorResults)
     async def ModifyOfferAccess(self, changes=None):
         '''
-        changes : typing.Sequence<+T_co>[~ModifyOfferAccess]<~ModifyOfferAccess>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        changes : typing.Sequence[~ModifyOfferAccess]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -2041,8 +2041,8 @@ class ApplicationOffersFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Offer(self, offers=None):
         '''
-        offers : typing.Sequence<+T_co>[~AddApplicationOffer]<~AddApplicationOffer>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        offers : typing.Sequence[~AddApplicationOffer]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -2059,8 +2059,8 @@ class ApplicationOffersFacade(Type):
     @ReturnMapping(RemoteApplicationInfoResults)
     async def RemoteApplicationInfo(self, offer_urls=None):
         '''
-        offer_urls : typing.Sequence<+T_co>[str]
-        Returns -> typing.Sequence<+T_co>[~RemoteApplicationInfoResult]<~RemoteApplicationInfoResult>
+        offer_urls : typing.Sequence[str]
+        Returns -> typing.Sequence[~RemoteApplicationInfoResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -2251,7 +2251,7 @@ class BackupsFacade(Type):
     async def List(self):
         '''
 
-        Returns -> typing.Sequence<+T_co>[~BackupsMetadataResult]<~BackupsMetadataResult>
+        Returns -> typing.Sequence[~BackupsMetadataResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -2286,8 +2286,8 @@ class BackupsFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Remove(self, ids=None):
         '''
-        ids : typing.Sequence<+T_co>[str]
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        ids : typing.Sequence[str]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -2369,7 +2369,7 @@ class BlockFacade(Type):
     async def List(self):
         '''
 
-        Returns -> typing.Sequence<+T_co>[~BlockResult]<~BlockResult>
+        Returns -> typing.Sequence[~BlockResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -2494,7 +2494,7 @@ class BundleFacade(Type):
         '''
         bundleurl : str
         yaml : str
-        Returns -> typing.Sequence<+T_co>[~BundleChange]<~BundleChange>
+        Returns -> typing.Union[typing.Sequence[~BundleChange], typing.Sequence[str]]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -2735,7 +2735,7 @@ class CharmsFacade(Type):
     async def CharmInfo(self, url=""):
         '''
         url : str
-        Returns -> typing.Union[_ForwardRef('CharmActions'), typing.Mapping<~KT, +VT_co>[str, ~CharmOption]<~CharmOption>, _ForwardRef('CharmLXDProfile'), _ForwardRef('CharmMeta'), _ForwardRef('CharmMetrics'), int, str]
+        Returns -> typing.Union[_ForwardRef('CharmActions'), typing.Mapping[str, ~CharmOption], _ForwardRef('CharmLXDProfile'), _ForwardRef('CharmMeta'), _ForwardRef('CharmMetrics'), int, str]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -2770,8 +2770,8 @@ class CharmsFacade(Type):
     @ReturnMapping(CharmsListResult)
     async def List(self, names=None):
         '''
-        names : typing.Sequence<+T_co>[str]
-        Returns -> typing.Sequence<+T_co>[str]
+        names : typing.Sequence[str]
+        Returns -> typing.Sequence[str]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -3271,6 +3271,7 @@ class ClientFacade(Type):
                      'ModelInfo': {'additionalProperties': False,
                                    'properties': {'agent-version': {'$ref': '#/definitions/Number'},
                                                   'cloud-credential-tag': {'type': 'string'},
+                                                  'cloud-credential-validity': {'type': 'boolean'},
                                                   'cloud-region': {'type': 'string'},
                                                   'cloud-tag': {'type': 'string'},
                                                   'controller-uuid': {'type': 'string'},
@@ -3693,7 +3694,7 @@ class ClientFacade(Type):
     async def APIHostPorts(self):
         '''
 
-        Returns -> typing.Sequence<+T_co>[~HostPort]<~HostPort>
+        Returns -> typing.Sequence[~HostPort]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -3774,8 +3775,8 @@ class ClientFacade(Type):
     @ReturnMapping(AddMachinesResults)
     async def AddMachines(self, params=None):
         '''
-        params : typing.Sequence<+T_co>[~AddMachineParams]<~AddMachineParams>
-        Returns -> typing.Sequence<+T_co>[~AddMachinesResult]<~AddMachinesResult>
+        params : typing.Sequence[~AddMachineParams]
+        Returns -> typing.Sequence[~AddMachinesResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -3792,8 +3793,8 @@ class ClientFacade(Type):
     @ReturnMapping(AddMachinesResults)
     async def AddMachinesV2(self, params=None):
         '''
-        params : typing.Sequence<+T_co>[~AddMachineParams]<~AddMachineParams>
-        Returns -> typing.Sequence<+T_co>[~AddMachinesResult]<~AddMachinesResult>
+        params : typing.Sequence[~AddMachineParams]
+        Returns -> typing.Sequence[~AddMachinesResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -3829,7 +3830,7 @@ class ClientFacade(Type):
     async def CACert(self):
         '''
 
-        Returns -> typing.Sequence<+T_co>[int]
+        Returns -> typing.Sequence[int]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -3847,7 +3848,7 @@ class ClientFacade(Type):
     async def DestroyMachines(self, force=False, machine_names=None):
         '''
         force : bool
-        machine_names : typing.Sequence<+T_co>[str]
+        machine_names : typing.Sequence[str]
         Returns -> None
         '''
         # map input types to rpc msg
@@ -3872,7 +3873,7 @@ class ClientFacade(Type):
         minor : int
         number : Number
         series : str
-        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence<+T_co>[~Tools]<~Tools>]
+        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence[~Tools]]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -3894,8 +3895,8 @@ class ClientFacade(Type):
     @ReturnMapping(FullStatus)
     async def FullStatus(self, patterns=None):
         '''
-        patterns : typing.Sequence<+T_co>[str]
-        Returns -> typing.Union[_ForwardRef('ModelStatusInfo'), typing.Sequence<+T_co>[~RelationStatus]<~RelationStatus>, typing.Mapping<~KT, +VT_co>[str, ~RemoteApplicationStatus]<~RemoteApplicationStatus>]
+        patterns : typing.Sequence[str]
+        Returns -> typing.Union[typing.Mapping[str, ~ApplicationStatus], typing.Mapping[str, ~BranchStatus], str, typing.Mapping[str, ~MachineStatus], _ForwardRef('ModelStatusInfo'), typing.Mapping[str, ~ApplicationOfferStatus], typing.Sequence[~RelationStatus], typing.Mapping[str, ~RemoteApplicationStatus]]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -3914,7 +3915,7 @@ class ClientFacade(Type):
         '''
         bundleurl : str
         yaml : str
-        Returns -> typing.Sequence<+T_co>[~BundleChange]<~BundleChange>
+        Returns -> typing.Union[typing.Sequence[~BundleChange], typing.Sequence[str]]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -3950,8 +3951,8 @@ class ClientFacade(Type):
     @ReturnMapping(AddMachinesResults)
     async def InjectMachines(self, params=None):
         '''
-        params : typing.Sequence<+T_co>[~AddMachineParams]<~AddMachineParams>
-        Returns -> typing.Sequence<+T_co>[~AddMachinesResult]<~AddMachinesResult>
+        params : typing.Sequence[~AddMachineParams]
+        Returns -> typing.Sequence[~AddMachinesResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -3969,7 +3970,7 @@ class ClientFacade(Type):
     async def ModelGet(self):
         '''
 
-        Returns -> typing.Mapping<~KT, +VT_co>[str, ~ConfigValue]<~ConfigValue>
+        Returns -> typing.Mapping[str, ~ConfigValue]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -3987,7 +3988,7 @@ class ClientFacade(Type):
     async def ModelInfo(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Number'), bool, _ForwardRef('ModelMigrationStatus'), _ForwardRef('ModelSLAInfo'), _ForwardRef('EntityStatus'), typing.Sequence<+T_co>[~ModelUserInfo]<~ModelUserInfo>]
+        Returns -> typing.Union[_ForwardRef('Number'), str, bool, typing.Sequence[~ModelMachineInfo], _ForwardRef('ModelMigrationStatus'), _ForwardRef('ModelSLAInfo'), _ForwardRef('EntityStatus'), typing.Sequence[~ModelUserInfo]]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -4004,7 +4005,7 @@ class ClientFacade(Type):
     @ReturnMapping(None)
     async def ModelSet(self, config=None):
         '''
-        config : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        config : typing.Mapping[str, typing.Any]
         Returns -> None
         '''
         # map input types to rpc msg
@@ -4022,7 +4023,7 @@ class ClientFacade(Type):
     @ReturnMapping(None)
     async def ModelUnset(self, keys=None):
         '''
-        keys : typing.Sequence<+T_co>[str]
+        keys : typing.Sequence[str]
         Returns -> None
         '''
         # map input types to rpc msg
@@ -4041,7 +4042,7 @@ class ClientFacade(Type):
     async def ModelUserInfo(self):
         '''
 
-        Returns -> typing.Sequence<+T_co>[~ModelUserInfoResult]<~ModelUserInfoResult>
+        Returns -> typing.Sequence[~ModelUserInfoResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -4118,8 +4119,8 @@ class ClientFacade(Type):
     @ReturnMapping(ResolveCharmResults)
     async def ResolveCharms(self, references=None):
         '''
-        references : typing.Sequence<+T_co>[str]
-        Returns -> typing.Sequence<+T_co>[~ResolveCharmResult]<~ResolveCharmResult>
+        references : typing.Sequence[str]
+        Returns -> typing.Sequence[~ResolveCharmResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -4156,8 +4157,8 @@ class ClientFacade(Type):
     @ReturnMapping(ErrorResults)
     async def RetryProvisioning(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -4233,7 +4234,7 @@ class ClientFacade(Type):
     async def SetSLALevel(self, modelslainfo=None, creds=None, level="", owner=""):
         '''
         modelslainfo : ModelSLAInfo
-        creds : typing.Sequence<+T_co>[int]
+        creds : typing.Sequence[int]
         level : str
         owner : str
         Returns -> None
@@ -4256,8 +4257,8 @@ class ClientFacade(Type):
     @ReturnMapping(StatusHistoryResults)
     async def StatusHistory(self, requests=None):
         '''
-        requests : typing.Sequence<+T_co>[~StatusHistoryRequest]<~StatusHistoryRequest>
-        Returns -> typing.Sequence<+T_co>[~StatusHistoryResult]<~StatusHistoryResult>
+        requests : typing.Sequence[~StatusHistoryRequest]
+        Returns -> typing.Sequence[~StatusHistoryResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -4526,8 +4527,8 @@ class DiscoverSpacesFacade(Type):
     @ReturnMapping(ErrorResults)
     async def AddSubnets(self, subnets=None):
         '''
-        subnets : typing.Sequence<+T_co>[~AddSubnetParams]<~AddSubnetParams>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        subnets : typing.Sequence[~AddSubnetParams]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -4544,8 +4545,8 @@ class DiscoverSpacesFacade(Type):
     @ReturnMapping(ErrorResults)
     async def CreateSpaces(self, spaces=None):
         '''
-        spaces : typing.Sequence<+T_co>[~CreateSpaceParams]<~CreateSpaceParams>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        spaces : typing.Sequence[~CreateSpaceParams]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -4563,7 +4564,7 @@ class DiscoverSpacesFacade(Type):
     async def ListSpaces(self):
         '''
 
-        Returns -> typing.Sequence<+T_co>[~ProviderSpace]<~ProviderSpace>
+        Returns -> typing.Sequence[~ProviderSpace]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -4582,7 +4583,7 @@ class DiscoverSpacesFacade(Type):
         '''
         space_tag : str
         zone : str
-        Returns -> typing.Sequence<+T_co>[~Subnet]<~Subnet>
+        Returns -> typing.Sequence[~Subnet]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -4601,7 +4602,7 @@ class DiscoverSpacesFacade(Type):
     async def ModelConfig(self):
         '''
 
-        Returns -> typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        Returns -> typing.Mapping[str, typing.Any]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -4679,8 +4680,8 @@ class DiskManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetMachineBlockDevices(self, machine_block_devices=None):
         '''
-        machine_block_devices : typing.Sequence<+T_co>[~MachineBlockDevices]<~MachineBlockDevices>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        machine_block_devices : typing.Sequence[~MachineBlockDevices]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -4722,7 +4723,7 @@ class EntityWatcherFacade(Type):
     async def Next(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence<+T_co>[str], _ForwardRef('Error')]
+        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error'), str]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -4789,7 +4790,7 @@ class FilesystemAttachmentsWatcherFacade(Type):
     async def Next(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence<+T_co>[~MachineStorageId]<~MachineStorageId>, _ForwardRef('Error')]
+        Returns -> typing.Union[typing.Sequence[~MachineStorageId], _ForwardRef('Error'), str]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -4824,19 +4825,7 @@ class FilesystemAttachmentsWatcherFacade(Type):
 class HighAvailabilityFacade(Type):
     name = 'HighAvailability'
     version = 2
-    schema =     {'definitions': {'Address': {'additionalProperties': False,
-                                 'properties': {'Scope': {'type': 'string'},
-                                                'SpaceName': {'type': 'string'},
-                                                'SpaceProviderId': {'type': 'string'},
-                                                'Type': {'type': 'string'},
-                                                'Value': {'type': 'string'}},
-                                 'required': ['Value',
-                                              'Type',
-                                              'Scope',
-                                              'SpaceName',
-                                              'SpaceProviderId'],
-                                 'type': 'object'},
-                     'ControllersChangeResult': {'additionalProperties': False,
+    schema =     {'definitions': {'ControllersChangeResult': {'additionalProperties': False,
                                                  'properties': {'error': {'$ref': '#/definitions/Error'},
                                                                 'result': {'$ref': '#/definitions/ControllersChanges'}},
                                                  'required': ['result'],
@@ -4851,12 +4840,8 @@ class HighAvailabilityFacade(Type):
                                                                      'type': 'array'},
                                                            'converted': {'items': {'type': 'string'},
                                                                          'type': 'array'},
-                                                           'demoted': {'items': {'type': 'string'},
-                                                                       'type': 'array'},
                                                            'maintained': {'items': {'type': 'string'},
                                                                           'type': 'array'},
-                                                           'promoted': {'items': {'type': 'string'},
-                                                                        'type': 'array'},
                                                            'removed': {'items': {'type': 'string'},
                                                                        'type': 'array'}},
                                             'type': 'object'},
@@ -4881,62 +4866,6 @@ class HighAvailabilityFacade(Type):
                                               'message': {'type': 'string'}},
                                'required': ['message', 'code'],
                                'type': 'object'},
-                     'HAMember': {'additionalProperties': False,
-                                  'properties': {'public-address': {'$ref': '#/definitions/Address'},
-                                                 'series': {'type': 'string'},
-                                                 'tag': {'type': 'string'}},
-                                  'required': ['tag', 'public-address', 'series'],
-                                  'type': 'object'},
-                     'Member': {'additionalProperties': False,
-                                'properties': {'Address': {'type': 'string'},
-                                               'Arbiter': {'type': 'boolean'},
-                                               'BuildIndexes': {'type': 'boolean'},
-                                               'Hidden': {'type': 'boolean'},
-                                               'Id': {'type': 'integer'},
-                                               'Priority': {'type': 'number'},
-                                               'SlaveDelay': {'type': 'integer'},
-                                               'Tags': {'patternProperties': {'.*': {'type': 'string'}},
-                                                        'type': 'object'},
-                                               'Votes': {'type': 'integer'}},
-                                'required': ['Id',
-                                             'Address',
-                                             'Arbiter',
-                                             'BuildIndexes',
-                                             'Hidden',
-                                             'Priority',
-                                             'Tags',
-                                             'SlaveDelay',
-                                             'Votes'],
-                                'type': 'object'},
-                     'MongoUpgradeResults': {'additionalProperties': False,
-                                             'properties': {'ha-members': {'items': {'$ref': '#/definitions/HAMember'},
-                                                                           'type': 'array'},
-                                                            'master': {'$ref': '#/definitions/HAMember'},
-                                                            'rs-members': {'items': {'$ref': '#/definitions/Member'},
-                                                                           'type': 'array'}},
-                                             'required': ['rs-members',
-                                                          'master',
-                                                          'ha-members'],
-                                             'type': 'object'},
-                     'MongoVersion': {'additionalProperties': False,
-                                      'properties': {'engine': {'type': 'string'},
-                                                     'major': {'type': 'integer'},
-                                                     'minor': {'type': 'integer'},
-                                                     'patch': {'type': 'string'}},
-                                      'required': ['major',
-                                                   'minor',
-                                                   'patch',
-                                                   'engine'],
-                                      'type': 'object'},
-                     'ResumeReplicationParams': {'additionalProperties': False,
-                                                 'properties': {'members': {'items': {'$ref': '#/definitions/Member'},
-                                                                            'type': 'array'}},
-                                                 'required': ['members'],
-                                                 'type': 'object'},
-                     'UpgradeMongoParams': {'additionalProperties': False,
-                                            'properties': {'target': {'$ref': '#/definitions/MongoVersion'}},
-                                            'required': ['target'],
-                                            'type': 'object'},
                      'Value': {'additionalProperties': False,
                                'properties': {'arch': {'type': 'string'},
                                               'container': {'type': 'string'},
@@ -4956,20 +4885,15 @@ class HighAvailabilityFacade(Type):
                                'type': 'object'}},
      'properties': {'EnableHA': {'properties': {'Params': {'$ref': '#/definitions/ControllersSpecs'},
                                                 'Result': {'$ref': '#/definitions/ControllersChangeResults'}},
-                                 'type': 'object'},
-                    'ResumeHAReplicationAfterUpgrade': {'properties': {'Params': {'$ref': '#/definitions/ResumeReplicationParams'}},
-                                                        'type': 'object'},
-                    'StopHAReplicationForUpgrade': {'properties': {'Params': {'$ref': '#/definitions/UpgradeMongoParams'},
-                                                                   'Result': {'$ref': '#/definitions/MongoUpgradeResults'}},
-                                                    'type': 'object'}},
+                                 'type': 'object'}},
      'type': 'object'}
     
 
     @ReturnMapping(ControllersChangeResults)
     async def EnableHA(self, specs=None):
         '''
-        specs : typing.Sequence<+T_co>[~ControllersSpec]<~ControllersSpec>
-        Returns -> typing.Sequence<+T_co>[~ControllersChangeResult]<~ControllersChangeResult>
+        specs : typing.Sequence[~ControllersSpec]
+        Returns -> typing.Sequence[~ControllersChangeResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -4978,42 +4902,6 @@ class HighAvailabilityFacade(Type):
                    version=2,
                    params=_params)
         _params['specs'] = specs
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(None)
-    async def ResumeHAReplicationAfterUpgrade(self, members=None):
-        '''
-        members : typing.Sequence<+T_co>[~Member]<~Member>
-        Returns -> None
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='HighAvailability',
-                   request='ResumeHAReplicationAfterUpgrade',
-                   version=2,
-                   params=_params)
-        _params['members'] = members
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(MongoUpgradeResults)
-    async def StopHAReplicationForUpgrade(self, target=None):
-        '''
-        target : MongoVersion
-        Returns -> typing.Union[_ForwardRef('HAMember'), typing.Sequence<+T_co>[~Member]<~Member>]
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='HighAvailability',
-                   request='StopHAReplicationForUpgrade',
-                   version=2,
-                   params=_params)
-        _params['target'] = target
         reply = await self.rpc(msg)
         return reply
 
@@ -5079,8 +4967,8 @@ class ImageManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def DeleteImages(self, images=None):
         '''
-        images : typing.Sequence<+T_co>[~ImageSpec]<~ImageSpec>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        images : typing.Sequence[~ImageSpec]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -5097,8 +4985,8 @@ class ImageManagerFacade(Type):
     @ReturnMapping(ListImageResult)
     async def ListImages(self, images=None):
         '''
-        images : typing.Sequence<+T_co>[~ImageSpec]<~ImageSpec>
-        Returns -> typing.Sequence<+T_co>[~ImageMetadata]<~ImageMetadata>
+        images : typing.Sequence[~ImageSpec]
+        Returns -> typing.Sequence[~ImageMetadata]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -5198,8 +5086,8 @@ class ImageMetadataFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Delete(self, image_ids=None):
         '''
-        image_ids : typing.Sequence<+T_co>[str]
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        image_ids : typing.Sequence[str]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -5216,13 +5104,13 @@ class ImageMetadataFacade(Type):
     @ReturnMapping(ListCloudImageMetadataResult)
     async def List(self, arches=None, region="", root_storage_type="", series=None, stream="", virt_type=""):
         '''
-        arches : typing.Sequence<+T_co>[str]
+        arches : typing.Sequence[str]
         region : str
         root_storage_type : str
-        series : typing.Sequence<+T_co>[str]
+        series : typing.Sequence[str]
         stream : str
         virt_type : str
-        Returns -> typing.Sequence<+T_co>[~CloudImageMetadata]<~CloudImageMetadata>
+        Returns -> typing.Sequence[~CloudImageMetadata]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -5244,8 +5132,8 @@ class ImageMetadataFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Save(self, metadata=None):
         '''
-        metadata : typing.Sequence<+T_co>[~CloudImageMetadataList]<~CloudImageMetadataList>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        metadata : typing.Sequence[~CloudImageMetadataList]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -5427,7 +5315,7 @@ class InstanceMutaterFacade(Type):
     async def CharmProfilingInfo(self, tag=""):
         '''
         tag : str
-        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence<+T_co>[~ProfileInfoResult]<~ProfileInfoResult>]
+        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error'), str, typing.Sequence[~ProfileInfoResult]]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -5462,8 +5350,8 @@ class InstanceMutaterFacade(Type):
     @ReturnMapping(LifeResults)
     async def Life(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~LifeResult]<~LifeResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~LifeResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -5480,8 +5368,8 @@ class InstanceMutaterFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetCharmProfiles(self, args=None):
         '''
-        args : typing.Sequence<+T_co>[~SetProfileArg]<~SetProfileArg>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        args : typing.Sequence[~SetProfileArg]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -5498,8 +5386,8 @@ class InstanceMutaterFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetModificationStatus(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        entities : typing.Sequence[~EntityStatusArgs]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -5517,7 +5405,7 @@ class InstanceMutaterFacade(Type):
     async def WatchContainers(self, tag=""):
         '''
         tag : str
-        Returns -> typing.Union[typing.Sequence<+T_co>[str], _ForwardRef('Error')]
+        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error'), str]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -5534,8 +5422,8 @@ class InstanceMutaterFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def WatchLXDProfileVerificationNeeded(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~NotifyWatchResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -5553,7 +5441,7 @@ class InstanceMutaterFacade(Type):
     async def WatchMachines(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence<+T_co>[str], _ForwardRef('Error')]
+        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error'), str]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -5633,8 +5521,8 @@ class LeadershipServiceFacade(Type):
     @ReturnMapping(ClaimLeadershipBulkResults)
     async def ClaimLeadership(self, params=None):
         '''
-        params : typing.Sequence<+T_co>[~ClaimLeadershipParams]<~ClaimLeadershipParams>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        params : typing.Sequence[~ClaimLeadershipParams]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -5789,8 +5677,8 @@ class MachineManagerFacade(Type):
     @ReturnMapping(AddMachinesResults)
     async def AddMachines(self, params=None):
         '''
-        params : typing.Sequence<+T_co>[~AddMachineParams]<~AddMachineParams>
-        Returns -> typing.Sequence<+T_co>[~AddMachinesResult]<~AddMachinesResult>
+        params : typing.Sequence[~AddMachineParams]
+        Returns -> typing.Sequence[~AddMachinesResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -5807,8 +5695,8 @@ class MachineManagerFacade(Type):
     @ReturnMapping(InstanceTypesResults)
     async def InstanceTypes(self, constraints=None):
         '''
-        constraints : typing.Sequence<+T_co>[~ModelInstanceTypesConstraint]<~ModelInstanceTypesConstraint>
-        Returns -> typing.Sequence<+T_co>[~InstanceTypesResult]<~InstanceTypesResult>
+        constraints : typing.Sequence[~ModelInstanceTypesConstraint]
+        Returns -> typing.Sequence[~InstanceTypesResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -5881,8 +5769,8 @@ class MetricsAdderFacade(Type):
     @ReturnMapping(ErrorResults)
     async def AddMetricBatches(self, batches=None):
         '''
-        batches : typing.Sequence<+T_co>[~MetricBatchParam]<~MetricBatchParam>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        batches : typing.Sequence[~MetricBatchParam]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -5971,8 +5859,8 @@ class MetricsDebugFacade(Type):
     @ReturnMapping(MetricResults)
     async def GetMetrics(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~EntityMetrics]<~EntityMetrics>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~EntityMetrics]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -5989,8 +5877,8 @@ class MetricsDebugFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetMeterStatus(self, statues=None):
         '''
-        statues : typing.Sequence<+T_co>[~MeterStatusParam]<~MeterStatusParam>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        statues : typing.Sequence[~MeterStatusParam]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6082,7 +5970,7 @@ class ModelConfigFacade(Type):
     async def ModelGet(self):
         '''
 
-        Returns -> typing.Mapping<~KT, +VT_co>[str, ~ConfigValue]<~ConfigValue>
+        Returns -> typing.Mapping[str, ~ConfigValue]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6099,7 +5987,7 @@ class ModelConfigFacade(Type):
     @ReturnMapping(None)
     async def ModelSet(self, config=None):
         '''
-        config : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        config : typing.Mapping[str, typing.Any]
         Returns -> None
         '''
         # map input types to rpc msg
@@ -6117,7 +6005,7 @@ class ModelConfigFacade(Type):
     @ReturnMapping(None)
     async def ModelUnset(self, keys=None):
         '''
-        keys : typing.Sequence<+T_co>[str]
+        keys : typing.Sequence[str]
         Returns -> None
         '''
         # map input types to rpc msg
@@ -6154,7 +6042,7 @@ class ModelConfigFacade(Type):
     async def Sequences(self):
         '''
 
-        Returns -> typing.Mapping<~KT, +VT_co>[str, int]
+        Returns -> typing.Mapping[str, int]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6172,7 +6060,7 @@ class ModelConfigFacade(Type):
     async def SetSLALevel(self, modelslainfo=None, creds=None, level="", owner=""):
         '''
         modelslainfo : ModelSLAInfo
-        creds : typing.Sequence<+T_co>[int]
+        creds : typing.Sequence[int]
         level : str
         owner : str
         Returns -> None
@@ -6332,9 +6220,9 @@ class ModelGenerationFacade(Type):
     @ReturnMapping(GenerationResults)
     async def BranchInfo(self, branches=None, detailed=False):
         '''
-        branches : typing.Sequence<+T_co>[str]
+        branches : typing.Sequence[str]
         detailed : bool
-        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence<+T_co>[~Generation]<~Generation>]
+        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence[~Generation]]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6389,8 +6277,8 @@ class ModelGenerationFacade(Type):
     async def TrackBranch(self, branch="", entities=None):
         '''
         branch : str
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6697,12 +6585,12 @@ class ModelManagerFacade(Type):
     async def CreateModel(self, cloud_tag="", config=None, credential="", name="", owner_tag="", region=""):
         '''
         cloud_tag : str
-        config : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        config : typing.Mapping[str, typing.Any]
         credential : str
         name : str
         owner_tag : str
         region : str
-        Returns -> typing.Union[_ForwardRef('Number'), _ForwardRef('ModelMigrationStatus'), _ForwardRef('ModelSLAInfo'), _ForwardRef('EntityStatus'), typing.Sequence<+T_co>[~ModelUserInfo]<~ModelUserInfo>]
+        Returns -> typing.Union[_ForwardRef('Number'), str, typing.Sequence[~ModelMachineInfo], _ForwardRef('ModelMigrationStatus'), _ForwardRef('ModelSLAInfo'), _ForwardRef('EntityStatus'), typing.Sequence[~ModelUserInfo]]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6724,8 +6612,8 @@ class ModelManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def DestroyModels(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6742,8 +6630,8 @@ class ModelManagerFacade(Type):
     @ReturnMapping(MapResults)
     async def DumpModels(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~MapResult]<~MapResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~MapResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6760,8 +6648,8 @@ class ModelManagerFacade(Type):
     @ReturnMapping(MapResults)
     async def DumpModelsDB(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~MapResult]<~MapResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~MapResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6779,7 +6667,7 @@ class ModelManagerFacade(Type):
     async def ListModels(self, tag=""):
         '''
         tag : str
-        Returns -> typing.Sequence<+T_co>[~UserModel]<~UserModel>
+        Returns -> typing.Sequence[~UserModel]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6797,7 +6685,7 @@ class ModelManagerFacade(Type):
     async def ModelDefaults(self):
         '''
 
-        Returns -> typing.Mapping<~KT, +VT_co>[str, ~ModelDefaults]<~ModelDefaults>
+        Returns -> typing.Mapping[str, ~ModelDefaults]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6814,8 +6702,8 @@ class ModelManagerFacade(Type):
     @ReturnMapping(ModelInfoResults)
     async def ModelInfo(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~ModelInfoResult]<~ModelInfoResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~ModelInfoResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6832,8 +6720,8 @@ class ModelManagerFacade(Type):
     @ReturnMapping(ModelStatusResults)
     async def ModelStatus(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~ModelStatus]<~ModelStatus>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~ModelStatus]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6850,8 +6738,8 @@ class ModelManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def ModifyModelAccess(self, changes=None):
         '''
-        changes : typing.Sequence<+T_co>[~ModifyModelAccess]<~ModifyModelAccess>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        changes : typing.Sequence[~ModifyModelAccess]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6868,8 +6756,8 @@ class ModelManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetModelDefaults(self, config=None):
         '''
-        config : typing.Sequence<+T_co>[~ModelDefaultValues]<~ModelDefaultValues>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        config : typing.Sequence[~ModelDefaultValues]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6886,8 +6774,8 @@ class ModelManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def UnsetModelDefaults(self, keys=None):
         '''
-        keys : typing.Sequence<+T_co>[~ModelUnsetKeys]<~ModelUnsetKeys>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        keys : typing.Sequence[~ModelUnsetKeys]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6969,8 +6857,8 @@ class ProxyUpdaterFacade(Type):
     @ReturnMapping(ProxyConfigResults)
     async def ProxyConfig(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~ProxyConfigResult]<~ProxyConfigResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~ProxyConfigResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -6987,8 +6875,8 @@ class ProxyUpdaterFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def WatchForProxyConfigAndAPIHostPortChanges(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~NotifyWatchResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -7060,8 +6948,8 @@ class RebootFacade(Type):
     @ReturnMapping(ErrorResults)
     async def ClearReboot(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -7078,8 +6966,8 @@ class RebootFacade(Type):
     @ReturnMapping(RebootActionResults)
     async def GetRebootAction(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~RebootActionResult]<~RebootActionResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~RebootActionResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -7096,8 +6984,8 @@ class RebootFacade(Type):
     @ReturnMapping(ErrorResults)
     async def RequestReboot(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -7227,8 +7115,8 @@ class SSHClientFacade(Type):
     @ReturnMapping(SSHAddressesResults)
     async def AllAddresses(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~SSHAddressesResult]<~SSHAddressesResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~SSHAddressesResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -7245,8 +7133,8 @@ class SSHClientFacade(Type):
     @ReturnMapping(SSHAddressResults)
     async def PrivateAddress(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~SSHAddressResult]<~SSHAddressResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~SSHAddressResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -7281,8 +7169,8 @@ class SSHClientFacade(Type):
     @ReturnMapping(SSHAddressResults)
     async def PublicAddress(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~SSHAddressResult]<~SSHAddressResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~SSHAddressResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -7299,8 +7187,8 @@ class SSHClientFacade(Type):
     @ReturnMapping(SSHPublicKeysResults)
     async def PublicKeys(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~SSHPublicKeysResult]<~SSHPublicKeysResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~SSHPublicKeysResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -7367,8 +7255,8 @@ class SingularFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Claim(self, claims=None):
         '''
-        claims : typing.Sequence<+T_co>[~SingularClaim]<~SingularClaim>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        claims : typing.Sequence[~SingularClaim]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -7385,8 +7273,8 @@ class SingularFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Wait(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -7477,8 +7365,8 @@ class SpacesFacade(Type):
     @ReturnMapping(ErrorResults)
     async def CreateSpaces(self, spaces=None):
         '''
-        spaces : typing.Sequence<+T_co>[~CreateSpaceParams]<~CreateSpaceParams>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        spaces : typing.Sequence[~CreateSpaceParams]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -7496,7 +7384,7 @@ class SpacesFacade(Type):
     async def ListSpaces(self):
         '''
 
-        Returns -> typing.Sequence<+T_co>[~Space]<~Space>
+        Returns -> typing.Sequence[~Space]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -7551,7 +7439,7 @@ class StatusHistoryFacade(Type):
     async def ModelConfig(self):
         '''
 
-        Returns -> typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        Returns -> typing.Mapping[str, typing.Any]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -7700,8 +7588,8 @@ class SubnetsFacade(Type):
     @ReturnMapping(ErrorResults)
     async def AddSubnets(self, subnets=None):
         '''
-        subnets : typing.Sequence<+T_co>[~AddSubnetParams]<~AddSubnetParams>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        subnets : typing.Sequence[~AddSubnetParams]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -7719,7 +7607,7 @@ class SubnetsFacade(Type):
     async def AllSpaces(self):
         '''
 
-        Returns -> typing.Sequence<+T_co>[~SpaceResult]<~SpaceResult>
+        Returns -> typing.Sequence[~SpaceResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -7737,7 +7625,7 @@ class SubnetsFacade(Type):
     async def AllZones(self):
         '''
 
-        Returns -> typing.Sequence<+T_co>[~ZoneResult]<~ZoneResult>
+        Returns -> typing.Sequence[~ZoneResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -7756,7 +7644,7 @@ class SubnetsFacade(Type):
         '''
         space_tag : str
         zone : str
-        Returns -> typing.Sequence<+T_co>[~Subnet]<~Subnet>
+        Returns -> typing.Sequence[~Subnet]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -7891,8 +7779,8 @@ class UserManagerFacade(Type):
     @ReturnMapping(AddUserResults)
     async def AddUser(self, users=None):
         '''
-        users : typing.Sequence<+T_co>[~AddUser]<~AddUser>
-        Returns -> typing.Sequence<+T_co>[~AddUserResult]<~AddUserResult>
+        users : typing.Sequence[~AddUser]
+        Returns -> typing.Sequence[~AddUserResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -7909,8 +7797,8 @@ class UserManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def DisableUser(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -7927,8 +7815,8 @@ class UserManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def EnableUser(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -7945,8 +7833,8 @@ class UserManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def RemoveUser(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -7963,8 +7851,8 @@ class UserManagerFacade(Type):
     @ReturnMapping(AddUserResults)
     async def ResetPassword(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~AddUserResult]<~AddUserResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~AddUserResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -7981,8 +7869,8 @@ class UserManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetPassword(self, changes=None):
         '''
-        changes : typing.Sequence<+T_co>[~EntityPassword]<~EntityPassword>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        changes : typing.Sequence[~EntityPassword]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -7999,9 +7887,9 @@ class UserManagerFacade(Type):
     @ReturnMapping(UserInfoResults)
     async def UserInfo(self, entities=None, include_disabled=False):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        entities : typing.Sequence[~Entity]
         include_disabled : bool
-        Returns -> typing.Sequence<+T_co>[~UserInfoResult]<~UserInfoResult>
+        Returns -> typing.Sequence[~UserInfoResult]
         '''
         # map input types to rpc msg
         _params = dict()
@@ -8051,7 +7939,7 @@ class VolumeAttachmentsWatcherFacade(Type):
     async def Next(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence<+T_co>[~MachineStorageId]<~MachineStorageId>, _ForwardRef('Error')]
+        Returns -> typing.Union[typing.Sequence[~MachineStorageId], _ForwardRef('Error'), str]
         '''
         # map input types to rpc msg
         _params = dict()
