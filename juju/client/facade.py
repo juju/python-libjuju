@@ -188,8 +188,8 @@ basic_types = [str, bool, int, float]
 type_mapping = {
     'str': '(bytes, str)',
     'Sequence': 'list',
-    'Union': 'dict',
-    'Mapping': 'dict',
+    'Union': '(dict, set)',
+    'Mapping': '(dict, set)',
 }
 
 
@@ -215,7 +215,7 @@ def kind_to_py(kind):
         return name, type_mapping[name], True
 
     suffix = name.lstrip("~")
-    return suffix, suffix, True
+    return suffix, "(dict, set, {})".format(suffix), True
 
 
 def strcast(kind, keep_builtins=False):
@@ -322,7 +322,7 @@ class Args(list):
 def buildValidation(name, instance_type, instance_sub_type, ident=None):
     INDENT = ident or "    "
     source = """{ident}if {name} is not None and not isinstance({name}, {instance_sub_type}):
-{ident}    raise Exception('Expected {name} to be of type {instance_type}')
+{ident}    raise Exception("{name} must be: {instance_type} got: {{}}".format(type({name}).__name__))
 """.format(ident=INDENT,
            name=name,
            instance_type=instance_type,
@@ -363,20 +363,14 @@ class {}(Type):
             # do the validation first, before setting the variables
             for arg in args:
                 arg_name = name_to_py(arg[0])
-                arg_type, arg_sub_type, ok = kind_to_py(arg[1])
-                if ok:
-                    source.append('{}'.format(buildValidation(arg_name, arg_type, arg_sub_type, ident=INDENT*2)))
-
-            for arg in args:
-                arg_name = name_to_py(arg[0])
                 arg_type = arg[1]
                 arg_type_name = strcast(arg_type)
                 if arg_type in basic_types:
-                    source.append("{}self.{} = {}".format(INDENT * 2,
+                    source.append("{}{}_ = {}".format(INDENT * 2,
                                                           arg_name,
                                                           arg_name))
                 elif type(arg_type) is typing.TypeVar:
-                    source.append("{}self.{} = {}.from_json({}) "
+                    source.append("{}{}_ = {}.from_json({}) "
                                   "if {} else None".format(INDENT * 2,
                                                            arg_name,
                                                            arg_type_name,
@@ -390,13 +384,13 @@ class {}(Type):
                     )
                     if type(value_type) is typing.TypeVar:
                         source.append(
-                            "{}self.{} = [{}.from_json(o) "
+                            "{}{}_ = [{}.from_json(o) "
                             "for o in {} or []]".format(INDENT * 2,
                                                         arg_name,
                                                         strcast(value_type),
                                                         arg_name))
                     else:
-                        source.append("{}self.{} = {}".format(INDENT * 2,
+                        source.append("{}{}_ = {}".format(INDENT * 2,
                                                               arg_name,
                                                               arg_name))
                 elif issubclass(arg_type, typing.Mapping):
@@ -407,20 +401,29 @@ class {}(Type):
                     )
                     if type(value_type) is typing.TypeVar:
                         source.append(
-                            "{}self.{} = {{k: {}.from_json(v) "
+                            "{}s{}_ = {{k: {}.from_json(v) "
                             "for k, v in ({} or dict()).items()}}".format(
                                 INDENT * 2,
                                 arg_name,
                                 strcast(value_type),
                                 arg_name))
                     else:
-                        source.append("{}self.{} = {}".format(INDENT * 2,
+                        source.append("{}{}_ = {}".format(INDENT * 2,
                                                               arg_name,
                                                               arg_name))
                 else:
-                    source.append("{}self.{} = {}".format(INDENT * 2,
+                    source.append("{}{}_ = {}".format(INDENT * 2,
                                                           arg_name,
                                                           arg_name))
+            for arg in args:
+                arg_name = "{}_".format(name_to_py(arg[0]))
+                arg_type, arg_sub_type, ok = kind_to_py(arg[1])
+                if ok:
+                    source.append('{}'.format(buildValidation(arg_name, arg_type, arg_sub_type, ident=INDENT*2)))
+
+            for arg in args:
+                arg_name = name_to_py(arg[0])
+                source.append('{}self.{} = {}_'.format(INDENT * 2, arg_name, arg_name))
             # Ensure that we take the kwargs (unknown_fields) and put it on the
             # Results/Params so we can inspect it.
             source.append("{}self.unknown_fields = unknown_fields".format(INDENT * 2))
