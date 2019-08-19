@@ -9,7 +9,7 @@ class APIHostPortsResult(Type):
     _toPy = {'servers': 'servers'}
     def __init__(self, servers=None, **unknown_fields):
         '''
-        servers : typing.Sequence<+T_co>[~HostPort]<~HostPort>
+        servers : typing.Sequence[~HostPort]
         '''
         self.servers = [HostPort.from_json(o) for o in servers or []]
         self.unknown_fields = unknown_fields
@@ -19,10 +19,10 @@ class APIHostPortsResult(Type):
 class Action(Type):
     _toSchema = {'name': 'name', 'parameters': 'parameters', 'receiver': 'receiver', 'tag': 'tag'}
     _toPy = {'name': 'name', 'parameters': 'parameters', 'receiver': 'receiver', 'tag': 'tag'}
-    def __init__(self, name="", parameters=None, receiver="", tag="", **unknown_fields):
+    def __init__(self, name=None, parameters=None, receiver=None, tag=None, **unknown_fields):
         '''
         name : str
-        parameters : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        parameters : typing.Mapping[str, typing.Any]
         receiver : str
         tag : str
         '''
@@ -37,11 +37,11 @@ class Action(Type):
 class ActionExecutionResult(Type):
     _toSchema = {'action_tag': 'action-tag', 'message': 'message', 'results': 'results', 'status': 'status'}
     _toPy = {'action-tag': 'action_tag', 'message': 'message', 'results': 'results', 'status': 'status'}
-    def __init__(self, action_tag="", message="", results=None, status="", **unknown_fields):
+    def __init__(self, action_tag=None, message=None, results=None, status=None, **unknown_fields):
         '''
         action_tag : str
         message : str
-        results : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        results : typing.Mapping[str, typing.Any]
         status : str
         '''
         self.action_tag = action_tag
@@ -57,7 +57,7 @@ class ActionExecutionResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~ActionExecutionResult]<~ActionExecutionResult>
+        results : typing.Sequence[~ActionExecutionResult]
         '''
         self.results = [ActionExecutionResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -67,7 +67,7 @@ class ActionExecutionResults(Type):
 class ActionPruneArgs(Type):
     _toSchema = {'max_history_mb': 'max-history-mb', 'max_history_time': 'max-history-time'}
     _toPy = {'max-history-mb': 'max_history_mb', 'max-history-time': 'max_history_time'}
-    def __init__(self, max_history_mb=0, max_history_time=0, **unknown_fields):
+    def __init__(self, max_history_mb=None, max_history_time=None, **unknown_fields):
         '''
         max_history_mb : int
         max_history_time : int
@@ -81,14 +81,14 @@ class ActionPruneArgs(Type):
 class ActionResult(Type):
     _toSchema = {'action': 'action', 'completed': 'completed', 'enqueued': 'enqueued', 'error': 'error', 'message': 'message', 'output': 'output', 'started': 'started', 'status': 'status'}
     _toPy = {'action': 'action', 'completed': 'completed', 'enqueued': 'enqueued', 'error': 'error', 'message': 'message', 'output': 'output', 'started': 'started', 'status': 'status'}
-    def __init__(self, action=None, completed="", enqueued="", error=None, message="", output=None, started="", status="", **unknown_fields):
+    def __init__(self, action=None, completed=None, enqueued=None, error=None, message=None, output=None, started=None, status=None, **unknown_fields):
         '''
         action : Action
         completed : str
         enqueued : str
         error : Error
         message : str
-        output : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        output : typing.Mapping[str, typing.Any]
         started : str
         status : str
         '''
@@ -109,7 +109,7 @@ class ActionResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~ActionResult]<~ActionResult>
+        results : typing.Sequence[~ActionResult]
         '''
         self.results = [ActionResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -119,10 +119,10 @@ class ActionResults(Type):
 class ActionSpec(Type):
     _toSchema = {'description': 'description', 'params': 'params'}
     _toPy = {'description': 'description', 'params': 'params'}
-    def __init__(self, description="", params=None, **unknown_fields):
+    def __init__(self, description=None, params=None, **unknown_fields):
         '''
         description : str
-        params : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        params : typing.Mapping[str, typing.Any]
         '''
         self.description = description
         self.params = params
@@ -135,7 +135,7 @@ class Actions(Type):
     _toPy = {'actions': 'actions'}
     def __init__(self, actions=None, **unknown_fields):
         '''
-        actions : typing.Sequence<+T_co>[~Action]<~Action>
+        actions : typing.Sequence[~Action]
         '''
         self.actions = [Action.from_json(o) for o in actions or []]
         self.unknown_fields = unknown_fields
@@ -145,9 +145,9 @@ class Actions(Type):
 class ActionsByName(Type):
     _toSchema = {'actions': 'actions', 'error': 'error', 'name': 'name'}
     _toPy = {'actions': 'actions', 'error': 'error', 'name': 'name'}
-    def __init__(self, actions=None, error=None, name="", **unknown_fields):
+    def __init__(self, actions=None, error=None, name=None, **unknown_fields):
         '''
-        actions : typing.Sequence<+T_co>[~ActionResult]<~ActionResult>
+        actions : typing.Sequence[~ActionResult]
         error : Error
         name : str
         '''
@@ -163,7 +163,7 @@ class ActionsByNames(Type):
     _toPy = {'actions': 'actions'}
     def __init__(self, actions=None, **unknown_fields):
         '''
-        actions : typing.Sequence<+T_co>[~ActionsByName]<~ActionsByName>
+        actions : typing.Sequence[~ActionsByName]
         '''
         self.actions = [ActionsByName.from_json(o) for o in actions or []]
         self.unknown_fields = unknown_fields
@@ -173,9 +173,9 @@ class ActionsByNames(Type):
 class ActionsByReceiver(Type):
     _toSchema = {'actions': 'actions', 'error': 'error', 'receiver': 'receiver'}
     _toPy = {'actions': 'actions', 'error': 'error', 'receiver': 'receiver'}
-    def __init__(self, actions=None, error=None, receiver="", **unknown_fields):
+    def __init__(self, actions=None, error=None, receiver=None, **unknown_fields):
         '''
-        actions : typing.Sequence<+T_co>[~ActionResult]<~ActionResult>
+        actions : typing.Sequence[~ActionResult]
         error : Error
         receiver : str
         '''
@@ -191,7 +191,7 @@ class ActionsByReceivers(Type):
     _toPy = {'actions': 'actions'}
     def __init__(self, actions=None, **unknown_fields):
         '''
-        actions : typing.Sequence<+T_co>[~ActionsByReceiver]<~ActionsByReceiver>
+        actions : typing.Sequence[~ActionsByReceiver]
         '''
         self.actions = [ActionsByReceiver.from_json(o) for o in actions or []]
         self.unknown_fields = unknown_fields
@@ -201,11 +201,11 @@ class ActionsByReceivers(Type):
 class AddApplicationOffer(Type):
     _toSchema = {'application_description': 'application-description', 'application_name': 'application-name', 'endpoints': 'endpoints', 'model_tag': 'model-tag', 'offer_name': 'offer-name'}
     _toPy = {'application-description': 'application_description', 'application-name': 'application_name', 'endpoints': 'endpoints', 'model-tag': 'model_tag', 'offer-name': 'offer_name'}
-    def __init__(self, application_description="", application_name="", endpoints=None, model_tag="", offer_name="", **unknown_fields):
+    def __init__(self, application_description=None, application_name=None, endpoints=None, model_tag=None, offer_name=None, **unknown_fields):
         '''
         application_description : str
         application_name : str
-        endpoints : typing.Mapping<~KT, +VT_co>[str, str]
+        endpoints : typing.Mapping[str, str]
         model_tag : str
         offer_name : str
         '''
@@ -223,7 +223,7 @@ class AddApplicationOffers(Type):
     _toPy = {'Offers': 'offers'}
     def __init__(self, offers=None, **unknown_fields):
         '''
-        offers : typing.Sequence<+T_co>[~AddApplicationOffer]<~AddApplicationOffer>
+        offers : typing.Sequence[~AddApplicationOffer]
         '''
         self.offers = [AddApplicationOffer.from_json(o) for o in offers or []]
         self.unknown_fields = unknown_fields
@@ -233,12 +233,12 @@ class AddApplicationOffers(Type):
 class AddApplicationUnits(Type):
     _toSchema = {'application': 'application', 'attach_storage': 'attach-storage', 'num_units': 'num-units', 'placement': 'placement', 'policy': 'policy'}
     _toPy = {'application': 'application', 'attach-storage': 'attach_storage', 'num-units': 'num_units', 'placement': 'placement', 'policy': 'policy'}
-    def __init__(self, application="", attach_storage=None, num_units=0, placement=None, policy="", **unknown_fields):
+    def __init__(self, application=None, attach_storage=None, num_units=None, placement=None, policy=None, **unknown_fields):
         '''
         application : str
-        attach_storage : typing.Sequence<+T_co>[str]
+        attach_storage : typing.Sequence[str]
         num_units : int
-        placement : typing.Sequence<+T_co>[~Placement]<~Placement>
+        placement : typing.Sequence[~Placement]
         policy : str
         '''
         self.application = application
@@ -255,7 +255,7 @@ class AddApplicationUnitsResults(Type):
     _toPy = {'units': 'units'}
     def __init__(self, units=None, **unknown_fields):
         '''
-        units : typing.Sequence<+T_co>[str]
+        units : typing.Sequence[str]
         '''
         self.units = units
         self.unknown_fields = unknown_fields
@@ -265,7 +265,7 @@ class AddApplicationUnitsResults(Type):
 class AddCharm(Type):
     _toSchema = {'channel': 'channel', 'force': 'force', 'url': 'url'}
     _toPy = {'channel': 'channel', 'force': 'force', 'url': 'url'}
-    def __init__(self, channel="", force=False, url="", **unknown_fields):
+    def __init__(self, channel=None, force=None, url=None, **unknown_fields):
         '''
         channel : str
         force : bool
@@ -281,7 +281,7 @@ class AddCharm(Type):
 class AddCharmWithAuthorization(Type):
     _toSchema = {'channel': 'channel', 'force': 'force', 'macaroon': 'macaroon', 'url': 'url'}
     _toPy = {'channel': 'channel', 'force': 'force', 'macaroon': 'macaroon', 'url': 'url'}
-    def __init__(self, channel="", force=False, macaroon=None, url="", **unknown_fields):
+    def __init__(self, channel=None, force=None, macaroon=None, url=None, **unknown_fields):
         '''
         channel : str
         force : bool
@@ -299,7 +299,7 @@ class AddCharmWithAuthorization(Type):
 class AddCloudArgs(Type):
     _toSchema = {'cloud': 'cloud', 'name': 'name'}
     _toPy = {'cloud': 'cloud', 'name': 'name'}
-    def __init__(self, cloud=None, name="", **unknown_fields):
+    def __init__(self, cloud=None, name=None, **unknown_fields):
         '''
         cloud : Cloud
         name : str
@@ -313,15 +313,15 @@ class AddCloudArgs(Type):
 class AddMachineParams(Type):
     _toSchema = {'addresses': 'addresses', 'constraints': 'constraints', 'container_type': 'container-type', 'disks': 'disks', 'hardware_characteristics': 'hardware-characteristics', 'instance_id': 'instance-id', 'jobs': 'jobs', 'nonce': 'nonce', 'parent_id': 'parent-id', 'placement': 'placement', 'series': 'series'}
     _toPy = {'addresses': 'addresses', 'constraints': 'constraints', 'container-type': 'container_type', 'disks': 'disks', 'hardware-characteristics': 'hardware_characteristics', 'instance-id': 'instance_id', 'jobs': 'jobs', 'nonce': 'nonce', 'parent-id': 'parent_id', 'placement': 'placement', 'series': 'series'}
-    def __init__(self, addresses=None, constraints=None, container_type="", disks=None, hardware_characteristics=None, instance_id="", jobs=None, nonce="", parent_id="", placement=None, series="", **unknown_fields):
+    def __init__(self, addresses=None, constraints=None, container_type=None, disks=None, hardware_characteristics=None, instance_id=None, jobs=None, nonce=None, parent_id=None, placement=None, series=None, **unknown_fields):
         '''
-        addresses : typing.Sequence<+T_co>[~Address]<~Address>
+        addresses : typing.Sequence[~Address]
         constraints : Value
         container_type : str
-        disks : typing.Sequence<+T_co>[~Constraints]<~Constraints>
+        disks : typing.Sequence[~Constraints]
         hardware_characteristics : HardwareCharacteristics
         instance_id : str
-        jobs : typing.Sequence<+T_co>[str]
+        jobs : typing.Sequence[str]
         nonce : str
         parent_id : str
         placement : Placement
@@ -347,7 +347,7 @@ class AddMachines(Type):
     _toPy = {'params': 'params'}
     def __init__(self, params=None, **unknown_fields):
         '''
-        params : typing.Sequence<+T_co>[~AddMachineParams]<~AddMachineParams>
+        params : typing.Sequence[~AddMachineParams]
         '''
         self.params = [AddMachineParams.from_json(o) for o in params or []]
         self.unknown_fields = unknown_fields
@@ -357,7 +357,7 @@ class AddMachines(Type):
 class AddMachinesResult(Type):
     _toSchema = {'error': 'error', 'machine': 'machine'}
     _toPy = {'error': 'error', 'machine': 'machine'}
-    def __init__(self, error=None, machine="", **unknown_fields):
+    def __init__(self, error=None, machine=None, **unknown_fields):
         '''
         error : Error
         machine : str
@@ -373,7 +373,7 @@ class AddMachinesResults(Type):
     _toPy = {'machines': 'machines'}
     def __init__(self, machines=None, **unknown_fields):
         '''
-        machines : typing.Sequence<+T_co>[~AddMachinesResult]<~AddMachinesResult>
+        machines : typing.Sequence[~AddMachinesResult]
         '''
         self.machines = [AddMachinesResult.from_json(o) for o in machines or []]
         self.unknown_fields = unknown_fields
@@ -383,14 +383,14 @@ class AddMachinesResults(Type):
 class AddPendingResourcesArgs(Type):
     _toSchema = {'addcharmwithauthorization': 'AddCharmWithAuthorization', 'channel': 'channel', 'entity': 'Entity', 'force': 'force', 'macaroon': 'macaroon', 'resources': 'resources', 'tag': 'tag', 'url': 'url'}
     _toPy = {'AddCharmWithAuthorization': 'addcharmwithauthorization', 'Entity': 'entity', 'channel': 'channel', 'force': 'force', 'macaroon': 'macaroon', 'resources': 'resources', 'tag': 'tag', 'url': 'url'}
-    def __init__(self, addcharmwithauthorization=None, entity=None, channel="", force=False, macaroon=None, resources=None, tag="", url="", **unknown_fields):
+    def __init__(self, addcharmwithauthorization=None, entity=None, channel=None, force=None, macaroon=None, resources=None, tag=None, url=None, **unknown_fields):
         '''
         addcharmwithauthorization : AddCharmWithAuthorization
         entity : Entity
         channel : str
         force : bool
         macaroon : Macaroon
-        resources : typing.Sequence<+T_co>[~CharmResource]<~CharmResource>
+        resources : typing.Sequence[~CharmResource]
         tag : str
         url : str
         '''
@@ -413,7 +413,7 @@ class AddPendingResourcesResult(Type):
         '''
         errorresult : ErrorResult
         error : Error
-        pending_ids : typing.Sequence<+T_co>[str]
+        pending_ids : typing.Sequence[str]
         '''
         self.errorresult = ErrorResult.from_json(errorresult) if errorresult else None
         self.error = Error.from_json(error) if error else None
@@ -427,8 +427,8 @@ class AddRelation(Type):
     _toPy = {'endpoints': 'endpoints', 'via-cidrs': 'via_cidrs'}
     def __init__(self, endpoints=None, via_cidrs=None, **unknown_fields):
         '''
-        endpoints : typing.Sequence<+T_co>[str]
-        via_cidrs : typing.Sequence<+T_co>[str]
+        endpoints : typing.Sequence[str]
+        via_cidrs : typing.Sequence[str]
         '''
         self.endpoints = endpoints
         self.via_cidrs = via_cidrs
@@ -441,7 +441,7 @@ class AddRelationResults(Type):
     _toPy = {'endpoints': 'endpoints'}
     def __init__(self, endpoints=None, **unknown_fields):
         '''
-        endpoints : typing.Mapping<~KT, +VT_co>[str, ~CharmRelation]<~CharmRelation>
+        endpoints : typing.Mapping[str, ~CharmRelation]
         '''
         self.endpoints = endpoints
         self.unknown_fields = unknown_fields
@@ -453,7 +453,7 @@ class AddStorageDetails(Type):
     _toPy = {'storage-tags': 'storage_tags'}
     def __init__(self, storage_tags=None, **unknown_fields):
         '''
-        storage_tags : typing.Sequence<+T_co>[str]
+        storage_tags : typing.Sequence[str]
         '''
         self.storage_tags = storage_tags
         self.unknown_fields = unknown_fields
@@ -479,7 +479,7 @@ class AddStorageResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~AddStorageResult]<~AddStorageResult>
+        results : typing.Sequence[~AddStorageResult]
         '''
         self.results = [AddStorageResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -489,14 +489,14 @@ class AddStorageResults(Type):
 class AddSubnetParams(Type):
     _toSchema = {'provider_network_id': 'provider-network-id', 'space_tag': 'space-tag', 'subnet_provider_id': 'subnet-provider-id', 'subnet_tag': 'subnet-tag', 'vlan_tag': 'vlan-tag', 'zones': 'zones'}
     _toPy = {'provider-network-id': 'provider_network_id', 'space-tag': 'space_tag', 'subnet-provider-id': 'subnet_provider_id', 'subnet-tag': 'subnet_tag', 'vlan-tag': 'vlan_tag', 'zones': 'zones'}
-    def __init__(self, provider_network_id="", space_tag="", subnet_provider_id="", subnet_tag="", vlan_tag=0, zones=None, **unknown_fields):
+    def __init__(self, provider_network_id=None, space_tag=None, subnet_provider_id=None, subnet_tag=None, vlan_tag=None, zones=None, **unknown_fields):
         '''
         provider_network_id : str
         space_tag : str
         subnet_provider_id : str
         subnet_tag : str
         vlan_tag : int
-        zones : typing.Sequence<+T_co>[str]
+        zones : typing.Sequence[str]
         '''
         self.provider_network_id = provider_network_id
         self.space_tag = space_tag
@@ -513,7 +513,7 @@ class AddSubnetsParams(Type):
     _toPy = {'subnets': 'subnets'}
     def __init__(self, subnets=None, **unknown_fields):
         '''
-        subnets : typing.Sequence<+T_co>[~AddSubnetParams]<~AddSubnetParams>
+        subnets : typing.Sequence[~AddSubnetParams]
         '''
         self.subnets = [AddSubnetParams.from_json(o) for o in subnets or []]
         self.unknown_fields = unknown_fields
@@ -523,7 +523,7 @@ class AddSubnetsParams(Type):
 class AddUser(Type):
     _toSchema = {'display_name': 'display-name', 'password': 'password', 'username': 'username'}
     _toPy = {'display-name': 'display_name', 'password': 'password', 'username': 'username'}
-    def __init__(self, display_name="", password="", username="", **unknown_fields):
+    def __init__(self, display_name=None, password=None, username=None, **unknown_fields):
         '''
         display_name : str
         password : str
@@ -539,10 +539,10 @@ class AddUser(Type):
 class AddUserResult(Type):
     _toSchema = {'error': 'error', 'secret_key': 'secret-key', 'tag': 'tag'}
     _toPy = {'error': 'error', 'secret-key': 'secret_key', 'tag': 'tag'}
-    def __init__(self, error=None, secret_key=None, tag="", **unknown_fields):
+    def __init__(self, error=None, secret_key=None, tag=None, **unknown_fields):
         '''
         error : Error
-        secret_key : typing.Sequence<+T_co>[int]
+        secret_key : typing.Sequence[int]
         tag : str
         '''
         self.error = Error.from_json(error) if error else None
@@ -557,7 +557,7 @@ class AddUserResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~AddUserResult]<~AddUserResult>
+        results : typing.Sequence[~AddUserResult]
         '''
         self.results = [AddUserResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -569,7 +569,7 @@ class AddUsers(Type):
     _toPy = {'users': 'users'}
     def __init__(self, users=None, **unknown_fields):
         '''
-        users : typing.Sequence<+T_co>[~AddUser]<~AddUser>
+        users : typing.Sequence[~AddUser]
         '''
         self.users = [AddUser.from_json(o) for o in users or []]
         self.unknown_fields = unknown_fields
@@ -579,7 +579,7 @@ class AddUsers(Type):
 class Address(Type):
     _toSchema = {'scope': 'scope', 'space_id': 'space-id', 'space_name': 'space-name', 'type_': 'type', 'value': 'value'}
     _toPy = {'scope': 'scope', 'space-id': 'space_id', 'space-name': 'space_name', 'type': 'type_', 'value': 'value'}
-    def __init__(self, scope="", space_id="", space_name="", type_="", value="", **unknown_fields):
+    def __init__(self, scope=None, space_id=None, space_name=None, type_=None, value=None, **unknown_fields):
         '''
         scope : str
         space_id : str
@@ -599,7 +599,7 @@ class Address(Type):
 class AdoptResourcesArgs(Type):
     _toSchema = {'model_tag': 'model-tag', 'source_controller_version': 'source-controller-version'}
     _toPy = {'model-tag': 'model_tag', 'source-controller-version': 'source_controller_version'}
-    def __init__(self, model_tag="", source_controller_version=None, **unknown_fields):
+    def __init__(self, model_tag=None, source_controller_version=None, **unknown_fields):
         '''
         model_tag : str
         source_controller_version : Number
@@ -613,11 +613,11 @@ class AdoptResourcesArgs(Type):
 class AgentGetEntitiesResult(Type):
     _toSchema = {'container_type': 'container-type', 'error': 'error', 'jobs': 'jobs', 'life': 'life'}
     _toPy = {'container-type': 'container_type', 'error': 'error', 'jobs': 'jobs', 'life': 'life'}
-    def __init__(self, container_type="", error=None, jobs=None, life="", **unknown_fields):
+    def __init__(self, container_type=None, error=None, jobs=None, life=None, **unknown_fields):
         '''
         container_type : str
         error : Error
-        jobs : typing.Sequence<+T_co>[str]
+        jobs : typing.Sequence[str]
         life : str
         '''
         self.container_type = container_type
@@ -633,7 +633,7 @@ class AgentGetEntitiesResults(Type):
     _toPy = {'entities': 'entities'}
     def __init__(self, entities=None, **unknown_fields):
         '''
-        entities : typing.Sequence<+T_co>[~AgentGetEntitiesResult]<~AgentGetEntitiesResult>
+        entities : typing.Sequence[~AgentGetEntitiesResult]
         '''
         self.entities = [AgentGetEntitiesResult.from_json(o) for o in entities or []]
         self.unknown_fields = unknown_fields
@@ -655,7 +655,7 @@ class AgentVersionResult(Type):
 class AllWatcherId(Type):
     _toSchema = {'watcher_id': 'watcher-id'}
     _toPy = {'watcher-id': 'watcher_id'}
-    def __init__(self, watcher_id="", **unknown_fields):
+    def __init__(self, watcher_id=None, **unknown_fields):
         '''
         watcher_id : str
         '''
@@ -669,7 +669,7 @@ class AllWatcherNextResults(Type):
     _toPy = {'deltas': 'deltas'}
     def __init__(self, deltas=None, **unknown_fields):
         '''
-        deltas : typing.Sequence<+T_co>[~Delta]<~Delta>
+        deltas : typing.Sequence[~Delta]
         '''
         self.deltas = [Delta.from_json(o) for o in deltas or []]
         self.unknown_fields = unknown_fields
@@ -679,9 +679,9 @@ class AllWatcherNextResults(Type):
 class AnnotationsGetResult(Type):
     _toSchema = {'annotations': 'annotations', 'entity': 'entity', 'error': 'error'}
     _toPy = {'annotations': 'annotations', 'entity': 'entity', 'error': 'error'}
-    def __init__(self, annotations=None, entity="", error=None, **unknown_fields):
+    def __init__(self, annotations=None, entity=None, error=None, **unknown_fields):
         '''
-        annotations : typing.Mapping<~KT, +VT_co>[str, str]
+        annotations : typing.Mapping[str, str]
         entity : str
         error : ErrorResult
         '''
@@ -697,7 +697,7 @@ class AnnotationsGetResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~AnnotationsGetResult]<~AnnotationsGetResult>
+        results : typing.Sequence[~AnnotationsGetResult]
         '''
         self.results = [AnnotationsGetResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -709,7 +709,7 @@ class AnnotationsSet(Type):
     _toPy = {'annotations': 'annotations'}
     def __init__(self, annotations=None, **unknown_fields):
         '''
-        annotations : typing.Sequence<+T_co>[~EntityAnnotations]<~EntityAnnotations>
+        annotations : typing.Sequence[~EntityAnnotations]
         '''
         self.annotations = [EntityAnnotations.from_json(o) for o in annotations or []]
         self.unknown_fields = unknown_fields
@@ -719,7 +719,7 @@ class AnnotationsSet(Type):
 class ApplicationCharm(Type):
     _toSchema = {'charm_modified_version': 'charm-modified-version', 'force_upgrade': 'force-upgrade', 'sha256': 'sha256', 'url': 'url'}
     _toPy = {'charm-modified-version': 'charm_modified_version', 'force-upgrade': 'force_upgrade', 'sha256': 'sha256', 'url': 'url'}
-    def __init__(self, charm_modified_version=0, force_upgrade=False, sha256="", url="", **unknown_fields):
+    def __init__(self, charm_modified_version=None, force_upgrade=None, sha256=None, url=None, **unknown_fields):
         '''
         charm_modified_version : int
         force_upgrade : bool
@@ -737,9 +737,9 @@ class ApplicationCharm(Type):
 class ApplicationCharmActionsResult(Type):
     _toSchema = {'actions': 'actions', 'application_tag': 'application-tag', 'error': 'error'}
     _toPy = {'actions': 'actions', 'application-tag': 'application_tag', 'error': 'error'}
-    def __init__(self, actions=None, application_tag="", error=None, **unknown_fields):
+    def __init__(self, actions=None, application_tag=None, error=None, **unknown_fields):
         '''
-        actions : typing.Mapping<~KT, +VT_co>[str, ~ActionSpec]<~ActionSpec>
+        actions : typing.Mapping[str, ~ActionSpec]
         application_tag : str
         error : Error
         '''
@@ -753,7 +753,7 @@ class ApplicationCharmActionsResult(Type):
 class ApplicationCharmRelations(Type):
     _toSchema = {'application': 'application'}
     _toPy = {'application': 'application'}
-    def __init__(self, application="", **unknown_fields):
+    def __init__(self, application=None, **unknown_fields):
         '''
         application : str
         '''
@@ -767,7 +767,7 @@ class ApplicationCharmRelationsResults(Type):
     _toPy = {'charm-relations': 'charm_relations'}
     def __init__(self, charm_relations=None, **unknown_fields):
         '''
-        charm_relations : typing.Sequence<+T_co>[str]
+        charm_relations : typing.Sequence[str]
         '''
         self.charm_relations = charm_relations
         self.unknown_fields = unknown_fields
@@ -793,7 +793,7 @@ class ApplicationCharmResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~ApplicationCharmResult]<~ApplicationCharmResult>
+        results : typing.Sequence[~ApplicationCharmResult]
         '''
         self.results = [ApplicationCharmResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -803,10 +803,10 @@ class ApplicationCharmResults(Type):
 class ApplicationConfigSet(Type):
     _toSchema = {'application': 'application', 'config': 'config', 'generation': 'generation'}
     _toPy = {'application': 'application', 'config': 'config', 'generation': 'generation'}
-    def __init__(self, application="", config=None, generation="", **unknown_fields):
+    def __init__(self, application=None, config=None, generation=None, **unknown_fields):
         '''
         application : str
-        config : typing.Mapping<~KT, +VT_co>[str, str]
+        config : typing.Mapping[str, str]
         generation : str
         '''
         self.application = application
@@ -821,7 +821,7 @@ class ApplicationConfigSetArgs(Type):
     _toPy = {'Args': 'args'}
     def __init__(self, args=None, **unknown_fields):
         '''
-        args : typing.Sequence<+T_co>[~ApplicationConfigSet]<~ApplicationConfigSet>
+        args : typing.Sequence[~ApplicationConfigSet]
         '''
         self.args = [ApplicationConfigSet.from_json(o) for o in args or []]
         self.unknown_fields = unknown_fields
@@ -833,7 +833,7 @@ class ApplicationConfigUnsetArgs(Type):
     _toPy = {'Args': 'args'}
     def __init__(self, args=None, **unknown_fields):
         '''
-        args : typing.Sequence<+T_co>[~ApplicationUnset]<~ApplicationUnset>
+        args : typing.Sequence[~ApplicationUnset]
         '''
         self.args = [ApplicationUnset.from_json(o) for o in args or []]
         self.unknown_fields = unknown_fields
@@ -857,20 +857,20 @@ class ApplicationConstraint(Type):
 class ApplicationDeploy(Type):
     _toSchema = {'application': 'application', 'channel': 'channel', 'charm_url': 'charm-url', 'config': 'config', 'config_yaml': 'config-yaml', 'constraints': 'constraints', 'endpoint_bindings': 'endpoint-bindings', 'num_units': 'num-units', 'placement': 'placement', 'resources': 'resources', 'series': 'series', 'storage': 'storage'}
     _toPy = {'application': 'application', 'channel': 'channel', 'charm-url': 'charm_url', 'config': 'config', 'config-yaml': 'config_yaml', 'constraints': 'constraints', 'endpoint-bindings': 'endpoint_bindings', 'num-units': 'num_units', 'placement': 'placement', 'resources': 'resources', 'series': 'series', 'storage': 'storage'}
-    def __init__(self, application="", channel="", charm_url="", config=None, config_yaml="", constraints=None, endpoint_bindings=None, num_units=0, placement=None, resources=None, series="", storage=None, **unknown_fields):
+    def __init__(self, application=None, channel=None, charm_url=None, config=None, config_yaml=None, constraints=None, endpoint_bindings=None, num_units=None, placement=None, resources=None, series=None, storage=None, **unknown_fields):
         '''
         application : str
         channel : str
         charm_url : str
-        config : typing.Mapping<~KT, +VT_co>[str, str]
+        config : typing.Mapping[str, str]
         config_yaml : str
         constraints : Value
-        endpoint_bindings : typing.Mapping<~KT, +VT_co>[str, str]
+        endpoint_bindings : typing.Mapping[str, str]
         num_units : int
-        placement : typing.Sequence<+T_co>[~Placement]<~Placement>
-        resources : typing.Mapping<~KT, +VT_co>[str, str]
+        placement : typing.Sequence[~Placement]
+        resources : typing.Mapping[str, str]
         series : str
-        storage : typing.Mapping<~KT, +VT_co>[str, ~Constraints]<~Constraints>
+        storage : typing.Mapping[str, ~Constraints]
         '''
         self.application = application
         self.channel = channel
@@ -891,7 +891,7 @@ class ApplicationDeploy(Type):
 class ApplicationDestroy(Type):
     _toSchema = {'application': 'application'}
     _toPy = {'application': 'application'}
-    def __init__(self, application="", **unknown_fields):
+    def __init__(self, application=None, **unknown_fields):
         '''
         application : str
         '''
@@ -903,7 +903,7 @@ class ApplicationDestroy(Type):
 class ApplicationExpose(Type):
     _toSchema = {'application': 'application'}
     _toPy = {'application': 'application'}
-    def __init__(self, application="", **unknown_fields):
+    def __init__(self, application=None, **unknown_fields):
         '''
         application : str
         '''
@@ -915,7 +915,7 @@ class ApplicationExpose(Type):
 class ApplicationGet(Type):
     _toSchema = {'application': 'application', 'branch': 'branch'}
     _toPy = {'application': 'application', 'branch': 'branch'}
-    def __init__(self, application="", branch="", **unknown_fields):
+    def __init__(self, application=None, branch=None, **unknown_fields):
         '''
         application : str
         branch : str
@@ -931,7 +931,7 @@ class ApplicationGetArgs(Type):
     _toPy = {'args': 'args'}
     def __init__(self, args=None, **unknown_fields):
         '''
-        args : typing.Sequence<+T_co>[~ApplicationGet]<~ApplicationGet>
+        args : typing.Sequence[~ApplicationGet]
         '''
         self.args = [ApplicationGet.from_json(o) for o in args or []]
         self.unknown_fields = unknown_fields
@@ -943,7 +943,7 @@ class ApplicationGetConfigResults(Type):
     _toPy = {'Results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~ConfigResult]<~ConfigResult>
+        results : typing.Sequence[~ConfigResult]
         '''
         self.results = [ConfigResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -955,7 +955,7 @@ class ApplicationGetConstraintsResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~ApplicationConstraint]<~ApplicationConstraint>
+        results : typing.Sequence[~ApplicationConstraint]
         '''
         self.results = [ApplicationConstraint.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -965,13 +965,13 @@ class ApplicationGetConstraintsResults(Type):
 class ApplicationGetResults(Type):
     _toSchema = {'application': 'application', 'application_config': 'application-config', 'channel': 'channel', 'charm': 'charm', 'config': 'config', 'constraints': 'constraints', 'series': 'series'}
     _toPy = {'application': 'application', 'application-config': 'application_config', 'channel': 'channel', 'charm': 'charm', 'config': 'config', 'constraints': 'constraints', 'series': 'series'}
-    def __init__(self, application="", application_config=None, channel="", charm="", config=None, constraints=None, series="", **unknown_fields):
+    def __init__(self, application=None, application_config=None, channel=None, charm=None, config=None, constraints=None, series=None, **unknown_fields):
         '''
         application : str
-        application_config : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        application_config : typing.Mapping[str, typing.Any]
         channel : str
         charm : str
-        config : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        config : typing.Mapping[str, typing.Any]
         constraints : Value
         series : str
         '''
@@ -989,12 +989,12 @@ class ApplicationGetResults(Type):
 class ApplicationInfo(Type):
     _toSchema = {'channel': 'channel', 'charm': 'charm', 'constraints': 'constraints', 'endpoint_bindings': 'endpoint-bindings', 'exposed': 'exposed', 'principal': 'principal', 'remote': 'remote', 'series': 'series', 'tag': 'tag'}
     _toPy = {'channel': 'channel', 'charm': 'charm', 'constraints': 'constraints', 'endpoint-bindings': 'endpoint_bindings', 'exposed': 'exposed', 'principal': 'principal', 'remote': 'remote', 'series': 'series', 'tag': 'tag'}
-    def __init__(self, channel="", charm="", constraints=None, endpoint_bindings=None, exposed=False, principal=False, remote=False, series="", tag="", **unknown_fields):
+    def __init__(self, channel=None, charm=None, constraints=None, endpoint_bindings=None, exposed=None, principal=None, remote=None, series=None, tag=None, **unknown_fields):
         '''
         channel : str
         charm : str
         constraints : Value
-        endpoint_bindings : typing.Mapping<~KT, +VT_co>[str, str]
+        endpoint_bindings : typing.Mapping[str, str]
         exposed : bool
         principal : bool
         remote : bool
@@ -1033,7 +1033,7 @@ class ApplicationInfoResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~ApplicationInfoResult]<~ApplicationInfoResult>
+        results : typing.Sequence[~ApplicationInfoResult]
         '''
         self.results = [ApplicationInfoResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -1043,10 +1043,10 @@ class ApplicationInfoResults(Type):
 class ApplicationMetricCredential(Type):
     _toSchema = {'application': 'application', 'metrics_credentials': 'metrics-credentials'}
     _toPy = {'application': 'application', 'metrics-credentials': 'metrics_credentials'}
-    def __init__(self, application="", metrics_credentials=None, **unknown_fields):
+    def __init__(self, application=None, metrics_credentials=None, **unknown_fields):
         '''
         application : str
-        metrics_credentials : typing.Sequence<+T_co>[int]
+        metrics_credentials : typing.Sequence[int]
         '''
         self.application = application
         self.metrics_credentials = metrics_credentials
@@ -1059,7 +1059,7 @@ class ApplicationMetricCredentials(Type):
     _toPy = {'creds': 'creds'}
     def __init__(self, creds=None, **unknown_fields):
         '''
-        creds : typing.Sequence<+T_co>[~ApplicationMetricCredential]<~ApplicationMetricCredential>
+        creds : typing.Sequence[~ApplicationMetricCredential]
         '''
         self.creds = [ApplicationMetricCredential.from_json(o) for o in creds or []]
         self.unknown_fields = unknown_fields
@@ -1069,16 +1069,16 @@ class ApplicationMetricCredentials(Type):
 class ApplicationOffer(Type):
     _toSchema = {'access': 'access', 'application_description': 'application-description', 'bindings': 'bindings', 'endpoints': 'endpoints', 'offer_name': 'offer-name', 'offer_url': 'offer-url', 'source_model_tag': 'source-model-tag', 'spaces': 'spaces'}
     _toPy = {'access': 'access', 'application-description': 'application_description', 'bindings': 'bindings', 'endpoints': 'endpoints', 'offer-name': 'offer_name', 'offer-url': 'offer_url', 'source-model-tag': 'source_model_tag', 'spaces': 'spaces'}
-    def __init__(self, access="", application_description="", bindings=None, endpoints=None, offer_name="", offer_url="", source_model_tag="", spaces=None, **unknown_fields):
+    def __init__(self, access=None, application_description=None, bindings=None, endpoints=None, offer_name=None, offer_url=None, source_model_tag=None, spaces=None, **unknown_fields):
         '''
         access : str
         application_description : str
-        bindings : typing.Mapping<~KT, +VT_co>[str, str]
-        endpoints : typing.Sequence<+T_co>[~RemoteEndpoint]<~RemoteEndpoint>
+        bindings : typing.Mapping[str, str]
+        endpoints : typing.Sequence[~RemoteEndpoint]
         offer_name : str
         offer_url : str
         source_model_tag : str
-        spaces : typing.Sequence<+T_co>[~RemoteSpace]<~RemoteSpace>
+        spaces : typing.Sequence[~RemoteSpace]
         '''
         self.access = access
         self.application_description = application_description
@@ -1095,21 +1095,21 @@ class ApplicationOffer(Type):
 class ApplicationOfferAdminDetails(Type):
     _toSchema = {'application_description': 'application-description', 'application_name': 'application-name', 'applicationofferdetails': 'ApplicationOfferDetails', 'bindings': 'bindings', 'charm_url': 'charm-url', 'connections': 'connections', 'endpoints': 'endpoints', 'offer_name': 'offer-name', 'offer_url': 'offer-url', 'offer_uuid': 'offer-uuid', 'source_model_tag': 'source-model-tag', 'spaces': 'spaces', 'users': 'users'}
     _toPy = {'ApplicationOfferDetails': 'applicationofferdetails', 'application-description': 'application_description', 'application-name': 'application_name', 'bindings': 'bindings', 'charm-url': 'charm_url', 'connections': 'connections', 'endpoints': 'endpoints', 'offer-name': 'offer_name', 'offer-url': 'offer_url', 'offer-uuid': 'offer_uuid', 'source-model-tag': 'source_model_tag', 'spaces': 'spaces', 'users': 'users'}
-    def __init__(self, applicationofferdetails=None, application_description="", application_name="", bindings=None, charm_url="", connections=None, endpoints=None, offer_name="", offer_url="", offer_uuid="", source_model_tag="", spaces=None, users=None, **unknown_fields):
+    def __init__(self, applicationofferdetails=None, application_description=None, application_name=None, bindings=None, charm_url=None, connections=None, endpoints=None, offer_name=None, offer_url=None, offer_uuid=None, source_model_tag=None, spaces=None, users=None, **unknown_fields):
         '''
         applicationofferdetails : ApplicationOfferDetails
         application_description : str
         application_name : str
-        bindings : typing.Mapping<~KT, +VT_co>[str, str]
+        bindings : typing.Mapping[str, str]
         charm_url : str
-        connections : typing.Sequence<+T_co>[~OfferConnection]<~OfferConnection>
-        endpoints : typing.Sequence<+T_co>[~RemoteEndpoint]<~RemoteEndpoint>
+        connections : typing.Sequence[~OfferConnection]
+        endpoints : typing.Sequence[~RemoteEndpoint]
         offer_name : str
         offer_url : str
         offer_uuid : str
         source_model_tag : str
-        spaces : typing.Sequence<+T_co>[~RemoteSpace]<~RemoteSpace>
-        users : typing.Sequence<+T_co>[~OfferUserDetails]<~OfferUserDetails>
+        spaces : typing.Sequence[~RemoteSpace]
+        users : typing.Sequence[~OfferUserDetails]
         '''
         self.applicationofferdetails = ApplicationOfferDetails.from_json(applicationofferdetails) if applicationofferdetails else None
         self.application_description = application_description
@@ -1131,17 +1131,17 @@ class ApplicationOfferAdminDetails(Type):
 class ApplicationOfferDetails(Type):
     _toSchema = {'application_description': 'application-description', 'bindings': 'bindings', 'endpoints': 'endpoints', 'offer_name': 'offer-name', 'offer_url': 'offer-url', 'offer_uuid': 'offer-uuid', 'source_model_tag': 'source-model-tag', 'spaces': 'spaces', 'users': 'users'}
     _toPy = {'application-description': 'application_description', 'bindings': 'bindings', 'endpoints': 'endpoints', 'offer-name': 'offer_name', 'offer-url': 'offer_url', 'offer-uuid': 'offer_uuid', 'source-model-tag': 'source_model_tag', 'spaces': 'spaces', 'users': 'users'}
-    def __init__(self, application_description="", bindings=None, endpoints=None, offer_name="", offer_url="", offer_uuid="", source_model_tag="", spaces=None, users=None, **unknown_fields):
+    def __init__(self, application_description=None, bindings=None, endpoints=None, offer_name=None, offer_url=None, offer_uuid=None, source_model_tag=None, spaces=None, users=None, **unknown_fields):
         '''
         application_description : str
-        bindings : typing.Mapping<~KT, +VT_co>[str, str]
-        endpoints : typing.Sequence<+T_co>[~RemoteEndpoint]<~RemoteEndpoint>
+        bindings : typing.Mapping[str, str]
+        endpoints : typing.Sequence[~RemoteEndpoint]
         offer_name : str
         offer_url : str
         offer_uuid : str
         source_model_tag : str
-        spaces : typing.Sequence<+T_co>[~RemoteSpace]<~RemoteSpace>
-        users : typing.Sequence<+T_co>[~OfferUserDetails]<~OfferUserDetails>
+        spaces : typing.Sequence[~RemoteSpace]
+        users : typing.Sequence[~OfferUserDetails]
         '''
         self.application_description = application_description
         self.bindings = bindings
@@ -1173,12 +1173,12 @@ class ApplicationOfferResult(Type):
 class ApplicationOfferStatus(Type):
     _toSchema = {'active_connected_count': 'active-connected-count', 'application_name': 'application-name', 'charm': 'charm', 'endpoints': 'endpoints', 'err': 'err', 'offer_name': 'offer-name', 'total_connected_count': 'total-connected-count'}
     _toPy = {'active-connected-count': 'active_connected_count', 'application-name': 'application_name', 'charm': 'charm', 'endpoints': 'endpoints', 'err': 'err', 'offer-name': 'offer_name', 'total-connected-count': 'total_connected_count'}
-    def __init__(self, active_connected_count=0, application_name="", charm="", endpoints=None, err=None, offer_name="", total_connected_count=0, **unknown_fields):
+    def __init__(self, active_connected_count=None, application_name=None, charm=None, endpoints=None, err=None, offer_name=None, total_connected_count=None, **unknown_fields):
         '''
         active_connected_count : int
         application_name : str
         charm : str
-        endpoints : typing.Mapping<~KT, +VT_co>[str, ~RemoteEndpoint]<~RemoteEndpoint>
+        endpoints : typing.Mapping[str, ~RemoteEndpoint]
         err : Error
         offer_name : str
         total_connected_count : int
@@ -1199,7 +1199,7 @@ class ApplicationOffersResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~ApplicationOfferResult]<~ApplicationOfferResult>
+        results : typing.Sequence[~ApplicationOfferResult]
         '''
         self.results = [ApplicationOfferResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -1211,8 +1211,8 @@ class ApplicationRelationsChange(Type):
     _toPy = {'changed': 'changed', 'removed': 'removed'}
     def __init__(self, changed=None, removed=None, **unknown_fields):
         '''
-        changed : typing.Sequence<+T_co>[~RelationChange]<~RelationChange>
-        removed : typing.Sequence<+T_co>[int]
+        changed : typing.Sequence[~RelationChange]
+        removed : typing.Sequence[int]
         '''
         self.changed = [RelationChange.from_json(o) for o in changed or []]
         self.removed = removed
@@ -1223,7 +1223,7 @@ class ApplicationRelationsChange(Type):
 class ApplicationRelationsWatchResult(Type):
     _toSchema = {'applicationrelationswatcherid': 'ApplicationRelationsWatcherId', 'changes': 'changes', 'error': 'error'}
     _toPy = {'ApplicationRelationsWatcherId': 'applicationrelationswatcherid', 'changes': 'changes', 'error': 'error'}
-    def __init__(self, applicationrelationswatcherid="", changes=None, error=None, **unknown_fields):
+    def __init__(self, applicationrelationswatcherid=None, changes=None, error=None, **unknown_fields):
         '''
         applicationrelationswatcherid : str
         changes : ApplicationRelationsChange
@@ -1239,11 +1239,11 @@ class ApplicationRelationsWatchResult(Type):
 class ApplicationSet(Type):
     _toSchema = {'application': 'application', 'branch': 'branch', 'options': 'options'}
     _toPy = {'application': 'application', 'branch': 'branch', 'options': 'options'}
-    def __init__(self, application="", branch="", options=None, **unknown_fields):
+    def __init__(self, application=None, branch=None, options=None, **unknown_fields):
         '''
         application : str
         branch : str
-        options : typing.Mapping<~KT, +VT_co>[str, str]
+        options : typing.Mapping[str, str]
         '''
         self.application = application
         self.branch = branch
@@ -1255,19 +1255,19 @@ class ApplicationSet(Type):
 class ApplicationSetCharm(Type):
     _toSchema = {'application': 'application', 'channel': 'channel', 'charm_url': 'charm-url', 'config_settings': 'config-settings', 'config_settings_yaml': 'config-settings-yaml', 'force': 'force', 'force_series': 'force-series', 'force_units': 'force-units', 'generation': 'generation', 'resource_ids': 'resource-ids', 'storage_constraints': 'storage-constraints'}
     _toPy = {'application': 'application', 'channel': 'channel', 'charm-url': 'charm_url', 'config-settings': 'config_settings', 'config-settings-yaml': 'config_settings_yaml', 'force': 'force', 'force-series': 'force_series', 'force-units': 'force_units', 'generation': 'generation', 'resource-ids': 'resource_ids', 'storage-constraints': 'storage_constraints'}
-    def __init__(self, application="", channel="", charm_url="", config_settings=None, config_settings_yaml="", force=False, force_series=False, force_units=False, generation="", resource_ids=None, storage_constraints=None, **unknown_fields):
+    def __init__(self, application=None, channel=None, charm_url=None, config_settings=None, config_settings_yaml=None, force=None, force_series=None, force_units=None, generation=None, resource_ids=None, storage_constraints=None, **unknown_fields):
         '''
         application : str
         channel : str
         charm_url : str
-        config_settings : typing.Mapping<~KT, +VT_co>[str, str]
+        config_settings : typing.Mapping[str, str]
         config_settings_yaml : str
         force : bool
         force_series : bool
         force_units : bool
         generation : str
-        resource_ids : typing.Mapping<~KT, +VT_co>[str, str]
-        storage_constraints : typing.Mapping<~KT, +VT_co>[str, ~StorageConstraints]<~StorageConstraints>
+        resource_ids : typing.Mapping[str, str]
+        storage_constraints : typing.Mapping[str, ~StorageConstraints]
         '''
         self.application = application
         self.channel = channel
@@ -1287,7 +1287,7 @@ class ApplicationSetCharm(Type):
 class ApplicationSetCharmProfile(Type):
     _toSchema = {'application': 'application', 'charm_url': 'charm-url'}
     _toPy = {'application': 'application', 'charm-url': 'charm_url'}
-    def __init__(self, application="", charm_url="", **unknown_fields):
+    def __init__(self, application=None, charm_url=None, **unknown_fields):
         '''
         application : str
         charm_url : str
@@ -1301,25 +1301,25 @@ class ApplicationSetCharmProfile(Type):
 class ApplicationStatus(Type):
     _toSchema = {'can_upgrade_to': 'can-upgrade-to', 'charm': 'charm', 'charm_profile': 'charm-profile', 'charm_verion': 'charm-verion', 'endpoint_bindings': 'endpoint-bindings', 'err': 'err', 'exposed': 'exposed', 'int_': 'int', 'life': 'life', 'meter_statuses': 'meter-statuses', 'provider_id': 'provider-id', 'public_address': 'public-address', 'relations': 'relations', 'series': 'series', 'status': 'status', 'subordinate_to': 'subordinate-to', 'units': 'units', 'workload_version': 'workload-version'}
     _toPy = {'can-upgrade-to': 'can_upgrade_to', 'charm': 'charm', 'charm-profile': 'charm_profile', 'charm-verion': 'charm_verion', 'endpoint-bindings': 'endpoint_bindings', 'err': 'err', 'exposed': 'exposed', 'int': 'int_', 'life': 'life', 'meter-statuses': 'meter_statuses', 'provider-id': 'provider_id', 'public-address': 'public_address', 'relations': 'relations', 'series': 'series', 'status': 'status', 'subordinate-to': 'subordinate_to', 'units': 'units', 'workload-version': 'workload_version'}
-    def __init__(self, can_upgrade_to="", charm="", charm_profile="", charm_verion="", endpoint_bindings=None, err=None, exposed=False, int_=0, life="", meter_statuses=None, provider_id="", public_address="", relations=None, series="", status=None, subordinate_to=None, units=None, workload_version="", **unknown_fields):
+    def __init__(self, can_upgrade_to=None, charm=None, charm_profile=None, charm_verion=None, endpoint_bindings=None, err=None, exposed=None, int_=None, life=None, meter_statuses=None, provider_id=None, public_address=None, relations=None, series=None, status=None, subordinate_to=None, units=None, workload_version=None, **unknown_fields):
         '''
         can_upgrade_to : str
         charm : str
         charm_profile : str
         charm_verion : str
-        endpoint_bindings : typing.Mapping<~KT, +VT_co>[str, str]
+        endpoint_bindings : typing.Mapping[str, str]
         err : Error
         exposed : bool
         int_ : int
         life : str
-        meter_statuses : typing.Mapping<~KT, +VT_co>[str, ~MeterStatus]<~MeterStatus>
+        meter_statuses : typing.Mapping[str, ~MeterStatus]
         provider_id : str
         public_address : str
-        relations : typing.Sequence<+T_co>[str]
+        relations : typing.Sequence[str]
         series : str
         status : DetailedStatus
-        subordinate_to : typing.Sequence<+T_co>[str]
-        units : typing.Mapping<~KT, +VT_co>[str, ~UnitStatus]<~UnitStatus>
+        subordinate_to : typing.Sequence[str]
+        units : typing.Mapping[str, ~UnitStatus]
         workload_version : str
         '''
         self.can_upgrade_to = can_upgrade_to
@@ -1351,7 +1351,7 @@ class ApplicationStatusResult(Type):
         '''
         application : StatusResult
         error : Error
-        units : typing.Mapping<~KT, +VT_co>[str, ~StatusResult]<~StatusResult>
+        units : typing.Mapping[str, ~StatusResult]
         '''
         self.application = StatusResult.from_json(application) if application else None
         self.error = Error.from_json(error) if error else None
@@ -1365,7 +1365,7 @@ class ApplicationStatusResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~ApplicationStatusResult]<~ApplicationStatusResult>
+        results : typing.Sequence[~ApplicationStatusResult]
         '''
         self.results = [ApplicationStatusResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -1375,7 +1375,7 @@ class ApplicationStatusResults(Type):
 class ApplicationTag(Type):
     _toSchema = {'name': 'Name'}
     _toPy = {'Name': 'name'}
-    def __init__(self, name="", **unknown_fields):
+    def __init__(self, name=None, **unknown_fields):
         '''
         name : str
         '''
@@ -1389,7 +1389,7 @@ class ApplicationURLs(Type):
     _toPy = {'application-urls': 'application_urls'}
     def __init__(self, application_urls=None, **unknown_fields):
         '''
-        application_urls : typing.Sequence<+T_co>[str]
+        application_urls : typing.Sequence[str]
         '''
         self.application_urls = application_urls
         self.unknown_fields = unknown_fields
@@ -1399,7 +1399,7 @@ class ApplicationURLs(Type):
 class ApplicationUnexpose(Type):
     _toSchema = {'application': 'application'}
     _toPy = {'application': 'application'}
-    def __init__(self, application="", **unknown_fields):
+    def __init__(self, application=None, **unknown_fields):
         '''
         application : str
         '''
@@ -1411,13 +1411,13 @@ class ApplicationUnexpose(Type):
 class ApplicationUnitParams(Type):
     _toSchema = {'address': 'address', 'data': 'data', 'filesystem_info': 'filesystem-info', 'info': 'info', 'ports': 'ports', 'provider_id': 'provider-id', 'stateful': 'stateful', 'status': 'status', 'unit_tag': 'unit-tag'}
     _toPy = {'address': 'address', 'data': 'data', 'filesystem-info': 'filesystem_info', 'info': 'info', 'ports': 'ports', 'provider-id': 'provider_id', 'stateful': 'stateful', 'status': 'status', 'unit-tag': 'unit_tag'}
-    def __init__(self, address="", data=None, filesystem_info=None, info="", ports=None, provider_id="", stateful=False, status="", unit_tag="", **unknown_fields):
+    def __init__(self, address=None, data=None, filesystem_info=None, info=None, ports=None, provider_id=None, stateful=None, status=None, unit_tag=None, **unknown_fields):
         '''
         address : str
-        data : typing.Mapping<~KT, +VT_co>[str, typing.Any]
-        filesystem_info : typing.Sequence<+T_co>[~KubernetesFilesystemInfo]<~KubernetesFilesystemInfo>
+        data : typing.Mapping[str, typing.Any]
+        filesystem_info : typing.Sequence[~KubernetesFilesystemInfo]
         info : str
-        ports : typing.Sequence<+T_co>[str]
+        ports : typing.Sequence[str]
         provider_id : str
         stateful : bool
         status : str
@@ -1439,11 +1439,11 @@ class ApplicationUnitParams(Type):
 class ApplicationUnset(Type):
     _toSchema = {'application': 'application', 'branch': 'branch', 'options': 'options'}
     _toPy = {'application': 'application', 'branch': 'branch', 'options': 'options'}
-    def __init__(self, application="", branch="", options=None, **unknown_fields):
+    def __init__(self, application=None, branch=None, options=None, **unknown_fields):
         '''
         application : str
         branch : str
-        options : typing.Sequence<+T_co>[str]
+        options : typing.Sequence[str]
         '''
         self.application = application
         self.branch = branch
@@ -1455,7 +1455,7 @@ class ApplicationUnset(Type):
 class ApplicationUpdate(Type):
     _toSchema = {'application': 'application', 'charm_url': 'charm-url', 'constraints': 'constraints', 'force': 'force', 'force_charm_url': 'force-charm-url', 'force_series': 'force-series', 'generation': 'generation', 'min_units': 'min-units', 'settings': 'settings', 'settings_yaml': 'settings-yaml'}
     _toPy = {'application': 'application', 'charm-url': 'charm_url', 'constraints': 'constraints', 'force': 'force', 'force-charm-url': 'force_charm_url', 'force-series': 'force_series', 'generation': 'generation', 'min-units': 'min_units', 'settings': 'settings', 'settings-yaml': 'settings_yaml'}
-    def __init__(self, application="", charm_url="", constraints=None, force=False, force_charm_url=False, force_series=False, generation="", min_units=0, settings=None, settings_yaml="", **unknown_fields):
+    def __init__(self, application=None, charm_url=None, constraints=None, force=None, force_charm_url=None, force_series=None, generation=None, min_units=None, settings=None, settings_yaml=None, **unknown_fields):
         '''
         application : str
         charm_url : str
@@ -1465,7 +1465,7 @@ class ApplicationUpdate(Type):
         force_series : bool
         generation : str
         min_units : int
-        settings : typing.Mapping<~KT, +VT_co>[str, str]
+        settings : typing.Mapping[str, str]
         settings_yaml : str
         '''
         self.application = application
@@ -1487,7 +1487,7 @@ class ApplicationsCharmActionsResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~ApplicationCharmActionsResult]<~ApplicationCharmActionsResult>
+        results : typing.Sequence[~ApplicationCharmActionsResult]
         '''
         self.results = [ApplicationCharmActionsResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -1499,7 +1499,7 @@ class ApplicationsDeploy(Type):
     _toPy = {'applications': 'applications'}
     def __init__(self, applications=None, **unknown_fields):
         '''
-        applications : typing.Sequence<+T_co>[~ApplicationDeploy]<~ApplicationDeploy>
+        applications : typing.Sequence[~ApplicationDeploy]
         '''
         self.applications = [ApplicationDeploy.from_json(o) for o in applications or []]
         self.unknown_fields = unknown_fields
@@ -1509,7 +1509,7 @@ class ApplicationsDeploy(Type):
 class BackupsCreateArgs(Type):
     _toSchema = {'keep_copy': 'keep-copy', 'no_download': 'no-download', 'notes': 'notes'}
     _toPy = {'keep-copy': 'keep_copy', 'no-download': 'no_download', 'notes': 'notes'}
-    def __init__(self, keep_copy=False, no_download=False, notes="", **unknown_fields):
+    def __init__(self, keep_copy=None, no_download=None, notes=None, **unknown_fields):
         '''
         keep_copy : bool
         no_download : bool
@@ -1525,7 +1525,7 @@ class BackupsCreateArgs(Type):
 class BackupsInfoArgs(Type):
     _toSchema = {'id_': 'id'}
     _toPy = {'id': 'id_'}
-    def __init__(self, id_="", **unknown_fields):
+    def __init__(self, id_=None, **unknown_fields):
         '''
         id_ : str
         '''
@@ -1550,7 +1550,7 @@ class BackupsListResult(Type):
     _toPy = {'list': 'list_'}
     def __init__(self, list_=None, **unknown_fields):
         '''
-        list_ : typing.Sequence<+T_co>[~BackupsMetadataResult]<~BackupsMetadataResult>
+        list_ : typing.Sequence[~BackupsMetadataResult]
         '''
         self.list_ = [BackupsMetadataResult.from_json(o) for o in list_ or []]
         self.unknown_fields = unknown_fields
@@ -1560,7 +1560,7 @@ class BackupsListResult(Type):
 class BackupsMetadataResult(Type):
     _toSchema = {'ca_cert': 'ca-cert', 'ca_private_key': 'ca-private-key', 'checksum': 'checksum', 'checksum_format': 'checksum-format', 'filename': 'filename', 'finished': 'finished', 'hostname': 'hostname', 'id_': 'id', 'machine': 'machine', 'model': 'model', 'notes': 'notes', 'series': 'series', 'size': 'size', 'started': 'started', 'stored': 'stored', 'version': 'version'}
     _toPy = {'ca-cert': 'ca_cert', 'ca-private-key': 'ca_private_key', 'checksum': 'checksum', 'checksum-format': 'checksum_format', 'filename': 'filename', 'finished': 'finished', 'hostname': 'hostname', 'id': 'id_', 'machine': 'machine', 'model': 'model', 'notes': 'notes', 'series': 'series', 'size': 'size', 'started': 'started', 'stored': 'stored', 'version': 'version'}
-    def __init__(self, ca_cert="", ca_private_key="", checksum="", checksum_format="", filename="", finished="", hostname="", id_="", machine="", model="", notes="", series="", size=0, started="", stored="", version=None, **unknown_fields):
+    def __init__(self, ca_cert=None, ca_private_key=None, checksum=None, checksum_format=None, filename=None, finished=None, hostname=None, id_=None, machine=None, model=None, notes=None, series=None, size=None, started=None, stored=None, version=None, **unknown_fields):
         '''
         ca_cert : str
         ca_private_key : str
@@ -1604,7 +1604,7 @@ class BackupsRemoveArgs(Type):
     _toPy = {'ids': 'ids'}
     def __init__(self, ids=None, **unknown_fields):
         '''
-        ids : typing.Sequence<+T_co>[str]
+        ids : typing.Sequence[str]
         '''
         self.ids = ids
         self.unknown_fields = unknown_fields
@@ -1614,7 +1614,7 @@ class BackupsRemoveArgs(Type):
 class Binary(Type):
     _toSchema = {'arch': 'Arch', 'build': 'Build', 'major': 'Major', 'minor': 'Minor', 'number': 'Number', 'patch': 'Patch', 'series': 'Series', 'tag': 'Tag'}
     _toPy = {'Arch': 'arch', 'Build': 'build', 'Major': 'major', 'Minor': 'minor', 'Number': 'number', 'Patch': 'patch', 'Series': 'series', 'Tag': 'tag'}
-    def __init__(self, arch="", build=0, major=0, minor=0, number=None, patch=0, series="", tag="", **unknown_fields):
+    def __init__(self, arch=None, build=None, major=None, minor=None, number=None, patch=None, series=None, tag=None, **unknown_fields):
         '''
         arch : str
         build : int
@@ -1640,7 +1640,7 @@ class Binary(Type):
 class Block(Type):
     _toSchema = {'id_': 'id', 'message': 'message', 'tag': 'tag', 'type_': 'type'}
     _toPy = {'id': 'id_', 'message': 'message', 'tag': 'tag', 'type': 'type_'}
-    def __init__(self, id_="", message="", tag="", type_="", **unknown_fields):
+    def __init__(self, id_=None, message=None, tag=None, type_=None, **unknown_fields):
         '''
         id_ : str
         message : str
@@ -1658,10 +1658,10 @@ class Block(Type):
 class BlockDevice(Type):
     _toSchema = {'busaddress': 'BusAddress', 'devicelinks': 'DeviceLinks', 'devicename': 'DeviceName', 'filesystemtype': 'FilesystemType', 'hardwareid': 'HardwareId', 'inuse': 'InUse', 'label': 'Label', 'mountpoint': 'MountPoint', 'size': 'Size', 'uuid': 'UUID', 'wwn': 'WWN'}
     _toPy = {'BusAddress': 'busaddress', 'DeviceLinks': 'devicelinks', 'DeviceName': 'devicename', 'FilesystemType': 'filesystemtype', 'HardwareId': 'hardwareid', 'InUse': 'inuse', 'Label': 'label', 'MountPoint': 'mountpoint', 'Size': 'size', 'UUID': 'uuid', 'WWN': 'wwn'}
-    def __init__(self, busaddress="", devicelinks=None, devicename="", filesystemtype="", hardwareid="", inuse=False, label="", mountpoint="", size=0, uuid="", wwn="", **unknown_fields):
+    def __init__(self, busaddress=None, devicelinks=None, devicename=None, filesystemtype=None, hardwareid=None, inuse=None, label=None, mountpoint=None, size=None, uuid=None, wwn=None, **unknown_fields):
         '''
         busaddress : str
-        devicelinks : typing.Sequence<+T_co>[str]
+        devicelinks : typing.Sequence[str]
         devicename : str
         filesystemtype : str
         hardwareid : str
@@ -1706,7 +1706,7 @@ class BlockDeviceResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~BlockDeviceResult]<~BlockDeviceResult>
+        results : typing.Sequence[~BlockDeviceResult]
         '''
         self.results = [BlockDeviceResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -1732,7 +1732,7 @@ class BlockResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~BlockResult]<~BlockResult>
+        results : typing.Sequence[~BlockResult]
         '''
         self.results = [BlockResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -1742,7 +1742,7 @@ class BlockResults(Type):
 class BlockSwitchParams(Type):
     _toSchema = {'message': 'message', 'type_': 'type'}
     _toPy = {'message': 'message', 'type': 'type_'}
-    def __init__(self, message="", type_="", **unknown_fields):
+    def __init__(self, message=None, type_=None, **unknown_fields):
         '''
         message : str
         type_ : str
@@ -1756,7 +1756,7 @@ class BlockSwitchParams(Type):
 class BoolResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
-    def __init__(self, error=None, result=False, **unknown_fields):
+    def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
         result : bool
@@ -1772,7 +1772,7 @@ class BoolResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~BoolResult]<~BoolResult>
+        results : typing.Sequence[~BoolResult]
         '''
         self.results = [BoolResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -1782,7 +1782,7 @@ class BoolResults(Type):
 class BranchArg(Type):
     _toSchema = {'branch': 'branch'}
     _toPy = {'branch': 'branch'}
-    def __init__(self, branch="", **unknown_fields):
+    def __init__(self, branch=None, **unknown_fields):
         '''
         branch : str
         '''
@@ -1794,9 +1794,9 @@ class BranchArg(Type):
 class BranchInfoArgs(Type):
     _toSchema = {'branches': 'branches', 'detailed': 'detailed'}
     _toPy = {'branches': 'branches', 'detailed': 'detailed'}
-    def __init__(self, branches=None, detailed=False, **unknown_fields):
+    def __init__(self, branches=None, detailed=None, **unknown_fields):
         '''
-        branches : typing.Sequence<+T_co>[str]
+        branches : typing.Sequence[str]
         detailed : bool
         '''
         self.branches = branches
@@ -1808,9 +1808,9 @@ class BranchInfoArgs(Type):
 class BranchStatus(Type):
     _toSchema = {'assigned_units': 'assigned-units', 'created': 'created'}
     _toPy = {'assigned-units': 'assigned_units', 'created': 'created'}
-    def __init__(self, assigned_units=None, created=0, **unknown_fields):
+    def __init__(self, assigned_units=None, created=None, **unknown_fields):
         '''
-        assigned_units : typing.Sequence<+T_co>[str]
+        assigned_units : typing.Sequence[str]
         created : int
         '''
         self.assigned_units = assigned_units
@@ -1822,10 +1822,10 @@ class BranchStatus(Type):
 class BranchTrackArg(Type):
     _toSchema = {'branch': 'branch', 'entities': 'entities'}
     _toPy = {'branch': 'branch', 'entities': 'entities'}
-    def __init__(self, branch="", entities=None, **unknown_fields):
+    def __init__(self, branch=None, entities=None, **unknown_fields):
         '''
         branch : str
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        entities : typing.Sequence[~Entity]
         '''
         self.branch = branch
         self.entities = [Entity.from_json(o) for o in entities or []]
@@ -1838,7 +1838,7 @@ class BulkImportStorageParams(Type):
     _toPy = {'storage': 'storage'}
     def __init__(self, storage=None, **unknown_fields):
         '''
-        storage : typing.Sequence<+T_co>[~ImportStorageParams]<~ImportStorageParams>
+        storage : typing.Sequence[~ImportStorageParams]
         '''
         self.storage = [ImportStorageParams.from_json(o) for o in storage or []]
         self.unknown_fields = unknown_fields
@@ -1848,12 +1848,12 @@ class BulkImportStorageParams(Type):
 class BundleChange(Type):
     _toSchema = {'args': 'args', 'id_': 'id', 'method': 'method', 'requires': 'requires'}
     _toPy = {'args': 'args', 'id': 'id_', 'method': 'method', 'requires': 'requires'}
-    def __init__(self, args=None, id_="", method="", requires=None, **unknown_fields):
+    def __init__(self, args=None, id_=None, method=None, requires=None, **unknown_fields):
         '''
-        args : typing.Sequence<+T_co>[typing.Any]
+        args : typing.Sequence[typing.Any]
         id_ : str
         method : str
-        requires : typing.Sequence<+T_co>[str]
+        requires : typing.Sequence[str]
         '''
         self.args = args
         self.id_ = id_
@@ -1866,7 +1866,7 @@ class BundleChange(Type):
 class BundleChangesParams(Type):
     _toSchema = {'bundleurl': 'bundleURL', 'yaml': 'yaml'}
     _toPy = {'bundleURL': 'bundleurl', 'yaml': 'yaml'}
-    def __init__(self, bundleurl="", yaml="", **unknown_fields):
+    def __init__(self, bundleurl=None, yaml=None, **unknown_fields):
         '''
         bundleurl : str
         yaml : str
@@ -1882,8 +1882,8 @@ class BundleChangesResults(Type):
     _toPy = {'changes': 'changes', 'errors': 'errors'}
     def __init__(self, changes=None, errors=None, **unknown_fields):
         '''
-        changes : typing.Sequence<+T_co>[~BundleChange]<~BundleChange>
-        errors : typing.Sequence<+T_co>[str]
+        changes : typing.Sequence[~BundleChange]
+        errors : typing.Sequence[str]
         '''
         self.changes = [BundleChange.from_json(o) for o in changes or []]
         self.errors = errors
@@ -1896,7 +1896,7 @@ class BytesResult(Type):
     _toPy = {'result': 'result'}
     def __init__(self, result=None, **unknown_fields):
         '''
-        result : typing.Sequence<+T_co>[int]
+        result : typing.Sequence[int]
         '''
         self.result = result
         self.unknown_fields = unknown_fields
@@ -1906,7 +1906,7 @@ class BytesResult(Type):
 class ChangeModelCredentialParams(Type):
     _toSchema = {'credential_tag': 'credential-tag', 'model_tag': 'model-tag'}
     _toPy = {'credential-tag': 'credential_tag', 'model-tag': 'model_tag'}
-    def __init__(self, credential_tag="", model_tag="", **unknown_fields):
+    def __init__(self, credential_tag=None, model_tag=None, **unknown_fields):
         '''
         credential_tag : str
         model_tag : str
@@ -1922,7 +1922,7 @@ class ChangeModelCredentialsParams(Type):
     _toPy = {'model-credentials': 'model_credentials'}
     def __init__(self, model_credentials=None, **unknown_fields):
         '''
-        model_credentials : typing.Sequence<+T_co>[~ChangeModelCredentialParams]<~ChangeModelCredentialParams>
+        model_credentials : typing.Sequence[~ChangeModelCredentialParams]
         '''
         self.model_credentials = [ChangeModelCredentialParams.from_json(o) for o in model_credentials or []]
         self.unknown_fields = unknown_fields
@@ -1932,10 +1932,10 @@ class ChangeModelCredentialsParams(Type):
 class CharmActionSpec(Type):
     _toSchema = {'description': 'description', 'params': 'params'}
     _toPy = {'description': 'description', 'params': 'params'}
-    def __init__(self, description="", params=None, **unknown_fields):
+    def __init__(self, description=None, params=None, **unknown_fields):
         '''
         description : str
-        params : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        params : typing.Mapping[str, typing.Any]
         '''
         self.description = description
         self.params = params
@@ -1948,7 +1948,7 @@ class CharmActions(Type):
     _toPy = {'specs': 'specs'}
     def __init__(self, specs=None, **unknown_fields):
         '''
-        specs : typing.Mapping<~KT, +VT_co>[str, ~CharmActionSpec]<~CharmActionSpec>
+        specs : typing.Mapping[str, ~CharmActionSpec]
         '''
         self.specs = specs
         self.unknown_fields = unknown_fields
@@ -1958,7 +1958,7 @@ class CharmActions(Type):
 class CharmDevice(Type):
     _toSchema = {'countmax': 'CountMax', 'countmin': 'CountMin', 'description': 'Description', 'name': 'Name', 'type_': 'Type'}
     _toPy = {'CountMax': 'countmax', 'CountMin': 'countmin', 'Description': 'description', 'Name': 'name', 'Type': 'type_'}
-    def __init__(self, countmax=0, countmin=0, description="", name="", type_="", **unknown_fields):
+    def __init__(self, countmax=None, countmin=None, description=None, name=None, type_=None, **unknown_fields):
         '''
         countmax : int
         countmin : int
@@ -1978,10 +1978,10 @@ class CharmDevice(Type):
 class CharmInfo(Type):
     _toSchema = {'actions': 'actions', 'config': 'config', 'lxd_profile': 'lxd-profile', 'meta': 'meta', 'metrics': 'metrics', 'revision': 'revision', 'url': 'url'}
     _toPy = {'actions': 'actions', 'config': 'config', 'lxd-profile': 'lxd_profile', 'meta': 'meta', 'metrics': 'metrics', 'revision': 'revision', 'url': 'url'}
-    def __init__(self, actions=None, config=None, lxd_profile=None, meta=None, metrics=None, revision=0, url="", **unknown_fields):
+    def __init__(self, actions=None, config=None, lxd_profile=None, meta=None, metrics=None, revision=None, url=None, **unknown_fields):
         '''
         actions : CharmActions
-        config : typing.Mapping<~KT, +VT_co>[str, ~CharmOption]<~CharmOption>
+        config : typing.Mapping[str, ~CharmOption]
         lxd_profile : CharmLXDProfile
         meta : CharmMeta
         metrics : CharmMetrics
@@ -2002,11 +2002,11 @@ class CharmInfo(Type):
 class CharmLXDProfile(Type):
     _toSchema = {'config': 'config', 'description': 'description', 'devices': 'devices'}
     _toPy = {'config': 'config', 'description': 'description', 'devices': 'devices'}
-    def __init__(self, config=None, description="", devices=None, **unknown_fields):
+    def __init__(self, config=None, description=None, devices=None, **unknown_fields):
         '''
-        config : typing.Mapping<~KT, +VT_co>[str, str]
+        config : typing.Mapping[str, str]
         description : str
-        devices : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        devices : typing.Mapping[str, typing.Any]
         '''
         self.config = config
         self.description = description
@@ -2018,25 +2018,25 @@ class CharmLXDProfile(Type):
 class CharmMeta(Type):
     _toSchema = {'categories': 'categories', 'description': 'description', 'devices': 'devices', 'extra_bindings': 'extra-bindings', 'min_juju_version': 'min-juju-version', 'name': 'name', 'payload_classes': 'payload-classes', 'peers': 'peers', 'provides': 'provides', 'requires': 'requires', 'resources': 'resources', 'series': 'series', 'storage': 'storage', 'subordinate': 'subordinate', 'summary': 'summary', 'tags': 'tags', 'terms': 'terms'}
     _toPy = {'categories': 'categories', 'description': 'description', 'devices': 'devices', 'extra-bindings': 'extra_bindings', 'min-juju-version': 'min_juju_version', 'name': 'name', 'payload-classes': 'payload_classes', 'peers': 'peers', 'provides': 'provides', 'requires': 'requires', 'resources': 'resources', 'series': 'series', 'storage': 'storage', 'subordinate': 'subordinate', 'summary': 'summary', 'tags': 'tags', 'terms': 'terms'}
-    def __init__(self, categories=None, description="", devices=None, extra_bindings=None, min_juju_version="", name="", payload_classes=None, peers=None, provides=None, requires=None, resources=None, series=None, storage=None, subordinate=False, summary="", tags=None, terms=None, **unknown_fields):
+    def __init__(self, categories=None, description=None, devices=None, extra_bindings=None, min_juju_version=None, name=None, payload_classes=None, peers=None, provides=None, requires=None, resources=None, series=None, storage=None, subordinate=None, summary=None, tags=None, terms=None, **unknown_fields):
         '''
-        categories : typing.Sequence<+T_co>[str]
+        categories : typing.Sequence[str]
         description : str
-        devices : typing.Mapping<~KT, +VT_co>[str, ~CharmDevice]<~CharmDevice>
-        extra_bindings : typing.Mapping<~KT, +VT_co>[str, str]
+        devices : typing.Mapping[str, ~CharmDevice]
+        extra_bindings : typing.Mapping[str, str]
         min_juju_version : str
         name : str
-        payload_classes : typing.Mapping<~KT, +VT_co>[str, ~CharmPayloadClass]<~CharmPayloadClass>
-        peers : typing.Mapping<~KT, +VT_co>[str, ~CharmRelation]<~CharmRelation>
-        provides : typing.Mapping<~KT, +VT_co>[str, ~CharmRelation]<~CharmRelation>
-        requires : typing.Mapping<~KT, +VT_co>[str, ~CharmRelation]<~CharmRelation>
-        resources : typing.Mapping<~KT, +VT_co>[str, ~CharmResourceMeta]<~CharmResourceMeta>
-        series : typing.Sequence<+T_co>[str]
-        storage : typing.Mapping<~KT, +VT_co>[str, ~CharmStorage]<~CharmStorage>
+        payload_classes : typing.Mapping[str, ~CharmPayloadClass]
+        peers : typing.Mapping[str, ~CharmRelation]
+        provides : typing.Mapping[str, ~CharmRelation]
+        requires : typing.Mapping[str, ~CharmRelation]
+        resources : typing.Mapping[str, ~CharmResourceMeta]
+        series : typing.Sequence[str]
+        storage : typing.Mapping[str, ~CharmStorage]
         subordinate : bool
         summary : str
-        tags : typing.Sequence<+T_co>[str]
-        terms : typing.Sequence<+T_co>[str]
+        tags : typing.Sequence[str]
+        terms : typing.Sequence[str]
         '''
         self.categories = categories
         self.description = description
@@ -2062,7 +2062,7 @@ class CharmMeta(Type):
 class CharmMetric(Type):
     _toSchema = {'description': 'description', 'type_': 'type'}
     _toPy = {'description': 'description', 'type': 'type_'}
-    def __init__(self, description="", type_="", **unknown_fields):
+    def __init__(self, description=None, type_=None, **unknown_fields):
         '''
         description : str
         type_ : str
@@ -2078,7 +2078,7 @@ class CharmMetrics(Type):
     _toPy = {'metrics': 'metrics', 'plan': 'plan'}
     def __init__(self, metrics=None, plan=None, **unknown_fields):
         '''
-        metrics : typing.Mapping<~KT, +VT_co>[str, ~CharmMetric]<~CharmMetric>
+        metrics : typing.Mapping[str, ~CharmMetric]
         plan : CharmPlan
         '''
         self.metrics = metrics
@@ -2090,9 +2090,9 @@ class CharmMetrics(Type):
 class CharmOption(Type):
     _toSchema = {'default': 'default', 'description': 'description', 'type_': 'type'}
     _toPy = {'default': 'default', 'description': 'description', 'type': 'type_'}
-    def __init__(self, default=None, description="", type_="", **unknown_fields):
+    def __init__(self, default=None, description=None, type_=None, **unknown_fields):
         '''
-        default : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        default : typing.Mapping[str, typing.Any]
         description : str
         type_ : str
         '''
@@ -2106,7 +2106,7 @@ class CharmOption(Type):
 class CharmPayloadClass(Type):
     _toSchema = {'name': 'name', 'type_': 'type'}
     _toPy = {'name': 'name', 'type': 'type_'}
-    def __init__(self, name="", type_="", **unknown_fields):
+    def __init__(self, name=None, type_=None, **unknown_fields):
         '''
         name : str
         type_ : str
@@ -2120,7 +2120,7 @@ class CharmPayloadClass(Type):
 class CharmPlan(Type):
     _toSchema = {'required': 'required'}
     _toPy = {'required': 'required'}
-    def __init__(self, required=False, **unknown_fields):
+    def __init__(self, required=None, **unknown_fields):
         '''
         required : bool
         '''
@@ -2132,13 +2132,13 @@ class CharmPlan(Type):
 class CharmProfilingInfoResult(Type):
     _toSchema = {'current_profiles': 'current-profiles', 'error': 'error', 'instance_id': 'instance-id', 'model_name': 'model-name', 'profile_changes': 'profile-changes'}
     _toPy = {'current-profiles': 'current_profiles', 'error': 'error', 'instance-id': 'instance_id', 'model-name': 'model_name', 'profile-changes': 'profile_changes'}
-    def __init__(self, current_profiles=None, error=None, instance_id="", model_name="", profile_changes=None, **unknown_fields):
+    def __init__(self, current_profiles=None, error=None, instance_id=None, model_name=None, profile_changes=None, **unknown_fields):
         '''
-        current_profiles : typing.Sequence<+T_co>[str]
+        current_profiles : typing.Sequence[str]
         error : Error
         instance_id : str
         model_name : str
-        profile_changes : typing.Sequence<+T_co>[~ProfileInfoResult]<~ProfileInfoResult>
+        profile_changes : typing.Sequence[~ProfileInfoResult]
         '''
         self.current_profiles = current_profiles
         self.error = Error.from_json(error) if error else None
@@ -2152,7 +2152,7 @@ class CharmProfilingInfoResult(Type):
 class CharmRelation(Type):
     _toSchema = {'interface': 'interface', 'limit': 'limit', 'name': 'name', 'optional': 'optional', 'role': 'role', 'scope': 'scope'}
     _toPy = {'interface': 'interface', 'limit': 'limit', 'name': 'name', 'optional': 'optional', 'role': 'role', 'scope': 'scope'}
-    def __init__(self, interface="", limit=0, name="", optional=False, role="", scope="", **unknown_fields):
+    def __init__(self, interface=None, limit=None, name=None, optional=None, role=None, scope=None, **unknown_fields):
         '''
         interface : str
         limit : int
@@ -2174,10 +2174,10 @@ class CharmRelation(Type):
 class CharmResource(Type):
     _toSchema = {'description': 'description', 'fingerprint': 'fingerprint', 'name': 'name', 'origin': 'origin', 'path': 'path', 'revision': 'revision', 'size': 'size', 'type_': 'type'}
     _toPy = {'description': 'description', 'fingerprint': 'fingerprint', 'name': 'name', 'origin': 'origin', 'path': 'path', 'revision': 'revision', 'size': 'size', 'type': 'type_'}
-    def __init__(self, description="", fingerprint=None, name="", origin="", path="", revision=0, size=0, type_="", **unknown_fields):
+    def __init__(self, description=None, fingerprint=None, name=None, origin=None, path=None, revision=None, size=None, type_=None, **unknown_fields):
         '''
         description : str
-        fingerprint : typing.Sequence<+T_co>[int]
+        fingerprint : typing.Sequence[int]
         name : str
         origin : str
         path : str
@@ -2200,7 +2200,7 @@ class CharmResource(Type):
 class CharmResourceMeta(Type):
     _toSchema = {'description': 'description', 'name': 'name', 'path': 'path', 'type_': 'type'}
     _toPy = {'description': 'description', 'name': 'name', 'path': 'path', 'type': 'type_'}
-    def __init__(self, description="", name="", path="", type_="", **unknown_fields):
+    def __init__(self, description=None, name=None, path=None, type_=None, **unknown_fields):
         '''
         description : str
         name : str
@@ -2218,7 +2218,7 @@ class CharmResourceMeta(Type):
 class CharmStorage(Type):
     _toSchema = {'count_max': 'count-max', 'count_min': 'count-min', 'description': 'description', 'location': 'location', 'minimum_size': 'minimum-size', 'name': 'name', 'properties': 'properties', 'read_only': 'read-only', 'shared': 'shared', 'type_': 'type'}
     _toPy = {'count-max': 'count_max', 'count-min': 'count_min', 'description': 'description', 'location': 'location', 'minimum-size': 'minimum_size', 'name': 'name', 'properties': 'properties', 'read-only': 'read_only', 'shared': 'shared', 'type': 'type_'}
-    def __init__(self, count_max=0, count_min=0, description="", location="", minimum_size=0, name="", properties=None, read_only=False, shared=False, type_="", **unknown_fields):
+    def __init__(self, count_max=None, count_min=None, description=None, location=None, minimum_size=None, name=None, properties=None, read_only=None, shared=None, type_=None, **unknown_fields):
         '''
         count_max : int
         count_min : int
@@ -2226,7 +2226,7 @@ class CharmStorage(Type):
         location : str
         minimum_size : int
         name : str
-        properties : typing.Sequence<+T_co>[str]
+        properties : typing.Sequence[str]
         read_only : bool
         shared : bool
         type_ : str
@@ -2248,7 +2248,7 @@ class CharmStorage(Type):
 class CharmURL(Type):
     _toSchema = {'url': 'url'}
     _toPy = {'url': 'url'}
-    def __init__(self, url="", **unknown_fields):
+    def __init__(self, url=None, **unknown_fields):
         '''
         url : str
         '''
@@ -2262,7 +2262,7 @@ class CharmURLs(Type):
     _toPy = {'urls': 'urls'}
     def __init__(self, urls=None, **unknown_fields):
         '''
-        urls : typing.Sequence<+T_co>[~CharmURL]<~CharmURL>
+        urls : typing.Sequence[~CharmURL]
         '''
         self.urls = [CharmURL.from_json(o) for o in urls or []]
         self.unknown_fields = unknown_fields
@@ -2274,7 +2274,7 @@ class CharmsList(Type):
     _toPy = {'names': 'names'}
     def __init__(self, names=None, **unknown_fields):
         '''
-        names : typing.Sequence<+T_co>[str]
+        names : typing.Sequence[str]
         '''
         self.names = names
         self.unknown_fields = unknown_fields
@@ -2286,7 +2286,7 @@ class CharmsListResult(Type):
     _toPy = {'charm-urls': 'charm_urls'}
     def __init__(self, charm_urls=None, **unknown_fields):
         '''
-        charm_urls : typing.Sequence<+T_co>[str]
+        charm_urls : typing.Sequence[str]
         '''
         self.charm_urls = charm_urls
         self.unknown_fields = unknown_fields
@@ -2298,7 +2298,7 @@ class ClaimLeadershipBulkParams(Type):
     _toPy = {'params': 'params'}
     def __init__(self, params=None, **unknown_fields):
         '''
-        params : typing.Sequence<+T_co>[~ClaimLeadershipParams]<~ClaimLeadershipParams>
+        params : typing.Sequence[~ClaimLeadershipParams]
         '''
         self.params = [ClaimLeadershipParams.from_json(o) for o in params or []]
         self.unknown_fields = unknown_fields
@@ -2310,7 +2310,7 @@ class ClaimLeadershipBulkResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        results : typing.Sequence[~ErrorResult]
         '''
         self.results = [ErrorResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -2320,7 +2320,7 @@ class ClaimLeadershipBulkResults(Type):
 class ClaimLeadershipParams(Type):
     _toSchema = {'application_tag': 'application-tag', 'duration': 'duration', 'unit_tag': 'unit-tag'}
     _toPy = {'application-tag': 'application_tag', 'duration': 'duration', 'unit-tag': 'unit_tag'}
-    def __init__(self, application_tag="", duration=0, unit_tag="", **unknown_fields):
+    def __init__(self, application_tag=None, duration=None, unit_tag=None, **unknown_fields):
         '''
         application_tag : str
         duration : float
@@ -2336,16 +2336,16 @@ class ClaimLeadershipParams(Type):
 class Cloud(Type):
     _toSchema = {'auth_types': 'auth-types', 'ca_certificates': 'ca-certificates', 'config': 'config', 'endpoint': 'endpoint', 'host_cloud_region': 'host-cloud-region', 'identity_endpoint': 'identity-endpoint', 'region_config': 'region-config', 'regions': 'regions', 'storage_endpoint': 'storage-endpoint', 'type_': 'type'}
     _toPy = {'auth-types': 'auth_types', 'ca-certificates': 'ca_certificates', 'config': 'config', 'endpoint': 'endpoint', 'host-cloud-region': 'host_cloud_region', 'identity-endpoint': 'identity_endpoint', 'region-config': 'region_config', 'regions': 'regions', 'storage-endpoint': 'storage_endpoint', 'type': 'type_'}
-    def __init__(self, auth_types=None, ca_certificates=None, config=None, endpoint="", host_cloud_region="", identity_endpoint="", region_config=None, regions=None, storage_endpoint="", type_="", **unknown_fields):
+    def __init__(self, auth_types=None, ca_certificates=None, config=None, endpoint=None, host_cloud_region=None, identity_endpoint=None, region_config=None, regions=None, storage_endpoint=None, type_=None, **unknown_fields):
         '''
-        auth_types : typing.Sequence<+T_co>[str]
-        ca_certificates : typing.Sequence<+T_co>[str]
-        config : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        auth_types : typing.Sequence[str]
+        ca_certificates : typing.Sequence[str]
+        config : typing.Mapping[str, typing.Any]
         endpoint : str
         host_cloud_region : str
         identity_endpoint : str
-        region_config : typing.Mapping<~KT, +VT_co>[str, typing.Any]
-        regions : typing.Sequence<+T_co>[~CloudRegion]<~CloudRegion>
+        region_config : typing.Mapping[str, typing.Any]
+        regions : typing.Sequence[~CloudRegion]
         storage_endpoint : str
         type_ : str
         '''
@@ -2366,11 +2366,11 @@ class Cloud(Type):
 class CloudCredential(Type):
     _toSchema = {'attrs': 'attrs', 'auth_type': 'auth-type', 'redacted': 'redacted'}
     _toPy = {'attrs': 'attrs', 'auth-type': 'auth_type', 'redacted': 'redacted'}
-    def __init__(self, attrs=None, auth_type="", redacted=None, **unknown_fields):
+    def __init__(self, attrs=None, auth_type=None, redacted=None, **unknown_fields):
         '''
-        attrs : typing.Mapping<~KT, +VT_co>[str, str]
+        attrs : typing.Mapping[str, str]
         auth_type : str
-        redacted : typing.Sequence<+T_co>[str]
+        redacted : typing.Sequence[str]
         '''
         self.attrs = attrs
         self.auth_type = auth_type
@@ -2382,7 +2382,7 @@ class CloudCredential(Type):
 class CloudCredentialArg(Type):
     _toSchema = {'cloud_name': 'cloud-name', 'credential_name': 'credential-name'}
     _toPy = {'cloud-name': 'cloud_name', 'credential-name': 'credential_name'}
-    def __init__(self, cloud_name="", credential_name="", **unknown_fields):
+    def __init__(self, cloud_name=None, credential_name=None, **unknown_fields):
         '''
         cloud_name : str
         credential_name : str
@@ -2396,9 +2396,9 @@ class CloudCredentialArg(Type):
 class CloudCredentialArgs(Type):
     _toSchema = {'credentials': 'credentials', 'include_secrets': 'include-secrets'}
     _toPy = {'credentials': 'credentials', 'include-secrets': 'include_secrets'}
-    def __init__(self, credentials=None, include_secrets=False, **unknown_fields):
+    def __init__(self, credentials=None, include_secrets=None, **unknown_fields):
         '''
-        credentials : typing.Sequence<+T_co>[~CloudCredentialArg]<~CloudCredentialArg>
+        credentials : typing.Sequence[~CloudCredentialArg]
         include_secrets : bool
         '''
         self.credentials = [CloudCredentialArg.from_json(o) for o in credentials or []]
@@ -2426,7 +2426,7 @@ class CloudCredentialResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~CloudCredentialResult]<~CloudCredentialResult>
+        results : typing.Sequence[~CloudCredentialResult]
         '''
         self.results = [CloudCredentialResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -2436,12 +2436,12 @@ class CloudCredentialResults(Type):
 class CloudDetails(Type):
     _toSchema = {'auth_types': 'auth-types', 'endpoint': 'endpoint', 'identity_endpoint': 'identity-endpoint', 'regions': 'regions', 'storage_endpoint': 'storage-endpoint', 'type_': 'type'}
     _toPy = {'auth-types': 'auth_types', 'endpoint': 'endpoint', 'identity-endpoint': 'identity_endpoint', 'regions': 'regions', 'storage-endpoint': 'storage_endpoint', 'type': 'type_'}
-    def __init__(self, auth_types=None, endpoint="", identity_endpoint="", regions=None, storage_endpoint="", type_="", **unknown_fields):
+    def __init__(self, auth_types=None, endpoint=None, identity_endpoint=None, regions=None, storage_endpoint=None, type_=None, **unknown_fields):
         '''
-        auth_types : typing.Sequence<+T_co>[str]
+        auth_types : typing.Sequence[str]
         endpoint : str
         identity_endpoint : str
-        regions : typing.Sequence<+T_co>[~CloudRegion]<~CloudRegion>
+        regions : typing.Sequence[~CloudRegion]
         storage_endpoint : str
         type_ : str
         '''
@@ -2458,7 +2458,7 @@ class CloudDetails(Type):
 class CloudImageMetadata(Type):
     _toSchema = {'arch': 'arch', 'image_id': 'image-id', 'priority': 'priority', 'region': 'region', 'root_storage_size': 'root-storage-size', 'root_storage_type': 'root-storage-type', 'series': 'series', 'source': 'source', 'stream': 'stream', 'version': 'version', 'virt_type': 'virt-type'}
     _toPy = {'arch': 'arch', 'image-id': 'image_id', 'priority': 'priority', 'region': 'region', 'root-storage-size': 'root_storage_size', 'root-storage-type': 'root_storage_type', 'series': 'series', 'source': 'source', 'stream': 'stream', 'version': 'version', 'virt-type': 'virt_type'}
-    def __init__(self, arch="", image_id="", priority=0, region="", root_storage_size=0, root_storage_type="", series="", source="", stream="", version="", virt_type="", **unknown_fields):
+    def __init__(self, arch=None, image_id=None, priority=None, region=None, root_storage_size=None, root_storage_type=None, series=None, source=None, stream=None, version=None, virt_type=None, **unknown_fields):
         '''
         arch : str
         image_id : str
@@ -2492,7 +2492,7 @@ class CloudImageMetadataList(Type):
     _toPy = {'metadata': 'metadata'}
     def __init__(self, metadata=None, **unknown_fields):
         '''
-        metadata : typing.Sequence<+T_co>[~CloudImageMetadata]<~CloudImageMetadata>
+        metadata : typing.Sequence[~CloudImageMetadata]
         '''
         self.metadata = [CloudImageMetadata.from_json(o) for o in metadata or []]
         self.unknown_fields = unknown_fields
@@ -2505,7 +2505,7 @@ class CloudInfo(Type):
     def __init__(self, clouddetails=None, users=None, **unknown_fields):
         '''
         clouddetails : CloudDetails
-        users : typing.Sequence<+T_co>[~CloudUserInfo]<~CloudUserInfo>
+        users : typing.Sequence[~CloudUserInfo]
         '''
         self.clouddetails = CloudDetails.from_json(clouddetails) if clouddetails else None
         self.users = [CloudUserInfo.from_json(o) for o in users or []]
@@ -2532,7 +2532,7 @@ class CloudInfoResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~CloudInfoResult]<~CloudInfoResult>
+        results : typing.Sequence[~CloudInfoResult]
         '''
         self.results = [CloudInfoResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -2542,7 +2542,7 @@ class CloudInfoResults(Type):
 class CloudInstanceTypesConstraint(Type):
     _toSchema = {'cloud_tag': 'cloud-tag', 'constraints': 'constraints', 'region': 'region'}
     _toPy = {'cloud-tag': 'cloud_tag', 'constraints': 'constraints', 'region': 'region'}
-    def __init__(self, cloud_tag="", constraints=None, region="", **unknown_fields):
+    def __init__(self, cloud_tag=None, constraints=None, region=None, **unknown_fields):
         '''
         cloud_tag : str
         constraints : Value
@@ -2560,7 +2560,7 @@ class CloudInstanceTypesConstraints(Type):
     _toPy = {'constraints': 'constraints'}
     def __init__(self, constraints=None, **unknown_fields):
         '''
-        constraints : typing.Sequence<+T_co>[~CloudInstanceTypesConstraint]<~CloudInstanceTypesConstraint>
+        constraints : typing.Sequence[~CloudInstanceTypesConstraint]
         '''
         self.constraints = [CloudInstanceTypesConstraint.from_json(o) for o in constraints or []]
         self.unknown_fields = unknown_fields
@@ -2570,7 +2570,7 @@ class CloudInstanceTypesConstraints(Type):
 class CloudRegion(Type):
     _toSchema = {'endpoint': 'endpoint', 'identity_endpoint': 'identity-endpoint', 'name': 'name', 'storage_endpoint': 'storage-endpoint'}
     _toPy = {'endpoint': 'endpoint', 'identity-endpoint': 'identity_endpoint', 'name': 'name', 'storage-endpoint': 'storage_endpoint'}
-    def __init__(self, endpoint="", identity_endpoint="", name="", storage_endpoint="", **unknown_fields):
+    def __init__(self, endpoint=None, identity_endpoint=None, name=None, storage_endpoint=None, **unknown_fields):
         '''
         endpoint : str
         identity_endpoint : str
@@ -2604,7 +2604,7 @@ class CloudResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~CloudResult]<~CloudResult>
+        results : typing.Sequence[~CloudResult]
         '''
         self.results = [CloudResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -2614,9 +2614,9 @@ class CloudResults(Type):
 class CloudSpec(Type):
     _toSchema = {'cacertificates': 'cacertificates', 'credential': 'credential', 'endpoint': 'endpoint', 'identity_endpoint': 'identity-endpoint', 'name': 'name', 'region': 'region', 'storage_endpoint': 'storage-endpoint', 'type_': 'type'}
     _toPy = {'cacertificates': 'cacertificates', 'credential': 'credential', 'endpoint': 'endpoint', 'identity-endpoint': 'identity_endpoint', 'name': 'name', 'region': 'region', 'storage-endpoint': 'storage_endpoint', 'type': 'type_'}
-    def __init__(self, cacertificates=None, credential=None, endpoint="", identity_endpoint="", name="", region="", storage_endpoint="", type_="", **unknown_fields):
+    def __init__(self, cacertificates=None, credential=None, endpoint=None, identity_endpoint=None, name=None, region=None, storage_endpoint=None, type_=None, **unknown_fields):
         '''
-        cacertificates : typing.Sequence<+T_co>[str]
+        cacertificates : typing.Sequence[str]
         credential : CloudCredential
         endpoint : str
         identity_endpoint : str
@@ -2656,7 +2656,7 @@ class CloudSpecResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~CloudSpecResult]<~CloudSpecResult>
+        results : typing.Sequence[~CloudSpecResult]
         '''
         self.results = [CloudSpecResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -2666,7 +2666,7 @@ class CloudSpecResults(Type):
 class CloudUserInfo(Type):
     _toSchema = {'access': 'access', 'display_name': 'display-name', 'user': 'user'}
     _toPy = {'access': 'access', 'display-name': 'display_name', 'user': 'user'}
-    def __init__(self, access="", display_name="", user="", **unknown_fields):
+    def __init__(self, access=None, display_name=None, user=None, **unknown_fields):
         '''
         access : str
         display_name : str
@@ -2684,7 +2684,7 @@ class CloudsResult(Type):
     _toPy = {'clouds': 'clouds'}
     def __init__(self, clouds=None, **unknown_fields):
         '''
-        clouds : typing.Mapping<~KT, +VT_co>[str, ~Cloud]<~Cloud>
+        clouds : typing.Mapping[str, ~Cloud]
         '''
         self.clouds = clouds
         self.unknown_fields = unknown_fields
@@ -2696,7 +2696,7 @@ class ConfigResult(Type):
     _toPy = {'config': 'config', 'error': 'error'}
     def __init__(self, config=None, error=None, **unknown_fields):
         '''
-        config : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        config : typing.Mapping[str, typing.Any]
         error : Error
         '''
         self.config = config
@@ -2711,7 +2711,7 @@ class ConfigSettingsResult(Type):
     def __init__(self, error=None, settings=None, **unknown_fields):
         '''
         error : Error
-        settings : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        settings : typing.Mapping[str, typing.Any]
         '''
         self.error = Error.from_json(error) if error else None
         self.settings = settings
@@ -2724,7 +2724,7 @@ class ConfigSettingsResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~ConfigSettingsResult]<~ConfigSettingsResult>
+        results : typing.Sequence[~ConfigSettingsResult]
         '''
         self.results = [ConfigSettingsResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -2734,10 +2734,10 @@ class ConfigSettingsResults(Type):
 class ConfigValue(Type):
     _toSchema = {'source': 'source', 'value': 'value'}
     _toPy = {'source': 'source', 'value': 'value'}
-    def __init__(self, source="", value=None, **unknown_fields):
+    def __init__(self, source=None, value=None, **unknown_fields):
         '''
         source : str
-        value : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        value : typing.Mapping[str, typing.Any]
         '''
         self.source = source
         self.value = value
@@ -2748,7 +2748,7 @@ class ConfigValue(Type):
 class Constraints(Type):
     _toSchema = {'count': 'Count', 'pool': 'Pool', 'size': 'Size'}
     _toPy = {'Count': 'count', 'Pool': 'pool', 'Size': 'size'}
-    def __init__(self, count=0, pool="", size=0, **unknown_fields):
+    def __init__(self, count=None, pool=None, size=None, **unknown_fields):
         '''
         count : int
         pool : str
@@ -2780,7 +2780,7 @@ class ConstraintsResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~ConstraintsResult]<~ConstraintsResult>
+        results : typing.Sequence[~ConstraintsResult]
         '''
         self.results = [ConstraintsResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -2790,21 +2790,21 @@ class ConstraintsResults(Type):
 class ConsumeApplicationArg(Type):
     _toSchema = {'application_alias': 'application-alias', 'application_description': 'application-description', 'applicationofferdetails': 'ApplicationOfferDetails', 'bindings': 'bindings', 'endpoints': 'endpoints', 'external_controller': 'external-controller', 'macaroon': 'macaroon', 'offer_name': 'offer-name', 'offer_url': 'offer-url', 'offer_uuid': 'offer-uuid', 'source_model_tag': 'source-model-tag', 'spaces': 'spaces', 'users': 'users'}
     _toPy = {'ApplicationOfferDetails': 'applicationofferdetails', 'application-alias': 'application_alias', 'application-description': 'application_description', 'bindings': 'bindings', 'endpoints': 'endpoints', 'external-controller': 'external_controller', 'macaroon': 'macaroon', 'offer-name': 'offer_name', 'offer-url': 'offer_url', 'offer-uuid': 'offer_uuid', 'source-model-tag': 'source_model_tag', 'spaces': 'spaces', 'users': 'users'}
-    def __init__(self, applicationofferdetails=None, application_alias="", application_description="", bindings=None, endpoints=None, external_controller=None, macaroon=None, offer_name="", offer_url="", offer_uuid="", source_model_tag="", spaces=None, users=None, **unknown_fields):
+    def __init__(self, applicationofferdetails=None, application_alias=None, application_description=None, bindings=None, endpoints=None, external_controller=None, macaroon=None, offer_name=None, offer_url=None, offer_uuid=None, source_model_tag=None, spaces=None, users=None, **unknown_fields):
         '''
         applicationofferdetails : ApplicationOfferDetails
         application_alias : str
         application_description : str
-        bindings : typing.Mapping<~KT, +VT_co>[str, str]
-        endpoints : typing.Sequence<+T_co>[~RemoteEndpoint]<~RemoteEndpoint>
+        bindings : typing.Mapping[str, str]
+        endpoints : typing.Sequence[~RemoteEndpoint]
         external_controller : ExternalControllerInfo
         macaroon : Macaroon
         offer_name : str
         offer_url : str
         offer_uuid : str
         source_model_tag : str
-        spaces : typing.Sequence<+T_co>[~RemoteSpace]<~RemoteSpace>
-        users : typing.Sequence<+T_co>[~OfferUserDetails]<~OfferUserDetails>
+        spaces : typing.Sequence[~RemoteSpace]
+        users : typing.Sequence[~OfferUserDetails]
         '''
         self.applicationofferdetails = ApplicationOfferDetails.from_json(applicationofferdetails) if applicationofferdetails else None
         self.application_alias = application_alias
@@ -2828,7 +2828,7 @@ class ConsumeApplicationArgs(Type):
     _toPy = {'args': 'args'}
     def __init__(self, args=None, **unknown_fields):
         '''
-        args : typing.Sequence<+T_co>[~ConsumeApplicationArg]<~ConsumeApplicationArg>
+        args : typing.Sequence[~ConsumeApplicationArg]
         '''
         self.args = [ConsumeApplicationArg.from_json(o) for o in args or []]
         self.unknown_fields = unknown_fields
@@ -2838,7 +2838,7 @@ class ConsumeApplicationArgs(Type):
 class ConsumeApplicationResult(Type):
     _toSchema = {'error': 'error', 'local_name': 'local-name'}
     _toPy = {'error': 'error', 'local-name': 'local_name'}
-    def __init__(self, error=None, local_name="", **unknown_fields):
+    def __init__(self, error=None, local_name=None, **unknown_fields):
         '''
         error : Error
         local_name : str
@@ -2854,7 +2854,7 @@ class ConsumeApplicationResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~ConsumeApplicationResult]<~ConsumeApplicationResult>
+        results : typing.Sequence[~ConsumeApplicationResult]
         '''
         self.results = [ConsumeApplicationResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -2902,7 +2902,7 @@ class ConsumeOfferDetailsResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~ConsumeOfferDetailsResult]<~ConsumeOfferDetailsResult>
+        results : typing.Sequence[~ConsumeOfferDetailsResult]
         '''
         self.results = [ConsumeOfferDetailsResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -2912,13 +2912,13 @@ class ConsumeOfferDetailsResults(Type):
 class ContainerConfig(Type):
     _toSchema = {'apt_mirror': 'apt-mirror', 'apt_proxy': 'apt-proxy', 'authorized_keys': 'authorized-keys', 'cloudinit_userdata': 'cloudinit-userdata', 'container_inherit_properties': 'container-inherit-properties', 'juju_proxy': 'juju-proxy', 'legacy_proxy': 'legacy-proxy', 'provider_type': 'provider-type', 'snap_proxy': 'snap-proxy', 'ssl_hostname_verification': 'ssl-hostname-verification', 'updatebehavior': 'UpdateBehavior'}
     _toPy = {'UpdateBehavior': 'updatebehavior', 'apt-mirror': 'apt_mirror', 'apt-proxy': 'apt_proxy', 'authorized-keys': 'authorized_keys', 'cloudinit-userdata': 'cloudinit_userdata', 'container-inherit-properties': 'container_inherit_properties', 'juju-proxy': 'juju_proxy', 'legacy-proxy': 'legacy_proxy', 'provider-type': 'provider_type', 'snap-proxy': 'snap_proxy', 'ssl-hostname-verification': 'ssl_hostname_verification'}
-    def __init__(self, updatebehavior=None, apt_mirror="", apt_proxy=None, authorized_keys="", cloudinit_userdata=None, container_inherit_properties="", juju_proxy=None, legacy_proxy=None, provider_type="", snap_proxy=None, ssl_hostname_verification=False, **unknown_fields):
+    def __init__(self, updatebehavior=None, apt_mirror=None, apt_proxy=None, authorized_keys=None, cloudinit_userdata=None, container_inherit_properties=None, juju_proxy=None, legacy_proxy=None, provider_type=None, snap_proxy=None, ssl_hostname_verification=None, **unknown_fields):
         '''
         updatebehavior : UpdateBehavior
         apt_mirror : str
         apt_proxy : Settings
         authorized_keys : str
-        cloudinit_userdata : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        cloudinit_userdata : typing.Mapping[str, typing.Any]
         container_inherit_properties : str
         juju_proxy : Settings
         legacy_proxy : Settings
@@ -2944,7 +2944,7 @@ class ContainerConfig(Type):
 class ContainerLXDProfile(Type):
     _toSchema = {'name': 'name', 'profile': 'profile'}
     _toPy = {'name': 'name', 'profile': 'profile'}
-    def __init__(self, name="", profile=None, **unknown_fields):
+    def __init__(self, name=None, profile=None, **unknown_fields):
         '''
         name : str
         profile : CharmLXDProfile
@@ -2960,7 +2960,7 @@ class ContainerManagerConfig(Type):
     _toPy = {'config': 'config'}
     def __init__(self, config=None, **unknown_fields):
         '''
-        config : typing.Mapping<~KT, +VT_co>[str, str]
+        config : typing.Mapping[str, str]
         '''
         self.config = config
         self.unknown_fields = unknown_fields
@@ -2970,7 +2970,7 @@ class ContainerManagerConfig(Type):
 class ContainerManagerConfigParams(Type):
     _toSchema = {'type_': 'type'}
     _toPy = {'type': 'type_'}
-    def __init__(self, type_="", **unknown_fields):
+    def __init__(self, type_=None, **unknown_fields):
         '''
         type_ : str
         '''
@@ -2985,7 +2985,7 @@ class ContainerProfileResult(Type):
     def __init__(self, error=None, lxd_profiles=None, **unknown_fields):
         '''
         error : Error
-        lxd_profiles : typing.Sequence<+T_co>[~ContainerLXDProfile]<~ContainerLXDProfile>
+        lxd_profiles : typing.Sequence[~ContainerLXDProfile]
         '''
         self.error = Error.from_json(error) if error else None
         self.lxd_profiles = [ContainerLXDProfile.from_json(o) for o in lxd_profiles or []]
@@ -2998,7 +2998,7 @@ class ContainerProfileResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~ContainerProfileResult]<~ContainerProfileResult>
+        results : typing.Sequence[~ContainerProfileResult]
         '''
         self.results = [ContainerProfileResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -3008,7 +3008,7 @@ class ContainerProfileResults(Type):
 class ContainerTypeResult(Type):
     _toSchema = {'container_type': 'container-type', 'error': 'error'}
     _toPy = {'container-type': 'container_type', 'error': 'error'}
-    def __init__(self, container_type="", error=None, **unknown_fields):
+    def __init__(self, container_type=None, error=None, **unknown_fields):
         '''
         container_type : str
         error : Error
@@ -3022,9 +3022,9 @@ class ContainerTypeResult(Type):
 class ControllerAPIInfoResult(Type):
     _toSchema = {'addresses': 'addresses', 'cacert': 'cacert', 'error': 'error'}
     _toPy = {'addresses': 'addresses', 'cacert': 'cacert', 'error': 'error'}
-    def __init__(self, addresses=None, cacert="", error=None, **unknown_fields):
+    def __init__(self, addresses=None, cacert=None, error=None, **unknown_fields):
         '''
-        addresses : typing.Sequence<+T_co>[str]
+        addresses : typing.Sequence[str]
         cacert : str
         error : Error
         '''
@@ -3040,7 +3040,7 @@ class ControllerAPIInfoResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~ControllerAPIInfoResult]<~ControllerAPIInfoResult>
+        results : typing.Sequence[~ControllerAPIInfoResult]
         '''
         self.results = [ControllerAPIInfoResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -3052,7 +3052,7 @@ class ControllerConfigResult(Type):
     _toPy = {'config': 'config'}
     def __init__(self, config=None, **unknown_fields):
         '''
-        config : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        config : typing.Mapping[str, typing.Any]
         '''
         self.config = config
         self.unknown_fields = unknown_fields
@@ -3064,7 +3064,7 @@ class ControllerConfigSet(Type):
     _toPy = {'config': 'config'}
     def __init__(self, config=None, **unknown_fields):
         '''
-        config : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        config : typing.Mapping[str, typing.Any]
         '''
         self.config = config
         self.unknown_fields = unknown_fields
@@ -3077,7 +3077,7 @@ class ControllerCredentialInfo(Type):
     def __init__(self, content=None, models=None, **unknown_fields):
         '''
         content : CredentialContent
-        models : typing.Sequence<+T_co>[~ModelAccess]<~ModelAccess>
+        models : typing.Sequence[~ModelAccess]
         '''
         self.content = CredentialContent.from_json(content) if content else None
         self.models = [ModelAccess.from_json(o) for o in models or []]
@@ -3104,7 +3104,7 @@ class ControllersChangeResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~ControllersChangeResult]<~ControllersChangeResult>
+        results : typing.Sequence[~ControllersChangeResult]
         '''
         self.results = [ControllersChangeResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -3116,12 +3116,12 @@ class ControllersChanges(Type):
     _toPy = {'added': 'added', 'converted': 'converted', 'demoted': 'demoted', 'maintained': 'maintained', 'promoted': 'promoted', 'removed': 'removed'}
     def __init__(self, added=None, converted=None, demoted=None, maintained=None, promoted=None, removed=None, **unknown_fields):
         '''
-        added : typing.Sequence<+T_co>[str]
-        converted : typing.Sequence<+T_co>[str]
-        demoted : typing.Sequence<+T_co>[str]
-        maintained : typing.Sequence<+T_co>[str]
-        promoted : typing.Sequence<+T_co>[str]
-        removed : typing.Sequence<+T_co>[str]
+        added : typing.Sequence[str]
+        converted : typing.Sequence[str]
+        demoted : typing.Sequence[str]
+        maintained : typing.Sequence[str]
+        promoted : typing.Sequence[str]
+        removed : typing.Sequence[str]
         '''
         self.added = added
         self.converted = converted
@@ -3136,11 +3136,11 @@ class ControllersChanges(Type):
 class ControllersSpec(Type):
     _toSchema = {'constraints': 'constraints', 'num_controllers': 'num-controllers', 'placement': 'placement', 'series': 'series'}
     _toPy = {'constraints': 'constraints', 'num-controllers': 'num_controllers', 'placement': 'placement', 'series': 'series'}
-    def __init__(self, constraints=None, num_controllers=0, placement=None, series="", **unknown_fields):
+    def __init__(self, constraints=None, num_controllers=None, placement=None, series=None, **unknown_fields):
         '''
         constraints : Value
         num_controllers : int
-        placement : typing.Sequence<+T_co>[str]
+        placement : typing.Sequence[str]
         series : str
         '''
         self.constraints = Value.from_json(constraints) if constraints else None
@@ -3156,7 +3156,7 @@ class ControllersSpecs(Type):
     _toPy = {'specs': 'specs'}
     def __init__(self, specs=None, **unknown_fields):
         '''
-        specs : typing.Sequence<+T_co>[~ControllersSpec]<~ControllersSpec>
+        specs : typing.Sequence[~ControllersSpec]
         '''
         self.specs = [ControllersSpec.from_json(o) for o in specs or []]
         self.unknown_fields = unknown_fields
@@ -3166,12 +3166,12 @@ class ControllersSpecs(Type):
 class CreateSpaceParams(Type):
     _toSchema = {'provider_id': 'provider-id', 'public': 'public', 'space_tag': 'space-tag', 'subnet_tags': 'subnet-tags'}
     _toPy = {'provider-id': 'provider_id', 'public': 'public', 'space-tag': 'space_tag', 'subnet-tags': 'subnet_tags'}
-    def __init__(self, provider_id="", public=False, space_tag="", subnet_tags=None, **unknown_fields):
+    def __init__(self, provider_id=None, public=None, space_tag=None, subnet_tags=None, **unknown_fields):
         '''
         provider_id : str
         public : bool
         space_tag : str
-        subnet_tags : typing.Sequence<+T_co>[str]
+        subnet_tags : typing.Sequence[str]
         '''
         self.provider_id = provider_id
         self.public = public
@@ -3186,7 +3186,7 @@ class CreateSpacesParams(Type):
     _toPy = {'spaces': 'spaces'}
     def __init__(self, spaces=None, **unknown_fields):
         '''
-        spaces : typing.Sequence<+T_co>[~CreateSpaceParams]<~CreateSpaceParams>
+        spaces : typing.Sequence[~CreateSpaceParams]
         '''
         self.spaces = [CreateSpaceParams.from_json(o) for o in spaces or []]
         self.unknown_fields = unknown_fields
@@ -3196,9 +3196,9 @@ class CreateSpacesParams(Type):
 class CredentialContent(Type):
     _toSchema = {'attrs': 'attrs', 'auth_type': 'auth-type', 'cloud': 'cloud', 'name': 'name'}
     _toPy = {'attrs': 'attrs', 'auth-type': 'auth_type', 'cloud': 'cloud', 'name': 'name'}
-    def __init__(self, attrs=None, auth_type="", cloud="", name="", **unknown_fields):
+    def __init__(self, attrs=None, auth_type=None, cloud=None, name=None, **unknown_fields):
         '''
-        attrs : typing.Mapping<~KT, +VT_co>[str, str]
+        attrs : typing.Mapping[str, str]
         auth_type : str
         cloud : str
         name : str
@@ -3230,7 +3230,7 @@ class CredentialContentResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~CredentialContentResult]<~CredentialContentResult>
+        results : typing.Sequence[~CredentialContentResult]
         '''
         self.results = [CredentialContentResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -3240,9 +3240,9 @@ class CredentialContentResults(Type):
 class Delta(Type):
     _toSchema = {'entity': 'entity', 'removed': 'removed'}
     _toPy = {'entity': 'entity', 'removed': 'removed'}
-    def __init__(self, entity=None, removed=False, **unknown_fields):
+    def __init__(self, entity=None, removed=None, **unknown_fields):
         '''
-        entity : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        entity : typing.Mapping[str, typing.Any]
         removed : bool
         '''
         self.entity = entity
@@ -3256,7 +3256,7 @@ class DeployerConnectionValues(Type):
     _toPy = {'api-addresses': 'api_addresses'}
     def __init__(self, api_addresses=None, **unknown_fields):
         '''
-        api_addresses : typing.Sequence<+T_co>[str]
+        api_addresses : typing.Sequence[str]
         '''
         self.api_addresses = api_addresses
         self.unknown_fields = unknown_fields
@@ -3268,9 +3268,9 @@ class DestroyApplicationInfo(Type):
     _toPy = {'destroyed-storage': 'destroyed_storage', 'destroyed-units': 'destroyed_units', 'detached-storage': 'detached_storage'}
     def __init__(self, destroyed_storage=None, destroyed_units=None, detached_storage=None, **unknown_fields):
         '''
-        destroyed_storage : typing.Sequence<+T_co>[~Entity]<~Entity>
-        destroyed_units : typing.Sequence<+T_co>[~Entity]<~Entity>
-        detached_storage : typing.Sequence<+T_co>[~Entity]<~Entity>
+        destroyed_storage : typing.Sequence[~Entity]
+        destroyed_units : typing.Sequence[~Entity]
+        detached_storage : typing.Sequence[~Entity]
         '''
         self.destroyed_storage = [Entity.from_json(o) for o in destroyed_storage or []]
         self.destroyed_units = [Entity.from_json(o) for o in destroyed_units or []]
@@ -3282,10 +3282,10 @@ class DestroyApplicationInfo(Type):
 class DestroyApplicationOffers(Type):
     _toSchema = {'force': 'force', 'offer_urls': 'offer-urls'}
     _toPy = {'force': 'force', 'offer-urls': 'offer_urls'}
-    def __init__(self, force=False, offer_urls=None, **unknown_fields):
+    def __init__(self, force=None, offer_urls=None, **unknown_fields):
         '''
         force : bool
-        offer_urls : typing.Sequence<+T_co>[str]
+        offer_urls : typing.Sequence[str]
         '''
         self.force = force
         self.offer_urls = offer_urls
@@ -3296,7 +3296,7 @@ class DestroyApplicationOffers(Type):
 class DestroyApplicationParams(Type):
     _toSchema = {'application_tag': 'application-tag', 'destroy_storage': 'destroy-storage', 'force': 'force', 'max_wait': 'max-wait'}
     _toPy = {'application-tag': 'application_tag', 'destroy-storage': 'destroy_storage', 'force': 'force', 'max-wait': 'max_wait'}
-    def __init__(self, application_tag="", destroy_storage=False, force=False, max_wait=0, **unknown_fields):
+    def __init__(self, application_tag=None, destroy_storage=None, force=None, max_wait=None, **unknown_fields):
         '''
         application_tag : str
         destroy_storage : bool
@@ -3330,7 +3330,7 @@ class DestroyApplicationResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~DestroyApplicationResult]<~DestroyApplicationResult>
+        results : typing.Sequence[~DestroyApplicationResult]
         '''
         self.results = [DestroyApplicationResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -3342,7 +3342,7 @@ class DestroyApplicationUnits(Type):
     _toPy = {'unit-names': 'unit_names'}
     def __init__(self, unit_names=None, **unknown_fields):
         '''
-        unit_names : typing.Sequence<+T_co>[str]
+        unit_names : typing.Sequence[str]
         '''
         self.unit_names = unit_names
         self.unknown_fields = unknown_fields
@@ -3354,7 +3354,7 @@ class DestroyApplicationsParams(Type):
     _toPy = {'applications': 'applications'}
     def __init__(self, applications=None, **unknown_fields):
         '''
-        applications : typing.Sequence<+T_co>[~DestroyApplicationParams]<~DestroyApplicationParams>
+        applications : typing.Sequence[~DestroyApplicationParams]
         '''
         self.applications = [DestroyApplicationParams.from_json(o) for o in applications or []]
         self.unknown_fields = unknown_fields
@@ -3364,7 +3364,7 @@ class DestroyApplicationsParams(Type):
 class DestroyConsumedApplicationParams(Type):
     _toSchema = {'application_tag': 'application-tag'}
     _toPy = {'application-tag': 'application_tag'}
-    def __init__(self, application_tag="", **unknown_fields):
+    def __init__(self, application_tag=None, **unknown_fields):
         '''
         application_tag : str
         '''
@@ -3378,7 +3378,7 @@ class DestroyConsumedApplicationsParams(Type):
     _toPy = {'applications': 'applications'}
     def __init__(self, applications=None, **unknown_fields):
         '''
-        applications : typing.Sequence<+T_co>[~DestroyConsumedApplicationParams]<~DestroyConsumedApplicationParams>
+        applications : typing.Sequence[~DestroyConsumedApplicationParams]
         '''
         self.applications = [DestroyConsumedApplicationParams.from_json(o) for o in applications or []]
         self.unknown_fields = unknown_fields
@@ -3388,7 +3388,7 @@ class DestroyConsumedApplicationsParams(Type):
 class DestroyControllerArgs(Type):
     _toSchema = {'destroy_models': 'destroy-models', 'destroy_storage': 'destroy-storage'}
     _toPy = {'destroy-models': 'destroy_models', 'destroy-storage': 'destroy_storage'}
-    def __init__(self, destroy_models=False, destroy_storage=False, **unknown_fields):
+    def __init__(self, destroy_models=None, destroy_storage=None, **unknown_fields):
         '''
         destroy_models : bool
         destroy_storage : bool
@@ -3404,9 +3404,9 @@ class DestroyMachineInfo(Type):
     _toPy = {'destroyed-storage': 'destroyed_storage', 'destroyed-units': 'destroyed_units', 'detached-storage': 'detached_storage'}
     def __init__(self, destroyed_storage=None, destroyed_units=None, detached_storage=None, **unknown_fields):
         '''
-        destroyed_storage : typing.Sequence<+T_co>[~Entity]<~Entity>
-        destroyed_units : typing.Sequence<+T_co>[~Entity]<~Entity>
-        detached_storage : typing.Sequence<+T_co>[~Entity]<~Entity>
+        destroyed_storage : typing.Sequence[~Entity]
+        destroyed_units : typing.Sequence[~Entity]
+        detached_storage : typing.Sequence[~Entity]
         '''
         self.destroyed_storage = [Entity.from_json(o) for o in destroyed_storage or []]
         self.destroyed_units = [Entity.from_json(o) for o in destroyed_units or []]
@@ -3434,7 +3434,7 @@ class DestroyMachineResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~DestroyMachineResult]<~DestroyMachineResult>
+        results : typing.Sequence[~DestroyMachineResult]
         '''
         self.results = [DestroyMachineResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -3444,10 +3444,10 @@ class DestroyMachineResults(Type):
 class DestroyMachines(Type):
     _toSchema = {'force': 'force', 'machine_names': 'machine-names'}
     _toPy = {'force': 'force', 'machine-names': 'machine_names'}
-    def __init__(self, force=False, machine_names=None, **unknown_fields):
+    def __init__(self, force=None, machine_names=None, **unknown_fields):
         '''
         force : bool
-        machine_names : typing.Sequence<+T_co>[str]
+        machine_names : typing.Sequence[str]
         '''
         self.force = force
         self.machine_names = machine_names
@@ -3458,11 +3458,11 @@ class DestroyMachines(Type):
 class DestroyMachinesParams(Type):
     _toSchema = {'force': 'force', 'keep': 'keep', 'machine_tags': 'machine-tags', 'max_wait': 'max-wait'}
     _toPy = {'force': 'force', 'keep': 'keep', 'machine-tags': 'machine_tags', 'max-wait': 'max_wait'}
-    def __init__(self, force=False, keep=False, machine_tags=None, max_wait=0, **unknown_fields):
+    def __init__(self, force=None, keep=None, machine_tags=None, max_wait=None, **unknown_fields):
         '''
         force : bool
         keep : bool
-        machine_tags : typing.Sequence<+T_co>[str]
+        machine_tags : typing.Sequence[str]
         max_wait : int
         '''
         self.force = force
@@ -3476,7 +3476,7 @@ class DestroyMachinesParams(Type):
 class DestroyModelParams(Type):
     _toSchema = {'destroy_storage': 'destroy-storage', 'force': 'force', 'max_wait': 'max-wait', 'model_tag': 'model-tag'}
     _toPy = {'destroy-storage': 'destroy_storage', 'force': 'force', 'max-wait': 'max_wait', 'model-tag': 'model_tag'}
-    def __init__(self, destroy_storage=False, force=False, max_wait=0, model_tag="", **unknown_fields):
+    def __init__(self, destroy_storage=None, force=None, max_wait=None, model_tag=None, **unknown_fields):
         '''
         destroy_storage : bool
         force : bool
@@ -3496,7 +3496,7 @@ class DestroyModelsParams(Type):
     _toPy = {'models': 'models'}
     def __init__(self, models=None, **unknown_fields):
         '''
-        models : typing.Sequence<+T_co>[~DestroyModelParams]<~DestroyModelParams>
+        models : typing.Sequence[~DestroyModelParams]
         '''
         self.models = [DestroyModelParams.from_json(o) for o in models or []]
         self.unknown_fields = unknown_fields
@@ -3506,9 +3506,9 @@ class DestroyModelsParams(Type):
 class DestroyRelation(Type):
     _toSchema = {'endpoints': 'endpoints', 'force': 'force', 'max_wait': 'max-wait', 'relation_id': 'relation-id'}
     _toPy = {'endpoints': 'endpoints', 'force': 'force', 'max-wait': 'max_wait', 'relation-id': 'relation_id'}
-    def __init__(self, endpoints=None, force=False, max_wait=0, relation_id=0, **unknown_fields):
+    def __init__(self, endpoints=None, force=None, max_wait=None, relation_id=None, **unknown_fields):
         '''
-        endpoints : typing.Sequence<+T_co>[str]
+        endpoints : typing.Sequence[str]
         force : bool
         max_wait : int
         relation_id : int
@@ -3526,8 +3526,8 @@ class DestroyUnitInfo(Type):
     _toPy = {'destroyed-storage': 'destroyed_storage', 'detached-storage': 'detached_storage'}
     def __init__(self, destroyed_storage=None, detached_storage=None, **unknown_fields):
         '''
-        destroyed_storage : typing.Sequence<+T_co>[~Entity]<~Entity>
-        detached_storage : typing.Sequence<+T_co>[~Entity]<~Entity>
+        destroyed_storage : typing.Sequence[~Entity]
+        detached_storage : typing.Sequence[~Entity]
         '''
         self.destroyed_storage = [Entity.from_json(o) for o in destroyed_storage or []]
         self.detached_storage = [Entity.from_json(o) for o in detached_storage or []]
@@ -3538,7 +3538,7 @@ class DestroyUnitInfo(Type):
 class DestroyUnitParams(Type):
     _toSchema = {'destroy_storage': 'destroy-storage', 'force': 'force', 'max_wait': 'max-wait', 'unit_tag': 'unit-tag'}
     _toPy = {'destroy-storage': 'destroy_storage', 'force': 'force', 'max-wait': 'max_wait', 'unit-tag': 'unit_tag'}
-    def __init__(self, destroy_storage=False, force=False, max_wait=0, unit_tag="", **unknown_fields):
+    def __init__(self, destroy_storage=None, force=None, max_wait=None, unit_tag=None, **unknown_fields):
         '''
         destroy_storage : bool
         force : bool
@@ -3572,7 +3572,7 @@ class DestroyUnitResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~DestroyUnitResult]<~DestroyUnitResult>
+        results : typing.Sequence[~DestroyUnitResult]
         '''
         self.results = [DestroyUnitResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -3584,7 +3584,7 @@ class DestroyUnitsParams(Type):
     _toPy = {'units': 'units'}
     def __init__(self, units=None, **unknown_fields):
         '''
-        units : typing.Sequence<+T_co>[~DestroyUnitParams]<~DestroyUnitParams>
+        units : typing.Sequence[~DestroyUnitParams]
         '''
         self.units = [DestroyUnitParams.from_json(o) for o in units or []]
         self.unknown_fields = unknown_fields
@@ -3594,9 +3594,9 @@ class DestroyUnitsParams(Type):
 class DetailedStatus(Type):
     _toSchema = {'data': 'data', 'err': 'err', 'info': 'info', 'kind': 'kind', 'life': 'life', 'since': 'since', 'status': 'status', 'version': 'version'}
     _toPy = {'data': 'data', 'err': 'err', 'info': 'info', 'kind': 'kind', 'life': 'life', 'since': 'since', 'status': 'status', 'version': 'version'}
-    def __init__(self, data=None, err=None, info="", kind="", life="", since="", status="", version="", **unknown_fields):
+    def __init__(self, data=None, err=None, info=None, kind=None, life=None, since=None, status=None, version=None, **unknown_fields):
         '''
-        data : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        data : typing.Mapping[str, typing.Any]
         err : Error
         info : str
         kind : str
@@ -3620,7 +3620,7 @@ class DetailedStatus(Type):
 class DeviceBridgeInfo(Type):
     _toSchema = {'bridge_name': 'bridge-name', 'host_device_name': 'host-device-name', 'mac_address': 'mac-address'}
     _toPy = {'bridge-name': 'bridge_name', 'host-device-name': 'host_device_name', 'mac-address': 'mac_address'}
-    def __init__(self, bridge_name="", host_device_name="", mac_address="", **unknown_fields):
+    def __init__(self, bridge_name=None, host_device_name=None, mac_address=None, **unknown_fields):
         '''
         bridge_name : str
         host_device_name : str
@@ -3638,7 +3638,7 @@ class DiscoverSpacesResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~ProviderSpace]<~ProviderSpace>
+        results : typing.Sequence[~ProviderSpace]
         '''
         self.results = [ProviderSpace.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -3651,7 +3651,7 @@ class DistributionGroupResult(Type):
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
-        result : typing.Sequence<+T_co>[str]
+        result : typing.Sequence[str]
         '''
         self.error = Error.from_json(error) if error else None
         self.result = result
@@ -3664,7 +3664,7 @@ class DistributionGroupResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~DistributionGroupResult]<~DistributionGroupResult>
+        results : typing.Sequence[~DistributionGroupResult]
         '''
         self.results = [DistributionGroupResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -3674,9 +3674,9 @@ class DistributionGroupResults(Type):
 class DumpModelRequest(Type):
     _toSchema = {'entities': 'entities', 'simplified': 'simplified'}
     _toPy = {'entities': 'entities', 'simplified': 'simplified'}
-    def __init__(self, entities=None, simplified=False, **unknown_fields):
+    def __init__(self, entities=None, simplified=None, **unknown_fields):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        entities : typing.Sequence[~Entity]
         simplified : bool
         '''
         self.entities = [Entity.from_json(o) for o in entities or []]
@@ -3688,7 +3688,7 @@ class DumpModelRequest(Type):
 class Endpoint(Type):
     _toSchema = {'application_name': 'application-name', 'relation': 'relation'}
     _toPy = {'application-name': 'application_name', 'relation': 'relation'}
-    def __init__(self, application_name="", relation=None, **unknown_fields):
+    def __init__(self, application_name=None, relation=None, **unknown_fields):
         '''
         application_name : str
         relation : CharmRelation
@@ -3702,7 +3702,7 @@ class Endpoint(Type):
 class EndpointFilterAttributes(Type):
     _toSchema = {'interface': 'interface', 'name': 'name', 'role': 'role'}
     _toPy = {'interface': 'interface', 'name': 'name', 'role': 'role'}
-    def __init__(self, interface="", name="", role="", **unknown_fields):
+    def __init__(self, interface=None, name=None, role=None, **unknown_fields):
         '''
         interface : str
         name : str
@@ -3718,7 +3718,7 @@ class EndpointFilterAttributes(Type):
 class EndpointStatus(Type):
     _toSchema = {'application': 'application', 'name': 'name', 'role': 'role', 'subordinate': 'subordinate'}
     _toPy = {'application': 'application', 'name': 'name', 'role': 'role', 'subordinate': 'subordinate'}
-    def __init__(self, application="", name="", role="", subordinate=False, **unknown_fields):
+    def __init__(self, application=None, name=None, role=None, subordinate=None, **unknown_fields):
         '''
         application : str
         name : str
@@ -3738,7 +3738,7 @@ class Entities(Type):
     _toPy = {'entities': 'entities'}
     def __init__(self, entities=None, **unknown_fields):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        entities : typing.Sequence[~Entity]
         '''
         self.entities = [Entity.from_json(o) for o in entities or []]
         self.unknown_fields = unknown_fields
@@ -3750,7 +3750,7 @@ class EntitiesCharmURL(Type):
     _toPy = {'entities': 'entities'}
     def __init__(self, entities=None, **unknown_fields):
         '''
-        entities : typing.Sequence<+T_co>[~EntityCharmURL]<~EntityCharmURL>
+        entities : typing.Sequence[~EntityCharmURL]
         '''
         self.entities = [EntityCharmURL.from_json(o) for o in entities or []]
         self.unknown_fields = unknown_fields
@@ -3762,7 +3762,7 @@ class EntitiesPortRanges(Type):
     _toPy = {'entities': 'entities'}
     def __init__(self, entities=None, **unknown_fields):
         '''
-        entities : typing.Sequence<+T_co>[~EntityPortRange]<~EntityPortRange>
+        entities : typing.Sequence[~EntityPortRange]
         '''
         self.entities = [EntityPortRange.from_json(o) for o in entities or []]
         self.unknown_fields = unknown_fields
@@ -3774,7 +3774,7 @@ class EntitiesResult(Type):
     _toPy = {'entities': 'entities', 'error': 'error'}
     def __init__(self, entities=None, error=None, **unknown_fields):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        entities : typing.Sequence[~Entity]
         error : Error
         '''
         self.entities = [Entity.from_json(o) for o in entities or []]
@@ -3788,7 +3788,7 @@ class EntitiesResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~EntitiesResult]<~EntitiesResult>
+        results : typing.Sequence[~EntitiesResult]
         '''
         self.results = [EntitiesResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -3800,7 +3800,7 @@ class EntitiesVersion(Type):
     _toPy = {'agent-tools': 'agent_tools'}
     def __init__(self, agent_tools=None, **unknown_fields):
         '''
-        agent_tools : typing.Sequence<+T_co>[~EntityVersion]<~EntityVersion>
+        agent_tools : typing.Sequence[~EntityVersion]
         '''
         self.agent_tools = [EntityVersion.from_json(o) for o in agent_tools or []]
         self.unknown_fields = unknown_fields
@@ -3810,9 +3810,9 @@ class EntitiesVersion(Type):
 class EntitiesWatchResult(Type):
     _toSchema = {'changes': 'changes', 'error': 'error', 'watcher_id': 'watcher-id'}
     _toPy = {'changes': 'changes', 'error': 'error', 'watcher-id': 'watcher_id'}
-    def __init__(self, changes=None, error=None, watcher_id="", **unknown_fields):
+    def __init__(self, changes=None, error=None, watcher_id=None, **unknown_fields):
         '''
-        changes : typing.Sequence<+T_co>[str]
+        changes : typing.Sequence[str]
         error : Error
         watcher_id : str
         '''
@@ -3826,7 +3826,7 @@ class EntitiesWatchResult(Type):
 class Entity(Type):
     _toSchema = {'tag': 'tag'}
     _toPy = {'tag': 'tag'}
-    def __init__(self, tag="", **unknown_fields):
+    def __init__(self, tag=None, **unknown_fields):
         '''
         tag : str
         '''
@@ -3838,9 +3838,9 @@ class Entity(Type):
 class EntityAnnotations(Type):
     _toSchema = {'annotations': 'annotations', 'entity': 'entity'}
     _toPy = {'annotations': 'annotations', 'entity': 'entity'}
-    def __init__(self, annotations=None, entity="", **unknown_fields):
+    def __init__(self, annotations=None, entity=None, **unknown_fields):
         '''
-        annotations : typing.Mapping<~KT, +VT_co>[str, str]
+        annotations : typing.Mapping[str, str]
         entity : str
         '''
         self.annotations = annotations
@@ -3852,7 +3852,7 @@ class EntityAnnotations(Type):
 class EntityCharmURL(Type):
     _toSchema = {'charm_url': 'charm-url', 'tag': 'tag'}
     _toPy = {'charm-url': 'charm_url', 'tag': 'tag'}
-    def __init__(self, charm_url="", tag="", **unknown_fields):
+    def __init__(self, charm_url=None, tag=None, **unknown_fields):
         '''
         charm_url : str
         tag : str
@@ -3866,7 +3866,7 @@ class EntityCharmURL(Type):
 class EntityMacaroonArg(Type):
     _toSchema = {'macaroon': 'macaroon', 'tag': 'tag'}
     _toPy = {'macaroon': 'macaroon', 'tag': 'tag'}
-    def __init__(self, macaroon=None, tag="", **unknown_fields):
+    def __init__(self, macaroon=None, tag=None, **unknown_fields):
         '''
         macaroon : Macaroon
         tag : str
@@ -3882,7 +3882,7 @@ class EntityMacaroonArgs(Type):
     _toPy = {'Args': 'args'}
     def __init__(self, args=None, **unknown_fields):
         '''
-        args : typing.Sequence<+T_co>[~EntityMacaroonArg]<~EntityMacaroonArg>
+        args : typing.Sequence[~EntityMacaroonArg]
         '''
         self.args = [EntityMacaroonArg.from_json(o) for o in args or []]
         self.unknown_fields = unknown_fields
@@ -3895,7 +3895,7 @@ class EntityMetrics(Type):
     def __init__(self, error=None, metrics=None, **unknown_fields):
         '''
         error : Error
-        metrics : typing.Sequence<+T_co>[~MetricResult]<~MetricResult>
+        metrics : typing.Sequence[~MetricResult]
         '''
         self.error = Error.from_json(error) if error else None
         self.metrics = [MetricResult.from_json(o) for o in metrics or []]
@@ -3906,7 +3906,7 @@ class EntityMetrics(Type):
 class EntityPassword(Type):
     _toSchema = {'password': 'password', 'tag': 'tag'}
     _toPy = {'password': 'password', 'tag': 'tag'}
-    def __init__(self, password="", tag="", **unknown_fields):
+    def __init__(self, password=None, tag=None, **unknown_fields):
         '''
         password : str
         tag : str
@@ -3922,7 +3922,7 @@ class EntityPasswords(Type):
     _toPy = {'changes': 'changes'}
     def __init__(self, changes=None, **unknown_fields):
         '''
-        changes : typing.Sequence<+T_co>[~EntityPassword]<~EntityPassword>
+        changes : typing.Sequence[~EntityPassword]
         '''
         self.changes = [EntityPassword.from_json(o) for o in changes or []]
         self.unknown_fields = unknown_fields
@@ -3932,7 +3932,7 @@ class EntityPasswords(Type):
 class EntityPortRange(Type):
     _toSchema = {'from_port': 'from-port', 'protocol': 'protocol', 'tag': 'tag', 'to_port': 'to-port'}
     _toPy = {'from-port': 'from_port', 'protocol': 'protocol', 'tag': 'tag', 'to-port': 'to_port'}
-    def __init__(self, from_port=0, protocol="", tag="", to_port=0, **unknown_fields):
+    def __init__(self, from_port=None, protocol=None, tag=None, to_port=None, **unknown_fields):
         '''
         from_port : int
         protocol : str
@@ -3950,9 +3950,9 @@ class EntityPortRange(Type):
 class EntityStatus(Type):
     _toSchema = {'data': 'data', 'info': 'info', 'since': 'since', 'status': 'status'}
     _toPy = {'data': 'data', 'info': 'info', 'since': 'since', 'status': 'status'}
-    def __init__(self, data=None, info="", since="", status="", **unknown_fields):
+    def __init__(self, data=None, info=None, since=None, status=None, **unknown_fields):
         '''
-        data : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        data : typing.Mapping[str, typing.Any]
         info : str
         since : str
         status : str
@@ -3968,9 +3968,9 @@ class EntityStatus(Type):
 class EntityStatusArgs(Type):
     _toSchema = {'data': 'data', 'info': 'info', 'status': 'status', 'tag': 'tag'}
     _toPy = {'data': 'data', 'info': 'info', 'status': 'status', 'tag': 'tag'}
-    def __init__(self, data=None, info="", status="", tag="", **unknown_fields):
+    def __init__(self, data=None, info=None, status=None, tag=None, **unknown_fields):
         '''
-        data : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        data : typing.Mapping[str, typing.Any]
         info : str
         status : str
         tag : str
@@ -3986,7 +3986,7 @@ class EntityStatusArgs(Type):
 class EntityString(Type):
     _toSchema = {'tag': 'tag', 'value': 'value'}
     _toPy = {'tag': 'tag', 'value': 'value'}
-    def __init__(self, tag="", value="", **unknown_fields):
+    def __init__(self, tag=None, value=None, **unknown_fields):
         '''
         tag : str
         value : str
@@ -4000,7 +4000,7 @@ class EntityString(Type):
 class EntityVersion(Type):
     _toSchema = {'tag': 'tag', 'tools': 'tools'}
     _toPy = {'tag': 'tag', 'tools': 'tools'}
-    def __init__(self, tag="", tools=None, **unknown_fields):
+    def __init__(self, tag=None, tools=None, **unknown_fields):
         '''
         tag : str
         tools : Version
@@ -4014,7 +4014,7 @@ class EntityVersion(Type):
 class EntityWorkloadVersion(Type):
     _toSchema = {'tag': 'tag', 'workload_version': 'workload-version'}
     _toPy = {'tag': 'tag', 'workload-version': 'workload_version'}
-    def __init__(self, tag="", workload_version="", **unknown_fields):
+    def __init__(self, tag=None, workload_version=None, **unknown_fields):
         '''
         tag : str
         workload_version : str
@@ -4030,7 +4030,7 @@ class EntityWorkloadVersions(Type):
     _toPy = {'entities': 'entities'}
     def __init__(self, entities=None, **unknown_fields):
         '''
-        entities : typing.Sequence<+T_co>[~EntityWorkloadVersion]<~EntityWorkloadVersion>
+        entities : typing.Sequence[~EntityWorkloadVersion]
         '''
         self.entities = [EntityWorkloadVersion.from_json(o) for o in entities or []]
         self.unknown_fields = unknown_fields
@@ -4042,7 +4042,7 @@ class EnvListArgs(Type):
     _toPy = {'patterns': 'patterns'}
     def __init__(self, patterns=None, **unknown_fields):
         '''
-        patterns : typing.Sequence<+T_co>[str]
+        patterns : typing.Sequence[str]
         '''
         self.patterns = patterns
         self.unknown_fields = unknown_fields
@@ -4054,7 +4054,7 @@ class EnvListResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~Payload]<~Payload>
+        results : typing.Sequence[~Payload]
         '''
         self.results = [Payload.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -4064,10 +4064,10 @@ class EnvListResults(Type):
 class Error(Type):
     _toSchema = {'code': 'code', 'info': 'info', 'message': 'message'}
     _toPy = {'code': 'code', 'info': 'info', 'message': 'message'}
-    def __init__(self, code="", info=None, message="", **unknown_fields):
+    def __init__(self, code=None, info=None, message=None, **unknown_fields):
         '''
         code : str
-        info : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        info : typing.Mapping[str, typing.Any]
         message : str
         '''
         self.code = code
@@ -4080,7 +4080,7 @@ class Error(Type):
 class ErrorInfo(Type):
     _toSchema = {'macaroon': 'macaroon', 'macaroon_path': 'macaroon-path'}
     _toPy = {'macaroon': 'macaroon', 'macaroon-path': 'macaroon_path'}
-    def __init__(self, macaroon=None, macaroon_path="", **unknown_fields):
+    def __init__(self, macaroon=None, macaroon_path=None, **unknown_fields):
         '''
         macaroon : Macaroon
         macaroon_path : str
@@ -4108,7 +4108,7 @@ class ErrorResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        results : typing.Sequence[~ErrorResult]
         '''
         self.results = [ErrorResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -4118,9 +4118,9 @@ class ErrorResults(Type):
 class ExternalControllerInfo(Type):
     _toSchema = {'addrs': 'addrs', 'ca_cert': 'ca-cert', 'controller_alias': 'controller-alias', 'controller_tag': 'controller-tag'}
     _toPy = {'addrs': 'addrs', 'ca-cert': 'ca_cert', 'controller-alias': 'controller_alias', 'controller-tag': 'controller_tag'}
-    def __init__(self, addrs=None, ca_cert="", controller_alias="", controller_tag="", **unknown_fields):
+    def __init__(self, addrs=None, ca_cert=None, controller_alias=None, controller_tag=None, **unknown_fields):
         '''
-        addrs : typing.Sequence<+T_co>[str]
+        addrs : typing.Sequence[str]
         ca_cert : str
         controller_alias : str
         controller_tag : str
@@ -4152,7 +4152,7 @@ class ExternalControllerInfoResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~ExternalControllerInfoResult]<~ExternalControllerInfoResult>
+        results : typing.Sequence[~ExternalControllerInfoResult]
         '''
         self.results = [ExternalControllerInfoResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -4162,7 +4162,7 @@ class ExternalControllerInfoResults(Type):
 class FanConfigEntry(Type):
     _toSchema = {'overlay': 'overlay', 'underlay': 'underlay'}
     _toPy = {'overlay': 'overlay', 'underlay': 'underlay'}
-    def __init__(self, overlay="", underlay="", **unknown_fields):
+    def __init__(self, overlay=None, underlay=None, **unknown_fields):
         '''
         overlay : str
         underlay : str
@@ -4178,7 +4178,7 @@ class FanConfigResult(Type):
     _toPy = {'fans': 'fans'}
     def __init__(self, fans=None, **unknown_fields):
         '''
-        fans : typing.Sequence<+T_co>[~FanConfigEntry]<~FanConfigEntry>
+        fans : typing.Sequence[~FanConfigEntry]
         '''
         self.fans = [FanConfigEntry.from_json(o) for o in fans or []]
         self.unknown_fields = unknown_fields
@@ -4188,7 +4188,7 @@ class FanConfigResult(Type):
 class Filesystem(Type):
     _toSchema = {'filesystem_tag': 'filesystem-tag', 'info': 'info', 'volume_tag': 'volume-tag'}
     _toPy = {'filesystem-tag': 'filesystem_tag', 'info': 'info', 'volume-tag': 'volume_tag'}
-    def __init__(self, filesystem_tag="", info=None, volume_tag="", **unknown_fields):
+    def __init__(self, filesystem_tag=None, info=None, volume_tag=None, **unknown_fields):
         '''
         filesystem_tag : str
         info : FilesystemInfo
@@ -4204,7 +4204,7 @@ class Filesystem(Type):
 class FilesystemAttachment(Type):
     _toSchema = {'filesystem_tag': 'filesystem-tag', 'info': 'info', 'machine_tag': 'machine-tag'}
     _toPy = {'filesystem-tag': 'filesystem_tag', 'info': 'info', 'machine-tag': 'machine_tag'}
-    def __init__(self, filesystem_tag="", info=None, machine_tag="", **unknown_fields):
+    def __init__(self, filesystem_tag=None, info=None, machine_tag=None, **unknown_fields):
         '''
         filesystem_tag : str
         info : FilesystemAttachmentInfo
@@ -4220,7 +4220,7 @@ class FilesystemAttachment(Type):
 class FilesystemAttachmentDetails(Type):
     _toSchema = {'filesystemattachmentinfo': 'FilesystemAttachmentInfo', 'life': 'life', 'mount_point': 'mount-point', 'read_only': 'read-only'}
     _toPy = {'FilesystemAttachmentInfo': 'filesystemattachmentinfo', 'life': 'life', 'mount-point': 'mount_point', 'read-only': 'read_only'}
-    def __init__(self, filesystemattachmentinfo=None, life="", mount_point="", read_only=False, **unknown_fields):
+    def __init__(self, filesystemattachmentinfo=None, life=None, mount_point=None, read_only=None, **unknown_fields):
         '''
         filesystemattachmentinfo : FilesystemAttachmentInfo
         life : str
@@ -4238,7 +4238,7 @@ class FilesystemAttachmentDetails(Type):
 class FilesystemAttachmentInfo(Type):
     _toSchema = {'mount_point': 'mount-point', 'read_only': 'read-only'}
     _toPy = {'mount-point': 'mount_point', 'read-only': 'read_only'}
-    def __init__(self, mount_point="", read_only=False, **unknown_fields):
+    def __init__(self, mount_point=None, read_only=None, **unknown_fields):
         '''
         mount_point : str
         read_only : bool
@@ -4252,7 +4252,7 @@ class FilesystemAttachmentInfo(Type):
 class FilesystemAttachmentParams(Type):
     _toSchema = {'filesystem_id': 'filesystem-id', 'filesystem_tag': 'filesystem-tag', 'instance_id': 'instance-id', 'machine_tag': 'machine-tag', 'mount_point': 'mount-point', 'provider': 'provider', 'read_only': 'read-only'}
     _toPy = {'filesystem-id': 'filesystem_id', 'filesystem-tag': 'filesystem_tag', 'instance-id': 'instance_id', 'machine-tag': 'machine_tag', 'mount-point': 'mount_point', 'provider': 'provider', 'read-only': 'read_only'}
-    def __init__(self, filesystem_id="", filesystem_tag="", instance_id="", machine_tag="", mount_point="", provider="", read_only=False, **unknown_fields):
+    def __init__(self, filesystem_id=None, filesystem_tag=None, instance_id=None, machine_tag=None, mount_point=None, provider=None, read_only=None, **unknown_fields):
         '''
         filesystem_id : str
         filesystem_tag : str
@@ -4292,7 +4292,7 @@ class FilesystemAttachmentParamsResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~FilesystemAttachmentParamsResult]<~FilesystemAttachmentParamsResult>
+        results : typing.Sequence[~FilesystemAttachmentParamsResult]
         '''
         self.results = [FilesystemAttachmentParamsResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -4318,7 +4318,7 @@ class FilesystemAttachmentResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~FilesystemAttachmentResult]<~FilesystemAttachmentResult>
+        results : typing.Sequence[~FilesystemAttachmentResult]
         '''
         self.results = [FilesystemAttachmentResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -4330,7 +4330,7 @@ class FilesystemAttachments(Type):
     _toPy = {'filesystem-attachments': 'filesystem_attachments'}
     def __init__(self, filesystem_attachments=None, **unknown_fields):
         '''
-        filesystem_attachments : typing.Sequence<+T_co>[~FilesystemAttachment]<~FilesystemAttachment>
+        filesystem_attachments : typing.Sequence[~FilesystemAttachment]
         '''
         self.filesystem_attachments = [FilesystemAttachment.from_json(o) for o in filesystem_attachments or []]
         self.unknown_fields = unknown_fields
@@ -4340,15 +4340,15 @@ class FilesystemAttachments(Type):
 class FilesystemDetails(Type):
     _toSchema = {'filesystem_tag': 'filesystem-tag', 'info': 'info', 'life': 'life', 'machine_attachments': 'machine-attachments', 'status': 'status', 'storage': 'storage', 'unit_attachments': 'unit-attachments', 'volume_tag': 'volume-tag'}
     _toPy = {'filesystem-tag': 'filesystem_tag', 'info': 'info', 'life': 'life', 'machine-attachments': 'machine_attachments', 'status': 'status', 'storage': 'storage', 'unit-attachments': 'unit_attachments', 'volume-tag': 'volume_tag'}
-    def __init__(self, filesystem_tag="", info=None, life="", machine_attachments=None, status=None, storage=None, unit_attachments=None, volume_tag="", **unknown_fields):
+    def __init__(self, filesystem_tag=None, info=None, life=None, machine_attachments=None, status=None, storage=None, unit_attachments=None, volume_tag=None, **unknown_fields):
         '''
         filesystem_tag : str
         info : FilesystemInfo
         life : str
-        machine_attachments : typing.Mapping<~KT, +VT_co>[str, ~FilesystemAttachmentDetails]<~FilesystemAttachmentDetails>
+        machine_attachments : typing.Mapping[str, ~FilesystemAttachmentDetails]
         status : EntityStatus
         storage : StorageDetails
-        unit_attachments : typing.Mapping<~KT, +VT_co>[str, ~FilesystemAttachmentDetails]<~FilesystemAttachmentDetails>
+        unit_attachments : typing.Mapping[str, ~FilesystemAttachmentDetails]
         volume_tag : str
         '''
         self.filesystem_tag = filesystem_tag
@@ -4369,7 +4369,7 @@ class FilesystemDetailsListResult(Type):
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
-        result : typing.Sequence<+T_co>[~FilesystemDetails]<~FilesystemDetails>
+        result : typing.Sequence[~FilesystemDetails]
         '''
         self.error = Error.from_json(error) if error else None
         self.result = [FilesystemDetails.from_json(o) for o in result or []]
@@ -4382,7 +4382,7 @@ class FilesystemDetailsListResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~FilesystemDetailsListResult]<~FilesystemDetailsListResult>
+        results : typing.Sequence[~FilesystemDetailsListResult]
         '''
         self.results = [FilesystemDetailsListResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -4394,7 +4394,7 @@ class FilesystemFilter(Type):
     _toPy = {'machines': 'machines'}
     def __init__(self, machines=None, **unknown_fields):
         '''
-        machines : typing.Sequence<+T_co>[str]
+        machines : typing.Sequence[str]
         '''
         self.machines = machines
         self.unknown_fields = unknown_fields
@@ -4406,7 +4406,7 @@ class FilesystemFilters(Type):
     _toPy = {'filters': 'filters'}
     def __init__(self, filters=None, **unknown_fields):
         '''
-        filters : typing.Sequence<+T_co>[~FilesystemFilter]<~FilesystemFilter>
+        filters : typing.Sequence[~FilesystemFilter]
         '''
         self.filters = [FilesystemFilter.from_json(o) for o in filters or []]
         self.unknown_fields = unknown_fields
@@ -4416,7 +4416,7 @@ class FilesystemFilters(Type):
 class FilesystemInfo(Type):
     _toSchema = {'filesystem_id': 'filesystem-id', 'pool': 'pool', 'size': 'size'}
     _toPy = {'filesystem-id': 'filesystem_id', 'pool': 'pool', 'size': 'size'}
-    def __init__(self, filesystem_id="", pool="", size=0, **unknown_fields):
+    def __init__(self, filesystem_id=None, pool=None, size=None, **unknown_fields):
         '''
         filesystem_id : str
         pool : str
@@ -4432,14 +4432,14 @@ class FilesystemInfo(Type):
 class FilesystemParams(Type):
     _toSchema = {'attachment': 'attachment', 'attributes': 'attributes', 'filesystem_tag': 'filesystem-tag', 'provider': 'provider', 'size': 'size', 'tags': 'tags', 'volume_tag': 'volume-tag'}
     _toPy = {'attachment': 'attachment', 'attributes': 'attributes', 'filesystem-tag': 'filesystem_tag', 'provider': 'provider', 'size': 'size', 'tags': 'tags', 'volume-tag': 'volume_tag'}
-    def __init__(self, attachment=None, attributes=None, filesystem_tag="", provider="", size=0, tags=None, volume_tag="", **unknown_fields):
+    def __init__(self, attachment=None, attributes=None, filesystem_tag=None, provider=None, size=None, tags=None, volume_tag=None, **unknown_fields):
         '''
         attachment : FilesystemAttachmentParams
-        attributes : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        attributes : typing.Mapping[str, typing.Any]
         filesystem_tag : str
         provider : str
         size : int
-        tags : typing.Mapping<~KT, +VT_co>[str, str]
+        tags : typing.Mapping[str, str]
         volume_tag : str
         '''
         self.attachment = FilesystemAttachmentParams.from_json(attachment) if attachment else None
@@ -4472,7 +4472,7 @@ class FilesystemParamsResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~FilesystemParamsResult]<~FilesystemParamsResult>
+        results : typing.Sequence[~FilesystemParamsResult]
         '''
         self.results = [FilesystemParamsResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -4498,7 +4498,7 @@ class FilesystemResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~FilesystemResult]<~FilesystemResult>
+        results : typing.Sequence[~FilesystemResult]
         '''
         self.results = [FilesystemResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -4510,7 +4510,7 @@ class Filesystems(Type):
     _toPy = {'filesystems': 'filesystems'}
     def __init__(self, filesystems=None, **unknown_fields):
         '''
-        filesystems : typing.Sequence<+T_co>[~Filesystem]<~Filesystem>
+        filesystems : typing.Sequence[~Filesystem]
         '''
         self.filesystems = [Filesystem.from_json(o) for o in filesystems or []]
         self.unknown_fields = unknown_fields
@@ -4522,7 +4522,7 @@ class FindActionsByNames(Type):
     _toPy = {'names': 'names'}
     def __init__(self, names=None, **unknown_fields):
         '''
-        names : typing.Sequence<+T_co>[str]
+        names : typing.Sequence[str]
         '''
         self.names = names
         self.unknown_fields = unknown_fields
@@ -4534,7 +4534,7 @@ class FindTags(Type):
     _toPy = {'prefixes': 'prefixes'}
     def __init__(self, prefixes=None, **unknown_fields):
         '''
-        prefixes : typing.Sequence<+T_co>[str]
+        prefixes : typing.Sequence[str]
         '''
         self.prefixes = prefixes
         self.unknown_fields = unknown_fields
@@ -4546,7 +4546,7 @@ class FindTagsResults(Type):
     _toPy = {'matches': 'matches'}
     def __init__(self, matches=None, **unknown_fields):
         '''
-        matches : typing.Sequence<+T_co>[~Entity]<~Entity>
+        matches : typing.Sequence[~Entity]
         '''
         self.matches = [Entity.from_json(o) for o in matches or []]
         self.unknown_fields = unknown_fields
@@ -4556,7 +4556,7 @@ class FindTagsResults(Type):
 class FindToolsParams(Type):
     _toSchema = {'agentstream': 'agentstream', 'arch': 'arch', 'major': 'major', 'minor': 'minor', 'number': 'number', 'series': 'series'}
     _toPy = {'agentstream': 'agentstream', 'arch': 'arch', 'major': 'major', 'minor': 'minor', 'number': 'number', 'series': 'series'}
-    def __init__(self, agentstream="", arch="", major=0, minor=0, number=None, series="", **unknown_fields):
+    def __init__(self, agentstream=None, arch=None, major=None, minor=None, number=None, series=None, **unknown_fields):
         '''
         agentstream : str
         arch : str
@@ -4581,7 +4581,7 @@ class FindToolsResult(Type):
     def __init__(self, error=None, list_=None, **unknown_fields):
         '''
         error : Error
-        list_ : typing.Sequence<+T_co>[~Tools]<~Tools>
+        list_ : typing.Sequence[~Tools]
         '''
         self.error = Error.from_json(error) if error else None
         self.list_ = [Tools.from_json(o) for o in list_ or []]
@@ -4592,10 +4592,10 @@ class FindToolsResult(Type):
 class FirewallRule(Type):
     _toSchema = {'known_service': 'known-service', 'whitelist_cidrs': 'whitelist-cidrs'}
     _toPy = {'known-service': 'known_service', 'whitelist-cidrs': 'whitelist_cidrs'}
-    def __init__(self, known_service="", whitelist_cidrs=None, **unknown_fields):
+    def __init__(self, known_service=None, whitelist_cidrs=None, **unknown_fields):
         '''
         known_service : str
-        whitelist_cidrs : typing.Sequence<+T_co>[str]
+        whitelist_cidrs : typing.Sequence[str]
         '''
         self.known_service = known_service
         self.whitelist_cidrs = whitelist_cidrs
@@ -4608,7 +4608,7 @@ class FirewallRuleArgs(Type):
     _toPy = {'args': 'args'}
     def __init__(self, args=None, **unknown_fields):
         '''
-        args : typing.Sequence<+T_co>[~FirewallRule]<~FirewallRule>
+        args : typing.Sequence[~FirewallRule]
         '''
         self.args = [FirewallRule.from_json(o) for o in args or []]
         self.unknown_fields = unknown_fields
@@ -4618,16 +4618,16 @@ class FirewallRuleArgs(Type):
 class FullStatus(Type):
     _toSchema = {'applications': 'applications', 'branches': 'branches', 'controller_timestamp': 'controller-timestamp', 'machines': 'machines', 'model': 'model', 'offers': 'offers', 'relations': 'relations', 'remote_applications': 'remote-applications'}
     _toPy = {'applications': 'applications', 'branches': 'branches', 'controller-timestamp': 'controller_timestamp', 'machines': 'machines', 'model': 'model', 'offers': 'offers', 'relations': 'relations', 'remote-applications': 'remote_applications'}
-    def __init__(self, applications=None, branches=None, controller_timestamp="", machines=None, model=None, offers=None, relations=None, remote_applications=None, **unknown_fields):
+    def __init__(self, applications=None, branches=None, controller_timestamp=None, machines=None, model=None, offers=None, relations=None, remote_applications=None, **unknown_fields):
         '''
-        applications : typing.Mapping<~KT, +VT_co>[str, ~ApplicationStatus]<~ApplicationStatus>
-        branches : typing.Mapping<~KT, +VT_co>[str, ~BranchStatus]<~BranchStatus>
+        applications : typing.Mapping[str, ~ApplicationStatus]
+        branches : typing.Mapping[str, ~BranchStatus]
         controller_timestamp : str
-        machines : typing.Mapping<~KT, +VT_co>[str, ~MachineStatus]<~MachineStatus>
+        machines : typing.Mapping[str, ~MachineStatus]
         model : ModelStatusInfo
-        offers : typing.Mapping<~KT, +VT_co>[str, ~ApplicationOfferStatus]<~ApplicationOfferStatus>
-        relations : typing.Sequence<+T_co>[~RelationStatus]<~RelationStatus>
-        remote_applications : typing.Mapping<~KT, +VT_co>[str, ~RemoteApplicationStatus]<~RemoteApplicationStatus>
+        offers : typing.Mapping[str, ~ApplicationOfferStatus]
+        relations : typing.Sequence[~RelationStatus]
+        remote_applications : typing.Mapping[str, ~RemoteApplicationStatus]
         '''
         self.applications = applications
         self.branches = branches
@@ -4644,9 +4644,9 @@ class FullStatus(Type):
 class Generation(Type):
     _toSchema = {'applications': 'applications', 'branch': 'branch', 'created': 'created', 'created_by': 'created-by'}
     _toPy = {'applications': 'applications', 'branch': 'branch', 'created': 'created', 'created-by': 'created_by'}
-    def __init__(self, applications=None, branch="", created=0, created_by="", **unknown_fields):
+    def __init__(self, applications=None, branch=None, created=None, created_by=None, **unknown_fields):
         '''
-        applications : typing.Sequence<+T_co>[~GenerationApplication]<~GenerationApplication>
+        applications : typing.Sequence[~GenerationApplication]
         branch : str
         created : int
         created_by : str
@@ -4662,13 +4662,13 @@ class Generation(Type):
 class GenerationApplication(Type):
     _toSchema = {'application': 'application', 'config': 'config', 'pending': 'pending', 'progress': 'progress', 'tracking': 'tracking'}
     _toPy = {'application': 'application', 'config': 'config', 'pending': 'pending', 'progress': 'progress', 'tracking': 'tracking'}
-    def __init__(self, application="", config=None, pending=None, progress="", tracking=None, **unknown_fields):
+    def __init__(self, application=None, config=None, pending=None, progress=None, tracking=None, **unknown_fields):
         '''
         application : str
-        config : typing.Mapping<~KT, +VT_co>[str, typing.Any]
-        pending : typing.Sequence<+T_co>[str]
+        config : typing.Mapping[str, typing.Any]
+        pending : typing.Sequence[str]
         progress : str
-        tracking : typing.Sequence<+T_co>[str]
+        tracking : typing.Sequence[str]
         '''
         self.application = application
         self.config = config
@@ -4685,7 +4685,7 @@ class GenerationResults(Type):
     def __init__(self, error=None, generations=None, **unknown_fields):
         '''
         error : Error
-        generations : typing.Sequence<+T_co>[~Generation]<~Generation>
+        generations : typing.Sequence[~Generation]
         '''
         self.error = Error.from_json(error) if error else None
         self.generations = [Generation.from_json(o) for o in generations or []]
@@ -4696,7 +4696,7 @@ class GenerationResults(Type):
 class GetApplicationConstraints(Type):
     _toSchema = {'application': 'application'}
     _toPy = {'application': 'application'}
-    def __init__(self, application="", **unknown_fields):
+    def __init__(self, application=None, **unknown_fields):
         '''
         application : str
         '''
@@ -4722,7 +4722,7 @@ class GetLeadershipSettingsBulkResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~GetLeadershipSettingsResult]<~GetLeadershipSettingsResult>
+        results : typing.Sequence[~GetLeadershipSettingsResult]
         '''
         self.results = [GetLeadershipSettingsResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -4735,7 +4735,7 @@ class GetLeadershipSettingsResult(Type):
     def __init__(self, error=None, settings=None, **unknown_fields):
         '''
         error : Error
-        settings : typing.Mapping<~KT, +VT_co>[str, str]
+        settings : typing.Mapping[str, str]
         '''
         self.error = Error.from_json(error) if error else None
         self.settings = settings
@@ -4746,7 +4746,7 @@ class GetLeadershipSettingsResult(Type):
 class GetTokenArg(Type):
     _toSchema = {'tag': 'tag'}
     _toPy = {'tag': 'tag'}
-    def __init__(self, tag="", **unknown_fields):
+    def __init__(self, tag=None, **unknown_fields):
         '''
         tag : str
         '''
@@ -4760,7 +4760,7 @@ class GetTokenArgs(Type):
     _toPy = {'Args': 'args'}
     def __init__(self, args=None, **unknown_fields):
         '''
-        args : typing.Sequence<+T_co>[~GetTokenArg]<~GetTokenArg>
+        args : typing.Sequence[~GetTokenArg]
         '''
         self.args = [GetTokenArg.from_json(o) for o in args or []]
         self.unknown_fields = unknown_fields
@@ -4772,8 +4772,8 @@ class GoalState(Type):
     _toPy = {'relations': 'relations', 'units': 'units'}
     def __init__(self, relations=None, units=None, **unknown_fields):
         '''
-        relations : typing.Mapping<~KT, +VT_co>[str, typing.Any]
-        units : typing.Mapping<~KT, +VT_co>[str, ~GoalStateStatus]<~GoalStateStatus>
+        relations : typing.Mapping[str, typing.Any]
+        units : typing.Mapping[str, ~GoalStateStatus]
         '''
         self.relations = relations
         self.units = units
@@ -4800,7 +4800,7 @@ class GoalStateResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~GoalStateResult]<~GoalStateResult>
+        results : typing.Sequence[~GoalStateResult]
         '''
         self.results = [GoalStateResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -4810,7 +4810,7 @@ class GoalStateResults(Type):
 class GoalStateStatus(Type):
     _toSchema = {'since': 'since', 'status': 'status'}
     _toPy = {'since': 'since', 'status': 'status'}
-    def __init__(self, since="", status="", **unknown_fields):
+    def __init__(self, since=None, status=None, **unknown_fields):
         '''
         since : str
         status : str
@@ -4824,7 +4824,7 @@ class GoalStateStatus(Type):
 class HAMember(Type):
     _toSchema = {'public_address': 'public-address', 'series': 'series', 'tag': 'tag'}
     _toPy = {'public-address': 'public_address', 'series': 'series', 'tag': 'tag'}
-    def __init__(self, public_address=None, series="", tag="", **unknown_fields):
+    def __init__(self, public_address=None, series=None, tag=None, **unknown_fields):
         '''
         public_address : Address
         series : str
@@ -4840,7 +4840,7 @@ class HAMember(Type):
 class HardwareCharacteristics(Type):
     _toSchema = {'arch': 'arch', 'availability_zone': 'availability-zone', 'cpu_cores': 'cpu-cores', 'cpu_power': 'cpu-power', 'mem': 'mem', 'root_disk': 'root-disk', 'root_disk_source': 'root-disk-source', 'tags': 'tags'}
     _toPy = {'arch': 'arch', 'availability-zone': 'availability_zone', 'cpu-cores': 'cpu_cores', 'cpu-power': 'cpu_power', 'mem': 'mem', 'root-disk': 'root_disk', 'root-disk-source': 'root_disk_source', 'tags': 'tags'}
-    def __init__(self, arch="", availability_zone="", cpu_cores=0, cpu_power=0, mem=0, root_disk=0, root_disk_source="", tags=None, **unknown_fields):
+    def __init__(self, arch=None, availability_zone=None, cpu_cores=None, cpu_power=None, mem=None, root_disk=None, root_disk_source=None, tags=None, **unknown_fields):
         '''
         arch : str
         availability_zone : str
@@ -4849,7 +4849,7 @@ class HardwareCharacteristics(Type):
         mem : int
         root_disk : int
         root_disk_source : str
-        tags : typing.Sequence<+T_co>[str]
+        tags : typing.Sequence[str]
         '''
         self.arch = arch
         self.availability_zone = availability_zone
@@ -4869,7 +4869,7 @@ class History(Type):
     def __init__(self, error=None, statuses=None, **unknown_fields):
         '''
         error : Error
-        statuses : typing.Sequence<+T_co>[~DetailedStatus]<~DetailedStatus>
+        statuses : typing.Sequence[~DetailedStatus]
         '''
         self.error = Error.from_json(error) if error else None
         self.statuses = [DetailedStatus.from_json(o) for o in statuses or []]
@@ -4880,10 +4880,10 @@ class History(Type):
 class HostNetworkChange(Type):
     _toSchema = {'error': 'error', 'new_bridges': 'new-bridges', 'reconfigure_delay': 'reconfigure-delay'}
     _toPy = {'error': 'error', 'new-bridges': 'new_bridges', 'reconfigure-delay': 'reconfigure_delay'}
-    def __init__(self, error=None, new_bridges=None, reconfigure_delay=0, **unknown_fields):
+    def __init__(self, error=None, new_bridges=None, reconfigure_delay=None, **unknown_fields):
         '''
         error : Error
-        new_bridges : typing.Sequence<+T_co>[~DeviceBridgeInfo]<~DeviceBridgeInfo>
+        new_bridges : typing.Sequence[~DeviceBridgeInfo]
         reconfigure_delay : int
         '''
         self.error = Error.from_json(error) if error else None
@@ -4898,7 +4898,7 @@ class HostNetworkChangeResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~HostNetworkChange]<~HostNetworkChange>
+        results : typing.Sequence[~HostNetworkChange]
         '''
         self.results = [HostNetworkChange.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -4908,7 +4908,7 @@ class HostNetworkChangeResults(Type):
 class HostPort(Type):
     _toSchema = {'address': 'Address', 'port': 'port', 'scope': 'scope', 'space_id': 'space-id', 'space_name': 'space-name', 'type_': 'type', 'value': 'value'}
     _toPy = {'Address': 'address', 'port': 'port', 'scope': 'scope', 'space-id': 'space_id', 'space-name': 'space_name', 'type': 'type_', 'value': 'value'}
-    def __init__(self, address=None, port=0, scope="", space_id="", space_name="", type_="", value="", **unknown_fields):
+    def __init__(self, address=None, port=None, scope=None, space_id=None, space_name=None, type_=None, value=None, **unknown_fields):
         '''
         address : Address
         port : int
@@ -4932,10 +4932,10 @@ class HostPort(Type):
 class HostedModelConfig(Type):
     _toSchema = {'cloud_spec': 'cloud-spec', 'config': 'config', 'error': 'error', 'name': 'name', 'owner': 'owner'}
     _toPy = {'cloud-spec': 'cloud_spec', 'config': 'config', 'error': 'error', 'name': 'name', 'owner': 'owner'}
-    def __init__(self, cloud_spec=None, config=None, error=None, name="", owner="", **unknown_fields):
+    def __init__(self, cloud_spec=None, config=None, error=None, name=None, owner=None, **unknown_fields):
         '''
         cloud_spec : CloudSpec
-        config : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        config : typing.Mapping[str, typing.Any]
         error : Error
         name : str
         owner : str
@@ -4954,7 +4954,7 @@ class HostedModelConfigsResults(Type):
     _toPy = {'models': 'models'}
     def __init__(self, models=None, **unknown_fields):
         '''
-        models : typing.Sequence<+T_co>[~HostedModelConfig]<~HostedModelConfig>
+        models : typing.Sequence[~HostedModelConfig]
         '''
         self.models = [HostedModelConfig.from_json(o) for o in models or []]
         self.unknown_fields = unknown_fields
@@ -4966,7 +4966,7 @@ class ImageFilterParams(Type):
     _toPy = {'images': 'images'}
     def __init__(self, images=None, **unknown_fields):
         '''
-        images : typing.Sequence<+T_co>[~ImageSpec]<~ImageSpec>
+        images : typing.Sequence[~ImageSpec]
         '''
         self.images = [ImageSpec.from_json(o) for o in images or []]
         self.unknown_fields = unknown_fields
@@ -4976,7 +4976,7 @@ class ImageFilterParams(Type):
 class ImageMetadata(Type):
     _toSchema = {'arch': 'arch', 'created': 'created', 'kind': 'kind', 'series': 'series', 'url': 'url'}
     _toPy = {'arch': 'arch', 'created': 'created', 'kind': 'kind', 'series': 'series', 'url': 'url'}
-    def __init__(self, arch="", created="", kind="", series="", url="", **unknown_fields):
+    def __init__(self, arch=None, created=None, kind=None, series=None, url=None, **unknown_fields):
         '''
         arch : str
         created : str
@@ -4996,12 +4996,12 @@ class ImageMetadata(Type):
 class ImageMetadataFilter(Type):
     _toSchema = {'arches': 'arches', 'region': 'region', 'root_storage_type': 'root-storage-type', 'series': 'series', 'stream': 'stream', 'virt_type': 'virt-type'}
     _toPy = {'arches': 'arches', 'region': 'region', 'root-storage-type': 'root_storage_type', 'series': 'series', 'stream': 'stream', 'virt-type': 'virt_type'}
-    def __init__(self, arches=None, region="", root_storage_type="", series=None, stream="", virt_type="", **unknown_fields):
+    def __init__(self, arches=None, region=None, root_storage_type=None, series=None, stream=None, virt_type=None, **unknown_fields):
         '''
-        arches : typing.Sequence<+T_co>[str]
+        arches : typing.Sequence[str]
         region : str
         root_storage_type : str
-        series : typing.Sequence<+T_co>[str]
+        series : typing.Sequence[str]
         stream : str
         virt_type : str
         '''
@@ -5018,7 +5018,7 @@ class ImageMetadataFilter(Type):
 class ImageSpec(Type):
     _toSchema = {'arch': 'arch', 'kind': 'kind', 'series': 'series'}
     _toPy = {'arch': 'arch', 'kind': 'kind', 'series': 'series'}
-    def __init__(self, arch="", kind="", series="", **unknown_fields):
+    def __init__(self, arch=None, kind=None, series=None, **unknown_fields):
         '''
         arch : str
         kind : str
@@ -5034,7 +5034,7 @@ class ImageSpec(Type):
 class ImportStorageDetails(Type):
     _toSchema = {'storage_tag': 'storage-tag'}
     _toPy = {'storage-tag': 'storage_tag'}
-    def __init__(self, storage_tag="", **unknown_fields):
+    def __init__(self, storage_tag=None, **unknown_fields):
         '''
         storage_tag : str
         '''
@@ -5046,7 +5046,7 @@ class ImportStorageDetails(Type):
 class ImportStorageParams(Type):
     _toSchema = {'kind': 'kind', 'pool': 'pool', 'provider_id': 'provider-id', 'storage_name': 'storage-name'}
     _toPy = {'kind': 'kind', 'pool': 'pool', 'provider-id': 'provider_id', 'storage-name': 'storage_name'}
-    def __init__(self, kind=0, pool="", provider_id="", storage_name="", **unknown_fields):
+    def __init__(self, kind=None, pool=None, provider_id=None, storage_name=None, **unknown_fields):
         '''
         kind : int
         pool : str
@@ -5080,7 +5080,7 @@ class ImportStorageResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~ImportStorageResult]<~ImportStorageResult>
+        results : typing.Sequence[~ImportStorageResult]
         '''
         self.results = [ImportStorageResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -5090,12 +5090,12 @@ class ImportStorageResults(Type):
 class IngressNetworksChangeEvent(Type):
     _toSchema = {'application_token': 'application-token', 'ingress_required': 'ingress-required', 'macaroons': 'macaroons', 'networks': 'networks', 'relation_token': 'relation-token'}
     _toPy = {'application-token': 'application_token', 'ingress-required': 'ingress_required', 'macaroons': 'macaroons', 'networks': 'networks', 'relation-token': 'relation_token'}
-    def __init__(self, application_token="", ingress_required=False, macaroons=None, networks=None, relation_token="", **unknown_fields):
+    def __init__(self, application_token=None, ingress_required=None, macaroons=None, networks=None, relation_token=None, **unknown_fields):
         '''
         application_token : str
         ingress_required : bool
-        macaroons : typing.Sequence<+T_co>[~Macaroon]<~Macaroon>
-        networks : typing.Sequence<+T_co>[str]
+        macaroons : typing.Sequence[~Macaroon]
+        networks : typing.Sequence[str]
         relation_token : str
         '''
         self.application_token = application_token
@@ -5112,7 +5112,7 @@ class IngressNetworksChanges(Type):
     _toPy = {'changes': 'changes'}
     def __init__(self, changes=None, **unknown_fields):
         '''
-        changes : typing.Sequence<+T_co>[~IngressNetworksChangeEvent]<~IngressNetworksChangeEvent>
+        changes : typing.Sequence[~IngressNetworksChangeEvent]
         '''
         self.changes = [IngressNetworksChangeEvent.from_json(o) for o in changes or []]
         self.unknown_fields = unknown_fields
@@ -5124,7 +5124,7 @@ class InitiateMigrationArgs(Type):
     _toPy = {'specs': 'specs'}
     def __init__(self, specs=None, **unknown_fields):
         '''
-        specs : typing.Sequence<+T_co>[~MigrationSpec]<~MigrationSpec>
+        specs : typing.Sequence[~MigrationSpec]
         '''
         self.specs = [MigrationSpec.from_json(o) for o in specs or []]
         self.unknown_fields = unknown_fields
@@ -5134,7 +5134,7 @@ class InitiateMigrationArgs(Type):
 class InitiateMigrationResult(Type):
     _toSchema = {'error': 'error', 'migration_id': 'migration-id', 'model_tag': 'model-tag'}
     _toPy = {'error': 'error', 'migration-id': 'migration_id', 'model-tag': 'model_tag'}
-    def __init__(self, error=None, migration_id="", model_tag="", **unknown_fields):
+    def __init__(self, error=None, migration_id=None, model_tag=None, **unknown_fields):
         '''
         error : Error
         migration_id : str
@@ -5152,7 +5152,7 @@ class InitiateMigrationResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~InitiateMigrationResult]<~InitiateMigrationResult>
+        results : typing.Sequence[~InitiateMigrationResult]
         '''
         self.results = [InitiateMigrationResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -5162,17 +5162,17 @@ class InitiateMigrationResults(Type):
 class InstanceInfo(Type):
     _toSchema = {'characteristics': 'characteristics', 'charm_profiles': 'charm-profiles', 'display_name': 'display-name', 'instance_id': 'instance-id', 'network_config': 'network-config', 'nonce': 'nonce', 'tag': 'tag', 'volume_attachments': 'volume-attachments', 'volumes': 'volumes'}
     _toPy = {'characteristics': 'characteristics', 'charm-profiles': 'charm_profiles', 'display-name': 'display_name', 'instance-id': 'instance_id', 'network-config': 'network_config', 'nonce': 'nonce', 'tag': 'tag', 'volume-attachments': 'volume_attachments', 'volumes': 'volumes'}
-    def __init__(self, characteristics=None, charm_profiles=None, display_name="", instance_id="", network_config=None, nonce="", tag="", volume_attachments=None, volumes=None, **unknown_fields):
+    def __init__(self, characteristics=None, charm_profiles=None, display_name=None, instance_id=None, network_config=None, nonce=None, tag=None, volume_attachments=None, volumes=None, **unknown_fields):
         '''
         characteristics : HardwareCharacteristics
-        charm_profiles : typing.Sequence<+T_co>[str]
+        charm_profiles : typing.Sequence[str]
         display_name : str
         instance_id : str
-        network_config : typing.Sequence<+T_co>[~NetworkConfig]<~NetworkConfig>
+        network_config : typing.Sequence[~NetworkConfig]
         nonce : str
         tag : str
-        volume_attachments : typing.Mapping<~KT, +VT_co>[str, ~VolumeAttachmentInfo]<~VolumeAttachmentInfo>
-        volumes : typing.Sequence<+T_co>[~Volume]<~Volume>
+        volume_attachments : typing.Mapping[str, ~VolumeAttachmentInfo]
+        volumes : typing.Sequence[~Volume]
         '''
         self.characteristics = HardwareCharacteristics.from_json(characteristics) if characteristics else None
         self.charm_profiles = charm_profiles
@@ -5190,9 +5190,9 @@ class InstanceInfo(Type):
 class InstanceType(Type):
     _toSchema = {'arches': 'arches', 'cost': 'cost', 'cpu_cores': 'cpu-cores', 'deprecated': 'deprecated', 'memory': 'memory', 'name': 'name', 'root_disk': 'root-disk', 'virt_type': 'virt-type'}
     _toPy = {'arches': 'arches', 'cost': 'cost', 'cpu-cores': 'cpu_cores', 'deprecated': 'deprecated', 'memory': 'memory', 'name': 'name', 'root-disk': 'root_disk', 'virt-type': 'virt_type'}
-    def __init__(self, arches=None, cost=0, cpu_cores=0, deprecated=False, memory=0, name="", root_disk=0, virt_type="", **unknown_fields):
+    def __init__(self, arches=None, cost=None, cpu_cores=None, deprecated=None, memory=None, name=None, root_disk=None, virt_type=None, **unknown_fields):
         '''
-        arches : typing.Sequence<+T_co>[str]
+        arches : typing.Sequence[str]
         cost : int
         cpu_cores : int
         deprecated : bool
@@ -5216,13 +5216,13 @@ class InstanceType(Type):
 class InstanceTypesResult(Type):
     _toSchema = {'cost_currency': 'cost-currency', 'cost_divisor': 'cost-divisor', 'cost_unit': 'cost-unit', 'error': 'error', 'instance_types': 'instance-types'}
     _toPy = {'cost-currency': 'cost_currency', 'cost-divisor': 'cost_divisor', 'cost-unit': 'cost_unit', 'error': 'error', 'instance-types': 'instance_types'}
-    def __init__(self, cost_currency="", cost_divisor=0, cost_unit="", error=None, instance_types=None, **unknown_fields):
+    def __init__(self, cost_currency=None, cost_divisor=None, cost_unit=None, error=None, instance_types=None, **unknown_fields):
         '''
         cost_currency : str
         cost_divisor : int
         cost_unit : str
         error : Error
-        instance_types : typing.Sequence<+T_co>[~InstanceType]<~InstanceType>
+        instance_types : typing.Sequence[~InstanceType]
         '''
         self.cost_currency = cost_currency
         self.cost_divisor = cost_divisor
@@ -5238,7 +5238,7 @@ class InstanceTypesResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~InstanceTypesResult]<~InstanceTypesResult>
+        results : typing.Sequence[~InstanceTypesResult]
         '''
         self.results = [InstanceTypesResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -5250,7 +5250,7 @@ class InstancesInfo(Type):
     _toPy = {'machines': 'machines'}
     def __init__(self, machines=None, **unknown_fields):
         '''
-        machines : typing.Sequence<+T_co>[~InstanceInfo]<~InstanceInfo>
+        machines : typing.Sequence[~InstanceInfo]
         '''
         self.machines = [InstanceInfo.from_json(o) for o in machines or []]
         self.unknown_fields = unknown_fields
@@ -5260,7 +5260,7 @@ class InstancesInfo(Type):
 class IntResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
-    def __init__(self, error=None, result=0, **unknown_fields):
+    def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
         result : int
@@ -5276,7 +5276,7 @@ class IntResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~IntResult]<~IntResult>
+        results : typing.Sequence[~IntResult]
         '''
         self.results = [IntResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -5286,7 +5286,7 @@ class IntResults(Type):
 class InterfaceAddress(Type):
     _toSchema = {'cidr': 'cidr', 'hostname': 'hostname', 'value': 'value'}
     _toPy = {'cidr': 'cidr', 'hostname': 'hostname', 'value': 'value'}
-    def __init__(self, cidr="", hostname="", value="", **unknown_fields):
+    def __init__(self, cidr=None, hostname=None, value=None, **unknown_fields):
         '''
         cidr : str
         hostname : str
@@ -5302,7 +5302,7 @@ class InterfaceAddress(Type):
 class InvalidateCredentialArg(Type):
     _toSchema = {'reason': 'reason'}
     _toPy = {'reason': 'reason'}
-    def __init__(self, reason="", **unknown_fields):
+    def __init__(self, reason=None, **unknown_fields):
         '''
         reason : str
         '''
@@ -5314,7 +5314,7 @@ class InvalidateCredentialArg(Type):
 class IsMasterResult(Type):
     _toSchema = {'master': 'master'}
     _toPy = {'master': 'master'}
-    def __init__(self, master=False, **unknown_fields):
+    def __init__(self, master=None, **unknown_fields):
         '''
         master : bool
         '''
@@ -5326,7 +5326,7 @@ class IsMasterResult(Type):
 class IsMeteredResult(Type):
     _toSchema = {'metered': 'metered'}
     _toPy = {'metered': 'metered'}
-    def __init__(self, metered=False, **unknown_fields):
+    def __init__(self, metered=None, **unknown_fields):
         '''
         metered : bool
         '''
@@ -5341,7 +5341,7 @@ class JobsResult(Type):
     def __init__(self, error=None, jobs=None, **unknown_fields):
         '''
         error : Error
-        jobs : typing.Sequence<+T_co>[str]
+        jobs : typing.Sequence[str]
         '''
         self.error = Error.from_json(error) if error else None
         self.jobs = jobs
@@ -5354,7 +5354,7 @@ class JobsResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~JobsResult]<~JobsResult>
+        results : typing.Sequence[~JobsResult]
         '''
         self.results = [JobsResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -5366,7 +5366,7 @@ class KnownServiceArgs(Type):
     _toPy = {'known-services': 'known_services'}
     def __init__(self, known_services=None, **unknown_fields):
         '''
-        known_services : typing.Sequence<+T_co>[str]
+        known_services : typing.Sequence[str]
         '''
         self.known_services = known_services
         self.unknown_fields = unknown_fields
@@ -5376,7 +5376,7 @@ class KnownServiceArgs(Type):
 class KubernetesDeploymentInfo(Type):
     _toSchema = {'deployment_type': 'deployment-type', 'service_type': 'service-type'}
     _toPy = {'deployment-type': 'deployment_type', 'service-type': 'service_type'}
-    def __init__(self, deployment_type="", service_type="", **unknown_fields):
+    def __init__(self, deployment_type=None, service_type=None, **unknown_fields):
         '''
         deployment_type : str
         service_type : str
@@ -5390,9 +5390,9 @@ class KubernetesDeploymentInfo(Type):
 class KubernetesDeviceParams(Type):
     _toSchema = {'attributes': 'Attributes', 'count': 'Count', 'type_': 'Type'}
     _toPy = {'Attributes': 'attributes', 'Count': 'count', 'Type': 'type_'}
-    def __init__(self, attributes=None, count=0, type_="", **unknown_fields):
+    def __init__(self, attributes=None, count=None, type_=None, **unknown_fields):
         '''
-        attributes : typing.Mapping<~KT, +VT_co>[str, str]
+        attributes : typing.Mapping[str, str]
         count : int
         type_ : str
         '''
@@ -5406,7 +5406,7 @@ class KubernetesDeviceParams(Type):
 class KubernetesFilesystemAttachmentParams(Type):
     _toSchema = {'mount_point': 'mount-point', 'provider': 'provider', 'read_only': 'read-only'}
     _toPy = {'mount-point': 'mount_point', 'provider': 'provider', 'read-only': 'read_only'}
-    def __init__(self, mount_point="", provider="", read_only=False, **unknown_fields):
+    def __init__(self, mount_point=None, provider=None, read_only=None, **unknown_fields):
         '''
         mount_point : str
         provider : str
@@ -5422,9 +5422,9 @@ class KubernetesFilesystemAttachmentParams(Type):
 class KubernetesFilesystemInfo(Type):
     _toSchema = {'data': 'data', 'filesystem_id': 'filesystem-id', 'info': 'info', 'mount_point': 'mount-point', 'pool': 'pool', 'read_only': 'read-only', 'size': 'size', 'status': 'status', 'storagename': 'storagename', 'volume': 'volume'}
     _toPy = {'data': 'data', 'filesystem-id': 'filesystem_id', 'info': 'info', 'mount-point': 'mount_point', 'pool': 'pool', 'read-only': 'read_only', 'size': 'size', 'status': 'status', 'storagename': 'storagename', 'volume': 'volume'}
-    def __init__(self, data=None, filesystem_id="", info="", mount_point="", pool="", read_only=False, size=0, status="", storagename="", volume=None, **unknown_fields):
+    def __init__(self, data=None, filesystem_id=None, info=None, mount_point=None, pool=None, read_only=None, size=None, status=None, storagename=None, volume=None, **unknown_fields):
         '''
-        data : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        data : typing.Mapping[str, typing.Any]
         filesystem_id : str
         info : str
         mount_point : str
@@ -5452,14 +5452,14 @@ class KubernetesFilesystemInfo(Type):
 class KubernetesFilesystemParams(Type):
     _toSchema = {'attachment': 'attachment', 'attributes': 'attributes', 'provider': 'provider', 'size': 'size', 'storagename': 'storagename', 'tags': 'tags'}
     _toPy = {'attachment': 'attachment', 'attributes': 'attributes', 'provider': 'provider', 'size': 'size', 'storagename': 'storagename', 'tags': 'tags'}
-    def __init__(self, attachment=None, attributes=None, provider="", size=0, storagename="", tags=None, **unknown_fields):
+    def __init__(self, attachment=None, attributes=None, provider=None, size=None, storagename=None, tags=None, **unknown_fields):
         '''
         attachment : KubernetesFilesystemAttachmentParams
-        attributes : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        attributes : typing.Mapping[str, typing.Any]
         provider : str
         size : int
         storagename : str
-        tags : typing.Mapping<~KT, +VT_co>[str, str]
+        tags : typing.Mapping[str, str]
         '''
         self.attachment = KubernetesFilesystemAttachmentParams.from_json(attachment) if attachment else None
         self.attributes = attributes
@@ -5474,15 +5474,15 @@ class KubernetesFilesystemParams(Type):
 class KubernetesProvisioningInfo(Type):
     _toSchema = {'constraints': 'constraints', 'deployment_info': 'deployment-info', 'devices': 'devices', 'filesystems': 'filesystems', 'pod_spec': 'pod-spec', 'tags': 'tags', 'volumes': 'volumes'}
     _toPy = {'constraints': 'constraints', 'deployment-info': 'deployment_info', 'devices': 'devices', 'filesystems': 'filesystems', 'pod-spec': 'pod_spec', 'tags': 'tags', 'volumes': 'volumes'}
-    def __init__(self, constraints=None, deployment_info=None, devices=None, filesystems=None, pod_spec="", tags=None, volumes=None, **unknown_fields):
+    def __init__(self, constraints=None, deployment_info=None, devices=None, filesystems=None, pod_spec=None, tags=None, volumes=None, **unknown_fields):
         '''
         constraints : Value
         deployment_info : KubernetesDeploymentInfo
-        devices : typing.Sequence<+T_co>[~KubernetesDeviceParams]<~KubernetesDeviceParams>
-        filesystems : typing.Sequence<+T_co>[~KubernetesFilesystemParams]<~KubernetesFilesystemParams>
+        devices : typing.Sequence[~KubernetesDeviceParams]
+        filesystems : typing.Sequence[~KubernetesFilesystemParams]
         pod_spec : str
-        tags : typing.Mapping<~KT, +VT_co>[str, str]
-        volumes : typing.Sequence<+T_co>[~KubernetesVolumeParams]<~KubernetesVolumeParams>
+        tags : typing.Mapping[str, str]
+        volumes : typing.Sequence[~KubernetesVolumeParams]
         '''
         self.constraints = Value.from_json(constraints) if constraints else None
         self.deployment_info = KubernetesDeploymentInfo.from_json(deployment_info) if deployment_info else None
@@ -5514,7 +5514,7 @@ class KubernetesProvisioningInfoResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~KubernetesProvisioningInfoResult]<~KubernetesProvisioningInfoResult>
+        results : typing.Sequence[~KubernetesProvisioningInfoResult]
         '''
         self.results = [KubernetesProvisioningInfoResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -5524,7 +5524,7 @@ class KubernetesProvisioningInfoResults(Type):
 class KubernetesUpgradeArg(Type):
     _toSchema = {'agent_tag': 'agent-tag', 'version': 'version'}
     _toPy = {'agent-tag': 'agent_tag', 'version': 'version'}
-    def __init__(self, agent_tag="", version=None, **unknown_fields):
+    def __init__(self, agent_tag=None, version=None, **unknown_fields):
         '''
         agent_tag : str
         version : Number
@@ -5538,7 +5538,7 @@ class KubernetesUpgradeArg(Type):
 class KubernetesVolumeAttachmentParams(Type):
     _toSchema = {'provider': 'provider', 'read_only': 'read-only'}
     _toPy = {'provider': 'provider', 'read-only': 'read_only'}
-    def __init__(self, provider="", read_only=False, **unknown_fields):
+    def __init__(self, provider=None, read_only=None, **unknown_fields):
         '''
         provider : str
         read_only : bool
@@ -5552,9 +5552,9 @@ class KubernetesVolumeAttachmentParams(Type):
 class KubernetesVolumeInfo(Type):
     _toSchema = {'data': 'data', 'info': 'info', 'persistent': 'persistent', 'pool': 'pool', 'size': 'size', 'status': 'status', 'volume_id': 'volume-id'}
     _toPy = {'data': 'data', 'info': 'info', 'persistent': 'persistent', 'pool': 'pool', 'size': 'size', 'status': 'status', 'volume-id': 'volume_id'}
-    def __init__(self, data=None, info="", persistent=False, pool="", size=0, status="", volume_id="", **unknown_fields):
+    def __init__(self, data=None, info=None, persistent=None, pool=None, size=None, status=None, volume_id=None, **unknown_fields):
         '''
-        data : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        data : typing.Mapping[str, typing.Any]
         info : str
         persistent : bool
         pool : str
@@ -5576,14 +5576,14 @@ class KubernetesVolumeInfo(Type):
 class KubernetesVolumeParams(Type):
     _toSchema = {'attachment': 'attachment', 'attributes': 'attributes', 'provider': 'provider', 'size': 'size', 'storagename': 'storagename', 'tags': 'tags'}
     _toPy = {'attachment': 'attachment', 'attributes': 'attributes', 'provider': 'provider', 'size': 'size', 'storagename': 'storagename', 'tags': 'tags'}
-    def __init__(self, attachment=None, attributes=None, provider="", size=0, storagename="", tags=None, **unknown_fields):
+    def __init__(self, attachment=None, attributes=None, provider=None, size=None, storagename=None, tags=None, **unknown_fields):
         '''
         attachment : KubernetesVolumeAttachmentParams
-        attributes : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        attributes : typing.Mapping[str, typing.Any]
         provider : str
         size : int
         storagename : str
-        tags : typing.Mapping<~KT, +VT_co>[str, str]
+        tags : typing.Mapping[str, str]
         '''
         self.attachment = KubernetesVolumeAttachmentParams.from_json(attachment) if attachment else None
         self.attributes = attributes
@@ -5598,11 +5598,11 @@ class KubernetesVolumeParams(Type):
 class LXDProfile(Type):
     _toSchema = {'config': 'config', 'description': 'description', 'devices': 'devices'}
     _toPy = {'config': 'config', 'description': 'description', 'devices': 'devices'}
-    def __init__(self, config=None, description="", devices=None, **unknown_fields):
+    def __init__(self, config=None, description=None, devices=None, **unknown_fields):
         '''
-        config : typing.Mapping<~KT, +VT_co>[str, str]
+        config : typing.Mapping[str, str]
         description : str
-        devices : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        devices : typing.Mapping[str, typing.Any]
         '''
         self.config = config
         self.description = description
@@ -5614,7 +5614,7 @@ class LXDProfile(Type):
 class LXDProfileUpgradeMessages(Type):
     _toSchema = {'application': 'application', 'watcher_id': 'watcher-id'}
     _toPy = {'application': 'application', 'watcher-id': 'watcher_id'}
-    def __init__(self, application=None, watcher_id="", **unknown_fields):
+    def __init__(self, application=None, watcher_id=None, **unknown_fields):
         '''
         application : Entity
         watcher_id : str
@@ -5628,7 +5628,7 @@ class LXDProfileUpgradeMessages(Type):
 class LXDProfileUpgradeMessagesResult(Type):
     _toSchema = {'error': 'error', 'message': 'message', 'unit_name': 'unit-name'}
     _toPy = {'error': 'error', 'message': 'message', 'unit-name': 'unit_name'}
-    def __init__(self, error=None, message="", unit_name="", **unknown_fields):
+    def __init__(self, error=None, message=None, unit_name=None, **unknown_fields):
         '''
         error : Error
         message : str
@@ -5646,7 +5646,7 @@ class LXDProfileUpgradeMessagesResults(Type):
     _toPy = {'args': 'args'}
     def __init__(self, args=None, **unknown_fields):
         '''
-        args : typing.Sequence<+T_co>[~LXDProfileUpgradeMessagesResult]<~LXDProfileUpgradeMessagesResult>
+        args : typing.Sequence[~LXDProfileUpgradeMessagesResult]
         '''
         self.args = [LXDProfileUpgradeMessagesResult.from_json(o) for o in args or []]
         self.unknown_fields = unknown_fields
@@ -5656,7 +5656,7 @@ class LXDProfileUpgradeMessagesResults(Type):
 class LifeResult(Type):
     _toSchema = {'error': 'error', 'life': 'life'}
     _toPy = {'error': 'error', 'life': 'life'}
-    def __init__(self, error=None, life="", **unknown_fields):
+    def __init__(self, error=None, life=None, **unknown_fields):
         '''
         error : Error
         life : str
@@ -5672,7 +5672,7 @@ class LifeResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~LifeResult]<~LifeResult>
+        results : typing.Sequence[~LifeResult]
         '''
         self.results = [LifeResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -5684,7 +5684,7 @@ class ListCloudImageMetadataResult(Type):
     _toPy = {'result': 'result'}
     def __init__(self, result=None, **unknown_fields):
         '''
-        result : typing.Sequence<+T_co>[~CloudImageMetadata]<~CloudImageMetadata>
+        result : typing.Sequence[~CloudImageMetadata]
         '''
         self.result = [CloudImageMetadata.from_json(o) for o in result or []]
         self.unknown_fields = unknown_fields
@@ -5694,7 +5694,7 @@ class ListCloudImageMetadataResult(Type):
 class ListCloudInfo(Type):
     _toSchema = {'clouddetails': 'CloudDetails', 'user_access': 'user-access'}
     _toPy = {'CloudDetails': 'clouddetails', 'user-access': 'user_access'}
-    def __init__(self, clouddetails=None, user_access="", **unknown_fields):
+    def __init__(self, clouddetails=None, user_access=None, **unknown_fields):
         '''
         clouddetails : CloudDetails
         user_access : str
@@ -5724,7 +5724,7 @@ class ListCloudInfoResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~ListCloudInfoResult]<~ListCloudInfoResult>
+        results : typing.Sequence[~ListCloudInfoResult]
         '''
         self.results = [ListCloudInfoResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -5734,7 +5734,7 @@ class ListCloudInfoResults(Type):
 class ListCloudsRequest(Type):
     _toSchema = {'all_': 'all', 'user_tag': 'user-tag'}
     _toPy = {'all': 'all_', 'user-tag': 'user_tag'}
-    def __init__(self, all_=False, user_tag="", **unknown_fields):
+    def __init__(self, all_=None, user_tag=None, **unknown_fields):
         '''
         all_ : bool
         user_tag : str
@@ -5750,7 +5750,7 @@ class ListFirewallRulesResults(Type):
     _toPy = {'Rules': 'rules'}
     def __init__(self, rules=None, **unknown_fields):
         '''
-        rules : typing.Sequence<+T_co>[~FirewallRule]<~FirewallRule>
+        rules : typing.Sequence[~FirewallRule]
         '''
         self.rules = [FirewallRule.from_json(o) for o in rules or []]
         self.unknown_fields = unknown_fields
@@ -5762,7 +5762,7 @@ class ListImageResult(Type):
     _toPy = {'result': 'result'}
     def __init__(self, result=None, **unknown_fields):
         '''
-        result : typing.Sequence<+T_co>[~ImageMetadata]<~ImageMetadata>
+        result : typing.Sequence[~ImageMetadata]
         '''
         self.result = [ImageMetadata.from_json(o) for o in result or []]
         self.unknown_fields = unknown_fields
@@ -5774,7 +5774,7 @@ class ListResourcesArgs(Type):
     _toPy = {'entities': 'entities'}
     def __init__(self, entities=None, **unknown_fields):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        entities : typing.Sequence[~Entity]
         '''
         self.entities = [Entity.from_json(o) for o in entities or []]
         self.unknown_fields = unknown_fields
@@ -5784,7 +5784,7 @@ class ListResourcesArgs(Type):
 class ListSSHKeys(Type):
     _toSchema = {'entities': 'entities', 'mode': 'mode'}
     _toPy = {'entities': 'entities', 'mode': 'mode'}
-    def __init__(self, entities=None, mode=False, **unknown_fields):
+    def __init__(self, entities=None, mode=None, **unknown_fields):
         '''
         entities : Entities
         mode : bool
@@ -5800,7 +5800,7 @@ class ListSpacesResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~Space]<~Space>
+        results : typing.Sequence[~Space]
         '''
         self.results = [Space.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -5812,7 +5812,7 @@ class ListSubnetsResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~Subnet]<~Subnet>
+        results : typing.Sequence[~Subnet]
         '''
         self.results = [Subnet.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -5824,7 +5824,7 @@ class ListUnitResourcesArgs(Type):
     _toPy = {'resource-names': 'resource_names'}
     def __init__(self, resource_names=None, **unknown_fields):
         '''
-        resource_names : typing.Sequence<+T_co>[str]
+        resource_names : typing.Sequence[str]
         '''
         self.resource_names = resource_names
         self.unknown_fields = unknown_fields
@@ -5836,7 +5836,7 @@ class LogForwardingGetLastSentParams(Type):
     _toPy = {'ids': 'ids'}
     def __init__(self, ids=None, **unknown_fields):
         '''
-        ids : typing.Sequence<+T_co>[~LogForwardingID]<~LogForwardingID>
+        ids : typing.Sequence[~LogForwardingID]
         '''
         self.ids = [LogForwardingID.from_json(o) for o in ids or []]
         self.unknown_fields = unknown_fields
@@ -5846,7 +5846,7 @@ class LogForwardingGetLastSentParams(Type):
 class LogForwardingGetLastSentResult(Type):
     _toSchema = {'err': 'err', 'record_id': 'record-id', 'record_timestamp': 'record-timestamp'}
     _toPy = {'err': 'err', 'record-id': 'record_id', 'record-timestamp': 'record_timestamp'}
-    def __init__(self, err=None, record_id=0, record_timestamp=0, **unknown_fields):
+    def __init__(self, err=None, record_id=None, record_timestamp=None, **unknown_fields):
         '''
         err : Error
         record_id : int
@@ -5864,7 +5864,7 @@ class LogForwardingGetLastSentResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~LogForwardingGetLastSentResult]<~LogForwardingGetLastSentResult>
+        results : typing.Sequence[~LogForwardingGetLastSentResult]
         '''
         self.results = [LogForwardingGetLastSentResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -5874,7 +5874,7 @@ class LogForwardingGetLastSentResults(Type):
 class LogForwardingID(Type):
     _toSchema = {'model': 'model', 'sink': 'sink'}
     _toPy = {'model': 'model', 'sink': 'sink'}
-    def __init__(self, model="", sink="", **unknown_fields):
+    def __init__(self, model=None, sink=None, **unknown_fields):
         '''
         model : str
         sink : str
@@ -5888,7 +5888,7 @@ class LogForwardingID(Type):
 class LogForwardingSetLastSentParam(Type):
     _toSchema = {'logforwardingid': 'LogForwardingID', 'model': 'model', 'record_id': 'record-id', 'record_timestamp': 'record-timestamp', 'sink': 'sink'}
     _toPy = {'LogForwardingID': 'logforwardingid', 'model': 'model', 'record-id': 'record_id', 'record-timestamp': 'record_timestamp', 'sink': 'sink'}
-    def __init__(self, logforwardingid=None, model="", record_id=0, record_timestamp=0, sink="", **unknown_fields):
+    def __init__(self, logforwardingid=None, model=None, record_id=None, record_timestamp=None, sink=None, **unknown_fields):
         '''
         logforwardingid : LogForwardingID
         model : str
@@ -5910,7 +5910,7 @@ class LogForwardingSetLastSentParams(Type):
     _toPy = {'params': 'params'}
     def __init__(self, params=None, **unknown_fields):
         '''
-        params : typing.Sequence<+T_co>[~LogForwardingSetLastSentParam]<~LogForwardingSetLastSentParam>
+        params : typing.Sequence[~LogForwardingSetLastSentParam]
         '''
         self.params = [LogForwardingSetLastSentParam.from_json(o) for o in params or []]
         self.unknown_fields = unknown_fields
@@ -5920,7 +5920,7 @@ class LogForwardingSetLastSentParams(Type):
 class LookUpArg(Type):
     _toSchema = {'id_': 'id', 'name': 'name'}
     _toPy = {'id': 'id_', 'name': 'name'}
-    def __init__(self, id_="", name="", **unknown_fields):
+    def __init__(self, id_=None, name=None, **unknown_fields):
         '''
         id_ : str
         name : str
@@ -5936,7 +5936,7 @@ class LookUpArgs(Type):
     _toPy = {'args': 'args'}
     def __init__(self, args=None, **unknown_fields):
         '''
-        args : typing.Sequence<+T_co>[~LookUpArg]<~LookUpArg>
+        args : typing.Sequence[~LookUpArg]
         '''
         self.args = [LookUpArg.from_json(o) for o in args or []]
         self.unknown_fields = unknown_fields
@@ -5946,7 +5946,7 @@ class LookUpArgs(Type):
 class LookUpPayloadArg(Type):
     _toSchema = {'id_': 'id', 'name': 'name'}
     _toPy = {'id': 'id_', 'name': 'name'}
-    def __init__(self, id_="", name="", **unknown_fields):
+    def __init__(self, id_=None, name=None, **unknown_fields):
         '''
         id_ : str
         name : str
@@ -5962,7 +5962,7 @@ class LookUpPayloadArgs(Type):
     _toPy = {'args': 'args'}
     def __init__(self, args=None, **unknown_fields):
         '''
-        args : typing.Sequence<+T_co>[~LookUpPayloadArg]<~LookUpPayloadArg>
+        args : typing.Sequence[~LookUpPayloadArg]
         '''
         self.args = [LookUpPayloadArg.from_json(o) for o in args or []]
         self.unknown_fields = unknown_fields
@@ -5999,7 +5999,7 @@ class MacaroonResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~MacaroonResult]<~MacaroonResult>
+        results : typing.Sequence[~MacaroonResult]
         '''
         self.results = [MacaroonResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -6009,9 +6009,9 @@ class MacaroonResults(Type):
 class MachineAddresses(Type):
     _toSchema = {'addresses': 'addresses', 'tag': 'tag'}
     _toPy = {'addresses': 'addresses', 'tag': 'tag'}
-    def __init__(self, addresses=None, tag="", **unknown_fields):
+    def __init__(self, addresses=None, tag=None, **unknown_fields):
         '''
-        addresses : typing.Sequence<+T_co>[~Address]<~Address>
+        addresses : typing.Sequence[~Address]
         tag : str
         '''
         self.addresses = [Address.from_json(o) for o in addresses or []]
@@ -6025,7 +6025,7 @@ class MachineAddressesResult(Type):
     _toPy = {'addresses': 'addresses', 'error': 'error'}
     def __init__(self, addresses=None, error=None, **unknown_fields):
         '''
-        addresses : typing.Sequence<+T_co>[~Address]<~Address>
+        addresses : typing.Sequence[~Address]
         error : Error
         '''
         self.addresses = [Address.from_json(o) for o in addresses or []]
@@ -6039,7 +6039,7 @@ class MachineAddressesResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~MachineAddressesResult]<~MachineAddressesResult>
+        results : typing.Sequence[~MachineAddressesResult]
         '''
         self.results = [MachineAddressesResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -6049,9 +6049,9 @@ class MachineAddressesResults(Type):
 class MachineBlockDevices(Type):
     _toSchema = {'block_devices': 'block-devices', 'machine': 'machine'}
     _toPy = {'block-devices': 'block_devices', 'machine': 'machine'}
-    def __init__(self, block_devices=None, machine="", **unknown_fields):
+    def __init__(self, block_devices=None, machine=None, **unknown_fields):
         '''
-        block_devices : typing.Sequence<+T_co>[~BlockDevice]<~BlockDevice>
+        block_devices : typing.Sequence[~BlockDevice]
         machine : str
         '''
         self.block_devices = [BlockDevice.from_json(o) for o in block_devices or []]
@@ -6063,9 +6063,9 @@ class MachineBlockDevices(Type):
 class MachineContainerResult(Type):
     _toSchema = {'container_types': 'container-types', 'determined': 'determined', 'error': 'error'}
     _toPy = {'container-types': 'container_types', 'determined': 'determined', 'error': 'error'}
-    def __init__(self, container_types=None, determined=False, error=None, **unknown_fields):
+    def __init__(self, container_types=None, determined=None, error=None, **unknown_fields):
         '''
-        container_types : typing.Sequence<+T_co>[str]
+        container_types : typing.Sequence[str]
         determined : bool
         error : Error
         '''
@@ -6081,7 +6081,7 @@ class MachineContainerResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~MachineContainerResult]<~MachineContainerResult>
+        results : typing.Sequence[~MachineContainerResult]
         '''
         self.results = [MachineContainerResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -6091,9 +6091,9 @@ class MachineContainerResults(Type):
 class MachineContainers(Type):
     _toSchema = {'container_types': 'container-types', 'machine_tag': 'machine-tag'}
     _toPy = {'container-types': 'container_types', 'machine-tag': 'machine_tag'}
-    def __init__(self, container_types=None, machine_tag="", **unknown_fields):
+    def __init__(self, container_types=None, machine_tag=None, **unknown_fields):
         '''
-        container_types : typing.Sequence<+T_co>[str]
+        container_types : typing.Sequence[str]
         machine_tag : str
         '''
         self.container_types = container_types
@@ -6107,7 +6107,7 @@ class MachineContainersParams(Type):
     _toPy = {'params': 'params'}
     def __init__(self, params=None, **unknown_fields):
         '''
-        params : typing.Sequence<+T_co>[~MachineContainers]<~MachineContainers>
+        params : typing.Sequence[~MachineContainers]
         '''
         self.params = [MachineContainers.from_json(o) for o in params or []]
         self.unknown_fields = unknown_fields
@@ -6117,7 +6117,7 @@ class MachineContainersParams(Type):
 class MachineHardware(Type):
     _toSchema = {'arch': 'arch', 'availability_zone': 'availability-zone', 'cores': 'cores', 'cpu_power': 'cpu-power', 'mem': 'mem', 'root_disk': 'root-disk', 'tags': 'tags'}
     _toPy = {'arch': 'arch', 'availability-zone': 'availability_zone', 'cores': 'cores', 'cpu-power': 'cpu_power', 'mem': 'mem', 'root-disk': 'root_disk', 'tags': 'tags'}
-    def __init__(self, arch="", availability_zone="", cores=0, cpu_power=0, mem=0, root_disk=0, tags=None, **unknown_fields):
+    def __init__(self, arch=None, availability_zone=None, cores=None, cpu_power=None, mem=None, root_disk=None, tags=None, **unknown_fields):
         '''
         arch : str
         availability_zone : str
@@ -6125,7 +6125,7 @@ class MachineHardware(Type):
         cpu_power : int
         mem : int
         root_disk : int
-        tags : typing.Sequence<+T_co>[str]
+        tags : typing.Sequence[str]
         '''
         self.arch = arch
         self.availability_zone = availability_zone
@@ -6144,7 +6144,7 @@ class MachineNetworkConfigResult(Type):
     def __init__(self, error=None, info=None, **unknown_fields):
         '''
         error : Error
-        info : typing.Sequence<+T_co>[~NetworkConfig]<~NetworkConfig>
+        info : typing.Sequence[~NetworkConfig]
         '''
         self.error = Error.from_json(error) if error else None
         self.info = [NetworkConfig.from_json(o) for o in info or []]
@@ -6157,7 +6157,7 @@ class MachineNetworkConfigResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~MachineNetworkConfigResult]<~MachineNetworkConfigResult>
+        results : typing.Sequence[~MachineNetworkConfigResult]
         '''
         self.results = [MachineNetworkConfigResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -6167,7 +6167,7 @@ class MachineNetworkConfigResults(Type):
 class MachinePortRange(Type):
     _toSchema = {'port_range': 'port-range', 'relation_tag': 'relation-tag', 'unit_tag': 'unit-tag'}
     _toPy = {'port-range': 'port_range', 'relation-tag': 'relation_tag', 'unit-tag': 'unit_tag'}
-    def __init__(self, port_range=None, relation_tag="", unit_tag="", **unknown_fields):
+    def __init__(self, port_range=None, relation_tag=None, unit_tag=None, **unknown_fields):
         '''
         port_range : PortRange
         relation_tag : str
@@ -6183,7 +6183,7 @@ class MachinePortRange(Type):
 class MachinePorts(Type):
     _toSchema = {'machine_tag': 'machine-tag', 'subnet_tag': 'subnet-tag'}
     _toPy = {'machine-tag': 'machine_tag', 'subnet-tag': 'subnet_tag'}
-    def __init__(self, machine_tag="", subnet_tag="", **unknown_fields):
+    def __init__(self, machine_tag=None, subnet_tag=None, **unknown_fields):
         '''
         machine_tag : str
         subnet_tag : str
@@ -6199,7 +6199,7 @@ class MachinePortsParams(Type):
     _toPy = {'params': 'params'}
     def __init__(self, params=None, **unknown_fields):
         '''
-        params : typing.Sequence<+T_co>[~MachinePorts]<~MachinePorts>
+        params : typing.Sequence[~MachinePorts]
         '''
         self.params = [MachinePorts.from_json(o) for o in params or []]
         self.unknown_fields = unknown_fields
@@ -6212,7 +6212,7 @@ class MachinePortsResult(Type):
     def __init__(self, error=None, ports=None, **unknown_fields):
         '''
         error : Error
-        ports : typing.Sequence<+T_co>[~MachinePortRange]<~MachinePortRange>
+        ports : typing.Sequence[~MachinePortRange]
         '''
         self.error = Error.from_json(error) if error else None
         self.ports = [MachinePortRange.from_json(o) for o in ports or []]
@@ -6225,7 +6225,7 @@ class MachinePortsResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~MachinePortsResult]<~MachinePortsResult>
+        results : typing.Sequence[~MachinePortsResult]
         '''
         self.results = [MachinePortsResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -6235,11 +6235,11 @@ class MachinePortsResults(Type):
 class MachineStatus(Type):
     _toSchema = {'agent_status': 'agent-status', 'constraints': 'constraints', 'containers': 'containers', 'display_name': 'display-name', 'dns_name': 'dns-name', 'hardware': 'hardware', 'has_vote': 'has-vote', 'id_': 'id', 'instance_id': 'instance-id', 'instance_status': 'instance-status', 'ip_addresses': 'ip-addresses', 'jobs': 'jobs', 'lxd_profiles': 'lxd-profiles', 'modification_status': 'modification-status', 'network_interfaces': 'network-interfaces', 'series': 'series', 'wants_vote': 'wants-vote'}
     _toPy = {'agent-status': 'agent_status', 'constraints': 'constraints', 'containers': 'containers', 'display-name': 'display_name', 'dns-name': 'dns_name', 'hardware': 'hardware', 'has-vote': 'has_vote', 'id': 'id_', 'instance-id': 'instance_id', 'instance-status': 'instance_status', 'ip-addresses': 'ip_addresses', 'jobs': 'jobs', 'lxd-profiles': 'lxd_profiles', 'modification-status': 'modification_status', 'network-interfaces': 'network_interfaces', 'series': 'series', 'wants-vote': 'wants_vote'}
-    def __init__(self, agent_status=None, constraints="", containers=None, display_name="", dns_name="", hardware="", has_vote=False, id_="", instance_id="", instance_status=None, ip_addresses=None, jobs=None, lxd_profiles=None, modification_status=None, network_interfaces=None, series="", wants_vote=False, **unknown_fields):
+    def __init__(self, agent_status=None, constraints=None, containers=None, display_name=None, dns_name=None, hardware=None, has_vote=None, id_=None, instance_id=None, instance_status=None, ip_addresses=None, jobs=None, lxd_profiles=None, modification_status=None, network_interfaces=None, series=None, wants_vote=None, **unknown_fields):
         '''
         agent_status : DetailedStatus
         constraints : str
-        containers : typing.Mapping<~KT, +VT_co>[str, ~MachineStatus]<~MachineStatus>
+        containers : typing.Mapping[str, ~MachineStatus]
         display_name : str
         dns_name : str
         hardware : str
@@ -6247,11 +6247,11 @@ class MachineStatus(Type):
         id_ : str
         instance_id : str
         instance_status : DetailedStatus
-        ip_addresses : typing.Sequence<+T_co>[str]
-        jobs : typing.Sequence<+T_co>[str]
-        lxd_profiles : typing.Mapping<~KT, +VT_co>[str, ~LXDProfile]<~LXDProfile>
+        ip_addresses : typing.Sequence[str]
+        jobs : typing.Sequence[str]
+        lxd_profiles : typing.Mapping[str, ~LXDProfile]
         modification_status : DetailedStatus
-        network_interfaces : typing.Mapping<~KT, +VT_co>[str, ~NetworkInterface]<~NetworkInterface>
+        network_interfaces : typing.Mapping[str, ~NetworkInterface]
         series : str
         wants_vote : bool
         '''
@@ -6279,7 +6279,7 @@ class MachineStatus(Type):
 class MachineStorageId(Type):
     _toSchema = {'attachment_tag': 'attachment-tag', 'machine_tag': 'machine-tag'}
     _toPy = {'attachment-tag': 'attachment_tag', 'machine-tag': 'machine_tag'}
-    def __init__(self, attachment_tag="", machine_tag="", **unknown_fields):
+    def __init__(self, attachment_tag=None, machine_tag=None, **unknown_fields):
         '''
         attachment_tag : str
         machine_tag : str
@@ -6295,7 +6295,7 @@ class MachineStorageIds(Type):
     _toPy = {'ids': 'ids'}
     def __init__(self, ids=None, **unknown_fields):
         '''
-        ids : typing.Sequence<+T_co>[~MachineStorageId]<~MachineStorageId>
+        ids : typing.Sequence[~MachineStorageId]
         '''
         self.ids = [MachineStorageId.from_json(o) for o in ids or []]
         self.unknown_fields = unknown_fields
@@ -6305,9 +6305,9 @@ class MachineStorageIds(Type):
 class MachineStorageIdsWatchResult(Type):
     _toSchema = {'changes': 'changes', 'error': 'error', 'watcher_id': 'watcher-id'}
     _toPy = {'changes': 'changes', 'error': 'error', 'watcher-id': 'watcher_id'}
-    def __init__(self, changes=None, error=None, watcher_id="", **unknown_fields):
+    def __init__(self, changes=None, error=None, watcher_id=None, **unknown_fields):
         '''
-        changes : typing.Sequence<+T_co>[~MachineStorageId]<~MachineStorageId>
+        changes : typing.Sequence[~MachineStorageId]
         error : Error
         watcher_id : str
         '''
@@ -6323,7 +6323,7 @@ class MachineStorageIdsWatchResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~MachineStorageIdsWatchResult]<~MachineStorageIdsWatchResult>
+        results : typing.Sequence[~MachineStorageIdsWatchResult]
         '''
         self.results = [MachineStorageIdsWatchResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -6336,7 +6336,7 @@ class MapResult(Type):
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
-        result : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        result : typing.Mapping[str, typing.Any]
         '''
         self.error = Error.from_json(error) if error else None
         self.result = result
@@ -6349,7 +6349,7 @@ class MapResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~MapResult]<~MapResult>
+        results : typing.Sequence[~MapResult]
         '''
         self.results = [MapResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -6359,7 +6359,7 @@ class MapResults(Type):
 class MasterMigrationStatus(Type):
     _toSchema = {'migration_id': 'migration-id', 'phase': 'phase', 'phase_changed_time': 'phase-changed-time', 'spec': 'spec'}
     _toPy = {'migration-id': 'migration_id', 'phase': 'phase', 'phase-changed-time': 'phase_changed_time', 'spec': 'spec'}
-    def __init__(self, migration_id="", phase="", phase_changed_time="", spec=None, **unknown_fields):
+    def __init__(self, migration_id=None, phase=None, phase_changed_time=None, spec=None, **unknown_fields):
         '''
         migration_id : str
         phase : str
@@ -6377,7 +6377,7 @@ class MasterMigrationStatus(Type):
 class Member(Type):
     _toSchema = {'address': 'Address', 'arbiter': 'Arbiter', 'buildindexes': 'BuildIndexes', 'hidden': 'Hidden', 'id_': 'Id', 'priority': 'Priority', 'slavedelay': 'SlaveDelay', 'tags': 'Tags', 'votes': 'Votes'}
     _toPy = {'Address': 'address', 'Arbiter': 'arbiter', 'BuildIndexes': 'buildindexes', 'Hidden': 'hidden', 'Id': 'id_', 'Priority': 'priority', 'SlaveDelay': 'slavedelay', 'Tags': 'tags', 'Votes': 'votes'}
-    def __init__(self, address="", arbiter=False, buildindexes=False, hidden=False, id_=0, priority=0, slavedelay=0, tags=None, votes=0, **unknown_fields):
+    def __init__(self, address=None, arbiter=None, buildindexes=None, hidden=None, id_=None, priority=None, slavedelay=None, tags=None, votes=None, **unknown_fields):
         '''
         address : str
         arbiter : bool
@@ -6386,7 +6386,7 @@ class Member(Type):
         id_ : int
         priority : float
         slavedelay : int
-        tags : typing.Mapping<~KT, +VT_co>[str, str]
+        tags : typing.Mapping[str, str]
         votes : int
         '''
         self.address = address
@@ -6407,7 +6407,7 @@ class MergeLeadershipSettingsBulkParams(Type):
     _toPy = {'params': 'params'}
     def __init__(self, params=None, **unknown_fields):
         '''
-        params : typing.Sequence<+T_co>[~MergeLeadershipSettingsParam]<~MergeLeadershipSettingsParam>
+        params : typing.Sequence[~MergeLeadershipSettingsParam]
         '''
         self.params = [MergeLeadershipSettingsParam.from_json(o) for o in params or []]
         self.unknown_fields = unknown_fields
@@ -6417,10 +6417,10 @@ class MergeLeadershipSettingsBulkParams(Type):
 class MergeLeadershipSettingsParam(Type):
     _toSchema = {'application_tag': 'application-tag', 'settings': 'settings', 'unit_tag': 'unit-tag'}
     _toPy = {'application-tag': 'application_tag', 'settings': 'settings', 'unit-tag': 'unit_tag'}
-    def __init__(self, application_tag="", settings=None, unit_tag="", **unknown_fields):
+    def __init__(self, application_tag=None, settings=None, unit_tag=None, **unknown_fields):
         '''
         application_tag : str
-        settings : typing.Mapping<~KT, +VT_co>[str, str]
+        settings : typing.Mapping[str, str]
         unit_tag : str
         '''
         self.application_tag = application_tag
@@ -6435,7 +6435,7 @@ class MetadataImageIds(Type):
     _toPy = {'image-ids': 'image_ids'}
     def __init__(self, image_ids=None, **unknown_fields):
         '''
-        image_ids : typing.Sequence<+T_co>[str]
+        image_ids : typing.Sequence[str]
         '''
         self.image_ids = image_ids
         self.unknown_fields = unknown_fields
@@ -6447,7 +6447,7 @@ class MetadataSaveParams(Type):
     _toPy = {'metadata': 'metadata'}
     def __init__(self, metadata=None, **unknown_fields):
         '''
-        metadata : typing.Sequence<+T_co>[~CloudImageMetadataList]<~CloudImageMetadataList>
+        metadata : typing.Sequence[~CloudImageMetadataList]
         '''
         self.metadata = [CloudImageMetadataList.from_json(o) for o in metadata or []]
         self.unknown_fields = unknown_fields
@@ -6457,7 +6457,7 @@ class MetadataSaveParams(Type):
 class MeterStatus(Type):
     _toSchema = {'color': 'color', 'message': 'message'}
     _toPy = {'color': 'color', 'message': 'message'}
-    def __init__(self, color="", message="", **unknown_fields):
+    def __init__(self, color=None, message=None, **unknown_fields):
         '''
         color : str
         message : str
@@ -6471,7 +6471,7 @@ class MeterStatus(Type):
 class MeterStatusParam(Type):
     _toSchema = {'code': 'code', 'info': 'info', 'tag': 'tag'}
     _toPy = {'code': 'code', 'info': 'info', 'tag': 'tag'}
-    def __init__(self, code="", info="", tag="", **unknown_fields):
+    def __init__(self, code=None, info=None, tag=None, **unknown_fields):
         '''
         code : str
         info : str
@@ -6489,7 +6489,7 @@ class MeterStatusParams(Type):
     _toPy = {'statues': 'statues'}
     def __init__(self, statues=None, **unknown_fields):
         '''
-        statues : typing.Sequence<+T_co>[~MeterStatusParam]<~MeterStatusParam>
+        statues : typing.Sequence[~MeterStatusParam]
         '''
         self.statues = [MeterStatusParam.from_json(o) for o in statues or []]
         self.unknown_fields = unknown_fields
@@ -6499,7 +6499,7 @@ class MeterStatusParams(Type):
 class MeterStatusResult(Type):
     _toSchema = {'code': 'code', 'error': 'error', 'info': 'info'}
     _toPy = {'code': 'code', 'error': 'error', 'info': 'info'}
-    def __init__(self, code="", error=None, info="", **unknown_fields):
+    def __init__(self, code=None, error=None, info=None, **unknown_fields):
         '''
         code : str
         error : Error
@@ -6517,7 +6517,7 @@ class MeterStatusResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~MeterStatusResult]<~MeterStatusResult>
+        results : typing.Sequence[~MeterStatusResult]
         '''
         self.results = [MeterStatusResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -6527,10 +6527,10 @@ class MeterStatusResults(Type):
 class Metric(Type):
     _toSchema = {'key': 'key', 'labels': 'labels', 'time': 'time', 'value': 'value'}
     _toPy = {'key': 'key', 'labels': 'labels', 'time': 'time', 'value': 'value'}
-    def __init__(self, key="", labels=None, time="", value="", **unknown_fields):
+    def __init__(self, key=None, labels=None, time=None, value=None, **unknown_fields):
         '''
         key : str
-        labels : typing.Mapping<~KT, +VT_co>[str, str]
+        labels : typing.Mapping[str, str]
         time : str
         value : str
         '''
@@ -6545,11 +6545,11 @@ class Metric(Type):
 class MetricBatch(Type):
     _toSchema = {'charm_url': 'charm-url', 'created': 'created', 'metrics': 'metrics', 'uuid': 'uuid'}
     _toPy = {'charm-url': 'charm_url', 'created': 'created', 'metrics': 'metrics', 'uuid': 'uuid'}
-    def __init__(self, charm_url="", created="", metrics=None, uuid="", **unknown_fields):
+    def __init__(self, charm_url=None, created=None, metrics=None, uuid=None, **unknown_fields):
         '''
         charm_url : str
         created : str
-        metrics : typing.Sequence<+T_co>[~Metric]<~Metric>
+        metrics : typing.Sequence[~Metric]
         uuid : str
         '''
         self.charm_url = charm_url
@@ -6563,7 +6563,7 @@ class MetricBatch(Type):
 class MetricBatchParam(Type):
     _toSchema = {'batch': 'batch', 'tag': 'tag'}
     _toPy = {'batch': 'batch', 'tag': 'tag'}
-    def __init__(self, batch=None, tag="", **unknown_fields):
+    def __init__(self, batch=None, tag=None, **unknown_fields):
         '''
         batch : MetricBatch
         tag : str
@@ -6579,7 +6579,7 @@ class MetricBatchParams(Type):
     _toPy = {'batches': 'batches'}
     def __init__(self, batches=None, **unknown_fields):
         '''
-        batches : typing.Sequence<+T_co>[~MetricBatchParam]<~MetricBatchParam>
+        batches : typing.Sequence[~MetricBatchParam]
         '''
         self.batches = [MetricBatchParam.from_json(o) for o in batches or []]
         self.unknown_fields = unknown_fields
@@ -6589,10 +6589,10 @@ class MetricBatchParams(Type):
 class MetricResult(Type):
     _toSchema = {'key': 'key', 'labels': 'labels', 'time': 'time', 'unit': 'unit', 'value': 'value'}
     _toPy = {'key': 'key', 'labels': 'labels', 'time': 'time', 'unit': 'unit', 'value': 'value'}
-    def __init__(self, key="", labels=None, time="", unit="", value="", **unknown_fields):
+    def __init__(self, key=None, labels=None, time=None, unit=None, value=None, **unknown_fields):
         '''
         key : str
-        labels : typing.Mapping<~KT, +VT_co>[str, str]
+        labels : typing.Mapping[str, str]
         time : str
         unit : str
         value : str
@@ -6611,7 +6611,7 @@ class MetricResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~EntityMetrics]<~EntityMetrics>
+        results : typing.Sequence[~EntityMetrics]
         '''
         self.results = [EntityMetrics.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -6621,7 +6621,7 @@ class MetricResults(Type):
 class MigrationModelInfo(Type):
     _toSchema = {'agent_version': 'agent-version', 'controller_agent_version': 'controller-agent-version', 'name': 'name', 'owner_tag': 'owner-tag', 'uuid': 'uuid'}
     _toPy = {'agent-version': 'agent_version', 'controller-agent-version': 'controller_agent_version', 'name': 'name', 'owner-tag': 'owner_tag', 'uuid': 'uuid'}
-    def __init__(self, agent_version=None, controller_agent_version=None, name="", owner_tag="", uuid="", **unknown_fields):
+    def __init__(self, agent_version=None, controller_agent_version=None, name=None, owner_tag=None, uuid=None, **unknown_fields):
         '''
         agent_version : Number
         controller_agent_version : Number
@@ -6641,7 +6641,7 @@ class MigrationModelInfo(Type):
 class MigrationSpec(Type):
     _toSchema = {'model_tag': 'model-tag', 'target_info': 'target-info'}
     _toPy = {'model-tag': 'model_tag', 'target-info': 'target_info'}
-    def __init__(self, model_tag="", target_info=None, **unknown_fields):
+    def __init__(self, model_tag=None, target_info=None, **unknown_fields):
         '''
         model_tag : str
         target_info : MigrationTargetInfo
@@ -6655,14 +6655,14 @@ class MigrationSpec(Type):
 class MigrationStatus(Type):
     _toSchema = {'attempt': 'attempt', 'migration_id': 'migration-id', 'phase': 'phase', 'source_api_addrs': 'source-api-addrs', 'source_ca_cert': 'source-ca-cert', 'target_api_addrs': 'target-api-addrs', 'target_ca_cert': 'target-ca-cert'}
     _toPy = {'attempt': 'attempt', 'migration-id': 'migration_id', 'phase': 'phase', 'source-api-addrs': 'source_api_addrs', 'source-ca-cert': 'source_ca_cert', 'target-api-addrs': 'target_api_addrs', 'target-ca-cert': 'target_ca_cert'}
-    def __init__(self, attempt=0, migration_id="", phase="", source_api_addrs=None, source_ca_cert="", target_api_addrs=None, target_ca_cert="", **unknown_fields):
+    def __init__(self, attempt=None, migration_id=None, phase=None, source_api_addrs=None, source_ca_cert=None, target_api_addrs=None, target_ca_cert=None, **unknown_fields):
         '''
         attempt : int
         migration_id : str
         phase : str
-        source_api_addrs : typing.Sequence<+T_co>[str]
+        source_api_addrs : typing.Sequence[str]
         source_ca_cert : str
-        target_api_addrs : typing.Sequence<+T_co>[str]
+        target_api_addrs : typing.Sequence[str]
         target_ca_cert : str
         '''
         self.attempt = attempt
@@ -6679,9 +6679,9 @@ class MigrationStatus(Type):
 class MigrationTargetInfo(Type):
     _toSchema = {'addrs': 'addrs', 'auth_tag': 'auth-tag', 'ca_cert': 'ca-cert', 'controller_alias': 'controller-alias', 'controller_tag': 'controller-tag', 'macaroons': 'macaroons', 'password': 'password'}
     _toPy = {'addrs': 'addrs', 'auth-tag': 'auth_tag', 'ca-cert': 'ca_cert', 'controller-alias': 'controller_alias', 'controller-tag': 'controller_tag', 'macaroons': 'macaroons', 'password': 'password'}
-    def __init__(self, addrs=None, auth_tag="", ca_cert="", controller_alias="", controller_tag="", macaroons="", password="", **unknown_fields):
+    def __init__(self, addrs=None, auth_tag=None, ca_cert=None, controller_alias=None, controller_tag=None, macaroons=None, password=None, **unknown_fields):
         '''
-        addrs : typing.Sequence<+T_co>[str]
+        addrs : typing.Sequence[str]
         auth_tag : str
         ca_cert : str
         controller_alias : str
@@ -6703,7 +6703,7 @@ class MigrationTargetInfo(Type):
 class MinionReport(Type):
     _toSchema = {'migration_id': 'migration-id', 'phase': 'phase', 'success': 'success'}
     _toPy = {'migration-id': 'migration_id', 'phase': 'phase', 'success': 'success'}
-    def __init__(self, migration_id="", phase="", success=False, **unknown_fields):
+    def __init__(self, migration_id=None, phase=None, success=None, **unknown_fields):
         '''
         migration_id : str
         phase : str
@@ -6719,14 +6719,14 @@ class MinionReport(Type):
 class MinionReports(Type):
     _toSchema = {'failed': 'failed', 'migration_id': 'migration-id', 'phase': 'phase', 'success_count': 'success-count', 'unknown_count': 'unknown-count', 'unknown_sample': 'unknown-sample'}
     _toPy = {'failed': 'failed', 'migration-id': 'migration_id', 'phase': 'phase', 'success-count': 'success_count', 'unknown-count': 'unknown_count', 'unknown-sample': 'unknown_sample'}
-    def __init__(self, failed=None, migration_id="", phase="", success_count=0, unknown_count=0, unknown_sample=None, **unknown_fields):
+    def __init__(self, failed=None, migration_id=None, phase=None, success_count=None, unknown_count=None, unknown_sample=None, **unknown_fields):
         '''
-        failed : typing.Sequence<+T_co>[str]
+        failed : typing.Sequence[str]
         migration_id : str
         phase : str
         success_count : int
         unknown_count : int
-        unknown_sample : typing.Sequence<+T_co>[str]
+        unknown_sample : typing.Sequence[str]
         '''
         self.failed = failed
         self.migration_id = migration_id
@@ -6741,7 +6741,7 @@ class MinionReports(Type):
 class Model(Type):
     _toSchema = {'name': 'name', 'owner_tag': 'owner-tag', 'type_': 'type', 'uuid': 'uuid'}
     _toPy = {'name': 'name', 'owner-tag': 'owner_tag', 'type': 'type_', 'uuid': 'uuid'}
-    def __init__(self, name="", owner_tag="", type_="", uuid="", **unknown_fields):
+    def __init__(self, name=None, owner_tag=None, type_=None, uuid=None, **unknown_fields):
         '''
         name : str
         owner_tag : str
@@ -6759,7 +6759,7 @@ class Model(Type):
 class ModelAccess(Type):
     _toSchema = {'access': 'access', 'model': 'model'}
     _toPy = {'access': 'access', 'model': 'model'}
-    def __init__(self, access="", model="", **unknown_fields):
+    def __init__(self, access=None, model=None, **unknown_fields):
         '''
         access : str
         model : str
@@ -6773,7 +6773,7 @@ class ModelAccess(Type):
 class ModelArgs(Type):
     _toSchema = {'model_tag': 'model-tag'}
     _toPy = {'model-tag': 'model_tag'}
-    def __init__(self, model_tag="", **unknown_fields):
+    def __init__(self, model_tag=None, **unknown_fields):
         '''
         model_tag : str
         '''
@@ -6785,9 +6785,9 @@ class ModelArgs(Type):
 class ModelBlockInfo(Type):
     _toSchema = {'blocks': 'blocks', 'model_uuid': 'model-uuid', 'name': 'name', 'owner_tag': 'owner-tag'}
     _toPy = {'blocks': 'blocks', 'model-uuid': 'model_uuid', 'name': 'name', 'owner-tag': 'owner_tag'}
-    def __init__(self, blocks=None, model_uuid="", name="", owner_tag="", **unknown_fields):
+    def __init__(self, blocks=None, model_uuid=None, name=None, owner_tag=None, **unknown_fields):
         '''
-        blocks : typing.Sequence<+T_co>[str]
+        blocks : typing.Sequence[str]
         model_uuid : str
         name : str
         owner_tag : str
@@ -6805,7 +6805,7 @@ class ModelBlockInfoList(Type):
     _toPy = {'models': 'models'}
     def __init__(self, models=None, **unknown_fields):
         '''
-        models : typing.Sequence<+T_co>[~ModelBlockInfo]<~ModelBlockInfo>
+        models : typing.Sequence[~ModelBlockInfo]
         '''
         self.models = [ModelBlockInfo.from_json(o) for o in models or []]
         self.unknown_fields = unknown_fields
@@ -6817,7 +6817,7 @@ class ModelConfigResult(Type):
     _toPy = {'config': 'config'}
     def __init__(self, config=None, **unknown_fields):
         '''
-        config : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        config : typing.Mapping[str, typing.Any]
         '''
         self.config = config
         self.unknown_fields = unknown_fields
@@ -6829,7 +6829,7 @@ class ModelConfigResults(Type):
     _toPy = {'config': 'config'}
     def __init__(self, config=None, **unknown_fields):
         '''
-        config : typing.Mapping<~KT, +VT_co>[str, ~ConfigValue]<~ConfigValue>
+        config : typing.Mapping[str, ~ConfigValue]
         '''
         self.config = config
         self.unknown_fields = unknown_fields
@@ -6839,10 +6839,10 @@ class ModelConfigResults(Type):
 class ModelCreateArgs(Type):
     _toSchema = {'cloud_tag': 'cloud-tag', 'config': 'config', 'credential': 'credential', 'name': 'name', 'owner_tag': 'owner-tag', 'region': 'region'}
     _toPy = {'cloud-tag': 'cloud_tag', 'config': 'config', 'credential': 'credential', 'name': 'name', 'owner-tag': 'owner_tag', 'region': 'region'}
-    def __init__(self, cloud_tag="", config=None, credential="", name="", owner_tag="", region="", **unknown_fields):
+    def __init__(self, cloud_tag=None, config=None, credential=None, name=None, owner_tag=None, region=None, **unknown_fields):
         '''
         cloud_tag : str
-        config : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        config : typing.Mapping[str, typing.Any]
         credential : str
         name : str
         owner_tag : str
@@ -6861,7 +6861,7 @@ class ModelCreateArgs(Type):
 class ModelCredential(Type):
     _toSchema = {'credential_tag': 'credential-tag', 'exists': 'exists', 'model_tag': 'model-tag', 'valid': 'valid'}
     _toPy = {'credential-tag': 'credential_tag', 'exists': 'exists', 'model-tag': 'model_tag', 'valid': 'valid'}
-    def __init__(self, credential_tag="", exists=False, model_tag="", valid=False, **unknown_fields):
+    def __init__(self, credential_tag=None, exists=None, model_tag=None, valid=None, **unknown_fields):
         '''
         credential_tag : str
         exists : bool
@@ -6879,11 +6879,11 @@ class ModelCredential(Type):
 class ModelDefaultValues(Type):
     _toSchema = {'cloud_region': 'cloud-region', 'cloud_tag': 'cloud-tag', 'config': 'config'}
     _toPy = {'cloud-region': 'cloud_region', 'cloud-tag': 'cloud_tag', 'config': 'config'}
-    def __init__(self, cloud_region="", cloud_tag="", config=None, **unknown_fields):
+    def __init__(self, cloud_region=None, cloud_tag=None, config=None, **unknown_fields):
         '''
         cloud_region : str
         cloud_tag : str
-        config : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        config : typing.Mapping[str, typing.Any]
         '''
         self.cloud_region = cloud_region
         self.cloud_tag = cloud_tag
@@ -6897,9 +6897,9 @@ class ModelDefaults(Type):
     _toPy = {'controller': 'controller', 'default': 'default', 'regions': 'regions'}
     def __init__(self, controller=None, default=None, regions=None, **unknown_fields):
         '''
-        controller : typing.Mapping<~KT, +VT_co>[str, typing.Any]
-        default : typing.Mapping<~KT, +VT_co>[str, typing.Any]
-        regions : typing.Sequence<+T_co>[~RegionDefaults]<~RegionDefaults>
+        controller : typing.Mapping[str, typing.Any]
+        default : typing.Mapping[str, typing.Any]
+        regions : typing.Sequence[~RegionDefaults]
         '''
         self.controller = controller
         self.default = default
@@ -6913,7 +6913,7 @@ class ModelDefaultsResult(Type):
     _toPy = {'config': 'config', 'error': 'error'}
     def __init__(self, config=None, error=None, **unknown_fields):
         '''
-        config : typing.Mapping<~KT, +VT_co>[str, ~ModelDefaults]<~ModelDefaults>
+        config : typing.Mapping[str, ~ModelDefaults]
         error : Error
         '''
         self.config = config
@@ -6927,7 +6927,7 @@ class ModelDefaultsResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~ModelDefaultsResult]<~ModelDefaultsResult>
+        results : typing.Sequence[~ModelDefaultsResult]
         '''
         self.results = [ModelDefaultsResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -6937,7 +6937,7 @@ class ModelDefaultsResults(Type):
 class ModelEntityCount(Type):
     _toSchema = {'count': 'count', 'entity': 'entity'}
     _toPy = {'count': 'count', 'entity': 'entity'}
-    def __init__(self, count=0, entity="", **unknown_fields):
+    def __init__(self, count=None, entity=None, **unknown_fields):
         '''
         count : int
         entity : str
@@ -6951,7 +6951,7 @@ class ModelEntityCount(Type):
 class ModelFilesystemInfo(Type):
     _toSchema = {'detachable': 'detachable', 'id_': 'id', 'message': 'message', 'provider_id': 'provider-id', 'status': 'status'}
     _toPy = {'detachable': 'detachable', 'id': 'id_', 'message': 'message', 'provider-id': 'provider_id', 'status': 'status'}
-    def __init__(self, detachable=False, id_="", message="", provider_id="", status="", **unknown_fields):
+    def __init__(self, detachable=None, id_=None, message=None, provider_id=None, status=None, **unknown_fields):
         '''
         detachable : bool
         id_ : str
@@ -6971,7 +6971,7 @@ class ModelFilesystemInfo(Type):
 class ModelInfo(Type):
     _toSchema = {'agent_version': 'agent-version', 'cloud_credential_tag': 'cloud-credential-tag', 'cloud_region': 'cloud-region', 'cloud_tag': 'cloud-tag', 'controller_uuid': 'controller-uuid', 'default_series': 'default-series', 'is_controller': 'is-controller', 'life': 'life', 'machines': 'machines', 'migration': 'migration', 'name': 'name', 'owner_tag': 'owner-tag', 'provider_type': 'provider-type', 'sla': 'sla', 'status': 'status', 'type_': 'type', 'users': 'users', 'uuid': 'uuid'}
     _toPy = {'agent-version': 'agent_version', 'cloud-credential-tag': 'cloud_credential_tag', 'cloud-region': 'cloud_region', 'cloud-tag': 'cloud_tag', 'controller-uuid': 'controller_uuid', 'default-series': 'default_series', 'is-controller': 'is_controller', 'life': 'life', 'machines': 'machines', 'migration': 'migration', 'name': 'name', 'owner-tag': 'owner_tag', 'provider-type': 'provider_type', 'sla': 'sla', 'status': 'status', 'type': 'type_', 'users': 'users', 'uuid': 'uuid'}
-    def __init__(self, agent_version=None, cloud_credential_tag="", cloud_region="", cloud_tag="", controller_uuid="", default_series="", is_controller=False, life="", machines=None, migration=None, name="", owner_tag="", provider_type="", sla=None, status=None, type_="", users=None, uuid="", **unknown_fields):
+    def __init__(self, agent_version=None, cloud_credential_tag=None, cloud_region=None, cloud_tag=None, controller_uuid=None, default_series=None, is_controller=None, life=None, machines=None, migration=None, name=None, owner_tag=None, provider_type=None, sla=None, status=None, type_=None, users=None, uuid=None, **unknown_fields):
         '''
         agent_version : Number
         cloud_credential_tag : str
@@ -6981,7 +6981,7 @@ class ModelInfo(Type):
         default_series : str
         is_controller : bool
         life : str
-        machines : typing.Sequence<+T_co>[~ModelMachineInfo]<~ModelMachineInfo>
+        machines : typing.Sequence[~ModelMachineInfo]
         migration : ModelMigrationStatus
         name : str
         owner_tag : str
@@ -6989,7 +6989,7 @@ class ModelInfo(Type):
         sla : ModelSLAInfo
         status : EntityStatus
         type_ : str
-        users : typing.Sequence<+T_co>[~ModelUserInfo]<~ModelUserInfo>
+        users : typing.Sequence[~ModelUserInfo]
         uuid : str
         '''
         self.agent_version = Number.from_json(agent_version) if agent_version else None
@@ -7033,7 +7033,7 @@ class ModelInfoResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~ModelInfoResult]<~ModelInfoResult>
+        results : typing.Sequence[~ModelInfoResult]
         '''
         self.results = [ModelInfoResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -7057,7 +7057,7 @@ class ModelInstanceTypesConstraints(Type):
     _toPy = {'constraints': 'constraints'}
     def __init__(self, constraints=None, **unknown_fields):
         '''
-        constraints : typing.Sequence<+T_co>[~ModelInstanceTypesConstraint]<~ModelInstanceTypesConstraint>
+        constraints : typing.Sequence[~ModelInstanceTypesConstraint]
         '''
         self.constraints = [ModelInstanceTypesConstraint.from_json(o) for o in constraints or []]
         self.unknown_fields = unknown_fields
@@ -7067,7 +7067,7 @@ class ModelInstanceTypesConstraints(Type):
 class ModelMachineInfo(Type):
     _toSchema = {'display_name': 'display-name', 'hardware': 'hardware', 'has_vote': 'has-vote', 'id_': 'id', 'instance_id': 'instance-id', 'message': 'message', 'status': 'status', 'wants_vote': 'wants-vote'}
     _toPy = {'display-name': 'display_name', 'hardware': 'hardware', 'has-vote': 'has_vote', 'id': 'id_', 'instance-id': 'instance_id', 'message': 'message', 'status': 'status', 'wants-vote': 'wants_vote'}
-    def __init__(self, display_name="", hardware=None, has_vote=False, id_="", instance_id="", message="", status="", wants_vote=False, **unknown_fields):
+    def __init__(self, display_name=None, hardware=None, has_vote=None, id_=None, instance_id=None, message=None, status=None, wants_vote=None, **unknown_fields):
         '''
         display_name : str
         hardware : MachineHardware
@@ -7093,7 +7093,7 @@ class ModelMachineInfo(Type):
 class ModelMigrationStatus(Type):
     _toSchema = {'end': 'end', 'start': 'start', 'status': 'status'}
     _toPy = {'end': 'end', 'start': 'start', 'status': 'status'}
-    def __init__(self, end="", start="", status="", **unknown_fields):
+    def __init__(self, end=None, start=None, status=None, **unknown_fields):
         '''
         end : str
         start : str
@@ -7109,7 +7109,7 @@ class ModelMigrationStatus(Type):
 class ModelResult(Type):
     _toSchema = {'error': 'error', 'name': 'name', 'type_': 'type', 'uuid': 'uuid'}
     _toPy = {'error': 'error', 'name': 'name', 'type': 'type_', 'uuid': 'uuid'}
-    def __init__(self, error=None, name="", type_="", uuid="", **unknown_fields):
+    def __init__(self, error=None, name=None, type_=None, uuid=None, **unknown_fields):
         '''
         error : Error
         name : str
@@ -7127,10 +7127,10 @@ class ModelResult(Type):
 class ModelSLA(Type):
     _toSchema = {'creds': 'creds', 'level': 'level', 'modelslainfo': 'ModelSLAInfo', 'owner': 'owner'}
     _toPy = {'ModelSLAInfo': 'modelslainfo', 'creds': 'creds', 'level': 'level', 'owner': 'owner'}
-    def __init__(self, modelslainfo=None, creds=None, level="", owner="", **unknown_fields):
+    def __init__(self, modelslainfo=None, creds=None, level=None, owner=None, **unknown_fields):
         '''
         modelslainfo : ModelSLAInfo
-        creds : typing.Sequence<+T_co>[int]
+        creds : typing.Sequence[int]
         level : str
         owner : str
         '''
@@ -7145,7 +7145,7 @@ class ModelSLA(Type):
 class ModelSLAInfo(Type):
     _toSchema = {'level': 'level', 'owner': 'owner'}
     _toPy = {'level': 'level', 'owner': 'owner'}
-    def __init__(self, level="", owner="", **unknown_fields):
+    def __init__(self, level=None, owner=None, **unknown_fields):
         '''
         level : str
         owner : str
@@ -7161,7 +7161,7 @@ class ModelSequencesResult(Type):
     _toPy = {'sequences': 'sequences'}
     def __init__(self, sequences=None, **unknown_fields):
         '''
-        sequences : typing.Mapping<~KT, +VT_co>[str, int]
+        sequences : typing.Mapping[str, int]
         '''
         self.sequences = sequences
         self.unknown_fields = unknown_fields
@@ -7173,7 +7173,7 @@ class ModelSet(Type):
     _toPy = {'config': 'config'}
     def __init__(self, config=None, **unknown_fields):
         '''
-        config : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        config : typing.Mapping[str, typing.Any]
         '''
         self.config = config
         self.unknown_fields = unknown_fields
@@ -7183,19 +7183,19 @@ class ModelSet(Type):
 class ModelStatus(Type):
     _toSchema = {'application_count': 'application-count', 'error': 'error', 'filesystems': 'filesystems', 'hosted_machine_count': 'hosted-machine-count', 'life': 'life', 'machines': 'machines', 'model_tag': 'model-tag', 'owner_tag': 'owner-tag', 'type_': 'type', 'unit_count': 'unit-count', 'volumes': 'volumes'}
     _toPy = {'application-count': 'application_count', 'error': 'error', 'filesystems': 'filesystems', 'hosted-machine-count': 'hosted_machine_count', 'life': 'life', 'machines': 'machines', 'model-tag': 'model_tag', 'owner-tag': 'owner_tag', 'type': 'type_', 'unit-count': 'unit_count', 'volumes': 'volumes'}
-    def __init__(self, application_count=0, error=None, filesystems=None, hosted_machine_count=0, life="", machines=None, model_tag="", owner_tag="", type_="", unit_count=0, volumes=None, **unknown_fields):
+    def __init__(self, application_count=None, error=None, filesystems=None, hosted_machine_count=None, life=None, machines=None, model_tag=None, owner_tag=None, type_=None, unit_count=None, volumes=None, **unknown_fields):
         '''
         application_count : int
         error : Error
-        filesystems : typing.Sequence<+T_co>[~ModelFilesystemInfo]<~ModelFilesystemInfo>
+        filesystems : typing.Sequence[~ModelFilesystemInfo]
         hosted_machine_count : int
         life : str
-        machines : typing.Sequence<+T_co>[~ModelMachineInfo]<~ModelMachineInfo>
+        machines : typing.Sequence[~ModelMachineInfo]
         model_tag : str
         owner_tag : str
         type_ : str
         unit_count : int
-        volumes : typing.Sequence<+T_co>[~ModelVolumeInfo]<~ModelVolumeInfo>
+        volumes : typing.Sequence[~ModelVolumeInfo]
         '''
         self.application_count = application_count
         self.error = Error.from_json(error) if error else None
@@ -7215,7 +7215,7 @@ class ModelStatus(Type):
 class ModelStatusInfo(Type):
     _toSchema = {'available_version': 'available-version', 'cloud_tag': 'cloud-tag', 'migration': 'migration', 'name': 'name', 'region': 'region', 'version': 'version'}
     _toPy = {'available-version': 'available_version', 'cloud-tag': 'cloud_tag', 'migration': 'migration', 'name': 'name', 'region': 'region', 'version': 'version'}
-    def __init__(self, available_version="", cloud_tag="", migration="", name="", region="", version="", **unknown_fields):
+    def __init__(self, available_version=None, cloud_tag=None, migration=None, name=None, region=None, version=None, **unknown_fields):
         '''
         available_version : str
         cloud_tag : str
@@ -7239,7 +7239,7 @@ class ModelStatusResults(Type):
     _toPy = {'models': 'models'}
     def __init__(self, models=None, **unknown_fields):
         '''
-        models : typing.Sequence<+T_co>[~ModelStatus]<~ModelStatus>
+        models : typing.Sequence[~ModelStatus]
         '''
         self.models = [ModelStatus.from_json(o) for o in models or []]
         self.unknown_fields = unknown_fields
@@ -7249,7 +7249,7 @@ class ModelStatusResults(Type):
 class ModelSummariesRequest(Type):
     _toSchema = {'all_': 'all', 'user_tag': 'user-tag'}
     _toPy = {'all': 'all_', 'user-tag': 'user_tag'}
-    def __init__(self, all_=False, user_tag="", **unknown_fields):
+    def __init__(self, all_=None, user_tag=None, **unknown_fields):
         '''
         all_ : bool
         user_tag : str
@@ -7263,14 +7263,14 @@ class ModelSummariesRequest(Type):
 class ModelSummary(Type):
     _toSchema = {'agent_version': 'agent-version', 'cloud_credential_tag': 'cloud-credential-tag', 'cloud_region': 'cloud-region', 'cloud_tag': 'cloud-tag', 'controller_uuid': 'controller-uuid', 'counts': 'counts', 'default_series': 'default-series', 'is_controller': 'is-controller', 'last_connection': 'last-connection', 'life': 'life', 'migration': 'migration', 'name': 'name', 'owner_tag': 'owner-tag', 'provider_type': 'provider-type', 'sla': 'sla', 'status': 'status', 'type_': 'type', 'user_access': 'user-access', 'uuid': 'uuid'}
     _toPy = {'agent-version': 'agent_version', 'cloud-credential-tag': 'cloud_credential_tag', 'cloud-region': 'cloud_region', 'cloud-tag': 'cloud_tag', 'controller-uuid': 'controller_uuid', 'counts': 'counts', 'default-series': 'default_series', 'is-controller': 'is_controller', 'last-connection': 'last_connection', 'life': 'life', 'migration': 'migration', 'name': 'name', 'owner-tag': 'owner_tag', 'provider-type': 'provider_type', 'sla': 'sla', 'status': 'status', 'type': 'type_', 'user-access': 'user_access', 'uuid': 'uuid'}
-    def __init__(self, agent_version=None, cloud_credential_tag="", cloud_region="", cloud_tag="", controller_uuid="", counts=None, default_series="", is_controller=False, last_connection="", life="", migration=None, name="", owner_tag="", provider_type="", sla=None, status=None, type_="", user_access="", uuid="", **unknown_fields):
+    def __init__(self, agent_version=None, cloud_credential_tag=None, cloud_region=None, cloud_tag=None, controller_uuid=None, counts=None, default_series=None, is_controller=None, last_connection=None, life=None, migration=None, name=None, owner_tag=None, provider_type=None, sla=None, status=None, type_=None, user_access=None, uuid=None, **unknown_fields):
         '''
         agent_version : Number
         cloud_credential_tag : str
         cloud_region : str
         cloud_tag : str
         controller_uuid : str
-        counts : typing.Sequence<+T_co>[~ModelEntityCount]<~ModelEntityCount>
+        counts : typing.Sequence[~ModelEntityCount]
         default_series : str
         is_controller : bool
         last_connection : str
@@ -7327,7 +7327,7 @@ class ModelSummaryResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~ModelSummaryResult]<~ModelSummaryResult>
+        results : typing.Sequence[~ModelSummaryResult]
         '''
         self.results = [ModelSummaryResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -7350,7 +7350,7 @@ class ModelUnset(Type):
     _toPy = {'keys': 'keys'}
     def __init__(self, keys=None, **unknown_fields):
         '''
-        keys : typing.Sequence<+T_co>[str]
+        keys : typing.Sequence[str]
         '''
         self.keys = keys
         self.unknown_fields = unknown_fields
@@ -7360,11 +7360,11 @@ class ModelUnset(Type):
 class ModelUnsetKeys(Type):
     _toSchema = {'cloud_region': 'cloud-region', 'cloud_tag': 'cloud-tag', 'keys': 'keys'}
     _toPy = {'cloud-region': 'cloud_region', 'cloud-tag': 'cloud_tag', 'keys': 'keys'}
-    def __init__(self, cloud_region="", cloud_tag="", keys=None, **unknown_fields):
+    def __init__(self, cloud_region=None, cloud_tag=None, keys=None, **unknown_fields):
         '''
         cloud_region : str
         cloud_tag : str
-        keys : typing.Sequence<+T_co>[str]
+        keys : typing.Sequence[str]
         '''
         self.cloud_region = cloud_region
         self.cloud_tag = cloud_tag
@@ -7376,7 +7376,7 @@ class ModelUnsetKeys(Type):
 class ModelUserInfo(Type):
     _toSchema = {'access': 'access', 'display_name': 'display-name', 'last_connection': 'last-connection', 'user': 'user'}
     _toPy = {'access': 'access', 'display-name': 'display_name', 'last-connection': 'last_connection', 'user': 'user'}
-    def __init__(self, access="", display_name="", last_connection="", user="", **unknown_fields):
+    def __init__(self, access=None, display_name=None, last_connection=None, user=None, **unknown_fields):
         '''
         access : str
         display_name : str
@@ -7410,7 +7410,7 @@ class ModelUserInfoResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~ModelUserInfoResult]<~ModelUserInfoResult>
+        results : typing.Sequence[~ModelUserInfoResult]
         '''
         self.results = [ModelUserInfoResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -7420,7 +7420,7 @@ class ModelUserInfoResults(Type):
 class ModelVolumeInfo(Type):
     _toSchema = {'detachable': 'detachable', 'id_': 'id', 'message': 'message', 'provider_id': 'provider-id', 'status': 'status'}
     _toPy = {'detachable': 'detachable', 'id': 'id_', 'message': 'message', 'provider-id': 'provider_id', 'status': 'status'}
-    def __init__(self, detachable=False, id_="", message="", provider_id="", status="", **unknown_fields):
+    def __init__(self, detachable=None, id_=None, message=None, provider_id=None, status=None, **unknown_fields):
         '''
         detachable : bool
         id_ : str
@@ -7440,7 +7440,7 @@ class ModelVolumeInfo(Type):
 class ModifyCloudAccess(Type):
     _toSchema = {'access': 'access', 'action': 'action', 'cloud_tag': 'cloud-tag', 'user_tag': 'user-tag'}
     _toPy = {'access': 'access', 'action': 'action', 'cloud-tag': 'cloud_tag', 'user-tag': 'user_tag'}
-    def __init__(self, access="", action="", cloud_tag="", user_tag="", **unknown_fields):
+    def __init__(self, access=None, action=None, cloud_tag=None, user_tag=None, **unknown_fields):
         '''
         access : str
         action : str
@@ -7460,7 +7460,7 @@ class ModifyCloudAccessRequest(Type):
     _toPy = {'changes': 'changes'}
     def __init__(self, changes=None, **unknown_fields):
         '''
-        changes : typing.Sequence<+T_co>[~ModifyCloudAccess]<~ModifyCloudAccess>
+        changes : typing.Sequence[~ModifyCloudAccess]
         '''
         self.changes = [ModifyCloudAccess.from_json(o) for o in changes or []]
         self.unknown_fields = unknown_fields
@@ -7470,7 +7470,7 @@ class ModifyCloudAccessRequest(Type):
 class ModifyControllerAccess(Type):
     _toSchema = {'access': 'access', 'action': 'action', 'user_tag': 'user-tag'}
     _toPy = {'access': 'access', 'action': 'action', 'user-tag': 'user_tag'}
-    def __init__(self, access="", action="", user_tag="", **unknown_fields):
+    def __init__(self, access=None, action=None, user_tag=None, **unknown_fields):
         '''
         access : str
         action : str
@@ -7488,7 +7488,7 @@ class ModifyControllerAccessRequest(Type):
     _toPy = {'changes': 'changes'}
     def __init__(self, changes=None, **unknown_fields):
         '''
-        changes : typing.Sequence<+T_co>[~ModifyControllerAccess]<~ModifyControllerAccess>
+        changes : typing.Sequence[~ModifyControllerAccess]
         '''
         self.changes = [ModifyControllerAccess.from_json(o) for o in changes or []]
         self.unknown_fields = unknown_fields
@@ -7498,7 +7498,7 @@ class ModifyControllerAccessRequest(Type):
 class ModifyModelAccess(Type):
     _toSchema = {'access': 'access', 'action': 'action', 'model_tag': 'model-tag', 'user_tag': 'user-tag'}
     _toPy = {'access': 'access', 'action': 'action', 'model-tag': 'model_tag', 'user-tag': 'user_tag'}
-    def __init__(self, access="", action="", model_tag="", user_tag="", **unknown_fields):
+    def __init__(self, access=None, action=None, model_tag=None, user_tag=None, **unknown_fields):
         '''
         access : str
         action : str
@@ -7518,7 +7518,7 @@ class ModifyModelAccessRequest(Type):
     _toPy = {'changes': 'changes'}
     def __init__(self, changes=None, **unknown_fields):
         '''
-        changes : typing.Sequence<+T_co>[~ModifyModelAccess]<~ModifyModelAccess>
+        changes : typing.Sequence[~ModifyModelAccess]
         '''
         self.changes = [ModifyModelAccess.from_json(o) for o in changes or []]
         self.unknown_fields = unknown_fields
@@ -7528,7 +7528,7 @@ class ModifyModelAccessRequest(Type):
 class ModifyOfferAccess(Type):
     _toSchema = {'access': 'access', 'action': 'action', 'offer_url': 'offer-url', 'user_tag': 'user-tag'}
     _toPy = {'access': 'access', 'action': 'action', 'offer-url': 'offer_url', 'user-tag': 'user_tag'}
-    def __init__(self, access="", action="", offer_url="", user_tag="", **unknown_fields):
+    def __init__(self, access=None, action=None, offer_url=None, user_tag=None, **unknown_fields):
         '''
         access : str
         action : str
@@ -7548,7 +7548,7 @@ class ModifyOfferAccessRequest(Type):
     _toPy = {'changes': 'changes'}
     def __init__(self, changes=None, **unknown_fields):
         '''
-        changes : typing.Sequence<+T_co>[~ModifyOfferAccess]<~ModifyOfferAccess>
+        changes : typing.Sequence[~ModifyOfferAccess]
         '''
         self.changes = [ModifyOfferAccess.from_json(o) for o in changes or []]
         self.unknown_fields = unknown_fields
@@ -7558,9 +7558,9 @@ class ModifyOfferAccessRequest(Type):
 class ModifyUserSSHKeys(Type):
     _toSchema = {'ssh_keys': 'ssh-keys', 'user': 'user'}
     _toPy = {'ssh-keys': 'ssh_keys', 'user': 'user'}
-    def __init__(self, ssh_keys=None, user="", **unknown_fields):
+    def __init__(self, ssh_keys=None, user=None, **unknown_fields):
         '''
-        ssh_keys : typing.Sequence<+T_co>[str]
+        ssh_keys : typing.Sequence[str]
         user : str
         '''
         self.ssh_keys = ssh_keys
@@ -7574,9 +7574,9 @@ class MongoUpgradeResults(Type):
     _toPy = {'ha-members': 'ha_members', 'master': 'master', 'rs-members': 'rs_members'}
     def __init__(self, ha_members=None, master=None, rs_members=None, **unknown_fields):
         '''
-        ha_members : typing.Sequence<+T_co>[~HAMember]<~HAMember>
+        ha_members : typing.Sequence[~HAMember]
         master : HAMember
-        rs_members : typing.Sequence<+T_co>[~Member]<~Member>
+        rs_members : typing.Sequence[~Member]
         '''
         self.ha_members = [HAMember.from_json(o) for o in ha_members or []]
         self.master = HAMember.from_json(master) if master else None
@@ -7588,7 +7588,7 @@ class MongoUpgradeResults(Type):
 class MongoVersion(Type):
     _toSchema = {'engine': 'engine', 'major': 'major', 'minor': 'minor', 'patch': 'patch'}
     _toPy = {'engine': 'engine', 'major': 'major', 'minor': 'minor', 'patch': 'patch'}
-    def __init__(self, engine="", major=0, minor=0, patch="", **unknown_fields):
+    def __init__(self, engine=None, major=None, minor=None, patch=None, **unknown_fields):
         '''
         engine : str
         major : int
@@ -7606,15 +7606,15 @@ class MongoVersion(Type):
 class NetworkConfig(Type):
     _toSchema = {'address': 'address', 'cidr': 'cidr', 'config_type': 'config-type', 'device_index': 'device-index', 'disabled': 'disabled', 'dns_search_domains': 'dns-search-domains', 'dns_servers': 'dns-servers', 'gateway_address': 'gateway-address', 'interface_name': 'interface-name', 'interface_type': 'interface-type', 'is_default_gateway': 'is-default-gateway', 'mac_address': 'mac-address', 'mtu': 'mtu', 'no_auto_start': 'no-auto-start', 'parent_interface_name': 'parent-interface-name', 'provider_address_id': 'provider-address-id', 'provider_id': 'provider-id', 'provider_space_id': 'provider-space-id', 'provider_subnet_id': 'provider-subnet-id', 'provider_vlan_id': 'provider-vlan-id', 'routes': 'routes', 'vlan_tag': 'vlan-tag'}
     _toPy = {'address': 'address', 'cidr': 'cidr', 'config-type': 'config_type', 'device-index': 'device_index', 'disabled': 'disabled', 'dns-search-domains': 'dns_search_domains', 'dns-servers': 'dns_servers', 'gateway-address': 'gateway_address', 'interface-name': 'interface_name', 'interface-type': 'interface_type', 'is-default-gateway': 'is_default_gateway', 'mac-address': 'mac_address', 'mtu': 'mtu', 'no-auto-start': 'no_auto_start', 'parent-interface-name': 'parent_interface_name', 'provider-address-id': 'provider_address_id', 'provider-id': 'provider_id', 'provider-space-id': 'provider_space_id', 'provider-subnet-id': 'provider_subnet_id', 'provider-vlan-id': 'provider_vlan_id', 'routes': 'routes', 'vlan-tag': 'vlan_tag'}
-    def __init__(self, address="", cidr="", config_type="", device_index=0, disabled=False, dns_search_domains=None, dns_servers=None, gateway_address="", interface_name="", interface_type="", is_default_gateway=False, mac_address="", mtu=0, no_auto_start=False, parent_interface_name="", provider_address_id="", provider_id="", provider_space_id="", provider_subnet_id="", provider_vlan_id="", routes=None, vlan_tag=0, **unknown_fields):
+    def __init__(self, address=None, cidr=None, config_type=None, device_index=None, disabled=None, dns_search_domains=None, dns_servers=None, gateway_address=None, interface_name=None, interface_type=None, is_default_gateway=None, mac_address=None, mtu=None, no_auto_start=None, parent_interface_name=None, provider_address_id=None, provider_id=None, provider_space_id=None, provider_subnet_id=None, provider_vlan_id=None, routes=None, vlan_tag=None, **unknown_fields):
         '''
         address : str
         cidr : str
         config_type : str
         device_index : int
         disabled : bool
-        dns_search_domains : typing.Sequence<+T_co>[str]
-        dns_servers : typing.Sequence<+T_co>[str]
+        dns_search_domains : typing.Sequence[str]
+        dns_servers : typing.Sequence[str]
         gateway_address : str
         interface_name : str
         interface_type : str
@@ -7628,7 +7628,7 @@ class NetworkConfig(Type):
         provider_space_id : str
         provider_subnet_id : str
         provider_vlan_id : str
-        routes : typing.Sequence<+T_co>[~NetworkRoute]<~NetworkRoute>
+        routes : typing.Sequence[~NetworkRoute]
         vlan_tag : int
         '''
         self.address = address
@@ -7660,9 +7660,9 @@ class NetworkConfig(Type):
 class NetworkInfo(Type):
     _toSchema = {'addresses': 'addresses', 'interface_name': 'interface-name', 'mac_address': 'mac-address'}
     _toPy = {'addresses': 'addresses', 'interface-name': 'interface_name', 'mac-address': 'mac_address'}
-    def __init__(self, addresses=None, interface_name="", mac_address="", **unknown_fields):
+    def __init__(self, addresses=None, interface_name=None, mac_address=None, **unknown_fields):
         '''
-        addresses : typing.Sequence<+T_co>[~InterfaceAddress]<~InterfaceAddress>
+        addresses : typing.Sequence[~InterfaceAddress]
         interface_name : str
         mac_address : str
         '''
@@ -7676,9 +7676,9 @@ class NetworkInfo(Type):
 class NetworkInfoParams(Type):
     _toSchema = {'bindings': 'bindings', 'relation_id': 'relation-id', 'unit': 'unit'}
     _toPy = {'bindings': 'bindings', 'relation-id': 'relation_id', 'unit': 'unit'}
-    def __init__(self, bindings=None, relation_id=0, unit="", **unknown_fields):
+    def __init__(self, bindings=None, relation_id=None, unit=None, **unknown_fields):
         '''
-        bindings : typing.Sequence<+T_co>[str]
+        bindings : typing.Sequence[str]
         relation_id : int
         unit : str
         '''
@@ -7694,10 +7694,10 @@ class NetworkInfoResult(Type):
     _toPy = {'bind-addresses': 'bind_addresses', 'egress-subnets': 'egress_subnets', 'error': 'error', 'ingress-addresses': 'ingress_addresses'}
     def __init__(self, bind_addresses=None, egress_subnets=None, error=None, ingress_addresses=None, **unknown_fields):
         '''
-        bind_addresses : typing.Sequence<+T_co>[~NetworkInfo]<~NetworkInfo>
-        egress_subnets : typing.Sequence<+T_co>[str]
+        bind_addresses : typing.Sequence[~NetworkInfo]
+        egress_subnets : typing.Sequence[str]
         error : Error
-        ingress_addresses : typing.Sequence<+T_co>[str]
+        ingress_addresses : typing.Sequence[str]
         '''
         self.bind_addresses = [NetworkInfo.from_json(o) for o in bind_addresses or []]
         self.egress_subnets = egress_subnets
@@ -7712,7 +7712,7 @@ class NetworkInfoResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Mapping<~KT, +VT_co>[str, ~NetworkInfoResult]<~NetworkInfoResult>
+        results : typing.Mapping[str, ~NetworkInfoResult]
         '''
         self.results = results
         self.unknown_fields = unknown_fields
@@ -7722,11 +7722,11 @@ class NetworkInfoResults(Type):
 class NetworkInterface(Type):
     _toSchema = {'dns_nameservers': 'dns-nameservers', 'gateway': 'gateway', 'ip_addresses': 'ip-addresses', 'is_up': 'is-up', 'mac_address': 'mac-address', 'space': 'space'}
     _toPy = {'dns-nameservers': 'dns_nameservers', 'gateway': 'gateway', 'ip-addresses': 'ip_addresses', 'is-up': 'is_up', 'mac-address': 'mac_address', 'space': 'space'}
-    def __init__(self, dns_nameservers=None, gateway="", ip_addresses=None, is_up=False, mac_address="", space="", **unknown_fields):
+    def __init__(self, dns_nameservers=None, gateway=None, ip_addresses=None, is_up=None, mac_address=None, space=None, **unknown_fields):
         '''
-        dns_nameservers : typing.Sequence<+T_co>[str]
+        dns_nameservers : typing.Sequence[str]
         gateway : str
-        ip_addresses : typing.Sequence<+T_co>[str]
+        ip_addresses : typing.Sequence[str]
         is_up : bool
         mac_address : str
         space : str
@@ -7744,7 +7744,7 @@ class NetworkInterface(Type):
 class NetworkRoute(Type):
     _toSchema = {'destination_cidr': 'destination-cidr', 'gateway_ip': 'gateway-ip', 'metric': 'metric'}
     _toPy = {'destination-cidr': 'destination_cidr', 'gateway-ip': 'gateway_ip', 'metric': 'metric'}
-    def __init__(self, destination_cidr="", gateway_ip="", metric=0, **unknown_fields):
+    def __init__(self, destination_cidr=None, gateway_ip=None, metric=None, **unknown_fields):
         '''
         destination_cidr : str
         gateway_ip : str
@@ -7760,7 +7760,7 @@ class NetworkRoute(Type):
 class NotifyWatchResult(Type):
     _toSchema = {'error': 'error', 'notifywatcherid': 'NotifyWatcherId'}
     _toPy = {'NotifyWatcherId': 'notifywatcherid', 'error': 'error'}
-    def __init__(self, notifywatcherid="", error=None, **unknown_fields):
+    def __init__(self, notifywatcherid=None, error=None, **unknown_fields):
         '''
         notifywatcherid : str
         error : Error
@@ -7776,7 +7776,7 @@ class NotifyWatchResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
+        results : typing.Sequence[~NotifyWatchResult]
         '''
         self.results = [NotifyWatchResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -7786,7 +7786,7 @@ class NotifyWatchResults(Type):
 class Number(Type):
     _toSchema = {'build': 'Build', 'major': 'Major', 'minor': 'Minor', 'patch': 'Patch', 'tag': 'Tag'}
     _toPy = {'Build': 'build', 'Major': 'major', 'Minor': 'minor', 'Patch': 'patch', 'Tag': 'tag'}
-    def __init__(self, build=0, major=0, minor=0, patch=0, tag="", **unknown_fields):
+    def __init__(self, build=None, major=None, minor=None, patch=None, tag=None, **unknown_fields):
         '''
         build : int
         major : int
@@ -7806,9 +7806,9 @@ class Number(Type):
 class OfferArg(Type):
     _toSchema = {'macaroons': 'macaroons', 'offer_uuid': 'offer-uuid'}
     _toPy = {'macaroons': 'macaroons', 'offer-uuid': 'offer_uuid'}
-    def __init__(self, macaroons=None, offer_uuid="", **unknown_fields):
+    def __init__(self, macaroons=None, offer_uuid=None, **unknown_fields):
         '''
-        macaroons : typing.Sequence<+T_co>[~Macaroon]<~Macaroon>
+        macaroons : typing.Sequence[~Macaroon]
         offer_uuid : str
         '''
         self.macaroons = [Macaroon.from_json(o) for o in macaroons or []]
@@ -7822,7 +7822,7 @@ class OfferArgs(Type):
     _toPy = {'args': 'args'}
     def __init__(self, args=None, **unknown_fields):
         '''
-        args : typing.Sequence<+T_co>[~OfferArg]<~OfferArg>
+        args : typing.Sequence[~OfferArg]
         '''
         self.args = [OfferArg.from_json(o) for o in args or []]
         self.unknown_fields = unknown_fields
@@ -7832,10 +7832,10 @@ class OfferArgs(Type):
 class OfferConnection(Type):
     _toSchema = {'endpoint': 'endpoint', 'ingress_subnets': 'ingress-subnets', 'relation_id': 'relation-id', 'source_model_tag': 'source-model-tag', 'status': 'status', 'username': 'username'}
     _toPy = {'endpoint': 'endpoint', 'ingress-subnets': 'ingress_subnets', 'relation-id': 'relation_id', 'source-model-tag': 'source_model_tag', 'status': 'status', 'username': 'username'}
-    def __init__(self, endpoint="", ingress_subnets=None, relation_id=0, source_model_tag="", status=None, username="", **unknown_fields):
+    def __init__(self, endpoint=None, ingress_subnets=None, relation_id=None, source_model_tag=None, status=None, username=None, **unknown_fields):
         '''
         endpoint : str
-        ingress_subnets : typing.Sequence<+T_co>[str]
+        ingress_subnets : typing.Sequence[str]
         relation_id : int
         source_model_tag : str
         status : EntityStatus
@@ -7854,14 +7854,14 @@ class OfferConnection(Type):
 class OfferFilter(Type):
     _toSchema = {'allowed_users': 'allowed-users', 'application_description': 'application-description', 'application_name': 'application-name', 'application_user': 'application-user', 'connected_users': 'connected-users', 'endpoints': 'endpoints', 'model_name': 'model-name', 'offer_name': 'offer-name', 'owner_name': 'owner-name'}
     _toPy = {'allowed-users': 'allowed_users', 'application-description': 'application_description', 'application-name': 'application_name', 'application-user': 'application_user', 'connected-users': 'connected_users', 'endpoints': 'endpoints', 'model-name': 'model_name', 'offer-name': 'offer_name', 'owner-name': 'owner_name'}
-    def __init__(self, allowed_users=None, application_description="", application_name="", application_user="", connected_users=None, endpoints=None, model_name="", offer_name="", owner_name="", **unknown_fields):
+    def __init__(self, allowed_users=None, application_description=None, application_name=None, application_user=None, connected_users=None, endpoints=None, model_name=None, offer_name=None, owner_name=None, **unknown_fields):
         '''
-        allowed_users : typing.Sequence<+T_co>[str]
+        allowed_users : typing.Sequence[str]
         application_description : str
         application_name : str
         application_user : str
-        connected_users : typing.Sequence<+T_co>[str]
-        endpoints : typing.Sequence<+T_co>[~EndpointFilterAttributes]<~EndpointFilterAttributes>
+        connected_users : typing.Sequence[str]
+        endpoints : typing.Sequence[~EndpointFilterAttributes]
         model_name : str
         offer_name : str
         owner_name : str
@@ -7884,7 +7884,7 @@ class OfferFilters(Type):
     _toPy = {'Filters': 'filters'}
     def __init__(self, filters=None, **unknown_fields):
         '''
-        filters : typing.Sequence<+T_co>[~OfferFilter]<~OfferFilter>
+        filters : typing.Sequence[~OfferFilter]
         '''
         self.filters = [OfferFilter.from_json(o) for o in filters or []]
         self.unknown_fields = unknown_fields
@@ -7894,7 +7894,7 @@ class OfferFilters(Type):
 class OfferStatusChange(Type):
     _toSchema = {'offer_name': 'offer-name', 'status': 'status'}
     _toPy = {'offer-name': 'offer_name', 'status': 'status'}
-    def __init__(self, offer_name="", status=None, **unknown_fields):
+    def __init__(self, offer_name=None, status=None, **unknown_fields):
         '''
         offer_name : str
         status : EntityStatus
@@ -7908,9 +7908,9 @@ class OfferStatusChange(Type):
 class OfferStatusWatchResult(Type):
     _toSchema = {'changes': 'changes', 'error': 'error', 'watcher_id': 'watcher-id'}
     _toPy = {'changes': 'changes', 'error': 'error', 'watcher-id': 'watcher_id'}
-    def __init__(self, changes=None, error=None, watcher_id="", **unknown_fields):
+    def __init__(self, changes=None, error=None, watcher_id=None, **unknown_fields):
         '''
-        changes : typing.Sequence<+T_co>[~OfferStatusChange]<~OfferStatusChange>
+        changes : typing.Sequence[~OfferStatusChange]
         error : Error
         watcher_id : str
         '''
@@ -7926,7 +7926,7 @@ class OfferStatusWatchResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~OfferStatusWatchResult]<~OfferStatusWatchResult>
+        results : typing.Sequence[~OfferStatusWatchResult]
         '''
         self.results = [OfferStatusWatchResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -7938,7 +7938,7 @@ class OfferURLs(Type):
     _toPy = {'offer-urls': 'offer_urls'}
     def __init__(self, offer_urls=None, **unknown_fields):
         '''
-        offer_urls : typing.Sequence<+T_co>[str]
+        offer_urls : typing.Sequence[str]
         '''
         self.offer_urls = offer_urls
         self.unknown_fields = unknown_fields
@@ -7948,7 +7948,7 @@ class OfferURLs(Type):
 class OfferUserDetails(Type):
     _toSchema = {'access': 'access', 'display_name': 'display-name', 'user': 'user'}
     _toPy = {'access': 'access', 'display-name': 'display_name', 'user': 'user'}
-    def __init__(self, access="", display_name="", user="", **unknown_fields):
+    def __init__(self, access=None, display_name=None, user=None, **unknown_fields):
         '''
         access : str
         display_name : str
@@ -7964,12 +7964,12 @@ class OfferUserDetails(Type):
 class OperatorProvisioningInfo(Type):
     _toSchema = {'api_addresses': 'api-addresses', 'charm_storage': 'charm-storage', 'image_path': 'image-path', 'tags': 'tags', 'version': 'version'}
     _toPy = {'api-addresses': 'api_addresses', 'charm-storage': 'charm_storage', 'image-path': 'image_path', 'tags': 'tags', 'version': 'version'}
-    def __init__(self, api_addresses=None, charm_storage=None, image_path="", tags=None, version=None, **unknown_fields):
+    def __init__(self, api_addresses=None, charm_storage=None, image_path=None, tags=None, version=None, **unknown_fields):
         '''
-        api_addresses : typing.Sequence<+T_co>[str]
+        api_addresses : typing.Sequence[str]
         charm_storage : KubernetesFilesystemParams
         image_path : str
-        tags : typing.Mapping<~KT, +VT_co>[str, str]
+        tags : typing.Mapping[str, str]
         version : Number
         '''
         self.api_addresses = api_addresses
@@ -7984,11 +7984,11 @@ class OperatorProvisioningInfo(Type):
 class Payload(Type):
     _toSchema = {'class_': 'class', 'id_': 'id', 'labels': 'labels', 'machine': 'machine', 'status': 'status', 'type_': 'type', 'unit': 'unit'}
     _toPy = {'class': 'class_', 'id': 'id_', 'labels': 'labels', 'machine': 'machine', 'status': 'status', 'type': 'type_', 'unit': 'unit'}
-    def __init__(self, class_="", id_="", labels=None, machine="", status="", type_="", unit="", **unknown_fields):
+    def __init__(self, class_=None, id_=None, labels=None, machine=None, status=None, type_=None, unit=None, **unknown_fields):
         '''
         class_ : str
         id_ : str
-        labels : typing.Sequence<+T_co>[str]
+        labels : typing.Sequence[str]
         machine : str
         status : str
         type_ : str
@@ -8010,7 +8010,7 @@ class PayloadListArgs(Type):
     _toPy = {'patterns': 'patterns'}
     def __init__(self, patterns=None, **unknown_fields):
         '''
-        patterns : typing.Sequence<+T_co>[str]
+        patterns : typing.Sequence[str]
         '''
         self.patterns = patterns
         self.unknown_fields = unknown_fields
@@ -8022,7 +8022,7 @@ class PayloadListResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~Payload]<~Payload>
+        results : typing.Sequence[~Payload]
         '''
         self.results = [Payload.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -8032,7 +8032,7 @@ class PayloadListResults(Type):
 class PayloadResult(Type):
     _toSchema = {'entity': 'Entity', 'error': 'error', 'not_found': 'not-found', 'payload': 'payload', 'tag': 'tag'}
     _toPy = {'Entity': 'entity', 'error': 'error', 'not-found': 'not_found', 'payload': 'payload', 'tag': 'tag'}
-    def __init__(self, entity=None, error=None, not_found=False, payload=None, tag="", **unknown_fields):
+    def __init__(self, entity=None, error=None, not_found=None, payload=None, tag=None, **unknown_fields):
         '''
         entity : Entity
         error : Error
@@ -8054,7 +8054,7 @@ class PayloadResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~PayloadResult]<~PayloadResult>
+        results : typing.Sequence[~PayloadResult]
         '''
         self.results = [PayloadResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -8064,7 +8064,7 @@ class PayloadResults(Type):
 class PhaseResult(Type):
     _toSchema = {'error': 'error', 'phase': 'phase'}
     _toPy = {'error': 'error', 'phase': 'phase'}
-    def __init__(self, error=None, phase="", **unknown_fields):
+    def __init__(self, error=None, phase=None, **unknown_fields):
         '''
         error : Error
         phase : str
@@ -8080,7 +8080,7 @@ class PhaseResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~PhaseResult]<~PhaseResult>
+        results : typing.Sequence[~PhaseResult]
         '''
         self.results = [PhaseResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -8090,7 +8090,7 @@ class PhaseResults(Type):
 class PinApplicationResult(Type):
     _toSchema = {'application_name': 'application-name', 'error': 'error'}
     _toPy = {'application-name': 'application_name', 'error': 'error'}
-    def __init__(self, application_name="", error=None, **unknown_fields):
+    def __init__(self, application_name=None, error=None, **unknown_fields):
         '''
         application_name : str
         error : Error
@@ -8106,7 +8106,7 @@ class PinApplicationsResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~PinApplicationResult]<~PinApplicationResult>
+        results : typing.Sequence[~PinApplicationResult]
         '''
         self.results = [PinApplicationResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -8118,7 +8118,7 @@ class PinnedLeadershipResult(Type):
     _toPy = {'result': 'result'}
     def __init__(self, result=None, **unknown_fields):
         '''
-        result : typing.Sequence<+T_co>[str]
+        result : typing.Sequence[str]
         '''
         self.result = result
         self.unknown_fields = unknown_fields
@@ -8128,7 +8128,7 @@ class PinnedLeadershipResult(Type):
 class Placement(Type):
     _toSchema = {'directive': 'directive', 'scope': 'scope'}
     _toPy = {'directive': 'directive', 'scope': 'scope'}
-    def __init__(self, directive="", scope="", **unknown_fields):
+    def __init__(self, directive=None, scope=None, **unknown_fields):
         '''
         directive : str
         scope : str
@@ -8142,7 +8142,7 @@ class Placement(Type):
 class PortRange(Type):
     _toSchema = {'from_port': 'from-port', 'protocol': 'protocol', 'to_port': 'to-port'}
     _toPy = {'from-port': 'from_port', 'protocol': 'protocol', 'to-port': 'to_port'}
-    def __init__(self, from_port=0, protocol="", to_port=0, **unknown_fields):
+    def __init__(self, from_port=None, protocol=None, to_port=None, **unknown_fields):
         '''
         from_port : int
         protocol : str
@@ -8158,7 +8158,7 @@ class PortRange(Type):
 class PrivateAddress(Type):
     _toSchema = {'target': 'target'}
     _toPy = {'target': 'target'}
-    def __init__(self, target="", **unknown_fields):
+    def __init__(self, target=None, **unknown_fields):
         '''
         target : str
         '''
@@ -8170,7 +8170,7 @@ class PrivateAddress(Type):
 class PrivateAddressResults(Type):
     _toSchema = {'private_address': 'private-address'}
     _toPy = {'private-address': 'private_address'}
-    def __init__(self, private_address="", **unknown_fields):
+    def __init__(self, private_address=None, **unknown_fields):
         '''
         private_address : str
         '''
@@ -8182,7 +8182,7 @@ class PrivateAddressResults(Type):
 class ProfileChangeResult(Type):
     _toSchema = {'error': 'error', 'new_profile_name': 'new-profile-name', 'old_profile_name': 'old-profile-name', 'profile': 'profile', 'subordinate': 'subordinate'}
     _toPy = {'error': 'error', 'new-profile-name': 'new_profile_name', 'old-profile-name': 'old_profile_name', 'profile': 'profile', 'subordinate': 'subordinate'}
-    def __init__(self, error=None, new_profile_name="", old_profile_name="", profile=None, subordinate=False, **unknown_fields):
+    def __init__(self, error=None, new_profile_name=None, old_profile_name=None, profile=None, subordinate=None, **unknown_fields):
         '''
         error : Error
         new_profile_name : str
@@ -8204,7 +8204,7 @@ class ProfileChangeResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~ProfileChangeResult]<~ProfileChangeResult>
+        results : typing.Sequence[~ProfileChangeResult]
         '''
         self.results = [ProfileChangeResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -8214,7 +8214,7 @@ class ProfileChangeResults(Type):
 class ProfileInfoResult(Type):
     _toSchema = {'application_name': 'application-name', 'error': 'error', 'profile': 'profile', 'revision': 'revision'}
     _toPy = {'application-name': 'application_name', 'error': 'error', 'profile': 'profile', 'revision': 'revision'}
-    def __init__(self, application_name="", error=None, profile=None, revision=0, **unknown_fields):
+    def __init__(self, application_name=None, error=None, profile=None, revision=None, **unknown_fields):
         '''
         application_name : str
         error : Error
@@ -8232,7 +8232,7 @@ class ProfileInfoResult(Type):
 class ProviderInterfaceInfo(Type):
     _toSchema = {'interface_name': 'interface-name', 'mac_address': 'mac-address', 'provider_id': 'provider-id'}
     _toPy = {'interface-name': 'interface_name', 'mac-address': 'mac_address', 'provider-id': 'provider_id'}
-    def __init__(self, interface_name="", mac_address="", provider_id="", **unknown_fields):
+    def __init__(self, interface_name=None, mac_address=None, provider_id=None, **unknown_fields):
         '''
         interface_name : str
         mac_address : str
@@ -8248,10 +8248,10 @@ class ProviderInterfaceInfo(Type):
 class ProviderInterfaceInfoResult(Type):
     _toSchema = {'error': 'error', 'interfaces': 'interfaces', 'machine_tag': 'machine-tag'}
     _toPy = {'error': 'error', 'interfaces': 'interfaces', 'machine-tag': 'machine_tag'}
-    def __init__(self, error=None, interfaces=None, machine_tag="", **unknown_fields):
+    def __init__(self, error=None, interfaces=None, machine_tag=None, **unknown_fields):
         '''
         error : Error
-        interfaces : typing.Sequence<+T_co>[~ProviderInterfaceInfo]<~ProviderInterfaceInfo>
+        interfaces : typing.Sequence[~ProviderInterfaceInfo]
         machine_tag : str
         '''
         self.error = Error.from_json(error) if error else None
@@ -8266,7 +8266,7 @@ class ProviderInterfaceInfoResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~ProviderInterfaceInfoResult]<~ProviderInterfaceInfoResult>
+        results : typing.Sequence[~ProviderInterfaceInfoResult]
         '''
         self.results = [ProviderInterfaceInfoResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -8276,12 +8276,12 @@ class ProviderInterfaceInfoResults(Type):
 class ProviderSpace(Type):
     _toSchema = {'error': 'error', 'name': 'name', 'provider_id': 'provider-id', 'subnets': 'subnets'}
     _toPy = {'error': 'error', 'name': 'name', 'provider-id': 'provider_id', 'subnets': 'subnets'}
-    def __init__(self, error=None, name="", provider_id="", subnets=None, **unknown_fields):
+    def __init__(self, error=None, name=None, provider_id=None, subnets=None, **unknown_fields):
         '''
         error : Error
         name : str
         provider_id : str
-        subnets : typing.Sequence<+T_co>[~Subnet]<~Subnet>
+        subnets : typing.Sequence[~Subnet]
         '''
         self.error = Error.from_json(error) if error else None
         self.name = name
@@ -8294,21 +8294,21 @@ class ProviderSpace(Type):
 class ProvisioningInfo(Type):
     _toSchema = {'charm_lxd_profiles': 'charm-lxd-profiles', 'cloudinit_userdata': 'cloudinit-userdata', 'constraints': 'constraints', 'controller_config': 'controller-config', 'endpoint_bindings': 'endpoint-bindings', 'image_metadata': 'image-metadata', 'jobs': 'jobs', 'placement': 'placement', 'series': 'series', 'subnets_to_zones': 'subnets-to-zones', 'tags': 'tags', 'volume_attachments': 'volume-attachments', 'volumes': 'volumes'}
     _toPy = {'charm-lxd-profiles': 'charm_lxd_profiles', 'cloudinit-userdata': 'cloudinit_userdata', 'constraints': 'constraints', 'controller-config': 'controller_config', 'endpoint-bindings': 'endpoint_bindings', 'image-metadata': 'image_metadata', 'jobs': 'jobs', 'placement': 'placement', 'series': 'series', 'subnets-to-zones': 'subnets_to_zones', 'tags': 'tags', 'volume-attachments': 'volume_attachments', 'volumes': 'volumes'}
-    def __init__(self, charm_lxd_profiles=None, cloudinit_userdata=None, constraints=None, controller_config=None, endpoint_bindings=None, image_metadata=None, jobs=None, placement="", series="", subnets_to_zones=None, tags=None, volume_attachments=None, volumes=None, **unknown_fields):
+    def __init__(self, charm_lxd_profiles=None, cloudinit_userdata=None, constraints=None, controller_config=None, endpoint_bindings=None, image_metadata=None, jobs=None, placement=None, series=None, subnets_to_zones=None, tags=None, volume_attachments=None, volumes=None, **unknown_fields):
         '''
-        charm_lxd_profiles : typing.Sequence<+T_co>[str]
-        cloudinit_userdata : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        charm_lxd_profiles : typing.Sequence[str]
+        cloudinit_userdata : typing.Mapping[str, typing.Any]
         constraints : Value
-        controller_config : typing.Mapping<~KT, +VT_co>[str, typing.Any]
-        endpoint_bindings : typing.Mapping<~KT, +VT_co>[str, str]
-        image_metadata : typing.Sequence<+T_co>[~CloudImageMetadata]<~CloudImageMetadata>
-        jobs : typing.Sequence<+T_co>[str]
+        controller_config : typing.Mapping[str, typing.Any]
+        endpoint_bindings : typing.Mapping[str, str]
+        image_metadata : typing.Sequence[~CloudImageMetadata]
+        jobs : typing.Sequence[str]
         placement : str
         series : str
-        subnets_to_zones : typing.Sequence<+T_co>[str]
-        tags : typing.Mapping<~KT, +VT_co>[str, str]
-        volume_attachments : typing.Sequence<+T_co>[~VolumeAttachmentParams]<~VolumeAttachmentParams>
-        volumes : typing.Sequence<+T_co>[~VolumeParams]<~VolumeParams>
+        subnets_to_zones : typing.Sequence[str]
+        tags : typing.Mapping[str, str]
+        volume_attachments : typing.Sequence[~VolumeAttachmentParams]
+        volumes : typing.Sequence[~VolumeParams]
         '''
         self.charm_lxd_profiles = charm_lxd_profiles
         self.cloudinit_userdata = cloudinit_userdata
@@ -8346,7 +8346,7 @@ class ProvisioningInfoResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~ProvisioningInfoResult]<~ProvisioningInfoResult>
+        results : typing.Sequence[~ProvisioningInfoResult]
         '''
         self.results = [ProvisioningInfoResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -8356,7 +8356,7 @@ class ProvisioningInfoResults(Type):
 class ProvisioningScriptParams(Type):
     _toSchema = {'data_dir': 'data-dir', 'disable_package_commands': 'disable-package-commands', 'machine_id': 'machine-id', 'nonce': 'nonce'}
     _toPy = {'data-dir': 'data_dir', 'disable-package-commands': 'disable_package_commands', 'machine-id': 'machine_id', 'nonce': 'nonce'}
-    def __init__(self, data_dir="", disable_package_commands=False, machine_id="", nonce="", **unknown_fields):
+    def __init__(self, data_dir=None, disable_package_commands=None, machine_id=None, nonce=None, **unknown_fields):
         '''
         data_dir : str
         disable_package_commands : bool
@@ -8374,7 +8374,7 @@ class ProvisioningScriptParams(Type):
 class ProvisioningScriptResult(Type):
     _toSchema = {'script': 'script'}
     _toPy = {'script': 'script'}
-    def __init__(self, script="", **unknown_fields):
+    def __init__(self, script=None, **unknown_fields):
         '''
         script : str
         '''
@@ -8386,7 +8386,7 @@ class ProvisioningScriptResult(Type):
 class ProxyConfig(Type):
     _toSchema = {'ftp': 'ftp', 'http': 'http', 'https': 'https', 'no_proxy': 'no-proxy'}
     _toPy = {'ftp': 'ftp', 'http': 'http', 'https': 'https', 'no-proxy': 'no_proxy'}
-    def __init__(self, ftp="", http="", https="", no_proxy="", **unknown_fields):
+    def __init__(self, ftp=None, http=None, https=None, no_proxy=None, **unknown_fields):
         '''
         ftp : str
         http : str
@@ -8404,7 +8404,7 @@ class ProxyConfig(Type):
 class ProxyConfigResult(Type):
     _toSchema = {'apt_proxy_settings': 'apt-proxy-settings', 'error': 'error', 'juju_proxy_settings': 'juju-proxy-settings', 'legacy_proxy_settings': 'legacy-proxy-settings', 'snap_proxy_settings': 'snap-proxy-settings', 'snap_store_assertions': 'snap-store-assertions', 'snap_store_id': 'snap-store-id'}
     _toPy = {'apt-proxy-settings': 'apt_proxy_settings', 'error': 'error', 'juju-proxy-settings': 'juju_proxy_settings', 'legacy-proxy-settings': 'legacy_proxy_settings', 'snap-proxy-settings': 'snap_proxy_settings', 'snap-store-assertions': 'snap_store_assertions', 'snap-store-id': 'snap_store_id'}
-    def __init__(self, apt_proxy_settings=None, error=None, juju_proxy_settings=None, legacy_proxy_settings=None, snap_proxy_settings=None, snap_store_assertions="", snap_store_id="", **unknown_fields):
+    def __init__(self, apt_proxy_settings=None, error=None, juju_proxy_settings=None, legacy_proxy_settings=None, snap_proxy_settings=None, snap_store_assertions=None, snap_store_id=None, **unknown_fields):
         '''
         apt_proxy_settings : ProxyConfig
         error : Error
@@ -8430,7 +8430,7 @@ class ProxyConfigResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~ProxyConfigResult]<~ProxyConfigResult>
+        results : typing.Sequence[~ProxyConfigResult]
         '''
         self.results = [ProxyConfigResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -8440,7 +8440,7 @@ class ProxyConfigResults(Type):
 class PublicAddress(Type):
     _toSchema = {'target': 'target'}
     _toPy = {'target': 'target'}
-    def __init__(self, target="", **unknown_fields):
+    def __init__(self, target=None, **unknown_fields):
         '''
         target : str
         '''
@@ -8452,7 +8452,7 @@ class PublicAddress(Type):
 class PublicAddressResults(Type):
     _toSchema = {'public_address': 'public-address'}
     _toPy = {'public-address': 'public_address'}
-    def __init__(self, public_address="", **unknown_fields):
+    def __init__(self, public_address=None, **unknown_fields):
         '''
         public_address : str
         '''
@@ -8466,7 +8466,7 @@ class QueryApplicationOffersResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~ApplicationOfferAdminDetails]<~ApplicationOfferAdminDetails>
+        results : typing.Sequence[~ApplicationOfferAdminDetails]
         '''
         self.results = [ApplicationOfferAdminDetails.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -8476,7 +8476,7 @@ class QueryApplicationOffersResults(Type):
 class RebootActionResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
-    def __init__(self, error=None, result="", **unknown_fields):
+    def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
         result : str
@@ -8492,7 +8492,7 @@ class RebootActionResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~RebootActionResult]<~RebootActionResult>
+        results : typing.Sequence[~RebootActionResult]
         '''
         self.results = [RebootActionResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -8502,10 +8502,10 @@ class RebootActionResults(Type):
 class RegionDefaults(Type):
     _toSchema = {'region_name': 'region-name', 'value': 'value'}
     _toPy = {'region-name': 'region_name', 'value': 'value'}
-    def __init__(self, region_name="", value=None, **unknown_fields):
+    def __init__(self, region_name=None, value=None, **unknown_fields):
         '''
         region_name : str
-        value : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        value : typing.Mapping[str, typing.Any]
         '''
         self.region_name = region_name
         self.value = value
@@ -8516,11 +8516,11 @@ class RegionDefaults(Type):
 class RegisterRemoteRelationArg(Type):
     _toSchema = {'application_token': 'application-token', 'local_endpoint_name': 'local-endpoint-name', 'macaroons': 'macaroons', 'offer_uuid': 'offer-uuid', 'relation_token': 'relation-token', 'remote_endpoint': 'remote-endpoint', 'remote_space': 'remote-space', 'source_model_tag': 'source-model-tag'}
     _toPy = {'application-token': 'application_token', 'local-endpoint-name': 'local_endpoint_name', 'macaroons': 'macaroons', 'offer-uuid': 'offer_uuid', 'relation-token': 'relation_token', 'remote-endpoint': 'remote_endpoint', 'remote-space': 'remote_space', 'source-model-tag': 'source_model_tag'}
-    def __init__(self, application_token="", local_endpoint_name="", macaroons=None, offer_uuid="", relation_token="", remote_endpoint=None, remote_space=None, source_model_tag="", **unknown_fields):
+    def __init__(self, application_token=None, local_endpoint_name=None, macaroons=None, offer_uuid=None, relation_token=None, remote_endpoint=None, remote_space=None, source_model_tag=None, **unknown_fields):
         '''
         application_token : str
         local_endpoint_name : str
-        macaroons : typing.Sequence<+T_co>[~Macaroon]<~Macaroon>
+        macaroons : typing.Sequence[~Macaroon]
         offer_uuid : str
         relation_token : str
         remote_endpoint : RemoteEndpoint
@@ -8544,7 +8544,7 @@ class RegisterRemoteRelationArgs(Type):
     _toPy = {'relations': 'relations'}
     def __init__(self, relations=None, **unknown_fields):
         '''
-        relations : typing.Sequence<+T_co>[~RegisterRemoteRelationArg]<~RegisterRemoteRelationArg>
+        relations : typing.Sequence[~RegisterRemoteRelationArg]
         '''
         self.relations = [RegisterRemoteRelationArg.from_json(o) for o in relations or []]
         self.unknown_fields = unknown_fields
@@ -8570,7 +8570,7 @@ class RegisterRemoteRelationResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~RegisterRemoteRelationResult]<~RegisterRemoteRelationResult>
+        results : typing.Sequence[~RegisterRemoteRelationResult]
         '''
         self.results = [RegisterRemoteRelationResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -8580,10 +8580,10 @@ class RegisterRemoteRelationResults(Type):
 class RelationChange(Type):
     _toSchema = {'changedunits': 'changedunits', 'departedunits': 'departedunits', 'id_': 'id', 'life': 'life'}
     _toPy = {'changedunits': 'changedunits', 'departedunits': 'departedunits', 'id': 'id_', 'life': 'life'}
-    def __init__(self, changedunits=None, departedunits=None, id_=0, life="", **unknown_fields):
+    def __init__(self, changedunits=None, departedunits=None, id_=None, life=None, **unknown_fields):
         '''
-        changedunits : typing.Mapping<~KT, +VT_co>[str, ~RelationUnitChange]<~RelationUnitChange>
-        departedunits : typing.Sequence<+T_co>[str]
+        changedunits : typing.Mapping[str, ~RelationUnitChange]
+        departedunits : typing.Sequence[str]
         id_ : int
         life : str
         '''
@@ -8600,7 +8600,7 @@ class RelationIds(Type):
     _toPy = {'relation-ids': 'relation_ids'}
     def __init__(self, relation_ids=None, **unknown_fields):
         '''
-        relation_ids : typing.Sequence<+T_co>[int]
+        relation_ids : typing.Sequence[int]
         '''
         self.relation_ids = relation_ids
         self.unknown_fields = unknown_fields
@@ -8610,7 +8610,7 @@ class RelationIds(Type):
 class RelationLifeSuspendedStatusChange(Type):
     _toSchema = {'key': 'key', 'life': 'life', 'suspended': 'suspended', 'suspended_reason': 'suspended-reason'}
     _toPy = {'key': 'key', 'life': 'life', 'suspended': 'suspended', 'suspended-reason': 'suspended_reason'}
-    def __init__(self, key="", life="", suspended=False, suspended_reason="", **unknown_fields):
+    def __init__(self, key=None, life=None, suspended=None, suspended_reason=None, **unknown_fields):
         '''
         key : str
         life : str
@@ -8628,9 +8628,9 @@ class RelationLifeSuspendedStatusChange(Type):
 class RelationLifeSuspendedStatusWatchResult(Type):
     _toSchema = {'changes': 'changes', 'error': 'error', 'watcher_id': 'watcher-id'}
     _toPy = {'changes': 'changes', 'error': 'error', 'watcher-id': 'watcher_id'}
-    def __init__(self, changes=None, error=None, watcher_id="", **unknown_fields):
+    def __init__(self, changes=None, error=None, watcher_id=None, **unknown_fields):
         '''
-        changes : typing.Sequence<+T_co>[~RelationLifeSuspendedStatusChange]<~RelationLifeSuspendedStatusChange>
+        changes : typing.Sequence[~RelationLifeSuspendedStatusChange]
         error : Error
         watcher_id : str
         '''
@@ -8644,7 +8644,7 @@ class RelationLifeSuspendedStatusWatchResult(Type):
 class RelationResult(Type):
     _toSchema = {'bool_': 'bool', 'endpoint': 'endpoint', 'error': 'error', 'id_': 'id', 'key': 'key', 'life': 'life', 'other_application': 'other-application'}
     _toPy = {'bool': 'bool_', 'endpoint': 'endpoint', 'error': 'error', 'id': 'id_', 'key': 'key', 'life': 'life', 'other-application': 'other_application'}
-    def __init__(self, bool_=False, endpoint=None, error=None, id_=0, key="", life="", other_application="", **unknown_fields):
+    def __init__(self, bool_=None, endpoint=None, error=None, id_=None, key=None, life=None, other_application=None, **unknown_fields):
         '''
         bool_ : bool
         endpoint : Endpoint
@@ -8670,7 +8670,7 @@ class RelationResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~RelationResult]<~RelationResult>
+        results : typing.Sequence[~RelationResult]
         '''
         self.results = [RelationResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -8680,9 +8680,9 @@ class RelationResults(Type):
 class RelationStatus(Type):
     _toSchema = {'endpoints': 'endpoints', 'id_': 'id', 'interface': 'interface', 'key': 'key', 'scope': 'scope', 'status': 'status'}
     _toPy = {'endpoints': 'endpoints', 'id': 'id_', 'interface': 'interface', 'key': 'key', 'scope': 'scope', 'status': 'status'}
-    def __init__(self, endpoints=None, id_=0, interface="", key="", scope="", status=None, **unknown_fields):
+    def __init__(self, endpoints=None, id_=None, interface=None, key=None, scope=None, status=None, **unknown_fields):
         '''
-        endpoints : typing.Sequence<+T_co>[~EndpointStatus]<~EndpointStatus>
+        endpoints : typing.Sequence[~EndpointStatus]
         id_ : int
         interface : str
         key : str
@@ -8702,7 +8702,7 @@ class RelationStatus(Type):
 class RelationStatusArg(Type):
     _toSchema = {'message': 'message', 'relation_id': 'relation-id', 'status': 'status', 'unit_tag': 'unit-tag'}
     _toPy = {'message': 'message', 'relation-id': 'relation_id', 'status': 'status', 'unit-tag': 'unit_tag'}
-    def __init__(self, message="", relation_id=0, status="", unit_tag="", **unknown_fields):
+    def __init__(self, message=None, relation_id=None, status=None, unit_tag=None, **unknown_fields):
         '''
         message : str
         relation_id : int
@@ -8722,7 +8722,7 @@ class RelationStatusArgs(Type):
     _toPy = {'args': 'args'}
     def __init__(self, args=None, **unknown_fields):
         '''
-        args : typing.Sequence<+T_co>[~RelationStatusArg]<~RelationStatusArg>
+        args : typing.Sequence[~RelationStatusArg]
         '''
         self.args = [RelationStatusArg.from_json(o) for o in args or []]
         self.unknown_fields = unknown_fields
@@ -8734,7 +8734,7 @@ class RelationStatusWatchResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~RelationLifeSuspendedStatusWatchResult]<~RelationLifeSuspendedStatusWatchResult>
+        results : typing.Sequence[~RelationLifeSuspendedStatusWatchResult]
         '''
         self.results = [RelationLifeSuspendedStatusWatchResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -8744,7 +8744,7 @@ class RelationStatusWatchResults(Type):
 class RelationSuspendedArg(Type):
     _toSchema = {'message': 'message', 'relation_id': 'relation-id', 'suspended': 'suspended'}
     _toPy = {'message': 'message', 'relation-id': 'relation_id', 'suspended': 'suspended'}
-    def __init__(self, message="", relation_id=0, suspended=False, **unknown_fields):
+    def __init__(self, message=None, relation_id=None, suspended=None, **unknown_fields):
         '''
         message : str
         relation_id : int
@@ -8762,7 +8762,7 @@ class RelationSuspendedArgs(Type):
     _toPy = {'args': 'args'}
     def __init__(self, args=None, **unknown_fields):
         '''
-        args : typing.Sequence<+T_co>[~RelationSuspendedArg]<~RelationSuspendedArg>
+        args : typing.Sequence[~RelationSuspendedArg]
         '''
         self.args = [RelationSuspendedArg.from_json(o) for o in args or []]
         self.unknown_fields = unknown_fields
@@ -8772,7 +8772,7 @@ class RelationSuspendedArgs(Type):
 class RelationUnit(Type):
     _toSchema = {'relation': 'relation', 'unit': 'unit'}
     _toPy = {'relation': 'relation', 'unit': 'unit'}
-    def __init__(self, relation="", unit="", **unknown_fields):
+    def __init__(self, relation=None, unit=None, **unknown_fields):
         '''
         relation : str
         unit : str
@@ -8788,7 +8788,7 @@ class RelationUnitChange(Type):
     _toPy = {'settings': 'settings'}
     def __init__(self, settings=None, **unknown_fields):
         '''
-        settings : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        settings : typing.Mapping[str, typing.Any]
         '''
         self.settings = settings
         self.unknown_fields = unknown_fields
@@ -8798,7 +8798,7 @@ class RelationUnitChange(Type):
 class RelationUnitPair(Type):
     _toSchema = {'local_unit': 'local-unit', 'relation': 'relation', 'remote_unit': 'remote-unit'}
     _toPy = {'local-unit': 'local_unit', 'relation': 'relation', 'remote-unit': 'remote_unit'}
-    def __init__(self, local_unit="", relation="", remote_unit="", **unknown_fields):
+    def __init__(self, local_unit=None, relation=None, remote_unit=None, **unknown_fields):
         '''
         local_unit : str
         relation : str
@@ -8816,7 +8816,7 @@ class RelationUnitPairs(Type):
     _toPy = {'relation-unit-pairs': 'relation_unit_pairs'}
     def __init__(self, relation_unit_pairs=None, **unknown_fields):
         '''
-        relation_unit_pairs : typing.Sequence<+T_co>[~RelationUnitPair]<~RelationUnitPair>
+        relation_unit_pairs : typing.Sequence[~RelationUnitPair]
         '''
         self.relation_unit_pairs = [RelationUnitPair.from_json(o) for o in relation_unit_pairs or []]
         self.unknown_fields = unknown_fields
@@ -8826,10 +8826,10 @@ class RelationUnitPairs(Type):
 class RelationUnitSettings(Type):
     _toSchema = {'relation': 'relation', 'settings': 'settings', 'unit': 'unit'}
     _toPy = {'relation': 'relation', 'settings': 'settings', 'unit': 'unit'}
-    def __init__(self, relation="", settings=None, unit="", **unknown_fields):
+    def __init__(self, relation=None, settings=None, unit=None, **unknown_fields):
         '''
         relation : str
-        settings : typing.Mapping<~KT, +VT_co>[str, str]
+        settings : typing.Mapping[str, str]
         unit : str
         '''
         self.relation = relation
@@ -8842,7 +8842,7 @@ class RelationUnitSettings(Type):
 class RelationUnitStatus(Type):
     _toSchema = {'in_scope': 'in-scope', 'relation_tag': 'relation-tag', 'suspended': 'suspended'}
     _toPy = {'in-scope': 'in_scope', 'relation-tag': 'relation_tag', 'suspended': 'suspended'}
-    def __init__(self, in_scope=False, relation_tag="", suspended=False, **unknown_fields):
+    def __init__(self, in_scope=None, relation_tag=None, suspended=None, **unknown_fields):
         '''
         in_scope : bool
         relation_tag : str
@@ -8861,7 +8861,7 @@ class RelationUnitStatusResult(Type):
     def __init__(self, error=None, results=None, **unknown_fields):
         '''
         error : Error
-        results : typing.Sequence<+T_co>[~RelationUnitStatus]<~RelationUnitStatus>
+        results : typing.Sequence[~RelationUnitStatus]
         '''
         self.error = Error.from_json(error) if error else None
         self.results = [RelationUnitStatus.from_json(o) for o in results or []]
@@ -8874,7 +8874,7 @@ class RelationUnitStatusResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~RelationUnitStatusResult]<~RelationUnitStatusResult>
+        results : typing.Sequence[~RelationUnitStatusResult]
         '''
         self.results = [RelationUnitStatusResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -8886,7 +8886,7 @@ class RelationUnits(Type):
     _toPy = {'relation-units': 'relation_units'}
     def __init__(self, relation_units=None, **unknown_fields):
         '''
-        relation_units : typing.Sequence<+T_co>[~RelationUnit]<~RelationUnit>
+        relation_units : typing.Sequence[~RelationUnit]
         '''
         self.relation_units = [RelationUnit.from_json(o) for o in relation_units or []]
         self.unknown_fields = unknown_fields
@@ -8898,8 +8898,8 @@ class RelationUnitsChange(Type):
     _toPy = {'changed': 'changed', 'departed': 'departed'}
     def __init__(self, changed=None, departed=None, **unknown_fields):
         '''
-        changed : typing.Mapping<~KT, +VT_co>[str, ~UnitSettings]<~UnitSettings>
-        departed : typing.Sequence<+T_co>[str]
+        changed : typing.Mapping[str, ~UnitSettings]
+        departed : typing.Sequence[str]
         '''
         self.changed = changed
         self.departed = departed
@@ -8912,7 +8912,7 @@ class RelationUnitsSettings(Type):
     _toPy = {'relation-units': 'relation_units'}
     def __init__(self, relation_units=None, **unknown_fields):
         '''
-        relation_units : typing.Sequence<+T_co>[~RelationUnitSettings]<~RelationUnitSettings>
+        relation_units : typing.Sequence[~RelationUnitSettings]
         '''
         self.relation_units = [RelationUnitSettings.from_json(o) for o in relation_units or []]
         self.unknown_fields = unknown_fields
@@ -8922,7 +8922,7 @@ class RelationUnitsSettings(Type):
 class RelationUnitsWatchResult(Type):
     _toSchema = {'changes': 'changes', 'error': 'error', 'watcher_id': 'watcher-id'}
     _toPy = {'changes': 'changes', 'error': 'error', 'watcher-id': 'watcher_id'}
-    def __init__(self, changes=None, error=None, watcher_id="", **unknown_fields):
+    def __init__(self, changes=None, error=None, watcher_id=None, **unknown_fields):
         '''
         changes : RelationUnitsChange
         error : Error
@@ -8940,7 +8940,7 @@ class RelationUnitsWatchResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~RelationUnitsWatchResult]<~RelationUnitsWatchResult>
+        results : typing.Sequence[~RelationUnitsWatchResult]
         '''
         self.results = [RelationUnitsWatchResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -8950,7 +8950,7 @@ class RelationUnitsWatchResults(Type):
 class RemoteApplication(Type):
     _toSchema = {'is_consumer_proxy': 'is-consumer-proxy', 'life': 'life', 'macaroon': 'macaroon', 'model_uuid': 'model-uuid', 'name': 'name', 'offer_uuid': 'offer-uuid', 'status': 'status'}
     _toPy = {'is-consumer-proxy': 'is_consumer_proxy', 'life': 'life', 'macaroon': 'macaroon', 'model-uuid': 'model_uuid', 'name': 'name', 'offer-uuid': 'offer_uuid', 'status': 'status'}
-    def __init__(self, is_consumer_proxy=False, life="", macaroon=None, model_uuid="", name="", offer_uuid="", status="", **unknown_fields):
+    def __init__(self, is_consumer_proxy=None, life=None, macaroon=None, model_uuid=None, name=None, offer_uuid=None, status=None, **unknown_fields):
         '''
         is_consumer_proxy : bool
         life : str
@@ -8974,7 +8974,7 @@ class RemoteApplication(Type):
 class RemoteApplicationChange(Type):
     _toSchema = {'application_tag': 'application-tag', 'life': 'life', 'relations': 'relations'}
     _toPy = {'application-tag': 'application_tag', 'life': 'life', 'relations': 'relations'}
-    def __init__(self, application_tag="", life="", relations=None, **unknown_fields):
+    def __init__(self, application_tag=None, life=None, relations=None, **unknown_fields):
         '''
         application_tag : str
         life : str
@@ -8990,10 +8990,10 @@ class RemoteApplicationChange(Type):
 class RemoteApplicationInfo(Type):
     _toSchema = {'description': 'description', 'endpoints': 'endpoints', 'icon_url_path': 'icon-url-path', 'model_tag': 'model-tag', 'name': 'name', 'offer_url': 'offer-url', 'source_model_label': 'source-model-label'}
     _toPy = {'description': 'description', 'endpoints': 'endpoints', 'icon-url-path': 'icon_url_path', 'model-tag': 'model_tag', 'name': 'name', 'offer-url': 'offer_url', 'source-model-label': 'source_model_label'}
-    def __init__(self, description="", endpoints=None, icon_url_path="", model_tag="", name="", offer_url="", source_model_label="", **unknown_fields):
+    def __init__(self, description=None, endpoints=None, icon_url_path=None, model_tag=None, name=None, offer_url=None, source_model_label=None, **unknown_fields):
         '''
         description : str
-        endpoints : typing.Sequence<+T_co>[~RemoteEndpoint]<~RemoteEndpoint>
+        endpoints : typing.Sequence[~RemoteEndpoint]
         icon_url_path : str
         model_tag : str
         name : str
@@ -9030,7 +9030,7 @@ class RemoteApplicationInfoResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~RemoteApplicationInfoResult]<~RemoteApplicationInfoResult>
+        results : typing.Sequence[~RemoteApplicationInfoResult]
         '''
         self.results = [RemoteApplicationInfoResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -9056,7 +9056,7 @@ class RemoteApplicationResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~RemoteApplicationResult]<~RemoteApplicationResult>
+        results : typing.Sequence[~RemoteApplicationResult]
         '''
         self.results = [RemoteApplicationResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -9066,14 +9066,14 @@ class RemoteApplicationResults(Type):
 class RemoteApplicationStatus(Type):
     _toSchema = {'endpoints': 'endpoints', 'err': 'err', 'life': 'life', 'offer_name': 'offer-name', 'offer_url': 'offer-url', 'relations': 'relations', 'status': 'status'}
     _toPy = {'endpoints': 'endpoints', 'err': 'err', 'life': 'life', 'offer-name': 'offer_name', 'offer-url': 'offer_url', 'relations': 'relations', 'status': 'status'}
-    def __init__(self, endpoints=None, err=None, life="", offer_name="", offer_url="", relations=None, status=None, **unknown_fields):
+    def __init__(self, endpoints=None, err=None, life=None, offer_name=None, offer_url=None, relations=None, status=None, **unknown_fields):
         '''
-        endpoints : typing.Sequence<+T_co>[~RemoteEndpoint]<~RemoteEndpoint>
+        endpoints : typing.Sequence[~RemoteEndpoint]
         err : Error
         life : str
         offer_name : str
         offer_url : str
-        relations : typing.Sequence<+T_co>[str]
+        relations : typing.Sequence[str]
         status : DetailedStatus
         '''
         self.endpoints = [RemoteEndpoint.from_json(o) for o in endpoints or []]
@@ -9090,7 +9090,7 @@ class RemoteApplicationStatus(Type):
 class RemoteApplicationWatchResult(Type):
     _toSchema = {'change': 'change', 'error': 'error', 'id_': 'id'}
     _toPy = {'change': 'change', 'error': 'error', 'id': 'id_'}
-    def __init__(self, change=None, error=None, id_="", **unknown_fields):
+    def __init__(self, change=None, error=None, id_=None, **unknown_fields):
         '''
         change : RemoteApplicationChange
         error : Error
@@ -9106,7 +9106,7 @@ class RemoteApplicationWatchResult(Type):
 class RemoteEndpoint(Type):
     _toSchema = {'interface': 'interface', 'limit': 'limit', 'name': 'name', 'role': 'role'}
     _toPy = {'interface': 'interface', 'limit': 'limit', 'name': 'name', 'role': 'role'}
-    def __init__(self, interface="", limit=0, name="", role="", **unknown_fields):
+    def __init__(self, interface=None, limit=None, name=None, role=None, **unknown_fields):
         '''
         interface : str
         limit : int
@@ -9124,9 +9124,9 @@ class RemoteEndpoint(Type):
 class RemoteEntityArg(Type):
     _toSchema = {'macaroons': 'macaroons', 'relation_token': 'relation-token'}
     _toPy = {'macaroons': 'macaroons', 'relation-token': 'relation_token'}
-    def __init__(self, macaroons=None, relation_token="", **unknown_fields):
+    def __init__(self, macaroons=None, relation_token=None, **unknown_fields):
         '''
-        macaroons : typing.Sequence<+T_co>[~Macaroon]<~Macaroon>
+        macaroons : typing.Sequence[~Macaroon]
         relation_token : str
         '''
         self.macaroons = [Macaroon.from_json(o) for o in macaroons or []]
@@ -9140,7 +9140,7 @@ class RemoteEntityArgs(Type):
     _toPy = {'args': 'args'}
     def __init__(self, args=None, **unknown_fields):
         '''
-        args : typing.Sequence<+T_co>[~RemoteEntityArg]<~RemoteEntityArg>
+        args : typing.Sequence[~RemoteEntityArg]
         '''
         self.args = [RemoteEntityArg.from_json(o) for o in args or []]
         self.unknown_fields = unknown_fields
@@ -9150,7 +9150,7 @@ class RemoteEntityArgs(Type):
 class RemoteEntityId(Type):
     _toSchema = {'model_uuid': 'model-uuid', 'token': 'token'}
     _toPy = {'model-uuid': 'model_uuid', 'token': 'token'}
-    def __init__(self, model_uuid="", token="", **unknown_fields):
+    def __init__(self, model_uuid=None, token=None, **unknown_fields):
         '''
         model_uuid : str
         token : str
@@ -9164,7 +9164,7 @@ class RemoteEntityId(Type):
 class RemoteEntityTokenArg(Type):
     _toSchema = {'tag': 'tag', 'token': 'token'}
     _toPy = {'tag': 'tag', 'token': 'token'}
-    def __init__(self, tag="", token="", **unknown_fields):
+    def __init__(self, tag=None, token=None, **unknown_fields):
         '''
         tag : str
         token : str
@@ -9180,7 +9180,7 @@ class RemoteEntityTokenArgs(Type):
     _toPy = {'Args': 'args'}
     def __init__(self, args=None, **unknown_fields):
         '''
-        args : typing.Sequence<+T_co>[~RemoteEntityTokenArg]<~RemoteEntityTokenArg>
+        args : typing.Sequence[~RemoteEntityTokenArg]
         '''
         self.args = [RemoteEntityTokenArg.from_json(o) for o in args or []]
         self.unknown_fields = unknown_fields
@@ -9190,7 +9190,7 @@ class RemoteEntityTokenArgs(Type):
 class RemoteRelation(Type):
     _toSchema = {'application_name': 'application-name', 'endpoint': 'endpoint', 'id_': 'id', 'key': 'key', 'life': 'life', 'remote_application_name': 'remote-application-name', 'remote_endpoint_name': 'remote-endpoint-name', 'source_model_uuid': 'source-model-uuid', 'suspended': 'suspended'}
     _toPy = {'application-name': 'application_name', 'endpoint': 'endpoint', 'id': 'id_', 'key': 'key', 'life': 'life', 'remote-application-name': 'remote_application_name', 'remote-endpoint-name': 'remote_endpoint_name', 'source-model-uuid': 'source_model_uuid', 'suspended': 'suspended'}
-    def __init__(self, application_name="", endpoint=None, id_=0, key="", life="", remote_application_name="", remote_endpoint_name="", source_model_uuid="", suspended=False, **unknown_fields):
+    def __init__(self, application_name=None, endpoint=None, id_=None, key=None, life=None, remote_application_name=None, remote_endpoint_name=None, source_model_uuid=None, suspended=None, **unknown_fields):
         '''
         application_name : str
         endpoint : RemoteEndpoint
@@ -9218,10 +9218,10 @@ class RemoteRelation(Type):
 class RemoteRelationChange(Type):
     _toSchema = {'changed_units': 'changed-units', 'departed_units': 'departed-units', 'id_': 'id', 'life': 'life'}
     _toPy = {'changed-units': 'changed_units', 'departed-units': 'departed_units', 'id': 'id_', 'life': 'life'}
-    def __init__(self, changed_units=None, departed_units=None, id_=0, life="", **unknown_fields):
+    def __init__(self, changed_units=None, departed_units=None, id_=None, life=None, **unknown_fields):
         '''
-        changed_units : typing.Mapping<~KT, +VT_co>[str, ~RemoteRelationUnitChange]<~RemoteRelationUnitChange>
-        departed_units : typing.Sequence<+T_co>[str]
+        changed_units : typing.Mapping[str, ~RemoteRelationUnitChange]
+        departed_units : typing.Sequence[str]
         id_ : int
         life : str
         '''
@@ -9236,14 +9236,14 @@ class RemoteRelationChange(Type):
 class RemoteRelationChangeEvent(Type):
     _toSchema = {'application_token': 'application-token', 'changed_units': 'changed-units', 'departed_units': 'departed-units', 'force_cleanup': 'force-cleanup', 'life': 'life', 'macaroons': 'macaroons', 'relation_token': 'relation-token', 'suspended': 'suspended', 'suspended_reason': 'suspended-reason'}
     _toPy = {'application-token': 'application_token', 'changed-units': 'changed_units', 'departed-units': 'departed_units', 'force-cleanup': 'force_cleanup', 'life': 'life', 'macaroons': 'macaroons', 'relation-token': 'relation_token', 'suspended': 'suspended', 'suspended-reason': 'suspended_reason'}
-    def __init__(self, application_token="", changed_units=None, departed_units=None, force_cleanup=False, life="", macaroons=None, relation_token="", suspended=False, suspended_reason="", **unknown_fields):
+    def __init__(self, application_token=None, changed_units=None, departed_units=None, force_cleanup=None, life=None, macaroons=None, relation_token=None, suspended=None, suspended_reason=None, **unknown_fields):
         '''
         application_token : str
-        changed_units : typing.Sequence<+T_co>[~RemoteRelationUnitChange]<~RemoteRelationUnitChange>
-        departed_units : typing.Sequence<+T_co>[int]
+        changed_units : typing.Sequence[~RemoteRelationUnitChange]
+        departed_units : typing.Sequence[int]
         force_cleanup : bool
         life : str
-        macaroons : typing.Sequence<+T_co>[~Macaroon]<~Macaroon>
+        macaroons : typing.Sequence[~Macaroon]
         relation_token : str
         suspended : bool
         suspended_reason : str
@@ -9264,7 +9264,7 @@ class RemoteRelationChangeEvent(Type):
 class RemoteRelationDetails(Type):
     _toSchema = {'macaroon': 'macaroon', 'relation_token': 'relation-token'}
     _toPy = {'macaroon': 'macaroon', 'relation-token': 'relation_token'}
-    def __init__(self, macaroon=None, relation_token="", **unknown_fields):
+    def __init__(self, macaroon=None, relation_token=None, **unknown_fields):
         '''
         macaroon : Macaroon
         relation_token : str
@@ -9294,7 +9294,7 @@ class RemoteRelationResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~RemoteRelationResult]<~RemoteRelationResult>
+        results : typing.Sequence[~RemoteRelationResult]
         '''
         self.results = [RemoteRelationResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -9304,9 +9304,9 @@ class RemoteRelationResults(Type):
 class RemoteRelationUnit(Type):
     _toSchema = {'macaroons': 'macaroons', 'relation_token': 'relation-token', 'unit': 'unit'}
     _toPy = {'macaroons': 'macaroons', 'relation-token': 'relation_token', 'unit': 'unit'}
-    def __init__(self, macaroons=None, relation_token="", unit="", **unknown_fields):
+    def __init__(self, macaroons=None, relation_token=None, unit=None, **unknown_fields):
         '''
-        macaroons : typing.Sequence<+T_co>[~Macaroon]<~Macaroon>
+        macaroons : typing.Sequence[~Macaroon]
         relation_token : str
         unit : str
         '''
@@ -9320,9 +9320,9 @@ class RemoteRelationUnit(Type):
 class RemoteRelationUnitChange(Type):
     _toSchema = {'settings': 'settings', 'unit_id': 'unit-id'}
     _toPy = {'settings': 'settings', 'unit-id': 'unit_id'}
-    def __init__(self, settings=None, unit_id=0, **unknown_fields):
+    def __init__(self, settings=None, unit_id=None, **unknown_fields):
         '''
-        settings : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        settings : typing.Mapping[str, typing.Any]
         unit_id : int
         '''
         self.settings = settings
@@ -9336,7 +9336,7 @@ class RemoteRelationUnits(Type):
     _toPy = {'relation-units': 'relation_units'}
     def __init__(self, relation_units=None, **unknown_fields):
         '''
-        relation_units : typing.Sequence<+T_co>[~RemoteRelationUnit]<~RemoteRelationUnit>
+        relation_units : typing.Sequence[~RemoteRelationUnit]
         '''
         self.relation_units = [RemoteRelationUnit.from_json(o) for o in relation_units or []]
         self.unknown_fields = unknown_fields
@@ -9346,11 +9346,11 @@ class RemoteRelationUnits(Type):
 class RemoteRelationsChange(Type):
     _toSchema = {'changed': 'changed', 'initial': 'initial', 'removed': 'removed'}
     _toPy = {'changed': 'changed', 'initial': 'initial', 'removed': 'removed'}
-    def __init__(self, changed=None, initial=False, removed=None, **unknown_fields):
+    def __init__(self, changed=None, initial=None, removed=None, **unknown_fields):
         '''
-        changed : typing.Sequence<+T_co>[~RemoteRelationChange]<~RemoteRelationChange>
+        changed : typing.Sequence[~RemoteRelationChange]
         initial : bool
-        removed : typing.Sequence<+T_co>[int]
+        removed : typing.Sequence[int]
         '''
         self.changed = [RemoteRelationChange.from_json(o) for o in changed or []]
         self.initial = initial
@@ -9364,7 +9364,7 @@ class RemoteRelationsChanges(Type):
     _toPy = {'changes': 'changes'}
     def __init__(self, changes=None, **unknown_fields):
         '''
-        changes : typing.Sequence<+T_co>[~RemoteRelationChangeEvent]<~RemoteRelationChangeEvent>
+        changes : typing.Sequence[~RemoteRelationChangeEvent]
         '''
         self.changes = [RemoteRelationChangeEvent.from_json(o) for o in changes or []]
         self.unknown_fields = unknown_fields
@@ -9374,7 +9374,7 @@ class RemoteRelationsChanges(Type):
 class RemoteRelationsWatchResult(Type):
     _toSchema = {'change': 'change', 'error': 'error', 'remoterelationswatcherid': 'RemoteRelationsWatcherId'}
     _toPy = {'RemoteRelationsWatcherId': 'remoterelationswatcherid', 'change': 'change', 'error': 'error'}
-    def __init__(self, remoterelationswatcherid="", change=None, error=None, **unknown_fields):
+    def __init__(self, remoterelationswatcherid=None, change=None, error=None, **unknown_fields):
         '''
         remoterelationswatcherid : str
         change : RemoteRelationsChange
@@ -9390,13 +9390,13 @@ class RemoteRelationsWatchResult(Type):
 class RemoteSpace(Type):
     _toSchema = {'cloud_type': 'cloud-type', 'name': 'name', 'provider_attributes': 'provider-attributes', 'provider_id': 'provider-id', 'subnets': 'subnets'}
     _toPy = {'cloud-type': 'cloud_type', 'name': 'name', 'provider-attributes': 'provider_attributes', 'provider-id': 'provider_id', 'subnets': 'subnets'}
-    def __init__(self, cloud_type="", name="", provider_attributes=None, provider_id="", subnets=None, **unknown_fields):
+    def __init__(self, cloud_type=None, name=None, provider_attributes=None, provider_id=None, subnets=None, **unknown_fields):
         '''
         cloud_type : str
         name : str
-        provider_attributes : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        provider_attributes : typing.Mapping[str, typing.Any]
         provider_id : str
-        subnets : typing.Sequence<+T_co>[~Subnet]<~Subnet>
+        subnets : typing.Sequence[~Subnet]
         '''
         self.cloud_type = cloud_type
         self.name = name
@@ -9410,7 +9410,7 @@ class RemoteSpace(Type):
 class RemoveBlocksArgs(Type):
     _toSchema = {'all_': 'all'}
     _toPy = {'all': 'all_'}
-    def __init__(self, all_=False, **unknown_fields):
+    def __init__(self, all_=None, **unknown_fields):
         '''
         all_ : bool
         '''
@@ -9422,7 +9422,7 @@ class RemoveBlocksArgs(Type):
 class RemoveFilesystemParams(Type):
     _toSchema = {'destroy': 'destroy', 'filesystem_id': 'filesystem-id', 'provider': 'provider'}
     _toPy = {'destroy': 'destroy', 'filesystem-id': 'filesystem_id', 'provider': 'provider'}
-    def __init__(self, destroy=False, filesystem_id="", provider="", **unknown_fields):
+    def __init__(self, destroy=None, filesystem_id=None, provider=None, **unknown_fields):
         '''
         destroy : bool
         filesystem_id : str
@@ -9454,7 +9454,7 @@ class RemoveFilesystemParamsResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~RemoveFilesystemParamsResult]<~RemoveFilesystemParamsResult>
+        results : typing.Sequence[~RemoveFilesystemParamsResult]
         '''
         self.results = [RemoveFilesystemParamsResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -9466,7 +9466,7 @@ class RemoveStorage(Type):
     _toPy = {'storage': 'storage'}
     def __init__(self, storage=None, **unknown_fields):
         '''
-        storage : typing.Sequence<+T_co>[~RemoveStorageInstance]<~RemoveStorageInstance>
+        storage : typing.Sequence[~RemoveStorageInstance]
         '''
         self.storage = [RemoveStorageInstance.from_json(o) for o in storage or []]
         self.unknown_fields = unknown_fields
@@ -9476,7 +9476,7 @@ class RemoveStorage(Type):
 class RemoveStorageInstance(Type):
     _toSchema = {'destroy_attachments': 'destroy-attachments', 'destroy_storage': 'destroy-storage', 'force': 'force', 'max_wait': 'max-wait', 'tag': 'tag'}
     _toPy = {'destroy-attachments': 'destroy_attachments', 'destroy-storage': 'destroy_storage', 'force': 'force', 'max-wait': 'max_wait', 'tag': 'tag'}
-    def __init__(self, destroy_attachments=False, destroy_storage=False, force=False, max_wait=0, tag="", **unknown_fields):
+    def __init__(self, destroy_attachments=None, destroy_storage=None, force=None, max_wait=None, tag=None, **unknown_fields):
         '''
         destroy_attachments : bool
         destroy_storage : bool
@@ -9496,7 +9496,7 @@ class RemoveStorageInstance(Type):
 class RemoveVolumeParams(Type):
     _toSchema = {'destroy': 'destroy', 'provider': 'provider', 'volume_id': 'volume-id'}
     _toPy = {'destroy': 'destroy', 'provider': 'provider', 'volume-id': 'volume_id'}
-    def __init__(self, destroy=False, provider="", volume_id="", **unknown_fields):
+    def __init__(self, destroy=None, provider=None, volume_id=None, **unknown_fields):
         '''
         destroy : bool
         provider : str
@@ -9528,7 +9528,7 @@ class RemoveVolumeParamsResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~RemoveVolumeParamsResult]<~RemoveVolumeParamsResult>
+        results : typing.Sequence[~RemoveVolumeParamsResult]
         '''
         self.results = [RemoveVolumeParamsResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -9538,7 +9538,7 @@ class RemoveVolumeParamsResults(Type):
 class ResolveCharmResult(Type):
     _toSchema = {'error': 'error', 'url': 'url'}
     _toPy = {'error': 'error', 'url': 'url'}
-    def __init__(self, error="", url="", **unknown_fields):
+    def __init__(self, error=None, url=None, **unknown_fields):
         '''
         error : str
         url : str
@@ -9554,7 +9554,7 @@ class ResolveCharmResults(Type):
     _toPy = {'urls': 'urls'}
     def __init__(self, urls=None, **unknown_fields):
         '''
-        urls : typing.Sequence<+T_co>[~ResolveCharmResult]<~ResolveCharmResult>
+        urls : typing.Sequence[~ResolveCharmResult]
         '''
         self.urls = [ResolveCharmResult.from_json(o) for o in urls or []]
         self.unknown_fields = unknown_fields
@@ -9566,7 +9566,7 @@ class ResolveCharms(Type):
     _toPy = {'references': 'references'}
     def __init__(self, references=None, **unknown_fields):
         '''
-        references : typing.Sequence<+T_co>[str]
+        references : typing.Sequence[str]
         '''
         self.references = references
         self.unknown_fields = unknown_fields
@@ -9576,7 +9576,7 @@ class ResolveCharms(Type):
 class Resolved(Type):
     _toSchema = {'retry': 'retry', 'unit_name': 'unit-name'}
     _toPy = {'retry': 'retry', 'unit-name': 'unit_name'}
-    def __init__(self, retry=False, unit_name="", **unknown_fields):
+    def __init__(self, retry=None, unit_name=None, **unknown_fields):
         '''
         retry : bool
         unit_name : str
@@ -9590,7 +9590,7 @@ class Resolved(Type):
 class ResolvedModeResult(Type):
     _toSchema = {'error': 'error', 'mode': 'mode'}
     _toPy = {'error': 'error', 'mode': 'mode'}
-    def __init__(self, error=None, mode="", **unknown_fields):
+    def __init__(self, error=None, mode=None, **unknown_fields):
         '''
         error : Error
         mode : str
@@ -9606,7 +9606,7 @@ class ResolvedModeResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~ResolvedModeResult]<~ResolvedModeResult>
+        results : typing.Sequence[~ResolvedModeResult]
         '''
         self.results = [ResolvedModeResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -9616,12 +9616,12 @@ class ResolvedModeResults(Type):
 class Resource(Type):
     _toSchema = {'application': 'application', 'charmresource': 'CharmResource', 'description': 'description', 'fingerprint': 'fingerprint', 'id_': 'id', 'name': 'name', 'origin': 'origin', 'path': 'path', 'pending_id': 'pending-id', 'revision': 'revision', 'size': 'size', 'timestamp': 'timestamp', 'type_': 'type', 'username': 'username'}
     _toPy = {'CharmResource': 'charmresource', 'application': 'application', 'description': 'description', 'fingerprint': 'fingerprint', 'id': 'id_', 'name': 'name', 'origin': 'origin', 'path': 'path', 'pending-id': 'pending_id', 'revision': 'revision', 'size': 'size', 'timestamp': 'timestamp', 'type': 'type_', 'username': 'username'}
-    def __init__(self, charmresource=None, application="", description="", fingerprint=None, id_="", name="", origin="", path="", pending_id="", revision=0, size=0, timestamp="", type_="", username="", **unknown_fields):
+    def __init__(self, charmresource=None, application=None, description=None, fingerprint=None, id_=None, name=None, origin=None, path=None, pending_id=None, revision=None, size=None, timestamp=None, type_=None, username=None, **unknown_fields):
         '''
         charmresource : CharmResource
         application : str
         description : str
-        fingerprint : typing.Sequence<+T_co>[int]
+        fingerprint : typing.Sequence[int]
         id_ : str
         name : str
         origin : str
@@ -9671,10 +9671,10 @@ class ResourcesResult(Type):
     def __init__(self, errorresult=None, charm_store_resources=None, error=None, resources=None, unit_resources=None, **unknown_fields):
         '''
         errorresult : ErrorResult
-        charm_store_resources : typing.Sequence<+T_co>[~CharmResource]<~CharmResource>
+        charm_store_resources : typing.Sequence[~CharmResource]
         error : Error
-        resources : typing.Sequence<+T_co>[~Resource]<~Resource>
-        unit_resources : typing.Sequence<+T_co>[~UnitResources]<~UnitResources>
+        resources : typing.Sequence[~Resource]
+        unit_resources : typing.Sequence[~UnitResources]
         '''
         self.errorresult = ErrorResult.from_json(errorresult) if errorresult else None
         self.charm_store_resources = [CharmResource.from_json(o) for o in charm_store_resources or []]
@@ -9690,7 +9690,7 @@ class ResourcesResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~ResourcesResult]<~ResourcesResult>
+        results : typing.Sequence[~ResourcesResult]
         '''
         self.results = [ResourcesResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -9700,7 +9700,7 @@ class ResourcesResults(Type):
 class RestoreArgs(Type):
     _toSchema = {'backup_id': 'backup-id'}
     _toPy = {'backup-id': 'backup_id'}
-    def __init__(self, backup_id="", **unknown_fields):
+    def __init__(self, backup_id=None, **unknown_fields):
         '''
         backup_id : str
         '''
@@ -9714,7 +9714,7 @@ class ResumeReplicationParams(Type):
     _toPy = {'members': 'members'}
     def __init__(self, members=None, **unknown_fields):
         '''
-        members : typing.Sequence<+T_co>[~Member]<~Member>
+        members : typing.Sequence[~Member]
         '''
         self.members = [Member.from_json(o) for o in members or []]
         self.unknown_fields = unknown_fields
@@ -9724,7 +9724,7 @@ class ResumeReplicationParams(Type):
 class RetryStrategy(Type):
     _toSchema = {'jitter_retry_time': 'jitter-retry-time', 'max_retry_time': 'max-retry-time', 'min_retry_time': 'min-retry-time', 'retry_time_factor': 'retry-time-factor', 'should_retry': 'should-retry'}
     _toPy = {'jitter-retry-time': 'jitter_retry_time', 'max-retry-time': 'max_retry_time', 'min-retry-time': 'min_retry_time', 'retry-time-factor': 'retry_time_factor', 'should-retry': 'should_retry'}
-    def __init__(self, jitter_retry_time=False, max_retry_time=0, min_retry_time=0, retry_time_factor=0, should_retry=False, **unknown_fields):
+    def __init__(self, jitter_retry_time=None, max_retry_time=None, min_retry_time=None, retry_time_factor=None, should_retry=None, **unknown_fields):
         '''
         jitter_retry_time : bool
         max_retry_time : int
@@ -9760,7 +9760,7 @@ class RetryStrategyResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~RetryStrategyResult]<~RetryStrategyResult>
+        results : typing.Sequence[~RetryStrategyResult]
         '''
         self.results = [RetryStrategyResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -9770,7 +9770,7 @@ class RetryStrategyResults(Type):
 class RevokeCredentialArg(Type):
     _toSchema = {'force': 'force', 'tag': 'tag'}
     _toPy = {'force': 'force', 'tag': 'tag'}
-    def __init__(self, force=False, tag="", **unknown_fields):
+    def __init__(self, force=None, tag=None, **unknown_fields):
         '''
         force : bool
         tag : str
@@ -9786,7 +9786,7 @@ class RevokeCredentialArgs(Type):
     _toPy = {'credentials': 'credentials'}
     def __init__(self, credentials=None, **unknown_fields):
         '''
-        credentials : typing.Sequence<+T_co>[~RevokeCredentialArg]<~RevokeCredentialArg>
+        credentials : typing.Sequence[~RevokeCredentialArg]
         '''
         self.credentials = [RevokeCredentialArg.from_json(o) for o in credentials or []]
         self.unknown_fields = unknown_fields
@@ -9796,13 +9796,13 @@ class RevokeCredentialArgs(Type):
 class RunParams(Type):
     _toSchema = {'applications': 'applications', 'commands': 'commands', 'machines': 'machines', 'timeout': 'timeout', 'units': 'units'}
     _toPy = {'applications': 'applications', 'commands': 'commands', 'machines': 'machines', 'timeout': 'timeout', 'units': 'units'}
-    def __init__(self, applications=None, commands="", machines=None, timeout=0, units=None, **unknown_fields):
+    def __init__(self, applications=None, commands=None, machines=None, timeout=None, units=None, **unknown_fields):
         '''
-        applications : typing.Sequence<+T_co>[str]
+        applications : typing.Sequence[str]
         commands : str
-        machines : typing.Sequence<+T_co>[str]
+        machines : typing.Sequence[str]
         timeout : int
-        units : typing.Sequence<+T_co>[str]
+        units : typing.Sequence[str]
         '''
         self.applications = applications
         self.commands = commands
@@ -9816,7 +9816,7 @@ class RunParams(Type):
 class SSHAddressResult(Type):
     _toSchema = {'address': 'address', 'error': 'error'}
     _toPy = {'address': 'address', 'error': 'error'}
-    def __init__(self, address="", error=None, **unknown_fields):
+    def __init__(self, address=None, error=None, **unknown_fields):
         '''
         address : str
         error : Error
@@ -9832,7 +9832,7 @@ class SSHAddressResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~SSHAddressResult]<~SSHAddressResult>
+        results : typing.Sequence[~SSHAddressResult]
         '''
         self.results = [SSHAddressResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -9844,7 +9844,7 @@ class SSHAddressesResult(Type):
     _toPy = {'addresses': 'addresses', 'error': 'error'}
     def __init__(self, addresses=None, error=None, **unknown_fields):
         '''
-        addresses : typing.Sequence<+T_co>[str]
+        addresses : typing.Sequence[str]
         error : Error
         '''
         self.addresses = addresses
@@ -9858,7 +9858,7 @@ class SSHAddressesResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~SSHAddressesResult]<~SSHAddressesResult>
+        results : typing.Sequence[~SSHAddressesResult]
         '''
         self.results = [SSHAddressesResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -9870,7 +9870,7 @@ class SSHHostKeySet(Type):
     _toPy = {'entity-keys': 'entity_keys'}
     def __init__(self, entity_keys=None, **unknown_fields):
         '''
-        entity_keys : typing.Sequence<+T_co>[~SSHHostKeys]<~SSHHostKeys>
+        entity_keys : typing.Sequence[~SSHHostKeys]
         '''
         self.entity_keys = [SSHHostKeys.from_json(o) for o in entity_keys or []]
         self.unknown_fields = unknown_fields
@@ -9880,9 +9880,9 @@ class SSHHostKeySet(Type):
 class SSHHostKeys(Type):
     _toSchema = {'public_keys': 'public-keys', 'tag': 'tag'}
     _toPy = {'public-keys': 'public_keys', 'tag': 'tag'}
-    def __init__(self, public_keys=None, tag="", **unknown_fields):
+    def __init__(self, public_keys=None, tag=None, **unknown_fields):
         '''
-        public_keys : typing.Sequence<+T_co>[str]
+        public_keys : typing.Sequence[str]
         tag : str
         '''
         self.public_keys = public_keys
@@ -9894,7 +9894,7 @@ class SSHHostKeys(Type):
 class SSHProxyResult(Type):
     _toSchema = {'use_proxy': 'use-proxy'}
     _toPy = {'use-proxy': 'use_proxy'}
-    def __init__(self, use_proxy=False, **unknown_fields):
+    def __init__(self, use_proxy=None, **unknown_fields):
         '''
         use_proxy : bool
         '''
@@ -9909,7 +9909,7 @@ class SSHPublicKeysResult(Type):
     def __init__(self, error=None, public_keys=None, **unknown_fields):
         '''
         error : Error
-        public_keys : typing.Sequence<+T_co>[str]
+        public_keys : typing.Sequence[str]
         '''
         self.error = Error.from_json(error) if error else None
         self.public_keys = public_keys
@@ -9922,7 +9922,7 @@ class SSHPublicKeysResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~SSHPublicKeysResult]<~SSHPublicKeysResult>
+        results : typing.Sequence[~SSHPublicKeysResult]
         '''
         self.results = [SSHPublicKeysResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -9932,7 +9932,7 @@ class SSHPublicKeysResults(Type):
 class ScaleApplicationInfo(Type):
     _toSchema = {'num_units': 'num-units'}
     _toPy = {'num-units': 'num_units'}
-    def __init__(self, num_units=0, **unknown_fields):
+    def __init__(self, num_units=None, **unknown_fields):
         '''
         num_units : int
         '''
@@ -9944,7 +9944,7 @@ class ScaleApplicationInfo(Type):
 class ScaleApplicationParams(Type):
     _toSchema = {'application_tag': 'application-tag', 'force': 'force', 'scale': 'scale', 'scale_change': 'scale-change'}
     _toPy = {'application-tag': 'application_tag', 'force': 'force', 'scale': 'scale', 'scale-change': 'scale_change'}
-    def __init__(self, application_tag="", force=False, scale=0, scale_change=0, **unknown_fields):
+    def __init__(self, application_tag=None, force=None, scale=None, scale_change=None, **unknown_fields):
         '''
         application_tag : str
         force : bool
@@ -9978,7 +9978,7 @@ class ScaleApplicationResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~ScaleApplicationResult]<~ScaleApplicationResult>
+        results : typing.Sequence[~ScaleApplicationResult]
         '''
         self.results = [ScaleApplicationResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -9990,7 +9990,7 @@ class ScaleApplicationsParams(Type):
     _toPy = {'applications': 'applications'}
     def __init__(self, applications=None, **unknown_fields):
         '''
-        applications : typing.Sequence<+T_co>[~ScaleApplicationParams]<~ScaleApplicationParams>
+        applications : typing.Sequence[~ScaleApplicationParams]
         '''
         self.applications = [ScaleApplicationParams.from_json(o) for o in applications or []]
         self.unknown_fields = unknown_fields
@@ -10002,10 +10002,10 @@ class SerializedModel(Type):
     _toPy = {'bytes': 'bytes_', 'charms': 'charms', 'resources': 'resources', 'tools': 'tools'}
     def __init__(self, bytes_=None, charms=None, resources=None, tools=None, **unknown_fields):
         '''
-        bytes_ : typing.Sequence<+T_co>[int]
-        charms : typing.Sequence<+T_co>[str]
-        resources : typing.Sequence<+T_co>[~SerializedModelResource]<~SerializedModelResource>
-        tools : typing.Sequence<+T_co>[~SerializedModelTools]<~SerializedModelTools>
+        bytes_ : typing.Sequence[int]
+        charms : typing.Sequence[str]
+        resources : typing.Sequence[~SerializedModelResource]
+        tools : typing.Sequence[~SerializedModelTools]
         '''
         self.bytes_ = bytes_
         self.charms = charms
@@ -10018,13 +10018,13 @@ class SerializedModel(Type):
 class SerializedModelResource(Type):
     _toSchema = {'application': 'application', 'application_revision': 'application-revision', 'charmstore_revision': 'charmstore-revision', 'name': 'name', 'unit_revisions': 'unit-revisions'}
     _toPy = {'application': 'application', 'application-revision': 'application_revision', 'charmstore-revision': 'charmstore_revision', 'name': 'name', 'unit-revisions': 'unit_revisions'}
-    def __init__(self, application="", application_revision=None, charmstore_revision=None, name="", unit_revisions=None, **unknown_fields):
+    def __init__(self, application=None, application_revision=None, charmstore_revision=None, name=None, unit_revisions=None, **unknown_fields):
         '''
         application : str
         application_revision : SerializedModelResourceRevision
         charmstore_revision : SerializedModelResourceRevision
         name : str
-        unit_revisions : typing.Mapping<~KT, +VT_co>[str, ~SerializedModelResourceRevision]<~SerializedModelResourceRevision>
+        unit_revisions : typing.Mapping[str, ~SerializedModelResourceRevision]
         '''
         self.application = application
         self.application_revision = SerializedModelResourceRevision.from_json(application_revision) if application_revision else None
@@ -10038,7 +10038,7 @@ class SerializedModelResource(Type):
 class SerializedModelResourceRevision(Type):
     _toSchema = {'description': 'description', 'fingerprint': 'fingerprint', 'origin': 'origin', 'path': 'path', 'revision': 'revision', 'size': 'size', 'timestamp': 'timestamp', 'type_': 'type', 'username': 'username'}
     _toPy = {'description': 'description', 'fingerprint': 'fingerprint', 'origin': 'origin', 'path': 'path', 'revision': 'revision', 'size': 'size', 'timestamp': 'timestamp', 'type': 'type_', 'username': 'username'}
-    def __init__(self, description="", fingerprint="", origin="", path="", revision=0, size=0, timestamp="", type_="", username="", **unknown_fields):
+    def __init__(self, description=None, fingerprint=None, origin=None, path=None, revision=None, size=None, timestamp=None, type_=None, username=None, **unknown_fields):
         '''
         description : str
         fingerprint : str
@@ -10066,7 +10066,7 @@ class SerializedModelResourceRevision(Type):
 class SerializedModelTools(Type):
     _toSchema = {'uri': 'uri', 'version': 'version'}
     _toPy = {'uri': 'uri', 'version': 'version'}
-    def __init__(self, uri="", version="", **unknown_fields):
+    def __init__(self, uri=None, version=None, **unknown_fields):
         '''
         uri : str
         version : str
@@ -10080,7 +10080,7 @@ class SerializedModelTools(Type):
 class SetConstraints(Type):
     _toSchema = {'application': 'application', 'constraints': 'constraints'}
     _toPy = {'application': 'application', 'constraints': 'constraints'}
-    def __init__(self, application="", constraints=None, **unknown_fields):
+    def __init__(self, application=None, constraints=None, **unknown_fields):
         '''
         application : str
         constraints : Value
@@ -10108,7 +10108,7 @@ class SetExternalControllersInfoParams(Type):
     _toPy = {'controllers': 'controllers'}
     def __init__(self, controllers=None, **unknown_fields):
         '''
-        controllers : typing.Sequence<+T_co>[~SetExternalControllerInfoParams]<~SetExternalControllerInfoParams>
+        controllers : typing.Sequence[~SetExternalControllerInfoParams]
         '''
         self.controllers = [SetExternalControllerInfoParams.from_json(o) for o in controllers or []]
         self.unknown_fields = unknown_fields
@@ -10120,7 +10120,7 @@ class SetMachineBlockDevices(Type):
     _toPy = {'machine-block-devices': 'machine_block_devices'}
     def __init__(self, machine_block_devices=None, **unknown_fields):
         '''
-        machine_block_devices : typing.Sequence<+T_co>[~MachineBlockDevices]<~MachineBlockDevices>
+        machine_block_devices : typing.Sequence[~MachineBlockDevices]
         '''
         self.machine_block_devices = [MachineBlockDevices.from_json(o) for o in machine_block_devices or []]
         self.unknown_fields = unknown_fields
@@ -10130,9 +10130,9 @@ class SetMachineBlockDevices(Type):
 class SetMachineNetworkConfig(Type):
     _toSchema = {'config': 'config', 'tag': 'tag'}
     _toPy = {'config': 'config', 'tag': 'tag'}
-    def __init__(self, config=None, tag="", **unknown_fields):
+    def __init__(self, config=None, tag=None, **unknown_fields):
         '''
-        config : typing.Sequence<+T_co>[~NetworkConfig]<~NetworkConfig>
+        config : typing.Sequence[~NetworkConfig]
         tag : str
         '''
         self.config = [NetworkConfig.from_json(o) for o in config or []]
@@ -10146,7 +10146,7 @@ class SetMachinesAddresses(Type):
     _toPy = {'machine-addresses': 'machine_addresses'}
     def __init__(self, machine_addresses=None, **unknown_fields):
         '''
-        machine_addresses : typing.Sequence<+T_co>[~MachineAddresses]<~MachineAddresses>
+        machine_addresses : typing.Sequence[~MachineAddresses]
         '''
         self.machine_addresses = [MachineAddresses.from_json(o) for o in machine_addresses or []]
         self.unknown_fields = unknown_fields
@@ -10156,7 +10156,7 @@ class SetMachinesAddresses(Type):
 class SetMigrationPhaseArgs(Type):
     _toSchema = {'phase': 'phase'}
     _toPy = {'phase': 'phase'}
-    def __init__(self, phase="", **unknown_fields):
+    def __init__(self, phase=None, **unknown_fields):
         '''
         phase : str
         '''
@@ -10168,7 +10168,7 @@ class SetMigrationPhaseArgs(Type):
 class SetMigrationStatusMessageArgs(Type):
     _toSchema = {'message': 'message'}
     _toPy = {'message': 'message'}
-    def __init__(self, message="", **unknown_fields):
+    def __init__(self, message=None, **unknown_fields):
         '''
         message : str
         '''
@@ -10180,7 +10180,7 @@ class SetMigrationStatusMessageArgs(Type):
 class SetModelAgentVersion(Type):
     _toSchema = {'force': 'force', 'version': 'version'}
     _toPy = {'force': 'force', 'version': 'version'}
-    def __init__(self, force=False, version=None, **unknown_fields):
+    def __init__(self, force=None, version=None, **unknown_fields):
         '''
         force : bool
         version : Number
@@ -10196,7 +10196,7 @@ class SetModelDefaults(Type):
     _toPy = {'config': 'config'}
     def __init__(self, config=None, **unknown_fields):
         '''
-        config : typing.Sequence<+T_co>[~ModelDefaultValues]<~ModelDefaultValues>
+        config : typing.Sequence[~ModelDefaultValues]
         '''
         self.config = [ModelDefaultValues.from_json(o) for o in config or []]
         self.unknown_fields = unknown_fields
@@ -10206,7 +10206,7 @@ class SetModelDefaults(Type):
 class SetModelEnvironVersion(Type):
     _toSchema = {'model_tag': 'model-tag', 'version': 'version'}
     _toPy = {'model-tag': 'model_tag', 'version': 'version'}
-    def __init__(self, model_tag="", version=0, **unknown_fields):
+    def __init__(self, model_tag=None, version=None, **unknown_fields):
         '''
         model_tag : str
         version : int
@@ -10222,7 +10222,7 @@ class SetModelEnvironVersions(Type):
     _toPy = {'models': 'models'}
     def __init__(self, models=None, **unknown_fields):
         '''
-        models : typing.Sequence<+T_co>[~SetModelEnvironVersion]<~SetModelEnvironVersion>
+        models : typing.Sequence[~SetModelEnvironVersion]
         '''
         self.models = [SetModelEnvironVersion.from_json(o) for o in models or []]
         self.unknown_fields = unknown_fields
@@ -10232,7 +10232,7 @@ class SetModelEnvironVersions(Type):
 class SetPayloadStatusArg(Type):
     _toSchema = {'entity': 'Entity', 'status': 'status', 'tag': 'tag'}
     _toPy = {'Entity': 'entity', 'status': 'status', 'tag': 'tag'}
-    def __init__(self, entity=None, status="", tag="", **unknown_fields):
+    def __init__(self, entity=None, status=None, tag=None, **unknown_fields):
         '''
         entity : Entity
         status : str
@@ -10250,7 +10250,7 @@ class SetPayloadStatusArgs(Type):
     _toPy = {'args': 'args'}
     def __init__(self, args=None, **unknown_fields):
         '''
-        args : typing.Sequence<+T_co>[~SetPayloadStatusArg]<~SetPayloadStatusArg>
+        args : typing.Sequence[~SetPayloadStatusArg]
         '''
         self.args = [SetPayloadStatusArg.from_json(o) for o in args or []]
         self.unknown_fields = unknown_fields
@@ -10262,7 +10262,7 @@ class SetPodSpecParams(Type):
     _toPy = {'specs': 'specs'}
     def __init__(self, specs=None, **unknown_fields):
         '''
-        specs : typing.Sequence<+T_co>[~EntityString]<~EntityString>
+        specs : typing.Sequence[~EntityString]
         '''
         self.specs = [EntityString.from_json(o) for o in specs or []]
         self.unknown_fields = unknown_fields
@@ -10275,7 +10275,7 @@ class SetProfileArg(Type):
     def __init__(self, entity=None, profiles=None, **unknown_fields):
         '''
         entity : Entity
-        profiles : typing.Sequence<+T_co>[str]
+        profiles : typing.Sequence[str]
         '''
         self.entity = Entity.from_json(entity) if entity else None
         self.profiles = profiles
@@ -10288,7 +10288,7 @@ class SetProfileArgs(Type):
     _toPy = {'args': 'args'}
     def __init__(self, args=None, **unknown_fields):
         '''
-        args : typing.Sequence<+T_co>[~SetProfileArg]<~SetProfileArg>
+        args : typing.Sequence[~SetProfileArg]
         '''
         self.args = [SetProfileArg.from_json(o) for o in args or []]
         self.unknown_fields = unknown_fields
@@ -10298,7 +10298,7 @@ class SetProfileArgs(Type):
 class SetProfileUpgradeCompleteArg(Type):
     _toSchema = {'entity': 'entity', 'message': 'message'}
     _toPy = {'entity': 'entity', 'message': 'message'}
-    def __init__(self, entity=None, message="", **unknown_fields):
+    def __init__(self, entity=None, message=None, **unknown_fields):
         '''
         entity : Entity
         message : str
@@ -10314,7 +10314,7 @@ class SetProfileUpgradeCompleteArgs(Type):
     _toPy = {'args': 'args'}
     def __init__(self, args=None, **unknown_fields):
         '''
-        args : typing.Sequence<+T_co>[~SetProfileUpgradeCompleteArg]<~SetProfileUpgradeCompleteArg>
+        args : typing.Sequence[~SetProfileUpgradeCompleteArg]
         '''
         self.args = [SetProfileUpgradeCompleteArg.from_json(o) for o in args or []]
         self.unknown_fields = unknown_fields
@@ -10326,7 +10326,7 @@ class SetStatus(Type):
     _toPy = {'entities': 'entities'}
     def __init__(self, entities=None, **unknown_fields):
         '''
-        entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
+        entities : typing.Sequence[~EntityStatusArgs]
         '''
         self.entities = [EntityStatusArgs.from_json(o) for o in entities or []]
         self.unknown_fields = unknown_fields
@@ -10336,7 +10336,7 @@ class SetStatus(Type):
 class SetStatusArg(Type):
     _toSchema = {'entity': 'Entity', 'status': 'status'}
     _toPy = {'Entity': 'entity', 'status': 'status'}
-    def __init__(self, entity=None, status="", **unknown_fields):
+    def __init__(self, entity=None, status=None, **unknown_fields):
         '''
         entity : Entity
         status : str
@@ -10352,7 +10352,7 @@ class SetStatusArgs(Type):
     _toPy = {'args': 'args'}
     def __init__(self, args=None, **unknown_fields):
         '''
-        args : typing.Sequence<+T_co>[~SetStatusArg]<~SetStatusArg>
+        args : typing.Sequence[~SetStatusArg]
         '''
         self.args = [SetStatusArg.from_json(o) for o in args or []]
         self.unknown_fields = unknown_fields
@@ -10362,7 +10362,7 @@ class SetStatusArgs(Type):
 class Settings(Type):
     _toSchema = {'autonoproxy': 'AutoNoProxy', 'ftp': 'Ftp', 'http': 'Http', 'https': 'Https', 'noproxy': 'NoProxy'}
     _toPy = {'AutoNoProxy': 'autonoproxy', 'Ftp': 'ftp', 'Http': 'http', 'Https': 'https', 'NoProxy': 'noproxy'}
-    def __init__(self, autonoproxy="", ftp="", http="", https="", noproxy="", **unknown_fields):
+    def __init__(self, autonoproxy=None, ftp=None, http=None, https=None, noproxy=None, **unknown_fields):
         '''
         autonoproxy : str
         ftp : str
@@ -10385,7 +10385,7 @@ class SettingsResult(Type):
     def __init__(self, error=None, settings=None, **unknown_fields):
         '''
         error : Error
-        settings : typing.Mapping<~KT, +VT_co>[str, str]
+        settings : typing.Mapping[str, str]
         '''
         self.error = Error.from_json(error) if error else None
         self.settings = settings
@@ -10398,7 +10398,7 @@ class SettingsResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~SettingsResult]<~SettingsResult>
+        results : typing.Sequence[~SettingsResult]
         '''
         self.results = [SettingsResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -10408,7 +10408,7 @@ class SettingsResults(Type):
 class SingularClaim(Type):
     _toSchema = {'claimant_tag': 'claimant-tag', 'duration': 'duration', 'entity_tag': 'entity-tag'}
     _toPy = {'claimant-tag': 'claimant_tag', 'duration': 'duration', 'entity-tag': 'entity_tag'}
-    def __init__(self, claimant_tag="", duration=0, entity_tag="", **unknown_fields):
+    def __init__(self, claimant_tag=None, duration=None, entity_tag=None, **unknown_fields):
         '''
         claimant_tag : str
         duration : int
@@ -10426,7 +10426,7 @@ class SingularClaims(Type):
     _toPy = {'claims': 'claims'}
     def __init__(self, claims=None, **unknown_fields):
         '''
-        claims : typing.Sequence<+T_co>[~SingularClaim]<~SingularClaim>
+        claims : typing.Sequence[~SingularClaim]
         '''
         self.claims = [SingularClaim.from_json(o) for o in claims or []]
         self.unknown_fields = unknown_fields
@@ -10436,11 +10436,11 @@ class SingularClaims(Type):
 class Space(Type):
     _toSchema = {'error': 'error', 'name': 'name', 'subnets': 'subnets'}
     _toPy = {'error': 'error', 'name': 'name', 'subnets': 'subnets'}
-    def __init__(self, error=None, name="", subnets=None, **unknown_fields):
+    def __init__(self, error=None, name=None, subnets=None, **unknown_fields):
         '''
         error : Error
         name : str
-        subnets : typing.Sequence<+T_co>[~Subnet]<~Subnet>
+        subnets : typing.Sequence[~Subnet]
         '''
         self.error = Error.from_json(error) if error else None
         self.name = name
@@ -10452,7 +10452,7 @@ class Space(Type):
 class SpaceResult(Type):
     _toSchema = {'error': 'error', 'tag': 'tag'}
     _toPy = {'error': 'error', 'tag': 'tag'}
-    def __init__(self, error=None, tag="", **unknown_fields):
+    def __init__(self, error=None, tag=None, **unknown_fields):
         '''
         error : Error
         tag : str
@@ -10468,7 +10468,7 @@ class SpaceResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~SpaceResult]<~SpaceResult>
+        results : typing.Sequence[~SpaceResult]
         '''
         self.results = [SpaceResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -10478,7 +10478,7 @@ class SpaceResults(Type):
 class StateServingInfo(Type):
     _toSchema = {'api_port': 'api-port', 'ca_private_key': 'ca-private-key', 'cert': 'cert', 'controller_api_port': 'controller-api-port', 'private_key': 'private-key', 'shared_secret': 'shared-secret', 'state_port': 'state-port', 'system_identity': 'system-identity'}
     _toPy = {'api-port': 'api_port', 'ca-private-key': 'ca_private_key', 'cert': 'cert', 'controller-api-port': 'controller_api_port', 'private-key': 'private_key', 'shared-secret': 'shared_secret', 'state-port': 'state_port', 'system-identity': 'system_identity'}
-    def __init__(self, api_port=0, ca_private_key="", cert="", controller_api_port=0, private_key="", shared_secret="", state_port=0, system_identity="", **unknown_fields):
+    def __init__(self, api_port=None, ca_private_key=None, cert=None, controller_api_port=None, private_key=None, shared_secret=None, state_port=None, system_identity=None, **unknown_fields):
         '''
         api_port : int
         ca_private_key : str
@@ -10504,11 +10504,11 @@ class StateServingInfo(Type):
 class StatusHistoryFilter(Type):
     _toSchema = {'date': 'date', 'delta': 'delta', 'exclude': 'exclude', 'size': 'size'}
     _toPy = {'date': 'date', 'delta': 'delta', 'exclude': 'exclude', 'size': 'size'}
-    def __init__(self, date="", delta=0, exclude=None, size=0, **unknown_fields):
+    def __init__(self, date=None, delta=None, exclude=None, size=None, **unknown_fields):
         '''
         date : str
         delta : int
-        exclude : typing.Sequence<+T_co>[str]
+        exclude : typing.Sequence[str]
         size : int
         '''
         self.date = date
@@ -10522,7 +10522,7 @@ class StatusHistoryFilter(Type):
 class StatusHistoryPruneArgs(Type):
     _toSchema = {'max_history_mb': 'max-history-mb', 'max_history_time': 'max-history-time'}
     _toPy = {'max-history-mb': 'max_history_mb', 'max-history-time': 'max_history_time'}
-    def __init__(self, max_history_mb=0, max_history_time=0, **unknown_fields):
+    def __init__(self, max_history_mb=None, max_history_time=None, **unknown_fields):
         '''
         max_history_mb : int
         max_history_time : int
@@ -10536,7 +10536,7 @@ class StatusHistoryPruneArgs(Type):
 class StatusHistoryRequest(Type):
     _toSchema = {'filter_': 'filter', 'historykind': 'historyKind', 'size': 'size', 'tag': 'tag'}
     _toPy = {'filter': 'filter_', 'historyKind': 'historykind', 'size': 'size', 'tag': 'tag'}
-    def __init__(self, filter_=None, historykind="", size=0, tag="", **unknown_fields):
+    def __init__(self, filter_=None, historykind=None, size=None, tag=None, **unknown_fields):
         '''
         filter_ : StatusHistoryFilter
         historykind : str
@@ -10556,7 +10556,7 @@ class StatusHistoryRequests(Type):
     _toPy = {'requests': 'requests'}
     def __init__(self, requests=None, **unknown_fields):
         '''
-        requests : typing.Sequence<+T_co>[~StatusHistoryRequest]<~StatusHistoryRequest>
+        requests : typing.Sequence[~StatusHistoryRequest]
         '''
         self.requests = [StatusHistoryRequest.from_json(o) for o in requests or []]
         self.unknown_fields = unknown_fields
@@ -10582,7 +10582,7 @@ class StatusHistoryResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~StatusHistoryResult]<~StatusHistoryResult>
+        results : typing.Sequence[~StatusHistoryResult]
         '''
         self.results = [StatusHistoryResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -10594,7 +10594,7 @@ class StatusParams(Type):
     _toPy = {'patterns': 'patterns'}
     def __init__(self, patterns=None, **unknown_fields):
         '''
-        patterns : typing.Sequence<+T_co>[str]
+        patterns : typing.Sequence[str]
         '''
         self.patterns = patterns
         self.unknown_fields = unknown_fields
@@ -10604,9 +10604,9 @@ class StatusParams(Type):
 class StatusResult(Type):
     _toSchema = {'data': 'data', 'error': 'error', 'id_': 'id', 'info': 'info', 'life': 'life', 'since': 'since', 'status': 'status'}
     _toPy = {'data': 'data', 'error': 'error', 'id': 'id_', 'info': 'info', 'life': 'life', 'since': 'since', 'status': 'status'}
-    def __init__(self, data=None, error=None, id_="", info="", life="", since="", status="", **unknown_fields):
+    def __init__(self, data=None, error=None, id_=None, info=None, life=None, since=None, status=None, **unknown_fields):
         '''
-        data : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        data : typing.Mapping[str, typing.Any]
         error : Error
         id_ : str
         info : str
@@ -10630,7 +10630,7 @@ class StatusResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~StatusResult]<~StatusResult>
+        results : typing.Sequence[~StatusResult]
         '''
         self.results = [StatusResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -10640,7 +10640,7 @@ class StatusResults(Type):
 class StorageAddParams(Type):
     _toSchema = {'name': 'name', 'storage': 'storage', 'unit': 'unit'}
     _toPy = {'name': 'name', 'storage': 'storage', 'unit': 'unit'}
-    def __init__(self, name="", storage=None, unit="", **unknown_fields):
+    def __init__(self, name=None, storage=None, unit=None, **unknown_fields):
         '''
         name : str
         storage : StorageConstraints
@@ -10656,7 +10656,7 @@ class StorageAddParams(Type):
 class StorageAttachment(Type):
     _toSchema = {'kind': 'kind', 'life': 'life', 'location': 'location', 'owner_tag': 'owner-tag', 'storage_tag': 'storage-tag', 'unit_tag': 'unit-tag'}
     _toPy = {'kind': 'kind', 'life': 'life', 'location': 'location', 'owner-tag': 'owner_tag', 'storage-tag': 'storage_tag', 'unit-tag': 'unit_tag'}
-    def __init__(self, kind=0, life="", location="", owner_tag="", storage_tag="", unit_tag="", **unknown_fields):
+    def __init__(self, kind=None, life=None, location=None, owner_tag=None, storage_tag=None, unit_tag=None, **unknown_fields):
         '''
         kind : int
         life : str
@@ -10678,7 +10678,7 @@ class StorageAttachment(Type):
 class StorageAttachmentDetails(Type):
     _toSchema = {'life': 'life', 'location': 'location', 'machine_tag': 'machine-tag', 'storage_tag': 'storage-tag', 'unit_tag': 'unit-tag'}
     _toPy = {'life': 'life', 'location': 'location', 'machine-tag': 'machine_tag', 'storage-tag': 'storage_tag', 'unit-tag': 'unit_tag'}
-    def __init__(self, life="", location="", machine_tag="", storage_tag="", unit_tag="", **unknown_fields):
+    def __init__(self, life=None, location=None, machine_tag=None, storage_tag=None, unit_tag=None, **unknown_fields):
         '''
         life : str
         location : str
@@ -10698,7 +10698,7 @@ class StorageAttachmentDetails(Type):
 class StorageAttachmentId(Type):
     _toSchema = {'storage_tag': 'storage-tag', 'unit_tag': 'unit-tag'}
     _toPy = {'storage-tag': 'storage_tag', 'unit-tag': 'unit_tag'}
-    def __init__(self, storage_tag="", unit_tag="", **unknown_fields):
+    def __init__(self, storage_tag=None, unit_tag=None, **unknown_fields):
         '''
         storage_tag : str
         unit_tag : str
@@ -10714,7 +10714,7 @@ class StorageAttachmentIds(Type):
     _toPy = {'ids': 'ids'}
     def __init__(self, ids=None, **unknown_fields):
         '''
-        ids : typing.Sequence<+T_co>[~StorageAttachmentId]<~StorageAttachmentId>
+        ids : typing.Sequence[~StorageAttachmentId]
         '''
         self.ids = [StorageAttachmentId.from_json(o) for o in ids or []]
         self.unknown_fields = unknown_fields
@@ -10740,7 +10740,7 @@ class StorageAttachmentIdsResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~StorageAttachmentIdsResult]<~StorageAttachmentIdsResult>
+        results : typing.Sequence[~StorageAttachmentIdsResult]
         '''
         self.results = [StorageAttachmentIdsResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -10766,7 +10766,7 @@ class StorageAttachmentResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~StorageAttachmentResult]<~StorageAttachmentResult>
+        results : typing.Sequence[~StorageAttachmentResult]
         '''
         self.results = [StorageAttachmentResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -10776,7 +10776,7 @@ class StorageAttachmentResults(Type):
 class StorageConstraints(Type):
     _toSchema = {'count': 'count', 'pool': 'pool', 'size': 'size'}
     _toPy = {'count': 'count', 'pool': 'pool', 'size': 'size'}
-    def __init__(self, count=0, pool="", size=0, **unknown_fields):
+    def __init__(self, count=None, pool=None, size=None, **unknown_fields):
         '''
         count : int
         pool : str
@@ -10792,7 +10792,7 @@ class StorageConstraints(Type):
 class StorageDetachmentParams(Type):
     _toSchema = {'force': 'force', 'ids': 'ids', 'max_wait': 'max-wait'}
     _toPy = {'force': 'force', 'ids': 'ids', 'max-wait': 'max_wait'}
-    def __init__(self, force=False, ids=None, max_wait=0, **unknown_fields):
+    def __init__(self, force=None, ids=None, max_wait=None, **unknown_fields):
         '''
         force : bool
         ids : StorageAttachmentIds
@@ -10808,9 +10808,9 @@ class StorageDetachmentParams(Type):
 class StorageDetails(Type):
     _toSchema = {'attachments': 'attachments', 'kind': 'kind', 'life': 'life', 'owner_tag': 'owner-tag', 'persistent': 'persistent', 'status': 'status', 'storage_tag': 'storage-tag'}
     _toPy = {'attachments': 'attachments', 'kind': 'kind', 'life': 'life', 'owner-tag': 'owner_tag', 'persistent': 'persistent', 'status': 'status', 'storage-tag': 'storage_tag'}
-    def __init__(self, attachments=None, kind=0, life="", owner_tag="", persistent=False, status=None, storage_tag="", **unknown_fields):
+    def __init__(self, attachments=None, kind=None, life=None, owner_tag=None, persistent=None, status=None, storage_tag=None, **unknown_fields):
         '''
-        attachments : typing.Mapping<~KT, +VT_co>[str, ~StorageAttachmentDetails]<~StorageAttachmentDetails>
+        attachments : typing.Mapping[str, ~StorageAttachmentDetails]
         kind : int
         life : str
         owner_tag : str
@@ -10835,7 +10835,7 @@ class StorageDetailsListResult(Type):
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
-        result : typing.Sequence<+T_co>[~StorageDetails]<~StorageDetails>
+        result : typing.Sequence[~StorageDetails]
         '''
         self.error = Error.from_json(error) if error else None
         self.result = [StorageDetails.from_json(o) for o in result or []]
@@ -10848,7 +10848,7 @@ class StorageDetailsListResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~StorageDetailsListResult]<~StorageDetailsListResult>
+        results : typing.Sequence[~StorageDetailsListResult]
         '''
         self.results = [StorageDetailsListResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -10874,7 +10874,7 @@ class StorageDetailsResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~StorageDetailsResult]<~StorageDetailsResult>
+        results : typing.Sequence[~StorageDetailsResult]
         '''
         self.results = [StorageDetailsResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -10897,7 +10897,7 @@ class StorageFilters(Type):
     _toPy = {'filters': 'filters'}
     def __init__(self, filters=None, **unknown_fields):
         '''
-        filters : typing.Sequence<+T_co>[~StorageFilter]<~StorageFilter>
+        filters : typing.Sequence[~StorageFilter]
         '''
         self.filters = [StorageFilter.from_json(o) for o in filters or []]
         self.unknown_fields = unknown_fields
@@ -10907,9 +10907,9 @@ class StorageFilters(Type):
 class StoragePool(Type):
     _toSchema = {'attrs': 'attrs', 'name': 'name', 'provider': 'provider'}
     _toPy = {'attrs': 'attrs', 'name': 'name', 'provider': 'provider'}
-    def __init__(self, attrs=None, name="", provider="", **unknown_fields):
+    def __init__(self, attrs=None, name=None, provider=None, **unknown_fields):
         '''
-        attrs : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        attrs : typing.Mapping[str, typing.Any]
         name : str
         provider : str
         '''
@@ -10925,7 +10925,7 @@ class StoragePoolArgs(Type):
     _toPy = {'pools': 'pools'}
     def __init__(self, pools=None, **unknown_fields):
         '''
-        pools : typing.Sequence<+T_co>[~StoragePool]<~StoragePool>
+        pools : typing.Sequence[~StoragePool]
         '''
         self.pools = [StoragePool.from_json(o) for o in pools or []]
         self.unknown_fields = unknown_fields
@@ -10935,7 +10935,7 @@ class StoragePoolArgs(Type):
 class StoragePoolDeleteArg(Type):
     _toSchema = {'name': 'name'}
     _toPy = {'name': 'name'}
-    def __init__(self, name="", **unknown_fields):
+    def __init__(self, name=None, **unknown_fields):
         '''
         name : str
         '''
@@ -10949,7 +10949,7 @@ class StoragePoolDeleteArgs(Type):
     _toPy = {'pools': 'pools'}
     def __init__(self, pools=None, **unknown_fields):
         '''
-        pools : typing.Sequence<+T_co>[~StoragePoolDeleteArg]<~StoragePoolDeleteArg>
+        pools : typing.Sequence[~StoragePoolDeleteArg]
         '''
         self.pools = [StoragePoolDeleteArg.from_json(o) for o in pools or []]
         self.unknown_fields = unknown_fields
@@ -10961,8 +10961,8 @@ class StoragePoolFilter(Type):
     _toPy = {'names': 'names', 'providers': 'providers'}
     def __init__(self, names=None, providers=None, **unknown_fields):
         '''
-        names : typing.Sequence<+T_co>[str]
-        providers : typing.Sequence<+T_co>[str]
+        names : typing.Sequence[str]
+        providers : typing.Sequence[str]
         '''
         self.names = names
         self.providers = providers
@@ -10975,7 +10975,7 @@ class StoragePoolFilters(Type):
     _toPy = {'filters': 'filters'}
     def __init__(self, filters=None, **unknown_fields):
         '''
-        filters : typing.Sequence<+T_co>[~StoragePoolFilter]<~StoragePoolFilter>
+        filters : typing.Sequence[~StoragePoolFilter]
         '''
         self.filters = [StoragePoolFilter.from_json(o) for o in filters or []]
         self.unknown_fields = unknown_fields
@@ -10988,7 +10988,7 @@ class StoragePoolsResult(Type):
     def __init__(self, error=None, storage_pools=None, **unknown_fields):
         '''
         error : Error
-        storage_pools : typing.Sequence<+T_co>[~StoragePool]<~StoragePool>
+        storage_pools : typing.Sequence[~StoragePool]
         '''
         self.error = Error.from_json(error) if error else None
         self.storage_pools = [StoragePool.from_json(o) for o in storage_pools or []]
@@ -11001,7 +11001,7 @@ class StoragePoolsResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~StoragePoolsResult]<~StoragePoolsResult>
+        results : typing.Sequence[~StoragePoolsResult]
         '''
         self.results = [StoragePoolsResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -11013,7 +11013,7 @@ class StoragesAddParams(Type):
     _toPy = {'storages': 'storages'}
     def __init__(self, storages=None, **unknown_fields):
         '''
-        storages : typing.Sequence<+T_co>[~StorageAddParams]<~StorageAddParams>
+        storages : typing.Sequence[~StorageAddParams]
         '''
         self.storages = [StorageAddParams.from_json(o) for o in storages or []]
         self.unknown_fields = unknown_fields
@@ -11023,7 +11023,7 @@ class StoragesAddParams(Type):
 class StringBoolResult(Type):
     _toSchema = {'error': 'error', 'ok': 'ok', 'result': 'result'}
     _toPy = {'error': 'error', 'ok': 'ok', 'result': 'result'}
-    def __init__(self, error=None, ok=False, result="", **unknown_fields):
+    def __init__(self, error=None, ok=None, result=None, **unknown_fields):
         '''
         error : Error
         ok : bool
@@ -11041,7 +11041,7 @@ class StringBoolResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~StringBoolResult]<~StringBoolResult>
+        results : typing.Sequence[~StringBoolResult]
         '''
         self.results = [StringBoolResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -11051,7 +11051,7 @@ class StringBoolResults(Type):
 class StringResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
-    def __init__(self, error=None, result="", **unknown_fields):
+    def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
         result : str
@@ -11067,7 +11067,7 @@ class StringResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~StringResult]<~StringResult>
+        results : typing.Sequence[~StringResult]
         '''
         self.results = [StringResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -11080,7 +11080,7 @@ class StringsResult(Type):
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
-        result : typing.Sequence<+T_co>[str]
+        result : typing.Sequence[str]
         '''
         self.error = Error.from_json(error) if error else None
         self.result = result
@@ -11093,7 +11093,7 @@ class StringsResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~StringsResult]<~StringsResult>
+        results : typing.Sequence[~StringsResult]
         '''
         self.results = [StringsResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -11103,9 +11103,9 @@ class StringsResults(Type):
 class StringsWatchResult(Type):
     _toSchema = {'changes': 'changes', 'error': 'error', 'watcher_id': 'watcher-id'}
     _toPy = {'changes': 'changes', 'error': 'error', 'watcher-id': 'watcher_id'}
-    def __init__(self, changes=None, error=None, watcher_id="", **unknown_fields):
+    def __init__(self, changes=None, error=None, watcher_id=None, **unknown_fields):
         '''
-        changes : typing.Sequence<+T_co>[str]
+        changes : typing.Sequence[str]
         error : Error
         watcher_id : str
         '''
@@ -11121,7 +11121,7 @@ class StringsWatchResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~StringsWatchResult]<~StringsWatchResult>
+        results : typing.Sequence[~StringsWatchResult]
         '''
         self.results = [StringsWatchResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -11131,7 +11131,7 @@ class StringsWatchResults(Type):
 class Subnet(Type):
     _toSchema = {'cidr': 'cidr', 'life': 'life', 'provider_id': 'provider-id', 'provider_network_id': 'provider-network-id', 'provider_space_id': 'provider-space-id', 'space_tag': 'space-tag', 'status': 'status', 'vlan_tag': 'vlan-tag', 'zones': 'zones'}
     _toPy = {'cidr': 'cidr', 'life': 'life', 'provider-id': 'provider_id', 'provider-network-id': 'provider_network_id', 'provider-space-id': 'provider_space_id', 'space-tag': 'space_tag', 'status': 'status', 'vlan-tag': 'vlan_tag', 'zones': 'zones'}
-    def __init__(self, cidr="", life="", provider_id="", provider_network_id="", provider_space_id="", space_tag="", status="", vlan_tag=0, zones=None, **unknown_fields):
+    def __init__(self, cidr=None, life=None, provider_id=None, provider_network_id=None, provider_space_id=None, space_tag=None, status=None, vlan_tag=None, zones=None, **unknown_fields):
         '''
         cidr : str
         life : str
@@ -11141,7 +11141,7 @@ class Subnet(Type):
         space_tag : str
         status : str
         vlan_tag : int
-        zones : typing.Sequence<+T_co>[str]
+        zones : typing.Sequence[str]
         '''
         self.cidr = cidr
         self.life = life
@@ -11159,7 +11159,7 @@ class Subnet(Type):
 class SubnetsFilters(Type):
     _toSchema = {'space_tag': 'space-tag', 'zone': 'zone'}
     _toPy = {'space-tag': 'space_tag', 'zone': 'zone'}
-    def __init__(self, space_tag="", zone="", **unknown_fields):
+    def __init__(self, space_tag=None, zone=None, **unknown_fields):
         '''
         space_tag : str
         zone : str
@@ -11173,7 +11173,7 @@ class SubnetsFilters(Type):
 class TaggedCredential(Type):
     _toSchema = {'credential': 'credential', 'tag': 'tag'}
     _toPy = {'credential': 'credential', 'tag': 'tag'}
-    def __init__(self, credential=None, tag="", **unknown_fields):
+    def __init__(self, credential=None, tag=None, **unknown_fields):
         '''
         credential : CloudCredential
         tag : str
@@ -11189,7 +11189,7 @@ class TaggedCredentials(Type):
     _toPy = {'credentials': 'credentials'}
     def __init__(self, credentials=None, **unknown_fields):
         '''
-        credentials : typing.Sequence<+T_co>[~TaggedCredential]<~TaggedCredential>
+        credentials : typing.Sequence[~TaggedCredential]
         '''
         self.credentials = [TaggedCredential.from_json(o) for o in credentials or []]
         self.unknown_fields = unknown_fields
@@ -11199,7 +11199,7 @@ class TaggedCredentials(Type):
 class TokenResult(Type):
     _toSchema = {'error': 'error', 'token': 'token'}
     _toPy = {'error': 'error', 'token': 'token'}
-    def __init__(self, error=None, token="", **unknown_fields):
+    def __init__(self, error=None, token=None, **unknown_fields):
         '''
         error : Error
         token : str
@@ -11215,7 +11215,7 @@ class TokenResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~TokenResult]<~TokenResult>
+        results : typing.Sequence[~TokenResult]
         '''
         self.results = [TokenResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -11225,7 +11225,7 @@ class TokenResults(Type):
 class Tools(Type):
     _toSchema = {'sha256': 'sha256', 'size': 'size', 'url': 'url', 'version': 'version'}
     _toPy = {'sha256': 'sha256', 'size': 'size', 'url': 'url', 'version': 'version'}
-    def __init__(self, sha256="", size=0, url="", version=None, **unknown_fields):
+    def __init__(self, sha256=None, size=None, url=None, version=None, **unknown_fields):
         '''
         sha256 : str
         size : int
@@ -11243,11 +11243,11 @@ class Tools(Type):
 class ToolsResult(Type):
     _toSchema = {'disable_ssl_hostname_verification': 'disable-ssl-hostname-verification', 'error': 'error', 'tools': 'tools'}
     _toPy = {'disable-ssl-hostname-verification': 'disable_ssl_hostname_verification', 'error': 'error', 'tools': 'tools'}
-    def __init__(self, disable_ssl_hostname_verification=False, error=None, tools=None, **unknown_fields):
+    def __init__(self, disable_ssl_hostname_verification=None, error=None, tools=None, **unknown_fields):
         '''
         disable_ssl_hostname_verification : bool
         error : Error
-        tools : typing.Sequence<+T_co>[~Tools]<~Tools>
+        tools : typing.Sequence[~Tools]
         '''
         self.disable_ssl_hostname_verification = disable_ssl_hostname_verification
         self.error = Error.from_json(error) if error else None
@@ -11261,7 +11261,7 @@ class ToolsResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~ToolsResult]<~ToolsResult>
+        results : typing.Sequence[~ToolsResult]
         '''
         self.results = [ToolsResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -11273,7 +11273,7 @@ class TrackArgs(Type):
     _toPy = {'payloads': 'payloads'}
     def __init__(self, payloads=None, **unknown_fields):
         '''
-        payloads : typing.Sequence<+T_co>[~Payload]<~Payload>
+        payloads : typing.Sequence[~Payload]
         '''
         self.payloads = [Payload.from_json(o) for o in payloads or []]
         self.unknown_fields = unknown_fields
@@ -11285,7 +11285,7 @@ class TrackPayloadArgs(Type):
     _toPy = {'payloads': 'payloads'}
     def __init__(self, payloads=None, **unknown_fields):
         '''
-        payloads : typing.Sequence<+T_co>[~Payload]<~Payload>
+        payloads : typing.Sequence[~Payload]
         '''
         self.payloads = [Payload.from_json(o) for o in payloads or []]
         self.unknown_fields = unknown_fields
@@ -11295,7 +11295,7 @@ class TrackPayloadArgs(Type):
 class UndertakerModelInfo(Type):
     _toSchema = {'force_destroyed': 'force-destroyed', 'global_name': 'global-name', 'is_system': 'is-system', 'life': 'life', 'name': 'name', 'uuid': 'uuid'}
     _toPy = {'force-destroyed': 'force_destroyed', 'global-name': 'global_name', 'is-system': 'is_system', 'life': 'life', 'name': 'name', 'uuid': 'uuid'}
-    def __init__(self, force_destroyed=False, global_name="", is_system=False, life="", name="", uuid="", **unknown_fields):
+    def __init__(self, force_destroyed=None, global_name=None, is_system=None, life=None, name=None, uuid=None, **unknown_fields):
         '''
         force_destroyed : bool
         global_name : str
@@ -11331,7 +11331,7 @@ class UndertakerModelInfoResult(Type):
 class UnitNetworkConfig(Type):
     _toSchema = {'binding_name': 'binding-name', 'unit_tag': 'unit-tag'}
     _toPy = {'binding-name': 'binding_name', 'unit-tag': 'unit_tag'}
-    def __init__(self, binding_name="", unit_tag="", **unknown_fields):
+    def __init__(self, binding_name=None, unit_tag=None, **unknown_fields):
         '''
         binding_name : str
         unit_tag : str
@@ -11348,7 +11348,7 @@ class UnitNetworkConfigResult(Type):
     def __init__(self, error=None, info=None, **unknown_fields):
         '''
         error : Error
-        info : typing.Sequence<+T_co>[~NetworkConfig]<~NetworkConfig>
+        info : typing.Sequence[~NetworkConfig]
         '''
         self.error = Error.from_json(error) if error else None
         self.info = [NetworkConfig.from_json(o) for o in info or []]
@@ -11361,7 +11361,7 @@ class UnitNetworkConfigResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~UnitNetworkConfigResult]<~UnitNetworkConfigResult>
+        results : typing.Sequence[~UnitNetworkConfigResult]
         '''
         self.results = [UnitNetworkConfigResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -11371,7 +11371,7 @@ class UnitNetworkConfigResults(Type):
 class UnitRefreshResult(Type):
     _toSchema = {'error': 'Error', 'life': 'Life', 'resolved': 'Resolved'}
     _toPy = {'Error': 'error', 'Life': 'life', 'Resolved': 'resolved'}
-    def __init__(self, error=None, life="", resolved="", **unknown_fields):
+    def __init__(self, error=None, life=None, resolved=None, **unknown_fields):
         '''
         error : Error
         life : str
@@ -11389,7 +11389,7 @@ class UnitRefreshResults(Type):
     _toPy = {'Results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~UnitRefreshResult]<~UnitRefreshResult>
+        results : typing.Sequence[~UnitRefreshResult]
         '''
         self.results = [UnitRefreshResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -11415,11 +11415,11 @@ class UnitResourceResult(Type):
 class UnitResources(Type):
     _toSchema = {'download_progress': 'download-progress', 'entity': 'Entity', 'resources': 'resources', 'tag': 'tag'}
     _toPy = {'Entity': 'entity', 'download-progress': 'download_progress', 'resources': 'resources', 'tag': 'tag'}
-    def __init__(self, entity=None, download_progress=None, resources=None, tag="", **unknown_fields):
+    def __init__(self, entity=None, download_progress=None, resources=None, tag=None, **unknown_fields):
         '''
         entity : Entity
-        download_progress : typing.Mapping<~KT, +VT_co>[str, int]
-        resources : typing.Sequence<+T_co>[~Resource]<~Resource>
+        download_progress : typing.Mapping[str, int]
+        resources : typing.Sequence[~Resource]
         tag : str
         '''
         self.entity = Entity.from_json(entity) if entity else None
@@ -11437,7 +11437,7 @@ class UnitResourcesResult(Type):
         '''
         errorresult : ErrorResult
         error : Error
-        resources : typing.Sequence<+T_co>[~UnitResourceResult]<~UnitResourceResult>
+        resources : typing.Sequence[~UnitResourceResult]
         '''
         self.errorresult = ErrorResult.from_json(errorresult) if errorresult else None
         self.error = Error.from_json(error) if error else None
@@ -11449,7 +11449,7 @@ class UnitResourcesResult(Type):
 class UnitSettings(Type):
     _toSchema = {'version': 'version'}
     _toPy = {'version': 'version'}
-    def __init__(self, version=0, **unknown_fields):
+    def __init__(self, version=None, **unknown_fields):
         '''
         version : int
         '''
@@ -11461,17 +11461,17 @@ class UnitSettings(Type):
 class UnitStatus(Type):
     _toSchema = {'address': 'address', 'agent_status': 'agent-status', 'charm': 'charm', 'leader': 'leader', 'machine': 'machine', 'opened_ports': 'opened-ports', 'provider_id': 'provider-id', 'public_address': 'public-address', 'subordinates': 'subordinates', 'workload_status': 'workload-status', 'workload_version': 'workload-version'}
     _toPy = {'address': 'address', 'agent-status': 'agent_status', 'charm': 'charm', 'leader': 'leader', 'machine': 'machine', 'opened-ports': 'opened_ports', 'provider-id': 'provider_id', 'public-address': 'public_address', 'subordinates': 'subordinates', 'workload-status': 'workload_status', 'workload-version': 'workload_version'}
-    def __init__(self, address="", agent_status=None, charm="", leader=False, machine="", opened_ports=None, provider_id="", public_address="", subordinates=None, workload_status=None, workload_version="", **unknown_fields):
+    def __init__(self, address=None, agent_status=None, charm=None, leader=None, machine=None, opened_ports=None, provider_id=None, public_address=None, subordinates=None, workload_status=None, workload_version=None, **unknown_fields):
         '''
         address : str
         agent_status : DetailedStatus
         charm : str
         leader : bool
         machine : str
-        opened_ports : typing.Sequence<+T_co>[str]
+        opened_ports : typing.Sequence[str]
         provider_id : str
         public_address : str
-        subordinates : typing.Mapping<~KT, +VT_co>[str, ~UnitStatus]<~UnitStatus>
+        subordinates : typing.Mapping[str, ~UnitStatus]
         workload_status : DetailedStatus
         workload_version : str
         '''
@@ -11495,7 +11495,7 @@ class UnitsNetworkConfig(Type):
     _toPy = {'args': 'args'}
     def __init__(self, args=None, **unknown_fields):
         '''
-        args : typing.Sequence<+T_co>[~UnitNetworkConfig]<~UnitNetworkConfig>
+        args : typing.Sequence[~UnitNetworkConfig]
         '''
         self.args = [UnitNetworkConfig.from_json(o) for o in args or []]
         self.unknown_fields = unknown_fields
@@ -11505,7 +11505,7 @@ class UnitsNetworkConfig(Type):
 class UnitsResolved(Type):
     _toSchema = {'all_': 'all', 'retry': 'retry', 'tags': 'tags'}
     _toPy = {'all': 'all_', 'retry': 'retry', 'tags': 'tags'}
-    def __init__(self, all_=False, retry=False, tags=None, **unknown_fields):
+    def __init__(self, all_=None, retry=None, tags=None, **unknown_fields):
         '''
         all_ : bool
         retry : bool
@@ -11523,7 +11523,7 @@ class UnsetModelDefaults(Type):
     _toPy = {'keys': 'keys'}
     def __init__(self, keys=None, **unknown_fields):
         '''
-        keys : typing.Sequence<+T_co>[~ModelUnsetKeys]<~ModelUnsetKeys>
+        keys : typing.Sequence[~ModelUnsetKeys]
         '''
         self.keys = [ModelUnsetKeys.from_json(o) for o in keys or []]
         self.unknown_fields = unknown_fields
@@ -11533,9 +11533,9 @@ class UnsetModelDefaults(Type):
 class UpdateApplicationServiceArg(Type):
     _toSchema = {'addresses': 'addresses', 'application_tag': 'application-tag', 'generation': 'generation', 'provider_id': 'provider-id', 'scale': 'scale'}
     _toPy = {'addresses': 'addresses', 'application-tag': 'application_tag', 'generation': 'generation', 'provider-id': 'provider_id', 'scale': 'scale'}
-    def __init__(self, addresses=None, application_tag="", generation=0, provider_id="", scale=0, **unknown_fields):
+    def __init__(self, addresses=None, application_tag=None, generation=None, provider_id=None, scale=None, **unknown_fields):
         '''
-        addresses : typing.Sequence<+T_co>[~Address]<~Address>
+        addresses : typing.Sequence[~Address]
         application_tag : str
         generation : int
         provider_id : str
@@ -11555,7 +11555,7 @@ class UpdateApplicationServiceArgs(Type):
     _toPy = {'args': 'args'}
     def __init__(self, args=None, **unknown_fields):
         '''
-        args : typing.Sequence<+T_co>[~UpdateApplicationServiceArg]<~UpdateApplicationServiceArg>
+        args : typing.Sequence[~UpdateApplicationServiceArg]
         '''
         self.args = [UpdateApplicationServiceArg.from_json(o) for o in args or []]
         self.unknown_fields = unknown_fields
@@ -11567,7 +11567,7 @@ class UpdateApplicationUnitArgs(Type):
     _toPy = {'args': 'args'}
     def __init__(self, args=None, **unknown_fields):
         '''
-        args : typing.Sequence<+T_co>[~UpdateApplicationUnits]<~UpdateApplicationUnits>
+        args : typing.Sequence[~UpdateApplicationUnits]
         '''
         self.args = [UpdateApplicationUnits.from_json(o) for o in args or []]
         self.unknown_fields = unknown_fields
@@ -11577,13 +11577,13 @@ class UpdateApplicationUnitArgs(Type):
 class UpdateApplicationUnits(Type):
     _toSchema = {'application_tag': 'application-tag', 'generation': 'generation', 'scale': 'scale', 'status': 'status', 'units': 'units'}
     _toPy = {'application-tag': 'application_tag', 'generation': 'generation', 'scale': 'scale', 'status': 'status', 'units': 'units'}
-    def __init__(self, application_tag="", generation=0, scale=0, status=None, units=None, **unknown_fields):
+    def __init__(self, application_tag=None, generation=None, scale=None, status=None, units=None, **unknown_fields):
         '''
         application_tag : str
         generation : int
         scale : int
         status : EntityStatus
-        units : typing.Sequence<+T_co>[~ApplicationUnitParams]<~ApplicationUnitParams>
+        units : typing.Sequence[~ApplicationUnitParams]
         '''
         self.application_tag = application_tag
         self.generation = generation
@@ -11597,7 +11597,7 @@ class UpdateApplicationUnits(Type):
 class UpdateBehavior(Type):
     _toSchema = {'enable_os_refresh_update': 'enable-os-refresh-update', 'enable_os_upgrade': 'enable-os-upgrade'}
     _toPy = {'enable-os-refresh-update': 'enable_os_refresh_update', 'enable-os-upgrade': 'enable_os_upgrade'}
-    def __init__(self, enable_os_refresh_update=False, enable_os_upgrade=False, **unknown_fields):
+    def __init__(self, enable_os_refresh_update=None, enable_os_upgrade=None, **unknown_fields):
         '''
         enable_os_refresh_update : bool
         enable_os_upgrade : bool
@@ -11613,7 +11613,7 @@ class UpdateCloudArgs(Type):
     _toPy = {'clouds': 'clouds'}
     def __init__(self, clouds=None, **unknown_fields):
         '''
-        clouds : typing.Sequence<+T_co>[~AddCloudArgs]<~AddCloudArgs>
+        clouds : typing.Sequence[~AddCloudArgs]
         '''
         self.clouds = [AddCloudArgs.from_json(o) for o in clouds or []]
         self.unknown_fields = unknown_fields
@@ -11623,7 +11623,7 @@ class UpdateCloudArgs(Type):
 class UpdateCloudCredential(Type):
     _toSchema = {'credential': 'credential', 'tag': 'tag'}
     _toPy = {'credential': 'credential', 'tag': 'tag'}
-    def __init__(self, credential=None, tag="", **unknown_fields):
+    def __init__(self, credential=None, tag=None, **unknown_fields):
         '''
         credential : CloudCredential
         tag : str
@@ -11639,7 +11639,7 @@ class UpdateCloudCredentials(Type):
     _toPy = {'credentials': 'credentials'}
     def __init__(self, credentials=None, **unknown_fields):
         '''
-        credentials : typing.Sequence<+T_co>[~UpdateCloudCredential]<~UpdateCloudCredential>
+        credentials : typing.Sequence[~UpdateCloudCredential]
         '''
         self.credentials = [UpdateCloudCredential.from_json(o) for o in credentials or []]
         self.unknown_fields = unknown_fields
@@ -11649,9 +11649,9 @@ class UpdateCloudCredentials(Type):
 class UpdateCredentialArgs(Type):
     _toSchema = {'credentials': 'credentials', 'force': 'force'}
     _toPy = {'credentials': 'credentials', 'force': 'force'}
-    def __init__(self, credentials=None, force=False, **unknown_fields):
+    def __init__(self, credentials=None, force=None, **unknown_fields):
         '''
-        credentials : typing.Sequence<+T_co>[~TaggedCredential]<~TaggedCredential>
+        credentials : typing.Sequence[~TaggedCredential]
         force : bool
         '''
         self.credentials = [TaggedCredential.from_json(o) for o in credentials or []]
@@ -11663,9 +11663,9 @@ class UpdateCredentialArgs(Type):
 class UpdateCredentialModelResult(Type):
     _toSchema = {'errors': 'errors', 'name': 'name', 'uuid': 'uuid'}
     _toPy = {'errors': 'errors', 'name': 'name', 'uuid': 'uuid'}
-    def __init__(self, errors=None, name="", uuid="", **unknown_fields):
+    def __init__(self, errors=None, name=None, uuid=None, **unknown_fields):
         '''
-        errors : typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        errors : typing.Sequence[~ErrorResult]
         name : str
         uuid : str
         '''
@@ -11679,10 +11679,10 @@ class UpdateCredentialModelResult(Type):
 class UpdateCredentialResult(Type):
     _toSchema = {'error': 'error', 'models': 'models', 'tag': 'tag'}
     _toPy = {'error': 'error', 'models': 'models', 'tag': 'tag'}
-    def __init__(self, error=None, models=None, tag="", **unknown_fields):
+    def __init__(self, error=None, models=None, tag=None, **unknown_fields):
         '''
         error : Error
-        models : typing.Sequence<+T_co>[~UpdateCredentialModelResult]<~UpdateCredentialModelResult>
+        models : typing.Sequence[~UpdateCredentialModelResult]
         tag : str
         '''
         self.error = Error.from_json(error) if error else None
@@ -11697,7 +11697,7 @@ class UpdateCredentialResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~UpdateCredentialResult]<~UpdateCredentialResult>
+        results : typing.Sequence[~UpdateCredentialResult]
         '''
         self.results = [UpdateCredentialResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -11707,7 +11707,7 @@ class UpdateCredentialResults(Type):
 class UpdateSeriesArg(Type):
     _toSchema = {'force': 'force', 'series': 'series', 'tag': 'tag'}
     _toPy = {'force': 'force', 'series': 'series', 'tag': 'tag'}
-    def __init__(self, force=False, series="", tag=None, **unknown_fields):
+    def __init__(self, force=None, series=None, tag=None, **unknown_fields):
         '''
         force : bool
         series : str
@@ -11725,7 +11725,7 @@ class UpdateSeriesArgs(Type):
     _toPy = {'args': 'args'}
     def __init__(self, args=None, **unknown_fields):
         '''
-        args : typing.Sequence<+T_co>[~UpdateSeriesArg]<~UpdateSeriesArg>
+        args : typing.Sequence[~UpdateSeriesArg]
         '''
         self.args = [UpdateSeriesArg.from_json(o) for o in args or []]
         self.unknown_fields = unknown_fields
@@ -11747,7 +11747,7 @@ class UpgradeMongoParams(Type):
 class UpgradeSeriesNotificationParam(Type):
     _toSchema = {'entity': 'entity', 'watcher_id': 'watcher-id'}
     _toPy = {'entity': 'entity', 'watcher-id': 'watcher_id'}
-    def __init__(self, entity=None, watcher_id="", **unknown_fields):
+    def __init__(self, entity=None, watcher_id=None, **unknown_fields):
         '''
         entity : Entity
         watcher_id : str
@@ -11763,7 +11763,7 @@ class UpgradeSeriesNotificationParams(Type):
     _toPy = {'params': 'params'}
     def __init__(self, params=None, **unknown_fields):
         '''
-        params : typing.Sequence<+T_co>[~UpgradeSeriesNotificationParam]<~UpgradeSeriesNotificationParam>
+        params : typing.Sequence[~UpgradeSeriesNotificationParam]
         '''
         self.params = [UpgradeSeriesNotificationParam.from_json(o) for o in params or []]
         self.unknown_fields = unknown_fields
@@ -11773,9 +11773,9 @@ class UpgradeSeriesNotificationParams(Type):
 class UpgradeSeriesStartUnitCompletionParam(Type):
     _toSchema = {'entities': 'entities', 'message': 'message'}
     _toPy = {'entities': 'entities', 'message': 'message'}
-    def __init__(self, entities=None, message="", **unknown_fields):
+    def __init__(self, entities=None, message=None, **unknown_fields):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        entities : typing.Sequence[~Entity]
         message : str
         '''
         self.entities = [Entity.from_json(o) for o in entities or []]
@@ -11787,7 +11787,7 @@ class UpgradeSeriesStartUnitCompletionParam(Type):
 class UpgradeSeriesStatusParam(Type):
     _toSchema = {'entity': 'entity', 'message': 'message', 'status': 'status'}
     _toPy = {'entity': 'entity', 'message': 'message', 'status': 'status'}
-    def __init__(self, entity=None, message="", status="", **unknown_fields):
+    def __init__(self, entity=None, message=None, status=None, **unknown_fields):
         '''
         entity : Entity
         message : str
@@ -11805,7 +11805,7 @@ class UpgradeSeriesStatusParams(Type):
     _toPy = {'params': 'params'}
     def __init__(self, params=None, **unknown_fields):
         '''
-        params : typing.Sequence<+T_co>[~UpgradeSeriesStatusParam]<~UpgradeSeriesStatusParam>
+        params : typing.Sequence[~UpgradeSeriesStatusParam]
         '''
         self.params = [UpgradeSeriesStatusParam.from_json(o) for o in params or []]
         self.unknown_fields = unknown_fields
@@ -11815,7 +11815,7 @@ class UpgradeSeriesStatusParams(Type):
 class UpgradeSeriesStatusResult(Type):
     _toSchema = {'error': 'error', 'status': 'status'}
     _toPy = {'error': 'error', 'status': 'status'}
-    def __init__(self, error=None, status="", **unknown_fields):
+    def __init__(self, error=None, status=None, **unknown_fields):
         '''
         error : Error
         status : str
@@ -11831,7 +11831,7 @@ class UpgradeSeriesStatusResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~UpgradeSeriesStatusResult]<~UpgradeSeriesStatusResult>
+        results : typing.Sequence[~UpgradeSeriesStatusResult]
         '''
         self.results = [UpgradeSeriesStatusResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -11844,7 +11844,7 @@ class UpgradeSeriesUnitsResult(Type):
     def __init__(self, error=None, unit_names=None, **unknown_fields):
         '''
         error : Error
-        unit_names : typing.Sequence<+T_co>[str]
+        unit_names : typing.Sequence[str]
         '''
         self.error = Error.from_json(error) if error else None
         self.unit_names = unit_names
@@ -11857,7 +11857,7 @@ class UpgradeSeriesUnitsResults(Type):
     _toPy = {'Results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~UpgradeSeriesUnitsResult]<~UpgradeSeriesUnitsResult>
+        results : typing.Sequence[~UpgradeSeriesUnitsResult]
         '''
         self.results = [UpgradeSeriesUnitsResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -11867,7 +11867,7 @@ class UpgradeSeriesUnitsResults(Type):
 class UserAccess(Type):
     _toSchema = {'access': 'access', 'user_tag': 'user-tag'}
     _toPy = {'access': 'access', 'user-tag': 'user_tag'}
-    def __init__(self, access="", user_tag="", **unknown_fields):
+    def __init__(self, access=None, user_tag=None, **unknown_fields):
         '''
         access : str
         user_tag : str
@@ -11897,7 +11897,7 @@ class UserAccessResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~UserAccessResult]<~UserAccessResult>
+        results : typing.Sequence[~UserAccessResult]
         '''
         self.results = [UserAccessResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -11907,7 +11907,7 @@ class UserAccessResults(Type):
 class UserCloud(Type):
     _toSchema = {'cloud_tag': 'cloud-tag', 'user_tag': 'user-tag'}
     _toPy = {'cloud-tag': 'cloud_tag', 'user-tag': 'user_tag'}
-    def __init__(self, cloud_tag="", user_tag="", **unknown_fields):
+    def __init__(self, cloud_tag=None, user_tag=None, **unknown_fields):
         '''
         cloud_tag : str
         user_tag : str
@@ -11923,7 +11923,7 @@ class UserClouds(Type):
     _toPy = {'user-clouds': 'user_clouds'}
     def __init__(self, user_clouds=None, **unknown_fields):
         '''
-        user_clouds : typing.Sequence<+T_co>[~UserCloud]<~UserCloud>
+        user_clouds : typing.Sequence[~UserCloud]
         '''
         self.user_clouds = [UserCloud.from_json(o) for o in user_clouds or []]
         self.unknown_fields = unknown_fields
@@ -11933,7 +11933,7 @@ class UserClouds(Type):
 class UserInfo(Type):
     _toSchema = {'access': 'access', 'created_by': 'created-by', 'date_created': 'date-created', 'disabled': 'disabled', 'display_name': 'display-name', 'last_connection': 'last-connection', 'username': 'username'}
     _toPy = {'access': 'access', 'created-by': 'created_by', 'date-created': 'date_created', 'disabled': 'disabled', 'display-name': 'display_name', 'last-connection': 'last_connection', 'username': 'username'}
-    def __init__(self, access="", created_by="", date_created="", disabled=False, display_name="", last_connection="", username="", **unknown_fields):
+    def __init__(self, access=None, created_by=None, date_created=None, disabled=None, display_name=None, last_connection=None, username=None, **unknown_fields):
         '''
         access : str
         created_by : str
@@ -11957,9 +11957,9 @@ class UserInfo(Type):
 class UserInfoRequest(Type):
     _toSchema = {'entities': 'entities', 'include_disabled': 'include-disabled'}
     _toPy = {'entities': 'entities', 'include-disabled': 'include_disabled'}
-    def __init__(self, entities=None, include_disabled=False, **unknown_fields):
+    def __init__(self, entities=None, include_disabled=None, **unknown_fields):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
+        entities : typing.Sequence[~Entity]
         include_disabled : bool
         '''
         self.entities = [Entity.from_json(o) for o in entities or []]
@@ -11987,7 +11987,7 @@ class UserInfoResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~UserInfoResult]<~UserInfoResult>
+        results : typing.Sequence[~UserInfoResult]
         '''
         self.results = [UserInfoResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -11997,7 +11997,7 @@ class UserInfoResults(Type):
 class UserModel(Type):
     _toSchema = {'last_connection': 'last-connection', 'model': 'model'}
     _toPy = {'last-connection': 'last_connection', 'model': 'model'}
-    def __init__(self, last_connection="", model=None, **unknown_fields):
+    def __init__(self, last_connection=None, model=None, **unknown_fields):
         '''
         last_connection : str
         model : Model
@@ -12013,7 +12013,7 @@ class UserModelList(Type):
     _toPy = {'user-models': 'user_models'}
     def __init__(self, user_models=None, **unknown_fields):
         '''
-        user_models : typing.Sequence<+T_co>[~UserModel]<~UserModel>
+        user_models : typing.Sequence[~UserModel]
         '''
         self.user_models = [UserModel.from_json(o) for o in user_models or []]
         self.unknown_fields = unknown_fields
@@ -12023,7 +12023,7 @@ class UserModelList(Type):
 class Value(Type):
     _toSchema = {'arch': 'arch', 'container': 'container', 'cores': 'cores', 'cpu_power': 'cpu-power', 'instance_type': 'instance-type', 'mem': 'mem', 'root_disk': 'root-disk', 'root_disk_source': 'root-disk-source', 'spaces': 'spaces', 'tags': 'tags', 'virt_type': 'virt-type', 'zones': 'zones'}
     _toPy = {'arch': 'arch', 'container': 'container', 'cores': 'cores', 'cpu-power': 'cpu_power', 'instance-type': 'instance_type', 'mem': 'mem', 'root-disk': 'root_disk', 'root-disk-source': 'root_disk_source', 'spaces': 'spaces', 'tags': 'tags', 'virt-type': 'virt_type', 'zones': 'zones'}
-    def __init__(self, arch="", container="", cores=0, cpu_power=0, instance_type="", mem=0, root_disk=0, root_disk_source="", spaces=None, tags=None, virt_type="", zones=None, **unknown_fields):
+    def __init__(self, arch=None, container=None, cores=None, cpu_power=None, instance_type=None, mem=None, root_disk=None, root_disk_source=None, spaces=None, tags=None, virt_type=None, zones=None, **unknown_fields):
         '''
         arch : str
         container : str
@@ -12033,10 +12033,10 @@ class Value(Type):
         mem : int
         root_disk : int
         root_disk_source : str
-        spaces : typing.Sequence<+T_co>[str]
-        tags : typing.Sequence<+T_co>[str]
+        spaces : typing.Sequence[str]
+        tags : typing.Sequence[str]
         virt_type : str
-        zones : typing.Sequence<+T_co>[str]
+        zones : typing.Sequence[str]
         '''
         self.arch = arch
         self.container = container
@@ -12085,7 +12085,7 @@ class VersionResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~VersionResult]<~VersionResult>
+        results : typing.Sequence[~VersionResult]
         '''
         self.results = [VersionResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -12095,7 +12095,7 @@ class VersionResults(Type):
 class Volume(Type):
     _toSchema = {'info': 'info', 'volume_tag': 'volume-tag'}
     _toPy = {'info': 'info', 'volume-tag': 'volume_tag'}
-    def __init__(self, info=None, volume_tag="", **unknown_fields):
+    def __init__(self, info=None, volume_tag=None, **unknown_fields):
         '''
         info : VolumeInfo
         volume_tag : str
@@ -12109,7 +12109,7 @@ class Volume(Type):
 class VolumeAttachment(Type):
     _toSchema = {'info': 'info', 'machine_tag': 'machine-tag', 'volume_tag': 'volume-tag'}
     _toPy = {'info': 'info', 'machine-tag': 'machine_tag', 'volume-tag': 'volume_tag'}
-    def __init__(self, info=None, machine_tag="", volume_tag="", **unknown_fields):
+    def __init__(self, info=None, machine_tag=None, volume_tag=None, **unknown_fields):
         '''
         info : VolumeAttachmentInfo
         machine_tag : str
@@ -12125,7 +12125,7 @@ class VolumeAttachment(Type):
 class VolumeAttachmentDetails(Type):
     _toSchema = {'bus_address': 'bus-address', 'device_link': 'device-link', 'device_name': 'device-name', 'life': 'life', 'plan_info': 'plan-info', 'read_only': 'read-only', 'volumeattachmentinfo': 'VolumeAttachmentInfo'}
     _toPy = {'VolumeAttachmentInfo': 'volumeattachmentinfo', 'bus-address': 'bus_address', 'device-link': 'device_link', 'device-name': 'device_name', 'life': 'life', 'plan-info': 'plan_info', 'read-only': 'read_only'}
-    def __init__(self, volumeattachmentinfo=None, bus_address="", device_link="", device_name="", life="", plan_info=None, read_only=False, **unknown_fields):
+    def __init__(self, volumeattachmentinfo=None, bus_address=None, device_link=None, device_name=None, life=None, plan_info=None, read_only=None, **unknown_fields):
         '''
         volumeattachmentinfo : VolumeAttachmentInfo
         bus_address : str
@@ -12149,7 +12149,7 @@ class VolumeAttachmentDetails(Type):
 class VolumeAttachmentInfo(Type):
     _toSchema = {'bus_address': 'bus-address', 'device_link': 'device-link', 'device_name': 'device-name', 'plan_info': 'plan-info', 'read_only': 'read-only'}
     _toPy = {'bus-address': 'bus_address', 'device-link': 'device_link', 'device-name': 'device_name', 'plan-info': 'plan_info', 'read-only': 'read_only'}
-    def __init__(self, bus_address="", device_link="", device_name="", plan_info=None, read_only=False, **unknown_fields):
+    def __init__(self, bus_address=None, device_link=None, device_name=None, plan_info=None, read_only=None, **unknown_fields):
         '''
         bus_address : str
         device_link : str
@@ -12169,7 +12169,7 @@ class VolumeAttachmentInfo(Type):
 class VolumeAttachmentParams(Type):
     _toSchema = {'instance_id': 'instance-id', 'machine_tag': 'machine-tag', 'provider': 'provider', 'read_only': 'read-only', 'volume_id': 'volume-id', 'volume_tag': 'volume-tag'}
     _toPy = {'instance-id': 'instance_id', 'machine-tag': 'machine_tag', 'provider': 'provider', 'read-only': 'read_only', 'volume-id': 'volume_id', 'volume-tag': 'volume_tag'}
-    def __init__(self, instance_id="", machine_tag="", provider="", read_only=False, volume_id="", volume_tag="", **unknown_fields):
+    def __init__(self, instance_id=None, machine_tag=None, provider=None, read_only=None, volume_id=None, volume_tag=None, **unknown_fields):
         '''
         instance_id : str
         machine_tag : str
@@ -12207,7 +12207,7 @@ class VolumeAttachmentParamsResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~VolumeAttachmentParamsResult]<~VolumeAttachmentParamsResult>
+        results : typing.Sequence[~VolumeAttachmentParamsResult]
         '''
         self.results = [VolumeAttachmentParamsResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -12217,7 +12217,7 @@ class VolumeAttachmentParamsResults(Type):
 class VolumeAttachmentPlan(Type):
     _toSchema = {'block_device': 'block-device', 'life': 'life', 'machine_tag': 'machine-tag', 'plan_info': 'plan-info', 'volume_tag': 'volume-tag'}
     _toPy = {'block-device': 'block_device', 'life': 'life', 'machine-tag': 'machine_tag', 'plan-info': 'plan_info', 'volume-tag': 'volume_tag'}
-    def __init__(self, block_device=None, life="", machine_tag="", plan_info=None, volume_tag="", **unknown_fields):
+    def __init__(self, block_device=None, life=None, machine_tag=None, plan_info=None, volume_tag=None, **unknown_fields):
         '''
         block_device : BlockDevice
         life : str
@@ -12237,9 +12237,9 @@ class VolumeAttachmentPlan(Type):
 class VolumeAttachmentPlanInfo(Type):
     _toSchema = {'device_attributes': 'device-attributes', 'device_type': 'device-type'}
     _toPy = {'device-attributes': 'device_attributes', 'device-type': 'device_type'}
-    def __init__(self, device_attributes=None, device_type="", **unknown_fields):
+    def __init__(self, device_attributes=None, device_type=None, **unknown_fields):
         '''
-        device_attributes : typing.Mapping<~KT, +VT_co>[str, str]
+        device_attributes : typing.Mapping[str, str]
         device_type : str
         '''
         self.device_attributes = device_attributes
@@ -12267,7 +12267,7 @@ class VolumeAttachmentPlanResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~VolumeAttachmentPlanResult]<~VolumeAttachmentPlanResult>
+        results : typing.Sequence[~VolumeAttachmentPlanResult]
         '''
         self.results = [VolumeAttachmentPlanResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -12279,7 +12279,7 @@ class VolumeAttachmentPlans(Type):
     _toPy = {'volume-plans': 'volume_plans'}
     def __init__(self, volume_plans=None, **unknown_fields):
         '''
-        volume_plans : typing.Sequence<+T_co>[~VolumeAttachmentPlan]<~VolumeAttachmentPlan>
+        volume_plans : typing.Sequence[~VolumeAttachmentPlan]
         '''
         self.volume_plans = [VolumeAttachmentPlan.from_json(o) for o in volume_plans or []]
         self.unknown_fields = unknown_fields
@@ -12305,7 +12305,7 @@ class VolumeAttachmentResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~VolumeAttachmentResult]<~VolumeAttachmentResult>
+        results : typing.Sequence[~VolumeAttachmentResult]
         '''
         self.results = [VolumeAttachmentResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -12317,7 +12317,7 @@ class VolumeAttachments(Type):
     _toPy = {'volume-attachments': 'volume_attachments'}
     def __init__(self, volume_attachments=None, **unknown_fields):
         '''
-        volume_attachments : typing.Sequence<+T_co>[~VolumeAttachment]<~VolumeAttachment>
+        volume_attachments : typing.Sequence[~VolumeAttachment]
         '''
         self.volume_attachments = [VolumeAttachment.from_json(o) for o in volume_attachments or []]
         self.unknown_fields = unknown_fields
@@ -12327,14 +12327,14 @@ class VolumeAttachments(Type):
 class VolumeDetails(Type):
     _toSchema = {'info': 'info', 'life': 'life', 'machine_attachments': 'machine-attachments', 'status': 'status', 'storage': 'storage', 'unit_attachments': 'unit-attachments', 'volume_tag': 'volume-tag'}
     _toPy = {'info': 'info', 'life': 'life', 'machine-attachments': 'machine_attachments', 'status': 'status', 'storage': 'storage', 'unit-attachments': 'unit_attachments', 'volume-tag': 'volume_tag'}
-    def __init__(self, info=None, life="", machine_attachments=None, status=None, storage=None, unit_attachments=None, volume_tag="", **unknown_fields):
+    def __init__(self, info=None, life=None, machine_attachments=None, status=None, storage=None, unit_attachments=None, volume_tag=None, **unknown_fields):
         '''
         info : VolumeInfo
         life : str
-        machine_attachments : typing.Mapping<~KT, +VT_co>[str, ~VolumeAttachmentDetails]<~VolumeAttachmentDetails>
+        machine_attachments : typing.Mapping[str, ~VolumeAttachmentDetails]
         status : EntityStatus
         storage : StorageDetails
-        unit_attachments : typing.Mapping<~KT, +VT_co>[str, ~VolumeAttachmentDetails]<~VolumeAttachmentDetails>
+        unit_attachments : typing.Mapping[str, ~VolumeAttachmentDetails]
         volume_tag : str
         '''
         self.info = VolumeInfo.from_json(info) if info else None
@@ -12354,7 +12354,7 @@ class VolumeDetailsListResult(Type):
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
-        result : typing.Sequence<+T_co>[~VolumeDetails]<~VolumeDetails>
+        result : typing.Sequence[~VolumeDetails]
         '''
         self.error = Error.from_json(error) if error else None
         self.result = [VolumeDetails.from_json(o) for o in result or []]
@@ -12367,7 +12367,7 @@ class VolumeDetailsListResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~VolumeDetailsListResult]<~VolumeDetailsListResult>
+        results : typing.Sequence[~VolumeDetailsListResult]
         '''
         self.results = [VolumeDetailsListResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -12379,7 +12379,7 @@ class VolumeFilter(Type):
     _toPy = {'machines': 'machines'}
     def __init__(self, machines=None, **unknown_fields):
         '''
-        machines : typing.Sequence<+T_co>[str]
+        machines : typing.Sequence[str]
         '''
         self.machines = machines
         self.unknown_fields = unknown_fields
@@ -12391,7 +12391,7 @@ class VolumeFilters(Type):
     _toPy = {'filters': 'filters'}
     def __init__(self, filters=None, **unknown_fields):
         '''
-        filters : typing.Sequence<+T_co>[~VolumeFilter]<~VolumeFilter>
+        filters : typing.Sequence[~VolumeFilter]
         '''
         self.filters = [VolumeFilter.from_json(o) for o in filters or []]
         self.unknown_fields = unknown_fields
@@ -12401,7 +12401,7 @@ class VolumeFilters(Type):
 class VolumeInfo(Type):
     _toSchema = {'hardware_id': 'hardware-id', 'persistent': 'persistent', 'pool': 'pool', 'size': 'size', 'volume_id': 'volume-id', 'wwn': 'wwn'}
     _toPy = {'hardware-id': 'hardware_id', 'persistent': 'persistent', 'pool': 'pool', 'size': 'size', 'volume-id': 'volume_id', 'wwn': 'wwn'}
-    def __init__(self, hardware_id="", persistent=False, pool="", size=0, volume_id="", wwn="", **unknown_fields):
+    def __init__(self, hardware_id=None, persistent=None, pool=None, size=None, volume_id=None, wwn=None, **unknown_fields):
         '''
         hardware_id : str
         persistent : bool
@@ -12423,13 +12423,13 @@ class VolumeInfo(Type):
 class VolumeParams(Type):
     _toSchema = {'attachment': 'attachment', 'attributes': 'attributes', 'provider': 'provider', 'size': 'size', 'tags': 'tags', 'volume_tag': 'volume-tag'}
     _toPy = {'attachment': 'attachment', 'attributes': 'attributes', 'provider': 'provider', 'size': 'size', 'tags': 'tags', 'volume-tag': 'volume_tag'}
-    def __init__(self, attachment=None, attributes=None, provider="", size=0, tags=None, volume_tag="", **unknown_fields):
+    def __init__(self, attachment=None, attributes=None, provider=None, size=None, tags=None, volume_tag=None, **unknown_fields):
         '''
         attachment : VolumeAttachmentParams
-        attributes : typing.Mapping<~KT, +VT_co>[str, typing.Any]
+        attributes : typing.Mapping[str, typing.Any]
         provider : str
         size : int
-        tags : typing.Mapping<~KT, +VT_co>[str, str]
+        tags : typing.Mapping[str, str]
         volume_tag : str
         '''
         self.attachment = VolumeAttachmentParams.from_json(attachment) if attachment else None
@@ -12461,7 +12461,7 @@ class VolumeParamsResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~VolumeParamsResult]<~VolumeParamsResult>
+        results : typing.Sequence[~VolumeParamsResult]
         '''
         self.results = [VolumeParamsResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -12487,7 +12487,7 @@ class VolumeResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~VolumeResult]<~VolumeResult>
+        results : typing.Sequence[~VolumeResult]
         '''
         self.results = [VolumeResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields
@@ -12499,7 +12499,7 @@ class Volumes(Type):
     _toPy = {'volumes': 'volumes'}
     def __init__(self, volumes=None, **unknown_fields):
         '''
-        volumes : typing.Sequence<+T_co>[~Volume]<~Volume>
+        volumes : typing.Sequence[~Volume]
         '''
         self.volumes = [Volume.from_json(o) for o in volumes or []]
         self.unknown_fields = unknown_fields
@@ -12509,7 +12509,7 @@ class Volumes(Type):
 class WatchContainer(Type):
     _toSchema = {'container_type': 'container-type', 'machine_tag': 'machine-tag'}
     _toPy = {'container-type': 'container_type', 'machine-tag': 'machine_tag'}
-    def __init__(self, container_type="", machine_tag="", **unknown_fields):
+    def __init__(self, container_type=None, machine_tag=None, **unknown_fields):
         '''
         container_type : str
         machine_tag : str
@@ -12525,7 +12525,7 @@ class WatchContainers(Type):
     _toPy = {'params': 'params'}
     def __init__(self, params=None, **unknown_fields):
         '''
-        params : typing.Sequence<+T_co>[~WatchContainer]<~WatchContainer>
+        params : typing.Sequence[~WatchContainer]
         '''
         self.params = [WatchContainer.from_json(o) for o in params or []]
         self.unknown_fields = unknown_fields
@@ -12535,7 +12535,7 @@ class WatchContainers(Type):
 class ZoneResult(Type):
     _toSchema = {'available': 'available', 'error': 'error', 'name': 'name'}
     _toPy = {'available': 'available', 'error': 'error', 'name': 'name'}
-    def __init__(self, available=False, error=None, name="", **unknown_fields):
+    def __init__(self, available=None, error=None, name=None, **unknown_fields):
         '''
         available : bool
         error : Error
@@ -12553,7 +12553,7 @@ class ZoneResults(Type):
     _toPy = {'results': 'results'}
     def __init__(self, results=None, **unknown_fields):
         '''
-        results : typing.Sequence<+T_co>[~ZoneResult]<~ZoneResult>
+        results : typing.Sequence[~ZoneResult]
         '''
         self.results = [ZoneResult.from_json(o) for o in results or []]
         self.unknown_fields = unknown_fields

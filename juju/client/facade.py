@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any, Mapping, Sequence, TypeVar, Union
 
 from . import codegen
+from .flags import DEFAULT_VALUES_FLAG, feature_enabled
 
 _marker = object()
 
@@ -201,11 +202,15 @@ def name_to_py(name):
 
 
 def var_type_to_py(kind):
-    var_name = None
-    if (kind in basic_types or type(kind) in basic_types):
-        var_name = kind.__name__
-    if var_name in basic_values:
-        return basic_values[var_name]
+    # Experimental behaviour where types are filled in from the values assigned
+    # via the type. This can be useful for better type handling, but should be
+    # experimented only with a feature flag.
+    if feature_enabled(DEFAULT_VALUES_FLAG):
+        var_name = None
+        if (kind in basic_types or type(kind) in basic_types):
+            var_name = kind.__name__
+        if var_name in basic_values:
+            return basic_values[var_name]
     return 'None'
 
 
