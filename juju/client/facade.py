@@ -295,18 +295,17 @@ class Args(list):
         return ''
 
     def as_validation(self):
-        if self:
-            parts = []
-            for item in self:
-                ''' if name is not None and not isinstance(name, type):
-                        raise JujuError("Expected {} to be of type {}".format(name, type))
-                '''
-                var_name = name_to_py(item[0])
-                var_type, var_sub_type, ok = kind_to_py(item[1])
-                if ok:
-                    parts.append('{}'.format(buildValidation(var_name, var_type, var_sub_type)))
-            return '\n'.join(parts)
-        return ''
+        """
+        as_validation returns a series of validation statements for every item
+        in the the Args.
+        """
+        parts = []
+        for item in self:
+            var_name = name_to_py(item[0])
+            var_type, var_sub_type, ok = kind_to_py(item[1])
+            if ok:
+                parts.append(buildValidation(var_name, var_type, var_sub_type))
+        return '\n'.join(parts)
 
     def typed(self):
         return self._get_arg_str(True)
@@ -321,7 +320,7 @@ class Args(list):
 def buildValidation(name, instance_type, instance_sub_type, ident=None):
     INDENT = ident or "    "
     source = """{ident}if {name} is not None and not isinstance({name}, {instance_sub_type}):
-{ident}    raise Exception("{name} must be: {instance_type} got: {{}}".format(type({name})))
+{ident}    raise Exception("Expected {name} to be a {instance_type}, received: {{}}".format(type({name})))
 """.format(ident=INDENT,
            name=name,
            instance_type=instance_type,

@@ -265,7 +265,7 @@ class MachineManagerFacade(Type):
         Returns -> typing.Sequence[~AddMachinesResult]
         '''
         if params is not None and not isinstance(params, (bytes, str, list)):
-            raise Exception("params must be: Sequence got: {}".format(type(params)))
+            raise Exception("Expected params to be a Sequence, received: {}".format(type(params)))
 
         # map input types to rpc msg
         _params = dict()
@@ -286,7 +286,7 @@ class MachineManagerFacade(Type):
         Returns -> typing.Sequence[~DestroyMachineResult]
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -310,16 +310,16 @@ class MachineManagerFacade(Type):
         Returns -> typing.Sequence[~DestroyMachineResult]
         '''
         if force is not None and not isinstance(force, bool):
-            raise Exception("force must be: bool got: {}".format(type(force)))
+            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
 
         if keep is not None and not isinstance(keep, bool):
-            raise Exception("keep must be: bool got: {}".format(type(keep)))
+            raise Exception("Expected keep to be a bool, received: {}".format(type(keep)))
 
         if machine_tags is not None and not isinstance(machine_tags, (bytes, str, list)):
-            raise Exception("machine_tags must be: Sequence got: {}".format(type(machine_tags)))
+            raise Exception("Expected machine_tags to be a Sequence, received: {}".format(type(machine_tags)))
 
         if max_wait is not None and not isinstance(max_wait, int):
-            raise Exception("max_wait must be: int got: {}".format(type(max_wait)))
+            raise Exception("Expected max_wait to be a int, received: {}".format(type(max_wait)))
 
         # map input types to rpc msg
         _params = dict()
@@ -343,7 +343,7 @@ class MachineManagerFacade(Type):
         Returns -> typing.Sequence[~DestroyMachineResult]
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -364,7 +364,7 @@ class MachineManagerFacade(Type):
         Returns -> typing.Sequence[~StringsResult]
         '''
         if params is not None and not isinstance(params, (bytes, str, list)):
-            raise Exception("params must be: Sequence got: {}".format(type(params)))
+            raise Exception("Expected params to be a Sequence, received: {}".format(type(params)))
 
         # map input types to rpc msg
         _params = dict()
@@ -385,7 +385,7 @@ class MachineManagerFacade(Type):
         Returns -> typing.Sequence[~InstanceTypesResult]
         '''
         if constraints is not None and not isinstance(constraints, (bytes, str, list)):
-            raise Exception("constraints must be: Sequence got: {}".format(type(constraints)))
+            raise Exception("Expected constraints to be a Sequence, received: {}".format(type(constraints)))
 
         # map input types to rpc msg
         _params = dict()
@@ -408,13 +408,13 @@ class MachineManagerFacade(Type):
         Returns -> Error
         '''
         if force is not None and not isinstance(force, bool):
-            raise Exception("force must be: bool got: {}".format(type(force)))
+            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
 
         if series is not None and not isinstance(series, (bytes, str)):
-            raise Exception("series must be: str got: {}".format(type(series)))
+            raise Exception("Expected series to be a str, received: {}".format(type(series)))
 
         if tag is not None and not isinstance(tag, (dict, set, Entity)):
-            raise Exception("tag must be: Entity got: {}".format(type(tag)))
+            raise Exception("Expected tag to be a Entity, received: {}".format(type(tag)))
 
         # map input types to rpc msg
         _params = dict()
@@ -439,13 +439,13 @@ class MachineManagerFacade(Type):
         Returns -> Error
         '''
         if force is not None and not isinstance(force, bool):
-            raise Exception("force must be: bool got: {}".format(type(force)))
+            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
 
         if series is not None and not isinstance(series, (bytes, str)):
-            raise Exception("series must be: str got: {}".format(type(series)))
+            raise Exception("Expected series to be a str, received: {}".format(type(series)))
 
         if tag is not None and not isinstance(tag, (dict, set, Entity)):
-            raise Exception("tag must be: Entity got: {}".format(type(tag)))
+            raise Exception("Expected tag to be a Entity, received: {}".format(type(tag)))
 
         # map input types to rpc msg
         _params = dict()
@@ -468,7 +468,7 @@ class MachineManagerFacade(Type):
         Returns -> typing.Sequence[~UpgradeSeriesUnitsResult]
         '''
         if args is not None and not isinstance(args, (bytes, str, list)):
-            raise Exception("args must be: Sequence got: {}".format(type(args)))
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
 
         # map input types to rpc msg
         _params = dict()
@@ -489,7 +489,7 @@ class MachineManagerFacade(Type):
         Returns -> typing.Sequence[~NotifyWatchResult]
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -878,7 +878,7 @@ class StorageFacade(Type):
         Returns -> typing.Sequence[~AddStorageResult]
         '''
         if storages is not None and not isinstance(storages, (bytes, str, list)):
-            raise Exception("storages must be: Sequence got: {}".format(type(storages)))
+            raise Exception("Expected storages to be a Sequence, received: {}".format(type(storages)))
 
         # map input types to rpc msg
         _params = dict()
@@ -899,7 +899,7 @@ class StorageFacade(Type):
         Returns -> typing.Sequence[~ErrorResult]
         '''
         if ids is not None and not isinstance(ids, (bytes, str, list)):
-            raise Exception("ids must be: Sequence got: {}".format(type(ids)))
+            raise Exception("Expected ids to be a Sequence, received: {}".format(type(ids)))
 
         # map input types to rpc msg
         _params = dict()
@@ -920,7 +920,7 @@ class StorageFacade(Type):
         Returns -> typing.Sequence[~ErrorResult]
         '''
         if pools is not None and not isinstance(pools, (bytes, str, list)):
-            raise Exception("pools must be: Sequence got: {}".format(type(pools)))
+            raise Exception("Expected pools to be a Sequence, received: {}".format(type(pools)))
 
         # map input types to rpc msg
         _params = dict()
@@ -943,13 +943,13 @@ class StorageFacade(Type):
         Returns -> typing.Sequence[~ErrorResult]
         '''
         if force is not None and not isinstance(force, bool):
-            raise Exception("force must be: bool got: {}".format(type(force)))
+            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
 
         if ids is not None and not isinstance(ids, (dict, set, StorageAttachmentIds)):
-            raise Exception("ids must be: StorageAttachmentIds got: {}".format(type(ids)))
+            raise Exception("Expected ids to be a StorageAttachmentIds, received: {}".format(type(ids)))
 
         if max_wait is not None and not isinstance(max_wait, int):
-            raise Exception("max_wait must be: int got: {}".format(type(max_wait)))
+            raise Exception("Expected max_wait to be a int, received: {}".format(type(max_wait)))
 
         # map input types to rpc msg
         _params = dict()
@@ -972,7 +972,7 @@ class StorageFacade(Type):
         Returns -> typing.Sequence[~ImportStorageResult]
         '''
         if storage is not None and not isinstance(storage, (bytes, str, list)):
-            raise Exception("storage must be: Sequence got: {}".format(type(storage)))
+            raise Exception("Expected storage to be a Sequence, received: {}".format(type(storage)))
 
         # map input types to rpc msg
         _params = dict()
@@ -993,7 +993,7 @@ class StorageFacade(Type):
         Returns -> typing.Sequence[~FilesystemDetailsListResult]
         '''
         if filters is not None and not isinstance(filters, (bytes, str, list)):
-            raise Exception("filters must be: Sequence got: {}".format(type(filters)))
+            raise Exception("Expected filters to be a Sequence, received: {}".format(type(filters)))
 
         # map input types to rpc msg
         _params = dict()
@@ -1014,7 +1014,7 @@ class StorageFacade(Type):
         Returns -> typing.Sequence[~StoragePoolsResult]
         '''
         if filters is not None and not isinstance(filters, (bytes, str, list)):
-            raise Exception("filters must be: Sequence got: {}".format(type(filters)))
+            raise Exception("Expected filters to be a Sequence, received: {}".format(type(filters)))
 
         # map input types to rpc msg
         _params = dict()
@@ -1035,7 +1035,7 @@ class StorageFacade(Type):
         Returns -> typing.Sequence[~StorageDetailsListResult]
         '''
         if filters is not None and not isinstance(filters, (bytes, str, list)):
-            raise Exception("filters must be: Sequence got: {}".format(type(filters)))
+            raise Exception("Expected filters to be a Sequence, received: {}".format(type(filters)))
 
         # map input types to rpc msg
         _params = dict()
@@ -1056,7 +1056,7 @@ class StorageFacade(Type):
         Returns -> typing.Sequence[~VolumeDetailsListResult]
         '''
         if filters is not None and not isinstance(filters, (bytes, str, list)):
-            raise Exception("filters must be: Sequence got: {}".format(type(filters)))
+            raise Exception("Expected filters to be a Sequence, received: {}".format(type(filters)))
 
         # map input types to rpc msg
         _params = dict()
@@ -1077,7 +1077,7 @@ class StorageFacade(Type):
         Returns -> typing.Sequence[~ErrorResult]
         '''
         if storage is not None and not isinstance(storage, (bytes, str, list)):
-            raise Exception("storage must be: Sequence got: {}".format(type(storage)))
+            raise Exception("Expected storage to be a Sequence, received: {}".format(type(storage)))
 
         # map input types to rpc msg
         _params = dict()
@@ -1098,7 +1098,7 @@ class StorageFacade(Type):
         Returns -> typing.Sequence[~ErrorResult]
         '''
         if pools is not None and not isinstance(pools, (bytes, str, list)):
-            raise Exception("pools must be: Sequence got: {}".format(type(pools)))
+            raise Exception("Expected pools to be a Sequence, received: {}".format(type(pools)))
 
         # map input types to rpc msg
         _params = dict()
@@ -1119,7 +1119,7 @@ class StorageFacade(Type):
         Returns -> typing.Sequence[~StorageDetailsResult]
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -1140,7 +1140,7 @@ class StorageFacade(Type):
         Returns -> typing.Sequence[~ErrorResult]
         '''
         if pools is not None and not isinstance(pools, (bytes, str, list)):
-            raise Exception("pools must be: Sequence got: {}".format(type(pools)))
+            raise Exception("Expected pools to be a Sequence, received: {}".format(type(pools)))
 
         # map input types to rpc msg
         _params = dict()
