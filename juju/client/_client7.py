@@ -376,7 +376,7 @@ class ControllerFacade(Type):
         Returns -> typing.Sequence[~CloudSpecResult]
         '''
         if entities is not None and not isinstance(entities, list):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities).__name__))
+            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -397,7 +397,7 @@ class ControllerFacade(Type):
         Returns -> None
         '''
         if config is not None and not isinstance(config, (dict, set)):
-            raise Exception("config must be: Mapping got: {}".format(type(config).__name__))
+            raise Exception("config must be: Mapping got: {}".format(type(config)))
 
         # map input types to rpc msg
         _params = dict()
@@ -418,7 +418,7 @@ class ControllerFacade(Type):
         Returns -> typing.Sequence[~ControllerAPIInfoResult]
         '''
         if entities is not None and not isinstance(entities, list):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities).__name__))
+            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -459,10 +459,10 @@ class ControllerFacade(Type):
         Returns -> None
         '''
         if destroy_models is not None and not isinstance(destroy_models, bool):
-            raise Exception("destroy_models must be: bool got: {}".format(type(destroy_models).__name__))
+            raise Exception("destroy_models must be: bool got: {}".format(type(destroy_models)))
 
         if destroy_storage is not None and not isinstance(destroy_storage, bool):
-            raise Exception("destroy_storage must be: bool got: {}".format(type(destroy_storage).__name__))
+            raise Exception("destroy_storage must be: bool got: {}".format(type(destroy_storage)))
 
         # map input types to rpc msg
         _params = dict()
@@ -503,7 +503,7 @@ class ControllerFacade(Type):
         Returns -> typing.Sequence[~UserAccessResult]
         '''
         if entities is not None and not isinstance(entities, list):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities).__name__))
+            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -562,7 +562,7 @@ class ControllerFacade(Type):
         Returns -> typing.Sequence[~InitiateMigrationResult]
         '''
         if specs is not None and not isinstance(specs, list):
-            raise Exception("specs must be: Sequence got: {}".format(type(specs).__name__))
+            raise Exception("specs must be: Sequence got: {}".format(type(specs)))
 
         # map input types to rpc msg
         _params = dict()
@@ -621,7 +621,7 @@ class ControllerFacade(Type):
         Returns -> typing.Sequence[~ModelStatus]
         '''
         if entities is not None and not isinstance(entities, list):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities).__name__))
+            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -642,7 +642,7 @@ class ControllerFacade(Type):
         Returns -> typing.Sequence[~ErrorResult]
         '''
         if changes is not None and not isinstance(changes, list):
-            raise Exception("changes must be: Sequence got: {}".format(type(changes).__name__))
+            raise Exception("changes must be: Sequence got: {}".format(type(changes)))
 
         # map input types to rpc msg
         _params = dict()
@@ -682,7 +682,7 @@ class ControllerFacade(Type):
         Returns -> None
         '''
         if all_ is not None and not isinstance(all_, bool):
-            raise Exception("all_ must be: bool got: {}".format(type(all_).__name__))
+            raise Exception("all_ must be: bool got: {}".format(type(all_)))
 
         # map input types to rpc msg
         _params = dict()
@@ -722,7 +722,7 @@ class ControllerFacade(Type):
         Returns -> typing.Sequence[~NotifyWatchResult]
         '''
         if entities is not None and not isinstance(entities, list):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities).__name__))
+            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -1167,7 +1167,7 @@ class ModelManagerFacade(Type):
         Returns -> typing.Sequence[~ErrorResult]
         '''
         if model_credentials is not None and not isinstance(model_credentials, list):
-            raise Exception("model_credentials must be: Sequence got: {}".format(type(model_credentials).__name__))
+            raise Exception("model_credentials must be: Sequence got: {}".format(type(model_credentials)))
 
         # map input types to rpc msg
         _params = dict()
@@ -1193,22 +1193,22 @@ class ModelManagerFacade(Type):
         Returns -> typing.Union[_ForwardRef('Number'), str, bool, typing.Sequence[~ModelMachineInfo], _ForwardRef('ModelMigrationStatus'), _ForwardRef('ModelSLAInfo'), _ForwardRef('EntityStatus'), typing.Sequence[~ModelUserInfo]]
         '''
         if cloud_tag is not None and not isinstance(cloud_tag, (bytes, str)):
-            raise Exception("cloud_tag must be: str got: {}".format(type(cloud_tag).__name__))
+            raise Exception("cloud_tag must be: str got: {}".format(type(cloud_tag)))
 
         if config is not None and not isinstance(config, (dict, set)):
-            raise Exception("config must be: Mapping got: {}".format(type(config).__name__))
+            raise Exception("config must be: Mapping got: {}".format(type(config)))
 
         if credential is not None and not isinstance(credential, (bytes, str)):
-            raise Exception("credential must be: str got: {}".format(type(credential).__name__))
+            raise Exception("credential must be: str got: {}".format(type(credential)))
 
         if name is not None and not isinstance(name, (bytes, str)):
-            raise Exception("name must be: str got: {}".format(type(name).__name__))
+            raise Exception("name must be: str got: {}".format(type(name)))
 
         if owner_tag is not None and not isinstance(owner_tag, (bytes, str)):
-            raise Exception("owner_tag must be: str got: {}".format(type(owner_tag).__name__))
+            raise Exception("owner_tag must be: str got: {}".format(type(owner_tag)))
 
         if region is not None and not isinstance(region, (bytes, str)):
-            raise Exception("region must be: str got: {}".format(type(region).__name__))
+            raise Exception("region must be: str got: {}".format(type(region)))
 
         # map input types to rpc msg
         _params = dict()
@@ -1234,7 +1234,7 @@ class ModelManagerFacade(Type):
         Returns -> typing.Sequence[~ErrorResult]
         '''
         if models is not None and not isinstance(models, list):
-            raise Exception("models must be: Sequence got: {}".format(type(models).__name__))
+            raise Exception("models must be: Sequence got: {}".format(type(models)))
 
         # map input types to rpc msg
         _params = dict()
@@ -1256,10 +1256,10 @@ class ModelManagerFacade(Type):
         Returns -> typing.Sequence[~StringResult]
         '''
         if entities is not None and not isinstance(entities, list):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities).__name__))
+            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
 
         if simplified is not None and not isinstance(simplified, bool):
-            raise Exception("simplified must be: bool got: {}".format(type(simplified).__name__))
+            raise Exception("simplified must be: bool got: {}".format(type(simplified)))
 
         # map input types to rpc msg
         _params = dict()
@@ -1281,7 +1281,7 @@ class ModelManagerFacade(Type):
         Returns -> typing.Sequence[~MapResult]
         '''
         if entities is not None and not isinstance(entities, list):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities).__name__))
+            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -1303,10 +1303,10 @@ class ModelManagerFacade(Type):
         Returns -> typing.Sequence[~ModelSummaryResult]
         '''
         if all_ is not None and not isinstance(all_, bool):
-            raise Exception("all_ must be: bool got: {}".format(type(all_).__name__))
+            raise Exception("all_ must be: bool got: {}".format(type(all_)))
 
         if user_tag is not None and not isinstance(user_tag, (bytes, str)):
-            raise Exception("user_tag must be: str got: {}".format(type(user_tag).__name__))
+            raise Exception("user_tag must be: str got: {}".format(type(user_tag)))
 
         # map input types to rpc msg
         _params = dict()
@@ -1328,7 +1328,7 @@ class ModelManagerFacade(Type):
         Returns -> typing.Sequence[~UserModel]
         '''
         if tag is not None and not isinstance(tag, (bytes, str)):
-            raise Exception("tag must be: str got: {}".format(type(tag).__name__))
+            raise Exception("tag must be: str got: {}".format(type(tag)))
 
         # map input types to rpc msg
         _params = dict()
@@ -1349,7 +1349,7 @@ class ModelManagerFacade(Type):
         Returns -> typing.Sequence[~ModelDefaultsResult]
         '''
         if entities is not None and not isinstance(entities, list):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities).__name__))
+            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -1370,7 +1370,7 @@ class ModelManagerFacade(Type):
         Returns -> typing.Sequence[~ModelInfoResult]
         '''
         if entities is not None and not isinstance(entities, list):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities).__name__))
+            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -1391,7 +1391,7 @@ class ModelManagerFacade(Type):
         Returns -> typing.Sequence[~ModelStatus]
         '''
         if entities is not None and not isinstance(entities, list):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities).__name__))
+            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -1412,7 +1412,7 @@ class ModelManagerFacade(Type):
         Returns -> typing.Sequence[~ErrorResult]
         '''
         if changes is not None and not isinstance(changes, list):
-            raise Exception("changes must be: Sequence got: {}".format(type(changes).__name__))
+            raise Exception("changes must be: Sequence got: {}".format(type(changes)))
 
         # map input types to rpc msg
         _params = dict()
@@ -1433,7 +1433,7 @@ class ModelManagerFacade(Type):
         Returns -> typing.Sequence[~ErrorResult]
         '''
         if config is not None and not isinstance(config, list):
-            raise Exception("config must be: Sequence got: {}".format(type(config).__name__))
+            raise Exception("config must be: Sequence got: {}".format(type(config)))
 
         # map input types to rpc msg
         _params = dict()
@@ -1454,7 +1454,7 @@ class ModelManagerFacade(Type):
         Returns -> typing.Sequence[~ErrorResult]
         '''
         if keys is not None and not isinstance(keys, list):
-            raise Exception("keys must be: Sequence got: {}".format(type(keys).__name__))
+            raise Exception("keys must be: Sequence got: {}".format(type(keys)))
 
         # map input types to rpc msg
         _params = dict()
@@ -2311,7 +2311,7 @@ class ProvisionerFacade(Type):
         Returns -> typing.Sequence[~StringResult]
         '''
         if entities is not None and not isinstance(entities, list):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities).__name__))
+            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -2351,7 +2351,7 @@ class ProvisionerFacade(Type):
         Returns -> typing.Sequence[~ProfileChangeResult]
         '''
         if entities is not None and not isinstance(entities, list):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities).__name__))
+            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -2372,7 +2372,7 @@ class ProvisionerFacade(Type):
         Returns -> typing.Sequence[~ConstraintsResult]
         '''
         if entities is not None and not isinstance(entities, list):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities).__name__))
+            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -2412,7 +2412,7 @@ class ProvisionerFacade(Type):
         Returns -> typing.Mapping[str, str]
         '''
         if type_ is not None and not isinstance(type_, (bytes, str)):
-            raise Exception("type_ must be: str got: {}".format(type(type_).__name__))
+            raise Exception("type_ must be: str got: {}".format(type(type_)))
 
         # map input types to rpc msg
         _params = dict()
@@ -2433,7 +2433,7 @@ class ProvisionerFacade(Type):
         Returns -> typing.Sequence[~ControllerAPIInfoResult]
         '''
         if entities is not None and not isinstance(entities, list):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities).__name__))
+            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -2473,7 +2473,7 @@ class ProvisionerFacade(Type):
         Returns -> typing.Sequence[~DistributionGroupResult]
         '''
         if entities is not None and not isinstance(entities, list):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities).__name__))
+            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -2494,7 +2494,7 @@ class ProvisionerFacade(Type):
         Returns -> typing.Sequence[~StringsResult]
         '''
         if entities is not None and not isinstance(entities, list):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities).__name__))
+            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -2515,7 +2515,7 @@ class ProvisionerFacade(Type):
         Returns -> typing.Sequence[~ErrorResult]
         '''
         if entities is not None and not isinstance(entities, list):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities).__name__))
+            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -2541,22 +2541,22 @@ class ProvisionerFacade(Type):
         Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence[~Tools]]
         '''
         if agentstream is not None and not isinstance(agentstream, (bytes, str)):
-            raise Exception("agentstream must be: str got: {}".format(type(agentstream).__name__))
+            raise Exception("agentstream must be: str got: {}".format(type(agentstream)))
 
         if arch is not None and not isinstance(arch, (bytes, str)):
-            raise Exception("arch must be: str got: {}".format(type(arch).__name__))
+            raise Exception("arch must be: str got: {}".format(type(arch)))
 
         if major is not None and not isinstance(major, int):
-            raise Exception("major must be: int got: {}".format(type(major).__name__))
+            raise Exception("major must be: int got: {}".format(type(major)))
 
         if minor is not None and not isinstance(minor, int):
-            raise Exception("minor must be: int got: {}".format(type(minor).__name__))
+            raise Exception("minor must be: int got: {}".format(type(minor)))
 
         if number is not None and not isinstance(number, (dict, set, Number)):
-            raise Exception("number must be: Number got: {}".format(type(number).__name__))
+            raise Exception("number must be: Number got: {}".format(type(number)))
 
         if series is not None and not isinstance(series, (bytes, str)):
-            raise Exception("series must be: str got: {}".format(type(series).__name__))
+            raise Exception("series must be: str got: {}".format(type(series)))
 
         # map input types to rpc msg
         _params = dict()
@@ -2582,7 +2582,7 @@ class ProvisionerFacade(Type):
         Returns -> typing.Sequence[~MachineNetworkConfigResult]
         '''
         if entities is not None and not isinstance(entities, list):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities).__name__))
+            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -2603,7 +2603,7 @@ class ProvisionerFacade(Type):
         Returns -> typing.Sequence[~ContainerProfileResult]
         '''
         if entities is not None and not isinstance(entities, list):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities).__name__))
+            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -2624,7 +2624,7 @@ class ProvisionerFacade(Type):
         Returns -> typing.Sequence[~HostNetworkChange]
         '''
         if entities is not None and not isinstance(entities, list):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities).__name__))
+            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -2645,7 +2645,7 @@ class ProvisionerFacade(Type):
         Returns -> typing.Sequence[~StringResult]
         '''
         if entities is not None and not isinstance(entities, list):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities).__name__))
+            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -2666,7 +2666,7 @@ class ProvisionerFacade(Type):
         Returns -> typing.Sequence[~StatusResult]
         '''
         if entities is not None and not isinstance(entities, list):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities).__name__))
+            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -2687,7 +2687,7 @@ class ProvisionerFacade(Type):
         Returns -> typing.Sequence[~BoolResult]
         '''
         if entities is not None and not isinstance(entities, list):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities).__name__))
+            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -2708,7 +2708,7 @@ class ProvisionerFacade(Type):
         Returns -> typing.Sequence[~LifeResult]
         '''
         if entities is not None and not isinstance(entities, list):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities).__name__))
+            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -2748,7 +2748,7 @@ class ProvisionerFacade(Type):
         Returns -> typing.Sequence[~ErrorResult]
         '''
         if entities is not None and not isinstance(entities, list):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities).__name__))
+            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -2807,7 +2807,7 @@ class ProvisionerFacade(Type):
         Returns -> typing.Sequence[~MachineNetworkConfigResult]
         '''
         if entities is not None and not isinstance(entities, list):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities).__name__))
+            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -2828,7 +2828,7 @@ class ProvisionerFacade(Type):
         Returns -> typing.Sequence[~ProvisioningInfoResult]
         '''
         if entities is not None and not isinstance(entities, list):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities).__name__))
+            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -2849,7 +2849,7 @@ class ProvisionerFacade(Type):
         Returns -> typing.Sequence[~ErrorResult]
         '''
         if entities is not None and not isinstance(entities, list):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities).__name__))
+            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -2870,7 +2870,7 @@ class ProvisionerFacade(Type):
         Returns -> typing.Sequence[~ErrorResult]
         '''
         if entities is not None and not isinstance(entities, list):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities).__name__))
+            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -2891,7 +2891,7 @@ class ProvisionerFacade(Type):
         Returns -> typing.Sequence[~ErrorResult]
         '''
         if entities is not None and not isinstance(entities, list):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities).__name__))
+            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -2912,7 +2912,7 @@ class ProvisionerFacade(Type):
         Returns -> typing.Sequence[~StringResult]
         '''
         if entities is not None and not isinstance(entities, list):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities).__name__))
+            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -2933,7 +2933,7 @@ class ProvisionerFacade(Type):
         Returns -> typing.Sequence[~ErrorResult]
         '''
         if args is not None and not isinstance(args, list):
-            raise Exception("args must be: Sequence got: {}".format(type(args).__name__))
+            raise Exception("args must be: Sequence got: {}".format(type(args)))
 
         # map input types to rpc msg
         _params = dict()
@@ -2955,10 +2955,10 @@ class ProvisionerFacade(Type):
         Returns -> None
         '''
         if config is not None and not isinstance(config, list):
-            raise Exception("config must be: Sequence got: {}".format(type(config).__name__))
+            raise Exception("config must be: Sequence got: {}".format(type(config)))
 
         if tag is not None and not isinstance(tag, (bytes, str)):
-            raise Exception("tag must be: str got: {}".format(type(tag).__name__))
+            raise Exception("tag must be: str got: {}".format(type(tag)))
 
         # map input types to rpc msg
         _params = dict()
@@ -2980,7 +2980,7 @@ class ProvisionerFacade(Type):
         Returns -> typing.Sequence[~ErrorResult]
         '''
         if machines is not None and not isinstance(machines, list):
-            raise Exception("machines must be: Sequence got: {}".format(type(machines).__name__))
+            raise Exception("machines must be: Sequence got: {}".format(type(machines)))
 
         # map input types to rpc msg
         _params = dict()
@@ -3001,7 +3001,7 @@ class ProvisionerFacade(Type):
         Returns -> typing.Sequence[~ErrorResult]
         '''
         if entities is not None and not isinstance(entities, list):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities).__name__))
+            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -3023,10 +3023,10 @@ class ProvisionerFacade(Type):
         Returns -> None
         '''
         if config is not None and not isinstance(config, list):
-            raise Exception("config must be: Sequence got: {}".format(type(config).__name__))
+            raise Exception("config must be: Sequence got: {}".format(type(config)))
 
         if tag is not None and not isinstance(tag, (bytes, str)):
-            raise Exception("tag must be: str got: {}".format(type(tag).__name__))
+            raise Exception("tag must be: str got: {}".format(type(tag)))
 
         # map input types to rpc msg
         _params = dict()
@@ -3048,7 +3048,7 @@ class ProvisionerFacade(Type):
         Returns -> typing.Sequence[~ErrorResult]
         '''
         if changes is not None and not isinstance(changes, list):
-            raise Exception("changes must be: Sequence got: {}".format(type(changes).__name__))
+            raise Exception("changes must be: Sequence got: {}".format(type(changes)))
 
         # map input types to rpc msg
         _params = dict()
@@ -3069,7 +3069,7 @@ class ProvisionerFacade(Type):
         Returns -> typing.Sequence[~ErrorResult]
         '''
         if entities is not None and not isinstance(entities, list):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities).__name__))
+            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -3090,7 +3090,7 @@ class ProvisionerFacade(Type):
         Returns -> typing.Sequence[~ErrorResult]
         '''
         if entities is not None and not isinstance(entities, list):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities).__name__))
+            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -3111,7 +3111,7 @@ class ProvisionerFacade(Type):
         Returns -> typing.Sequence[~ErrorResult]
         '''
         if params is not None and not isinstance(params, list):
-            raise Exception("params must be: Sequence got: {}".format(type(params).__name__))
+            raise Exception("params must be: Sequence got: {}".format(type(params)))
 
         # map input types to rpc msg
         _params = dict()
@@ -3132,7 +3132,7 @@ class ProvisionerFacade(Type):
         Returns -> typing.Sequence[~ErrorResult]
         '''
         if args is not None and not isinstance(args, list):
-            raise Exception("args must be: Sequence got: {}".format(type(args).__name__))
+            raise Exception("args must be: Sequence got: {}".format(type(args)))
 
         # map input types to rpc msg
         _params = dict()
@@ -3172,7 +3172,7 @@ class ProvisionerFacade(Type):
         Returns -> typing.Sequence[~StatusResult]
         '''
         if entities is not None and not isinstance(entities, list):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities).__name__))
+            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -3193,7 +3193,7 @@ class ProvisionerFacade(Type):
         Returns -> typing.Sequence[~ToolsResult]
         '''
         if entities is not None and not isinstance(entities, list):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities).__name__))
+            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -3214,7 +3214,7 @@ class ProvisionerFacade(Type):
         Returns -> typing.Sequence[~ErrorResult]
         '''
         if entities is not None and not isinstance(entities, list):
-            raise Exception("entities must be: Sequence got: {}".format(type(entities).__name__))
+            raise Exception("entities must be: Sequence got: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -3254,7 +3254,7 @@ class ProvisionerFacade(Type):
         Returns -> typing.Sequence[~StringsWatchResult]
         '''
         if params is not None and not isinstance(params, list):
-            raise Exception("params must be: Sequence got: {}".format(type(params).__name__))
+            raise Exception("params must be: Sequence got: {}".format(type(params)))
 
         # map input types to rpc msg
         _params = dict()
@@ -3275,7 +3275,7 @@ class ProvisionerFacade(Type):
         Returns -> typing.Sequence[~StringsWatchResult]
         '''
         if params is not None and not isinstance(params, list):
-            raise Exception("params must be: Sequence got: {}".format(type(params).__name__))
+            raise Exception("params must be: Sequence got: {}".format(type(params)))
 
         # map input types to rpc msg
         _params = dict()
@@ -3296,7 +3296,7 @@ class ProvisionerFacade(Type):
         Returns -> typing.Sequence[~StringsWatchResult]
         '''
         if params is not None and not isinstance(params, list):
-            raise Exception("params must be: Sequence got: {}".format(type(params).__name__))
+            raise Exception("params must be: Sequence got: {}".format(type(params)))
 
         # map input types to rpc msg
         _params = dict()

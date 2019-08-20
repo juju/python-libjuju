@@ -13,7 +13,6 @@ from pathlib import Path
 from typing import Any, Mapping, Sequence, TypeVar, Union
 
 from . import codegen
-from .flags import DEFAULT_VALUES_FLAG, feature_enabled
 
 _marker = object()
 
@@ -322,7 +321,7 @@ class Args(list):
 def buildValidation(name, instance_type, instance_sub_type, ident=None):
     INDENT = ident or "    "
     source = """{ident}if {name} is not None and not isinstance({name}, {instance_sub_type}):
-{ident}    raise Exception("{name} must be: {instance_type} got: {{}}".format(type({name}).__name__))
+{ident}    raise Exception("{name} must be: {instance_type} got: {{}}".format(type({name})))
 """.format(ident=INDENT,
            name=name,
            instance_type=instance_type,
@@ -367,8 +366,8 @@ class {}(Type):
                 arg_type_name = strcast(arg_type)
                 if arg_type in basic_types:
                     source.append("{}{}_ = {}".format(INDENT * 2,
-                                                          arg_name,
-                                                          arg_name))
+                                                      arg_name,
+                                                      arg_name))
                 elif type(arg_type) is typing.TypeVar:
                     source.append("{}{}_ = {}.from_json({}) "
                                   "if {} else None".format(INDENT * 2,
@@ -391,8 +390,8 @@ class {}(Type):
                                                         arg_name))
                     else:
                         source.append("{}{}_ = {}".format(INDENT * 2,
-                                                              arg_name,
-                                                              arg_name))
+                                                          arg_name,
+                                                          arg_name))
                 elif issubclass(arg_type, typing.Mapping):
                     value_type = (
                         arg_type_name.__parameters__[1]
@@ -409,17 +408,22 @@ class {}(Type):
                                 arg_name))
                     else:
                         source.append("{}{}_ = {}".format(INDENT * 2,
-                                                              arg_name,
-                                                              arg_name))
-                else:
-                    source.append("{}{}_ = {}".format(INDENT * 2,
                                                           arg_name,
                                                           arg_name))
+                else:
+                    source.append("{}{}_ = {}".format(INDENT * 2,
+                                                      arg_name,
+                                                      arg_name))
+            if len(args) > 0:
+                source.append('\n{}# Validate arguments against known Juju API types.'.format(INDENT * 2))
             for arg in args:
                 arg_name = "{}_".format(name_to_py(arg[0]))
                 arg_type, arg_sub_type, ok = kind_to_py(arg[1])
                 if ok:
-                    source.append('{}'.format(buildValidation(arg_name, arg_type, arg_sub_type, ident=INDENT*2)))
+                    source.append('{}'.format(buildValidation(arg_name,
+                                                              arg_type,
+                                                              arg_sub_type,
+                                                              ident=INDENT * 2)))
 
             for arg in args:
                 arg_name = name_to_py(arg[0])
