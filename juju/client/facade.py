@@ -186,7 +186,7 @@ basic_types = [str, bool, int, float]
 
 type_mapping = {
     'str': '(bytes, str)',
-    'Sequence': 'list',
+    'Sequence': '(bytes, str, list)',
     'Union': '(dict, set)',
     'Mapping': '(dict, set)',
 }
