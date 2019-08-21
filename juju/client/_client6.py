@@ -261,9 +261,12 @@ class MachineManagerFacade(Type):
     @ReturnMapping(AddMachinesResults)
     async def AddMachines(self, params=None):
         '''
-        params : typing.Sequence<+T_co>[~AddMachineParams]<~AddMachineParams>
-        Returns -> typing.Sequence<+T_co>[~AddMachinesResult]<~AddMachinesResult>
+        params : typing.Sequence[~AddMachineParams]
+        Returns -> typing.Sequence[~AddMachinesResult]
         '''
+        if params is not None and not isinstance(params, (bytes, str, list)):
+            raise Exception("Expected params to be a Sequence, received: {}".format(type(params)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='MachineManager',
@@ -279,9 +282,12 @@ class MachineManagerFacade(Type):
     @ReturnMapping(DestroyMachineResults)
     async def DestroyMachine(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~DestroyMachineResult]<~DestroyMachineResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~DestroyMachineResult]
         '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='MachineManager',
@@ -295,14 +301,26 @@ class MachineManagerFacade(Type):
 
 
     @ReturnMapping(DestroyMachineResults)
-    async def DestroyMachineWithParams(self, force=False, keep=False, machine_tags=None, max_wait=0):
+    async def DestroyMachineWithParams(self, force=None, keep=None, machine_tags=None, max_wait=None):
         '''
         force : bool
         keep : bool
-        machine_tags : typing.Sequence<+T_co>[str]
+        machine_tags : typing.Sequence[str]
         max_wait : int
-        Returns -> typing.Sequence<+T_co>[~DestroyMachineResult]<~DestroyMachineResult>
+        Returns -> typing.Sequence[~DestroyMachineResult]
         '''
+        if force is not None and not isinstance(force, bool):
+            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
+
+        if keep is not None and not isinstance(keep, bool):
+            raise Exception("Expected keep to be a bool, received: {}".format(type(keep)))
+
+        if machine_tags is not None and not isinstance(machine_tags, (bytes, str, list)):
+            raise Exception("Expected machine_tags to be a Sequence, received: {}".format(type(machine_tags)))
+
+        if max_wait is not None and not isinstance(max_wait, int):
+            raise Exception("Expected max_wait to be a int, received: {}".format(type(max_wait)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='MachineManager',
@@ -321,9 +339,12 @@ class MachineManagerFacade(Type):
     @ReturnMapping(DestroyMachineResults)
     async def ForceDestroyMachine(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~DestroyMachineResult]<~DestroyMachineResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~DestroyMachineResult]
         '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='MachineManager',
@@ -339,9 +360,12 @@ class MachineManagerFacade(Type):
     @ReturnMapping(StringsResults)
     async def GetUpgradeSeriesMessages(self, params=None):
         '''
-        params : typing.Sequence<+T_co>[~UpgradeSeriesNotificationParam]<~UpgradeSeriesNotificationParam>
-        Returns -> typing.Sequence<+T_co>[~StringsResult]<~StringsResult>
+        params : typing.Sequence[~UpgradeSeriesNotificationParam]
+        Returns -> typing.Sequence[~StringsResult]
         '''
+        if params is not None and not isinstance(params, (bytes, str, list)):
+            raise Exception("Expected params to be a Sequence, received: {}".format(type(params)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='MachineManager',
@@ -357,9 +381,12 @@ class MachineManagerFacade(Type):
     @ReturnMapping(InstanceTypesResults)
     async def InstanceTypes(self, constraints=None):
         '''
-        constraints : typing.Sequence<+T_co>[~ModelInstanceTypesConstraint]<~ModelInstanceTypesConstraint>
-        Returns -> typing.Sequence<+T_co>[~InstanceTypesResult]<~InstanceTypesResult>
+        constraints : typing.Sequence[~ModelInstanceTypesConstraint]
+        Returns -> typing.Sequence[~InstanceTypesResult]
         '''
+        if constraints is not None and not isinstance(constraints, (bytes, str, list)):
+            raise Exception("Expected constraints to be a Sequence, received: {}".format(type(constraints)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='MachineManager',
@@ -373,13 +400,22 @@ class MachineManagerFacade(Type):
 
 
     @ReturnMapping(ErrorResult)
-    async def UpgradeSeriesComplete(self, force=False, series="", tag=None):
+    async def UpgradeSeriesComplete(self, force=None, series=None, tag=None):
         '''
         force : bool
         series : str
         tag : Entity
         Returns -> Error
         '''
+        if force is not None and not isinstance(force, bool):
+            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
+
+        if series is not None and not isinstance(series, (bytes, str)):
+            raise Exception("Expected series to be a str, received: {}".format(type(series)))
+
+        if tag is not None and not isinstance(tag, (dict, set, Entity)):
+            raise Exception("Expected tag to be a Entity, received: {}".format(type(tag)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='MachineManager',
@@ -395,13 +431,22 @@ class MachineManagerFacade(Type):
 
 
     @ReturnMapping(ErrorResult)
-    async def UpgradeSeriesPrepare(self, force=False, series="", tag=None):
+    async def UpgradeSeriesPrepare(self, force=None, series=None, tag=None):
         '''
         force : bool
         series : str
         tag : Entity
         Returns -> Error
         '''
+        if force is not None and not isinstance(force, bool):
+            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
+
+        if series is not None and not isinstance(series, (bytes, str)):
+            raise Exception("Expected series to be a str, received: {}".format(type(series)))
+
+        if tag is not None and not isinstance(tag, (dict, set, Entity)):
+            raise Exception("Expected tag to be a Entity, received: {}".format(type(tag)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='MachineManager',
@@ -419,9 +464,12 @@ class MachineManagerFacade(Type):
     @ReturnMapping(UpgradeSeriesUnitsResults)
     async def UpgradeSeriesValidate(self, args=None):
         '''
-        args : typing.Sequence<+T_co>[~UpdateSeriesArg]<~UpdateSeriesArg>
-        Returns -> typing.Sequence<+T_co>[~UpgradeSeriesUnitsResult]<~UpgradeSeriesUnitsResult>
+        args : typing.Sequence[~UpdateSeriesArg]
+        Returns -> typing.Sequence[~UpgradeSeriesUnitsResult]
         '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='MachineManager',
@@ -437,9 +485,12 @@ class MachineManagerFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def WatchUpgradeSeriesNotifications(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~NotifyWatchResult]
         '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='MachineManager',
@@ -823,9 +874,12 @@ class StorageFacade(Type):
     @ReturnMapping(AddStorageResults)
     async def AddToUnit(self, storages=None):
         '''
-        storages : typing.Sequence<+T_co>[~StorageAddParams]<~StorageAddParams>
-        Returns -> typing.Sequence<+T_co>[~AddStorageResult]<~AddStorageResult>
+        storages : typing.Sequence[~StorageAddParams]
+        Returns -> typing.Sequence[~AddStorageResult]
         '''
+        if storages is not None and not isinstance(storages, (bytes, str, list)):
+            raise Exception("Expected storages to be a Sequence, received: {}".format(type(storages)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Storage',
@@ -841,9 +895,12 @@ class StorageFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Attach(self, ids=None):
         '''
-        ids : typing.Sequence<+T_co>[~StorageAttachmentId]<~StorageAttachmentId>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        ids : typing.Sequence[~StorageAttachmentId]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
+        if ids is not None and not isinstance(ids, (bytes, str, list)):
+            raise Exception("Expected ids to be a Sequence, received: {}".format(type(ids)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Storage',
@@ -859,9 +916,12 @@ class StorageFacade(Type):
     @ReturnMapping(ErrorResults)
     async def CreatePool(self, pools=None):
         '''
-        pools : typing.Sequence<+T_co>[~StoragePool]<~StoragePool>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        pools : typing.Sequence[~StoragePool]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
+        if pools is not None and not isinstance(pools, (bytes, str, list)):
+            raise Exception("Expected pools to be a Sequence, received: {}".format(type(pools)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Storage',
@@ -875,13 +935,22 @@ class StorageFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def DetachStorage(self, force=False, ids=None, max_wait=0):
+    async def DetachStorage(self, force=None, ids=None, max_wait=None):
         '''
         force : bool
         ids : StorageAttachmentIds
         max_wait : int
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        Returns -> typing.Sequence[~ErrorResult]
         '''
+        if force is not None and not isinstance(force, bool):
+            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
+
+        if ids is not None and not isinstance(ids, (dict, set, StorageAttachmentIds)):
+            raise Exception("Expected ids to be a StorageAttachmentIds, received: {}".format(type(ids)))
+
+        if max_wait is not None and not isinstance(max_wait, int):
+            raise Exception("Expected max_wait to be a int, received: {}".format(type(max_wait)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Storage',
@@ -899,9 +968,12 @@ class StorageFacade(Type):
     @ReturnMapping(ImportStorageResults)
     async def Import(self, storage=None):
         '''
-        storage : typing.Sequence<+T_co>[~ImportStorageParams]<~ImportStorageParams>
-        Returns -> typing.Sequence<+T_co>[~ImportStorageResult]<~ImportStorageResult>
+        storage : typing.Sequence[~ImportStorageParams]
+        Returns -> typing.Sequence[~ImportStorageResult]
         '''
+        if storage is not None and not isinstance(storage, (bytes, str, list)):
+            raise Exception("Expected storage to be a Sequence, received: {}".format(type(storage)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Storage',
@@ -917,9 +989,12 @@ class StorageFacade(Type):
     @ReturnMapping(FilesystemDetailsListResults)
     async def ListFilesystems(self, filters=None):
         '''
-        filters : typing.Sequence<+T_co>[~FilesystemFilter]<~FilesystemFilter>
-        Returns -> typing.Sequence<+T_co>[~FilesystemDetailsListResult]<~FilesystemDetailsListResult>
+        filters : typing.Sequence[~FilesystemFilter]
+        Returns -> typing.Sequence[~FilesystemDetailsListResult]
         '''
+        if filters is not None and not isinstance(filters, (bytes, str, list)):
+            raise Exception("Expected filters to be a Sequence, received: {}".format(type(filters)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Storage',
@@ -935,9 +1010,12 @@ class StorageFacade(Type):
     @ReturnMapping(StoragePoolsResults)
     async def ListPools(self, filters=None):
         '''
-        filters : typing.Sequence<+T_co>[~StoragePoolFilter]<~StoragePoolFilter>
-        Returns -> typing.Sequence<+T_co>[~StoragePoolsResult]<~StoragePoolsResult>
+        filters : typing.Sequence[~StoragePoolFilter]
+        Returns -> typing.Sequence[~StoragePoolsResult]
         '''
+        if filters is not None and not isinstance(filters, (bytes, str, list)):
+            raise Exception("Expected filters to be a Sequence, received: {}".format(type(filters)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Storage',
@@ -953,9 +1031,12 @@ class StorageFacade(Type):
     @ReturnMapping(StorageDetailsListResults)
     async def ListStorageDetails(self, filters=None):
         '''
-        filters : typing.Sequence<+T_co>[~StorageFilter]<~StorageFilter>
-        Returns -> typing.Sequence<+T_co>[~StorageDetailsListResult]<~StorageDetailsListResult>
+        filters : typing.Sequence[~StorageFilter]
+        Returns -> typing.Sequence[~StorageDetailsListResult]
         '''
+        if filters is not None and not isinstance(filters, (bytes, str, list)):
+            raise Exception("Expected filters to be a Sequence, received: {}".format(type(filters)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Storage',
@@ -971,9 +1052,12 @@ class StorageFacade(Type):
     @ReturnMapping(VolumeDetailsListResults)
     async def ListVolumes(self, filters=None):
         '''
-        filters : typing.Sequence<+T_co>[~VolumeFilter]<~VolumeFilter>
-        Returns -> typing.Sequence<+T_co>[~VolumeDetailsListResult]<~VolumeDetailsListResult>
+        filters : typing.Sequence[~VolumeFilter]
+        Returns -> typing.Sequence[~VolumeDetailsListResult]
         '''
+        if filters is not None and not isinstance(filters, (bytes, str, list)):
+            raise Exception("Expected filters to be a Sequence, received: {}".format(type(filters)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Storage',
@@ -989,9 +1073,12 @@ class StorageFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Remove(self, storage=None):
         '''
-        storage : typing.Sequence<+T_co>[~RemoveStorageInstance]<~RemoveStorageInstance>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        storage : typing.Sequence[~RemoveStorageInstance]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
+        if storage is not None and not isinstance(storage, (bytes, str, list)):
+            raise Exception("Expected storage to be a Sequence, received: {}".format(type(storage)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Storage',
@@ -1007,9 +1094,12 @@ class StorageFacade(Type):
     @ReturnMapping(ErrorResults)
     async def RemovePool(self, pools=None):
         '''
-        pools : typing.Sequence<+T_co>[~StoragePoolDeleteArg]<~StoragePoolDeleteArg>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        pools : typing.Sequence[~StoragePoolDeleteArg]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
+        if pools is not None and not isinstance(pools, (bytes, str, list)):
+            raise Exception("Expected pools to be a Sequence, received: {}".format(type(pools)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Storage',
@@ -1025,9 +1115,12 @@ class StorageFacade(Type):
     @ReturnMapping(StorageDetailsResults)
     async def StorageDetails(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~StorageDetailsResult]<~StorageDetailsResult>
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~StorageDetailsResult]
         '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Storage',
@@ -1043,9 +1136,12 @@ class StorageFacade(Type):
     @ReturnMapping(ErrorResults)
     async def UpdatePool(self, pools=None):
         '''
-        pools : typing.Sequence<+T_co>[~StoragePool]<~StoragePool>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        pools : typing.Sequence[~StoragePool]
+        Returns -> typing.Sequence[~ErrorResult]
         '''
+        if pools is not None and not isinstance(pools, (bytes, str, list)):
+            raise Exception("Expected pools to be a Sequence, received: {}".format(type(pools)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Storage',

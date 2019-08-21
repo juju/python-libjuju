@@ -23,5 +23,5 @@ def test_from_connection():
 
 def test_to_json():
     uml = client.UserModelList([client.UserModel()])
-    assert uml.to_json() == ('{"user-models": [{"last-connection": "", '
+    assert uml.to_json() == ('{"user-models": [{"last-connection": null, '
                              '"model": null}]}')
