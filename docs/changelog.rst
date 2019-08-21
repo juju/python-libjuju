@@ -1,6 +1,13 @@
 Changelog
 ---------
 
+2.6.1
+^^^^^
+Wednesday August 21 2019
+
+ * Pylibjuju now validates arguments correctly, instead of relying on default
+   positional argument values.
+
 2.6.0
 ^^^^^
 Wednesday August 14 2019
