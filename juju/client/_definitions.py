@@ -41,7 +41,7 @@ class Action(Type):
         if name_ is not None and not isinstance(name_, (bytes, str)):
             raise Exception("Expected name_ to be a str, received: {}".format(type(name_)))
 
-        if parameters_ is not None and not isinstance(parameters_, (dict, set)):
+        if parameters_ is not None and not isinstance(parameters_, dict):
             raise Exception("Expected parameters_ to be a Mapping, received: {}".format(type(parameters_)))
 
         if receiver_ is not None and not isinstance(receiver_, (bytes, str)):
@@ -80,7 +80,7 @@ class ActionExecutionResult(Type):
         if message_ is not None and not isinstance(message_, (bytes, str)):
             raise Exception("Expected message_ to be a str, received: {}".format(type(message_)))
 
-        if results_ is not None and not isinstance(results_, (dict, set)):
+        if results_ is not None and not isinstance(results_, dict):
             raise Exception("Expected results_ to be a Mapping, received: {}".format(type(results_)))
 
         if status_ is not None and not isinstance(status_, (bytes, str)):
@@ -160,7 +160,7 @@ class ActionResult(Type):
         status_ = status
 
         # Validate arguments against known Juju API types.
-        if action_ is not None and not isinstance(action_, (dict, set, Action)):
+        if action_ is not None and not isinstance(action_, (dict, Action)):
             raise Exception("Expected action_ to be a Action, received: {}".format(type(action_)))
 
         if completed_ is not None and not isinstance(completed_, (bytes, str)):
@@ -169,13 +169,13 @@ class ActionResult(Type):
         if enqueued_ is not None and not isinstance(enqueued_, (bytes, str)):
             raise Exception("Expected enqueued_ to be a str, received: {}".format(type(enqueued_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if message_ is not None and not isinstance(message_, (bytes, str)):
             raise Exception("Expected message_ to be a str, received: {}".format(type(message_)))
 
-        if output_ is not None and not isinstance(output_, (dict, set)):
+        if output_ is not None and not isinstance(output_, dict):
             raise Exception("Expected output_ to be a Mapping, received: {}".format(type(output_)))
 
         if started_ is not None and not isinstance(started_, (bytes, str)):
@@ -229,7 +229,7 @@ class ActionSpec(Type):
         if description_ is not None and not isinstance(description_, (bytes, str)):
             raise Exception("Expected description_ to be a str, received: {}".format(type(description_)))
 
-        if params_ is not None and not isinstance(params_, (dict, set)):
+        if params_ is not None and not isinstance(params_, dict):
             raise Exception("Expected params_ to be a Mapping, received: {}".format(type(params_)))
 
         self.description = description_
@@ -273,7 +273,7 @@ class ActionsByName(Type):
         if actions_ is not None and not isinstance(actions_, (bytes, str, list)):
             raise Exception("Expected actions_ to be a Sequence, received: {}".format(type(actions_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if name_ is not None and not isinstance(name_, (bytes, str)):
@@ -321,7 +321,7 @@ class ActionsByReceiver(Type):
         if actions_ is not None and not isinstance(actions_, (bytes, str, list)):
             raise Exception("Expected actions_ to be a Sequence, received: {}".format(type(actions_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if receiver_ is not None and not isinstance(receiver_, (bytes, str)):
@@ -376,7 +376,7 @@ class AddApplicationOffer(Type):
         if application_name_ is not None and not isinstance(application_name_, (bytes, str)):
             raise Exception("Expected application_name_ to be a str, received: {}".format(type(application_name_)))
 
-        if endpoints_ is not None and not isinstance(endpoints_, (dict, set)):
+        if endpoints_ is not None and not isinstance(endpoints_, dict):
             raise Exception("Expected endpoints_ to be a Mapping, received: {}".format(type(endpoints_)))
 
         if model_tag_ is not None and not isinstance(model_tag_, (bytes, str)):
@@ -524,7 +524,7 @@ class AddCharmWithAuthorization(Type):
         if force_ is not None and not isinstance(force_, bool):
             raise Exception("Expected force_ to be a bool, received: {}".format(type(force_)))
 
-        if macaroon_ is not None and not isinstance(macaroon_, (dict, set, Macaroon)):
+        if macaroon_ is not None and not isinstance(macaroon_, (dict, Macaroon)):
             raise Exception("Expected macaroon_ to be a Macaroon, received: {}".format(type(macaroon_)))
 
         if url_ is not None and not isinstance(url_, (bytes, str)):
@@ -550,7 +550,7 @@ class AddCloudArgs(Type):
         name_ = name
 
         # Validate arguments against known Juju API types.
-        if cloud_ is not None and not isinstance(cloud_, (dict, set, Cloud)):
+        if cloud_ is not None and not isinstance(cloud_, (dict, Cloud)):
             raise Exception("Expected cloud_ to be a Cloud, received: {}".format(type(cloud_)))
 
         if name_ is not None and not isinstance(name_, (bytes, str)):
@@ -595,7 +595,7 @@ class AddMachineParams(Type):
         if addresses_ is not None and not isinstance(addresses_, (bytes, str, list)):
             raise Exception("Expected addresses_ to be a Sequence, received: {}".format(type(addresses_)))
 
-        if constraints_ is not None and not isinstance(constraints_, (dict, set, Value)):
+        if constraints_ is not None and not isinstance(constraints_, (dict, Value)):
             raise Exception("Expected constraints_ to be a Value, received: {}".format(type(constraints_)))
 
         if container_type_ is not None and not isinstance(container_type_, (bytes, str)):
@@ -604,7 +604,7 @@ class AddMachineParams(Type):
         if disks_ is not None and not isinstance(disks_, (bytes, str, list)):
             raise Exception("Expected disks_ to be a Sequence, received: {}".format(type(disks_)))
 
-        if hardware_characteristics_ is not None and not isinstance(hardware_characteristics_, (dict, set, HardwareCharacteristics)):
+        if hardware_characteristics_ is not None and not isinstance(hardware_characteristics_, (dict, HardwareCharacteristics)):
             raise Exception("Expected hardware_characteristics_ to be a HardwareCharacteristics, received: {}".format(type(hardware_characteristics_)))
 
         if instance_id_ is not None and not isinstance(instance_id_, (bytes, str)):
@@ -619,7 +619,7 @@ class AddMachineParams(Type):
         if parent_id_ is not None and not isinstance(parent_id_, (bytes, str)):
             raise Exception("Expected parent_id_ to be a str, received: {}".format(type(parent_id_)))
 
-        if placement_ is not None and not isinstance(placement_, (dict, set, Placement)):
+        if placement_ is not None and not isinstance(placement_, (dict, Placement)):
             raise Exception("Expected placement_ to be a Placement, received: {}".format(type(placement_)))
 
         if series_ is not None and not isinstance(series_, (bytes, str)):
@@ -670,7 +670,7 @@ class AddMachinesResult(Type):
         machine_ = machine
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if machine_ is not None and not isinstance(machine_, (bytes, str)):
@@ -724,10 +724,10 @@ class AddPendingResourcesArgs(Type):
         url_ = url
 
         # Validate arguments against known Juju API types.
-        if addcharmwithauthorization_ is not None and not isinstance(addcharmwithauthorization_, (dict, set, AddCharmWithAuthorization)):
+        if addcharmwithauthorization_ is not None and not isinstance(addcharmwithauthorization_, (dict, AddCharmWithAuthorization)):
             raise Exception("Expected addcharmwithauthorization_ to be a AddCharmWithAuthorization, received: {}".format(type(addcharmwithauthorization_)))
 
-        if entity_ is not None and not isinstance(entity_, (dict, set, Entity)):
+        if entity_ is not None and not isinstance(entity_, (dict, Entity)):
             raise Exception("Expected entity_ to be a Entity, received: {}".format(type(entity_)))
 
         if channel_ is not None and not isinstance(channel_, (bytes, str)):
@@ -736,7 +736,7 @@ class AddPendingResourcesArgs(Type):
         if force_ is not None and not isinstance(force_, bool):
             raise Exception("Expected force_ to be a bool, received: {}".format(type(force_)))
 
-        if macaroon_ is not None and not isinstance(macaroon_, (dict, set, Macaroon)):
+        if macaroon_ is not None and not isinstance(macaroon_, (dict, Macaroon)):
             raise Exception("Expected macaroon_ to be a Macaroon, received: {}".format(type(macaroon_)))
 
         if resources_ is not None and not isinstance(resources_, (bytes, str, list)):
@@ -774,10 +774,10 @@ class AddPendingResourcesResult(Type):
         pending_ids_ = pending_ids
 
         # Validate arguments against known Juju API types.
-        if errorresult_ is not None and not isinstance(errorresult_, (dict, set, ErrorResult)):
+        if errorresult_ is not None and not isinstance(errorresult_, (dict, ErrorResult)):
             raise Exception("Expected errorresult_ to be a ErrorResult, received: {}".format(type(errorresult_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if pending_ids_ is not None and not isinstance(pending_ids_, (bytes, str, list)):
@@ -824,7 +824,7 @@ class AddRelationResults(Type):
         endpoints_ = endpoints
 
         # Validate arguments against known Juju API types.
-        if endpoints_ is not None and not isinstance(endpoints_, (dict, set)):
+        if endpoints_ is not None and not isinstance(endpoints_, dict):
             raise Exception("Expected endpoints_ to be a Mapping, received: {}".format(type(endpoints_)))
 
         self.endpoints = endpoints_
@@ -862,10 +862,10 @@ class AddStorageResult(Type):
         result_ = AddStorageDetails.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, AddStorageDetails)):
+        if result_ is not None and not isinstance(result_, (dict, AddStorageDetails)):
             raise Exception("Expected result_ to be a AddStorageDetails, received: {}".format(type(result_)))
 
         self.error = error_
@@ -1002,7 +1002,7 @@ class AddUserResult(Type):
         tag_ = tag
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if secret_key_ is not None and not isinstance(secret_key_, (bytes, str, list)):
@@ -1111,7 +1111,7 @@ class AdoptResourcesArgs(Type):
         if model_tag_ is not None and not isinstance(model_tag_, (bytes, str)):
             raise Exception("Expected model_tag_ to be a str, received: {}".format(type(model_tag_)))
 
-        if source_controller_version_ is not None and not isinstance(source_controller_version_, (dict, set, Number)):
+        if source_controller_version_ is not None and not isinstance(source_controller_version_, (dict, Number)):
             raise Exception("Expected source_controller_version_ to be a Number, received: {}".format(type(source_controller_version_)))
 
         self.model_tag = model_tag_
@@ -1139,7 +1139,7 @@ class AgentGetEntitiesResult(Type):
         if container_type_ is not None and not isinstance(container_type_, (bytes, str)):
             raise Exception("Expected container_type_ to be a str, received: {}".format(type(container_type_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if jobs_ is not None and not isinstance(jobs_, (bytes, str, list)):
@@ -1184,7 +1184,7 @@ class AgentVersionResult(Type):
         version_ = Number.from_json(version) if version else None
 
         # Validate arguments against known Juju API types.
-        if version_ is not None and not isinstance(version_, (dict, set, Number)):
+        if version_ is not None and not isinstance(version_, (dict, Number)):
             raise Exception("Expected version_ to be a Number, received: {}".format(type(version_)))
 
         self.version = version_
@@ -1242,13 +1242,13 @@ class AnnotationsGetResult(Type):
         error_ = ErrorResult.from_json(error) if error else None
 
         # Validate arguments against known Juju API types.
-        if annotations_ is not None and not isinstance(annotations_, (dict, set)):
+        if annotations_ is not None and not isinstance(annotations_, dict):
             raise Exception("Expected annotations_ to be a Mapping, received: {}".format(type(annotations_)))
 
         if entity_ is not None and not isinstance(entity_, (bytes, str)):
             raise Exception("Expected entity_ to be a str, received: {}".format(type(entity_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, ErrorResult)):
+        if error_ is not None and not isinstance(error_, (dict, ErrorResult)):
             raise Exception("Expected error_ to be a ErrorResult, received: {}".format(type(error_)))
 
         self.annotations = annotations_
@@ -1344,13 +1344,13 @@ class ApplicationCharmActionsResult(Type):
         error_ = Error.from_json(error) if error else None
 
         # Validate arguments against known Juju API types.
-        if actions_ is not None and not isinstance(actions_, (dict, set)):
+        if actions_ is not None and not isinstance(actions_, dict):
             raise Exception("Expected actions_ to be a Mapping, received: {}".format(type(actions_)))
 
         if application_tag_ is not None and not isinstance(application_tag_, (bytes, str)):
             raise Exception("Expected application_tag_ to be a str, received: {}".format(type(application_tag_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         self.actions = actions_
@@ -1408,10 +1408,10 @@ class ApplicationCharmResult(Type):
         result_ = ApplicationCharm.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, ApplicationCharm)):
+        if result_ is not None and not isinstance(result_, (dict, ApplicationCharm)):
             raise Exception("Expected result_ to be a ApplicationCharm, received: {}".format(type(result_)))
 
         self.error = error_
@@ -1455,7 +1455,7 @@ class ApplicationConfigSet(Type):
         if application_ is not None and not isinstance(application_, (bytes, str)):
             raise Exception("Expected application_ to be a str, received: {}".format(type(application_)))
 
-        if config_ is not None and not isinstance(config_, (dict, set)):
+        if config_ is not None and not isinstance(config_, dict):
             raise Exception("Expected config_ to be a Mapping, received: {}".format(type(config_)))
 
         if generation_ is not None and not isinstance(generation_, (bytes, str)):
@@ -1516,10 +1516,10 @@ class ApplicationConstraint(Type):
         error_ = Error.from_json(error) if error else None
 
         # Validate arguments against known Juju API types.
-        if constraints_ is not None and not isinstance(constraints_, (dict, set, Value)):
+        if constraints_ is not None and not isinstance(constraints_, (dict, Value)):
             raise Exception("Expected constraints_ to be a Value, received: {}".format(type(constraints_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         self.constraints = constraints_
@@ -1569,16 +1569,16 @@ class ApplicationDeploy(Type):
         if charm_url_ is not None and not isinstance(charm_url_, (bytes, str)):
             raise Exception("Expected charm_url_ to be a str, received: {}".format(type(charm_url_)))
 
-        if config_ is not None and not isinstance(config_, (dict, set)):
+        if config_ is not None and not isinstance(config_, dict):
             raise Exception("Expected config_ to be a Mapping, received: {}".format(type(config_)))
 
         if config_yaml_ is not None and not isinstance(config_yaml_, (bytes, str)):
             raise Exception("Expected config_yaml_ to be a str, received: {}".format(type(config_yaml_)))
 
-        if constraints_ is not None and not isinstance(constraints_, (dict, set, Value)):
+        if constraints_ is not None and not isinstance(constraints_, (dict, Value)):
             raise Exception("Expected constraints_ to be a Value, received: {}".format(type(constraints_)))
 
-        if endpoint_bindings_ is not None and not isinstance(endpoint_bindings_, (dict, set)):
+        if endpoint_bindings_ is not None and not isinstance(endpoint_bindings_, dict):
             raise Exception("Expected endpoint_bindings_ to be a Mapping, received: {}".format(type(endpoint_bindings_)))
 
         if num_units_ is not None and not isinstance(num_units_, int):
@@ -1587,13 +1587,13 @@ class ApplicationDeploy(Type):
         if placement_ is not None and not isinstance(placement_, (bytes, str, list)):
             raise Exception("Expected placement_ to be a Sequence, received: {}".format(type(placement_)))
 
-        if resources_ is not None and not isinstance(resources_, (dict, set)):
+        if resources_ is not None and not isinstance(resources_, dict):
             raise Exception("Expected resources_ to be a Mapping, received: {}".format(type(resources_)))
 
         if series_ is not None and not isinstance(series_, (bytes, str)):
             raise Exception("Expected series_ to be a str, received: {}".format(type(series_)))
 
-        if storage_ is not None and not isinstance(storage_, (dict, set)):
+        if storage_ is not None and not isinstance(storage_, dict):
             raise Exception("Expected storage_ to be a Mapping, received: {}".format(type(storage_)))
 
         self.application = application_
@@ -1751,7 +1751,7 @@ class ApplicationGetResults(Type):
         if application_ is not None and not isinstance(application_, (bytes, str)):
             raise Exception("Expected application_ to be a str, received: {}".format(type(application_)))
 
-        if application_config_ is not None and not isinstance(application_config_, (dict, set)):
+        if application_config_ is not None and not isinstance(application_config_, dict):
             raise Exception("Expected application_config_ to be a Mapping, received: {}".format(type(application_config_)))
 
         if channel_ is not None and not isinstance(channel_, (bytes, str)):
@@ -1760,10 +1760,10 @@ class ApplicationGetResults(Type):
         if charm_ is not None and not isinstance(charm_, (bytes, str)):
             raise Exception("Expected charm_ to be a str, received: {}".format(type(charm_)))
 
-        if config_ is not None and not isinstance(config_, (dict, set)):
+        if config_ is not None and not isinstance(config_, dict):
             raise Exception("Expected config_ to be a Mapping, received: {}".format(type(config_)))
 
-        if constraints_ is not None and not isinstance(constraints_, (dict, set, Value)):
+        if constraints_ is not None and not isinstance(constraints_, (dict, Value)):
             raise Exception("Expected constraints_ to be a Value, received: {}".format(type(constraints_)))
 
         if series_ is not None and not isinstance(series_, (bytes, str)):
@@ -1812,10 +1812,10 @@ class ApplicationInfo(Type):
         if charm_ is not None and not isinstance(charm_, (bytes, str)):
             raise Exception("Expected charm_ to be a str, received: {}".format(type(charm_)))
 
-        if constraints_ is not None and not isinstance(constraints_, (dict, set, Value)):
+        if constraints_ is not None and not isinstance(constraints_, (dict, Value)):
             raise Exception("Expected constraints_ to be a Value, received: {}".format(type(constraints_)))
 
-        if endpoint_bindings_ is not None and not isinstance(endpoint_bindings_, (dict, set)):
+        if endpoint_bindings_ is not None and not isinstance(endpoint_bindings_, dict):
             raise Exception("Expected endpoint_bindings_ to be a Mapping, received: {}".format(type(endpoint_bindings_)))
 
         if exposed_ is not None and not isinstance(exposed_, bool):
@@ -1858,10 +1858,10 @@ class ApplicationInfoResult(Type):
         result_ = ApplicationInfo.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, ApplicationInfo)):
+        if result_ is not None and not isinstance(result_, (dict, ApplicationInfo)):
             raise Exception("Expected result_ to be a ApplicationInfo, received: {}".format(type(result_)))
 
         self.error = error_
@@ -1960,7 +1960,7 @@ class ApplicationOffer(Type):
         if application_description_ is not None and not isinstance(application_description_, (bytes, str)):
             raise Exception("Expected application_description_ to be a str, received: {}".format(type(application_description_)))
 
-        if bindings_ is not None and not isinstance(bindings_, (dict, set)):
+        if bindings_ is not None and not isinstance(bindings_, dict):
             raise Exception("Expected bindings_ to be a Mapping, received: {}".format(type(bindings_)))
 
         if endpoints_ is not None and not isinstance(endpoints_, (bytes, str, list)):
@@ -2024,7 +2024,7 @@ class ApplicationOfferAdminDetails(Type):
         users_ = [OfferUserDetails.from_json(o) for o in users or []]
 
         # Validate arguments against known Juju API types.
-        if applicationofferdetails_ is not None and not isinstance(applicationofferdetails_, (dict, set, ApplicationOfferDetails)):
+        if applicationofferdetails_ is not None and not isinstance(applicationofferdetails_, (dict, ApplicationOfferDetails)):
             raise Exception("Expected applicationofferdetails_ to be a ApplicationOfferDetails, received: {}".format(type(applicationofferdetails_)))
 
         if application_description_ is not None and not isinstance(application_description_, (bytes, str)):
@@ -2033,7 +2033,7 @@ class ApplicationOfferAdminDetails(Type):
         if application_name_ is not None and not isinstance(application_name_, (bytes, str)):
             raise Exception("Expected application_name_ to be a str, received: {}".format(type(application_name_)))
 
-        if bindings_ is not None and not isinstance(bindings_, (dict, set)):
+        if bindings_ is not None and not isinstance(bindings_, dict):
             raise Exception("Expected bindings_ to be a Mapping, received: {}".format(type(bindings_)))
 
         if charm_url_ is not None and not isinstance(charm_url_, (bytes, str)):
@@ -2109,7 +2109,7 @@ class ApplicationOfferDetails(Type):
         if application_description_ is not None and not isinstance(application_description_, (bytes, str)):
             raise Exception("Expected application_description_ to be a str, received: {}".format(type(application_description_)))
 
-        if bindings_ is not None and not isinstance(bindings_, (dict, set)):
+        if bindings_ is not None and not isinstance(bindings_, dict):
             raise Exception("Expected bindings_ to be a Mapping, received: {}".format(type(bindings_)))
 
         if endpoints_ is not None and not isinstance(endpoints_, (bytes, str, list)):
@@ -2158,10 +2158,10 @@ class ApplicationOfferResult(Type):
         result_ = ApplicationOfferAdminDetails.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, ApplicationOfferAdminDetails)):
+        if result_ is not None and not isinstance(result_, (dict, ApplicationOfferAdminDetails)):
             raise Exception("Expected result_ to be a ApplicationOfferAdminDetails, received: {}".format(type(result_)))
 
         self.error = error_
@@ -2201,10 +2201,10 @@ class ApplicationOfferStatus(Type):
         if charm_ is not None and not isinstance(charm_, (bytes, str)):
             raise Exception("Expected charm_ to be a str, received: {}".format(type(charm_)))
 
-        if endpoints_ is not None and not isinstance(endpoints_, (dict, set)):
+        if endpoints_ is not None and not isinstance(endpoints_, dict):
             raise Exception("Expected endpoints_ to be a Mapping, received: {}".format(type(endpoints_)))
 
-        if err_ is not None and not isinstance(err_, (dict, set, Error)):
+        if err_ is not None and not isinstance(err_, (dict, Error)):
             raise Exception("Expected err_ to be a Error, received: {}".format(type(err_)))
 
         if offer_name_ is not None and not isinstance(offer_name_, (bytes, str)):
@@ -2283,10 +2283,10 @@ class ApplicationRelationsWatchResult(Type):
         if applicationrelationswatcherid_ is not None and not isinstance(applicationrelationswatcherid_, (bytes, str)):
             raise Exception("Expected applicationrelationswatcherid_ to be a str, received: {}".format(type(applicationrelationswatcherid_)))
 
-        if changes_ is not None and not isinstance(changes_, (dict, set, ApplicationRelationsChange)):
+        if changes_ is not None and not isinstance(changes_, (dict, ApplicationRelationsChange)):
             raise Exception("Expected changes_ to be a ApplicationRelationsChange, received: {}".format(type(changes_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         self.applicationrelationswatcherid = applicationrelationswatcherid_
@@ -2316,7 +2316,7 @@ class ApplicationSet(Type):
         if branch_ is not None and not isinstance(branch_, (bytes, str)):
             raise Exception("Expected branch_ to be a str, received: {}".format(type(branch_)))
 
-        if options_ is not None and not isinstance(options_, (dict, set)):
+        if options_ is not None and not isinstance(options_, dict):
             raise Exception("Expected options_ to be a Mapping, received: {}".format(type(options_)))
 
         self.application = application_
@@ -2365,7 +2365,7 @@ class ApplicationSetCharm(Type):
         if charm_url_ is not None and not isinstance(charm_url_, (bytes, str)):
             raise Exception("Expected charm_url_ to be a str, received: {}".format(type(charm_url_)))
 
-        if config_settings_ is not None and not isinstance(config_settings_, (dict, set)):
+        if config_settings_ is not None and not isinstance(config_settings_, dict):
             raise Exception("Expected config_settings_ to be a Mapping, received: {}".format(type(config_settings_)))
 
         if config_settings_yaml_ is not None and not isinstance(config_settings_yaml_, (bytes, str)):
@@ -2383,10 +2383,10 @@ class ApplicationSetCharm(Type):
         if generation_ is not None and not isinstance(generation_, (bytes, str)):
             raise Exception("Expected generation_ to be a str, received: {}".format(type(generation_)))
 
-        if resource_ids_ is not None and not isinstance(resource_ids_, (dict, set)):
+        if resource_ids_ is not None and not isinstance(resource_ids_, dict):
             raise Exception("Expected resource_ids_ to be a Mapping, received: {}".format(type(resource_ids_)))
 
-        if storage_constraints_ is not None and not isinstance(storage_constraints_, (dict, set)):
+        if storage_constraints_ is not None and not isinstance(storage_constraints_, dict):
             raise Exception("Expected storage_constraints_ to be a Mapping, received: {}".format(type(storage_constraints_)))
 
         self.application = application_
@@ -2484,10 +2484,10 @@ class ApplicationStatus(Type):
         if charm_verion_ is not None and not isinstance(charm_verion_, (bytes, str)):
             raise Exception("Expected charm_verion_ to be a str, received: {}".format(type(charm_verion_)))
 
-        if endpoint_bindings_ is not None and not isinstance(endpoint_bindings_, (dict, set)):
+        if endpoint_bindings_ is not None and not isinstance(endpoint_bindings_, dict):
             raise Exception("Expected endpoint_bindings_ to be a Mapping, received: {}".format(type(endpoint_bindings_)))
 
-        if err_ is not None and not isinstance(err_, (dict, set, Error)):
+        if err_ is not None and not isinstance(err_, (dict, Error)):
             raise Exception("Expected err_ to be a Error, received: {}".format(type(err_)))
 
         if exposed_ is not None and not isinstance(exposed_, bool):
@@ -2499,7 +2499,7 @@ class ApplicationStatus(Type):
         if life_ is not None and not isinstance(life_, (bytes, str)):
             raise Exception("Expected life_ to be a str, received: {}".format(type(life_)))
 
-        if meter_statuses_ is not None and not isinstance(meter_statuses_, (dict, set)):
+        if meter_statuses_ is not None and not isinstance(meter_statuses_, dict):
             raise Exception("Expected meter_statuses_ to be a Mapping, received: {}".format(type(meter_statuses_)))
 
         if provider_id_ is not None and not isinstance(provider_id_, (bytes, str)):
@@ -2514,13 +2514,13 @@ class ApplicationStatus(Type):
         if series_ is not None and not isinstance(series_, (bytes, str)):
             raise Exception("Expected series_ to be a str, received: {}".format(type(series_)))
 
-        if status_ is not None and not isinstance(status_, (dict, set, DetailedStatus)):
+        if status_ is not None and not isinstance(status_, (dict, DetailedStatus)):
             raise Exception("Expected status_ to be a DetailedStatus, received: {}".format(type(status_)))
 
         if subordinate_to_ is not None and not isinstance(subordinate_to_, (bytes, str, list)):
             raise Exception("Expected subordinate_to_ to be a Sequence, received: {}".format(type(subordinate_to_)))
 
-        if units_ is not None and not isinstance(units_, (dict, set)):
+        if units_ is not None and not isinstance(units_, dict):
             raise Exception("Expected units_ to be a Mapping, received: {}".format(type(units_)))
 
         if workload_version_ is not None and not isinstance(workload_version_, (bytes, str)):
@@ -2562,13 +2562,13 @@ class ApplicationStatusResult(Type):
         units_ = units
 
         # Validate arguments against known Juju API types.
-        if application_ is not None and not isinstance(application_, (dict, set, StatusResult)):
+        if application_ is not None and not isinstance(application_, (dict, StatusResult)):
             raise Exception("Expected application_ to be a StatusResult, received: {}".format(type(application_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if units_ is not None and not isinstance(units_, (dict, set)):
+        if units_ is not None and not isinstance(units_, dict):
             raise Exception("Expected units_ to be a Mapping, received: {}".format(type(units_)))
 
         self.application = application_
@@ -2679,7 +2679,7 @@ class ApplicationUnitParams(Type):
         if address_ is not None and not isinstance(address_, (bytes, str)):
             raise Exception("Expected address_ to be a str, received: {}".format(type(address_)))
 
-        if data_ is not None and not isinstance(data_, (dict, set)):
+        if data_ is not None and not isinstance(data_, dict):
             raise Exception("Expected data_ to be a Mapping, received: {}".format(type(data_)))
 
         if filesystem_info_ is not None and not isinstance(filesystem_info_, (bytes, str, list)):
@@ -2780,7 +2780,7 @@ class ApplicationUpdate(Type):
         if charm_url_ is not None and not isinstance(charm_url_, (bytes, str)):
             raise Exception("Expected charm_url_ to be a str, received: {}".format(type(charm_url_)))
 
-        if constraints_ is not None and not isinstance(constraints_, (dict, set, Value)):
+        if constraints_ is not None and not isinstance(constraints_, (dict, Value)):
             raise Exception("Expected constraints_ to be a Value, received: {}".format(type(constraints_)))
 
         if force_ is not None and not isinstance(force_, bool):
@@ -2798,7 +2798,7 @@ class ApplicationUpdate(Type):
         if min_units_ is not None and not isinstance(min_units_, int):
             raise Exception("Expected min_units_ to be a int, received: {}".format(type(min_units_)))
 
-        if settings_ is not None and not isinstance(settings_, (dict, set)):
+        if settings_ is not None and not isinstance(settings_, dict):
             raise Exception("Expected settings_ to be a Mapping, received: {}".format(type(settings_)))
 
         if settings_yaml_ is not None and not isinstance(settings_yaml_, (bytes, str)):
@@ -3016,7 +3016,7 @@ class BackupsMetadataResult(Type):
         if stored_ is not None and not isinstance(stored_, (bytes, str)):
             raise Exception("Expected stored_ to be a str, received: {}".format(type(stored_)))
 
-        if version_ is not None and not isinstance(version_, (dict, set, Number)):
+        if version_ is not None and not isinstance(version_, (dict, Number)):
             raise Exception("Expected version_ to be a Number, received: {}".format(type(version_)))
 
         self.ca_cert = ca_cert_
@@ -3093,7 +3093,7 @@ class Binary(Type):
         if minor_ is not None and not isinstance(minor_, int):
             raise Exception("Expected minor_ to be a int, received: {}".format(type(minor_)))
 
-        if number_ is not None and not isinstance(number_, (dict, set, Number)):
+        if number_ is not None and not isinstance(number_, (dict, Number)):
             raise Exception("Expected number_ to be a Number, received: {}".format(type(number_)))
 
         if patch_ is not None and not isinstance(patch_, int):
@@ -3243,10 +3243,10 @@ class BlockDeviceResult(Type):
         result_ = BlockDevice.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, BlockDevice)):
+        if result_ is not None and not isinstance(result_, (dict, BlockDevice)):
             raise Exception("Expected result_ to be a BlockDevice, received: {}".format(type(result_)))
 
         self.error = error_
@@ -3285,10 +3285,10 @@ class BlockResult(Type):
         result_ = Block.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, Block)):
+        if result_ is not None and not isinstance(result_, (dict, Block)):
             raise Exception("Expected result_ to be a Block, received: {}".format(type(result_)))
 
         self.error = error_
@@ -3351,7 +3351,7 @@ class BoolResult(Type):
         result_ = result
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if result_ is not None and not isinstance(result_, bool):
@@ -3648,7 +3648,7 @@ class CharmActionSpec(Type):
         if description_ is not None and not isinstance(description_, (bytes, str)):
             raise Exception("Expected description_ to be a str, received: {}".format(type(description_)))
 
-        if params_ is not None and not isinstance(params_, (dict, set)):
+        if params_ is not None and not isinstance(params_, dict):
             raise Exception("Expected params_ to be a Mapping, received: {}".format(type(params_)))
 
         self.description = description_
@@ -3667,7 +3667,7 @@ class CharmActions(Type):
         specs_ = specs
 
         # Validate arguments against known Juju API types.
-        if specs_ is not None and not isinstance(specs_, (dict, set)):
+        if specs_ is not None and not isinstance(specs_, dict):
             raise Exception("Expected specs_ to be a Mapping, received: {}".format(type(specs_)))
 
         self.specs = specs_
@@ -3739,19 +3739,19 @@ class CharmInfo(Type):
         url_ = url
 
         # Validate arguments against known Juju API types.
-        if actions_ is not None and not isinstance(actions_, (dict, set, CharmActions)):
+        if actions_ is not None and not isinstance(actions_, (dict, CharmActions)):
             raise Exception("Expected actions_ to be a CharmActions, received: {}".format(type(actions_)))
 
-        if config_ is not None and not isinstance(config_, (dict, set)):
+        if config_ is not None and not isinstance(config_, dict):
             raise Exception("Expected config_ to be a Mapping, received: {}".format(type(config_)))
 
-        if lxd_profile_ is not None and not isinstance(lxd_profile_, (dict, set, CharmLXDProfile)):
+        if lxd_profile_ is not None and not isinstance(lxd_profile_, (dict, CharmLXDProfile)):
             raise Exception("Expected lxd_profile_ to be a CharmLXDProfile, received: {}".format(type(lxd_profile_)))
 
-        if meta_ is not None and not isinstance(meta_, (dict, set, CharmMeta)):
+        if meta_ is not None and not isinstance(meta_, (dict, CharmMeta)):
             raise Exception("Expected meta_ to be a CharmMeta, received: {}".format(type(meta_)))
 
-        if metrics_ is not None and not isinstance(metrics_, (dict, set, CharmMetrics)):
+        if metrics_ is not None and not isinstance(metrics_, (dict, CharmMetrics)):
             raise Exception("Expected metrics_ to be a CharmMetrics, received: {}".format(type(metrics_)))
 
         if revision_ is not None and not isinstance(revision_, int):
@@ -3785,13 +3785,13 @@ class CharmLXDProfile(Type):
         devices_ = devices
 
         # Validate arguments against known Juju API types.
-        if config_ is not None and not isinstance(config_, (dict, set)):
+        if config_ is not None and not isinstance(config_, dict):
             raise Exception("Expected config_ to be a Mapping, received: {}".format(type(config_)))
 
         if description_ is not None and not isinstance(description_, (bytes, str)):
             raise Exception("Expected description_ to be a str, received: {}".format(type(description_)))
 
-        if devices_ is not None and not isinstance(devices_, (dict, set)):
+        if devices_ is not None and not isinstance(devices_, dict):
             raise Exception("Expected devices_ to be a Mapping, received: {}".format(type(devices_)))
 
         self.config = config_
@@ -3849,10 +3849,10 @@ class CharmMeta(Type):
         if description_ is not None and not isinstance(description_, (bytes, str)):
             raise Exception("Expected description_ to be a str, received: {}".format(type(description_)))
 
-        if devices_ is not None and not isinstance(devices_, (dict, set)):
+        if devices_ is not None and not isinstance(devices_, dict):
             raise Exception("Expected devices_ to be a Mapping, received: {}".format(type(devices_)))
 
-        if extra_bindings_ is not None and not isinstance(extra_bindings_, (dict, set)):
+        if extra_bindings_ is not None and not isinstance(extra_bindings_, dict):
             raise Exception("Expected extra_bindings_ to be a Mapping, received: {}".format(type(extra_bindings_)))
 
         if min_juju_version_ is not None and not isinstance(min_juju_version_, (bytes, str)):
@@ -3861,25 +3861,25 @@ class CharmMeta(Type):
         if name_ is not None and not isinstance(name_, (bytes, str)):
             raise Exception("Expected name_ to be a str, received: {}".format(type(name_)))
 
-        if payload_classes_ is not None and not isinstance(payload_classes_, (dict, set)):
+        if payload_classes_ is not None and not isinstance(payload_classes_, dict):
             raise Exception("Expected payload_classes_ to be a Mapping, received: {}".format(type(payload_classes_)))
 
-        if peers_ is not None and not isinstance(peers_, (dict, set)):
+        if peers_ is not None and not isinstance(peers_, dict):
             raise Exception("Expected peers_ to be a Mapping, received: {}".format(type(peers_)))
 
-        if provides_ is not None and not isinstance(provides_, (dict, set)):
+        if provides_ is not None and not isinstance(provides_, dict):
             raise Exception("Expected provides_ to be a Mapping, received: {}".format(type(provides_)))
 
-        if requires_ is not None and not isinstance(requires_, (dict, set)):
+        if requires_ is not None and not isinstance(requires_, dict):
             raise Exception("Expected requires_ to be a Mapping, received: {}".format(type(requires_)))
 
-        if resources_ is not None and not isinstance(resources_, (dict, set)):
+        if resources_ is not None and not isinstance(resources_, dict):
             raise Exception("Expected resources_ to be a Mapping, received: {}".format(type(resources_)))
 
         if series_ is not None and not isinstance(series_, (bytes, str, list)):
             raise Exception("Expected series_ to be a Sequence, received: {}".format(type(series_)))
 
-        if storage_ is not None and not isinstance(storage_, (dict, set)):
+        if storage_ is not None and not isinstance(storage_, dict):
             raise Exception("Expected storage_ to be a Mapping, received: {}".format(type(storage_)))
 
         if subordinate_ is not None and not isinstance(subordinate_, bool):
@@ -3951,10 +3951,10 @@ class CharmMetrics(Type):
         plan_ = CharmPlan.from_json(plan) if plan else None
 
         # Validate arguments against known Juju API types.
-        if metrics_ is not None and not isinstance(metrics_, (dict, set)):
+        if metrics_ is not None and not isinstance(metrics_, dict):
             raise Exception("Expected metrics_ to be a Mapping, received: {}".format(type(metrics_)))
 
-        if plan_ is not None and not isinstance(plan_, (dict, set, CharmPlan)):
+        if plan_ is not None and not isinstance(plan_, (dict, CharmPlan)):
             raise Exception("Expected plan_ to be a CharmPlan, received: {}".format(type(plan_)))
 
         self.metrics = metrics_
@@ -3968,7 +3968,7 @@ class CharmOption(Type):
     _toPy = {'default': 'default', 'description': 'description', 'type': 'type_'}
     def __init__(self, default=None, description=None, type_=None, **unknown_fields):
         '''
-        default : typing.Mapping[str, typing.Any]
+        default : Any
         description : str
         type_ : str
         '''
@@ -3977,9 +3977,6 @@ class CharmOption(Type):
         type__ = type_
 
         # Validate arguments against known Juju API types.
-        if default_ is not None and not isinstance(default_, (dict, set)):
-            raise Exception("Expected default_ to be a Mapping, received: {}".format(type(default_)))
-
         if description_ is not None and not isinstance(description_, (bytes, str)):
             raise Exception("Expected description_ to be a str, received: {}".format(type(description_)))
 
@@ -4056,7 +4053,7 @@ class CharmProfilingInfoResult(Type):
         if current_profiles_ is not None and not isinstance(current_profiles_, (bytes, str, list)):
             raise Exception("Expected current_profiles_ to be a Sequence, received: {}".format(type(current_profiles_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if instance_id_ is not None and not isinstance(instance_id_, (bytes, str)):
@@ -4465,7 +4462,7 @@ class Cloud(Type):
         if ca_certificates_ is not None and not isinstance(ca_certificates_, (bytes, str, list)):
             raise Exception("Expected ca_certificates_ to be a Sequence, received: {}".format(type(ca_certificates_)))
 
-        if config_ is not None and not isinstance(config_, (dict, set)):
+        if config_ is not None and not isinstance(config_, dict):
             raise Exception("Expected config_ to be a Mapping, received: {}".format(type(config_)))
 
         if endpoint_ is not None and not isinstance(endpoint_, (bytes, str)):
@@ -4477,7 +4474,7 @@ class Cloud(Type):
         if identity_endpoint_ is not None and not isinstance(identity_endpoint_, (bytes, str)):
             raise Exception("Expected identity_endpoint_ to be a str, received: {}".format(type(identity_endpoint_)))
 
-        if region_config_ is not None and not isinstance(region_config_, (dict, set)):
+        if region_config_ is not None and not isinstance(region_config_, dict):
             raise Exception("Expected region_config_ to be a Mapping, received: {}".format(type(region_config_)))
 
         if regions_ is not None and not isinstance(regions_, (bytes, str, list)):
@@ -4517,7 +4514,7 @@ class CloudCredential(Type):
         redacted_ = redacted
 
         # Validate arguments against known Juju API types.
-        if attrs_ is not None and not isinstance(attrs_, (dict, set)):
+        if attrs_ is not None and not isinstance(attrs_, dict):
             raise Exception("Expected attrs_ to be a Mapping, received: {}".format(type(attrs_)))
 
         if auth_type_ is not None and not isinstance(auth_type_, (bytes, str)):
@@ -4593,10 +4590,10 @@ class CloudCredentialResult(Type):
         result_ = CloudCredential.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, CloudCredential)):
+        if result_ is not None and not isinstance(result_, (dict, CloudCredential)):
             raise Exception("Expected result_ to be a CloudCredential, received: {}".format(type(result_)))
 
         self.error = error_
@@ -4779,7 +4776,7 @@ class CloudInfo(Type):
         users_ = [CloudUserInfo.from_json(o) for o in users or []]
 
         # Validate arguments against known Juju API types.
-        if clouddetails_ is not None and not isinstance(clouddetails_, (dict, set, CloudDetails)):
+        if clouddetails_ is not None and not isinstance(clouddetails_, (dict, CloudDetails)):
             raise Exception("Expected clouddetails_ to be a CloudDetails, received: {}".format(type(clouddetails_)))
 
         if users_ is not None and not isinstance(users_, (bytes, str, list)):
@@ -4803,10 +4800,10 @@ class CloudInfoResult(Type):
         result_ = CloudInfo.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, CloudInfo)):
+        if result_ is not None and not isinstance(result_, (dict, CloudInfo)):
             raise Exception("Expected result_ to be a CloudInfo, received: {}".format(type(result_)))
 
         self.error = error_
@@ -4850,7 +4847,7 @@ class CloudInstanceTypesConstraint(Type):
         if cloud_tag_ is not None and not isinstance(cloud_tag_, (bytes, str)):
             raise Exception("Expected cloud_tag_ to be a str, received: {}".format(type(cloud_tag_)))
 
-        if constraints_ is not None and not isinstance(constraints_, (dict, set, Value)):
+        if constraints_ is not None and not isinstance(constraints_, (dict, Value)):
             raise Exception("Expected constraints_ to be a Value, received: {}".format(type(constraints_)))
 
         if region_ is not None and not isinstance(region_, (bytes, str)):
@@ -4929,10 +4926,10 @@ class CloudResult(Type):
         error_ = Error.from_json(error) if error else None
 
         # Validate arguments against known Juju API types.
-        if cloud_ is not None and not isinstance(cloud_, (dict, set, Cloud)):
+        if cloud_ is not None and not isinstance(cloud_, (dict, Cloud)):
             raise Exception("Expected cloud_ to be a Cloud, received: {}".format(type(cloud_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         self.cloud = cloud_
@@ -4986,7 +4983,7 @@ class CloudSpec(Type):
         if cacertificates_ is not None and not isinstance(cacertificates_, (bytes, str, list)):
             raise Exception("Expected cacertificates_ to be a Sequence, received: {}".format(type(cacertificates_)))
 
-        if credential_ is not None and not isinstance(credential_, (dict, set, CloudCredential)):
+        if credential_ is not None and not isinstance(credential_, (dict, CloudCredential)):
             raise Exception("Expected credential_ to be a CloudCredential, received: {}".format(type(credential_)))
 
         if endpoint_ is not None and not isinstance(endpoint_, (bytes, str)):
@@ -5031,10 +5028,10 @@ class CloudSpecResult(Type):
         result_ = CloudSpec.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, CloudSpec)):
+        if result_ is not None and not isinstance(result_, (dict, CloudSpec)):
             raise Exception("Expected result_ to be a CloudSpec, received: {}".format(type(result_)))
 
         self.error = error_
@@ -5101,7 +5098,7 @@ class CloudsResult(Type):
         clouds_ = clouds
 
         # Validate arguments against known Juju API types.
-        if clouds_ is not None and not isinstance(clouds_, (dict, set)):
+        if clouds_ is not None and not isinstance(clouds_, dict):
             raise Exception("Expected clouds_ to be a Mapping, received: {}".format(type(clouds_)))
 
         self.clouds = clouds_
@@ -5121,10 +5118,10 @@ class ConfigResult(Type):
         error_ = Error.from_json(error) if error else None
 
         # Validate arguments against known Juju API types.
-        if config_ is not None and not isinstance(config_, (dict, set)):
+        if config_ is not None and not isinstance(config_, dict):
             raise Exception("Expected config_ to be a Mapping, received: {}".format(type(config_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         self.config = config_
@@ -5145,10 +5142,10 @@ class ConfigSettingsResult(Type):
         settings_ = settings
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if settings_ is not None and not isinstance(settings_, (dict, set)):
+        if settings_ is not None and not isinstance(settings_, dict):
             raise Exception("Expected settings_ to be a Mapping, received: {}".format(type(settings_)))
 
         self.error = error_
@@ -5181,7 +5178,7 @@ class ConfigValue(Type):
     def __init__(self, source=None, value=None, **unknown_fields):
         '''
         source : str
-        value : typing.Mapping[str, typing.Any]
+        value : Any
         '''
         source_ = source
         value_ = value
@@ -5189,9 +5186,6 @@ class ConfigValue(Type):
         # Validate arguments against known Juju API types.
         if source_ is not None and not isinstance(source_, (bytes, str)):
             raise Exception("Expected source_ to be a str, received: {}".format(type(source_)))
-
-        if value_ is not None and not isinstance(value_, (dict, set)):
-            raise Exception("Expected value_ to be a Mapping, received: {}".format(type(value_)))
 
         self.source = source_
         self.value = value_
@@ -5241,10 +5235,10 @@ class ConstraintsResult(Type):
         error_ = Error.from_json(error) if error else None
 
         # Validate arguments against known Juju API types.
-        if constraints_ is not None and not isinstance(constraints_, (dict, set, Value)):
+        if constraints_ is not None and not isinstance(constraints_, (dict, Value)):
             raise Exception("Expected constraints_ to be a Value, received: {}".format(type(constraints_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         self.constraints = constraints_
@@ -5305,7 +5299,7 @@ class ConsumeApplicationArg(Type):
         users_ = [OfferUserDetails.from_json(o) for o in users or []]
 
         # Validate arguments against known Juju API types.
-        if applicationofferdetails_ is not None and not isinstance(applicationofferdetails_, (dict, set, ApplicationOfferDetails)):
+        if applicationofferdetails_ is not None and not isinstance(applicationofferdetails_, (dict, ApplicationOfferDetails)):
             raise Exception("Expected applicationofferdetails_ to be a ApplicationOfferDetails, received: {}".format(type(applicationofferdetails_)))
 
         if application_alias_ is not None and not isinstance(application_alias_, (bytes, str)):
@@ -5314,16 +5308,16 @@ class ConsumeApplicationArg(Type):
         if application_description_ is not None and not isinstance(application_description_, (bytes, str)):
             raise Exception("Expected application_description_ to be a str, received: {}".format(type(application_description_)))
 
-        if bindings_ is not None and not isinstance(bindings_, (dict, set)):
+        if bindings_ is not None and not isinstance(bindings_, dict):
             raise Exception("Expected bindings_ to be a Mapping, received: {}".format(type(bindings_)))
 
         if endpoints_ is not None and not isinstance(endpoints_, (bytes, str, list)):
             raise Exception("Expected endpoints_ to be a Sequence, received: {}".format(type(endpoints_)))
 
-        if external_controller_ is not None and not isinstance(external_controller_, (dict, set, ExternalControllerInfo)):
+        if external_controller_ is not None and not isinstance(external_controller_, (dict, ExternalControllerInfo)):
             raise Exception("Expected external_controller_ to be a ExternalControllerInfo, received: {}".format(type(external_controller_)))
 
-        if macaroon_ is not None and not isinstance(macaroon_, (dict, set, Macaroon)):
+        if macaroon_ is not None and not isinstance(macaroon_, (dict, Macaroon)):
             raise Exception("Expected macaroon_ to be a Macaroon, received: {}".format(type(macaroon_)))
 
         if offer_name_ is not None and not isinstance(offer_name_, (bytes, str)):
@@ -5391,7 +5385,7 @@ class ConsumeApplicationResult(Type):
         local_name_ = local_name
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if local_name_ is not None and not isinstance(local_name_, (bytes, str)):
@@ -5435,13 +5429,13 @@ class ConsumeOfferDetails(Type):
         offer_ = ApplicationOfferDetails.from_json(offer) if offer else None
 
         # Validate arguments against known Juju API types.
-        if external_controller_ is not None and not isinstance(external_controller_, (dict, set, ExternalControllerInfo)):
+        if external_controller_ is not None and not isinstance(external_controller_, (dict, ExternalControllerInfo)):
             raise Exception("Expected external_controller_ to be a ExternalControllerInfo, received: {}".format(type(external_controller_)))
 
-        if macaroon_ is not None and not isinstance(macaroon_, (dict, set, Macaroon)):
+        if macaroon_ is not None and not isinstance(macaroon_, (dict, Macaroon)):
             raise Exception("Expected macaroon_ to be a Macaroon, received: {}".format(type(macaroon_)))
 
-        if offer_ is not None and not isinstance(offer_, (dict, set, ApplicationOfferDetails)):
+        if offer_ is not None and not isinstance(offer_, (dict, ApplicationOfferDetails)):
             raise Exception("Expected offer_ to be a ApplicationOfferDetails, received: {}".format(type(offer_)))
 
         self.external_controller = external_controller_
@@ -5469,19 +5463,19 @@ class ConsumeOfferDetailsResult(Type):
         offer_ = ApplicationOfferDetails.from_json(offer) if offer else None
 
         # Validate arguments against known Juju API types.
-        if consumeofferdetails_ is not None and not isinstance(consumeofferdetails_, (dict, set, ConsumeOfferDetails)):
+        if consumeofferdetails_ is not None and not isinstance(consumeofferdetails_, (dict, ConsumeOfferDetails)):
             raise Exception("Expected consumeofferdetails_ to be a ConsumeOfferDetails, received: {}".format(type(consumeofferdetails_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if external_controller_ is not None and not isinstance(external_controller_, (dict, set, ExternalControllerInfo)):
+        if external_controller_ is not None and not isinstance(external_controller_, (dict, ExternalControllerInfo)):
             raise Exception("Expected external_controller_ to be a ExternalControllerInfo, received: {}".format(type(external_controller_)))
 
-        if macaroon_ is not None and not isinstance(macaroon_, (dict, set, Macaroon)):
+        if macaroon_ is not None and not isinstance(macaroon_, (dict, Macaroon)):
             raise Exception("Expected macaroon_ to be a Macaroon, received: {}".format(type(macaroon_)))
 
-        if offer_ is not None and not isinstance(offer_, (dict, set, ApplicationOfferDetails)):
+        if offer_ is not None and not isinstance(offer_, (dict, ApplicationOfferDetails)):
             raise Exception("Expected offer_ to be a ApplicationOfferDetails, received: {}".format(type(offer_)))
 
         self.consumeofferdetails = consumeofferdetails_
@@ -5541,34 +5535,34 @@ class ContainerConfig(Type):
         ssl_hostname_verification_ = ssl_hostname_verification
 
         # Validate arguments against known Juju API types.
-        if updatebehavior_ is not None and not isinstance(updatebehavior_, (dict, set, UpdateBehavior)):
+        if updatebehavior_ is not None and not isinstance(updatebehavior_, (dict, UpdateBehavior)):
             raise Exception("Expected updatebehavior_ to be a UpdateBehavior, received: {}".format(type(updatebehavior_)))
 
         if apt_mirror_ is not None and not isinstance(apt_mirror_, (bytes, str)):
             raise Exception("Expected apt_mirror_ to be a str, received: {}".format(type(apt_mirror_)))
 
-        if apt_proxy_ is not None and not isinstance(apt_proxy_, (dict, set, Settings)):
+        if apt_proxy_ is not None and not isinstance(apt_proxy_, (dict, Settings)):
             raise Exception("Expected apt_proxy_ to be a Settings, received: {}".format(type(apt_proxy_)))
 
         if authorized_keys_ is not None and not isinstance(authorized_keys_, (bytes, str)):
             raise Exception("Expected authorized_keys_ to be a str, received: {}".format(type(authorized_keys_)))
 
-        if cloudinit_userdata_ is not None and not isinstance(cloudinit_userdata_, (dict, set)):
+        if cloudinit_userdata_ is not None and not isinstance(cloudinit_userdata_, dict):
             raise Exception("Expected cloudinit_userdata_ to be a Mapping, received: {}".format(type(cloudinit_userdata_)))
 
         if container_inherit_properties_ is not None and not isinstance(container_inherit_properties_, (bytes, str)):
             raise Exception("Expected container_inherit_properties_ to be a str, received: {}".format(type(container_inherit_properties_)))
 
-        if juju_proxy_ is not None and not isinstance(juju_proxy_, (dict, set, Settings)):
+        if juju_proxy_ is not None and not isinstance(juju_proxy_, (dict, Settings)):
             raise Exception("Expected juju_proxy_ to be a Settings, received: {}".format(type(juju_proxy_)))
 
-        if legacy_proxy_ is not None and not isinstance(legacy_proxy_, (dict, set, Settings)):
+        if legacy_proxy_ is not None and not isinstance(legacy_proxy_, (dict, Settings)):
             raise Exception("Expected legacy_proxy_ to be a Settings, received: {}".format(type(legacy_proxy_)))
 
         if provider_type_ is not None and not isinstance(provider_type_, (bytes, str)):
             raise Exception("Expected provider_type_ to be a str, received: {}".format(type(provider_type_)))
 
-        if snap_proxy_ is not None and not isinstance(snap_proxy_, (dict, set, Settings)):
+        if snap_proxy_ is not None and not isinstance(snap_proxy_, (dict, Settings)):
             raise Exception("Expected snap_proxy_ to be a Settings, received: {}".format(type(snap_proxy_)))
 
         if ssl_hostname_verification_ is not None and not isinstance(ssl_hostname_verification_, bool):
@@ -5604,7 +5598,7 @@ class ContainerLXDProfile(Type):
         if name_ is not None and not isinstance(name_, (bytes, str)):
             raise Exception("Expected name_ to be a str, received: {}".format(type(name_)))
 
-        if profile_ is not None and not isinstance(profile_, (dict, set, CharmLXDProfile)):
+        if profile_ is not None and not isinstance(profile_, (dict, CharmLXDProfile)):
             raise Exception("Expected profile_ to be a CharmLXDProfile, received: {}".format(type(profile_)))
 
         self.name = name_
@@ -5623,7 +5617,7 @@ class ContainerManagerConfig(Type):
         config_ = config
 
         # Validate arguments against known Juju API types.
-        if config_ is not None and not isinstance(config_, (dict, set)):
+        if config_ is not None and not isinstance(config_, dict):
             raise Exception("Expected config_ to be a Mapping, received: {}".format(type(config_)))
 
         self.config = config_
@@ -5661,7 +5655,7 @@ class ContainerProfileResult(Type):
         lxd_profiles_ = [ContainerLXDProfile.from_json(o) for o in lxd_profiles or []]
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if lxd_profiles_ is not None and not isinstance(lxd_profiles_, (bytes, str, list)):
@@ -5706,7 +5700,7 @@ class ContainerTypeResult(Type):
         if container_type_ is not None and not isinstance(container_type_, (bytes, str)):
             raise Exception("Expected container_type_ to be a str, received: {}".format(type(container_type_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         self.container_type = container_type_
@@ -5735,7 +5729,7 @@ class ControllerAPIInfoResult(Type):
         if cacert_ is not None and not isinstance(cacert_, (bytes, str)):
             raise Exception("Expected cacert_ to be a str, received: {}".format(type(cacert_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         self.addresses = addresses_
@@ -5773,7 +5767,7 @@ class ControllerConfigResult(Type):
         config_ = config
 
         # Validate arguments against known Juju API types.
-        if config_ is not None and not isinstance(config_, (dict, set)):
+        if config_ is not None and not isinstance(config_, dict):
             raise Exception("Expected config_ to be a Mapping, received: {}".format(type(config_)))
 
         self.config = config_
@@ -5791,7 +5785,7 @@ class ControllerConfigSet(Type):
         config_ = config
 
         # Validate arguments against known Juju API types.
-        if config_ is not None and not isinstance(config_, (dict, set)):
+        if config_ is not None and not isinstance(config_, dict):
             raise Exception("Expected config_ to be a Mapping, received: {}".format(type(config_)))
 
         self.config = config_
@@ -5811,7 +5805,7 @@ class ControllerCredentialInfo(Type):
         models_ = [ModelAccess.from_json(o) for o in models or []]
 
         # Validate arguments against known Juju API types.
-        if content_ is not None and not isinstance(content_, (dict, set, CredentialContent)):
+        if content_ is not None and not isinstance(content_, (dict, CredentialContent)):
             raise Exception("Expected content_ to be a CredentialContent, received: {}".format(type(content_)))
 
         if models_ is not None and not isinstance(models_, (bytes, str, list)):
@@ -5835,10 +5829,10 @@ class ControllersChangeResult(Type):
         result_ = ControllersChanges.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, ControllersChanges)):
+        if result_ is not None and not isinstance(result_, (dict, ControllersChanges)):
             raise Exception("Expected result_ to be a ControllersChanges, received: {}".format(type(result_)))
 
         self.error = error_
@@ -5929,7 +5923,7 @@ class ControllersSpec(Type):
         series_ = series
 
         # Validate arguments against known Juju API types.
-        if constraints_ is not None and not isinstance(constraints_, (dict, set, Value)):
+        if constraints_ is not None and not isinstance(constraints_, (dict, Value)):
             raise Exception("Expected constraints_ to be a Value, received: {}".format(type(constraints_)))
 
         if num_controllers_ is not None and not isinstance(num_controllers_, int):
@@ -6037,7 +6031,7 @@ class CredentialContent(Type):
         name_ = name
 
         # Validate arguments against known Juju API types.
-        if attrs_ is not None and not isinstance(attrs_, (dict, set)):
+        if attrs_ is not None and not isinstance(attrs_, dict):
             raise Exception("Expected attrs_ to be a Mapping, received: {}".format(type(attrs_)))
 
         if auth_type_ is not None and not isinstance(auth_type_, (bytes, str)):
@@ -6069,10 +6063,10 @@ class CredentialContentResult(Type):
         result_ = ControllerCredentialInfo.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, ControllerCredentialInfo)):
+        if result_ is not None and not isinstance(result_, (dict, ControllerCredentialInfo)):
             raise Exception("Expected result_ to be a ControllerCredentialInfo, received: {}".format(type(result_)))
 
         self.error = error_
@@ -6104,16 +6098,13 @@ class Delta(Type):
     _toPy = {'entity': 'entity', 'removed': 'removed'}
     def __init__(self, entity=None, removed=None, **unknown_fields):
         '''
-        entity : typing.Mapping[str, typing.Any]
+        entity : Any
         removed : bool
         '''
         entity_ = entity
         removed_ = removed
 
         # Validate arguments against known Juju API types.
-        if entity_ is not None and not isinstance(entity_, (dict, set)):
-            raise Exception("Expected entity_ to be a Mapping, received: {}".format(type(entity_)))
-
         if removed_ is not None and not isinstance(removed_, bool):
             raise Exception("Expected removed_ to be a bool, received: {}".format(type(removed_)))
 
@@ -6243,10 +6234,10 @@ class DestroyApplicationResult(Type):
         info_ = DestroyApplicationInfo.from_json(info) if info else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if info_ is not None and not isinstance(info_, (dict, set, DestroyApplicationInfo)):
+        if info_ is not None and not isinstance(info_, (dict, DestroyApplicationInfo)):
             raise Exception("Expected info_ to be a DestroyApplicationInfo, received: {}".format(type(info_)))
 
         self.error = error_
@@ -6411,10 +6402,10 @@ class DestroyMachineResult(Type):
         info_ = DestroyMachineInfo.from_json(info) if info else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if info_ is not None and not isinstance(info_, (dict, set, DestroyMachineInfo)):
+        if info_ is not None and not isinstance(info_, (dict, DestroyMachineInfo)):
             raise Exception("Expected info_ to be a DestroyMachineInfo, received: {}".format(type(info_)))
 
         self.error = error_
@@ -6663,10 +6654,10 @@ class DestroyUnitResult(Type):
         info_ = DestroyUnitInfo.from_json(info) if info else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if info_ is not None and not isinstance(info_, (dict, set, DestroyUnitInfo)):
+        if info_ is not None and not isinstance(info_, (dict, DestroyUnitInfo)):
             raise Exception("Expected info_ to be a DestroyUnitInfo, received: {}".format(type(info_)))
 
         self.error = error_
@@ -6735,10 +6726,10 @@ class DetailedStatus(Type):
         version_ = version
 
         # Validate arguments against known Juju API types.
-        if data_ is not None and not isinstance(data_, (dict, set)):
+        if data_ is not None and not isinstance(data_, dict):
             raise Exception("Expected data_ to be a Mapping, received: {}".format(type(data_)))
 
-        if err_ is not None and not isinstance(err_, (dict, set, Error)):
+        if err_ is not None and not isinstance(err_, (dict, Error)):
             raise Exception("Expected err_ to be a Error, received: {}".format(type(err_)))
 
         if info_ is not None and not isinstance(info_, (bytes, str)):
@@ -6831,7 +6822,7 @@ class DistributionGroupResult(Type):
         result_ = result
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if result_ is not None and not isinstance(result_, (bytes, str, list)):
@@ -6900,7 +6891,7 @@ class Endpoint(Type):
         if application_name_ is not None and not isinstance(application_name_, (bytes, str)):
             raise Exception("Expected application_name_ to be a str, received: {}".format(type(application_name_)))
 
-        if relation_ is not None and not isinstance(relation_, (dict, set, CharmRelation)):
+        if relation_ is not None and not isinstance(relation_, (dict, CharmRelation)):
             raise Exception("Expected relation_ to be a CharmRelation, received: {}".format(type(relation_)))
 
         self.application_name = application_name_
@@ -7044,7 +7035,7 @@ class EntitiesResult(Type):
         if entities_ is not None and not isinstance(entities_, (bytes, str, list)):
             raise Exception("Expected entities_ to be a Sequence, received: {}".format(type(entities_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         self.entities = entities_
@@ -7106,7 +7097,7 @@ class EntitiesWatchResult(Type):
         if changes_ is not None and not isinstance(changes_, (bytes, str, list)):
             raise Exception("Expected changes_ to be a Sequence, received: {}".format(type(changes_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if watcher_id_ is not None and not isinstance(watcher_id_, (bytes, str)):
@@ -7149,7 +7140,7 @@ class EntityAnnotations(Type):
         entity_ = entity
 
         # Validate arguments against known Juju API types.
-        if annotations_ is not None and not isinstance(annotations_, (dict, set)):
+        if annotations_ is not None and not isinstance(annotations_, dict):
             raise Exception("Expected annotations_ to be a Mapping, received: {}".format(type(annotations_)))
 
         if entity_ is not None and not isinstance(entity_, (bytes, str)):
@@ -7197,7 +7188,7 @@ class EntityMacaroonArg(Type):
         tag_ = tag
 
         # Validate arguments against known Juju API types.
-        if macaroon_ is not None and not isinstance(macaroon_, (dict, set, Macaroon)):
+        if macaroon_ is not None and not isinstance(macaroon_, (dict, Macaroon)):
             raise Exception("Expected macaroon_ to be a Macaroon, received: {}".format(type(macaroon_)))
 
         if tag_ is not None and not isinstance(tag_, (bytes, str)):
@@ -7239,7 +7230,7 @@ class EntityMetrics(Type):
         metrics_ = [MetricResult.from_json(o) for o in metrics or []]
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if metrics_ is not None and not isinstance(metrics_, (bytes, str, list)):
@@ -7345,7 +7336,7 @@ class EntityStatus(Type):
         status_ = status
 
         # Validate arguments against known Juju API types.
-        if data_ is not None and not isinstance(data_, (dict, set)):
+        if data_ is not None and not isinstance(data_, dict):
             raise Exception("Expected data_ to be a Mapping, received: {}".format(type(data_)))
 
         if info_ is not None and not isinstance(info_, (bytes, str)):
@@ -7381,7 +7372,7 @@ class EntityStatusArgs(Type):
         tag_ = tag
 
         # Validate arguments against known Juju API types.
-        if data_ is not None and not isinstance(data_, (dict, set)):
+        if data_ is not None and not isinstance(data_, dict):
             raise Exception("Expected data_ to be a Mapping, received: {}".format(type(data_)))
 
         if info_ is not None and not isinstance(info_, (bytes, str)):
@@ -7440,7 +7431,7 @@ class EntityVersion(Type):
         if tag_ is not None and not isinstance(tag_, (bytes, str)):
             raise Exception("Expected tag_ to be a str, received: {}".format(type(tag_)))
 
-        if tools_ is not None and not isinstance(tools_, (dict, set, Version)):
+        if tools_ is not None and not isinstance(tools_, (dict, Version)):
             raise Exception("Expected tools_ to be a Version, received: {}".format(type(tools_)))
 
         self.tag = tag_
@@ -7544,7 +7535,7 @@ class Error(Type):
         if code_ is not None and not isinstance(code_, (bytes, str)):
             raise Exception("Expected code_ to be a str, received: {}".format(type(code_)))
 
-        if info_ is not None and not isinstance(info_, (dict, set)):
+        if info_ is not None and not isinstance(info_, dict):
             raise Exception("Expected info_ to be a Mapping, received: {}".format(type(info_)))
 
         if message_ is not None and not isinstance(message_, (bytes, str)):
@@ -7569,7 +7560,7 @@ class ErrorInfo(Type):
         macaroon_path_ = macaroon_path
 
         # Validate arguments against known Juju API types.
-        if macaroon_ is not None and not isinstance(macaroon_, (dict, set, Macaroon)):
+        if macaroon_ is not None and not isinstance(macaroon_, (dict, Macaroon)):
             raise Exception("Expected macaroon_ to be a Macaroon, received: {}".format(type(macaroon_)))
 
         if macaroon_path_ is not None and not isinstance(macaroon_path_, (bytes, str)):
@@ -7591,7 +7582,7 @@ class ErrorResult(Type):
         error_ = Error.from_json(error) if error else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         self.error = error_
@@ -7665,10 +7656,10 @@ class ExternalControllerInfoResult(Type):
         result_ = ExternalControllerInfo.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, ExternalControllerInfo)):
+        if result_ is not None and not isinstance(result_, (dict, ExternalControllerInfo)):
             raise Exception("Expected result_ to be a ExternalControllerInfo, received: {}".format(type(result_)))
 
         self.error = error_
@@ -7754,7 +7745,7 @@ class Filesystem(Type):
         if filesystem_tag_ is not None and not isinstance(filesystem_tag_, (bytes, str)):
             raise Exception("Expected filesystem_tag_ to be a str, received: {}".format(type(filesystem_tag_)))
 
-        if info_ is not None and not isinstance(info_, (dict, set, FilesystemInfo)):
+        if info_ is not None and not isinstance(info_, (dict, FilesystemInfo)):
             raise Exception("Expected info_ to be a FilesystemInfo, received: {}".format(type(info_)))
 
         if volume_tag_ is not None and not isinstance(volume_tag_, (bytes, str)):
@@ -7784,7 +7775,7 @@ class FilesystemAttachment(Type):
         if filesystem_tag_ is not None and not isinstance(filesystem_tag_, (bytes, str)):
             raise Exception("Expected filesystem_tag_ to be a str, received: {}".format(type(filesystem_tag_)))
 
-        if info_ is not None and not isinstance(info_, (dict, set, FilesystemAttachmentInfo)):
+        if info_ is not None and not isinstance(info_, (dict, FilesystemAttachmentInfo)):
             raise Exception("Expected info_ to be a FilesystemAttachmentInfo, received: {}".format(type(info_)))
 
         if machine_tag_ is not None and not isinstance(machine_tag_, (bytes, str)):
@@ -7813,7 +7804,7 @@ class FilesystemAttachmentDetails(Type):
         read_only_ = read_only
 
         # Validate arguments against known Juju API types.
-        if filesystemattachmentinfo_ is not None and not isinstance(filesystemattachmentinfo_, (dict, set, FilesystemAttachmentInfo)):
+        if filesystemattachmentinfo_ is not None and not isinstance(filesystemattachmentinfo_, (dict, FilesystemAttachmentInfo)):
             raise Exception("Expected filesystemattachmentinfo_ to be a FilesystemAttachmentInfo, received: {}".format(type(filesystemattachmentinfo_)))
 
         if life_ is not None and not isinstance(life_, (bytes, str)):
@@ -7923,10 +7914,10 @@ class FilesystemAttachmentParamsResult(Type):
         result_ = FilesystemAttachmentParams.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, FilesystemAttachmentParams)):
+        if result_ is not None and not isinstance(result_, (dict, FilesystemAttachmentParams)):
             raise Exception("Expected result_ to be a FilesystemAttachmentParams, received: {}".format(type(result_)))
 
         self.error = error_
@@ -7965,10 +7956,10 @@ class FilesystemAttachmentResult(Type):
         result_ = FilesystemAttachment.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, FilesystemAttachment)):
+        if result_ is not None and not isinstance(result_, (dict, FilesystemAttachment)):
             raise Exception("Expected result_ to be a FilesystemAttachment, received: {}".format(type(result_)))
 
         self.error = error_
@@ -8040,22 +8031,22 @@ class FilesystemDetails(Type):
         if filesystem_tag_ is not None and not isinstance(filesystem_tag_, (bytes, str)):
             raise Exception("Expected filesystem_tag_ to be a str, received: {}".format(type(filesystem_tag_)))
 
-        if info_ is not None and not isinstance(info_, (dict, set, FilesystemInfo)):
+        if info_ is not None and not isinstance(info_, (dict, FilesystemInfo)):
             raise Exception("Expected info_ to be a FilesystemInfo, received: {}".format(type(info_)))
 
         if life_ is not None and not isinstance(life_, (bytes, str)):
             raise Exception("Expected life_ to be a str, received: {}".format(type(life_)))
 
-        if machine_attachments_ is not None and not isinstance(machine_attachments_, (dict, set)):
+        if machine_attachments_ is not None and not isinstance(machine_attachments_, dict):
             raise Exception("Expected machine_attachments_ to be a Mapping, received: {}".format(type(machine_attachments_)))
 
-        if status_ is not None and not isinstance(status_, (dict, set, EntityStatus)):
+        if status_ is not None and not isinstance(status_, (dict, EntityStatus)):
             raise Exception("Expected status_ to be a EntityStatus, received: {}".format(type(status_)))
 
-        if storage_ is not None and not isinstance(storage_, (dict, set, StorageDetails)):
+        if storage_ is not None and not isinstance(storage_, (dict, StorageDetails)):
             raise Exception("Expected storage_ to be a StorageDetails, received: {}".format(type(storage_)))
 
-        if unit_attachments_ is not None and not isinstance(unit_attachments_, (dict, set)):
+        if unit_attachments_ is not None and not isinstance(unit_attachments_, dict):
             raise Exception("Expected unit_attachments_ to be a Mapping, received: {}".format(type(unit_attachments_)))
 
         if volume_tag_ is not None and not isinstance(volume_tag_, (bytes, str)):
@@ -8085,7 +8076,7 @@ class FilesystemDetailsListResult(Type):
         result_ = [FilesystemDetails.from_json(o) for o in result or []]
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if result_ is not None and not isinstance(result_, (bytes, str, list)):
@@ -8203,10 +8194,10 @@ class FilesystemParams(Type):
         volume_tag_ = volume_tag
 
         # Validate arguments against known Juju API types.
-        if attachment_ is not None and not isinstance(attachment_, (dict, set, FilesystemAttachmentParams)):
+        if attachment_ is not None and not isinstance(attachment_, (dict, FilesystemAttachmentParams)):
             raise Exception("Expected attachment_ to be a FilesystemAttachmentParams, received: {}".format(type(attachment_)))
 
-        if attributes_ is not None and not isinstance(attributes_, (dict, set)):
+        if attributes_ is not None and not isinstance(attributes_, dict):
             raise Exception("Expected attributes_ to be a Mapping, received: {}".format(type(attributes_)))
 
         if filesystem_tag_ is not None and not isinstance(filesystem_tag_, (bytes, str)):
@@ -8218,7 +8209,7 @@ class FilesystemParams(Type):
         if size_ is not None and not isinstance(size_, int):
             raise Exception("Expected size_ to be a int, received: {}".format(type(size_)))
 
-        if tags_ is not None and not isinstance(tags_, (dict, set)):
+        if tags_ is not None and not isinstance(tags_, dict):
             raise Exception("Expected tags_ to be a Mapping, received: {}".format(type(tags_)))
 
         if volume_tag_ is not None and not isinstance(volume_tag_, (bytes, str)):
@@ -8247,10 +8238,10 @@ class FilesystemParamsResult(Type):
         result_ = FilesystemParams.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, FilesystemParams)):
+        if result_ is not None and not isinstance(result_, (dict, FilesystemParams)):
             raise Exception("Expected result_ to be a FilesystemParams, received: {}".format(type(result_)))
 
         self.error = error_
@@ -8289,10 +8280,10 @@ class FilesystemResult(Type):
         result_ = Filesystem.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, Filesystem)):
+        if result_ is not None and not isinstance(result_, (dict, Filesystem)):
             raise Exception("Expected result_ to be a Filesystem, received: {}".format(type(result_)))
 
         self.error = error_
@@ -8423,7 +8414,7 @@ class FindToolsParams(Type):
         if minor_ is not None and not isinstance(minor_, int):
             raise Exception("Expected minor_ to be a int, received: {}".format(type(minor_)))
 
-        if number_ is not None and not isinstance(number_, (dict, set, Number)):
+        if number_ is not None and not isinstance(number_, (dict, Number)):
             raise Exception("Expected number_ to be a Number, received: {}".format(type(number_)))
 
         if series_ is not None and not isinstance(series_, (bytes, str)):
@@ -8451,7 +8442,7 @@ class FindToolsResult(Type):
         list__ = [Tools.from_json(o) for o in list_ or []]
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if list__ is not None and not isinstance(list__, (bytes, str, list)):
@@ -8529,28 +8520,28 @@ class FullStatus(Type):
         remote_applications_ = remote_applications
 
         # Validate arguments against known Juju API types.
-        if applications_ is not None and not isinstance(applications_, (dict, set)):
+        if applications_ is not None and not isinstance(applications_, dict):
             raise Exception("Expected applications_ to be a Mapping, received: {}".format(type(applications_)))
 
-        if branches_ is not None and not isinstance(branches_, (dict, set)):
+        if branches_ is not None and not isinstance(branches_, dict):
             raise Exception("Expected branches_ to be a Mapping, received: {}".format(type(branches_)))
 
         if controller_timestamp_ is not None and not isinstance(controller_timestamp_, (bytes, str)):
             raise Exception("Expected controller_timestamp_ to be a str, received: {}".format(type(controller_timestamp_)))
 
-        if machines_ is not None and not isinstance(machines_, (dict, set)):
+        if machines_ is not None and not isinstance(machines_, dict):
             raise Exception("Expected machines_ to be a Mapping, received: {}".format(type(machines_)))
 
-        if model_ is not None and not isinstance(model_, (dict, set, ModelStatusInfo)):
+        if model_ is not None and not isinstance(model_, (dict, ModelStatusInfo)):
             raise Exception("Expected model_ to be a ModelStatusInfo, received: {}".format(type(model_)))
 
-        if offers_ is not None and not isinstance(offers_, (dict, set)):
+        if offers_ is not None and not isinstance(offers_, dict):
             raise Exception("Expected offers_ to be a Mapping, received: {}".format(type(offers_)))
 
         if relations_ is not None and not isinstance(relations_, (bytes, str, list)):
             raise Exception("Expected relations_ to be a Sequence, received: {}".format(type(relations_)))
 
-        if remote_applications_ is not None and not isinstance(remote_applications_, (dict, set)):
+        if remote_applications_ is not None and not isinstance(remote_applications_, dict):
             raise Exception("Expected remote_applications_ to be a Mapping, received: {}".format(type(remote_applications_)))
 
         self.applications = applications_
@@ -8622,7 +8613,7 @@ class GenerationApplication(Type):
         if application_ is not None and not isinstance(application_, (bytes, str)):
             raise Exception("Expected application_ to be a str, received: {}".format(type(application_)))
 
-        if config_ is not None and not isinstance(config_, (dict, set)):
+        if config_ is not None and not isinstance(config_, dict):
             raise Exception("Expected config_ to be a Mapping, received: {}".format(type(config_)))
 
         if pending_ is not None and not isinstance(pending_, (bytes, str, list)):
@@ -8655,7 +8646,7 @@ class GenerationResults(Type):
         generations_ = [Generation.from_json(o) for o in generations or []]
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if generations_ is not None and not isinstance(generations_, (bytes, str, list)):
@@ -8695,7 +8686,7 @@ class GetConstraintsResults(Type):
         constraints_ = Value.from_json(constraints) if constraints else None
 
         # Validate arguments against known Juju API types.
-        if constraints_ is not None and not isinstance(constraints_, (dict, set, Value)):
+        if constraints_ is not None and not isinstance(constraints_, (dict, Value)):
             raise Exception("Expected constraints_ to be a Value, received: {}".format(type(constraints_)))
 
         self.constraints = constraints_
@@ -8733,10 +8724,10 @@ class GetLeadershipSettingsResult(Type):
         settings_ = settings
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if settings_ is not None and not isinstance(settings_, (dict, set)):
+        if settings_ is not None and not isinstance(settings_, dict):
             raise Exception("Expected settings_ to be a Mapping, received: {}".format(type(settings_)))
 
         self.error = error_
@@ -8793,10 +8784,10 @@ class GoalState(Type):
         units_ = units
 
         # Validate arguments against known Juju API types.
-        if relations_ is not None and not isinstance(relations_, (dict, set)):
+        if relations_ is not None and not isinstance(relations_, dict):
             raise Exception("Expected relations_ to be a Mapping, received: {}".format(type(relations_)))
 
-        if units_ is not None and not isinstance(units_, (dict, set)):
+        if units_ is not None and not isinstance(units_, dict):
             raise Exception("Expected units_ to be a Mapping, received: {}".format(type(units_)))
 
         self.relations = relations_
@@ -8817,10 +8808,10 @@ class GoalStateResult(Type):
         result_ = GoalState.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, GoalState)):
+        if result_ is not None and not isinstance(result_, (dict, GoalState)):
             raise Exception("Expected result_ to be a GoalState, received: {}".format(type(result_)))
 
         self.error = error_
@@ -8885,7 +8876,7 @@ class HAMember(Type):
         tag_ = tag
 
         # Validate arguments against known Juju API types.
-        if public_address_ is not None and not isinstance(public_address_, (dict, set, Address)):
+        if public_address_ is not None and not isinstance(public_address_, (dict, Address)):
             raise Exception("Expected public_address_ to be a Address, received: {}".format(type(public_address_)))
 
         if series_ is not None and not isinstance(series_, (bytes, str)):
@@ -8973,7 +8964,7 @@ class History(Type):
         statuses_ = [DetailedStatus.from_json(o) for o in statuses or []]
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if statuses_ is not None and not isinstance(statuses_, (bytes, str, list)):
@@ -8999,7 +8990,7 @@ class HostNetworkChange(Type):
         reconfigure_delay_ = reconfigure_delay
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if new_bridges_ is not None and not isinstance(new_bridges_, (bytes, str, list)):
@@ -9055,7 +9046,7 @@ class HostPort(Type):
         value_ = value
 
         # Validate arguments against known Juju API types.
-        if address_ is not None and not isinstance(address_, (dict, set, Address)):
+        if address_ is not None and not isinstance(address_, (dict, Address)):
             raise Exception("Expected address_ to be a Address, received: {}".format(type(address_)))
 
         if port_ is not None and not isinstance(port_, int):
@@ -9105,13 +9096,13 @@ class HostedModelConfig(Type):
         owner_ = owner
 
         # Validate arguments against known Juju API types.
-        if cloud_spec_ is not None and not isinstance(cloud_spec_, (dict, set, CloudSpec)):
+        if cloud_spec_ is not None and not isinstance(cloud_spec_, (dict, CloudSpec)):
             raise Exception("Expected cloud_spec_ to be a CloudSpec, received: {}".format(type(cloud_spec_)))
 
-        if config_ is not None and not isinstance(config_, (dict, set)):
+        if config_ is not None and not isinstance(config_, dict):
             raise Exception("Expected config_ to be a Mapping, received: {}".format(type(config_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if name_ is not None and not isinstance(name_, (bytes, str)):
@@ -9351,10 +9342,10 @@ class ImportStorageResult(Type):
         result_ = ImportStorageDetails.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, ImportStorageDetails)):
+        if result_ is not None and not isinstance(result_, (dict, ImportStorageDetails)):
             raise Exception("Expected result_ to be a ImportStorageDetails, received: {}".format(type(result_)))
 
         self.error = error_
@@ -9473,7 +9464,7 @@ class InitiateMigrationResult(Type):
         model_tag_ = model_tag
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if migration_id_ is not None and not isinstance(migration_id_, (bytes, str)):
@@ -9533,7 +9524,7 @@ class InstanceInfo(Type):
         volumes_ = [Volume.from_json(o) for o in volumes or []]
 
         # Validate arguments against known Juju API types.
-        if characteristics_ is not None and not isinstance(characteristics_, (dict, set, HardwareCharacteristics)):
+        if characteristics_ is not None and not isinstance(characteristics_, (dict, HardwareCharacteristics)):
             raise Exception("Expected characteristics_ to be a HardwareCharacteristics, received: {}".format(type(characteristics_)))
 
         if charm_profiles_ is not None and not isinstance(charm_profiles_, (bytes, str, list)):
@@ -9554,7 +9545,7 @@ class InstanceInfo(Type):
         if tag_ is not None and not isinstance(tag_, (bytes, str)):
             raise Exception("Expected tag_ to be a str, received: {}".format(type(tag_)))
 
-        if volume_attachments_ is not None and not isinstance(volume_attachments_, (dict, set)):
+        if volume_attachments_ is not None and not isinstance(volume_attachments_, dict):
             raise Exception("Expected volume_attachments_ to be a Mapping, received: {}".format(type(volume_attachments_)))
 
         if volumes_ is not None and not isinstance(volumes_, (bytes, str, list)):
@@ -9660,7 +9651,7 @@ class InstanceTypesResult(Type):
         if cost_unit_ is not None and not isinstance(cost_unit_, (bytes, str)):
             raise Exception("Expected cost_unit_ to be a str, received: {}".format(type(cost_unit_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if instance_types_ is not None and not isinstance(instance_types_, (bytes, str, list)):
@@ -9723,7 +9714,7 @@ class IntResult(Type):
         result_ = result
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if result_ is not None and not isinstance(result_, int):
@@ -9849,7 +9840,7 @@ class JobsResult(Type):
         jobs_ = jobs
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if jobs_ is not None and not isinstance(jobs_, (bytes, str, list)):
@@ -9935,7 +9926,7 @@ class KubernetesDeviceParams(Type):
         type__ = type_
 
         # Validate arguments against known Juju API types.
-        if attributes_ is not None and not isinstance(attributes_, (dict, set)):
+        if attributes_ is not None and not isinstance(attributes_, dict):
             raise Exception("Expected attributes_ to be a Mapping, received: {}".format(type(attributes_)))
 
         if count_ is not None and not isinstance(count_, int):
@@ -10009,7 +10000,7 @@ class KubernetesFilesystemInfo(Type):
         volume_ = KubernetesVolumeInfo.from_json(volume) if volume else None
 
         # Validate arguments against known Juju API types.
-        if data_ is not None and not isinstance(data_, (dict, set)):
+        if data_ is not None and not isinstance(data_, dict):
             raise Exception("Expected data_ to be a Mapping, received: {}".format(type(data_)))
 
         if filesystem_id_ is not None and not isinstance(filesystem_id_, (bytes, str)):
@@ -10036,7 +10027,7 @@ class KubernetesFilesystemInfo(Type):
         if storagename_ is not None and not isinstance(storagename_, (bytes, str)):
             raise Exception("Expected storagename_ to be a str, received: {}".format(type(storagename_)))
 
-        if volume_ is not None and not isinstance(volume_, (dict, set, KubernetesVolumeInfo)):
+        if volume_ is not None and not isinstance(volume_, (dict, KubernetesVolumeInfo)):
             raise Exception("Expected volume_ to be a KubernetesVolumeInfo, received: {}".format(type(volume_)))
 
         self.data = data_
@@ -10073,10 +10064,10 @@ class KubernetesFilesystemParams(Type):
         tags_ = tags
 
         # Validate arguments against known Juju API types.
-        if attachment_ is not None and not isinstance(attachment_, (dict, set, KubernetesFilesystemAttachmentParams)):
+        if attachment_ is not None and not isinstance(attachment_, (dict, KubernetesFilesystemAttachmentParams)):
             raise Exception("Expected attachment_ to be a KubernetesFilesystemAttachmentParams, received: {}".format(type(attachment_)))
 
-        if attributes_ is not None and not isinstance(attributes_, (dict, set)):
+        if attributes_ is not None and not isinstance(attributes_, dict):
             raise Exception("Expected attributes_ to be a Mapping, received: {}".format(type(attributes_)))
 
         if provider_ is not None and not isinstance(provider_, (bytes, str)):
@@ -10088,7 +10079,7 @@ class KubernetesFilesystemParams(Type):
         if storagename_ is not None and not isinstance(storagename_, (bytes, str)):
             raise Exception("Expected storagename_ to be a str, received: {}".format(type(storagename_)))
 
-        if tags_ is not None and not isinstance(tags_, (dict, set)):
+        if tags_ is not None and not isinstance(tags_, dict):
             raise Exception("Expected tags_ to be a Mapping, received: {}".format(type(tags_)))
 
         self.attachment = attachment_
@@ -10123,10 +10114,10 @@ class KubernetesProvisioningInfo(Type):
         volumes_ = [KubernetesVolumeParams.from_json(o) for o in volumes or []]
 
         # Validate arguments against known Juju API types.
-        if constraints_ is not None and not isinstance(constraints_, (dict, set, Value)):
+        if constraints_ is not None and not isinstance(constraints_, (dict, Value)):
             raise Exception("Expected constraints_ to be a Value, received: {}".format(type(constraints_)))
 
-        if deployment_info_ is not None and not isinstance(deployment_info_, (dict, set, KubernetesDeploymentInfo)):
+        if deployment_info_ is not None and not isinstance(deployment_info_, (dict, KubernetesDeploymentInfo)):
             raise Exception("Expected deployment_info_ to be a KubernetesDeploymentInfo, received: {}".format(type(deployment_info_)))
 
         if devices_ is not None and not isinstance(devices_, (bytes, str, list)):
@@ -10138,7 +10129,7 @@ class KubernetesProvisioningInfo(Type):
         if pod_spec_ is not None and not isinstance(pod_spec_, (bytes, str)):
             raise Exception("Expected pod_spec_ to be a str, received: {}".format(type(pod_spec_)))
 
-        if tags_ is not None and not isinstance(tags_, (dict, set)):
+        if tags_ is not None and not isinstance(tags_, dict):
             raise Exception("Expected tags_ to be a Mapping, received: {}".format(type(tags_)))
 
         if volumes_ is not None and not isinstance(volumes_, (bytes, str, list)):
@@ -10167,10 +10158,10 @@ class KubernetesProvisioningInfoResult(Type):
         result_ = KubernetesProvisioningInfo.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, KubernetesProvisioningInfo)):
+        if result_ is not None and not isinstance(result_, (dict, KubernetesProvisioningInfo)):
             raise Exception("Expected result_ to be a KubernetesProvisioningInfo, received: {}".format(type(result_)))
 
         self.error = error_
@@ -10212,7 +10203,7 @@ class KubernetesUpgradeArg(Type):
         if agent_tag_ is not None and not isinstance(agent_tag_, (bytes, str)):
             raise Exception("Expected agent_tag_ to be a str, received: {}".format(type(agent_tag_)))
 
-        if version_ is not None and not isinstance(version_, (dict, set, Number)):
+        if version_ is not None and not isinstance(version_, (dict, Number)):
             raise Exception("Expected version_ to be a Number, received: {}".format(type(version_)))
 
         self.agent_tag = agent_tag_
@@ -10267,7 +10258,7 @@ class KubernetesVolumeInfo(Type):
         volume_id_ = volume_id
 
         # Validate arguments against known Juju API types.
-        if data_ is not None and not isinstance(data_, (dict, set)):
+        if data_ is not None and not isinstance(data_, dict):
             raise Exception("Expected data_ to be a Mapping, received: {}".format(type(data_)))
 
         if info_ is not None and not isinstance(info_, (bytes, str)):
@@ -10319,10 +10310,10 @@ class KubernetesVolumeParams(Type):
         tags_ = tags
 
         # Validate arguments against known Juju API types.
-        if attachment_ is not None and not isinstance(attachment_, (dict, set, KubernetesVolumeAttachmentParams)):
+        if attachment_ is not None and not isinstance(attachment_, (dict, KubernetesVolumeAttachmentParams)):
             raise Exception("Expected attachment_ to be a KubernetesVolumeAttachmentParams, received: {}".format(type(attachment_)))
 
-        if attributes_ is not None and not isinstance(attributes_, (dict, set)):
+        if attributes_ is not None and not isinstance(attributes_, dict):
             raise Exception("Expected attributes_ to be a Mapping, received: {}".format(type(attributes_)))
 
         if provider_ is not None and not isinstance(provider_, (bytes, str)):
@@ -10334,7 +10325,7 @@ class KubernetesVolumeParams(Type):
         if storagename_ is not None and not isinstance(storagename_, (bytes, str)):
             raise Exception("Expected storagename_ to be a str, received: {}".format(type(storagename_)))
 
-        if tags_ is not None and not isinstance(tags_, (dict, set)):
+        if tags_ is not None and not isinstance(tags_, dict):
             raise Exception("Expected tags_ to be a Mapping, received: {}".format(type(tags_)))
 
         self.attachment = attachment_
@@ -10361,13 +10352,13 @@ class LXDProfile(Type):
         devices_ = devices
 
         # Validate arguments against known Juju API types.
-        if config_ is not None and not isinstance(config_, (dict, set)):
+        if config_ is not None and not isinstance(config_, dict):
             raise Exception("Expected config_ to be a Mapping, received: {}".format(type(config_)))
 
         if description_ is not None and not isinstance(description_, (bytes, str)):
             raise Exception("Expected description_ to be a str, received: {}".format(type(description_)))
 
-        if devices_ is not None and not isinstance(devices_, (dict, set)):
+        if devices_ is not None and not isinstance(devices_, dict):
             raise Exception("Expected devices_ to be a Mapping, received: {}".format(type(devices_)))
 
         self.config = config_
@@ -10389,7 +10380,7 @@ class LXDProfileUpgradeMessages(Type):
         watcher_id_ = watcher_id
 
         # Validate arguments against known Juju API types.
-        if application_ is not None and not isinstance(application_, (dict, set, Entity)):
+        if application_ is not None and not isinstance(application_, (dict, Entity)):
             raise Exception("Expected application_ to be a Entity, received: {}".format(type(application_)))
 
         if watcher_id_ is not None and not isinstance(watcher_id_, (bytes, str)):
@@ -10415,7 +10406,7 @@ class LXDProfileUpgradeMessagesResult(Type):
         unit_name_ = unit_name
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if message_ is not None and not isinstance(message_, (bytes, str)):
@@ -10461,7 +10452,7 @@ class LifeResult(Type):
         life_ = life
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if life_ is not None and not isinstance(life_, (bytes, str)):
@@ -10521,7 +10512,7 @@ class ListCloudInfo(Type):
         user_access_ = user_access
 
         # Validate arguments against known Juju API types.
-        if clouddetails_ is not None and not isinstance(clouddetails_, (dict, set, CloudDetails)):
+        if clouddetails_ is not None and not isinstance(clouddetails_, (dict, CloudDetails)):
             raise Exception("Expected clouddetails_ to be a CloudDetails, received: {}".format(type(clouddetails_)))
 
         if user_access_ is not None and not isinstance(user_access_, (bytes, str)):
@@ -10545,10 +10536,10 @@ class ListCloudInfoResult(Type):
         result_ = ListCloudInfo.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, ListCloudInfo)):
+        if result_ is not None and not isinstance(result_, (dict, ListCloudInfo)):
             raise Exception("Expected result_ to be a ListCloudInfo, received: {}".format(type(result_)))
 
         self.error = error_
@@ -10665,7 +10656,7 @@ class ListSSHKeys(Type):
         mode_ = mode
 
         # Validate arguments against known Juju API types.
-        if entities_ is not None and not isinstance(entities_, (dict, set, Entities)):
+        if entities_ is not None and not isinstance(entities_, (dict, Entities)):
             raise Exception("Expected entities_ to be a Entities, received: {}".format(type(entities_)))
 
         if mode_ is not None and not isinstance(mode_, bool):
@@ -10763,7 +10754,7 @@ class LogForwardingGetLastSentResult(Type):
         record_timestamp_ = record_timestamp
 
         # Validate arguments against known Juju API types.
-        if err_ is not None and not isinstance(err_, (dict, set, Error)):
+        if err_ is not None and not isinstance(err_, (dict, Error)):
             raise Exception("Expected err_ to be a Error, received: {}".format(type(err_)))
 
         if record_id_ is not None and not isinstance(record_id_, int):
@@ -10839,7 +10830,7 @@ class LogForwardingSetLastSentParam(Type):
         sink_ = sink
 
         # Validate arguments against known Juju API types.
-        if logforwardingid_ is not None and not isinstance(logforwardingid_, (dict, set, LogForwardingID)):
+        if logforwardingid_ is not None and not isinstance(logforwardingid_, (dict, LogForwardingID)):
             raise Exception("Expected logforwardingid_ to be a LogForwardingID, received: {}".format(type(logforwardingid_)))
 
         if model_ is not None and not isinstance(model_, (bytes, str)):
@@ -10988,10 +10979,10 @@ class MacaroonResult(Type):
         result_ = Macaroon.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, Macaroon)):
+        if result_ is not None and not isinstance(result_, (dict, Macaroon)):
             raise Exception("Expected result_ to be a Macaroon, received: {}".format(type(result_)))
 
         self.error = error_
@@ -11057,7 +11048,7 @@ class MachineAddressesResult(Type):
         if addresses_ is not None and not isinstance(addresses_, (bytes, str, list)):
             raise Exception("Expected addresses_ to be a Sequence, received: {}".format(type(addresses_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         self.addresses = addresses_
@@ -11128,7 +11119,7 @@ class MachineContainerResult(Type):
         if determined_ is not None and not isinstance(determined_, bool):
             raise Exception("Expected determined_ to be a bool, received: {}".format(type(determined_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         self.container_types = container_types_
@@ -11264,7 +11255,7 @@ class MachineNetworkConfigResult(Type):
         info_ = [NetworkConfig.from_json(o) for o in info or []]
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if info_ is not None and not isinstance(info_, (bytes, str, list)):
@@ -11308,7 +11299,7 @@ class MachinePortRange(Type):
         unit_tag_ = unit_tag
 
         # Validate arguments against known Juju API types.
-        if port_range_ is not None and not isinstance(port_range_, (dict, set, PortRange)):
+        if port_range_ is not None and not isinstance(port_range_, (dict, PortRange)):
             raise Exception("Expected port_range_ to be a PortRange, received: {}".format(type(port_range_)))
 
         if relation_tag_ is not None and not isinstance(relation_tag_, (bytes, str)):
@@ -11378,7 +11369,7 @@ class MachinePortsResult(Type):
         ports_ = [MachinePortRange.from_json(o) for o in ports or []]
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if ports_ is not None and not isinstance(ports_, (bytes, str, list)):
@@ -11450,13 +11441,13 @@ class MachineStatus(Type):
         wants_vote_ = wants_vote
 
         # Validate arguments against known Juju API types.
-        if agent_status_ is not None and not isinstance(agent_status_, (dict, set, DetailedStatus)):
+        if agent_status_ is not None and not isinstance(agent_status_, (dict, DetailedStatus)):
             raise Exception("Expected agent_status_ to be a DetailedStatus, received: {}".format(type(agent_status_)))
 
         if constraints_ is not None and not isinstance(constraints_, (bytes, str)):
             raise Exception("Expected constraints_ to be a str, received: {}".format(type(constraints_)))
 
-        if containers_ is not None and not isinstance(containers_, (dict, set)):
+        if containers_ is not None and not isinstance(containers_, dict):
             raise Exception("Expected containers_ to be a Mapping, received: {}".format(type(containers_)))
 
         if display_name_ is not None and not isinstance(display_name_, (bytes, str)):
@@ -11477,7 +11468,7 @@ class MachineStatus(Type):
         if instance_id_ is not None and not isinstance(instance_id_, (bytes, str)):
             raise Exception("Expected instance_id_ to be a str, received: {}".format(type(instance_id_)))
 
-        if instance_status_ is not None and not isinstance(instance_status_, (dict, set, DetailedStatus)):
+        if instance_status_ is not None and not isinstance(instance_status_, (dict, DetailedStatus)):
             raise Exception("Expected instance_status_ to be a DetailedStatus, received: {}".format(type(instance_status_)))
 
         if ip_addresses_ is not None and not isinstance(ip_addresses_, (bytes, str, list)):
@@ -11486,13 +11477,13 @@ class MachineStatus(Type):
         if jobs_ is not None and not isinstance(jobs_, (bytes, str, list)):
             raise Exception("Expected jobs_ to be a Sequence, received: {}".format(type(jobs_)))
 
-        if lxd_profiles_ is not None and not isinstance(lxd_profiles_, (dict, set)):
+        if lxd_profiles_ is not None and not isinstance(lxd_profiles_, dict):
             raise Exception("Expected lxd_profiles_ to be a Mapping, received: {}".format(type(lxd_profiles_)))
 
-        if modification_status_ is not None and not isinstance(modification_status_, (dict, set, DetailedStatus)):
+        if modification_status_ is not None and not isinstance(modification_status_, (dict, DetailedStatus)):
             raise Exception("Expected modification_status_ to be a DetailedStatus, received: {}".format(type(modification_status_)))
 
-        if network_interfaces_ is not None and not isinstance(network_interfaces_, (dict, set)):
+        if network_interfaces_ is not None and not isinstance(network_interfaces_, dict):
             raise Exception("Expected network_interfaces_ to be a Mapping, received: {}".format(type(network_interfaces_)))
 
         if series_ is not None and not isinstance(series_, (bytes, str)):
@@ -11581,7 +11572,7 @@ class MachineStorageIdsWatchResult(Type):
         if changes_ is not None and not isinstance(changes_, (bytes, str, list)):
             raise Exception("Expected changes_ to be a Sequence, received: {}".format(type(changes_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if watcher_id_ is not None and not isinstance(watcher_id_, (bytes, str)):
@@ -11624,10 +11615,10 @@ class MapResult(Type):
         result_ = result
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set)):
+        if result_ is not None and not isinstance(result_, dict):
             raise Exception("Expected result_ to be a Mapping, received: {}".format(type(result_)))
 
         self.error = error_
@@ -11679,7 +11670,7 @@ class MasterMigrationStatus(Type):
         if phase_changed_time_ is not None and not isinstance(phase_changed_time_, (bytes, str)):
             raise Exception("Expected phase_changed_time_ to be a str, received: {}".format(type(phase_changed_time_)))
 
-        if spec_ is not None and not isinstance(spec_, (dict, set, MigrationSpec)):
+        if spec_ is not None and not isinstance(spec_, (dict, MigrationSpec)):
             raise Exception("Expected spec_ to be a MigrationSpec, received: {}".format(type(spec_)))
 
         self.migration_id = migration_id_
@@ -11737,7 +11728,7 @@ class Member(Type):
         if slavedelay_ is not None and not isinstance(slavedelay_, int):
             raise Exception("Expected slavedelay_ to be a int, received: {}".format(type(slavedelay_)))
 
-        if tags_ is not None and not isinstance(tags_, (dict, set)):
+        if tags_ is not None and not isinstance(tags_, dict):
             raise Exception("Expected tags_ to be a Mapping, received: {}".format(type(tags_)))
 
         if votes_ is not None and not isinstance(votes_, int):
@@ -11791,7 +11782,7 @@ class MergeLeadershipSettingsParam(Type):
         if application_tag_ is not None and not isinstance(application_tag_, (bytes, str)):
             raise Exception("Expected application_tag_ to be a str, received: {}".format(type(application_tag_)))
 
-        if settings_ is not None and not isinstance(settings_, (dict, set)):
+        if settings_ is not None and not isinstance(settings_, dict):
             raise Exception("Expected settings_ to be a Mapping, received: {}".format(type(settings_)))
 
         if unit_tag_ is not None and not isinstance(unit_tag_, (bytes, str)):
@@ -11929,7 +11920,7 @@ class MeterStatusResult(Type):
         if code_ is not None and not isinstance(code_, (bytes, str)):
             raise Exception("Expected code_ to be a str, received: {}".format(type(code_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if info_ is not None and not isinstance(info_, (bytes, str)):
@@ -11979,7 +11970,7 @@ class Metric(Type):
         if key_ is not None and not isinstance(key_, (bytes, str)):
             raise Exception("Expected key_ to be a str, received: {}".format(type(key_)))
 
-        if labels_ is not None and not isinstance(labels_, (dict, set)):
+        if labels_ is not None and not isinstance(labels_, dict):
             raise Exception("Expected labels_ to be a Mapping, received: {}".format(type(labels_)))
 
         if time_ is not None and not isinstance(time_, (bytes, str)):
@@ -12044,7 +12035,7 @@ class MetricBatchParam(Type):
         tag_ = tag
 
         # Validate arguments against known Juju API types.
-        if batch_ is not None and not isinstance(batch_, (dict, set, MetricBatch)):
+        if batch_ is not None and not isinstance(batch_, (dict, MetricBatch)):
             raise Exception("Expected batch_ to be a MetricBatch, received: {}".format(type(batch_)))
 
         if tag_ is not None and not isinstance(tag_, (bytes, str)):
@@ -12095,7 +12086,7 @@ class MetricResult(Type):
         if key_ is not None and not isinstance(key_, (bytes, str)):
             raise Exception("Expected key_ to be a str, received: {}".format(type(key_)))
 
-        if labels_ is not None and not isinstance(labels_, (dict, set)):
+        if labels_ is not None and not isinstance(labels_, dict):
             raise Exception("Expected labels_ to be a Mapping, received: {}".format(type(labels_)))
 
         if time_ is not None and not isinstance(time_, (bytes, str)):
@@ -12152,10 +12143,10 @@ class MigrationModelInfo(Type):
         uuid_ = uuid
 
         # Validate arguments against known Juju API types.
-        if agent_version_ is not None and not isinstance(agent_version_, (dict, set, Number)):
+        if agent_version_ is not None and not isinstance(agent_version_, (dict, Number)):
             raise Exception("Expected agent_version_ to be a Number, received: {}".format(type(agent_version_)))
 
-        if controller_agent_version_ is not None and not isinstance(controller_agent_version_, (dict, set, Number)):
+        if controller_agent_version_ is not None and not isinstance(controller_agent_version_, (dict, Number)):
             raise Exception("Expected controller_agent_version_ to be a Number, received: {}".format(type(controller_agent_version_)))
 
         if name_ is not None and not isinstance(name_, (bytes, str)):
@@ -12191,7 +12182,7 @@ class MigrationSpec(Type):
         if model_tag_ is not None and not isinstance(model_tag_, (bytes, str)):
             raise Exception("Expected model_tag_ to be a str, received: {}".format(type(model_tag_)))
 
-        if target_info_ is not None and not isinstance(target_info_, (dict, set, MigrationTargetInfo)):
+        if target_info_ is not None and not isinstance(target_info_, (dict, MigrationTargetInfo)):
             raise Exception("Expected target_info_ to be a MigrationTargetInfo, received: {}".format(type(target_info_)))
 
         self.model_tag = model_tag_
@@ -12528,7 +12519,7 @@ class ModelConfigResult(Type):
         config_ = config
 
         # Validate arguments against known Juju API types.
-        if config_ is not None and not isinstance(config_, (dict, set)):
+        if config_ is not None and not isinstance(config_, dict):
             raise Exception("Expected config_ to be a Mapping, received: {}".format(type(config_)))
 
         self.config = config_
@@ -12546,7 +12537,7 @@ class ModelConfigResults(Type):
         config_ = config
 
         # Validate arguments against known Juju API types.
-        if config_ is not None and not isinstance(config_, (dict, set)):
+        if config_ is not None and not isinstance(config_, dict):
             raise Exception("Expected config_ to be a Mapping, received: {}".format(type(config_)))
 
         self.config = config_
@@ -12577,7 +12568,7 @@ class ModelCreateArgs(Type):
         if cloud_tag_ is not None and not isinstance(cloud_tag_, (bytes, str)):
             raise Exception("Expected cloud_tag_ to be a str, received: {}".format(type(cloud_tag_)))
 
-        if config_ is not None and not isinstance(config_, (dict, set)):
+        if config_ is not None and not isinstance(config_, dict):
             raise Exception("Expected config_ to be a Mapping, received: {}".format(type(config_)))
 
         if credential_ is not None and not isinstance(credential_, (bytes, str)):
@@ -12658,7 +12649,7 @@ class ModelDefaultValues(Type):
         if cloud_tag_ is not None and not isinstance(cloud_tag_, (bytes, str)):
             raise Exception("Expected cloud_tag_ to be a str, received: {}".format(type(cloud_tag_)))
 
-        if config_ is not None and not isinstance(config_, (dict, set)):
+        if config_ is not None and not isinstance(config_, dict):
             raise Exception("Expected config_ to be a Mapping, received: {}".format(type(config_)))
 
         self.cloud_region = cloud_region_
@@ -12673,8 +12664,8 @@ class ModelDefaults(Type):
     _toPy = {'controller': 'controller', 'default': 'default', 'regions': 'regions'}
     def __init__(self, controller=None, default=None, regions=None, **unknown_fields):
         '''
-        controller : typing.Mapping[str, typing.Any]
-        default : typing.Mapping[str, typing.Any]
+        controller : Any
+        default : Any
         regions : typing.Sequence[~RegionDefaults]
         '''
         controller_ = controller
@@ -12682,12 +12673,6 @@ class ModelDefaults(Type):
         regions_ = [RegionDefaults.from_json(o) for o in regions or []]
 
         # Validate arguments against known Juju API types.
-        if controller_ is not None and not isinstance(controller_, (dict, set)):
-            raise Exception("Expected controller_ to be a Mapping, received: {}".format(type(controller_)))
-
-        if default_ is not None and not isinstance(default_, (dict, set)):
-            raise Exception("Expected default_ to be a Mapping, received: {}".format(type(default_)))
-
         if regions_ is not None and not isinstance(regions_, (bytes, str, list)):
             raise Exception("Expected regions_ to be a Sequence, received: {}".format(type(regions_)))
 
@@ -12710,10 +12695,10 @@ class ModelDefaultsResult(Type):
         error_ = Error.from_json(error) if error else None
 
         # Validate arguments against known Juju API types.
-        if config_ is not None and not isinstance(config_, (dict, set)):
+        if config_ is not None and not isinstance(config_, dict):
             raise Exception("Expected config_ to be a Mapping, received: {}".format(type(config_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         self.config = config_
@@ -12850,7 +12835,7 @@ class ModelInfo(Type):
         uuid_ = uuid
 
         # Validate arguments against known Juju API types.
-        if agent_version_ is not None and not isinstance(agent_version_, (dict, set, Number)):
+        if agent_version_ is not None and not isinstance(agent_version_, (dict, Number)):
             raise Exception("Expected agent_version_ to be a Number, received: {}".format(type(agent_version_)))
 
         if cloud_credential_tag_ is not None and not isinstance(cloud_credential_tag_, (bytes, str)):
@@ -12877,7 +12862,7 @@ class ModelInfo(Type):
         if machines_ is not None and not isinstance(machines_, (bytes, str, list)):
             raise Exception("Expected machines_ to be a Sequence, received: {}".format(type(machines_)))
 
-        if migration_ is not None and not isinstance(migration_, (dict, set, ModelMigrationStatus)):
+        if migration_ is not None and not isinstance(migration_, (dict, ModelMigrationStatus)):
             raise Exception("Expected migration_ to be a ModelMigrationStatus, received: {}".format(type(migration_)))
 
         if name_ is not None and not isinstance(name_, (bytes, str)):
@@ -12889,10 +12874,10 @@ class ModelInfo(Type):
         if provider_type_ is not None and not isinstance(provider_type_, (bytes, str)):
             raise Exception("Expected provider_type_ to be a str, received: {}".format(type(provider_type_)))
 
-        if sla_ is not None and not isinstance(sla_, (dict, set, ModelSLAInfo)):
+        if sla_ is not None and not isinstance(sla_, (dict, ModelSLAInfo)):
             raise Exception("Expected sla_ to be a ModelSLAInfo, received: {}".format(type(sla_)))
 
-        if status_ is not None and not isinstance(status_, (dict, set, EntityStatus)):
+        if status_ is not None and not isinstance(status_, (dict, EntityStatus)):
             raise Exception("Expected status_ to be a EntityStatus, received: {}".format(type(status_)))
 
         if type__ is not None and not isinstance(type__, (bytes, str)):
@@ -12938,10 +12923,10 @@ class ModelInfoResult(Type):
         result_ = ModelInfo.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, ModelInfo)):
+        if result_ is not None and not isinstance(result_, (dict, ModelInfo)):
             raise Exception("Expected result_ to be a ModelInfo, received: {}".format(type(result_)))
 
         self.error = error_
@@ -12978,7 +12963,7 @@ class ModelInstanceTypesConstraint(Type):
         value_ = Value.from_json(value) if value else None
 
         # Validate arguments against known Juju API types.
-        if value_ is not None and not isinstance(value_, (dict, set, Value)):
+        if value_ is not None and not isinstance(value_, (dict, Value)):
             raise Exception("Expected value_ to be a Value, received: {}".format(type(value_)))
 
         self.value = value_
@@ -13031,7 +13016,7 @@ class ModelMachineInfo(Type):
         if display_name_ is not None and not isinstance(display_name_, (bytes, str)):
             raise Exception("Expected display_name_ to be a str, received: {}".format(type(display_name_)))
 
-        if hardware_ is not None and not isinstance(hardware_, (dict, set, MachineHardware)):
+        if hardware_ is not None and not isinstance(hardware_, (dict, MachineHardware)):
             raise Exception("Expected hardware_ to be a MachineHardware, received: {}".format(type(hardware_)))
 
         if has_vote_ is not None and not isinstance(has_vote_, bool):
@@ -13110,7 +13095,7 @@ class ModelResult(Type):
         uuid_ = uuid
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if name_ is not None and not isinstance(name_, (bytes, str)):
@@ -13146,7 +13131,7 @@ class ModelSLA(Type):
         owner_ = owner
 
         # Validate arguments against known Juju API types.
-        if modelslainfo_ is not None and not isinstance(modelslainfo_, (dict, set, ModelSLAInfo)):
+        if modelslainfo_ is not None and not isinstance(modelslainfo_, (dict, ModelSLAInfo)):
             raise Exception("Expected modelslainfo_ to be a ModelSLAInfo, received: {}".format(type(modelslainfo_)))
 
         if creds_ is not None and not isinstance(creds_, (bytes, str, list)):
@@ -13200,7 +13185,7 @@ class ModelSequencesResult(Type):
         sequences_ = sequences
 
         # Validate arguments against known Juju API types.
-        if sequences_ is not None and not isinstance(sequences_, (dict, set)):
+        if sequences_ is not None and not isinstance(sequences_, dict):
             raise Exception("Expected sequences_ to be a Mapping, received: {}".format(type(sequences_)))
 
         self.sequences = sequences_
@@ -13218,7 +13203,7 @@ class ModelSet(Type):
         config_ = config
 
         # Validate arguments against known Juju API types.
-        if config_ is not None and not isinstance(config_, (dict, set)):
+        if config_ is not None and not isinstance(config_, dict):
             raise Exception("Expected config_ to be a Mapping, received: {}".format(type(config_)))
 
         self.config = config_
@@ -13259,7 +13244,7 @@ class ModelStatus(Type):
         if application_count_ is not None and not isinstance(application_count_, int):
             raise Exception("Expected application_count_ to be a int, received: {}".format(type(application_count_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if filesystems_ is not None and not isinstance(filesystems_, (bytes, str, list)):
@@ -13440,7 +13425,7 @@ class ModelSummary(Type):
         uuid_ = uuid
 
         # Validate arguments against known Juju API types.
-        if agent_version_ is not None and not isinstance(agent_version_, (dict, set, Number)):
+        if agent_version_ is not None and not isinstance(agent_version_, (dict, Number)):
             raise Exception("Expected agent_version_ to be a Number, received: {}".format(type(agent_version_)))
 
         if cloud_credential_tag_ is not None and not isinstance(cloud_credential_tag_, (bytes, str)):
@@ -13470,7 +13455,7 @@ class ModelSummary(Type):
         if life_ is not None and not isinstance(life_, (bytes, str)):
             raise Exception("Expected life_ to be a str, received: {}".format(type(life_)))
 
-        if migration_ is not None and not isinstance(migration_, (dict, set, ModelMigrationStatus)):
+        if migration_ is not None and not isinstance(migration_, (dict, ModelMigrationStatus)):
             raise Exception("Expected migration_ to be a ModelMigrationStatus, received: {}".format(type(migration_)))
 
         if name_ is not None and not isinstance(name_, (bytes, str)):
@@ -13482,10 +13467,10 @@ class ModelSummary(Type):
         if provider_type_ is not None and not isinstance(provider_type_, (bytes, str)):
             raise Exception("Expected provider_type_ to be a str, received: {}".format(type(provider_type_)))
 
-        if sla_ is not None and not isinstance(sla_, (dict, set, ModelSLAInfo)):
+        if sla_ is not None and not isinstance(sla_, (dict, ModelSLAInfo)):
             raise Exception("Expected sla_ to be a ModelSLAInfo, received: {}".format(type(sla_)))
 
-        if status_ is not None and not isinstance(status_, (dict, set, EntityStatus)):
+        if status_ is not None and not isinstance(status_, (dict, EntityStatus)):
             raise Exception("Expected status_ to be a EntityStatus, received: {}".format(type(status_)))
 
         if type__ is not None and not isinstance(type__, (bytes, str)):
@@ -13532,10 +13517,10 @@ class ModelSummaryResult(Type):
         result_ = ModelSummary.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, ModelSummary)):
+        if result_ is not None and not isinstance(result_, (dict, ModelSummary)):
             raise Exception("Expected result_ to be a ModelSummary, received: {}".format(type(result_)))
 
         self.error = error_
@@ -13669,10 +13654,10 @@ class ModelUserInfoResult(Type):
         result_ = ModelUserInfo.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, ModelUserInfo)):
+        if result_ is not None and not isinstance(result_, (dict, ModelUserInfo)):
             raise Exception("Expected result_ to be a ModelUserInfo, received: {}".format(type(result_)))
 
         self.error = error_
@@ -13992,7 +13977,7 @@ class MongoUpgradeResults(Type):
         if ha_members_ is not None and not isinstance(ha_members_, (bytes, str, list)):
             raise Exception("Expected ha_members_ to be a Sequence, received: {}".format(type(ha_members_)))
 
-        if master_ is not None and not isinstance(master_, (dict, set, HAMember)):
+        if master_ is not None and not isinstance(master_, (dict, HAMember)):
             raise Exception("Expected master_ to be a HAMember, received: {}".format(type(master_)))
 
         if rs_members_ is not None and not isinstance(rs_members_, (bytes, str, list)):
@@ -14267,7 +14252,7 @@ class NetworkInfoResult(Type):
         if egress_subnets_ is not None and not isinstance(egress_subnets_, (bytes, str, list)):
             raise Exception("Expected egress_subnets_ to be a Sequence, received: {}".format(type(egress_subnets_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if ingress_addresses_ is not None and not isinstance(ingress_addresses_, (bytes, str, list)):
@@ -14291,7 +14276,7 @@ class NetworkInfoResults(Type):
         results_ = results
 
         # Validate arguments against known Juju API types.
-        if results_ is not None and not isinstance(results_, (dict, set)):
+        if results_ is not None and not isinstance(results_, dict):
             raise Exception("Expected results_ to be a Mapping, received: {}".format(type(results_)))
 
         self.results = results_
@@ -14392,7 +14377,7 @@ class NotifyWatchResult(Type):
         if notifywatcherid_ is not None and not isinstance(notifywatcherid_, (bytes, str)):
             raise Exception("Expected notifywatcherid_ to be a str, received: {}".format(type(notifywatcherid_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         self.notifywatcherid = notifywatcherid_
@@ -14535,7 +14520,7 @@ class OfferConnection(Type):
         if source_model_tag_ is not None and not isinstance(source_model_tag_, (bytes, str)):
             raise Exception("Expected source_model_tag_ to be a str, received: {}".format(type(source_model_tag_)))
 
-        if status_ is not None and not isinstance(status_, (dict, set, EntityStatus)):
+        if status_ is not None and not isinstance(status_, (dict, EntityStatus)):
             raise Exception("Expected status_ to be a EntityStatus, received: {}".format(type(status_)))
 
         if username_ is not None and not isinstance(username_, (bytes, str)):
@@ -14650,7 +14635,7 @@ class OfferStatusChange(Type):
         if offer_name_ is not None and not isinstance(offer_name_, (bytes, str)):
             raise Exception("Expected offer_name_ to be a str, received: {}".format(type(offer_name_)))
 
-        if status_ is not None and not isinstance(status_, (dict, set, EntityStatus)):
+        if status_ is not None and not isinstance(status_, (dict, EntityStatus)):
             raise Exception("Expected status_ to be a EntityStatus, received: {}".format(type(status_)))
 
         self.offer_name = offer_name_
@@ -14676,7 +14661,7 @@ class OfferStatusWatchResult(Type):
         if changes_ is not None and not isinstance(changes_, (bytes, str, list)):
             raise Exception("Expected changes_ to be a Sequence, received: {}".format(type(changes_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if watcher_id_ is not None and not isinstance(watcher_id_, (bytes, str)):
@@ -14776,16 +14761,16 @@ class OperatorProvisioningInfo(Type):
         if api_addresses_ is not None and not isinstance(api_addresses_, (bytes, str, list)):
             raise Exception("Expected api_addresses_ to be a Sequence, received: {}".format(type(api_addresses_)))
 
-        if charm_storage_ is not None and not isinstance(charm_storage_, (dict, set, KubernetesFilesystemParams)):
+        if charm_storage_ is not None and not isinstance(charm_storage_, (dict, KubernetesFilesystemParams)):
             raise Exception("Expected charm_storage_ to be a KubernetesFilesystemParams, received: {}".format(type(charm_storage_)))
 
         if image_path_ is not None and not isinstance(image_path_, (bytes, str)):
             raise Exception("Expected image_path_ to be a str, received: {}".format(type(image_path_)))
 
-        if tags_ is not None and not isinstance(tags_, (dict, set)):
+        if tags_ is not None and not isinstance(tags_, dict):
             raise Exception("Expected tags_ to be a Mapping, received: {}".format(type(tags_)))
 
-        if version_ is not None and not isinstance(version_, (dict, set, Number)):
+        if version_ is not None and not isinstance(version_, (dict, Number)):
             raise Exception("Expected version_ to be a Number, received: {}".format(type(version_)))
 
         self.api_addresses = api_addresses_
@@ -14905,16 +14890,16 @@ class PayloadResult(Type):
         tag_ = tag
 
         # Validate arguments against known Juju API types.
-        if entity_ is not None and not isinstance(entity_, (dict, set, Entity)):
+        if entity_ is not None and not isinstance(entity_, (dict, Entity)):
             raise Exception("Expected entity_ to be a Entity, received: {}".format(type(entity_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if not_found_ is not None and not isinstance(not_found_, bool):
             raise Exception("Expected not_found_ to be a bool, received: {}".format(type(not_found_)))
 
-        if payload_ is not None and not isinstance(payload_, (dict, set, Payload)):
+        if payload_ is not None and not isinstance(payload_, (dict, Payload)):
             raise Exception("Expected payload_ to be a Payload, received: {}".format(type(payload_)))
 
         if tag_ is not None and not isinstance(tag_, (bytes, str)):
@@ -14959,7 +14944,7 @@ class PhaseResult(Type):
         phase_ = phase
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if phase_ is not None and not isinstance(phase_, (bytes, str)):
@@ -15004,7 +14989,7 @@ class PinApplicationResult(Type):
         if application_name_ is not None and not isinstance(application_name_, (bytes, str)):
             raise Exception("Expected application_name_ to be a str, received: {}".format(type(application_name_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         self.application_name = application_name_
@@ -15157,7 +15142,7 @@ class ProfileChangeResult(Type):
         subordinate_ = subordinate
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if new_profile_name_ is not None and not isinstance(new_profile_name_, (bytes, str)):
@@ -15166,7 +15151,7 @@ class ProfileChangeResult(Type):
         if old_profile_name_ is not None and not isinstance(old_profile_name_, (bytes, str)):
             raise Exception("Expected old_profile_name_ to be a str, received: {}".format(type(old_profile_name_)))
 
-        if profile_ is not None and not isinstance(profile_, (dict, set, CharmLXDProfile)):
+        if profile_ is not None and not isinstance(profile_, (dict, CharmLXDProfile)):
             raise Exception("Expected profile_ to be a CharmLXDProfile, received: {}".format(type(profile_)))
 
         if subordinate_ is not None and not isinstance(subordinate_, bool):
@@ -15218,10 +15203,10 @@ class ProfileInfoResult(Type):
         if application_name_ is not None and not isinstance(application_name_, (bytes, str)):
             raise Exception("Expected application_name_ to be a str, received: {}".format(type(application_name_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if profile_ is not None and not isinstance(profile_, (dict, set, CharmLXDProfile)):
+        if profile_ is not None and not isinstance(profile_, (dict, CharmLXDProfile)):
             raise Exception("Expected profile_ to be a CharmLXDProfile, received: {}".format(type(profile_)))
 
         if revision_ is not None and not isinstance(revision_, int):
@@ -15279,7 +15264,7 @@ class ProviderInterfaceInfoResult(Type):
         machine_tag_ = machine_tag
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if interfaces_ is not None and not isinstance(interfaces_, (bytes, str, list)):
@@ -15329,7 +15314,7 @@ class ProviderSpace(Type):
         subnets_ = [Subnet.from_json(o) for o in subnets or []]
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if name_ is not None and not isinstance(name_, (bytes, str)):
@@ -15386,16 +15371,16 @@ class ProvisioningInfo(Type):
         if charm_lxd_profiles_ is not None and not isinstance(charm_lxd_profiles_, (bytes, str, list)):
             raise Exception("Expected charm_lxd_profiles_ to be a Sequence, received: {}".format(type(charm_lxd_profiles_)))
 
-        if cloudinit_userdata_ is not None and not isinstance(cloudinit_userdata_, (dict, set)):
+        if cloudinit_userdata_ is not None and not isinstance(cloudinit_userdata_, dict):
             raise Exception("Expected cloudinit_userdata_ to be a Mapping, received: {}".format(type(cloudinit_userdata_)))
 
-        if constraints_ is not None and not isinstance(constraints_, (dict, set, Value)):
+        if constraints_ is not None and not isinstance(constraints_, (dict, Value)):
             raise Exception("Expected constraints_ to be a Value, received: {}".format(type(constraints_)))
 
-        if controller_config_ is not None and not isinstance(controller_config_, (dict, set)):
+        if controller_config_ is not None and not isinstance(controller_config_, dict):
             raise Exception("Expected controller_config_ to be a Mapping, received: {}".format(type(controller_config_)))
 
-        if endpoint_bindings_ is not None and not isinstance(endpoint_bindings_, (dict, set)):
+        if endpoint_bindings_ is not None and not isinstance(endpoint_bindings_, dict):
             raise Exception("Expected endpoint_bindings_ to be a Mapping, received: {}".format(type(endpoint_bindings_)))
 
         if image_metadata_ is not None and not isinstance(image_metadata_, (bytes, str, list)):
@@ -15413,7 +15398,7 @@ class ProvisioningInfo(Type):
         if subnets_to_zones_ is not None and not isinstance(subnets_to_zones_, (bytes, str, list)):
             raise Exception("Expected subnets_to_zones_ to be a Sequence, received: {}".format(type(subnets_to_zones_)))
 
-        if tags_ is not None and not isinstance(tags_, (dict, set)):
+        if tags_ is not None and not isinstance(tags_, dict):
             raise Exception("Expected tags_ to be a Mapping, received: {}".format(type(tags_)))
 
         if volume_attachments_ is not None and not isinstance(volume_attachments_, (bytes, str, list)):
@@ -15451,10 +15436,10 @@ class ProvisioningInfoResult(Type):
         result_ = ProvisioningInfo.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, ProvisioningInfo)):
+        if result_ is not None and not isinstance(result_, (dict, ProvisioningInfo)):
             raise Exception("Expected result_ to be a ProvisioningInfo, received: {}".format(type(result_)))
 
         self.error = error_
@@ -15593,19 +15578,19 @@ class ProxyConfigResult(Type):
         snap_store_id_ = snap_store_id
 
         # Validate arguments against known Juju API types.
-        if apt_proxy_settings_ is not None and not isinstance(apt_proxy_settings_, (dict, set, ProxyConfig)):
+        if apt_proxy_settings_ is not None and not isinstance(apt_proxy_settings_, (dict, ProxyConfig)):
             raise Exception("Expected apt_proxy_settings_ to be a ProxyConfig, received: {}".format(type(apt_proxy_settings_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if juju_proxy_settings_ is not None and not isinstance(juju_proxy_settings_, (dict, set, ProxyConfig)):
+        if juju_proxy_settings_ is not None and not isinstance(juju_proxy_settings_, (dict, ProxyConfig)):
             raise Exception("Expected juju_proxy_settings_ to be a ProxyConfig, received: {}".format(type(juju_proxy_settings_)))
 
-        if legacy_proxy_settings_ is not None and not isinstance(legacy_proxy_settings_, (dict, set, ProxyConfig)):
+        if legacy_proxy_settings_ is not None and not isinstance(legacy_proxy_settings_, (dict, ProxyConfig)):
             raise Exception("Expected legacy_proxy_settings_ to be a ProxyConfig, received: {}".format(type(legacy_proxy_settings_)))
 
-        if snap_proxy_settings_ is not None and not isinstance(snap_proxy_settings_, (dict, set, ProxyConfig)):
+        if snap_proxy_settings_ is not None and not isinstance(snap_proxy_settings_, (dict, ProxyConfig)):
             raise Exception("Expected snap_proxy_settings_ to be a ProxyConfig, received: {}".format(type(snap_proxy_settings_)))
 
         if snap_store_assertions_ is not None and not isinstance(snap_store_assertions_, (bytes, str)):
@@ -15709,7 +15694,7 @@ class RebootActionResult(Type):
         result_ = result
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if result_ is not None and not isinstance(result_, (bytes, str)):
@@ -15745,7 +15730,7 @@ class RegionDefaults(Type):
     def __init__(self, region_name=None, value=None, **unknown_fields):
         '''
         region_name : str
-        value : typing.Mapping[str, typing.Any]
+        value : Any
         '''
         region_name_ = region_name
         value_ = value
@@ -15753,9 +15738,6 @@ class RegionDefaults(Type):
         # Validate arguments against known Juju API types.
         if region_name_ is not None and not isinstance(region_name_, (bytes, str)):
             raise Exception("Expected region_name_ to be a str, received: {}".format(type(region_name_)))
-
-        if value_ is not None and not isinstance(value_, (dict, set)):
-            raise Exception("Expected value_ to be a Mapping, received: {}".format(type(value_)))
 
         self.region_name = region_name_
         self.value = value_
@@ -15802,10 +15784,10 @@ class RegisterRemoteRelationArg(Type):
         if relation_token_ is not None and not isinstance(relation_token_, (bytes, str)):
             raise Exception("Expected relation_token_ to be a str, received: {}".format(type(relation_token_)))
 
-        if remote_endpoint_ is not None and not isinstance(remote_endpoint_, (dict, set, RemoteEndpoint)):
+        if remote_endpoint_ is not None and not isinstance(remote_endpoint_, (dict, RemoteEndpoint)):
             raise Exception("Expected remote_endpoint_ to be a RemoteEndpoint, received: {}".format(type(remote_endpoint_)))
 
-        if remote_space_ is not None and not isinstance(remote_space_, (dict, set, RemoteSpace)):
+        if remote_space_ is not None and not isinstance(remote_space_, (dict, RemoteSpace)):
             raise Exception("Expected remote_space_ to be a RemoteSpace, received: {}".format(type(remote_space_)))
 
         if source_model_tag_ is not None and not isinstance(source_model_tag_, (bytes, str)):
@@ -15853,10 +15835,10 @@ class RegisterRemoteRelationResult(Type):
         result_ = RemoteRelationDetails.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, RemoteRelationDetails)):
+        if result_ is not None and not isinstance(result_, (dict, RemoteRelationDetails)):
             raise Exception("Expected result_ to be a RemoteRelationDetails, received: {}".format(type(result_)))
 
         self.error = error_
@@ -15899,7 +15881,7 @@ class RelationChange(Type):
         life_ = life
 
         # Validate arguments against known Juju API types.
-        if changedunits_ is not None and not isinstance(changedunits_, (dict, set)):
+        if changedunits_ is not None and not isinstance(changedunits_, dict):
             raise Exception("Expected changedunits_ to be a Mapping, received: {}".format(type(changedunits_)))
 
         if departedunits_ is not None and not isinstance(departedunits_, (bytes, str, list)):
@@ -15990,7 +15972,7 @@ class RelationLifeSuspendedStatusWatchResult(Type):
         if changes_ is not None and not isinstance(changes_, (bytes, str, list)):
             raise Exception("Expected changes_ to be a Sequence, received: {}".format(type(changes_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if watcher_id_ is not None and not isinstance(watcher_id_, (bytes, str)):
@@ -16028,10 +16010,10 @@ class RelationResult(Type):
         if bool__ is not None and not isinstance(bool__, bool):
             raise Exception("Expected bool__ to be a bool, received: {}".format(type(bool__)))
 
-        if endpoint_ is not None and not isinstance(endpoint_, (dict, set, Endpoint)):
+        if endpoint_ is not None and not isinstance(endpoint_, (dict, Endpoint)):
             raise Exception("Expected endpoint_ to be a Endpoint, received: {}".format(type(endpoint_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if id__ is not None and not isinstance(id__, int):
@@ -16110,7 +16092,7 @@ class RelationStatus(Type):
         if scope_ is not None and not isinstance(scope_, (bytes, str)):
             raise Exception("Expected scope_ to be a str, received: {}".format(type(scope_)))
 
-        if status_ is not None and not isinstance(status_, (dict, set, DetailedStatus)):
+        if status_ is not None and not isinstance(status_, (dict, DetailedStatus)):
             raise Exception("Expected status_ to be a DetailedStatus, received: {}".format(type(status_)))
 
         self.endpoints = endpoints_
@@ -16277,7 +16259,7 @@ class RelationUnitChange(Type):
         settings_ = settings
 
         # Validate arguments against known Juju API types.
-        if settings_ is not None and not isinstance(settings_, (dict, set)):
+        if settings_ is not None and not isinstance(settings_, dict):
             raise Exception("Expected settings_ to be a Mapping, received: {}".format(type(settings_)))
 
         self.settings = settings_
@@ -16350,7 +16332,7 @@ class RelationUnitSettings(Type):
         if relation_ is not None and not isinstance(relation_, (bytes, str)):
             raise Exception("Expected relation_ to be a str, received: {}".format(type(relation_)))
 
-        if settings_ is not None and not isinstance(settings_, (dict, set)):
+        if settings_ is not None and not isinstance(settings_, dict):
             raise Exception("Expected settings_ to be a Mapping, received: {}".format(type(settings_)))
 
         if unit_ is not None and not isinstance(unit_, (bytes, str)):
@@ -16405,7 +16387,7 @@ class RelationUnitStatusResult(Type):
         results_ = [RelationUnitStatus.from_json(o) for o in results or []]
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if results_ is not None and not isinstance(results_, (bytes, str, list)):
@@ -16465,7 +16447,7 @@ class RelationUnitsChange(Type):
         departed_ = departed
 
         # Validate arguments against known Juju API types.
-        if changed_ is not None and not isinstance(changed_, (dict, set)):
+        if changed_ is not None and not isinstance(changed_, dict):
             raise Exception("Expected changed_ to be a Mapping, received: {}".format(type(changed_)))
 
         if departed_ is not None and not isinstance(departed_, (bytes, str, list)):
@@ -16509,10 +16491,10 @@ class RelationUnitsWatchResult(Type):
         watcher_id_ = watcher_id
 
         # Validate arguments against known Juju API types.
-        if changes_ is not None and not isinstance(changes_, (dict, set, RelationUnitsChange)):
+        if changes_ is not None and not isinstance(changes_, (dict, RelationUnitsChange)):
             raise Exception("Expected changes_ to be a RelationUnitsChange, received: {}".format(type(changes_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if watcher_id_ is not None and not isinstance(watcher_id_, (bytes, str)):
@@ -16571,7 +16553,7 @@ class RemoteApplication(Type):
         if life_ is not None and not isinstance(life_, (bytes, str)):
             raise Exception("Expected life_ to be a str, received: {}".format(type(life_)))
 
-        if macaroon_ is not None and not isinstance(macaroon_, (dict, set, Macaroon)):
+        if macaroon_ is not None and not isinstance(macaroon_, (dict, Macaroon)):
             raise Exception("Expected macaroon_ to be a Macaroon, received: {}".format(type(macaroon_)))
 
         if model_uuid_ is not None and not isinstance(model_uuid_, (bytes, str)):
@@ -16617,7 +16599,7 @@ class RemoteApplicationChange(Type):
         if life_ is not None and not isinstance(life_, (bytes, str)):
             raise Exception("Expected life_ to be a str, received: {}".format(type(life_)))
 
-        if relations_ is not None and not isinstance(relations_, (dict, set, RemoteRelationsChange)):
+        if relations_ is not None and not isinstance(relations_, (dict, RemoteRelationsChange)):
             raise Exception("Expected relations_ to be a RemoteRelationsChange, received: {}".format(type(relations_)))
 
         self.application_tag = application_tag_
@@ -16693,10 +16675,10 @@ class RemoteApplicationInfoResult(Type):
         result_ = RemoteApplicationInfo.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, RemoteApplicationInfo)):
+        if result_ is not None and not isinstance(result_, (dict, RemoteApplicationInfo)):
             raise Exception("Expected result_ to be a RemoteApplicationInfo, received: {}".format(type(result_)))
 
         self.error = error_
@@ -16735,10 +16717,10 @@ class RemoteApplicationResult(Type):
         result_ = RemoteApplication.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, RemoteApplication)):
+        if result_ is not None and not isinstance(result_, (dict, RemoteApplication)):
             raise Exception("Expected result_ to be a RemoteApplication, received: {}".format(type(result_)))
 
         self.error = error_
@@ -16790,7 +16772,7 @@ class RemoteApplicationStatus(Type):
         if endpoints_ is not None and not isinstance(endpoints_, (bytes, str, list)):
             raise Exception("Expected endpoints_ to be a Sequence, received: {}".format(type(endpoints_)))
 
-        if err_ is not None and not isinstance(err_, (dict, set, Error)):
+        if err_ is not None and not isinstance(err_, (dict, Error)):
             raise Exception("Expected err_ to be a Error, received: {}".format(type(err_)))
 
         if life_ is not None and not isinstance(life_, (bytes, str)):
@@ -16805,7 +16787,7 @@ class RemoteApplicationStatus(Type):
         if relations_ is not None and not isinstance(relations_, (bytes, str, list)):
             raise Exception("Expected relations_ to be a Sequence, received: {}".format(type(relations_)))
 
-        if status_ is not None and not isinstance(status_, (dict, set, DetailedStatus)):
+        if status_ is not None and not isinstance(status_, (dict, DetailedStatus)):
             raise Exception("Expected status_ to be a DetailedStatus, received: {}".format(type(status_)))
 
         self.endpoints = endpoints_
@@ -16833,10 +16815,10 @@ class RemoteApplicationWatchResult(Type):
         id__ = id_
 
         # Validate arguments against known Juju API types.
-        if change_ is not None and not isinstance(change_, (dict, set, RemoteApplicationChange)):
+        if change_ is not None and not isinstance(change_, (dict, RemoteApplicationChange)):
             raise Exception("Expected change_ to be a RemoteApplicationChange, received: {}".format(type(change_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if id__ is not None and not isinstance(id__, (bytes, str)):
@@ -17022,7 +17004,7 @@ class RemoteRelation(Type):
         if application_name_ is not None and not isinstance(application_name_, (bytes, str)):
             raise Exception("Expected application_name_ to be a str, received: {}".format(type(application_name_)))
 
-        if endpoint_ is not None and not isinstance(endpoint_, (dict, set, RemoteEndpoint)):
+        if endpoint_ is not None and not isinstance(endpoint_, (dict, RemoteEndpoint)):
             raise Exception("Expected endpoint_ to be a RemoteEndpoint, received: {}".format(type(endpoint_)))
 
         if id__ is not None and not isinstance(id__, int):
@@ -17075,7 +17057,7 @@ class RemoteRelationChange(Type):
         life_ = life
 
         # Validate arguments against known Juju API types.
-        if changed_units_ is not None and not isinstance(changed_units_, (dict, set)):
+        if changed_units_ is not None and not isinstance(changed_units_, dict):
             raise Exception("Expected changed_units_ to be a Mapping, received: {}".format(type(changed_units_)))
 
         if departed_units_ is not None and not isinstance(departed_units_, (bytes, str, list)):
@@ -17173,7 +17155,7 @@ class RemoteRelationDetails(Type):
         relation_token_ = relation_token
 
         # Validate arguments against known Juju API types.
-        if macaroon_ is not None and not isinstance(macaroon_, (dict, set, Macaroon)):
+        if macaroon_ is not None and not isinstance(macaroon_, (dict, Macaroon)):
             raise Exception("Expected macaroon_ to be a Macaroon, received: {}".format(type(macaroon_)))
 
         if relation_token_ is not None and not isinstance(relation_token_, (bytes, str)):
@@ -17197,10 +17179,10 @@ class RemoteRelationResult(Type):
         result_ = RemoteRelation.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, RemoteRelation)):
+        if result_ is not None and not isinstance(result_, (dict, RemoteRelation)):
             raise Exception("Expected result_ to be a RemoteRelation, received: {}".format(type(result_)))
 
         self.error = error_
@@ -17269,7 +17251,7 @@ class RemoteRelationUnitChange(Type):
         unit_id_ = unit_id
 
         # Validate arguments against known Juju API types.
-        if settings_ is not None and not isinstance(settings_, (dict, set)):
+        if settings_ is not None and not isinstance(settings_, dict):
             raise Exception("Expected settings_ to be a Mapping, received: {}".format(type(settings_)))
 
         if unit_id_ is not None and not isinstance(unit_id_, int):
@@ -17364,10 +17346,10 @@ class RemoteRelationsWatchResult(Type):
         if remoterelationswatcherid_ is not None and not isinstance(remoterelationswatcherid_, (bytes, str)):
             raise Exception("Expected remoterelationswatcherid_ to be a str, received: {}".format(type(remoterelationswatcherid_)))
 
-        if change_ is not None and not isinstance(change_, (dict, set, RemoteRelationsChange)):
+        if change_ is not None and not isinstance(change_, (dict, RemoteRelationsChange)):
             raise Exception("Expected change_ to be a RemoteRelationsChange, received: {}".format(type(change_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         self.remoterelationswatcherid = remoterelationswatcherid_
@@ -17401,7 +17383,7 @@ class RemoteSpace(Type):
         if name_ is not None and not isinstance(name_, (bytes, str)):
             raise Exception("Expected name_ to be a str, received: {}".format(type(name_)))
 
-        if provider_attributes_ is not None and not isinstance(provider_attributes_, (dict, set)):
+        if provider_attributes_ is not None and not isinstance(provider_attributes_, dict):
             raise Exception("Expected provider_attributes_ to be a Mapping, received: {}".format(type(provider_attributes_)))
 
         if provider_id_ is not None and not isinstance(provider_id_, (bytes, str)):
@@ -17479,10 +17461,10 @@ class RemoveFilesystemParamsResult(Type):
         result_ = RemoveFilesystemParams.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, RemoveFilesystemParams)):
+        if result_ is not None and not isinstance(result_, (dict, RemoveFilesystemParams)):
             raise Exception("Expected result_ to be a RemoveFilesystemParams, received: {}".format(type(result_)))
 
         self.error = error_
@@ -17611,10 +17593,10 @@ class RemoveVolumeParamsResult(Type):
         result_ = RemoveVolumeParams.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, RemoveVolumeParams)):
+        if result_ is not None and not isinstance(result_, (dict, RemoveVolumeParams)):
             raise Exception("Expected result_ to be a RemoveVolumeParams, received: {}".format(type(result_)))
 
         self.error = error_
@@ -17737,7 +17719,7 @@ class ResolvedModeResult(Type):
         mode_ = mode
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if mode_ is not None and not isinstance(mode_, (bytes, str)):
@@ -17803,7 +17785,7 @@ class Resource(Type):
         username_ = username
 
         # Validate arguments against known Juju API types.
-        if charmresource_ is not None and not isinstance(charmresource_, (dict, set, CharmResource)):
+        if charmresource_ is not None and not isinstance(charmresource_, (dict, CharmResource)):
             raise Exception("Expected charmresource_ to be a CharmResource, received: {}".format(type(charmresource_)))
 
         if application_ is not None and not isinstance(application_, (bytes, str)):
@@ -17875,10 +17857,10 @@ class ResourceResult(Type):
         resource_ = Resource.from_json(resource) if resource else None
 
         # Validate arguments against known Juju API types.
-        if errorresult_ is not None and not isinstance(errorresult_, (dict, set, ErrorResult)):
+        if errorresult_ is not None and not isinstance(errorresult_, (dict, ErrorResult)):
             raise Exception("Expected errorresult_ to be a ErrorResult, received: {}".format(type(errorresult_)))
 
-        if resource_ is not None and not isinstance(resource_, (dict, set, Resource)):
+        if resource_ is not None and not isinstance(resource_, (dict, Resource)):
             raise Exception("Expected resource_ to be a Resource, received: {}".format(type(resource_)))
 
         self.errorresult = errorresult_
@@ -17905,13 +17887,13 @@ class ResourcesResult(Type):
         unit_resources_ = [UnitResources.from_json(o) for o in unit_resources or []]
 
         # Validate arguments against known Juju API types.
-        if errorresult_ is not None and not isinstance(errorresult_, (dict, set, ErrorResult)):
+        if errorresult_ is not None and not isinstance(errorresult_, (dict, ErrorResult)):
             raise Exception("Expected errorresult_ to be a ErrorResult, received: {}".format(type(errorresult_)))
 
         if charm_store_resources_ is not None and not isinstance(charm_store_resources_, (bytes, str, list)):
             raise Exception("Expected charm_store_resources_ to be a Sequence, received: {}".format(type(charm_store_resources_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if resources_ is not None and not isinstance(resources_, (bytes, str, list)):
@@ -18037,10 +18019,10 @@ class RetryStrategyResult(Type):
         result_ = RetryStrategy.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, RetryStrategy)):
+        if result_ is not None and not isinstance(result_, (dict, RetryStrategy)):
             raise Exception("Expected result_ to be a RetryStrategy, received: {}".format(type(result_)))
 
         self.error = error_
@@ -18166,7 +18148,7 @@ class SSHAddressResult(Type):
         if address_ is not None and not isinstance(address_, (bytes, str)):
             raise Exception("Expected address_ to be a str, received: {}".format(type(address_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         self.address = address_
@@ -18208,7 +18190,7 @@ class SSHAddressesResult(Type):
         if addresses_ is not None and not isinstance(addresses_, (bytes, str, list)):
             raise Exception("Expected addresses_ to be a Sequence, received: {}".format(type(addresses_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         self.addresses = addresses_
@@ -18307,7 +18289,7 @@ class SSHPublicKeysResult(Type):
         public_keys_ = public_keys
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if public_keys_ is not None and not isinstance(public_keys_, (bytes, str, list)):
@@ -18403,10 +18385,10 @@ class ScaleApplicationResult(Type):
         info_ = ScaleApplicationInfo.from_json(info) if info else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if info_ is not None and not isinstance(info_, (dict, set, ScaleApplicationInfo)):
+        if info_ is not None and not isinstance(info_, (dict, ScaleApplicationInfo)):
             raise Exception("Expected info_ to be a ScaleApplicationInfo, received: {}".format(type(info_)))
 
         self.error = error_
@@ -18508,16 +18490,16 @@ class SerializedModelResource(Type):
         if application_ is not None and not isinstance(application_, (bytes, str)):
             raise Exception("Expected application_ to be a str, received: {}".format(type(application_)))
 
-        if application_revision_ is not None and not isinstance(application_revision_, (dict, set, SerializedModelResourceRevision)):
+        if application_revision_ is not None and not isinstance(application_revision_, (dict, SerializedModelResourceRevision)):
             raise Exception("Expected application_revision_ to be a SerializedModelResourceRevision, received: {}".format(type(application_revision_)))
 
-        if charmstore_revision_ is not None and not isinstance(charmstore_revision_, (dict, set, SerializedModelResourceRevision)):
+        if charmstore_revision_ is not None and not isinstance(charmstore_revision_, (dict, SerializedModelResourceRevision)):
             raise Exception("Expected charmstore_revision_ to be a SerializedModelResourceRevision, received: {}".format(type(charmstore_revision_)))
 
         if name_ is not None and not isinstance(name_, (bytes, str)):
             raise Exception("Expected name_ to be a str, received: {}".format(type(name_)))
 
-        if unit_revisions_ is not None and not isinstance(unit_revisions_, (dict, set)):
+        if unit_revisions_ is not None and not isinstance(unit_revisions_, dict):
             raise Exception("Expected unit_revisions_ to be a Mapping, received: {}".format(type(unit_revisions_)))
 
         self.application = application_
@@ -18634,7 +18616,7 @@ class SetConstraints(Type):
         if application_ is not None and not isinstance(application_, (bytes, str)):
             raise Exception("Expected application_ to be a str, received: {}".format(type(application_)))
 
-        if constraints_ is not None and not isinstance(constraints_, (dict, set, Value)):
+        if constraints_ is not None and not isinstance(constraints_, (dict, Value)):
             raise Exception("Expected constraints_ to be a Value, received: {}".format(type(constraints_)))
 
         self.application = application_
@@ -18653,7 +18635,7 @@ class SetExternalControllerInfoParams(Type):
         info_ = ExternalControllerInfo.from_json(info) if info else None
 
         # Validate arguments against known Juju API types.
-        if info_ is not None and not isinstance(info_, (dict, set, ExternalControllerInfo)):
+        if info_ is not None and not isinstance(info_, (dict, ExternalControllerInfo)):
             raise Exception("Expected info_ to be a ExternalControllerInfo, received: {}".format(type(info_)))
 
         self.info = info_
@@ -18790,7 +18772,7 @@ class SetModelAgentVersion(Type):
         if force_ is not None and not isinstance(force_, bool):
             raise Exception("Expected force_ to be a bool, received: {}".format(type(force_)))
 
-        if version_ is not None and not isinstance(version_, (dict, set, Number)):
+        if version_ is not None and not isinstance(version_, (dict, Number)):
             raise Exception("Expected version_ to be a Number, received: {}".format(type(version_)))
 
         self.force = force_
@@ -18873,7 +18855,7 @@ class SetPayloadStatusArg(Type):
         tag_ = tag
 
         # Validate arguments against known Juju API types.
-        if entity_ is not None and not isinstance(entity_, (dict, set, Entity)):
+        if entity_ is not None and not isinstance(entity_, (dict, Entity)):
             raise Exception("Expected entity_ to be a Entity, received: {}".format(type(entity_)))
 
         if status_ is not None and not isinstance(status_, (bytes, str)):
@@ -18937,7 +18919,7 @@ class SetProfileArg(Type):
         profiles_ = profiles
 
         # Validate arguments against known Juju API types.
-        if entity_ is not None and not isinstance(entity_, (dict, set, Entity)):
+        if entity_ is not None and not isinstance(entity_, (dict, Entity)):
             raise Exception("Expected entity_ to be a Entity, received: {}".format(type(entity_)))
 
         if profiles_ is not None and not isinstance(profiles_, (bytes, str, list)):
@@ -18979,7 +18961,7 @@ class SetProfileUpgradeCompleteArg(Type):
         message_ = message
 
         # Validate arguments against known Juju API types.
-        if entity_ is not None and not isinstance(entity_, (dict, set, Entity)):
+        if entity_ is not None and not isinstance(entity_, (dict, Entity)):
             raise Exception("Expected entity_ to be a Entity, received: {}".format(type(entity_)))
 
         if message_ is not None and not isinstance(message_, (bytes, str)):
@@ -19039,7 +19021,7 @@ class SetStatusArg(Type):
         status_ = status
 
         # Validate arguments against known Juju API types.
-        if entity_ is not None and not isinstance(entity_, (dict, set, Entity)):
+        if entity_ is not None and not isinstance(entity_, (dict, Entity)):
             raise Exception("Expected entity_ to be a Entity, received: {}".format(type(entity_)))
 
         if status_ is not None and not isinstance(status_, (bytes, str)):
@@ -19123,10 +19105,10 @@ class SettingsResult(Type):
         settings_ = settings
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if settings_ is not None and not isinstance(settings_, (dict, set)):
+        if settings_ is not None and not isinstance(settings_, dict):
             raise Exception("Expected settings_ to be a Mapping, received: {}".format(type(settings_)))
 
         self.error = error_
@@ -19215,7 +19197,7 @@ class Space(Type):
         subnets_ = [Subnet.from_json(o) for o in subnets or []]
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if name_ is not None and not isinstance(name_, (bytes, str)):
@@ -19243,7 +19225,7 @@ class SpaceResult(Type):
         tag_ = tag
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if tag_ is not None and not isinstance(tag_, (bytes, str)):
@@ -19409,7 +19391,7 @@ class StatusHistoryRequest(Type):
         tag_ = tag
 
         # Validate arguments against known Juju API types.
-        if filter__ is not None and not isinstance(filter__, (dict, set, StatusHistoryFilter)):
+        if filter__ is not None and not isinstance(filter__, (dict, StatusHistoryFilter)):
             raise Exception("Expected filter__ to be a StatusHistoryFilter, received: {}".format(type(filter__)))
 
         if historykind_ is not None and not isinstance(historykind_, (bytes, str)):
@@ -19459,10 +19441,10 @@ class StatusHistoryResult(Type):
         history_ = History.from_json(history) if history else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if history_ is not None and not isinstance(history_, (dict, set, History)):
+        if history_ is not None and not isinstance(history_, (dict, History)):
             raise Exception("Expected history_ to be a History, received: {}".format(type(history_)))
 
         self.error = error_
@@ -19529,10 +19511,10 @@ class StatusResult(Type):
         status_ = status
 
         # Validate arguments against known Juju API types.
-        if data_ is not None and not isinstance(data_, (dict, set)):
+        if data_ is not None and not isinstance(data_, dict):
             raise Exception("Expected data_ to be a Mapping, received: {}".format(type(data_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if id__ is not None and not isinstance(id__, (bytes, str)):
@@ -19596,7 +19578,7 @@ class StorageAddParams(Type):
         if name_ is not None and not isinstance(name_, (bytes, str)):
             raise Exception("Expected name_ to be a str, received: {}".format(type(name_)))
 
-        if storage_ is not None and not isinstance(storage_, (dict, set, StorageConstraints)):
+        if storage_ is not None and not isinstance(storage_, (dict, StorageConstraints)):
             raise Exception("Expected storage_ to be a StorageConstraints, received: {}".format(type(storage_)))
 
         if unit_ is not None and not isinstance(unit_, (bytes, str)):
@@ -19753,10 +19735,10 @@ class StorageAttachmentIdsResult(Type):
         result_ = StorageAttachmentIds.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, StorageAttachmentIds)):
+        if result_ is not None and not isinstance(result_, (dict, StorageAttachmentIds)):
             raise Exception("Expected result_ to be a StorageAttachmentIds, received: {}".format(type(result_)))
 
         self.error = error_
@@ -19795,10 +19777,10 @@ class StorageAttachmentResult(Type):
         result_ = StorageAttachment.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, StorageAttachment)):
+        if result_ is not None and not isinstance(result_, (dict, StorageAttachment)):
             raise Exception("Expected result_ to be a StorageAttachment, received: {}".format(type(result_)))
 
         self.error = error_
@@ -19872,7 +19854,7 @@ class StorageDetachmentParams(Type):
         if force_ is not None and not isinstance(force_, bool):
             raise Exception("Expected force_ to be a bool, received: {}".format(type(force_)))
 
-        if ids_ is not None and not isinstance(ids_, (dict, set, StorageAttachmentIds)):
+        if ids_ is not None and not isinstance(ids_, (dict, StorageAttachmentIds)):
             raise Exception("Expected ids_ to be a StorageAttachmentIds, received: {}".format(type(ids_)))
 
         if max_wait_ is not None and not isinstance(max_wait_, int):
@@ -19907,7 +19889,7 @@ class StorageDetails(Type):
         storage_tag_ = storage_tag
 
         # Validate arguments against known Juju API types.
-        if attachments_ is not None and not isinstance(attachments_, (dict, set)):
+        if attachments_ is not None and not isinstance(attachments_, dict):
             raise Exception("Expected attachments_ to be a Mapping, received: {}".format(type(attachments_)))
 
         if kind_ is not None and not isinstance(kind_, int):
@@ -19922,7 +19904,7 @@ class StorageDetails(Type):
         if persistent_ is not None and not isinstance(persistent_, bool):
             raise Exception("Expected persistent_ to be a bool, received: {}".format(type(persistent_)))
 
-        if status_ is not None and not isinstance(status_, (dict, set, EntityStatus)):
+        if status_ is not None and not isinstance(status_, (dict, EntityStatus)):
             raise Exception("Expected status_ to be a EntityStatus, received: {}".format(type(status_)))
 
         if storage_tag_ is not None and not isinstance(storage_tag_, (bytes, str)):
@@ -19951,7 +19933,7 @@ class StorageDetailsListResult(Type):
         result_ = [StorageDetails.from_json(o) for o in result or []]
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if result_ is not None and not isinstance(result_, (bytes, str, list)):
@@ -19993,10 +19975,10 @@ class StorageDetailsResult(Type):
         result_ = StorageDetails.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, StorageDetails)):
+        if result_ is not None and not isinstance(result_, (dict, StorageDetails)):
             raise Exception("Expected result_ to be a StorageDetails, received: {}".format(type(result_)))
 
         self.error = error_
@@ -20066,7 +20048,7 @@ class StoragePool(Type):
         provider_ = provider
 
         # Validate arguments against known Juju API types.
-        if attrs_ is not None and not isinstance(attrs_, (dict, set)):
+        if attrs_ is not None and not isinstance(attrs_, dict):
             raise Exception("Expected attrs_ to be a Mapping, received: {}".format(type(attrs_)))
 
         if name_ is not None and not isinstance(name_, (bytes, str)):
@@ -20190,7 +20172,7 @@ class StoragePoolsResult(Type):
         storage_pools_ = [StoragePool.from_json(o) for o in storage_pools or []]
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if storage_pools_ is not None and not isinstance(storage_pools_, (bytes, str, list)):
@@ -20252,7 +20234,7 @@ class StringBoolResult(Type):
         result_ = result
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if ok_ is not None and not isinstance(ok_, bool):
@@ -20298,7 +20280,7 @@ class StringResult(Type):
         result_ = result
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if result_ is not None and not isinstance(result_, (bytes, str)):
@@ -20340,7 +20322,7 @@ class StringsResult(Type):
         result_ = result
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if result_ is not None and not isinstance(result_, (bytes, str, list)):
@@ -20387,7 +20369,7 @@ class StringsWatchResult(Type):
         if changes_ is not None and not isinstance(changes_, (bytes, str, list)):
             raise Exception("Expected changes_ to be a Sequence, received: {}".format(type(changes_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if watcher_id_ is not None and not isinstance(watcher_id_, (bytes, str)):
@@ -20520,7 +20502,7 @@ class TaggedCredential(Type):
         tag_ = tag
 
         # Validate arguments against known Juju API types.
-        if credential_ is not None and not isinstance(credential_, (dict, set, CloudCredential)):
+        if credential_ is not None and not isinstance(credential_, (dict, CloudCredential)):
             raise Exception("Expected credential_ to be a CloudCredential, received: {}".format(type(credential_)))
 
         if tag_ is not None and not isinstance(tag_, (bytes, str)):
@@ -20562,7 +20544,7 @@ class TokenResult(Type):
         token_ = token
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if token_ is not None and not isinstance(token_, (bytes, str)):
@@ -20617,7 +20599,7 @@ class Tools(Type):
         if url_ is not None and not isinstance(url_, (bytes, str)):
             raise Exception("Expected url_ to be a str, received: {}".format(type(url_)))
 
-        if version_ is not None and not isinstance(version_, (dict, set, Binary)):
+        if version_ is not None and not isinstance(version_, (dict, Binary)):
             raise Exception("Expected version_ to be a Binary, received: {}".format(type(version_)))
 
         self.sha256 = sha256_
@@ -20645,7 +20627,7 @@ class ToolsResult(Type):
         if disable_ssl_hostname_verification_ is not None and not isinstance(disable_ssl_hostname_verification_, bool):
             raise Exception("Expected disable_ssl_hostname_verification_ to be a bool, received: {}".format(type(disable_ssl_hostname_verification_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if tools_ is not None and not isinstance(tools_, (bytes, str, list)):
@@ -20772,10 +20754,10 @@ class UndertakerModelInfoResult(Type):
         result_ = UndertakerModelInfo.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, UndertakerModelInfo)):
+        if result_ is not None and not isinstance(result_, (dict, UndertakerModelInfo)):
             raise Exception("Expected result_ to be a UndertakerModelInfo, received: {}".format(type(result_)))
 
         self.error = error_
@@ -20820,7 +20802,7 @@ class UnitNetworkConfigResult(Type):
         info_ = [NetworkConfig.from_json(o) for o in info or []]
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if info_ is not None and not isinstance(info_, (bytes, str, list)):
@@ -20864,7 +20846,7 @@ class UnitRefreshResult(Type):
         resolved_ = resolved
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if life_ is not None and not isinstance(life_, (bytes, str)):
@@ -20912,13 +20894,13 @@ class UnitResourceResult(Type):
         resource_ = Resource.from_json(resource) if resource else None
 
         # Validate arguments against known Juju API types.
-        if errorresult_ is not None and not isinstance(errorresult_, (dict, set, ErrorResult)):
+        if errorresult_ is not None and not isinstance(errorresult_, (dict, ErrorResult)):
             raise Exception("Expected errorresult_ to be a ErrorResult, received: {}".format(type(errorresult_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if resource_ is not None and not isinstance(resource_, (dict, set, Resource)):
+        if resource_ is not None and not isinstance(resource_, (dict, Resource)):
             raise Exception("Expected resource_ to be a Resource, received: {}".format(type(resource_)))
 
         self.errorresult = errorresult_
@@ -20944,10 +20926,10 @@ class UnitResources(Type):
         tag_ = tag
 
         # Validate arguments against known Juju API types.
-        if entity_ is not None and not isinstance(entity_, (dict, set, Entity)):
+        if entity_ is not None and not isinstance(entity_, (dict, Entity)):
             raise Exception("Expected entity_ to be a Entity, received: {}".format(type(entity_)))
 
-        if download_progress_ is not None and not isinstance(download_progress_, (dict, set)):
+        if download_progress_ is not None and not isinstance(download_progress_, dict):
             raise Exception("Expected download_progress_ to be a Mapping, received: {}".format(type(download_progress_)))
 
         if resources_ is not None and not isinstance(resources_, (bytes, str, list)):
@@ -20978,10 +20960,10 @@ class UnitResourcesResult(Type):
         resources_ = [UnitResourceResult.from_json(o) for o in resources or []]
 
         # Validate arguments against known Juju API types.
-        if errorresult_ is not None and not isinstance(errorresult_, (dict, set, ErrorResult)):
+        if errorresult_ is not None and not isinstance(errorresult_, (dict, ErrorResult)):
             raise Exception("Expected errorresult_ to be a ErrorResult, received: {}".format(type(errorresult_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if resources_ is not None and not isinstance(resources_, (bytes, str, list)):
@@ -21045,7 +21027,7 @@ class UnitStatus(Type):
         if address_ is not None and not isinstance(address_, (bytes, str)):
             raise Exception("Expected address_ to be a str, received: {}".format(type(address_)))
 
-        if agent_status_ is not None and not isinstance(agent_status_, (dict, set, DetailedStatus)):
+        if agent_status_ is not None and not isinstance(agent_status_, (dict, DetailedStatus)):
             raise Exception("Expected agent_status_ to be a DetailedStatus, received: {}".format(type(agent_status_)))
 
         if charm_ is not None and not isinstance(charm_, (bytes, str)):
@@ -21066,10 +21048,10 @@ class UnitStatus(Type):
         if public_address_ is not None and not isinstance(public_address_, (bytes, str)):
             raise Exception("Expected public_address_ to be a str, received: {}".format(type(public_address_)))
 
-        if subordinates_ is not None and not isinstance(subordinates_, (dict, set)):
+        if subordinates_ is not None and not isinstance(subordinates_, dict):
             raise Exception("Expected subordinates_ to be a Mapping, received: {}".format(type(subordinates_)))
 
-        if workload_status_ is not None and not isinstance(workload_status_, (dict, set, DetailedStatus)):
+        if workload_status_ is not None and not isinstance(workload_status_, (dict, DetailedStatus)):
             raise Exception("Expected workload_status_ to be a DetailedStatus, received: {}".format(type(workload_status_)))
 
         if workload_version_ is not None and not isinstance(workload_version_, (bytes, str)):
@@ -21128,7 +21110,7 @@ class UnitsResolved(Type):
         if retry_ is not None and not isinstance(retry_, bool):
             raise Exception("Expected retry_ to be a bool, received: {}".format(type(retry_)))
 
-        if tags_ is not None and not isinstance(tags_, (dict, set, Entities)):
+        if tags_ is not None and not isinstance(tags_, (dict, Entities)):
             raise Exception("Expected tags_ to be a Entities, received: {}".format(type(tags_)))
 
         self.all_ = all__
@@ -21261,7 +21243,7 @@ class UpdateApplicationUnits(Type):
         if scale_ is not None and not isinstance(scale_, int):
             raise Exception("Expected scale_ to be a int, received: {}".format(type(scale_)))
 
-        if status_ is not None and not isinstance(status_, (dict, set, EntityStatus)):
+        if status_ is not None and not isinstance(status_, (dict, EntityStatus)):
             raise Exception("Expected status_ to be a EntityStatus, received: {}".format(type(status_)))
 
         if units_ is not None and not isinstance(units_, (bytes, str, list)):
@@ -21330,7 +21312,7 @@ class UpdateCloudCredential(Type):
         tag_ = tag
 
         # Validate arguments against known Juju API types.
-        if credential_ is not None and not isinstance(credential_, (dict, set, CloudCredential)):
+        if credential_ is not None and not isinstance(credential_, (dict, CloudCredential)):
             raise Exception("Expected credential_ to be a CloudCredential, received: {}".format(type(credential_)))
 
         if tag_ is not None and not isinstance(tag_, (bytes, str)):
@@ -21428,7 +21410,7 @@ class UpdateCredentialResult(Type):
         tag_ = tag
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if models_ is not None and not isinstance(models_, (bytes, str, list)):
@@ -21482,7 +21464,7 @@ class UpdateSeriesArg(Type):
         if series_ is not None and not isinstance(series_, (bytes, str)):
             raise Exception("Expected series_ to be a str, received: {}".format(type(series_)))
 
-        if tag_ is not None and not isinstance(tag_, (dict, set, Entity)):
+        if tag_ is not None and not isinstance(tag_, (dict, Entity)):
             raise Exception("Expected tag_ to be a Entity, received: {}".format(type(tag_)))
 
         self.force = force_
@@ -21520,7 +21502,7 @@ class UpgradeMongoParams(Type):
         target_ = MongoVersion.from_json(target) if target else None
 
         # Validate arguments against known Juju API types.
-        if target_ is not None and not isinstance(target_, (dict, set, MongoVersion)):
+        if target_ is not None and not isinstance(target_, (dict, MongoVersion)):
             raise Exception("Expected target_ to be a MongoVersion, received: {}".format(type(target_)))
 
         self.target = target_
@@ -21540,7 +21522,7 @@ class UpgradeSeriesNotificationParam(Type):
         watcher_id_ = watcher_id
 
         # Validate arguments against known Juju API types.
-        if entity_ is not None and not isinstance(entity_, (dict, set, Entity)):
+        if entity_ is not None and not isinstance(entity_, (dict, Entity)):
             raise Exception("Expected entity_ to be a Entity, received: {}".format(type(entity_)))
 
         if watcher_id_ is not None and not isinstance(watcher_id_, (bytes, str)):
@@ -21608,7 +21590,7 @@ class UpgradeSeriesStatusParam(Type):
         status_ = status
 
         # Validate arguments against known Juju API types.
-        if entity_ is not None and not isinstance(entity_, (dict, set, Entity)):
+        if entity_ is not None and not isinstance(entity_, (dict, Entity)):
             raise Exception("Expected entity_ to be a Entity, received: {}".format(type(entity_)))
 
         if message_ is not None and not isinstance(message_, (bytes, str)):
@@ -21654,7 +21636,7 @@ class UpgradeSeriesStatusResult(Type):
         status_ = status
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if status_ is not None and not isinstance(status_, (bytes, str)):
@@ -21696,7 +21678,7 @@ class UpgradeSeriesUnitsResult(Type):
         unit_names_ = unit_names
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if unit_names_ is not None and not isinstance(unit_names_, (bytes, str, list)):
@@ -21762,10 +21744,10 @@ class UserAccessResult(Type):
         result_ = UserAccess.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, UserAccess)):
+        if result_ is not None and not isinstance(result_, (dict, UserAccess)):
             raise Exception("Expected result_ to be a UserAccess, received: {}".format(type(result_)))
 
         self.error = error_
@@ -21924,10 +21906,10 @@ class UserInfoResult(Type):
         result_ = UserInfo.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, UserInfo)):
+        if result_ is not None and not isinstance(result_, (dict, UserInfo)):
             raise Exception("Expected result_ to be a UserInfo, received: {}".format(type(result_)))
 
         self.error = error_
@@ -21969,7 +21951,7 @@ class UserModel(Type):
         if last_connection_ is not None and not isinstance(last_connection_, (bytes, str)):
             raise Exception("Expected last_connection_ to be a str, received: {}".format(type(last_connection_)))
 
-        if model_ is not None and not isinstance(model_, (dict, set, Model)):
+        if model_ is not None and not isinstance(model_, (dict, Model)):
             raise Exception("Expected model_ to be a Model, received: {}".format(type(model_)))
 
         self.last_connection = last_connection_
@@ -22090,7 +22072,7 @@ class Version(Type):
         version_ = Binary.from_json(version) if version else None
 
         # Validate arguments against known Juju API types.
-        if version_ is not None and not isinstance(version_, (dict, set, Binary)):
+        if version_ is not None and not isinstance(version_, (dict, Binary)):
             raise Exception("Expected version_ to be a Binary, received: {}".format(type(version_)))
 
         self.version = version_
@@ -22110,10 +22092,10 @@ class VersionResult(Type):
         version_ = Number.from_json(version) if version else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if version_ is not None and not isinstance(version_, (dict, set, Number)):
+        if version_ is not None and not isinstance(version_, (dict, Number)):
             raise Exception("Expected version_ to be a Number, received: {}".format(type(version_)))
 
         self.error = error_
@@ -22152,7 +22134,7 @@ class Volume(Type):
         volume_tag_ = volume_tag
 
         # Validate arguments against known Juju API types.
-        if info_ is not None and not isinstance(info_, (dict, set, VolumeInfo)):
+        if info_ is not None and not isinstance(info_, (dict, VolumeInfo)):
             raise Exception("Expected info_ to be a VolumeInfo, received: {}".format(type(info_)))
 
         if volume_tag_ is not None and not isinstance(volume_tag_, (bytes, str)):
@@ -22178,7 +22160,7 @@ class VolumeAttachment(Type):
         volume_tag_ = volume_tag
 
         # Validate arguments against known Juju API types.
-        if info_ is not None and not isinstance(info_, (dict, set, VolumeAttachmentInfo)):
+        if info_ is not None and not isinstance(info_, (dict, VolumeAttachmentInfo)):
             raise Exception("Expected info_ to be a VolumeAttachmentInfo, received: {}".format(type(info_)))
 
         if machine_tag_ is not None and not isinstance(machine_tag_, (bytes, str)):
@@ -22216,7 +22198,7 @@ class VolumeAttachmentDetails(Type):
         read_only_ = read_only
 
         # Validate arguments against known Juju API types.
-        if volumeattachmentinfo_ is not None and not isinstance(volumeattachmentinfo_, (dict, set, VolumeAttachmentInfo)):
+        if volumeattachmentinfo_ is not None and not isinstance(volumeattachmentinfo_, (dict, VolumeAttachmentInfo)):
             raise Exception("Expected volumeattachmentinfo_ to be a VolumeAttachmentInfo, received: {}".format(type(volumeattachmentinfo_)))
 
         if bus_address_ is not None and not isinstance(bus_address_, (bytes, str)):
@@ -22231,7 +22213,7 @@ class VolumeAttachmentDetails(Type):
         if life_ is not None and not isinstance(life_, (bytes, str)):
             raise Exception("Expected life_ to be a str, received: {}".format(type(life_)))
 
-        if plan_info_ is not None and not isinstance(plan_info_, (dict, set, VolumeAttachmentPlanInfo)):
+        if plan_info_ is not None and not isinstance(plan_info_, (dict, VolumeAttachmentPlanInfo)):
             raise Exception("Expected plan_info_ to be a VolumeAttachmentPlanInfo, received: {}".format(type(plan_info_)))
 
         if read_only_ is not None and not isinstance(read_only_, bool):
@@ -22275,7 +22257,7 @@ class VolumeAttachmentInfo(Type):
         if device_name_ is not None and not isinstance(device_name_, (bytes, str)):
             raise Exception("Expected device_name_ to be a str, received: {}".format(type(device_name_)))
 
-        if plan_info_ is not None and not isinstance(plan_info_, (dict, set, VolumeAttachmentPlanInfo)):
+        if plan_info_ is not None and not isinstance(plan_info_, (dict, VolumeAttachmentPlanInfo)):
             raise Exception("Expected plan_info_ to be a VolumeAttachmentPlanInfo, received: {}".format(type(plan_info_)))
 
         if read_only_ is not None and not isinstance(read_only_, bool):
@@ -22350,10 +22332,10 @@ class VolumeAttachmentParamsResult(Type):
         result_ = VolumeAttachmentParams.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, VolumeAttachmentParams)):
+        if result_ is not None and not isinstance(result_, (dict, VolumeAttachmentParams)):
             raise Exception("Expected result_ to be a VolumeAttachmentParams, received: {}".format(type(result_)))
 
         self.error = error_
@@ -22398,7 +22380,7 @@ class VolumeAttachmentPlan(Type):
         volume_tag_ = volume_tag
 
         # Validate arguments against known Juju API types.
-        if block_device_ is not None and not isinstance(block_device_, (dict, set, BlockDevice)):
+        if block_device_ is not None and not isinstance(block_device_, (dict, BlockDevice)):
             raise Exception("Expected block_device_ to be a BlockDevice, received: {}".format(type(block_device_)))
 
         if life_ is not None and not isinstance(life_, (bytes, str)):
@@ -22407,7 +22389,7 @@ class VolumeAttachmentPlan(Type):
         if machine_tag_ is not None and not isinstance(machine_tag_, (bytes, str)):
             raise Exception("Expected machine_tag_ to be a str, received: {}".format(type(machine_tag_)))
 
-        if plan_info_ is not None and not isinstance(plan_info_, (dict, set, VolumeAttachmentPlanInfo)):
+        if plan_info_ is not None and not isinstance(plan_info_, (dict, VolumeAttachmentPlanInfo)):
             raise Exception("Expected plan_info_ to be a VolumeAttachmentPlanInfo, received: {}".format(type(plan_info_)))
 
         if volume_tag_ is not None and not isinstance(volume_tag_, (bytes, str)):
@@ -22434,7 +22416,7 @@ class VolumeAttachmentPlanInfo(Type):
         device_type_ = device_type
 
         # Validate arguments against known Juju API types.
-        if device_attributes_ is not None and not isinstance(device_attributes_, (dict, set)):
+        if device_attributes_ is not None and not isinstance(device_attributes_, dict):
             raise Exception("Expected device_attributes_ to be a Mapping, received: {}".format(type(device_attributes_)))
 
         if device_type_ is not None and not isinstance(device_type_, (bytes, str)):
@@ -22458,10 +22440,10 @@ class VolumeAttachmentPlanResult(Type):
         result_ = VolumeAttachmentPlan.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, VolumeAttachmentPlan)):
+        if result_ is not None and not isinstance(result_, (dict, VolumeAttachmentPlan)):
             raise Exception("Expected result_ to be a VolumeAttachmentPlan, received: {}".format(type(result_)))
 
         self.error = error_
@@ -22518,10 +22500,10 @@ class VolumeAttachmentResult(Type):
         result_ = VolumeAttachment.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, VolumeAttachment)):
+        if result_ is not None and not isinstance(result_, (dict, VolumeAttachment)):
             raise Exception("Expected result_ to be a VolumeAttachment, received: {}".format(type(result_)))
 
         self.error = error_
@@ -22588,22 +22570,22 @@ class VolumeDetails(Type):
         volume_tag_ = volume_tag
 
         # Validate arguments against known Juju API types.
-        if info_ is not None and not isinstance(info_, (dict, set, VolumeInfo)):
+        if info_ is not None and not isinstance(info_, (dict, VolumeInfo)):
             raise Exception("Expected info_ to be a VolumeInfo, received: {}".format(type(info_)))
 
         if life_ is not None and not isinstance(life_, (bytes, str)):
             raise Exception("Expected life_ to be a str, received: {}".format(type(life_)))
 
-        if machine_attachments_ is not None and not isinstance(machine_attachments_, (dict, set)):
+        if machine_attachments_ is not None and not isinstance(machine_attachments_, dict):
             raise Exception("Expected machine_attachments_ to be a Mapping, received: {}".format(type(machine_attachments_)))
 
-        if status_ is not None and not isinstance(status_, (dict, set, EntityStatus)):
+        if status_ is not None and not isinstance(status_, (dict, EntityStatus)):
             raise Exception("Expected status_ to be a EntityStatus, received: {}".format(type(status_)))
 
-        if storage_ is not None and not isinstance(storage_, (dict, set, StorageDetails)):
+        if storage_ is not None and not isinstance(storage_, (dict, StorageDetails)):
             raise Exception("Expected storage_ to be a StorageDetails, received: {}".format(type(storage_)))
 
-        if unit_attachments_ is not None and not isinstance(unit_attachments_, (dict, set)):
+        if unit_attachments_ is not None and not isinstance(unit_attachments_, dict):
             raise Exception("Expected unit_attachments_ to be a Mapping, received: {}".format(type(unit_attachments_)))
 
         if volume_tag_ is not None and not isinstance(volume_tag_, (bytes, str)):
@@ -22632,7 +22614,7 @@ class VolumeDetailsListResult(Type):
         result_ = [VolumeDetails.from_json(o) for o in result or []]
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if result_ is not None and not isinstance(result_, (bytes, str, list)):
@@ -22766,10 +22748,10 @@ class VolumeParams(Type):
         volume_tag_ = volume_tag
 
         # Validate arguments against known Juju API types.
-        if attachment_ is not None and not isinstance(attachment_, (dict, set, VolumeAttachmentParams)):
+        if attachment_ is not None and not isinstance(attachment_, (dict, VolumeAttachmentParams)):
             raise Exception("Expected attachment_ to be a VolumeAttachmentParams, received: {}".format(type(attachment_)))
 
-        if attributes_ is not None and not isinstance(attributes_, (dict, set)):
+        if attributes_ is not None and not isinstance(attributes_, dict):
             raise Exception("Expected attributes_ to be a Mapping, received: {}".format(type(attributes_)))
 
         if provider_ is not None and not isinstance(provider_, (bytes, str)):
@@ -22778,7 +22760,7 @@ class VolumeParams(Type):
         if size_ is not None and not isinstance(size_, int):
             raise Exception("Expected size_ to be a int, received: {}".format(type(size_)))
 
-        if tags_ is not None and not isinstance(tags_, (dict, set)):
+        if tags_ is not None and not isinstance(tags_, dict):
             raise Exception("Expected tags_ to be a Mapping, received: {}".format(type(tags_)))
 
         if volume_tag_ is not None and not isinstance(volume_tag_, (bytes, str)):
@@ -22806,10 +22788,10 @@ class VolumeParamsResult(Type):
         result_ = VolumeParams.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, VolumeParams)):
+        if result_ is not None and not isinstance(result_, (dict, VolumeParams)):
             raise Exception("Expected result_ to be a VolumeParams, received: {}".format(type(result_)))
 
         self.error = error_
@@ -22848,10 +22830,10 @@ class VolumeResult(Type):
         result_ = Volume.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, set, Volume)):
+        if result_ is not None and not isinstance(result_, (dict, Volume)):
             raise Exception("Expected result_ to be a Volume, received: {}".format(type(result_)))
 
         self.error = error_
@@ -22955,7 +22937,7 @@ class ZoneResult(Type):
         if available_ is not None and not isinstance(available_, bool):
             raise Exception("Expected available_ to be a bool, received: {}".format(type(available_)))
 
-        if error_ is not None and not isinstance(error_, (dict, set, Error)):
+        if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if name_ is not None and not isinstance(name_, (bytes, str)):

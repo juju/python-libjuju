@@ -396,7 +396,7 @@ class ControllerFacade(Type):
         config : typing.Mapping[str, typing.Any]
         Returns -> None
         '''
-        if config is not None and not isinstance(config, (dict, set)):
+        if config is not None and not isinstance(config, dict):
             raise Exception("Expected config to be a Mapping, received: {}".format(type(config)))
 
         # map input types to rpc msg
@@ -1195,7 +1195,7 @@ class ModelManagerFacade(Type):
         if cloud_tag is not None and not isinstance(cloud_tag, (bytes, str)):
             raise Exception("Expected cloud_tag to be a str, received: {}".format(type(cloud_tag)))
 
-        if config is not None and not isinstance(config, (dict, set)):
+        if config is not None and not isinstance(config, dict):
             raise Exception("Expected config to be a Mapping, received: {}".format(type(config)))
 
         if credential is not None and not isinstance(credential, (bytes, str)):
@@ -2552,7 +2552,7 @@ class ProvisionerFacade(Type):
         if minor is not None and not isinstance(minor, int):
             raise Exception("Expected minor to be a int, received: {}".format(type(minor)))
 
-        if number is not None and not isinstance(number, (dict, set, Number)):
+        if number is not None and not isinstance(number, (dict, Number)):
             raise Exception("Expected number to be a Number, received: {}".format(type(number)))
 
         if series is not None and not isinstance(series, (bytes, str)):

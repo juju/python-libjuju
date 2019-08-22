@@ -1935,7 +1935,7 @@ class CAASOperatorUpgraderFacade(Type):
         if agent_tag is not None and not isinstance(agent_tag, (bytes, str)):
             raise Exception("Expected agent_tag to be a str, received: {}".format(type(agent_tag)))
 
-        if version is not None and not isinstance(version, (dict, set, Number)):
+        if version is not None and not isinstance(version, (dict, Number)):
             raise Exception("Expected version to be a Number, received: {}".format(type(version)))
 
         # map input types to rpc msg
@@ -3306,7 +3306,7 @@ class ClientFacade(Type):
         if channel is not None and not isinstance(channel, (bytes, str)):
             raise Exception("Expected channel to be a str, received: {}".format(type(channel)))
 
-        if macaroon is not None and not isinstance(macaroon, (dict, set, Macaroon)):
+        if macaroon is not None and not isinstance(macaroon, (dict, Macaroon)):
             raise Exception("Expected macaroon to be a Macaroon, received: {}".format(type(macaroon)))
 
         if url is not None and not isinstance(url, (bytes, str)):
@@ -3451,7 +3451,7 @@ class ClientFacade(Type):
         if minor is not None and not isinstance(minor, int):
             raise Exception("Expected minor to be a int, received: {}".format(type(minor)))
 
-        if number is not None and not isinstance(number, (dict, set, Number)):
+        if number is not None and not isinstance(number, (dict, Number)):
             raise Exception("Expected number to be a Number, received: {}".format(type(number)))
 
         if series is not None and not isinstance(series, (bytes, str)):
@@ -3599,7 +3599,7 @@ class ClientFacade(Type):
         config : typing.Mapping[str, typing.Any]
         Returns -> None
         '''
-        if config is not None and not isinstance(config, (dict, set)):
+        if config is not None and not isinstance(config, dict):
             raise Exception("Expected config to be a Mapping, received: {}".format(type(config)))
 
         # map input types to rpc msg
@@ -3825,7 +3825,7 @@ class ClientFacade(Type):
         version : Number
         Returns -> None
         '''
-        if version is not None and not isinstance(version, (dict, set, Number)):
+        if version is not None and not isinstance(version, (dict, Number)):
             raise Exception("Expected version to be a Number, received: {}".format(type(version)))
 
         # map input types to rpc msg
@@ -3850,7 +3850,7 @@ class ClientFacade(Type):
         if application is not None and not isinstance(application, (bytes, str)):
             raise Exception("Expected application to be a str, received: {}".format(type(application)))
 
-        if constraints is not None and not isinstance(constraints, (dict, set, Value)):
+        if constraints is not None and not isinstance(constraints, (dict, Value)):
             raise Exception("Expected constraints to be a Value, received: {}".format(type(constraints)))
 
         # map input types to rpc msg
@@ -3873,7 +3873,7 @@ class ClientFacade(Type):
         creds : typing.Sequence[int]
         Returns -> None
         '''
-        if modelslainfo is not None and not isinstance(modelslainfo, (dict, set, ModelSLAInfo)):
+        if modelslainfo is not None and not isinstance(modelslainfo, (dict, ModelSLAInfo)):
             raise Exception("Expected modelslainfo to be a ModelSLAInfo, received: {}".format(type(modelslainfo)))
 
         if creds is not None and not isinstance(creds, (bytes, str, list)):
@@ -5753,7 +5753,7 @@ class KeyManagerFacade(Type):
         mode : bool
         Returns -> typing.Sequence[~StringsResult]
         '''
-        if entities is not None and not isinstance(entities, (dict, set, Entities)):
+        if entities is not None and not isinstance(entities, (dict, Entities)):
             raise Exception("Expected entities to be a Entities, received: {}".format(type(entities)))
 
         if mode is not None and not isinstance(mode, bool):
@@ -7988,7 +7988,7 @@ class MigrationTargetFacade(Type):
         if model_tag is not None and not isinstance(model_tag, (bytes, str)):
             raise Exception("Expected model_tag to be a str, received: {}".format(type(model_tag)))
 
-        if source_controller_version is not None and not isinstance(source_controller_version, (dict, set, Number)):
+        if source_controller_version is not None and not isinstance(source_controller_version, (dict, Number)):
             raise Exception("Expected source_controller_version to be a Number, received: {}".format(type(source_controller_version)))
 
         # map input types to rpc msg
@@ -8111,10 +8111,10 @@ class MigrationTargetFacade(Type):
         uuid : str
         Returns -> None
         '''
-        if agent_version is not None and not isinstance(agent_version, (dict, set, Number)):
+        if agent_version is not None and not isinstance(agent_version, (dict, Number)):
             raise Exception("Expected agent_version to be a Number, received: {}".format(type(agent_version)))
 
-        if controller_agent_version is not None and not isinstance(controller_agent_version, (dict, set, Number)):
+        if controller_agent_version is not None and not isinstance(controller_agent_version, (dict, Number)):
             raise Exception("Expected controller_agent_version to be a Number, received: {}".format(type(controller_agent_version)))
 
         if name is not None and not isinstance(name, (bytes, str)):
@@ -8232,7 +8232,7 @@ class ModelConfigFacade(Type):
         config : typing.Mapping[str, typing.Any]
         Returns -> None
         '''
-        if config is not None and not isinstance(config, (dict, set)):
+        if config is not None and not isinstance(config, dict):
             raise Exception("Expected config to be a Mapping, received: {}".format(type(config)))
 
         # map input types to rpc msg
@@ -8294,7 +8294,7 @@ class ModelConfigFacade(Type):
         creds : typing.Sequence[int]
         Returns -> None
         '''
-        if modelslainfo is not None and not isinstance(modelslainfo, (dict, set, ModelSLAInfo)):
+        if modelslainfo is not None and not isinstance(modelslainfo, (dict, ModelSLAInfo)):
             raise Exception("Expected modelslainfo to be a ModelSLAInfo, received: {}".format(type(modelslainfo)))
 
         if creds is not None and not isinstance(creds, (bytes, str, list)):
@@ -10372,10 +10372,10 @@ class ResourcesFacade(Type):
         url : str
         Returns -> typing.Union[_ForwardRef('ErrorResult'), _ForwardRef('Error'), typing.Sequence[str]]
         '''
-        if addcharmwithauthorization is not None and not isinstance(addcharmwithauthorization, (dict, set, AddCharmWithAuthorization)):
+        if addcharmwithauthorization is not None and not isinstance(addcharmwithauthorization, (dict, AddCharmWithAuthorization)):
             raise Exception("Expected addcharmwithauthorization to be a AddCharmWithAuthorization, received: {}".format(type(addcharmwithauthorization)))
 
-        if entity is not None and not isinstance(entity, (dict, set, Entity)):
+        if entity is not None and not isinstance(entity, (dict, Entity)):
             raise Exception("Expected entity to be a Entity, received: {}".format(type(entity)))
 
         if channel is not None and not isinstance(channel, (bytes, str)):
@@ -10384,7 +10384,7 @@ class ResourcesFacade(Type):
         if force is not None and not isinstance(force, bool):
             raise Exception("Expected force to be a bool, received: {}".format(type(force)))
 
-        if macaroon is not None and not isinstance(macaroon, (dict, set, Macaroon)):
+        if macaroon is not None and not isinstance(macaroon, (dict, Macaroon)):
             raise Exception("Expected macaroon to be a Macaroon, received: {}".format(type(macaroon)))
 
         if resources is not None and not isinstance(resources, (bytes, str, list)):

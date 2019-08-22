@@ -187,8 +187,8 @@ basic_types = [str, bool, int, float]
 type_mapping = {
     'str': '(bytes, str)',
     'Sequence': '(bytes, str, list)',
-    'Union': '(dict, set)',
-    'Mapping': '(dict, set)',
+    'Union': 'dict',
+    'Mapping': 'dict',
 }
 
 
@@ -205,8 +205,8 @@ def var_type_to_py(kind):
 
 
 def kind_to_py(kind):
-    if kind is None:
-        return 'None', False
+    if kind is None or kind is typing.Any:
+        return 'None', '', False
     name = kind.__name__
     if (kind in basic_types or type(kind) in basic_types):
         return name, type_mapping.get(name) or name, True
@@ -214,7 +214,7 @@ def kind_to_py(kind):
         return name, type_mapping[name], True
 
     suffix = name.lstrip("~")
-    return suffix, "(dict, set, {})".format(suffix), True
+    return suffix, "(dict, {})".format(suffix), True
 
 
 def strcast(kind, keep_builtins=False):
@@ -223,6 +223,8 @@ def strcast(kind, keep_builtins=False):
         return kind.__name__
     if str(kind).startswith('~'):
         return str(kind)[1:]
+    if kind is typing.Any:
+        return 'Any'
     if issubclass(kind, typing.GenericMeta):
         return str(kind)[1:]
     return kind
@@ -363,7 +365,7 @@ class {}(Type):
                 arg_name = name_to_py(arg[0])
                 arg_type = arg[1]
                 arg_type_name = strcast(arg_type)
-                if arg_type in basic_types:
+                if arg_type in basic_types or arg_type is typing.Any:
                     source.append("{}{}_ = {}".format(INDENT * 2,
                                                       arg_name,
                                                       arg_name))
@@ -700,7 +702,7 @@ class Schema(dict):
                 add((name, Mapping[str, SCHEMA_TO_PYTHON[ppkind]]))
 
         if not struct and node.get('additionalProperties', False):
-            add((name, Mapping[str, SCHEMA_TO_PYTHON['object']]))
+            add((name, SCHEMA_TO_PYTHON.get('object')))
 
         return struct
 

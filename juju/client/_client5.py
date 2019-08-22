@@ -745,7 +745,7 @@ class ApplicationFacade(Type):
         if application is not None and not isinstance(application, (bytes, str)):
             raise Exception("Expected application to be a str, received: {}".format(type(application)))
 
-        if options is not None and not isinstance(options, (dict, set)):
+        if options is not None and not isinstance(options, dict):
             raise Exception("Expected options to be a Mapping, received: {}".format(type(options)))
 
         # map input types to rpc msg
@@ -784,7 +784,7 @@ class ApplicationFacade(Type):
         if charm_url is not None and not isinstance(charm_url, (bytes, str)):
             raise Exception("Expected charm_url to be a str, received: {}".format(type(charm_url)))
 
-        if config_settings is not None and not isinstance(config_settings, (dict, set)):
+        if config_settings is not None and not isinstance(config_settings, dict):
             raise Exception("Expected config_settings to be a Mapping, received: {}".format(type(config_settings)))
 
         if config_settings_yaml is not None and not isinstance(config_settings_yaml, (bytes, str)):
@@ -796,10 +796,10 @@ class ApplicationFacade(Type):
         if force_units is not None and not isinstance(force_units, bool):
             raise Exception("Expected force_units to be a bool, received: {}".format(type(force_units)))
 
-        if resource_ids is not None and not isinstance(resource_ids, (dict, set)):
+        if resource_ids is not None and not isinstance(resource_ids, dict):
             raise Exception("Expected resource_ids to be a Mapping, received: {}".format(type(resource_ids)))
 
-        if storage_constraints is not None and not isinstance(storage_constraints, (dict, set)):
+        if storage_constraints is not None and not isinstance(storage_constraints, dict):
             raise Exception("Expected storage_constraints to be a Mapping, received: {}".format(type(storage_constraints)))
 
         # map input types to rpc msg
@@ -832,7 +832,7 @@ class ApplicationFacade(Type):
         if application is not None and not isinstance(application, (bytes, str)):
             raise Exception("Expected application to be a str, received: {}".format(type(application)))
 
-        if constraints is not None and not isinstance(constraints, (dict, set, Value)):
+        if constraints is not None and not isinstance(constraints, (dict, Value)):
             raise Exception("Expected constraints to be a Value, received: {}".format(type(constraints)))
 
         # map input types to rpc msg
@@ -935,7 +935,7 @@ class ApplicationFacade(Type):
         if charm_url is not None and not isinstance(charm_url, (bytes, str)):
             raise Exception("Expected charm_url to be a str, received: {}".format(type(charm_url)))
 
-        if constraints is not None and not isinstance(constraints, (dict, set, Value)):
+        if constraints is not None and not isinstance(constraints, (dict, Value)):
             raise Exception("Expected constraints to be a Value, received: {}".format(type(constraints)))
 
         if force_charm_url is not None and not isinstance(force_charm_url, bool):
@@ -947,7 +947,7 @@ class ApplicationFacade(Type):
         if min_units is not None and not isinstance(min_units, int):
             raise Exception("Expected min_units to be a int, received: {}".format(type(min_units)))
 
-        if settings is not None and not isinstance(settings, (dict, set)):
+        if settings is not None and not isinstance(settings, dict):
             raise Exception("Expected settings to be a Mapping, received: {}".format(type(settings)))
 
         if settings_yaml is not None and not isinstance(settings_yaml, (bytes, str)):
@@ -1345,7 +1345,7 @@ class CloudFacade(Type):
         name : str
         Returns -> None
         '''
-        if cloud is not None and not isinstance(cloud, (dict, set, Cloud)):
+        if cloud is not None and not isinstance(cloud, (dict, Cloud)):
             raise Exception("Expected cloud to be a Cloud, received: {}".format(type(cloud)))
 
         if name is not None and not isinstance(name, (bytes, str)):
@@ -2058,7 +2058,7 @@ class ControllerFacade(Type):
         config : typing.Mapping[str, typing.Any]
         Returns -> None
         '''
-        if config is not None and not isinstance(config, (dict, set)):
+        if config is not None and not isinstance(config, dict):
             raise Exception("Expected config to be a Mapping, received: {}".format(type(config)))
 
         # map input types to rpc msg
@@ -3504,7 +3504,7 @@ class MachineManagerFacade(Type):
         if series is not None and not isinstance(series, (bytes, str)):
             raise Exception("Expected series to be a str, received: {}".format(type(series)))
 
-        if tag is not None and not isinstance(tag, (dict, set, Entity)):
+        if tag is not None and not isinstance(tag, (dict, Entity)):
             raise Exception("Expected tag to be a Entity, received: {}".format(type(tag)))
 
         # map input types to rpc msg
@@ -3535,7 +3535,7 @@ class MachineManagerFacade(Type):
         if series is not None and not isinstance(series, (bytes, str)):
             raise Exception("Expected series to be a str, received: {}".format(type(series)))
 
-        if tag is not None and not isinstance(tag, (dict, set, Entity)):
+        if tag is not None and not isinstance(tag, (dict, Entity)):
             raise Exception("Expected tag to be a Entity, received: {}".format(type(tag)))
 
         # map input types to rpc msg
@@ -4038,7 +4038,7 @@ class ModelManagerFacade(Type):
         if cloud_tag is not None and not isinstance(cloud_tag, (bytes, str)):
             raise Exception("Expected cloud_tag to be a str, received: {}".format(type(cloud_tag)))
 
-        if config is not None and not isinstance(config, (dict, set)):
+        if config is not None and not isinstance(config, dict):
             raise Exception("Expected config to be a Mapping, received: {}".format(type(config)))
 
         if credential is not None and not isinstance(credential, (bytes, str)):

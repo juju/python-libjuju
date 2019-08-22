@@ -413,7 +413,7 @@ class MachineManagerFacade(Type):
         if series is not None and not isinstance(series, (bytes, str)):
             raise Exception("Expected series to be a str, received: {}".format(type(series)))
 
-        if tag is not None and not isinstance(tag, (dict, set, Entity)):
+        if tag is not None and not isinstance(tag, (dict, Entity)):
             raise Exception("Expected tag to be a Entity, received: {}".format(type(tag)))
 
         # map input types to rpc msg
@@ -444,7 +444,7 @@ class MachineManagerFacade(Type):
         if series is not None and not isinstance(series, (bytes, str)):
             raise Exception("Expected series to be a str, received: {}".format(type(series)))
 
-        if tag is not None and not isinstance(tag, (dict, set, Entity)):
+        if tag is not None and not isinstance(tag, (dict, Entity)):
             raise Exception("Expected tag to be a Entity, received: {}".format(type(tag)))
 
         # map input types to rpc msg
@@ -945,7 +945,7 @@ class StorageFacade(Type):
         if force is not None and not isinstance(force, bool):
             raise Exception("Expected force to be a bool, received: {}".format(type(force)))
 
-        if ids is not None and not isinstance(ids, (dict, set, StorageAttachmentIds)):
+        if ids is not None and not isinstance(ids, (dict, StorageAttachmentIds)):
             raise Exception("Expected ids to be a StorageAttachmentIds, received: {}".format(type(ids)))
 
         if max_wait is not None and not isinstance(max_wait, int):
