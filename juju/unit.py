@@ -96,7 +96,7 @@ class Unit(model.ModelEntity):
         """
         app_facade = client.ApplicationFacade.from_connection(self.connection)
 
-        log.debug(
+        log.info(
             'Destroying %s', self.name)
 
         return await app_facade.DestroyUnits([self.name])
@@ -119,7 +119,8 @@ class Unit(model.ModelEntity):
         """
         app_facade = client.ApplicationFacade.from_connection(self.connection)
 
-        log.debug(
+        log.info(
+
             'Resolving %s', self.name)
 
         return await app_facade.ResolveUnitErrors(
@@ -138,7 +139,7 @@ class Unit(model.ModelEntity):
         """
         action = client.ActionFacade.from_connection(self.connection)
 
-        log.debug(
+        log.info(
             'Running `%s` on %s', command, self.name)
 
         if timeout:
@@ -168,7 +169,7 @@ class Unit(model.ModelEntity):
         """
         action_facade = client.ActionFacade.from_connection(self.connection)
 
-        log.debug('Starting action `%s` on %s', action_name, self.name)
+        log.info('Starting action `%s` on %s', action_name, self.name)
 
         res = await action_facade.Enqueue(actions=[client.Action(
             name=action_name,
@@ -183,7 +184,7 @@ class Unit(model.ModelEntity):
         elif error:
             raise Exception('Unknown action error: %s' % error.serialize())
         action_id = action.tag[len('action-'):]
-        log.debug('Action started as %s', action_id)
+        log.info('Action started as %s', action_id)
         # we mustn't use wait_for_action because that blocks until the
         # action is complete, rather than just being in the model
         return await self.model._wait_for_new('action', action_id)

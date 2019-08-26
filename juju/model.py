@@ -630,7 +630,7 @@ class Model:
                 self.add_local_charm, fh, series, os.stat(fh.name).st_size)
             charm_url = await self._connector.loop.run_in_executor(None, func)
 
-        log.debug('Uploaded local charm: %s -> %s', charm_dir, charm_url)
+        log.info('Uploaded local charm: %s -> %s', charm_dir, charm_url)
         return charm_url
 
     def add_local_charm(self, charm_file, series, size=None):
@@ -1100,7 +1100,7 @@ class Model:
                     machine_id,
                 )
 
-        log.debug('Added new machine %s', machine_id)
+        log.info('Added new machine %s', machine_id)
         return await self._wait_for_new('machine', machine_id)
 
     async def add_relation(self, relation1, relation2):
