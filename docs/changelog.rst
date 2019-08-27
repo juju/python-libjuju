@@ -1,6 +1,13 @@
 Changelog
 ---------
 
+2.6.2
+^^^^^
+Wednesday August 27 2019
+
+ * Fixes validation issue with a go interface{} type (Any type) being returned
+   from the Juju API server (#344)
+
 2.6.1
 ^^^^^
 Wednesday August 21 2019
