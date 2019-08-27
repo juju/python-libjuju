@@ -41,6 +41,10 @@ class BundleHandler:
             model.connection())
         self.ann_facade = client.AnnotationsFacade.from_connection(
             model.connection())
+        self.param_types = {
+            'addCharm': AddCharmChange,
+            'addMachines': AddMachineChange,
+        }
 
     async def _validate_bundle(self, bundle):
         """Validate the bundle for known issues, raises an error if it
@@ -129,11 +133,17 @@ class BundleHandler:
             raise JujuError(self.plan.errors)
 
     async def execute_plan(self):
-        client.BundleChange.__repr__ = lambda self: "BundleChange({}, {})".format(self.id_, self.requires)
         changes = ChangeSet(self.plan.changes)
         for step in changes.sorted():
             method = getattr(self, step.method)
-            result = await method(step.id_, *step.args)
+            change_cls = self.param_types.get(step.method)
+            if change_cls is None:
+                # TODO: Remove this method calling, once we've implemented all
+                # the changes.
+                result = await method(change, step.id_, *step.args)
+            else:
+                change = change_cls(step.id_, step.requires, step.args)
+                result = await method(change)
             self.references[step.id_] = result
 
     @property
@@ -156,65 +166,36 @@ class BundleHandler:
                 reference = ref
         return reference
 
-    async def addCharm(self, change_id, charm, series):
+    async def addCharm(self, change):
         """
-        :param charm string:
-            Charm holds the URL of the charm to be added.
+        :param change AddCharmChange: change holds the charm changes when
+            deploying a charm.
+        """
 
-        :param series string:
-            Series holds the series of the charm to be added
-            if the charm default is not sufficient.
-        """
         # We don't add local charms because they've already been added
         # by self._handle_local_charms
-        if charm.startswith('local:'):
-            return charm
+        if change.charm.startswith('local:'):
+            return change.charm
 
-        entity_id = await self.charmstore.entityId(charm)
+        entity_id = await self.charmstore.entityId(change.charm)
         log.debug('Adding %s', entity_id)
         await self.client_facade.AddCharm(channel=None, url=entity_id, force=False)
         return entity_id
 
-    async def addMachines(self, change_id, params=None):
-        """
-        :param params dict:
-            Dictionary specifying the machine to add. All keys are optional.
-            Keys include:
-
-            series: string specifying the machine OS series.
-
-            constraints: string holding machine constraints, if any. We'll
-                parse this into the json friendly dict that the juju api
-                expects.
-
-            container_type: string holding the type of the container (for
-                instance ""lxd" or kvm"). It is not specified for top level
-                machines.
-
-            parent_id: string holding a placeholder pointing to another
-                machine change or to a unit change. This value is only
-                specified in the case this machine is a container, in
-                which case also ContainerType is set.
-
-        """
-        params = params or {}
-
-        # Normalize keys
-        params = {normalize_key(k): params[k] for k in params.keys()}
-
+    async def addMachines(self, change):
         # Fix up values, as necessary.
-        if 'parent_id' in params:
+        params = {}
+        if change.parent_id is not None:
             if params['parent_id'].startswith('$addUnit'):
                 unit = self.resolve(params['parent_id'])[0]
                 params['parent_id'] = unit.machine.entity_id
             else:
                 params['parent_id'] = self.resolve(params['parent_id'])
 
-        params['constraints'] = parse_constraints(
-            params.get('constraints'))
+        params['constraints'] = parse_constraints(change.constraints)
         params['jobs'] = params.get('jobs', ['JobHostUnits'])
 
-        if params.get('container_type') == 'lxc':
+        if change.container_type == 'lxc':
             log.warning('Juju 2.0 does not support lxc containers. '
                         'Converting containers to lxd.')
             params['container_type'] = 'lxd'
@@ -464,3 +445,115 @@ class ChangeSet:
                     results.append(change)
                     break
         return results
+
+
+class ChangeInfo:
+
+    def __init__(self, change_id, requires):
+        self.change_id = change_id
+        self.requires = requires
+
+
+class AddCharmChange(ChangeInfo):
+
+    def __init__(self, change_id, requires, params=None):
+        super(AddCharmChange, self).__init__(change_id, requires)
+        params = params or {}
+        self.params = {normalize_key(k): params[k] for k in params.keys()}
+
+    def description(self):
+        series = ""
+        channel = ""
+        if self.series != "":
+            series = " for series {}".format(self.series)
+        if self.channel != "":
+            channel = " from channel {}".format(self.channel)
+        return "upload charm {charm}{series}{channel}".format(charm=self.charm,
+                                                              series=series,
+                                                              channel=channel)
+
+    @property
+    def charm(self):
+        """
+        :return string:
+            Charm holds the URL of the charm to be added.
+        """
+        return self.params.charm
+
+    @property
+    def series(self):
+        """
+        :return string:
+            Series holds the series of the charm to be added
+            if the charm default is not sufficient.
+        """
+        return self.params.series
+
+    @property
+    def channel(self):
+        """
+        :return string:
+            Channel returns the channel the bundle has requested
+            for the charm to use.
+        """
+        if "channel" in self.params:
+            return self.params.channel
+        return None
+
+
+class AddMachineChange(ChangeInfo):
+
+    def __init__(self, change_id, requires, params=None):
+        super(AddMachineChange, self).__init__(change_id, requires)
+        params = params or {}
+        self.params = {normalize_key(k): params[k] for k in params.keys()}
+
+    def description(self):
+        machine = "new machine"
+        if self.container_type is not None and self.container_type != "":
+            machine = "{container_type} container on {machine}".format(container_type=self.container_type,
+                                                                       machine=machine)
+        return "add {}".format(machine)
+
+    @property
+    def series(self):
+        """
+        return  string specifying the machine OS series.
+        """
+        if "series" in self.params:
+            return self.params.series
+        return None
+
+    @property
+    def parent_id(self):
+        """
+        return  string holding a placeholder pointing to another
+                machine change or to a unit change. This value is only
+                specified in the case this machine is a container, in
+                which case also ContainerType is set.
+        """
+        if "parent_id" in self.params:
+            return self.params.parent_id
+        return None
+
+    @property
+    def constraints(self):
+        """
+        return  string holding machine constraints, if any. We'll
+                parse this into the json friendly dict that the juju api
+                expects.
+        """
+        if "constraints" in self.params:
+            return self.params.constraints
+        return None
+
+    @property
+    def container_type(self):
+        """
+        return  string holding the type of the container (for
+                instance ""lxd" or kvm"). It is not specified for top level
+                machines.
+        """
+        if "container_type" in self.params:
+            return self.params.container_type
+        return None
