@@ -1099,7 +1099,7 @@ class ApplicationFacade(Type):
         if retry is not None and not isinstance(retry, bool):
             raise Exception("Expected retry to be a bool, received: {}".format(type(retry)))
 
-        if tags is not None and not isinstance(tags, (dict, set, Entities)):
+        if tags is not None and not isinstance(tags, (dict, Entities)):
             raise Exception("Expected tags to be a Entities, received: {}".format(type(tags)))
 
         # map input types to rpc msg
@@ -1151,7 +1151,7 @@ class ApplicationFacade(Type):
         if branch is not None and not isinstance(branch, (bytes, str)):
             raise Exception("Expected branch to be a str, received: {}".format(type(branch)))
 
-        if options is not None and not isinstance(options, (dict, set)):
+        if options is not None and not isinstance(options, dict):
             raise Exception("Expected options to be a Mapping, received: {}".format(type(options)))
 
         # map input types to rpc msg
@@ -1214,7 +1214,7 @@ class ApplicationFacade(Type):
         if charm_url is not None and not isinstance(charm_url, (bytes, str)):
             raise Exception("Expected charm_url to be a str, received: {}".format(type(charm_url)))
 
-        if config_settings is not None and not isinstance(config_settings, (dict, set)):
+        if config_settings is not None and not isinstance(config_settings, dict):
             raise Exception("Expected config_settings to be a Mapping, received: {}".format(type(config_settings)))
 
         if config_settings_yaml is not None and not isinstance(config_settings_yaml, (bytes, str)):
@@ -1232,10 +1232,10 @@ class ApplicationFacade(Type):
         if generation is not None and not isinstance(generation, (bytes, str)):
             raise Exception("Expected generation to be a str, received: {}".format(type(generation)))
 
-        if resource_ids is not None and not isinstance(resource_ids, (dict, set)):
+        if resource_ids is not None and not isinstance(resource_ids, dict):
             raise Exception("Expected resource_ids to be a Mapping, received: {}".format(type(resource_ids)))
 
-        if storage_constraints is not None and not isinstance(storage_constraints, (dict, set)):
+        if storage_constraints is not None and not isinstance(storage_constraints, dict):
             raise Exception("Expected storage_constraints to be a Mapping, received: {}".format(type(storage_constraints)))
 
         # map input types to rpc msg
@@ -1270,7 +1270,7 @@ class ApplicationFacade(Type):
         if application is not None and not isinstance(application, (bytes, str)):
             raise Exception("Expected application to be a str, received: {}".format(type(application)))
 
-        if constraints is not None and not isinstance(constraints, (dict, set, Value)):
+        if constraints is not None and not isinstance(constraints, (dict, Value)):
             raise Exception("Expected constraints to be a Value, received: {}".format(type(constraints)))
 
         # map input types to rpc msg
@@ -1422,7 +1422,7 @@ class ApplicationFacade(Type):
         if charm_url is not None and not isinstance(charm_url, (bytes, str)):
             raise Exception("Expected charm_url to be a str, received: {}".format(type(charm_url)))
 
-        if constraints is not None and not isinstance(constraints, (dict, set, Value)):
+        if constraints is not None and not isinstance(constraints, (dict, Value)):
             raise Exception("Expected constraints to be a Value, received: {}".format(type(constraints)))
 
         if force is not None and not isinstance(force, bool):
@@ -1440,7 +1440,7 @@ class ApplicationFacade(Type):
         if min_units is not None and not isinstance(min_units, int):
             raise Exception("Expected min_units to be a int, received: {}".format(type(min_units)))
 
-        if settings is not None and not isinstance(settings, (dict, set)):
+        if settings is not None and not isinstance(settings, dict):
             raise Exception("Expected settings to be a Mapping, received: {}".format(type(settings)))
 
         if settings_yaml is not None and not isinstance(settings_yaml, (bytes, str)):
