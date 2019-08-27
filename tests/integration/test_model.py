@@ -1,5 +1,8 @@
 import asyncio
+import json
 import os
+import random
+import string
 import time
 import uuid
 from concurrent.futures import ThreadPoolExecutor
@@ -14,8 +17,7 @@ from juju.client.client import ApplicationFacade, ConfigValue
 from juju.errors import JujuError
 from juju.model import Model, ModelObserver
 from juju.utils import block_until, run_with_interrupt
-import random
-import string
+
 from .. import base
 
 MB = 1
@@ -576,6 +578,9 @@ async def test_watcher_reconnect(event_loop):
 @pytest.mark.asyncio
 async def test_config(event_loop):
     async with base.CleanModel() as model:
+        # first test get_config with nothing.
+        result = await model.get_config()
+        assert 'extra-info' not in result
         await model.set_config({
             'extra-info': 'booyah',
             'test-mode': ConfigValue(value=True),
@@ -584,6 +589,26 @@ async def test_config(event_loop):
         assert 'extra-info' in result
         assert result['extra-info'].source == 'model'
         assert result['extra-info'].value == 'booyah'
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_config_with_json(event_loop):
+    async with base.CleanModel() as model:
+        # first test get_config with nothing.
+        result = await model.get_config()
+        assert 'extra-complex-info' not in result
+        # test model config with more complex data
+        expected = ['foo', {'bar': 1}]
+        await model.set_config({
+            'extra-complex-info': json.dumps(expected),
+            'test-mode': ConfigValue(value=True),
+        })
+        result = await model.get_config()
+        assert 'extra-complex-info' in result
+        assert result['extra-complex-info'].source == 'model'
+        recieved = json.loads(result['extra-complex-info'].value)
+        assert recieved == recieved
 
 
 @base.bootstrapped
