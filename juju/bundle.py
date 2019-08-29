@@ -42,10 +42,13 @@ class BundleHandler:
         self.ann_facade = client.AnnotationsFacade.from_connection(
             model.connection())
 
-        change_type_cls = [AddCharmChange,
+        change_type_cls = [AddApplicationChange,
+                           AddCharmChange,
                            AddMachineChange,
                            AddRelationChange,
                            AddUnitChange,
+                           CreateOfferChange,
+                           ConsumeOfferChange,
                            ExposeChange,
                            ScaleChange,
                            SetAnnotationsChange,
@@ -145,31 +148,33 @@ class BundleHandler:
         for step in changes.sorted():
             change_cls = self.change_types.get(step.method)
             if change_cls is None:
-                # TODO: Remove this method calling, once we've implemented all
-                # the changes.
-                method = getattr(self, step.method)
-                result = await method(change, step.id_, *step.args)
+                raise NotImplementedError("unknown change type: {}".format(step.method))
+            # Explicitly call out what methods we work with, so it makes it
+            # very easy to understand what happens with the execution.
+            change = change_cls(step.id_, step.requires, step.args)
+            log.info(change.description())
+            if step.method == AddApplicationChange.method():
+                result = await self.handleAddApplication(change)
+            elif step.method == AddCharmChange.method():
+                result = await self.handleAddCharm(change)
+            elif step.method == AddMachineChange.method():
+                result = await self.handleAddMachine(change)
+            elif step.method == AddRelationChange.method():
+                result = await self.handleAddRelation(change)
+            elif step.method == AddUnitChange.method():
+                result = await self.handleAddUnit(change)
+            elif step.method == CreateOfferChange.method():
+                result = await self.handleCreateOffer(change)
+            elif step.method == ConsumeOfferChange.method():
+                result = await self.handleConsumeOffer(change)
+            elif step.method == ExposeChange.method():
+                result = await self.handleExpose(change)
+            elif step.method == ScaleChange.method():
+                result = await self.handleScale(change)
+            elif step.method == SetAnnotationsChange.method():
+                result = await self.handleSetAnnotations(change)
             else:
-                # Explicitly call out what methods we work with, so it makes it
-                # very easy to understand what happens with the execution.
-                change = change_cls(step.id_, step.requires, step.args)
-                log.info(change.description())
-                if step.method == AddCharmChange.method():
-                    result = await self.handleAddCharm(change)
-                elif step.method == AddMachineChange.method():
-                    result = await self.handleAddMachine(change)
-                elif step.method == AddRelationChange.method():
-                    result = await self.handleAddRelation(change)
-                elif step.method == AddUnitChange.method():
-                    result = await self.handleAddUnit(change)
-                elif step.method == ExposeChange.method():
-                    result = await self.handleExpose(change)
-                elif step.method == ScaleChange.method():
-                    result = await self.handleScale(change)
-                elif step.method == SetAnnotationsChange.method():
-                    result = await self.handleSetAnnotations(change)
-                else:
-                    raise Exception("unknown change type: {}".format(step.method))
+                raise NotImplementedError("unknown change type: {}".format(step.method))
             self.references[step.id_] = result
 
     @property
@@ -192,6 +197,37 @@ class BundleHandler:
                 reference = ref
         return reference
 
+    async def handleAddApplication(self, change):
+        """
+        :param change AddApplicationChange: holds a change for deploying a Juju
+            application.
+        """
+        # resolve indirect references
+        charm = self.resolve(change.charm)
+        options = {}
+        if change.options is not None:
+            options = change.options
+        if self.trusted:
+            if self.model.info.agent_version < client.Number.from_json('2.4.0'):
+                raise NotImplementedError("trusted is not supported on model version {}".format(self.model.info.agent_version))
+            options["trust"] = "true"
+        if not charm.startswith('local:'):
+            resources = await self.model._add_store_resources(
+                change.application, charm, overrides=change.resources)
+        await self.model._deploy(
+            charm_url=charm,
+            application=change.application,
+            series=change.series,
+            config=change.options,
+            constraints=change.constraints,
+            endpoint_bindings=change.endpoint_bindings,
+            resources=resources,
+            storage=change.storage,
+            devices=change.devices,
+            num_units=change.num_units,
+        )
+        return change.application
+
     async def handleAddCharm(self, change):
         """
         :param change AddCharmChange: change holds the charm changes when
@@ -209,7 +245,7 @@ class BundleHandler:
 
     async def handleAddMachine(self, change):
         """
-        :param change AddMachineChange: holds a change for adding a machine or 
+        :param change AddMachineChange: holds a change for adding a machine or
             container.
         """
         # Fix up values, as necessary.
@@ -273,6 +309,23 @@ class BundleHandler:
         log.info('Relating %s <-> %s', ep1, ep2)
         return await self.model.add_relation(ep1, ep2)
 
+    async def handleCreateOffer(self, change):
+        """
+        :param change CreateOfferChange: holds a change for creating a new
+            application endpoint offer.
+        """
+        application = self.resolve(change.application_name)
+        for ep in change.endpoints:
+            await self.model.create_offer(ep, offer_name=change.offer_name, application_name=application)
+
+    async def handleConsumeOffer(self, change):
+        """
+        :param change ConsumeOfferChange: holds a change for consuming a offer.
+        """
+        application = self.resolve(change.application_name)
+        local_name = await self.model.consume(change.url, application_alias=application)
+        return local_name
+
     async def handleExpose(self, change):
         """
         :param change ExposeChange: holds a change for exposing an application.
@@ -299,117 +352,6 @@ class BundleHandler:
         except KeyError:
             entity = await self.model._wait_for_new(change.entity_type, entity_id)
         return await entity.set_annotations(change.annotations)
-
-    async def deploy(self, change_id, charm, series, application, options, constraints,
-                     storage, endpoint_bindings, *args):
-        """
-        :param charm string:
-            Charm holds the URL of the charm to be used to deploy this
-            application.
-
-        :param series string:
-            Series holds the series of the application to be deployed
-            if the charm default is not sufficient.
-
-        :param application string:
-            Application holds the application name.
-
-        :param options map[string]interface{}:
-            Options holds application options.
-
-        :param constraints string:
-            Constraints holds the optional application constraints.
-
-        :param storage map[string]string:
-            Storage holds the optional storage constraints.
-
-        :param endpoint_bindings map[string]string:
-            EndpointBindings holds the optional endpoint bindings
-
-        :param devices map[string]string:
-            Devices holds the optional devices constraints.
-            (Only given on Juju 2.5+)
-
-        :param resources map[string]int:
-            Resources identifies the revision to use for each resource
-            of the application's charm.
-
-        :param num_units int:
-            NumUnits holds the number of units required.  For IAAS models, this
-            will be 0 and separate AddUnitChanges will be used.  For Kubernetes
-            models, this will be used to scale the application.
-            (Only given on Juju 2.5+)
-        """
-        # resolve indirect references
-        charm = self.resolve(charm)
-
-        if len(args) == 1:
-            # Juju 2.4 and below only sends the resources
-            resources = args[0]
-            devices, num_units = None, None
-        else:
-            # Juju 2.5+ sends devices before resources, as well as num_units
-            # There might be placement but we need to ignore that.
-            devices, resources, num_units = args[:3]
-
-        if options is None:
-            options = {}
-        if self.trusted:
-            if self.model.info.agent_version < client.Number.from_json('2.4.0'):
-                raise NotImplementedError("trusted is not supported on model version {}".format(self.model.info.agent_version))
-            options["trust"] = "true"
-        if not charm.startswith('local:'):
-            resources = await self.model._add_store_resources(
-                application, charm, overrides=resources)
-        await self.model._deploy(
-            charm_url=charm,
-            application=application,
-            series=series,
-            config=options,
-            constraints=constraints,
-            endpoint_bindings=endpoint_bindings,
-            resources=resources,
-            storage=storage,
-            devices=devices,
-            num_units=num_units,
-        )
-        return application
-
-    async def createOffer(self, change_id, endpoints, application_name, offer_name):
-        """
-        :param application_name string:
-            Application is the name of the application to create an offer for.
-        :param endpoints [string]:
-            Endpoint is a list of application endpoint to expose as part of an
-            offer.
-        :param offer_name string:
-            OfferName describes the offer name.
-        """
-        application = self.resolve(application_name)
-        for ep in endpoints:
-            await self.model.create_offer(ep, offer_name=offer_name, application_name=application)
-
-    async def consumeOffer(self, change_id, url, application_name):
-        """
-        :param application_name string:
-            Application is the name of the application on offer.
-        :param url string:
-            URL contains the location of the offer
-        """
-        application = self.resolve(application_name)
-        local_name = await self.model.consume(url, application_alias=application)
-        return local_name
-
-    async def grantOfferAccess(self, change_id, user, access, offer_name):
-        """
-        :param user string:
-            User holds the user name to grant access to.
-        :param access string:
-            The type of access to grant.
-        :param offer string:
-            The offer name to be granted access to.
-        """
-        raise NotImplementedError()
 
 
 def get_charm_series(path):
@@ -456,6 +398,84 @@ class ChangeInfo:
         self.change_id = change_id
         self.requires = requires
 
+
+class AddApplicationChange(ChangeInfo):
+    """
+    AddCharmChange holds a change for deploying a Juju application.
+
+    :charm: holds the URL of the charm to be used to deploy this application.
+    :series: holds the series of the application to be deployed if the charm
+        default is not sufficient.
+    :application: holds the application name.
+    :num_units: holds the number of units required. For IAAS models, this will
+        be 0 and separate AddUnitChanges will be used. For Kubernetes models,
+        this will be used to scale the application.
+    :options: holds application options.
+    :constraints: holds the optional application constraints.
+    :storage: holds the optional storage constraints.
+    :devices: holds the optional devices constraints.
+    :endpoint_bindings: holds the optional endpoint bindings
+    :resources: identifies the revision to use for each resource of the
+        application's charm.
+    :local_resources: identifies the path to the local resource of the
+        application's charm.
+    """
+    def __init__(self, change_id, requires, params=None):
+        super(AddApplicationChange, self).__init__(change_id, requires)
+
+        if isinstance(params, list):
+            self.charm = params[0]
+            self.series = params[1]
+            self.application = params[2]
+            self.options = params[3]
+            self.constraints = params[4]
+            self.storage = params[5]
+            self.endpoint_bindings = params[6]
+            if len(params) == 8:
+                # Juju 2.4 and below only sends the resources
+                self.resources = params[7]
+                self.devices = None
+                self.num_units = None
+            else:
+                # Juju 2.5+ sends devices before resources, as well as num_units
+                # There might be placement but we need to ignore that.
+                self.devices = params[7]
+                self.resources = params[8]
+                self.num_units = params[9]
+
+        elif isinstance(params, dict):
+            self.charm = params.charm
+            self.series = params.series
+            self.application = params.application
+            self.options = params.options
+            self.constraints = params.contstraints
+            self.storage = params.storage
+            self.devices = params.devices
+            self.endpoint_bindings = params.get("endpoint-bindings")
+            self.resources = params.resources
+            self.num_units = params.get("num-units")
+        else:
+            raise Exception("unexpected params type")
+
+    @staticmethod
+    def method():
+        return "deploy"
+
+    def description(self):
+        series = ""
+        if self.series != "":
+            series = " on {}".format(self.series)
+        units_info = ""
+        if self.num_units > 0:
+            plural = ""
+            if self.num_units > 1:
+                plural = "s"
+            units_info = " with {num_units} unit{plural}".format(num_units=self.num_units,
+                                                                 plural=plural)
+        return "deploy application {application}{units_info}{series} using {charm}".format(application=self.application,
+                                                                                          units_info=units_info,
+                                                                                          series=series,
+                                                                                          charm=self.charm)
 
 class AddCharmChange(ChangeInfo):
     """
@@ -578,9 +598,9 @@ class AddUnitChange(ChangeInfo):
     """
     AddUnitChange holds a change for adding an application unit.
 
-    :Application: holds the application placeholder name for which a unit is
+    :application: holds the application placeholder name for which a unit is
         added.
-    :To: holds the optional location where to add the unit, as a placeholder
+    :to: holds the optional location where to add the unit, as a placeholder
 	    pointing to another unit change or to a machine change.
     """
     def __init__(self, change_id, requires, params=None):
@@ -602,6 +622,93 @@ class AddUnitChange(ChangeInfo):
     def description(self):
         return "add {application} unit to {to}".format(application=self.application,
                                                        to=self.to)
+
+
+class CreateOfferChange(ChangeInfo):
+    """
+    CreateOfferChange holds a change for creating a new application endpoint
+    offer.
+
+    :application: is the name of the application to create an offer for.
+        added.
+    :endpoint: is a list of application endpoint to expose as part of an offer.
+    :offer_name: describes the offer name.
+    """
+    def __init__(self, change_id, requires, params=None):
+        super(CreateOfferChange, self).__init__(change_id, requires)
+
+        if isinstance(params, list):
+            self.application = params[0]
+            self.endpoints = params[1]
+            self.offer_name = params[2]
+        elif isinstance(params, dict):
+            self.application = params.application
+            self.endpoints = params.endpoints
+            self.offer_name = params.get("offer-name")
+        else:
+            raise Exception("unexpected params type")
+
+    @staticmethod
+    def method():
+        return "createOffer"
+
+    def description(self):
+        return "create offer {offer_name} using {application}:{endpoints}".format(offer_name=self.offer_name,
+                                                                                  application=self.application,
+                                                                                  endpoints=self.endpoints.join(","))
+
+
+class ConsumeOfferChange(ChangeInfo):
+    """
+    CreateOfferChange holds a change for consuming a offer.
+
+    :url: contains the location of the offer
+    :application_name: describes the application name on offer.
+    """
+    def __init__(self, change_id, requires, params=None):
+        super(ConsumeOfferChange, self).__init__(change_id, requires)
+
+        if isinstance(params, list):
+            self.url = params[0]
+            self.application_name = params[1]
+        elif isinstance(params, dict):
+            self.url = params.url
+            self.application_name = params.application_name
+        else:
+            raise Exception("unexpected params type")
+
+    @staticmethod
+    def method():
+        return "consumeOffer"
+
+    def description(self):
+        return "consume offer {application_name} at {url}".format(application_name=self.application_name,
+                                                                  url=self.url)
+
+
+class ExposeChange(ChangeInfo):
+    """
+    ExposeChange holds a change for exposing an application.
+
+    :application: holds the placeholder name of the application that must be
+        exposed.
+    """
+    def __init__(self, change_id, requires, params=None):
+        super(ExposeChange, self).__init__(change_id, requires)
+
+        if isinstance(params, list):
+            self.application = params[0]
+        elif isinstance(params, dict):
+            self.application = params.application
+        else:
+            raise Exception("unexpected params type")
+
+    @staticmethod
+    def method():
+        return "expose"
+
+    def description(self):
+        return "expose {application}".format(application=self.application)
 
 
 class ScaleChange(ChangeInfo):
@@ -630,31 +737,6 @@ class ScaleChange(ChangeInfo):
     def description(self):
         return "scale {application} to {scale} units".format(application=self.application,
                                                              scale=self.scale)
-
-
-class ExposeChange(ChangeInfo):
-    """
-    ExposeChange holds a change for exposing an application.
-
-    :application: holds the placeholder name of the application that must be
-        exposed.
-    """
-    def __init__(self, change_id, requires, params=None):
-        super(ExposeChange, self).__init__(change_id, requires)
-
-        if isinstance(params, list):
-            self.application = params[0]
-        elif isinstance(params, dict):
-            self.application = params.application
-        else:
-            raise Exception("unexpected params type")
-
-    @staticmethod
-    def method():
-        return "expose"
-
-    def description(self):
-        return "expose {application}".format(application=self.application)
 
 
 class SetAnnotationsChange(ChangeInfo):
