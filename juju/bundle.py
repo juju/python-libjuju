@@ -8,7 +8,6 @@ import yaml
 from toposort import toposort_flatten
 
 from .client import client
-from .constraints import normalize_key
 from .constraints import parse as parse_constraints
 from .errors import JujuError
 
@@ -51,8 +50,7 @@ class BundleHandler:
                            ConsumeOfferChange,
                            ExposeChange,
                            ScaleChange,
-                           SetAnnotationsChange,
-                          ]
+                           SetAnnotationsChange]
         self.change_types = {}
         for change_cls in change_type_cls:
             self.change_types[change_cls.method()] = change_cls
@@ -444,16 +442,16 @@ class AddApplicationChange(ChangeInfo):
                 self.num_units = params[9]
 
         elif isinstance(params, dict):
-            self.charm = params.charm
-            self.series = params.series
-            self.application = params.application
-            self.options = params.options
-            self.constraints = params.contstraints
-            self.storage = params.storage
-            self.devices = params.devices
-            self.endpoint_bindings = params.get("endpoint-bindings")
-            self.resources = params.resources
-            self.num_units = params.get("num-units")
+            self.charm = params["charm"]
+            self.series = params["series"]
+            self.application = params["application"]
+            self.options = params["options"]
+            self.constraints = params["constraints"]
+            self.storage = params["storage"]
+            self.devices = params["devices"]
+            self.endpoint_bindings = params["endpoint-bindings"]
+            self.resources = params["resources"]
+            self.num_units = params["num-units"]
         else:
             raise Exception("unexpected params type")
 
@@ -473,9 +471,10 @@ class AddApplicationChange(ChangeInfo):
             units_info = " with {num_units} unit{plural}".format(num_units=self.num_units,
                                                                  plural=plural)
         return "deploy application {application}{units_info}{series} using {charm}".format(application=self.application,
-                                                                                          units_info=units_info,
-                                                                                          series=series,
-                                                                                          charm=self.charm)
+                                                                                           units_info=units_info,
+                                                                                           series=series,
+                                                                                           charm=self.charm)
+
 
 class AddCharmChange(ChangeInfo):
     """
@@ -497,10 +496,10 @@ class AddCharmChange(ChangeInfo):
             else:
                 self.channel = None
         elif isinstance(params, dict):
-            self.charm = params.charm
-            self.series = params.series
-            if "channel" in params and params.channel != "":
-                self.channel = params.channel
+            self.charm = params["charm"]
+            self.series = params["series"]
+            if "channel" in params and params["channel"] != "":
+                self.channel = params["channel"]
             else:
                 self.channel = None
         else:
@@ -529,23 +528,23 @@ class AddMachineChange(ChangeInfo):
     :series: holds the optional machine OS series.
     :constraints: holds the optional machine constraints.
     :container_type: optionally holds the type of the container (for instance
-	    "lxc" or kvm"). It is not specified for top level machines.
+        "lxc" or kvm"). It is not specified for top level machines.
     :parent_id: holds the id of the parent machine.
     """
     def __init__(self, change_id, requires, params=None):
         super(AddMachineChange, self).__init__(change_id, requires)
         # this one is weird, as it returns a set of parameters inside a list.
         if isinstance(params, list):
-            add_machine_options = params[0]
-            self.series = add_machine_options.get("series")
-            self.constraints = add_machine_options.get("constraints")
-            self.container_type = add_machine_options.get("containerType")
-            self.parent_id = add_machine_options.get("parentId")
+            options = params[0] or {}
+            self.series = options.get("series")
+            self.constraints = options.get("constraints")
+            self.container_type = options.get("containerType")
+            self.parent_id = options.get("parentId")
         elif isinstance(params, dict):
-            self.series = params.series
-            self.constraints = params.contstraints
-            self.container_type = params.get("container-type")
-            self.parent_id = params.get("parent-id")
+            self.series = params["series"]
+            self.constraints = params["constraints"]
+            self.container_type = params["container-type"]
+            self.parent_id = params["parent-id"]
         else:
             raise Exception("unexpected params type")
 
@@ -567,11 +566,11 @@ class AddRelationChange(ChangeInfo):
     applications.
 
     Endpoint1 and Endpoint2 hold relation endpoints in the
-	"application:interface" form, where the application is either a
-	placeholder pointing to an application change or in the case of a model
-	that already has this application deployed, the name of the
-	application, and the interface is optional. Examples are
-	"$deploy-42:web", "$deploy-42", "mysql:db".
+    "application:interface" form, where the application is either a
+    placeholder pointing to an application change or in the case of a model
+    that already has this application deployed, the name of the
+    application, and the interface is optional. Examples are
+    "$deploy-42:web", "$deploy-42", "mysql:db".
     """
     def __init__(self, change_id, requires, params=None):
         super(AddRelationChange, self).__init__(change_id, requires)
@@ -580,8 +579,8 @@ class AddRelationChange(ChangeInfo):
             self.endpoint1 = params[0]
             self.endpoint2 = params[1]
         elif isinstance(params, dict):
-            self.endpoint1 = params.endpoint1
-            self.endpoint2 = params.endpoint2
+            self.endpoint1 = params["endpoint1"]
+            self.endpoint2 = params["endpoint2"]
         else:
             raise Exception("unexpected params type")
 
@@ -601,7 +600,7 @@ class AddUnitChange(ChangeInfo):
     :application: holds the application placeholder name for which a unit is
         added.
     :to: holds the optional location where to add the unit, as a placeholder
-	    pointing to another unit change or to a machine change.
+        pointing to another unit change or to a machine change.
     """
     def __init__(self, change_id, requires, params=None):
         super(AddUnitChange, self).__init__(change_id, requires)
@@ -610,8 +609,8 @@ class AddUnitChange(ChangeInfo):
             self.application = params[0]
             self.to = params[1]
         elif isinstance(params, dict):
-            self.application = params.application
-            self.to = params.to
+            self.application = params["application"]
+            self.to = params["to"]
         else:
             raise Exception("unexpected params type")
 
@@ -642,9 +641,9 @@ class CreateOfferChange(ChangeInfo):
             self.endpoints = params[1]
             self.offer_name = params[2]
         elif isinstance(params, dict):
-            self.application = params.application
-            self.endpoints = params.endpoints
-            self.offer_name = params.get("offer-name")
+            self.application = params["application"]
+            self.endpoints = params["endpoints"]
+            self.offer_name = params["offer-name"]
         else:
             raise Exception("unexpected params type")
 
@@ -672,8 +671,8 @@ class ConsumeOfferChange(ChangeInfo):
             self.url = params[0]
             self.application_name = params[1]
         elif isinstance(params, dict):
-            self.url = params.url
-            self.application_name = params.application_name
+            self.url = params["url"]
+            self.application_name = params["application_name"]
         else:
             raise Exception("unexpected params type")
 
@@ -699,7 +698,7 @@ class ExposeChange(ChangeInfo):
         if isinstance(params, list):
             self.application = params[0]
         elif isinstance(params, dict):
-            self.application = params.application
+            self.application = params["application"]
         else:
             raise Exception("unexpected params type")
 
@@ -725,8 +724,8 @@ class ScaleChange(ChangeInfo):
             self.application = params[0]
             self.scale = params[1]
         elif isinstance(params, dict):
-            self.application = params.application
-            self.scale = params.scale
+            self.application = params["application"]
+            self.scale = params["scale"]
         else:
             raise Exception("unexpected params type")
 
@@ -757,9 +756,9 @@ class SetAnnotationsChange(ChangeInfo):
             self.entity_type = params[1]
             self.annotations = params[2]
         elif isinstance(params, dict):
-            self.id = params.id
-            self.entity_type = params.get("entity-type")
-            self.annotations = params.annotations
+            self.id = params["id"]
+            self.entity_type = params["entity-type"]
+            self.annotations = params["annotations"]
         else:
             raise Exception("unexpected params type")
 
