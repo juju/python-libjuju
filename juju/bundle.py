@@ -41,9 +41,12 @@ class BundleHandler:
             model.connection())
         self.ann_facade = client.AnnotationsFacade.from_connection(
             model.connection())
-        self.param_types = {
-            'addCharm': AddCharmChange,
-            'addMachines': AddMachineChange,
+
+        # ChangeTypes are a series of types that the BundleHandler can translate
+        # correctly from the API changes response.
+        self.change_types = {
+            AddCharmChange.method: AddCharmChange,
+            AddMachineChange.method: AddMachineChange,
         }
 
     async def _validate_bundle(self, bundle):
@@ -136,7 +139,7 @@ class BundleHandler:
         changes = ChangeSet(self.plan.changes)
         for step in changes.sorted():
             method = getattr(self, step.method)
-            change_cls = self.param_types.get(step.method)
+            change_cls = self.change_types.get(step.method)
             if change_cls is None:
                 # TODO: Remove this method calling, once we've implemented all
                 # the changes.
@@ -461,6 +464,10 @@ class AddCharmChange(ChangeInfo):
         params = params or {}
         self.params = {normalize_key(k): params[k] for k in params.keys()}
 
+    @staticmethod
+    def method():
+        return "addCharm"
+
     def description(self):
         series = ""
         channel = ""
@@ -507,6 +514,10 @@ class AddMachineChange(ChangeInfo):
         super(AddMachineChange, self).__init__(change_id, requires)
         params = params or {}
         self.params = {normalize_key(k): params[k] for k in params.keys()}
+
+    @staticmethod
+    def method():
+        return "addMachines"
 
     def description(self):
         machine = "new machine"
