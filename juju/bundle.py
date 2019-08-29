@@ -42,12 +42,17 @@ class BundleHandler:
         self.ann_facade = client.AnnotationsFacade.from_connection(
             model.connection())
 
-        # ChangeTypes are a series of types that the BundleHandler can translate
-        # correctly from the API changes response.
-        self.change_types = {
-            AddCharmChange.method: AddCharmChange,
-            AddMachineChange.method: AddMachineChange,
-        }
+        change_type_cls = [AddCharmChange,
+                           AddMachineChange,
+                           AddRelationChange,
+                           AddUnitChange,
+                           ExposeChange,
+                           ScaleChange,
+                           SetAnnotationsChange,
+                          ]
+        self.change_types = {}
+        for change_cls in change_type_cls:
+            self.change_types[change_cls.method()] = change_cls
 
     async def _validate_bundle(self, bundle):
         """Validate the bundle for known issues, raises an error if it
@@ -138,15 +143,33 @@ class BundleHandler:
     async def execute_plan(self):
         changes = ChangeSet(self.plan.changes)
         for step in changes.sorted():
-            method = getattr(self, step.method)
             change_cls = self.change_types.get(step.method)
             if change_cls is None:
                 # TODO: Remove this method calling, once we've implemented all
                 # the changes.
+                method = getattr(self, step.method)
                 result = await method(change, step.id_, *step.args)
             else:
+                # Explicitly call out what methods we work with, so it makes it
+                # very easy to understand what happens with the execution.
                 change = change_cls(step.id_, step.requires, step.args)
-                result = await method(change)
+                log.info(change.description())
+                if step.method == AddCharmChange.method():
+                    result = await self.handleAddCharm(change)
+                elif step.method == AddMachineChange.method():
+                    result = await self.handleAddMachine(change)
+                elif step.method == AddRelationChange.method():
+                    result = await self.handleAddRelation(change)
+                elif step.method == AddUnitChange.method():
+                    result = await self.handleAddUnit(change)
+                elif step.method == ExposeChange.method():
+                    result = await self.handleExpose(change)
+                elif step.method == ScaleChange.method():
+                    result = await self.handleScale(change)
+                elif step.method == SetAnnotationsChange.method():
+                    result = await self.handleSetAnnotations(change)
+                else:
+                    raise Exception("unknown change type: {}".format(step.method))
             self.references[step.id_] = result
 
     @property
@@ -169,12 +192,11 @@ class BundleHandler:
                 reference = ref
         return reference
 
-    async def addCharm(self, change):
+    async def handleAddCharm(self, change):
         """
         :param change AddCharmChange: change holds the charm changes when
             deploying a charm.
         """
-
         # We don't add local charms because they've already been added
         # by self._handle_local_charms
         if change.charm.startswith('local:'):
@@ -185,7 +207,11 @@ class BundleHandler:
         await self.client_facade.AddCharm(channel=None, url=entity_id, force=False)
         return entity_id
 
-    async def addMachines(self, change):
+    async def handleAddMachine(self, change):
+        """
+        :param change AddMachineChange: holds a change for adding a machine or 
+            container.
+        """
         # Fix up values, as necessary.
         params = {}
         if change.parent_id is not None:
@@ -213,20 +239,66 @@ class BundleHandler:
         log.debug('Added new machine %s', machine)
         return machine
 
-    async def addRelation(self, change_id, endpoint1, endpoint2):
+    async def handleAddUnit(self, change):
         """
-        :param endpoint1 string:
-        :param endpoint2 string:
-            Endpoint1 and Endpoint2 hold relation endpoints in the
-            "application:interface" form, where the application is always a
-            placeholder pointing to an application change, and the interface is
-            optional. Examples are "$deploy-42:web" or just "$deploy-42".
+        :param change AddUnitChange: holds a change for adding an application
+            unit.
         """
-        ep1 = self.resolveRelation(endpoint1)
-        ep2 = self.resolveRelation(endpoint2)
+        application = self.resolve(change.application)
+        placement = self.resolve(change.to)
+        if self._units_by_app.get(application):
+            # enough units for this application already exist;
+            # claim one, and carry on
+            # NB: this should probably honor placement, but the juju client
+            # doesn't, so we're not bothering, either
+            unit_name = self._units_by_app[application].pop()
+            log.debug('Reusing unit %s for %s', unit_name, application)
+            return self.model.units[unit_name]
+
+        log.debug('Adding new unit for %s%s', application,
+                  ' to %s' % placement if placement else '')
+        return await self.model.applications[application].add_unit(
+            count=1,
+            to=placement,
+        )
+
+    async def handleAddRelation(self, change):
+        """
+        :param change AddRelationChange: change holds the relation changes when
+            adding a relation.
+        """
+        ep1 = self.resolveRelation(change.endpoint1)
+        ep2 = self.resolveRelation(change.endpoint2)
 
         log.info('Relating %s <-> %s', ep1, ep2)
         return await self.model.add_relation(ep1, ep2)
+
+    async def handleExpose(self, change):
+        """
+        :param change ExposeChange: holds a change for exposing an application.
+        """
+        application = self.resolve(change.application)
+        log.info('Exposing %s', application)
+        return await self.model.applications[application].expose()
+
+    async def handleScale(self, change):
+        """
+        :param change ScaleChange: change holds the scale for a k8s application.
+        """
+        application = self.resolve(change.application)
+        return await self.model.applications[application].scale(scale=change.scale)
+
+    async def handleSetAnnotations(self, change):
+        """
+        :param change SetAnnotationsChange: holds a change for setting
+            application and machine annotations.
+        """
+        entity_id = self.resolve(change.id)
+        try:
+            entity = self.model.state.get_entity(change.entity_type, entity_id)
+        except KeyError:
+            entity = await self.model._wait_for_new(change.entity_type, entity_id)
+        return await entity.set_annotations(change.annotations)
 
     async def deploy(self, change_id, charm, series, application, options, constraints,
                      storage, endpoint_bindings, *args):
@@ -302,78 +374,6 @@ class BundleHandler:
             num_units=num_units,
         )
         return application
-
-    async def addUnit(self, change_id, application, to):
-        """
-        :param application string:
-            Application holds the application placeholder name for which a unit
-            is added.
-
-        :param to string:
-            To holds the optional location where to add the unit, as a
-            placeholder pointing to another unit change or to a machine change.
-        """
-        application = self.resolve(application)
-        placement = self.resolve(to)
-        if self._units_by_app.get(application):
-            # enough units for this application already exist;
-            # claim one, and carry on
-            # NB: this should probably honor placement, but the juju client
-            # doesn't, so we're not bothering, either
-            unit_name = self._units_by_app[application].pop()
-            log.debug('Reusing unit %s for %s', unit_name, application)
-            return self.model.units[unit_name]
-
-        log.debug('Adding new unit for %s%s', application,
-                  ' to %s' % placement if placement else '')
-        return await self.model.applications[application].add_unit(
-            count=1,
-            to=placement,
-        )
-
-    async def scale(self, change_id, application, scale):
-        """
-        Handle a change of scale to a k8s application.
-
-        :param string application:
-            Application holds the application placeholder name for which a unit
-            is added.
-
-        :param int scale:
-            New scale value to use.
-        """
-        application = self.resolve(application)
-        return await self.model.applications[application].scale(scale=scale)
-
-    async def expose(self, change_id, application):
-        """
-        :param application string:
-            Application holds the placeholder name of the application that must
-            be exposed.
-        """
-        application = self.resolve(application)
-        log.info('Exposing %s', application)
-        return await self.model.applications[application].expose()
-
-    async def setAnnotations(self, change_id, id_, entity_type, annotations):
-        """
-        :param id_ string:
-            Id is the placeholder for the application or machine change
-            corresponding to the entity to be annotated.
-
-        :param entity_type EntityType:
-            EntityType holds the type of the entity, "application" or
-            "machine".
-
-        :param annotations map[string]string:
-            Annotations holds the annotations as key/value pairs.
-        """
-        entity_id = self.resolve(id_)
-        try:
-            entity = self.model.state.get_entity(entity_type, entity_id)
-        except KeyError:
-            entity = await self.model._wait_for_new(entity_type, entity_id)
-        return await entity.set_annotations(annotations)
 
     async def createOffer(self, change_id, endpoints, application_name, offer_name):
         """
@@ -458,11 +458,33 @@ class ChangeInfo:
 
 
 class AddCharmChange(ChangeInfo):
+    """
+    AddCharmChange holds a change for adding a charm to the environment.
 
+    :charm: holds the URL of the charm to be added.
+    :series: holds the series of the charm to be added if the charm default is
+        not sufficient.
+    :channel: holds the preferred channel for obtaining the charm.
+    """
     def __init__(self, change_id, requires, params=None):
         super(AddCharmChange, self).__init__(change_id, requires)
-        params = params or {}
-        self.params = {normalize_key(k): params[k] for k in params.keys()}
+
+        if isinstance(params, list):
+            self.charm = params[0]
+            self.series = params[1]
+            if len(params) > 2 and params[2] != "":
+                self.channel = params[2]
+            else:
+                self.channel = None
+        elif isinstance(params, dict):
+            self.charm = params.charm
+            self.series = params.series
+            if "channel" in params and params.channel != "":
+                self.channel = params.channel
+            else:
+                self.channel = None
+        else:
+            raise Exception("unexpected params type")
 
     @staticmethod
     def method():
@@ -473,47 +495,39 @@ class AddCharmChange(ChangeInfo):
         channel = ""
         if self.series != "":
             series = " for series {}".format(self.series)
-        if self.channel != "":
+        if self.channel is not None:
             channel = " from channel {}".format(self.channel)
         return "upload charm {charm}{series}{channel}".format(charm=self.charm,
                                                               series=series,
                                                               channel=channel)
 
-    @property
-    def charm(self):
-        """
-        :return string:
-            Charm holds the URL of the charm to be added.
-        """
-        return self.params.charm
-
-    @property
-    def series(self):
-        """
-        :return string:
-            Series holds the series of the charm to be added
-            if the charm default is not sufficient.
-        """
-        return self.params.series
-
-    @property
-    def channel(self):
-        """
-        :return string:
-            Channel returns the channel the bundle has requested
-            for the charm to use.
-        """
-        if "channel" in self.params:
-            return self.params.channel
-        return None
-
 
 class AddMachineChange(ChangeInfo):
+    """
+    AddMachineChange holds a change for adding a machine or container.
 
+    :series: holds the optional machine OS series.
+    :constraints: holds the optional machine constraints.
+    :container_type: optionally holds the type of the container (for instance
+	    "lxc" or kvm"). It is not specified for top level machines.
+    :parent_id: holds the id of the parent machine.
+    """
     def __init__(self, change_id, requires, params=None):
         super(AddMachineChange, self).__init__(change_id, requires)
-        params = params or {}
-        self.params = {normalize_key(k): params[k] for k in params.keys()}
+        # this one is weird, as it returns a set of parameters inside a list.
+        if isinstance(params, list):
+            add_machine_options = params[0]
+            self.series = add_machine_options.get("series")
+            self.constraints = add_machine_options.get("constraints")
+            self.container_type = add_machine_options.get("containerType")
+            self.parent_id = add_machine_options.get("parentId")
+        elif isinstance(params, dict):
+            self.series = params.series
+            self.constraints = params.contstraints
+            self.container_type = params.get("container-type")
+            self.parent_id = params.get("parent-id")
+        else:
+            raise Exception("unexpected params type")
 
     @staticmethod
     def method():
@@ -526,45 +540,150 @@ class AddMachineChange(ChangeInfo):
                                                                        machine=machine)
         return "add {}".format(machine)
 
-    @property
-    def series(self):
-        """
-        return  string specifying the machine OS series.
-        """
-        if "series" in self.params:
-            return self.params.series
-        return None
 
-    @property
-    def parent_id(self):
-        """
-        return  string holding a placeholder pointing to another
-                machine change or to a unit change. This value is only
-                specified in the case this machine is a container, in
-                which case also ContainerType is set.
-        """
-        if "parent_id" in self.params:
-            return self.params.parent_id
-        return None
+class AddRelationChange(ChangeInfo):
+    """
+    AddRelationChange holds a change for adding a relation between two
+    applications.
 
-    @property
-    def constraints(self):
-        """
-        return  string holding machine constraints, if any. We'll
-                parse this into the json friendly dict that the juju api
-                expects.
-        """
-        if "constraints" in self.params:
-            return self.params.constraints
-        return None
+    Endpoint1 and Endpoint2 hold relation endpoints in the
+	"application:interface" form, where the application is either a
+	placeholder pointing to an application change or in the case of a model
+	that already has this application deployed, the name of the
+	application, and the interface is optional. Examples are
+	"$deploy-42:web", "$deploy-42", "mysql:db".
+    """
+    def __init__(self, change_id, requires, params=None):
+        super(AddRelationChange, self).__init__(change_id, requires)
 
-    @property
-    def container_type(self):
-        """
-        return  string holding the type of the container (for
-                instance ""lxd" or kvm"). It is not specified for top level
-                machines.
-        """
-        if "container_type" in self.params:
-            return self.params.container_type
-        return None
+        if isinstance(params, list):
+            self.endpoint1 = params[0]
+            self.endpoint2 = params[1]
+        elif isinstance(params, dict):
+            self.endpoint1 = params.endpoint1
+            self.endpoint2 = params.endpoint2
+        else:
+            raise Exception("unexpected params type")
+
+    @staticmethod
+    def method():
+        return "addRelation"
+
+    def description(self):
+        return "add relation {endpoint1} - {endpoint2}".format(endpoint1=self.endpoint1,
+                                                               endpoint2=self.endpoint2)
+
+
+class AddUnitChange(ChangeInfo):
+    """
+    AddUnitChange holds a change for adding an application unit.
+
+    :Application: holds the application placeholder name for which a unit is
+        added.
+    :To: holds the optional location where to add the unit, as a placeholder
+	    pointing to another unit change or to a machine change.
+    """
+    def __init__(self, change_id, requires, params=None):
+        super(AddUnitChange, self).__init__(change_id, requires)
+
+        if isinstance(params, list):
+            self.application = params[0]
+            self.to = params[1]
+        elif isinstance(params, dict):
+            self.application = params.application
+            self.to = params.to
+        else:
+            raise Exception("unexpected params type")
+
+    @staticmethod
+    def method():
+        return "addUnit"
+
+    def description(self):
+        return "add {application} unit to {to}".format(application=self.application,
+                                                       to=self.to)
+
+
+class ScaleChange(ChangeInfo):
+    """
+    ScaleChange holds a change for scaling an application.
+
+    :application: holds the placeholder name of the application to be scaled.
+    :scale: is the new scale value to use.
+    """
+    def __init__(self, change_id, requires, params=None):
+        super(ScaleChange, self).__init__(change_id, requires)
+
+        if isinstance(params, list):
+            self.application = params[0]
+            self.scale = params[1]
+        elif isinstance(params, dict):
+            self.application = params.application
+            self.scale = params.scale
+        else:
+            raise Exception("unexpected params type")
+
+    @staticmethod
+    def method():
+        return "scale"
+
+    def description(self):
+        return "scale {application} to {scale} units".format(application=self.application,
+                                                             scale=self.scale)
+
+
+class ExposeChange(ChangeInfo):
+    """
+    ExposeChange holds a change for exposing an application.
+
+    :application: holds the placeholder name of the application that must be
+        exposed.
+    """
+    def __init__(self, change_id, requires, params=None):
+        super(ExposeChange, self).__init__(change_id, requires)
+
+        if isinstance(params, list):
+            self.application = params[0]
+        elif isinstance(params, dict):
+            self.application = params.application
+        else:
+            raise Exception("unexpected params type")
+
+    @staticmethod
+    def method():
+        return "expose"
+
+    def description(self):
+        return "expose {application}".format(application=self.application)
+
+
+class SetAnnotationsChange(ChangeInfo):
+    """
+    SetAnnotationsChange holds a change for setting application and machine
+    annotations.
+
+    :id: is the placeholder for the application or machine change corresponding
+        to the entity to be annotated.
+    :entity_type: holds the type of the entity, "application" or "machine".
+    :ennotations: holds the annotations as key/value pairs.
+    """
+    def __init__(self, change_id, requires, params=None):
+        super(SetAnnotationsChange, self).__init__(change_id, requires)
+
+        if isinstance(params, list):
+            self.id = params[0]
+            self.entity_type = params[1]
+            self.annotations = params[2]
+        elif isinstance(params, dict):
+            self.id = params.id
+            self.entity_type = params.get("entity-type")
+            self.annotations = params.annotations
+        else:
+            raise Exception("unexpected params type")
+
+    @staticmethod
+    def method():
+        return "setAnnotations"
+
+    def description(self):
+        return "set annotations for {id}".format(id=self.id)
