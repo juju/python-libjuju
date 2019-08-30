@@ -123,6 +123,26 @@ class TestAddApplicationChange(unittest.TestCase):
                           "devices": "devices",
                           "num_units": "num_units"}, change.__dict__)
 
+    def test_dict_params_missing_data(self):
+        change = AddApplicationChange(1, [], params={"charm": "charm",
+                                                     "series": "series",
+                                                     "application": "application",
+                                                     "options": "options",
+                                                     "constraints": "constraints",
+                                                     "storage": "storage"})
+        self.assertEqual({"change_id": 1,
+                          "requires": [],
+                          "charm": "charm",
+                          "series": "series",
+                          "application": "application",
+                          "options": "options",
+                          "constraints": "constraints",
+                          "storage": "storage",
+                          "endpoint_bindings": None,
+                          "resources": None,
+                          "devices": None,
+                          "num_units": None}, change.__dict__)
+
 
 class TestAddCharmChange(unittest.TestCase):
 
@@ -158,6 +178,15 @@ class TestAddCharmChange(unittest.TestCase):
                           "series": "series",
                           "channel": "channel"}, change.__dict__)
 
+    def test_dict_params_missing_data(self):
+        change = AddCharmChange(1, [], params={"charm": "charm",
+                                               "series": "series"})
+        self.assertEqual({"change_id": 1,
+                          "requires": [],
+                          "charm": "charm",
+                          "series": "series",
+                          "channel": None}, change.__dict__)
+
 
 class TestAddMachineChange(unittest.TestCase):
 
@@ -188,6 +217,17 @@ class TestAddMachineChange(unittest.TestCase):
                           "container_type": "container_type",
                           "parent_id": "parent_id"}, change.__dict__)
 
+    def test_dict_params_missing_data(self):
+        change = AddMachineChange(1, [], params={"series": "series",
+                                                 "constraints": "constraints",
+                                                 "container-type": "container_type"})
+        self.assertEqual({"change_id": 1,
+                          "requires": [],
+                          "series": "series",
+                          "constraints": "constraints",
+                          "container_type": "container_type",
+                          "parent_id": None}, change.__dict__)
+
 
 class TestAddRelationChange(unittest.TestCase):
 
@@ -209,6 +249,13 @@ class TestAddRelationChange(unittest.TestCase):
                           "endpoint1": "endpoint1",
                           "endpoint2": "endpoint2"}, change.__dict__)
 
+    def test_dict_params_missing_data(self):
+        change = AddRelationChange(1, [], params={"endpoint1": "endpoint1"})
+        self.assertEqual({"change_id": 1,
+                          "requires": [],
+                          "endpoint1": "endpoint1",
+                          "endpoint2": None}, change.__dict__)
+
 
 class TestAddUnitChange(unittest.TestCase):
 
@@ -229,6 +276,13 @@ class TestAddUnitChange(unittest.TestCase):
                           "requires": [],
                           "application": "application",
                           "to": "to"}, change.__dict__)
+
+    def test_dict_params_missing_data(self):
+        change = AddUnitChange(1, [], params={"application": "application"})
+        self.assertEqual({"change_id": 1,
+                          "requires": [],
+                          "application": "application",
+                          "to": None}, change.__dict__)
 
 
 class TestCreateOfferChange(unittest.TestCase):
@@ -254,6 +308,15 @@ class TestCreateOfferChange(unittest.TestCase):
                           "endpoints": "endpoints",
                           "offer_name": "offer_name"}, change.__dict__)
 
+    def test_dict_params_missing_data(self):
+        change = CreateOfferChange(1, [], params={"application": "application",
+                                                  "endpoints": "endpoints"})
+        self.assertEqual({"change_id": 1,
+                          "requires": [],
+                          "application": "application",
+                          "endpoints": "endpoints",
+                          "offer_name": None}, change.__dict__)
+
 
 class TestConsumeOfferChange(unittest.TestCase):
 
@@ -269,11 +332,18 @@ class TestConsumeOfferChange(unittest.TestCase):
 
     def test_dict_params(self):
         change = ConsumeOfferChange(1, [], params={"url": "url",
-                                                   "application_name": "application_name"})
+                                                   "application-name": "application_name"})
         self.assertEqual({"change_id": 1,
                           "requires": [],
                           "url": "url",
                           "application_name": "application_name"}, change.__dict__)
+
+    def test_dict_params_missing_data(self):
+        change = ConsumeOfferChange(1, [], params={"url": "url"})
+        self.assertEqual({"change_id": 1,
+                          "requires": [],
+                          "url": "url",
+                          "application_name": None}, change.__dict__)
 
 
 class TestExposeChange(unittest.TestCase):
@@ -292,6 +362,12 @@ class TestExposeChange(unittest.TestCase):
         self.assertEqual({"change_id": 1,
                           "requires": [],
                           "application": "application"}, change.__dict__)
+
+    def test_dict_params_missing_data(self):
+        change = ExposeChange(1, [], params={})
+        self.assertEqual({"change_id": 1,
+                          "requires": [],
+                          "application": None}, change.__dict__)
 
 
 class TestScaleChange(unittest.TestCase):
@@ -313,6 +389,13 @@ class TestScaleChange(unittest.TestCase):
                           "requires": [],
                           "application": "application",
                           "scale": "scale"}, change.__dict__)
+
+    def test_dict_params_missing_data(self):
+        change = ScaleChange(1, [], params={"application": "application"})
+        self.assertEqual({"change_id": 1,
+                          "requires": [],
+                          "application": "application",
+                          "scale": None}, change.__dict__)
 
 
 class TestSetAnnotationsChange(unittest.TestCase):
@@ -337,3 +420,12 @@ class TestSetAnnotationsChange(unittest.TestCase):
                           "id": "id",
                           "entity_type": "entity_type",
                           "annotations": "annotations"}, change.__dict__)
+
+    def test_dict_params_missing_data(self):
+        change = SetAnnotationsChange(1, [], params={"id": "id",
+                                                     "entity-type": "entity_type"})
+        self.assertEqual({"change_id": 1,
+                          "requires": [],
+                          "id": "id",
+                          "entity_type": "entity_type",
+                          "annotations": None}, change.__dict__)

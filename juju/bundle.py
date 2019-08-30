@@ -391,13 +391,39 @@ class ChangeSet:
 
 
 class ChangeInfo:
+    _toPy = {}
 
     def __init__(self, change_id, requires):
         self.change_id = change_id
         self.requires = requires
 
+    @classmethod
+    def from_dict(cls, self, data):
+        """
+        from_dict converts a data bag into fields on a class instance.
+        If a value is missing from the data, then None is assigned to the field
+        instance value.
+        """
+        d = (data or {})
+        for k, v in cls._toPy.items():
+            if k in d:
+                setattr(self, v, d[k])
+            else:
+                setattr(self, v, None)
+
 
 class AddApplicationChange(ChangeInfo):
+    _toPy = {'charm': 'charm',
+             'series': 'series',
+             'application': 'application',
+             'options': 'options',
+             'constraints': 'constraints',
+             'storage': 'storage',
+             'devices': 'devices',
+             'endpoint-bindings': 'endpoint_bindings',
+             'resources': 'resources',
+             'num-units': 'num_units'}
+
     """
     AddCharmChange holds a change for deploying a Juju application.
 
@@ -442,16 +468,7 @@ class AddApplicationChange(ChangeInfo):
                 self.num_units = params[9]
 
         elif isinstance(params, dict):
-            self.charm = params["charm"]
-            self.series = params["series"]
-            self.application = params["application"]
-            self.options = params["options"]
-            self.constraints = params["constraints"]
-            self.storage = params["storage"]
-            self.devices = params["devices"]
-            self.endpoint_bindings = params["endpoint-bindings"]
-            self.resources = params["resources"]
-            self.num_units = params["num-units"]
+            AddApplicationChange.from_dict(self, params)
         else:
             raise Exception("unexpected params type")
 
@@ -477,6 +494,10 @@ class AddApplicationChange(ChangeInfo):
 
 
 class AddCharmChange(ChangeInfo):
+    _toPy = {'charm': 'charm',
+             'series': 'series',
+             'channel': 'channel'}
+
     """
     AddCharmChange holds a change for adding a charm to the environment.
 
@@ -496,12 +517,7 @@ class AddCharmChange(ChangeInfo):
             else:
                 self.channel = None
         elif isinstance(params, dict):
-            self.charm = params["charm"]
-            self.series = params["series"]
-            if "channel" in params and params["channel"] != "":
-                self.channel = params["channel"]
-            else:
-                self.channel = None
+            AddCharmChange.from_dict(self, params)
         else:
             raise Exception("unexpected params type")
 
@@ -522,6 +538,11 @@ class AddCharmChange(ChangeInfo):
 
 
 class AddMachineChange(ChangeInfo):
+    _toPy = {'series': 'series',
+             'constraints': 'constraints',
+             'container-type': 'container_type',
+             'parent-id': 'parent_id'}
+
     """
     AddMachineChange holds a change for adding a machine or container.
 
@@ -541,10 +562,7 @@ class AddMachineChange(ChangeInfo):
             self.container_type = options.get("containerType")
             self.parent_id = options.get("parentId")
         elif isinstance(params, dict):
-            self.series = params["series"]
-            self.constraints = params["constraints"]
-            self.container_type = params["container-type"]
-            self.parent_id = params["parent-id"]
+            AddMachineChange.from_dict(self, params)
         else:
             raise Exception("unexpected params type")
 
@@ -561,6 +579,8 @@ class AddMachineChange(ChangeInfo):
 
 
 class AddRelationChange(ChangeInfo):
+    _toPy = {'endpoint1': 'endpoint1',
+             'endpoint2': 'endpoint2'}
     """
     AddRelationChange holds a change for adding a relation between two
     applications.
@@ -579,8 +599,7 @@ class AddRelationChange(ChangeInfo):
             self.endpoint1 = params[0]
             self.endpoint2 = params[1]
         elif isinstance(params, dict):
-            self.endpoint1 = params["endpoint1"]
-            self.endpoint2 = params["endpoint2"]
+            AddRelationChange.from_dict(self, params)
         else:
             raise Exception("unexpected params type")
 
@@ -594,6 +613,8 @@ class AddRelationChange(ChangeInfo):
 
 
 class AddUnitChange(ChangeInfo):
+    _toPy = {'application': 'application',
+             'to': 'to'}
     """
     AddUnitChange holds a change for adding an application unit.
 
@@ -609,8 +630,7 @@ class AddUnitChange(ChangeInfo):
             self.application = params[0]
             self.to = params[1]
         elif isinstance(params, dict):
-            self.application = params["application"]
-            self.to = params["to"]
+            AddUnitChange.from_dict(self, params)
         else:
             raise Exception("unexpected params type")
 
@@ -624,6 +644,9 @@ class AddUnitChange(ChangeInfo):
 
 
 class CreateOfferChange(ChangeInfo):
+    _toPy = {'application': 'application',
+             'endpoints': 'endpoints',
+             'offer-name': 'offer_name'}
     """
     CreateOfferChange holds a change for creating a new application endpoint
     offer.
@@ -641,9 +664,7 @@ class CreateOfferChange(ChangeInfo):
             self.endpoints = params[1]
             self.offer_name = params[2]
         elif isinstance(params, dict):
-            self.application = params["application"]
-            self.endpoints = params["endpoints"]
-            self.offer_name = params["offer-name"]
+            CreateOfferChange.from_dict(self, params)
         else:
             raise Exception("unexpected params type")
 
@@ -658,6 +679,8 @@ class CreateOfferChange(ChangeInfo):
 
 
 class ConsumeOfferChange(ChangeInfo):
+    _toPy = {'url': 'url',
+             'application-name': 'application_name'}
     """
     CreateOfferChange holds a change for consuming a offer.
 
@@ -671,8 +694,7 @@ class ConsumeOfferChange(ChangeInfo):
             self.url = params[0]
             self.application_name = params[1]
         elif isinstance(params, dict):
-            self.url = params["url"]
-            self.application_name = params["application_name"]
+            ConsumeOfferChange.from_dict(self, params)
         else:
             raise Exception("unexpected params type")
 
@@ -686,6 +708,7 @@ class ConsumeOfferChange(ChangeInfo):
 
 
 class ExposeChange(ChangeInfo):
+    _toPy = {'application': 'application'}
     """
     ExposeChange holds a change for exposing an application.
 
@@ -698,7 +721,7 @@ class ExposeChange(ChangeInfo):
         if isinstance(params, list):
             self.application = params[0]
         elif isinstance(params, dict):
-            self.application = params["application"]
+            ExposeChange.from_dict(self, params)
         else:
             raise Exception("unexpected params type")
 
@@ -711,6 +734,8 @@ class ExposeChange(ChangeInfo):
 
 
 class ScaleChange(ChangeInfo):
+    _toPy = {'application': 'application',
+             'scale': 'scale'}
     """
     ScaleChange holds a change for scaling an application.
 
@@ -724,8 +749,7 @@ class ScaleChange(ChangeInfo):
             self.application = params[0]
             self.scale = params[1]
         elif isinstance(params, dict):
-            self.application = params["application"]
-            self.scale = params["scale"]
+            ScaleChange.from_dict(self, params)
         else:
             raise Exception("unexpected params type")
 
@@ -739,6 +763,9 @@ class ScaleChange(ChangeInfo):
 
 
 class SetAnnotationsChange(ChangeInfo):
+    _toPy = {'id': 'id',
+             'entity-type': 'entity_type',
+             'annotations': 'annotations'}
     """
     SetAnnotationsChange holds a change for setting application and machine
     annotations.
@@ -756,9 +783,7 @@ class SetAnnotationsChange(ChangeInfo):
             self.entity_type = params[1]
             self.annotations = params[2]
         elif isinstance(params, dict):
-            self.id = params["id"]
-            self.entity_type = params["entity-type"]
-            self.annotations = params["annotations"]
+            SetAnnotationsChange.from_dict(self, params)
         else:
             raise Exception("unexpected params type")
 
