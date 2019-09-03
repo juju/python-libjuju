@@ -497,7 +497,7 @@ class TestCreateOfferChangeRun:
         context.model = model
 
         result = await change.run(context)
-        assert result == None
+        assert result is None
 
         model.create_offer.assert_called_once()
         model.create_offer.assert_called_with("endpoints",
@@ -548,7 +548,7 @@ class TestConsumeOfferChangeRun:
         context.model = model
 
         result = await change.run(context)
-        assert result == None
+        assert result is None
 
         model.consume.assert_called_once()
         model.consume.assert_called_with("url",
@@ -595,7 +595,7 @@ class TestExposeChangeRun:
         context.model = model
 
         result = await change.run(context)
-        assert result == None
+        assert result is None
 
         model.applications["application1"].expose.assert_called_once()
 
@@ -645,7 +645,7 @@ class TestScaleChangeRun:
         context.model = model
 
         result = await change.run(context)
-        assert result == None
+        assert result is None
 
         model.applications["application1"].scale.assert_called_once()
         model.applications["application1"].scale.assert_called_with(scale=1)

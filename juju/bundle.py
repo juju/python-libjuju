@@ -181,7 +181,13 @@ def get_charm_series(path):
     md = Path(path) / "metadata.yaml"
     if not md.exists():
         return None
-    data = yaml.load(md.open())
+    try:
+        data = yaml.safe_load(md.open())
+    except yaml.YAMLError as exc:
+        if hasattr(exc, "problem_mark"):
+            mark = exc.problem_mark
+            log.error("Error parsing YAML file {}, line {}, column: {}".format(md, mark.line, mark.column))
+        raise
     series = data.get('series')
     return series[0] if series else None
 
@@ -218,8 +224,7 @@ class ChangeInfo:
 
     @classmethod
     def from_dict(cls, self, data):
-        """
-        from_dict converts a data bag into fields on a class instance.
+        """from_dict converts a data bag into fields on a class instance.
         If a value is missing from the data, then None is assigned to the field
         instance value.
         """
@@ -243,21 +248,20 @@ class AddApplicationChange(ChangeInfo):
              'resources': 'resources',
              'num-units': 'num_units'}
 
-    """
-    AddApplicationChange holds a change for deploying a Juju application.
+    """AddApplicationChange holds a change for deploying a Juju application.
 
-    :charm: holds the URL of the charm to be used to deploy this application.
-    :series: holds the series of the application to be deployed if the charm
+    :charm: URL of the charm to be used to deploy this application.
+    :series: series of the application to be deployed if the charm
         default is not sufficient.
-    :application: holds the application name.
-    :num_units: holds the number of units required. For IAAS models, this will
+    :application: application name.
+    :num_units: number of units required. For IAAS models, this will
         be 0 and separate AddUnitChanges will be used. For Kubernetes models,
         this will be used to scale the application.
     :options: holds application options.
-    :constraints: holds the optional application constraints.
-    :storage: holds the optional storage constraints.
-    :devices: holds the optional devices constraints.
-    :endpoint_bindings: holds the optional endpoint bindings
+    :constraints: optional application constraints.
+    :storage: optional storage constraints.
+    :devices: optional devices constraints.
+    :endpoint_bindings: optional endpoint bindings
     :resources: identifies the revision to use for each resource of the
         application's charm.
     :local_resources: identifies the path to the local resource of the
@@ -293,14 +297,12 @@ class AddApplicationChange(ChangeInfo):
 
     @staticmethod
     def method():
-        """
-        method returns an associated ID for the Juju API call.
+        """method returns an associated ID for the Juju API call.
         """
         return "deploy"
 
     async def run(self, context):
-        """
-        Run executes a AddApplicationChange using the returned parameters from
+        """Executes a AddApplicationChange using the returned parameters from
         the API server.
 
         :param context: is used for any methods or properties required to
@@ -354,13 +356,12 @@ class AddCharmChange(ChangeInfo):
              'series': 'series',
              'channel': 'channel'}
 
-    """
-    AddCharmChange holds a change for adding a charm to the environment.
+    """AddCharmChange holds a change for adding a charm to the environment.
 
-    :charm: holds the URL of the charm to be added.
-    :series: holds the series of the charm to be added if the charm default is
+    :charm: URL of the charm to be added.
+    :series: series of the charm to be added if the charm default is
         not sufficient.
-    :channel: holds the preferred channel for obtaining the charm.
+    :channel: preferred channel for obtaining the charm.
     """
     def __init__(self, change_id, requires, params=None):
         super(AddCharmChange, self).__init__(change_id, requires)
@@ -379,14 +380,12 @@ class AddCharmChange(ChangeInfo):
 
     @staticmethod
     def method():
-        """
-        method returns an associated ID for the Juju API call.
+        """method returns an associated ID for the Juju API call.
         """
         return "addCharm"
 
     async def run(self, context):
-        """
-        Run executes a AddCharmChange using the returned parameters from
+        """Executes a AddCharmChange using the returned parameters from
         the API server.
 
         :param context: is used for any methods or properties required to
@@ -420,14 +419,13 @@ class AddMachineChange(ChangeInfo):
              'container-type': 'container_type',
              'parent-id': 'parent_id'}
 
-    """
-    AddMachineChange holds a change for adding a machine or container.
+    """AddMachineChange holds a change for adding a machine or container.
 
-    :series: holds the optional machine OS series.
-    :constraints: holds the optional machine constraints.
-    :container_type: optionally holds the type of the container (for instance
+    :series: optional machine OS series.
+    :constraints: optional machine constraints.
+    :container_type: optionally type of the container (for instance
         "lxc" or kvm"). It is not specified for top level machines.
-    :parent_id: holds the id of the parent machine.
+    :parent_id: id of the parent machine.
     """
     def __init__(self, change_id, requires, params=None):
         super(AddMachineChange, self).__init__(change_id, requires)
@@ -445,14 +443,12 @@ class AddMachineChange(ChangeInfo):
 
     @staticmethod
     def method():
-        """
-        method returns an associated ID for the Juju API call.
+        """method returns an associated ID for the Juju API call.
         """
         return "addMachines"
 
     async def run(self, context):
-        """
-        Run executes a AddMachineChange using the returned parameters from
+        """Executes a AddMachineChange using the returned parameters from
         the API server.
 
         :param context: is used for any methods or properties required to
@@ -499,8 +495,7 @@ class AddMachineChange(ChangeInfo):
 class AddRelationChange(ChangeInfo):
     _toPy = {'endpoint1': 'endpoint1',
              'endpoint2': 'endpoint2'}
-    """
-    AddRelationChange holds a change for adding a relation between two
+    """AddRelationChange holds a change for adding a relation between two
     applications.
 
     Endpoint1 and Endpoint2 hold relation endpoints in the
@@ -523,14 +518,12 @@ class AddRelationChange(ChangeInfo):
 
     @staticmethod
     def method():
-        """
-        method returns an associated ID for the Juju API call.
+        """method returns an associated ID for the Juju API call.
         """
         return "addRelation"
 
     async def run(self, context):
-        """
-        Run executes a AddRelationChange using the returned parameters from
+        """Executes a AddRelationChange using the returned parameters from
         the API server.
 
         :param context: is used for any methods or properties required to
@@ -550,12 +543,11 @@ class AddRelationChange(ChangeInfo):
 class AddUnitChange(ChangeInfo):
     _toPy = {'application': 'application',
              'to': 'to'}
-    """
-    AddUnitChange holds a change for adding an application unit.
+    """AddUnitChange holds a change for adding an application unit.
 
-    :application: holds the application placeholder name for which a unit is
+    :application: application placeholder name for which a unit is
         added.
-    :to: holds the optional location where to add the unit, as a placeholder
+    :to: optional location where to add the unit, as a placeholder
         pointing to another unit change or to a machine change.
     """
     def __init__(self, change_id, requires, params=None):
@@ -571,14 +563,12 @@ class AddUnitChange(ChangeInfo):
 
     @staticmethod
     def method():
-        """
-        method returns an associated ID for the Juju API call.
+        """method returns an associated ID for the Juju API call.
         """
         return "addUnit"
 
     async def run(self, context):
-        """
-        Run executes a AddUnitChange using the returned parameters from
+        """Executes a AddUnitChange using the returned parameters from
         the API server.
 
         :param context: is used for any methods or properties required to
@@ -611,8 +601,7 @@ class CreateOfferChange(ChangeInfo):
     _toPy = {'application': 'application',
              'endpoints': 'endpoints',
              'offer-name': 'offer_name'}
-    """
-    CreateOfferChange holds a change for creating a new application endpoint
+    """CreateOfferChange holds a change for creating a new application endpoint
     offer.
 
     :application: is the name of the application to create an offer for.
@@ -634,14 +623,12 @@ class CreateOfferChange(ChangeInfo):
 
     @staticmethod
     def method():
-        """
-        method returns an associated ID for the Juju API call.
+        """method returns an associated ID for the Juju API call.
         """
         return "createOffer"
 
     async def run(self, context):
-        """
-        Run executes a CreateOfferChange using the returned parameters from
+        """Executes a CreateOfferChange using the returned parameters from
         the API server.
 
         :param context: is used for any methods or properties required to
@@ -660,8 +647,7 @@ class CreateOfferChange(ChangeInfo):
 class ConsumeOfferChange(ChangeInfo):
     _toPy = {'url': 'url',
              'application-name': 'application_name'}
-    """
-    CreateOfferChange holds a change for consuming a offer.
+    """CreateOfferChange holds a change for consuming a offer.
 
     :url: contains the location of the offer
     :application_name: describes the application name on offer.
@@ -679,14 +665,12 @@ class ConsumeOfferChange(ChangeInfo):
 
     @staticmethod
     def method():
-        """
-        method returns an associated ID for the Juju API call.
+        """method returns an associated ID for the Juju API call.
         """
         return "consumeOffer"
 
     async def run(self, context):
-        """
-        Run executes a ConsumeOfferChange using the returned parameters from
+        """Executes a ConsumeOfferChange using the returned parameters from
         the API server.
 
         :param context: is used for any methods or properties required to
@@ -703,10 +687,9 @@ class ConsumeOfferChange(ChangeInfo):
 
 class ExposeChange(ChangeInfo):
     _toPy = {'application': 'application'}
-    """
-    ExposeChange holds a change for exposing an application.
+    """ExposeChange holds a change for exposing an application.
 
-    :application: holds the placeholder name of the application that must be
+    :application: placeholder name of the application that must be
         exposed.
     """
     def __init__(self, change_id, requires, params=None):
@@ -721,14 +704,12 @@ class ExposeChange(ChangeInfo):
 
     @staticmethod
     def method():
-        """
-        method returns an associated ID for the Juju API call.
+        """method returns an associated ID for the Juju API call.
         """
         return "expose"
 
     async def run(self, context):
-        """
-        Run executes a ExposeChange using the returned parameters from
+        """Executes a ExposeChange using the returned parameters from
         the API server.
 
         :param context: is used for any methods or properties required to
@@ -748,7 +729,7 @@ class ScaleChange(ChangeInfo):
     """
     ScaleChange holds a change for scaling an application.
 
-    :application: holds the placeholder name of the application to be scaled.
+    :application: placeholder name of the application to be scaled.
     :scale: is the new scale value to use.
     """
     def __init__(self, change_id, requires, params=None):
@@ -764,14 +745,12 @@ class ScaleChange(ChangeInfo):
 
     @staticmethod
     def method():
-        """
-        method returns an associated ID for the Juju API call.
+        """method returns an associated ID for the Juju API call.
         """
         return "scale"
 
     async def run(self, context):
-        """
-        Run executes a ScaleChange using the returned parameters from
+        """Executes a ScaleChange using the returned parameters from
         the API server.
 
         :param context: is used for any methods or properties required to
@@ -789,14 +768,13 @@ class SetAnnotationsChange(ChangeInfo):
     _toPy = {'id': 'id',
              'entity-type': 'entity_type',
              'annotations': 'annotations'}
-    """
-    SetAnnotationsChange holds a change for setting application and machine
+    """SetAnnotationsChange holds a change for setting application and machine
     annotations.
 
     :id: is the placeholder for the application or machine change corresponding
         to the entity to be annotated.
-    :entity_type: holds the type of the entity, "application" or "machine".
-    :ennotations: holds the annotations as key/value pairs.
+    :entity_type: type of the entity, "application" or "machine".
+    :ennotations: annotations as key/value pairs.
     """
     def __init__(self, change_id, requires, params=None):
         super(SetAnnotationsChange, self).__init__(change_id, requires)
@@ -812,14 +790,12 @@ class SetAnnotationsChange(ChangeInfo):
 
     @staticmethod
     def method():
-        """
-        method returns an associated ID for the Juju API call.
+        """method returns an associated ID for the Juju API call.
         """
         return "setAnnotations"
 
     async def run(self, context):
-        """
-        Run executes a SetAnnotationsChange using the returned parameters from
+        """Executes a SetAnnotationsChange using the returned parameters from
         the API server.
 
         :param context: is used for any methods or properties required to
