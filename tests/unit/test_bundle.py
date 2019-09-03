@@ -1,11 +1,15 @@
 import unittest
+from unittest import mock
 
+import pytest
 from juju.bundle import (AddApplicationChange, AddCharmChange,
                          AddMachineChange, AddRelationChange, AddUnitChange,
                          ChangeSet, ConsumeOfferChange, CreateOfferChange,
                          ExposeChange, ScaleChange, SetAnnotationsChange)
 from juju.client import client
 from toposort import CircularDependencyError
+
+from .. import base
 
 
 class TestChangeSet(unittest.TestCase):
@@ -144,6 +148,51 @@ class TestAddApplicationChange(unittest.TestCase):
                           "num_units": None}, change.__dict__)
 
 
+class TestAddApplicationChangeRun:
+
+    @pytest.mark.asyncio
+    async def test_run(self, event_loop):
+        change = AddApplicationChange(1, [], params={"charm": "charm",
+                                                     "series": "series",
+                                                     "application": "application",
+                                                     "options": "options",
+                                                     "constraints": "constraints",
+                                                     "storage": "storage",
+                                                     "endpoint-bindings": "endpoint_bindings",
+                                                     "resources": "resources",
+                                                     "devices": "devices",
+                                                     "num-units": "num_units"})
+
+        model = mock.Mock()
+        model._deploy = base.AsyncMock(return_value=None)
+        model._add_store_resources = base.AsyncMock(return_value=["resource1"])
+
+        context = mock.Mock()
+        context.resolve.return_value = "charm1"
+        context.trusted = False
+        context.model = model
+
+        result = await change.run(context)
+        assert result == "application"
+
+        model._add_store_resources.assert_called_once()
+        model._add_store_resources.assert_called_with("application",
+                                                      "charm1",
+                                                      overrides="resources")
+
+        model._deploy.assert_called_once()
+        model._deploy.assert_called_with(charm_url="charm1",
+                                         application="application",
+                                         series="series",
+                                         config="options",
+                                         constraints="constraints",
+                                         endpoint_bindings="endpoint_bindings",
+                                         resources=["resource1"],
+                                         storage="storage",
+                                         devices="devices",
+                                         num_units="num_units")
+
+
 class TestAddCharmChange(unittest.TestCase):
 
     def test_method(self):
@@ -188,6 +237,36 @@ class TestAddCharmChange(unittest.TestCase):
                           "channel": None}, change.__dict__)
 
 
+class TestAddCharmChangeRun:
+
+    @pytest.mark.asyncio
+    async def test_run(self, event_loop):
+        change = AddCharmChange(1, [], params={"charm": "charm",
+                                               "series": "series",
+                                               "channel": "channel"})
+
+        charmstore = mock.Mock()
+        charmstore.entityId = base.AsyncMock(return_value="entity_id")
+
+        client_facade = mock.Mock()
+        client_facade.AddCharm = base.AsyncMock(return_value=None)
+
+        context = mock.Mock()
+        context.charmstore = charmstore
+        context.client_facade = client_facade
+
+        result = await change.run(context)
+        assert result == "entity_id"
+
+        charmstore.entityId.assert_called_once()
+        charmstore.entityId.assert_called_with("charm")
+
+        client_facade.AddCharm.assert_called_once()
+        client_facade.AddCharm.assert_called_with(channel=None,
+                                                  url="entity_id",
+                                                  force=False)
+
+
 class TestAddMachineChange(unittest.TestCase):
 
     def test_method(self):
@@ -229,6 +308,35 @@ class TestAddMachineChange(unittest.TestCase):
                           "parent_id": None}, change.__dict__)
 
 
+class TestAddMachineChangeRun:
+
+    @pytest.mark.asyncio
+    async def test_run(self, event_loop):
+        change = AddMachineChange(1, [], params={"series": "series",
+                                                 "constraints": "cores=1",
+                                                 "container-type": "container_type",
+                                                 "parent-id": "parent_id"})
+
+        machines = [client.AddMachinesResult(machine="machine1")]
+
+        client_facade = mock.Mock()
+        client_facade.AddMachines = base.AsyncMock(return_value=client.AddMachinesResults(machines))
+
+        context = mock.Mock()
+        context.resolve.return_value = "parent_id1"
+        context.client_facade = client_facade
+
+        result = await change.run(context)
+        assert result == "machine1"
+
+        client_facade.AddMachines.assert_called_once()
+        client_facade.AddMachines.assert_called_with(params=[client.AddMachineParams(series="series",
+                                                                                     constraints="{\"cores\":1}",
+                                                                                     container_type="container_type",
+                                                                                     parent_id="parent_id1",
+                                                                                     jobs=["JobHostUnits"])])
+
+
 class TestAddRelationChange(unittest.TestCase):
 
     def test_method(self):
@@ -257,6 +365,27 @@ class TestAddRelationChange(unittest.TestCase):
                           "endpoint2": None}, change.__dict__)
 
 
+class TestAddRelationChangeRun:
+
+    @pytest.mark.asyncio
+    async def test_run(self, event_loop):
+        change = AddRelationChange(1, [], params={"endpoint1": "endpoint1",
+                                                  "endpoint2": "endpoint2"})
+
+        model = mock.Mock()
+        model.add_relation = base.AsyncMock(return_value="relation1")
+
+        context = mock.Mock()
+        context.resolveRelation = mock.Mock(side_effect=['endpoint_1', 'endpoint_2'])
+        context.model = model
+
+        result = await change.run(context)
+        assert result == "relation1"
+
+        model.add_relation.assert_called_once()
+        model.add_relation.assert_called_with("endpoint_1", "endpoint_2")
+
+
 class TestAddUnitChange(unittest.TestCase):
 
     def test_method(self):
@@ -283,6 +412,40 @@ class TestAddUnitChange(unittest.TestCase):
                           "requires": [],
                           "application": "application",
                           "to": None}, change.__dict__)
+
+
+class MockModel:
+
+    def __init__(self, app):
+        self.app = app
+
+    @property
+    def applications(self):
+        return self.app
+
+
+class TestAddUnitChangeRun:
+
+    @pytest.mark.asyncio
+    async def test_run(self, event_loop):
+        change = AddUnitChange(1, [], params={"application": "application",
+                                              "to": "to"})
+
+        app = mock.Mock()
+        app.add_unit = base.AsyncMock(return_value="unit1")
+
+        model = MockModel({"application1": app})
+
+        context = mock.Mock()
+        context.resolve = mock.Mock(side_effect=['application1', 'to1'])
+        context._units_by_app = {}
+        context.model = model
+
+        result = await change.run(context)
+        assert result == "unit1"
+
+        model.applications["application1"].add_unit.assert_called_once()
+        model.applications["application1"].add_unit.assert_called_with(count=1, to="to1")
 
 
 class TestCreateOfferChange(unittest.TestCase):
@@ -318,6 +481,30 @@ class TestCreateOfferChange(unittest.TestCase):
                           "offer_name": None}, change.__dict__)
 
 
+class TestCreateOfferChangeRun:
+
+    @pytest.mark.asyncio
+    async def test_run(self, event_loop):
+        change = CreateOfferChange(1, [], params={"application": "application",
+                                                  "endpoints": ["endpoints"],
+                                                  "offer-name": "offer_name"})
+
+        model = mock.Mock()
+        model.create_offer = base.AsyncMock(return_value=None)
+
+        context = mock.Mock()
+        context.resolve = mock.Mock(side_effect=['application1'])
+        context.model = model
+
+        result = await change.run(context)
+        assert result == None
+
+        model.create_offer.assert_called_once()
+        model.create_offer.assert_called_with("endpoints",
+                                              offer_name="offer_name",
+                                              application_name="application1")
+
+
 class TestConsumeOfferChange(unittest.TestCase):
 
     def test_method(self):
@@ -346,6 +533,28 @@ class TestConsumeOfferChange(unittest.TestCase):
                           "application_name": None}, change.__dict__)
 
 
+class TestConsumeOfferChangeRun:
+
+    @pytest.mark.asyncio
+    async def test_run(self, event_loop):
+        change = ConsumeOfferChange(1, [], params={"url": "url",
+                                                   "application-name": "application_name"})
+
+        model = mock.Mock()
+        model.consume = base.AsyncMock(return_value=None)
+
+        context = mock.Mock()
+        context.resolve = mock.Mock(side_effect=['application1'])
+        context.model = model
+
+        result = await change.run(context)
+        assert result == None
+
+        model.consume.assert_called_once()
+        model.consume.assert_called_with("url",
+                                         application_alias="application1")
+
+
 class TestExposeChange(unittest.TestCase):
 
     def test_method(self):
@@ -368,6 +577,27 @@ class TestExposeChange(unittest.TestCase):
         self.assertEqual({"change_id": 1,
                           "requires": [],
                           "application": None}, change.__dict__)
+
+
+class TestExposeChangeRun:
+
+    @pytest.mark.asyncio
+    async def test_run(self, event_loop):
+        change = ExposeChange(1, [], params={"application": "application"})
+
+        app = mock.Mock()
+        app.expose = base.AsyncMock(return_value=None)
+
+        model = MockModel({"application1": app})
+
+        context = mock.Mock()
+        context.resolve = mock.Mock(side_effect=['application1'])
+        context.model = model
+
+        result = await change.run(context)
+        assert result == None
+
+        model.applications["application1"].expose.assert_called_once()
 
 
 class TestScaleChange(unittest.TestCase):
@@ -396,6 +626,29 @@ class TestScaleChange(unittest.TestCase):
                           "requires": [],
                           "application": "application",
                           "scale": None}, change.__dict__)
+
+
+class TestScaleChangeRun:
+
+    @pytest.mark.asyncio
+    async def test_run(self, event_loop):
+        change = ScaleChange(1, [], params={"application": "application",
+                                            "scale": 1})
+
+        app = mock.Mock()
+        app.scale = base.AsyncMock(return_value=None)
+
+        model = MockModel({"application1": app})
+
+        context = mock.Mock()
+        context.resolve = mock.Mock(side_effect=['application1'])
+        context.model = model
+
+        result = await change.run(context)
+        assert result == None
+
+        model.applications["application1"].scale.assert_called_once()
+        model.applications["application1"].scale.assert_called_with(scale=1)
 
 
 class TestSetAnnotationsChange(unittest.TestCase):
@@ -429,3 +682,31 @@ class TestSetAnnotationsChange(unittest.TestCase):
                           "id": "id",
                           "entity_type": "entity_type",
                           "annotations": None}, change.__dict__)
+
+
+class TestSetAnnotationsChangeRun:
+
+    @pytest.mark.asyncio
+    async def test_run(self, event_loop):
+        change = SetAnnotationsChange(1, [], params={"id": "id",
+                                                     "entity-type": "entity_type",
+                                                     "annotations": "annotations"})
+
+        entity = mock.Mock()
+        entity.set_annotations = base.AsyncMock(return_value="annotations1")
+
+        state = mock.Mock()
+        state.get_entity = mock.Mock(return_value=entity)
+
+        model = mock.Mock()
+        model.state = state
+
+        context = mock.Mock()
+        context.resolve = mock.Mock(side_effect=['application1'])
+        context.model = model
+
+        result = await change.run(context)
+        assert result == "annotations1"
+
+        entity.set_annotations.assert_called_once()
+        entity.set_annotations.assert_called_with("annotations")

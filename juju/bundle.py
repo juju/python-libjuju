@@ -461,19 +461,22 @@ class AddMachineChange(ChangeInfo):
         # Fix up values, as necessary.
         params = {}
         if self.parent_id is not None:
-            if params['parent_id'].startswith('$addUnit'):
-                unit = context.resolve(params['parent_id'])[0]
+            if self.parent_id.startswith('$addUnit'):
+                unit = context.resolve(self.parent_id)[0]
                 params['parent_id'] = unit.machine.entity_id
             else:
-                params['parent_id'] = context.resolve(params['parent_id'])
+                params['parent_id'] = context.resolve(self.parent_id)
 
         params['constraints'] = parse_constraints(self.constraints)
         params['jobs'] = params.get('jobs', ['JobHostUnits'])
+        params['series'] = self.series
 
         if self.container_type == 'lxc':
             log.warning('Juju 2.0 does not support lxc containers. '
                         'Converting containers to lxd.')
             params['container_type'] = 'lxd'
+        else:
+            params['container_type'] = self.container_type
 
         # Submit the request.
         params = client.AddMachineParams(**params)
