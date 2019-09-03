@@ -147,33 +147,9 @@ class BundleHandler:
             change_cls = self.change_types.get(step.method)
             if change_cls is None:
                 raise NotImplementedError("unknown change type: {}".format(step.method))
-            # Explicitly call out what methods we work with, so it makes it
-            # very easy to understand what happens with the execution.
             change = change_cls(step.id_, step.requires, step.args)
             log.info("Applying change: {}".format(change))
-            if step.method == AddApplicationChange.method():
-                result = await self.handleAddApplication(change)
-            elif step.method == AddCharmChange.method():
-                result = await self.handleAddCharm(change)
-            elif step.method == AddMachineChange.method():
-                result = await self.handleAddMachine(change)
-            elif step.method == AddRelationChange.method():
-                result = await self.handleAddRelation(change)
-            elif step.method == AddUnitChange.method():
-                result = await self.handleAddUnit(change)
-            elif step.method == CreateOfferChange.method():
-                result = await self.handleCreateOffer(change)
-            elif step.method == ConsumeOfferChange.method():
-                result = await self.handleConsumeOffer(change)
-            elif step.method == ExposeChange.method():
-                result = await self.handleExpose(change)
-            elif step.method == ScaleChange.method():
-                result = await self.handleScale(change)
-            elif step.method == SetAnnotationsChange.method():
-                result = await self.handleSetAnnotations(change)
-            else:
-                raise NotImplementedError("unknown change type: {}".format(step.method))
-            self.references[step.id_] = result
+            self.references[step.id_] = await change.run(self)
 
     @property
     def applications(self):
@@ -195,169 +171,12 @@ class BundleHandler:
                 reference = ref
         return reference
 
-    async def handleAddApplication(self, change):
-        """
-        :param change AddApplicationChange: holds a change for deploying a Juju
-            application.
-        """
-        # resolve indirect references
-        charm = self.resolve(change.charm)
-        options = {}
-        if change.options is not None:
-            options = change.options
-        if self.trusted:
-            if self.model.info.agent_version < client.Number.from_json('2.4.0'):
-                raise NotImplementedError("trusted is not supported on model version {}".format(self.model.info.agent_version))
-            options["trust"] = "true"
-        if not charm.startswith('local:'):
-            resources = await self.model._add_store_resources(
-                change.application, charm, overrides=change.resources)
-        await self.model._deploy(
-            charm_url=charm,
-            application=change.application,
-            series=change.series,
-            config=change.options,
-            constraints=change.constraints,
-            endpoint_bindings=change.endpoint_bindings,
-            resources=resources,
-            storage=change.storage,
-            devices=change.devices,
-            num_units=change.num_units,
-        )
-        return change.application
-
-    async def handleAddCharm(self, change):
-        """
-        :param change AddCharmChange: change holds the charm changes when
-            deploying a charm.
-        """
-        # We don't add local charms because they've already been added
-        # by self._handle_local_charms
-        if change.charm.startswith('local:'):
-            return change.charm
-
-        entity_id = await self.charmstore.entityId(change.charm)
-        log.debug('Adding %s', entity_id)
-        await self.client_facade.AddCharm(channel=None, url=entity_id, force=False)
-        return entity_id
-
-    async def handleAddMachine(self, change):
-        """
-        :param change AddMachineChange: holds a change for adding a machine or
-            container.
-        """
-        # Fix up values, as necessary.
-        params = {}
-        if change.parent_id is not None:
-            if params['parent_id'].startswith('$addUnit'):
-                unit = self.resolve(params['parent_id'])[0]
-                params['parent_id'] = unit.machine.entity_id
-            else:
-                params['parent_id'] = self.resolve(params['parent_id'])
-
-        params['constraints'] = parse_constraints(change.constraints)
-        params['jobs'] = params.get('jobs', ['JobHostUnits'])
-
-        if change.container_type == 'lxc':
-            log.warning('Juju 2.0 does not support lxc containers. '
-                        'Converting containers to lxd.')
-            params['container_type'] = 'lxd'
-
-        # Submit the request.
-        params = client.AddMachineParams(**params)
-        results = await self.client_facade.AddMachines(params=[params])
-        error = results.machines[0].error
-        if error:
-            raise ValueError("Error adding machine: %s" % error.message)
-        machine = results.machines[0].machine
-        log.debug('Added new machine %s', machine)
-        return machine
-
-    async def handleAddUnit(self, change):
-        """
-        :param change AddUnitChange: holds a change for adding an application
-            unit.
-        """
-        application = self.resolve(change.application)
-        placement = self.resolve(change.to)
-        if self._units_by_app.get(application):
-            # enough units for this application already exist;
-            # claim one, and carry on
-            # NB: this should probably honor placement, but the juju client
-            # doesn't, so we're not bothering, either
-            unit_name = self._units_by_app[application].pop()
-            log.debug('Reusing unit %s for %s', unit_name, application)
-            return self.model.units[unit_name]
-
-        log.debug('Adding new unit for %s%s', application,
-                  ' to %s' % placement if placement else '')
-        return await self.model.applications[application].add_unit(
-            count=1,
-            to=placement,
-        )
-
-    async def handleAddRelation(self, change):
-        """
-        :param change AddRelationChange: change holds the relation changes when
-            adding a relation.
-        """
-        ep1 = self.resolveRelation(change.endpoint1)
-        ep2 = self.resolveRelation(change.endpoint2)
-
-        log.info('Relating %s <-> %s', ep1, ep2)
-        return await self.model.add_relation(ep1, ep2)
-
-    async def handleCreateOffer(self, change):
-        """
-        :param change CreateOfferChange: holds a change for creating a new
-            application endpoint offer.
-        """
-        application = self.resolve(change.application_name)
-        for ep in change.endpoints:
-            await self.model.create_offer(ep, offer_name=change.offer_name, application_name=application)
-
-    async def handleConsumeOffer(self, change):
-        """
-        :param change ConsumeOfferChange: holds a change for consuming a offer.
-        """
-        application = self.resolve(change.application_name)
-        local_name = await self.model.consume(change.url, application_alias=application)
-        return local_name
-
-    async def handleExpose(self, change):
-        """
-        :param change ExposeChange: holds a change for exposing an application.
-        """
-        application = self.resolve(change.application)
-        log.info('Exposing %s', application)
-        return await self.model.applications[application].expose()
-
-    async def handleScale(self, change):
-        """
-        :param change ScaleChange: change holds the scale for a k8s application.
-        """
-        application = self.resolve(change.application)
-        return await self.model.applications[application].scale(scale=change.scale)
-
-    async def handleSetAnnotations(self, change):
-        """
-        :param change SetAnnotationsChange: holds a change for setting
-            application and machine annotations.
-        """
-        entity_id = self.resolve(change.id)
-        try:
-            entity = self.model.state.get_entity(change.entity_type, entity_id)
-        except KeyError:
-            entity = await self.model._wait_for_new(change.entity_type, entity_id)
-        return await entity.set_annotations(change.annotations)
-
 
 def get_charm_series(path):
     """Inspects the charm directory at ``path`` and returns a default
     series from its metadata.yaml (the first item in the 'series' list).
 
     Returns None if no series can be determined.
-
     """
     md = Path(path) / "metadata.yaml"
     if not md.exists():
@@ -474,7 +293,44 @@ class AddApplicationChange(ChangeInfo):
 
     @staticmethod
     def method():
+        """
+        method returns an associated ID for the Juju API call.
+        """
         return "deploy"
+
+    async def run(self, context):
+        """
+        Run executes a AddApplicationChange using the returned parameters from
+        the API server.
+
+        :param context: is used for any methods or properties required to
+            perform a change.
+        """
+        # resolve indirect references
+        charm = context.resolve(self.charm)
+        options = {}
+        if self.options is not None:
+            options = self.options
+        if context.trusted:
+            if context.model.info.agent_version < client.Number.from_json('2.4.0'):
+                raise NotImplementedError("trusted is not supported on model version {}".format(context.model.info.agent_version))
+            options["trust"] = "true"
+        if not charm.startswith('local:'):
+            resources = await context.model._add_store_resources(
+                self.application, charm, overrides=self.resources)
+        await context.model._deploy(
+            charm_url=charm,
+            application=self.application,
+            series=self.series,
+            config=self.options,
+            constraints=self.constraints,
+            endpoint_bindings=self.endpoint_bindings,
+            resources=resources,
+            storage=self.storage,
+            devices=self.devices,
+            num_units=self.num_units,
+        )
+        return self.application
 
     def __str__(self):
         series = ""
@@ -523,7 +379,28 @@ class AddCharmChange(ChangeInfo):
 
     @staticmethod
     def method():
+        """
+        method returns an associated ID for the Juju API call.
+        """
         return "addCharm"
+
+    async def run(self, context):
+        """
+        Run executes a AddCharmChange using the returned parameters from
+        the API server.
+
+        :param context: is used for any methods or properties required to
+            perform a change.
+        """
+        # We don't add local charms because they've already been added
+        # by self._handle_local_charms
+        if self.charm.startswith('local:'):
+            return self.charm
+
+        entity_id = await context.charmstore.entityId(self.charm)
+        log.debug('Adding %s', entity_id)
+        await context.client_facade.AddCharm(channel=None, url=entity_id, force=False)
+        return entity_id
 
     def __str__(self):
         series = ""
@@ -568,7 +445,45 @@ class AddMachineChange(ChangeInfo):
 
     @staticmethod
     def method():
+        """
+        method returns an associated ID for the Juju API call.
+        """
         return "addMachines"
+
+    async def run(self, context):
+        """
+        Run executes a AddMachineChange using the returned parameters from
+        the API server.
+
+        :param context: is used for any methods or properties required to
+            perform a change.
+        """
+        # Fix up values, as necessary.
+        params = {}
+        if self.parent_id is not None:
+            if params['parent_id'].startswith('$addUnit'):
+                unit = context.resolve(params['parent_id'])[0]
+                params['parent_id'] = unit.machine.entity_id
+            else:
+                params['parent_id'] = context.resolve(params['parent_id'])
+
+        params['constraints'] = parse_constraints(self.constraints)
+        params['jobs'] = params.get('jobs', ['JobHostUnits'])
+
+        if self.container_type == 'lxc':
+            log.warning('Juju 2.0 does not support lxc containers. '
+                        'Converting containers to lxd.')
+            params['container_type'] = 'lxd'
+
+        # Submit the request.
+        params = client.AddMachineParams(**params)
+        results = await context.client_facade.AddMachines(params=[params])
+        error = results.machines[0].error
+        if error:
+            raise ValueError("Error adding machine: %s" % error.message)
+        machine = results.machines[0].machine
+        log.debug('Added new machine %s', machine)
+        return machine
 
     def __str__(self):
         machine = "new machine"
@@ -605,7 +520,24 @@ class AddRelationChange(ChangeInfo):
 
     @staticmethod
     def method():
+        """
+        method returns an associated ID for the Juju API call.
+        """
         return "addRelation"
+
+    async def run(self, context):
+        """
+        Run executes a AddRelationChange using the returned parameters from
+        the API server.
+
+        :param context: is used for any methods or properties required to
+            perform a change.
+        """
+        ep1 = context.resolveRelation(self.endpoint1)
+        ep2 = context.resolveRelation(self.endpoint2)
+
+        log.info('Relating %s <-> %s', ep1, ep2)
+        return await context.model.add_relation(ep1, ep2)
 
     def __str__(self):
         return "add relation {endpoint1} - {endpoint2}".format(endpoint1=self.endpoint1,
@@ -636,7 +568,36 @@ class AddUnitChange(ChangeInfo):
 
     @staticmethod
     def method():
+        """
+        method returns an associated ID for the Juju API call.
+        """
         return "addUnit"
+
+    async def run(self, context):
+        """
+        Run executes a AddUnitChange using the returned parameters from
+        the API server.
+
+        :param context: is used for any methods or properties required to
+            perform a change.
+        """
+        application = context.resolve(self.application)
+        placement = context.resolve(self.to)
+        if context._units_by_app.get(application):
+            # enough units for this application already exist;
+            # claim one, and carry on
+            # NB: this should probably honor placement, but the juju client
+            # doesn't, so we're not bothering, either
+            unit_name = context._units_by_app[application].pop()
+            log.debug('Reusing unit %s for %s', unit_name, application)
+            return context.model.units[unit_name]
+
+        log.debug('Adding new unit for %s%s', application,
+                  ' to %s' % placement if placement else '')
+        return await context.model.applications[application].add_unit(
+            count=1,
+            to=placement,
+        )
 
     def __str__(self):
         return "add {application} unit to {to}".format(application=self.application,
@@ -670,7 +631,22 @@ class CreateOfferChange(ChangeInfo):
 
     @staticmethod
     def method():
+        """
+        method returns an associated ID for the Juju API call.
+        """
         return "createOffer"
+
+    async def run(self, context):
+        """
+        Run executes a CreateOfferChange using the returned parameters from
+        the API server.
+
+        :param context: is used for any methods or properties required to
+            perform a change.
+        """
+        application = context.resolve(self.application)
+        for ep in self.endpoints:
+            await context.model.create_offer(ep, offer_name=self.offer_name, application_name=application)
 
     def __str__(self):
         return "create offer {offer_name} using {application}:{endpoints}".format(offer_name=self.offer_name,
@@ -700,7 +676,22 @@ class ConsumeOfferChange(ChangeInfo):
 
     @staticmethod
     def method():
+        """
+        method returns an associated ID for the Juju API call.
+        """
         return "consumeOffer"
+
+    async def run(self, context):
+        """
+        Run executes a ConsumeOfferChange using the returned parameters from
+        the API server.
+
+        :param context: is used for any methods or properties required to
+            perform a change.
+        """
+        application = context.resolve(self.application_name)
+        local_name = await context.model.consume(self.url, application_alias=application)
+        return local_name
 
     def __str__(self):
         return "consume offer {application_name} at {url}".format(application_name=self.application_name,
@@ -727,7 +718,22 @@ class ExposeChange(ChangeInfo):
 
     @staticmethod
     def method():
+        """
+        method returns an associated ID for the Juju API call.
+        """
         return "expose"
+
+    async def run(self, context):
+        """
+        Run executes a ExposeChange using the returned parameters from
+        the API server.
+
+        :param context: is used for any methods or properties required to
+            perform a change.
+        """
+        application = context.resolve(self.application)
+        log.info('Exposing %s', application)
+        return await context.model.applications[application].expose()
 
     def __str__(self):
         return "expose {application}".format(application=self.application)
@@ -755,7 +761,21 @@ class ScaleChange(ChangeInfo):
 
     @staticmethod
     def method():
+        """
+        method returns an associated ID for the Juju API call.
+        """
         return "scale"
+
+    async def run(self, context):
+        """
+        Run executes a ScaleChange using the returned parameters from
+        the API server.
+
+        :param context: is used for any methods or properties required to
+            perform a change.
+        """
+        application = context.resolve(self.application)
+        return await context.model.applications[application].scale(scale=self.scale)
 
     def __str__(self):
         return "scale {application} to {scale} units".format(application=self.application,
@@ -789,7 +809,25 @@ class SetAnnotationsChange(ChangeInfo):
 
     @staticmethod
     def method():
+        """
+        method returns an associated ID for the Juju API call.
+        """
         return "setAnnotations"
+
+    async def run(self, context):
+        """
+        Run executes a SetAnnotationsChange using the returned parameters from
+        the API server.
+
+        :param context: is used for any methods or properties required to
+            perform a change.
+        """
+        entity_id = context.resolve(self.id)
+        try:
+            entity = context.model.state.get_entity(self.entity_type, entity_id)
+        except KeyError:
+            entity = await context.model._wait_for_new(self.entity_type, entity_id)
+        return await entity.set_annotations(self.annotations)
 
     def __str__(self):
         return "set annotations for {id}".format(id=self.id)
