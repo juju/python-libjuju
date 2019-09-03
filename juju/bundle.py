@@ -150,7 +150,7 @@ class BundleHandler:
             # Explicitly call out what methods we work with, so it makes it
             # very easy to understand what happens with the execution.
             change = change_cls(step.id_, step.requires, step.args)
-            log.info(change.description())
+            log.info("Applying change: {}".format(change))
             if step.method == AddApplicationChange.method():
                 result = await self.handleAddApplication(change)
             elif step.method == AddCharmChange.method():
@@ -425,7 +425,7 @@ class AddApplicationChange(ChangeInfo):
              'num-units': 'num_units'}
 
     """
-    AddCharmChange holds a change for deploying a Juju application.
+    AddApplicationChange holds a change for deploying a Juju application.
 
     :charm: holds the URL of the charm to be used to deploy this application.
     :series: holds the series of the application to be deployed if the charm
@@ -476,7 +476,7 @@ class AddApplicationChange(ChangeInfo):
     def method():
         return "deploy"
 
-    def description(self):
+    def __str__(self):
         series = ""
         if self.series != "":
             series = " on {}".format(self.series)
@@ -525,7 +525,7 @@ class AddCharmChange(ChangeInfo):
     def method():
         return "addCharm"
 
-    def description(self):
+    def __str__(self):
         series = ""
         channel = ""
         if self.series != "":
@@ -570,7 +570,7 @@ class AddMachineChange(ChangeInfo):
     def method():
         return "addMachines"
 
-    def description(self):
+    def __str__(self):
         machine = "new machine"
         if self.container_type is not None and self.container_type != "":
             machine = "{container_type} container on {machine}".format(container_type=self.container_type,
@@ -607,7 +607,7 @@ class AddRelationChange(ChangeInfo):
     def method():
         return "addRelation"
 
-    def description(self):
+    def __str__(self):
         return "add relation {endpoint1} - {endpoint2}".format(endpoint1=self.endpoint1,
                                                                endpoint2=self.endpoint2)
 
@@ -638,7 +638,7 @@ class AddUnitChange(ChangeInfo):
     def method():
         return "addUnit"
 
-    def description(self):
+    def __str__(self):
         return "add {application} unit to {to}".format(application=self.application,
                                                        to=self.to)
 
@@ -672,7 +672,7 @@ class CreateOfferChange(ChangeInfo):
     def method():
         return "createOffer"
 
-    def description(self):
+    def __str__(self):
         return "create offer {offer_name} using {application}:{endpoints}".format(offer_name=self.offer_name,
                                                                                   application=self.application,
                                                                                   endpoints=self.endpoints.join(","))
@@ -702,7 +702,7 @@ class ConsumeOfferChange(ChangeInfo):
     def method():
         return "consumeOffer"
 
-    def description(self):
+    def __str__(self):
         return "consume offer {application_name} at {url}".format(application_name=self.application_name,
                                                                   url=self.url)
 
@@ -729,7 +729,7 @@ class ExposeChange(ChangeInfo):
     def method():
         return "expose"
 
-    def description(self):
+    def __str__(self):
         return "expose {application}".format(application=self.application)
 
 
@@ -757,7 +757,7 @@ class ScaleChange(ChangeInfo):
     def method():
         return "scale"
 
-    def description(self):
+    def __str__(self):
         return "scale {application} to {scale} units".format(application=self.application,
                                                              scale=self.scale)
 
@@ -791,5 +791,5 @@ class SetAnnotationsChange(ChangeInfo):
     def method():
         return "setAnnotations"
 
-    def description(self):
+    def __str__(self):
         return "set annotations for {id}".format(id=self.id)
