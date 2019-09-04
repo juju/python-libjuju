@@ -41,6 +41,7 @@ class BundleHandler:
         self.ann_facade = client.AnnotationsFacade.from_connection(
             model.connection())
 
+        # This describes all the change types that the BundleHandler supports.
         change_type_cls = [AddApplicationChange,
                            AddCharmChange,
                            AddMachineChange,
@@ -358,10 +359,18 @@ class AddCharmChange(ChangeInfo):
 
     """AddCharmChange holds a change for adding a charm to the environment.
 
-    :charm: URL of the charm to be added.
-    :series: series of the charm to be added if the charm default is
-        not sufficient.
-    :channel: preferred channel for obtaining the charm.
+    :change_id: id of the change that will be used to identify the current
+        change
+    :requires: is a slice of dependencies that are required to happen.
+    :params: holds the change parameters from the api response. Currently the
+        params could either be a list or a dict. The later being the newer
+        return results.
+
+    Params holds the following values:
+        :charm: URL of the charm to be added.
+        :series: series of the charm to be added if the charm default is
+           not sufficient.
+        :channel: preferred channel for obtaining the charm.
     """
     def __init__(self, change_id, requires, params=None):
         super(AddCharmChange, self).__init__(change_id, requires)
@@ -421,11 +430,19 @@ class AddMachineChange(ChangeInfo):
 
     """AddMachineChange holds a change for adding a machine or container.
 
-    :series: optional machine OS series.
-    :constraints: optional machine constraints.
-    :container_type: optionally type of the container (for instance
-        "lxc" or kvm"). It is not specified for top level machines.
-    :parent_id: id of the parent machine.
+    :change_id: id of the change that will be used to identify the current
+        change
+    :requires: is a slice of dependencies that are required to happen.
+    :params: holds the change parameters from the api response. Currently the
+        params could either be a list or a dict. The later being the newer
+        return results.
+
+    Params holds the following values:
+        :series: optional machine OS series.
+        :constraints: optional machine constraints.
+        :container_type: optionally type of the container (for instance
+            "lxc" or kvm"). It is not specified for top level machines.
+        :parent_id: id of the parent machine.
     """
     def __init__(self, change_id, requires, params=None):
         super(AddMachineChange, self).__init__(change_id, requires)
@@ -498,12 +515,20 @@ class AddRelationChange(ChangeInfo):
     """AddRelationChange holds a change for adding a relation between two
     applications.
 
-    Endpoint1 and Endpoint2 hold relation endpoints in the
-    "application:interface" form, where the application is either a
-    placeholder pointing to an application change or in the case of a model
-    that already has this application deployed, the name of the
-    application, and the interface is optional. Examples are
-    "$deploy-42:web", "$deploy-42", "mysql:db".
+    :change_id: id of the change that will be used to identify the current
+        change
+    :requires: is a slice of dependencies that are required to happen.
+    :params: holds the change parameters from the api response. Currently the
+        params could either be a list or a dict. The later being the newer
+        return results.
+
+    Params holds the following values:
+        Endpoint1 and Endpoint2 hold relation endpoints in the
+        "application:interface" form, where the application is either a
+        placeholder pointing to an application change or in the case of a model
+        that already has this application deployed, the name of the
+        application, and the interface is optional. Examples are
+        "$deploy-42:web", "$deploy-42", "mysql:db".
     """
     def __init__(self, change_id, requires, params=None):
         super(AddRelationChange, self).__init__(change_id, requires)
@@ -545,10 +570,18 @@ class AddUnitChange(ChangeInfo):
              'to': 'to'}
     """AddUnitChange holds a change for adding an application unit.
 
-    :application: application placeholder name for which a unit is
-        added.
-    :to: optional location where to add the unit, as a placeholder
-        pointing to another unit change or to a machine change.
+    :change_id: id of the change that will be used to identify the current
+        change
+    :requires: is a slice of dependencies that are required to happen.
+    :params: holds the change parameters from the api response. Currently the
+        params could either be a list or a dict. The later being the newer
+        return results.
+
+    Params holds the following values:
+        :application: application placeholder name for which a unit is
+            added.
+        :to: optional location where to add the unit, as a placeholder
+            pointing to another unit change or to a machine change.
     """
     def __init__(self, change_id, requires, params=None):
         super(AddUnitChange, self).__init__(change_id, requires)
@@ -604,10 +637,19 @@ class CreateOfferChange(ChangeInfo):
     """CreateOfferChange holds a change for creating a new application endpoint
     offer.
 
-    :application: is the name of the application to create an offer for.
-        added.
-    :endpoint: is a list of application endpoint to expose as part of an offer.
-    :offer_name: describes the offer name.
+    :change_id: id of the change that will be used to identify the current
+        change
+    :requires: is a slice of dependencies that are required to happen.
+    :params: holds the change parameters from the api response. Currently the
+        params could either be a list or a dict. The later being the newer
+        return results.
+
+    Params holds the following values:
+        :application: is the name of the application to create an offer for.
+            added.
+        :endpoint: is a list of application endpoint to expose as part of an
+            offer.
+        :offer_name: describes the offer name.
     """
     def __init__(self, change_id, requires, params=None):
         super(CreateOfferChange, self).__init__(change_id, requires)
@@ -649,8 +691,16 @@ class ConsumeOfferChange(ChangeInfo):
              'application-name': 'application_name'}
     """CreateOfferChange holds a change for consuming a offer.
 
-    :url: contains the location of the offer
-    :application_name: describes the application name on offer.
+    :change_id: id of the change that will be used to identify the current
+        change
+    :requires: is a slice of dependencies that are required to happen.
+    :params: holds the change parameters from the api response. Currently the
+        params could either be a list or a dict. The later being the newer
+        return results.
+
+    Params holds the following values:
+        :url: contains the location of the offer
+        :application_name: describes the application name on offer.
     """
     def __init__(self, change_id, requires, params=None):
         super(ConsumeOfferChange, self).__init__(change_id, requires)
@@ -689,8 +739,16 @@ class ExposeChange(ChangeInfo):
     _toPy = {'application': 'application'}
     """ExposeChange holds a change for exposing an application.
 
-    :application: placeholder name of the application that must be
-        exposed.
+    :change_id: id of the change that will be used to identify the current
+        change
+    :requires: is a slice of dependencies that are required to happen.
+    :params: holds the change parameters from the api response. Currently the
+        params could either be a list or a dict. The later being the newer
+        return results.
+
+    Params holds the following values:
+        :application: placeholder name of the application that must be
+            exposed.
     """
     def __init__(self, change_id, requires, params=None):
         super(ExposeChange, self).__init__(change_id, requires)
@@ -729,8 +787,16 @@ class ScaleChange(ChangeInfo):
     """
     ScaleChange holds a change for scaling an application.
 
-    :application: placeholder name of the application to be scaled.
-    :scale: is the new scale value to use.
+    :change_id: id of the change that will be used to identify the current
+        change
+    :requires: is a slice of dependencies that are required to happen.
+    :params: holds the change parameters from the api response. Currently the
+        params could either be a list or a dict. The later being the newer
+        return results.
+
+    Params holds the following values:
+        :application: placeholder name of the application to be scaled.
+        :scale: is the new scale value to use.
     """
     def __init__(self, change_id, requires, params=None):
         super(ScaleChange, self).__init__(change_id, requires)
@@ -771,10 +837,18 @@ class SetAnnotationsChange(ChangeInfo):
     """SetAnnotationsChange holds a change for setting application and machine
     annotations.
 
-    :id: is the placeholder for the application or machine change corresponding
-        to the entity to be annotated.
-    :entity_type: type of the entity, "application" or "machine".
-    :ennotations: annotations as key/value pairs.
+    :change_id: id of the change that will be used to identify the current
+        change
+    :requires: is a slice of dependencies that are required to happen.
+    :params: holds the change parameters from the api response. Currently the
+        params could either be a list or a dict. The later being the newer
+        return results.
+
+    Params holds the following values:
+        :id: is the placeholder for the application or machine change
+            corresponding to the entity to be annotated.
+        :entity_type: type of the entity, "application" or "machine".
+        :ennotations: annotations as key/value pairs.
     """
     def __init__(self, change_id, requires, params=None):
         super(SetAnnotationsChange, self).__init__(change_id, requires)
