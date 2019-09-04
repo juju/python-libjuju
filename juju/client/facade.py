@@ -595,6 +595,15 @@ class Type:
     def connect(self, connection):
         self.connection = connection
 
+    def __repr__(self):
+        return "{}({})".format(self.__class__, self.__dict__)
+
+    def __eq__(self, other):
+        if not isinstance(other, Type):
+            return NotImplemented
+
+        return self.__dict__ == other.__dict__
+
     async def rpc(self, msg):
         result = await self.connection.rpc(msg, encoder=TypeEncoder)
         return result
