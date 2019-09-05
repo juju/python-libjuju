@@ -683,10 +683,10 @@ class CreateOfferChange(ChangeInfo):
     def __str__(self):
         endpoints = ""
         if self.endpoints is not None:
-            endpoints = self.endpoints.join(",")
-        return "create offer {offer_name} using {application}:{endpoints}".format(offer_name=self.offer_name,
-                                                                                  application=self.application,
-                                                                                  endpoints=endpoints)
+            endpoints = ":{}".format(self.endpoints.join(","))
+        return "create offer {offer_name} using {application}{endpoints}".format(offer_name=self.offer_name,
+                                                                                 application=self.application,
+                                                                                 endpoints=endpoints)
 
 
 class ConsumeOfferChange(ChangeInfo):
