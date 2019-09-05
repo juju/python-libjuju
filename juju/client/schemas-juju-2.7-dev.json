@@ -4816,7 +4816,7 @@
     },
     {
         "Name": "Bundle",
-        "Version": 3,
+        "Version": 4,
         "Schema": {
             "type": "object",
             "properties": {
@@ -4836,6 +4836,17 @@
                         },
                         "Result": {
                             "$ref": "#/definitions/BundleChangesResults"
+                        }
+                    }
+                },
+                "GetChangesMapArgs": {
+                    "type": "object",
+                    "properties": {
+                        "Params": {
+                            "$ref": "#/definitions/BundleChangesParams"
+                        },
+                        "Result": {
+                            "$ref": "#/definitions/BundleChangesMapArgsResults"
                         }
                     }
                 }
@@ -4871,6 +4882,57 @@
                         "args",
                         "requires"
                     ]
+                },
+                "BundleChangesMapArgs": {
+                    "type": "object",
+                    "properties": {
+                        "args": {
+                            "type": "object",
+                            "patternProperties": {
+                                ".*": {
+                                    "type": "object",
+                                    "additionalProperties": true
+                                }
+                            }
+                        },
+                        "id": {
+                            "type": "string"
+                        },
+                        "method": {
+                            "type": "string"
+                        },
+                        "requires": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "id",
+                        "method",
+                        "args",
+                        "requires"
+                    ]
+                },
+                "BundleChangesMapArgsResults": {
+                    "type": "object",
+                    "properties": {
+                        "changes": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/BundleChangesMapArgs"
+                            }
+                        },
+                        "errors": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "additionalProperties": false
                 },
                 "BundleChangesParams": {
                     "type": "object",
@@ -10947,6 +11009,9 @@
                     "properties": {
                         "cloud": {
                             "$ref": "#/definitions/Cloud"
+                        },
+                        "force": {
+                            "type": "boolean"
                         },
                         "name": {
                             "type": "string"
@@ -29842,7 +29907,7 @@
     },
     {
         "Name": "Spaces",
-        "Version": 4,
+        "Version": 5,
         "Schema": {
             "type": "object",
             "properties": {
@@ -29873,6 +29938,12 @@
                 "CreateSpaceParams": {
                     "type": "object",
                     "properties": {
+                        "cidrs": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
                         "provider-id": {
                             "type": "string"
                         },
@@ -29881,17 +29952,11 @@
                         },
                         "space-tag": {
                             "type": "string"
-                        },
-                        "subnet-tags": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
                         }
                     },
                     "additionalProperties": false,
                     "required": [
-                        "subnet-tags",
+                        "cidrs",
                         "space-tag",
                         "public"
                     ]
@@ -32884,7 +32949,7 @@
     },
     {
         "Name": "Subnets",
-        "Version": 2,
+        "Version": 3,
         "Schema": {
             "type": "object",
             "properties": {
@@ -32931,6 +32996,9 @@
                 "AddSubnetParams": {
                     "type": "object",
                     "properties": {
+                        "cidr": {
+                            "type": "string"
+                        },
                         "provider-network-id": {
                             "type": "string"
                         },
@@ -32938,9 +33006,6 @@
                             "type": "string"
                         },
                         "subnet-provider-id": {
-                            "type": "string"
-                        },
-                        "subnet-tag": {
                             "type": "string"
                         },
                         "vlan-tag": {
@@ -36474,6 +36539,9 @@
                             "type": "string"
                         },
                         "Resolved": {
+                            "type": "string"
+                        },
+                        "provider-id": {
                             "type": "string"
                         }
                     },

@@ -184,11 +184,11 @@ def booler(v):
 basic_types = [str, bool, int, float]
 
 
-basic_values = {
-    'str': '""',
-    'bool': 'False',
-    'int': '0',
-    'float': '0',
+type_mapping = {
+    'str': '(bytes, str)',
+    'Sequence': '(bytes, str, list)',
+    'Union': 'dict',
+    'Mapping': 'dict',
 }
 
 
@@ -201,12 +201,20 @@ def name_to_py(name):
 
 
 def var_type_to_py(kind):
-    var_name = None
-    if (kind in basic_types or type(kind) in basic_types):
-        var_name = kind.__name__
-    if var_name in basic_values:
-        return basic_values[var_name]
     return 'None'
+
+
+def kind_to_py(kind):
+    if kind is None or kind is typing.Any:
+        return 'None', '', False
+    name = kind.__name__
+    if (kind in basic_types or type(kind) in basic_types):
+        return name, type_mapping.get(name) or name, True
+    if (name in type_mapping):
+        return name, type_mapping[name], True
+
+    suffix = name.lstrip("~")
+    return suffix, "(dict, {})".format(suffix), True
 
 
 def strcast(kind, keep_builtins=False):
@@ -215,6 +223,8 @@ def strcast(kind, keep_builtins=False):
         return kind.__name__
     if str(kind).startswith('~'):
         return str(kind)[1:]
+    if kind is typing.Any:
+        return 'Any'
     if issubclass(kind, typing.GenericMeta):
         return str(kind)[1:]
     return kind
@@ -286,6 +296,19 @@ class Args(list):
             return ', '.join(parts)
         return ''
 
+    def as_validation(self):
+        """
+        as_validation returns a series of validation statements for every item
+        in the the Args.
+        """
+        parts = []
+        for item in self:
+            var_name = name_to_py(item[0])
+            var_type, var_sub_type, ok = kind_to_py(item[1])
+            if ok:
+                parts.append(buildValidation(var_name, var_type, var_sub_type))
+        return '\n'.join(parts)
+
     def typed(self):
         return self._get_arg_str(True)
 
@@ -294,6 +317,17 @@ class Args(list):
 
     def get_doc(self):
         return self._get_arg_str(True, "\n")
+
+
+def buildValidation(name, instance_type, instance_sub_type, ident=None):
+    INDENT = ident or "    "
+    source = """{ident}if {name} is not None and not isinstance({name}, {instance_sub_type}):
+{ident}    raise Exception("Expected {name} to be a {instance_type}, received: {{}}".format(type({name})))
+""".format(ident=INDENT,
+           name=name,
+           instance_type=instance_type,
+           instance_sub_type=instance_sub_type)
+    return source
 
 
 def buildTypes(schema, capture):
@@ -326,16 +360,17 @@ class {}(Type):
         if not args:
             source.append("{}self.unknown_fields = unknown_fields".format(INDENT * 2))
         else:
+            # do the validation first, before setting the variables
             for arg in args:
                 arg_name = name_to_py(arg[0])
                 arg_type = arg[1]
                 arg_type_name = strcast(arg_type)
-                if arg_type in basic_types:
-                    source.append("{}self.{} = {}".format(INDENT * 2,
-                                                          arg_name,
-                                                          arg_name))
+                if arg_type in basic_types or arg_type is typing.Any:
+                    source.append("{}{}_ = {}".format(INDENT * 2,
+                                                      arg_name,
+                                                      arg_name))
                 elif type(arg_type) is typing.TypeVar:
-                    source.append("{}self.{} = {}.from_json({}) "
+                    source.append("{}{}_ = {}.from_json({}) "
                                   "if {} else None".format(INDENT * 2,
                                                            arg_name,
                                                            arg_type_name,
@@ -349,15 +384,15 @@ class {}(Type):
                     )
                     if type(value_type) is typing.TypeVar:
                         source.append(
-                            "{}self.{} = [{}.from_json(o) "
+                            "{}{}_ = [{}.from_json(o) "
                             "for o in {} or []]".format(INDENT * 2,
                                                         arg_name,
                                                         strcast(value_type),
                                                         arg_name))
                     else:
-                        source.append("{}self.{} = {}".format(INDENT * 2,
-                                                              arg_name,
-                                                              arg_name))
+                        source.append("{}{}_ = {}".format(INDENT * 2,
+                                                          arg_name,
+                                                          arg_name))
                 elif issubclass(arg_type, typing.Mapping):
                     value_type = (
                         arg_type_name.__parameters__[1]
@@ -366,20 +401,34 @@ class {}(Type):
                     )
                     if type(value_type) is typing.TypeVar:
                         source.append(
-                            "{}self.{} = {{k: {}.from_json(v) "
+                            "{}s{}_ = {{k: {}.from_json(v) "
                             "for k, v in ({} or dict()).items()}}".format(
                                 INDENT * 2,
                                 arg_name,
                                 strcast(value_type),
                                 arg_name))
                     else:
-                        source.append("{}self.{} = {}".format(INDENT * 2,
-                                                              arg_name,
-                                                              arg_name))
-                else:
-                    source.append("{}self.{} = {}".format(INDENT * 2,
+                        source.append("{}{}_ = {}".format(INDENT * 2,
                                                           arg_name,
                                                           arg_name))
+                else:
+                    source.append("{}{}_ = {}".format(INDENT * 2,
+                                                      arg_name,
+                                                      arg_name))
+            if len(args) > 0:
+                source.append('\n{}# Validate arguments against known Juju API types.'.format(INDENT * 2))
+            for arg in args:
+                arg_name = "{}_".format(name_to_py(arg[0]))
+                arg_type, arg_sub_type, ok = kind_to_py(arg[1])
+                if ok:
+                    source.append('{}'.format(buildValidation(arg_name,
+                                                              arg_type,
+                                                              arg_sub_type,
+                                                              ident=INDENT * 2)))
+
+            for arg in args:
+                arg_name = name_to_py(arg[0])
+                source.append('{}self.{} = {}_'.format(INDENT * 2, arg_name, arg_name))
             # Ensure that we take the kwargs (unknown_fields) and put it on the
             # Results/Params so we can inspect it.
             source.append("{}self.unknown_fields = unknown_fields".format(INDENT * 2))
@@ -464,6 +513,7 @@ def makeFunc(cls, name, params, result, _async=True):
 {docstring}
     Returns -> {res}
     '''
+{validation}
     # map input types to rpc msg
     _params = dict()
     msg = dict(type='{cls.name}',
@@ -481,6 +531,7 @@ def makeFunc(cls, name, params, result, _async=True):
                             argsep=", " if args else "",
                             args=args.as_kwargs(),
                             res=res,
+                            validation=args.as_validation(),
                             rettype=result.__name__ if result else None,
                             docstring=textwrap.indent(args.get_doc(), INDENT),
                             cls=cls,
@@ -543,6 +594,15 @@ class TypeEncoder(json.JSONEncoder):
 class Type:
     def connect(self, connection):
         self.connection = connection
+
+    def __repr__(self):
+        return "{}({})".format(self.__class__, self.__dict__)
+
+    def __eq__(self, other):
+        if not isinstance(other, Type):
+            return NotImplemented
+
+        return self.__dict__ == other.__dict__
 
     async def rpc(self, msg):
         result = await self.connection.rpc(msg, encoder=TypeEncoder)
@@ -651,7 +711,7 @@ class Schema(dict):
                 add((name, Mapping[str, SCHEMA_TO_PYTHON[ppkind]]))
 
         if not struct and node.get('additionalProperties', False):
-            add((name, Mapping[str, SCHEMA_TO_PYTHON['object']]))
+            add((name, SCHEMA_TO_PYTHON.get('object')))
 
         return struct
 
