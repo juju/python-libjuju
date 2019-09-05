@@ -325,7 +325,7 @@ class AddApplicationChange(ChangeInfo):
             charm_url=charm,
             application=self.application,
             series=self.series,
-            config=self.options,
+            config=options,
             constraints=self.constraints,
             endpoint_bindings=self.endpoint_bindings,
             resources=resources,
@@ -337,10 +337,10 @@ class AddApplicationChange(ChangeInfo):
 
     def __str__(self):
         series = ""
-        if self.series != "":
+        if self.series is not None and self.series != "":
             series = " on {}".format(self.series)
         units_info = ""
-        if self.num_units > 0:
+        if self.num_units is not None:
             plural = ""
             if self.num_units > 1:
                 plural = "s"
@@ -413,7 +413,7 @@ class AddCharmChange(ChangeInfo):
     def __str__(self):
         series = ""
         channel = ""
-        if self.series != "":
+        if self.series is not None and self.series != "":
             series = " for series {}".format(self.series)
         if self.channel is not None:
             channel = " from channel {}".format(self.channel)
@@ -681,9 +681,12 @@ class CreateOfferChange(ChangeInfo):
             await context.model.create_offer(ep, offer_name=self.offer_name, application_name=application)
 
     def __str__(self):
+        endpoints = ""
+        if self.endpoints is not None:
+            endpoints = self.endpoints.join(",")
         return "create offer {offer_name} using {application}:{endpoints}".format(offer_name=self.offer_name,
                                                                                   application=self.application,
-                                                                                  endpoints=self.endpoints.join(","))
+                                                                                  endpoints=endpoints)
 
 
 class ConsumeOfferChange(ChangeInfo):
