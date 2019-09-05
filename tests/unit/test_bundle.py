@@ -262,7 +262,7 @@ class TestAddCharmChangeRun:
         charmstore.entityId.assert_called_with("charm")
 
         client_facade.AddCharm.assert_called_once()
-        client_facade.AddCharm.assert_called_with(channel=None,
+        client_facade.AddCharm.assert_called_with(channel="channel",
                                                   url="entity_id",
                                                   force=False)
 
