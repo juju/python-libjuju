@@ -28,7 +28,7 @@ client_facades = {
     'ApplicationScaler': {'versions': [1]},
     'Backups': {'versions': [1, 2]},
     'Block': {'versions': [2]},
-    'Bundle': {'versions': [1, 2, 3]},
+    'Bundle': {'versions': [1, 2, 3, 4]},
     'CharmRevisionUpdater': {'versions': [2]},
     'Charms': {'versions': [2]},
     'Cleaner': {'versions': [2]},
