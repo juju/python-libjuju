@@ -135,9 +135,15 @@ class BundleHandler:
         self.bundle = await self._validate_bundle(self.bundle)
         self.bundle = await self._handle_local_charms(self.bundle)
 
-        self.plan = await self.bundle_facade.GetChanges(
-            bundleurl=entity_id,
-            yaml=yaml.dump(self.bundle))
+        if client.BundleFacade.best_facade_version(self.model.connection()) < 4:
+            self.plan = await self.bundle_facade.GetChanges(
+                bundleurl=entity_id,
+                yaml=yaml.dump(self.bundle))
+        else:
+            log.info("bundle_facade using GetChangesMapArgs API to deploy bundle changes")
+            self.plan = await self.bundle_facade.GetChangesMapArgs(
+                bundleurl=entity_id,
+                yaml=yaml.dump(self.bundle))
 
         if self.plan.errors:
             raise JujuError(self.plan.errors)
