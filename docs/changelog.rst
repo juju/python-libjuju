@@ -1,6 +1,13 @@
 Changelog
 ---------
 
+2.6.3
+^^^^^
+
+ * Refactor bundle handler code so that it can be more resilient against changes
+   to the bundle changes API.
+ * Updated the dependencies to the latest version (pyyaml)
+
 2.6.2
 ^^^^^
 Wednesday August 27 2019
