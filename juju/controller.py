@@ -437,6 +437,34 @@ class Controller:
         """
         raise NotImplementedError()
 
+    async def cloud(self, name=None):
+        """Get Cloud
+
+        :param str name: Cloud name. If not specified, the cloud where
+                         the controller lives on is returned.
+        :returns: -> ~CloudResult
+        """
+        if name is None:
+            name = await self.get_cloud()
+        entity = client.Entity(tag.cloud(name))
+        cloud_facade = client.CloudFacade.from_connection(self.connection())
+        cloud = await cloud_facade.Cloud(entities=[entity])
+        if len(cloud.results) == 0:
+            log.error("No clouds found.")
+            raise
+        elif len(cloud.results) > 1:
+            log.error("More than one cloud found.")
+            raise
+        return cloud.results[0]
+
+    async def clouds(self):
+        """Get all the clouds in the controller
+
+        :returns: -> ~CloudsResult
+        """
+        cloud_facade = client.CloudFacade.from_connection(self.connection())
+        return await cloud_facade.Clouds()
+
     async def get_cloud(self):
         """
         Get the name of the cloud that this controller lives on.
