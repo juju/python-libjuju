@@ -447,7 +447,7 @@ class Application(model.ModelEntity):
 
     async def upgrade_charm(
             self, channel=None, force=False, force_series=False, force_units=False,
-            path=None, resources=None, revision=None, switch=None):
+            path=None, resources=None, revision=None, switch=None, force_charm_url=None):
         """Upgrade the charm for this application.
 
         :param str channel: Channel to use when getting the charm from the
@@ -483,6 +483,8 @@ class Application(model.ModelEntity):
             charm_url = switch
             if not charm_url.startswith('cs:'):
                 charm_url = 'cs:' + charm_url
+        elif force_charm_url is not None:
+            charm_url = force_charm_url
         else:
             charm_url = self.data['charm-url']
             charm_url = charm_url.rpartition('-')[0]
@@ -493,7 +495,7 @@ class Application(model.ModelEntity):
                                                             channel=channel)
                 charm_url = charmstore_entity['Id']
 
-        if charm_url == self.data['charm-url']:
+        if force and charm_url == self.data['charm-url']:
             raise JujuError('already running charm "%s"' % charm_url)
 
         # Update charm

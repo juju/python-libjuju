@@ -51,7 +51,8 @@ class BundleHandler:
                            ConsumeOfferChange,
                            ExposeChange,
                            ScaleChange,
-                           SetAnnotationsChange]
+                           SetAnnotationsChange,
+                           UpgradeCharmChange]
         self.change_types = {}
         for change_cls in change_type_cls:
             self.change_types[change_cls.method()] = change_cls
@@ -887,3 +888,72 @@ class SetAnnotationsChange(ChangeInfo):
 
     def __str__(self):
         return "set annotations for {id}".format(id=self.id)
+
+
+class UpgradeCharmChange(ChangeInfo):
+    _toPy = {'charm': 'charm',
+             'application': 'application',
+             'series': 'series',
+             'resources': 'resources',
+             'local-resources': 'local_resources'}
+    """UpgradeCharmChange holds a change for adding a charm to the environment.
+
+    :change_id: id of the change that will be used to identify the current
+        change
+    :requires: is a slice of dependencies that are required to happen.
+    :params: holds the change parameters from the api response. Currently the
+        params could either be a list or a dict. The later being the newer
+        return results.
+
+    Params holds the following values:
+        :charm: Charm holds the placeholder or URL of the charm to be added.
+        :application: Application refers to the application that is being upgraded.
+        :series: Series holds the series of the charm to be added.
+        :resources: Resources identifies the revision to use for each resource
+            of the application's charm.
+        :local-resources: LocalResources identifies the path to the local resource
+            of the application's charm.
+    """
+    def __init__(self, change_id, requires, params=None):
+        super(UpgradeCharmChange, self).__init__(change_id, requires)
+
+        if isinstance(params, list):
+            self.charm = params[0]
+            self.application = params[1]
+            self.series = params[2]
+            if len(params) > 3:
+                self.resources = params[3]
+            if len(params) > 4:
+                self.local_resources = params[4]
+        elif isinstance(params, dict):
+            UpgradeCharmChange.from_dict(self, params)
+        else:
+            raise Exception("unexpected params type")
+
+    @staticmethod
+    def method():
+        """method returns an associated ID for the Juju API call.
+        """
+        return "upgradeCharm"
+
+    async def run(self, context):
+        """Executes a UpgradeCharmChange using the returned parameters from
+        the API server.
+
+        :param context: is used for any methods or properties required to
+            perform a change.
+        """
+        charm_url = context.resolve(self.charm)
+        application = [app for name, app in context.applications.items()
+                       if name == self.application]
+        if application is None:
+            raise Exception("application {app} not found".format(app=self.application))
+        return application.upgrade_charm(force_charm_url=charm_url)
+
+    def __str__(self):
+        series = ""
+        if self.series is not None:
+            series = " for series {series}".format(series=self.series)
+        return "upgrade {app} to use charm {charm}{series}".format(app=self.application,
+                                                                    charm=self.charm,
+                                                                    series=series)
