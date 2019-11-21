@@ -49,3 +49,15 @@ class JujuRedirectException(Exception):
             for servers in self.redirect_info['servers']
             for s in servers if s['scope'] == 'public' or not self.follow_redirect
         ]
+
+
+class JujuEntityNotFoundError(JujuError):
+    """Exception indicating that an entity was not found in the state. It was
+       expected that the entity was found in state and this is a terminal
+       condition.
+       To fix this condition, you should disconnect and reconnect to ensure that
+       any missing entities are correctly picked up."""
+    def __init__(self, entity_name, entity_types=None):
+        self.entity_name = entity_name
+        self.entity_types = entity_types
+        super().__init__("Entity not found: {}".format(entity_name))

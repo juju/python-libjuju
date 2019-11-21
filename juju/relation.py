@@ -1,6 +1,7 @@
 import logging
 
 from . import model
+from .errors import JujuEntityNotFoundError
 
 log = logging.getLogger(__name__)
 
@@ -20,7 +21,7 @@ class Endpoint:
             return self.model.applications[app_name]
         if app_name in self.model.remote_applications:
             return self.model.remote_applications[app_name]
-        return None
+        raise JujuEntityNotFoundError(app_name, ["application", "remoteApplication"])
 
     @property
     def name(self):
