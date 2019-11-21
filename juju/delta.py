@@ -79,6 +79,26 @@ class RemoteApplicationDelta(EntityDelta):
         return RemoteApplication
 
 
+class CharmDelta(EntityDelta):
+    def get_id(self):
+        return self.data['charm-url']
+
+    @classmethod
+    def get_entity_class(self):
+        from .charm import Charm
+        return Charm
+
+
+class ApplicationOfferDelta(EntityDelta):
+    def get_id(self):
+        return self.data['application-name']
+
+    @classmethod
+    def get_entity_class(self):
+        from .remoteapplication import ApplicationOffer
+        return ApplicationOffer
+
+
 _delta_types = {
     'action': ActionDelta,
     'application': ApplicationDelta,
@@ -87,4 +107,6 @@ _delta_types = {
     'unit': UnitDelta,
     'relation': RelationDelta,
     'remoteApplication': RemoteApplicationDelta,
+    'charm': CharmDelta,
+    'applicationOffer': ApplicationOfferDelta,
 }

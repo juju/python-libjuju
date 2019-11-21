@@ -14,33 +14,10 @@
 
 import logging
 
-from . import model, tag
+from . import model
 
 log = logging.getLogger(__name__)
 
 
-class RemoteApplication(model.ModelEntity):
-
-    @property
-    def status(self):
-        """Get the application status, as set by the charm's leader.
-
-        """
-        return self.safe_data['status']['current']
-
-    @property
-    def status_message(self):
-        """Get the application status message, as set by the charm's leader.
-
-        """
-        return self.safe_data['status']['message']
-
-    @property
-    def tag(self):
-        return tag.application(self.name)
-
-
-class ApplicationOffer(model.ModelEntity):
-    @property
-    def tag(self):
-        return tag.application(self.name)
+class Charm(model.ModelEntity):
+    pass

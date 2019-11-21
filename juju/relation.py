@@ -21,6 +21,8 @@ class Endpoint:
             return self.model.applications[app_name]
         if app_name in self.model.remote_applications:
             return self.model.remote_applications[app_name]
+        if app_name in self.model.application_offers:
+            return self.model.application_offers[app_name]
         raise JujuEntityNotFoundError(app_name, ["application", "remoteApplication"])
 
     @property
