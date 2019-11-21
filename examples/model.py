@@ -1,3 +1,11 @@
+"""
+This example shows how to reconnect to a model if you encounter an error
+
+1. Connects to current model.
+2. Attempts to get an application that doesn't exist.
+3. Disconnect then reconnect.
+
+"""
 from juju import loop
 from juju.model import Model
 from juju.errors import JujuEntityNotFoundError

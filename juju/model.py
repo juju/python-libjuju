@@ -902,7 +902,7 @@ class Model:
                             # the all watcher. Currently they're ignored, causing
                             # issue.
                             # raise JujuError("unknown delta type {}".format(e.args))
-                            log.debug("unknown delta type: %s", e.args[0])
+                            log.warn("unknown delta type: %s", e.args[0])
                     self._watch_received.set()
             except CancelledError:
                 pass
