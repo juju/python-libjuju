@@ -1,6 +1,7 @@
 import logging
 
 from . import model
+from .errors import JujuEntityNotFoundError
 
 log = logging.getLogger(__name__)
 
@@ -20,7 +21,9 @@ class Endpoint:
             return self.model.applications[app_name]
         if app_name in self.model.remote_applications:
             return self.model.remote_applications[app_name]
-        raise KeyError(app_name)
+        if app_name in self.model.application_offers:
+            return self.model.application_offers[app_name]
+        raise JujuEntityNotFoundError(app_name, ["application", "remoteApplication"])
 
     @property
     def name(self):
@@ -107,6 +110,10 @@ class Relation(model.ModelEntity):
             else:
                 app_name, endpoint_name = spec, None
             for endpoint in self.endpoints:
+                # The all watcher hasn't updated the internal state, so it can
+                # appear that the remote application doesn't exist.
+                if endpoint.application is None:
+                    continue
                 if app_name == endpoint.application.name and \
                    endpoint_name in (endpoint.name, None):
                     # found a match for this spec, so move to next one

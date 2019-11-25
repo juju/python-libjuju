@@ -144,6 +144,13 @@ class ModelState:
         return self._live_entity_map('remoteApplication')
 
     @property
+    def application_offers(self):
+        """Return a map of application-name:Application for all applications
+        offers currently in the model.
+        """
+        return self._live_entity_map('applicationOffer')
+
+    @property
     def machines(self):
         """Return a map of machine-id:Machine for all machines currently in
         the model.
@@ -733,6 +740,13 @@ class Model:
         return self.state.remote_applications
 
     @property
+    def application_offers(self):
+        """Return a map of application-name:Application for all applications
+        offers currently in the model.
+        """
+        return self.state.application_offers
+
+    @property
     def machines(self):
         """Return a map of machine-id:Machine for all machines currently in
         the model.
@@ -883,7 +897,12 @@ class Model:
                             old_obj, new_obj = self.state.apply_delta(delta)
                             await self._notify_observers(delta, old_obj, new_obj)
                         except KeyError as e:
-                            log.debug("unknown delta type: %s", e.args[0])
+                            # TODO (stickupkid): we should raise the unknown delta
+                            # type, so we handle correctly all the types comming from
+                            # the all watcher. Currently they're ignored, causing
+                            # issue.
+                            # raise JujuError("unknown delta type {}".format(e.args))
+                            log.warn("unknown delta type: %s", e.args[0])
                     self._watch_received.set()
             except CancelledError:
                 pass
