@@ -4,7 +4,6 @@ import mock
 
 from juju.model import Model
 from juju.relation import Relation
-from juju.errors import JujuEntityNotFoundError
 
 
 def _make_delta(entity, type_, data=None):
@@ -60,4 +59,4 @@ class TestRelation(unittest.TestCase):
         model.state.apply_delta(delta)
 
         rel = Relation("uuid-1234", model)
-        self.assertRaises(JujuEntityNotFoundError, rel.matches, ["xxx"])
+        self.assertFalse(rel.matches(["xxx"]))

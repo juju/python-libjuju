@@ -129,7 +129,7 @@ async def test_add_relation_with_offer(event_loop):
                 channel='stable',
             )
             await model_2.block_until(
-                lambda: all(unit.agent_status == 'executing'
+                lambda: all(unit.agent_status == 'idle'
                             for unit in application.units))
 
             await model_2.add_relation("wordpress", "admin/{}.mysql".format(model_1.info.name))
