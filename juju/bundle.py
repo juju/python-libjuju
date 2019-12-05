@@ -8,7 +8,7 @@ import yaml
 from toposort import toposort_flatten
 
 from .client import client
-from .constraints import parse as parse_constraints
+from .constraints import parse as parse_constraints, parse_storage_constraint, parse_device_constraint
 from .errors import JujuError
 
 log = logging.getLogger(__name__)
@@ -277,17 +277,18 @@ class AddApplicationChange(ChangeInfo):
             self.application = params[2]
             self.options = params[3]
             self.constraints = params[4]
-            self.storage = params[5]
-            self.endpoint_bindings = params[6]
+            self.storage = {k: parse_storage_constraint(v) for k, v in params[5].items()}
             if len(params) == 8:
-                # Juju 2.4 and below only sends the resources
+                # Juju 2.4 and below only sends the endpoint bindings and resources
+                self.endpoint_bindings = params[6]
                 self.resources = params[7]
                 self.devices = None
                 self.num_units = None
             else:
-                # Juju 2.5+ sends devices before resources, as well as num_units
+                # Juju 2.5+ sends devices before endpoint bindings, as well as num_units
                 # There might be placement but we need to ignore that.
-                self.devices = params[7]
+                self.devices = {k: parse_device_constraint(v) for k, v in params[6].items()}
+                self.endpoint_bindings = params[7]
                 self.resources = params[8]
                 self.num_units = params[9]
 
