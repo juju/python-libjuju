@@ -192,6 +192,41 @@ class TestAddApplicationChangeRun:
                                          devices="devices",
                                          num_units="num_units")
 
+    @pytest.mark.asyncio
+    async def test_run_local(self, event_loop):
+        change = AddApplicationChange(1, [], params={"charm": "local:charm",
+                                                     "series": "series",
+                                                     "application": "application",
+                                                     "options": "options",
+                                                     "constraints": "constraints",
+                                                     "storage": "storage",
+                                                     "endpoint-bindings": "endpoint_bindings",
+                                                     "devices": "devices",
+                                                     "num-units": "num_units"})
+
+        model = mock.Mock()
+        model._deploy = base.AsyncMock(return_value=None)
+
+        context = mock.Mock()
+        context.resolve.return_value = "local:charm1"
+        context.trusted = False
+        context.model = model
+
+        result = await change.run(context)
+        assert result == "application"
+
+        model._deploy.assert_called_once()
+        model._deploy.assert_called_with(charm_url="local:charm1",
+                                         application="application",
+                                         series="series",
+                                         config="options",
+                                         constraints="constraints",
+                                         endpoint_bindings="endpoint_bindings",
+                                         resources={},
+                                         storage="storage",
+                                         devices="devices",
+                                         num_units="num_units")
+
 
 class TestAddCharmChange(unittest.TestCase):
 
