@@ -322,6 +322,8 @@ class AddApplicationChange(ChangeInfo):
         if not charm.startswith('local:'):
             resources = await context.model._add_store_resources(
                 self.application, charm, overrides=self.resources)
+        else:
+            resources = {}
         await context.model._deploy(
             charm_url=charm,
             application=self.application,
