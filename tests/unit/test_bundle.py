@@ -63,7 +63,7 @@ class TestAddApplicationChange(unittest.TestCase):
                                                      "application",
                                                      "options",
                                                      "constraints",
-                                                     "storage",
+                                                     {"db": "pool,1,1GB"},
                                                      "endpoint_bindings",
                                                      "resources"])
         self.assertEqual({"change_id": 1,
@@ -73,7 +73,7 @@ class TestAddApplicationChange(unittest.TestCase):
                           "application": "application",
                           "options": "options",
                           "constraints": "constraints",
-                          "storage": "storage",
+                          "storage": {"db": {"pool": "pool", "count": 1, "size": 1024}},
                           "endpoint_bindings": "endpoint_bindings",
                           "resources": "resources",
                           "devices": None,
@@ -85,9 +85,9 @@ class TestAddApplicationChange(unittest.TestCase):
                                                      "application",
                                                      "options",
                                                      "constraints",
-                                                     "storage",
+                                                     {"db": "pool,1,1GB"},
+                                                     {"gpu": "1,gpu,attr1=a;attr2=b"},
                                                      "endpoint_bindings",
-                                                     "devices",
                                                      "resources",
                                                      "num_units"])
         self.assertEqual({"change_id": 1,
@@ -97,10 +97,10 @@ class TestAddApplicationChange(unittest.TestCase):
                           "application": "application",
                           "options": "options",
                           "constraints": "constraints",
-                          "storage": "storage",
+                          "storage": {"db": {"pool": "pool", "count": 1, "size": 1024}},
                           "endpoint_bindings": "endpoint_bindings",
                           "resources": "resources",
-                          "devices": "devices",
+                          "devices": {"gpu": {"type": "gpu", "count": 1, "attributes": {"attr1": "a", "attr2": "b"}}},
                           "num_units": "num_units"}, change.__dict__)
 
     def test_dict_params(self):
