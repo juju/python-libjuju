@@ -3,6 +3,7 @@ import subprocess
 import uuid
 
 from juju.client.connection import Connection
+from juju.client import client
 from juju.client.jujudata import FileJujuData
 from juju.controller import Controller
 from juju.errors import JujuAPIError
@@ -226,3 +227,21 @@ async def test_macaroon_auth(event_loop):
                 await controller.disconnect()
         async with base.CleanModel():
             pass  # create and login to model works
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_add_remove_cloud(event_loop):
+    async with base.CleanController() as controller:
+        cloud_name = 'test-{}'.format(uuid.uuid4())
+        cloud = client.Cloud(
+            auth_types=["userpass"],
+            endpoint="http://localhost:1234",
+            type_="kubernetes")
+        cloud = await controller.add_cloud(cloud_name, cloud)
+        try:
+            assert cloud.auth_types[0] == "userpass"
+            assert cloud.endpoint == "http://localhost:1234"
+            assert cloud.type_ == "kubernetes"
+        finally:
+            await controller.remove_cloud(cloud_name)
