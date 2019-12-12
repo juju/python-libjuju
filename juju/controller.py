@@ -249,6 +249,28 @@ class Controller:
             await cloud_facade.UpdateCredentials(credentials=tagged_credentials)
         return name
 
+    async def add_cloud(self, name, cloud):
+        """Add a cloud to this controller.
+
+        :param str name: Name to give the new cloud.
+        :param Cloud cloud: Cloud configuration.
+        :return Cloud: Cloud that was created.
+        """
+        log.debug('Adding cloud %s', name)
+        cloud_facade = client.CloudFacade.from_connection(self.connection())
+        await cloud_facade.AddCloud(cloud=cloud, name=name)
+        result = await self.cloud(name=name)
+        return result.cloud
+
+    async def remove_cloud(self, name):
+        """Remove a cloud from this controller.
+
+        :param str name: Name of the cloud to remove.
+        """
+        log.debug('Removing cloud %s', name)
+        cloud_facade = client.CloudFacade.from_connection(self.connection())
+        await cloud_facade.RemoveClouds(entities=[client.Entity(tag.cloud(name))])
+
     async def add_model(
             self, model_name, cloud_name=None, credential_name=None,
             owner=None, config=None, region=None):

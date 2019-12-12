@@ -1529,32 +1529,38 @@ class ApplicationConstraint(Type):
 
 
 class ApplicationDeploy(Type):
-    _toSchema = {'application': 'application', 'channel': 'channel', 'charm_url': 'charm-url', 'config': 'config', 'config_yaml': 'config-yaml', 'constraints': 'constraints', 'endpoint_bindings': 'endpoint-bindings', 'num_units': 'num-units', 'placement': 'placement', 'resources': 'resources', 'series': 'series', 'storage': 'storage'}
-    _toPy = {'application': 'application', 'channel': 'channel', 'charm-url': 'charm_url', 'config': 'config', 'config-yaml': 'config_yaml', 'constraints': 'constraints', 'endpoint-bindings': 'endpoint_bindings', 'num-units': 'num_units', 'placement': 'placement', 'resources': 'resources', 'series': 'series', 'storage': 'storage'}
-    def __init__(self, application=None, channel=None, charm_url=None, config=None, config_yaml=None, constraints=None, endpoint_bindings=None, num_units=None, placement=None, resources=None, series=None, storage=None, **unknown_fields):
+    _toSchema = {'application': 'application', 'attach_storage': 'attach-storage', 'channel': 'channel', 'charm_url': 'charm-url', 'config': 'config', 'config_yaml': 'config-yaml', 'constraints': 'constraints', 'devices': 'devices', 'endpoint_bindings': 'endpoint-bindings', 'num_units': 'num-units', 'placement': 'placement', 'policy': 'policy', 'resources': 'resources', 'series': 'series', 'storage': 'storage'}
+    _toPy = {'application': 'application', 'attach-storage': 'attach_storage', 'channel': 'channel', 'charm-url': 'charm_url', 'config': 'config', 'config-yaml': 'config_yaml', 'constraints': 'constraints', 'devices': 'devices', 'endpoint-bindings': 'endpoint_bindings', 'num-units': 'num_units', 'placement': 'placement', 'policy': 'policy', 'resources': 'resources', 'series': 'series', 'storage': 'storage'}
+    def __init__(self, application=None, attach_storage=None, channel=None, charm_url=None, config=None, config_yaml=None, constraints=None, devices=None, endpoint_bindings=None, num_units=None, placement=None, policy=None, resources=None, series=None, storage=None, **unknown_fields):
         '''
         application : str
+        attach_storage : typing.Sequence[str]
         channel : str
         charm_url : str
         config : typing.Mapping[str, str]
         config_yaml : str
         constraints : Value
+        devices : typing.Mapping[str, ~Constraints]
         endpoint_bindings : typing.Mapping[str, str]
         num_units : int
         placement : typing.Sequence[~Placement]
+        policy : str
         resources : typing.Mapping[str, str]
         series : str
         storage : typing.Mapping[str, ~Constraints]
         '''
         application_ = application
+        attach_storage_ = attach_storage
         channel_ = channel
         charm_url_ = charm_url
         config_ = config
         config_yaml_ = config_yaml
         constraints_ = Value.from_json(constraints) if constraints else None
+        devices_ = devices
         endpoint_bindings_ = endpoint_bindings
         num_units_ = num_units
         placement_ = [Placement.from_json(o) for o in placement or []]
+        policy_ = policy
         resources_ = resources
         series_ = series
         storage_ = storage
@@ -1562,6 +1568,9 @@ class ApplicationDeploy(Type):
         # Validate arguments against known Juju API types.
         if application_ is not None and not isinstance(application_, (bytes, str)):
             raise Exception("Expected application_ to be a str, received: {}".format(type(application_)))
+
+        if attach_storage_ is not None and not isinstance(attach_storage_, (bytes, str, list)):
+            raise Exception("Expected attach_storage_ to be a Sequence, received: {}".format(type(attach_storage_)))
 
         if channel_ is not None and not isinstance(channel_, (bytes, str)):
             raise Exception("Expected channel_ to be a str, received: {}".format(type(channel_)))
@@ -1578,6 +1587,9 @@ class ApplicationDeploy(Type):
         if constraints_ is not None and not isinstance(constraints_, (dict, Value)):
             raise Exception("Expected constraints_ to be a Value, received: {}".format(type(constraints_)))
 
+        if devices_ is not None and not isinstance(devices_, dict):
+            raise Exception("Expected devices_ to be a Mapping, received: {}".format(type(devices_)))
+
         if endpoint_bindings_ is not None and not isinstance(endpoint_bindings_, dict):
             raise Exception("Expected endpoint_bindings_ to be a Mapping, received: {}".format(type(endpoint_bindings_)))
 
@@ -1586,6 +1598,9 @@ class ApplicationDeploy(Type):
 
         if placement_ is not None and not isinstance(placement_, (bytes, str, list)):
             raise Exception("Expected placement_ to be a Sequence, received: {}".format(type(placement_)))
+
+        if policy_ is not None and not isinstance(policy_, (bytes, str)):
+            raise Exception("Expected policy_ to be a str, received: {}".format(type(policy_)))
 
         if resources_ is not None and not isinstance(resources_, dict):
             raise Exception("Expected resources_ to be a Mapping, received: {}".format(type(resources_)))
@@ -1597,14 +1612,17 @@ class ApplicationDeploy(Type):
             raise Exception("Expected storage_ to be a Mapping, received: {}".format(type(storage_)))
 
         self.application = application_
+        self.attach_storage = attach_storage_
         self.channel = channel_
         self.charm_url = charm_url_
         self.config = config_
         self.config_yaml = config_yaml_
         self.constraints = constraints_
+        self.devices = devices_
         self.endpoint_bindings = endpoint_bindings_
         self.num_units = num_units_
         self.placement = placement_
+        self.policy = policy_
         self.resources = resources_
         self.series = series_
         self.storage = storage_

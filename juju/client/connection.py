@@ -33,7 +33,7 @@ client_facades = {
     'Charms': {'versions': [2]},
     'Cleaner': {'versions': [2]},
     'Client': {'versions': [1, 2]},
-    'Cloud': {'versions': [1, 2]},
+    'Cloud': {'versions': [1, 2, 3, 4, 5]},
     'CAASFirewaller': {'versions': [1]},
     'CAASOperator': {'versions': [1]},
     'CAASAgent': {'versions': [1]},

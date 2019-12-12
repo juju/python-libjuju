@@ -12,18 +12,23 @@ class Endpoint:
         self.data = data
 
     def __repr__(self):
-        return '<Endpoint {}:{}>'.format(self.application.name, self.name)
+        return '<Endpoint {}:{}>'.format(self.data['application-name'], self.name)
+
+    @property
+    def application_name(self):
+        return self.data['application-name']
 
     @property
     def application(self):
+        """Application returns the underlying application model from the state.
+        If no application is found, then a JujuEntityNotFoundError is raised, in
+        this scenario it is expected that you disconnect and reconnect to the
+        model.
+        """
         app_name = self.data['application-name']
         if app_name in self.model.applications:
             return self.model.applications[app_name]
-        if app_name in self.model.remote_applications:
-            return self.model.remote_applications[app_name]
-        if app_name in self.model.application_offers:
-            return self.model.application_offers[app_name]
-        raise JujuEntityNotFoundError(app_name, ["application", "remoteApplication"])
+        raise JujuEntityNotFoundError(app_name, ["application"])
 
     @property
     def name(self):
@@ -104,17 +109,32 @@ class Relation(model.ModelEntity):
 
         :return: True if all specs match.
         """
+        # Matches expects that the underlying application exists when it walks
+        # over the endpoints.
+        # This isn't directly required, but it validates that the framework
+        # has all the information available to it, when you walk over all the
+        # relations.
+        # The one exception is remote-<uuid> applications aren't real
+        # applications in the general sense of a application, but are more akin
+        # to a shadow application.
+        def model_application_exists(app_name):
+            model_app_name = None
+            if app_name in self.model.applications:
+                model_app_name = self.model.applications[app_name].name
+            elif app_name in self.model.remote_applications:
+                model_app_name = self.model.remote_applications[app_name].name
+            elif app_name in self.model.application_offers:
+                model_app_name = self.model.application_offers[app_name].name
+            return model_app_name == app_name
+
         for spec in specs:
             if ':' in spec:
                 app_name, endpoint_name = spec.split(':')
             else:
                 app_name, endpoint_name = spec, None
             for endpoint in self.endpoints:
-                # The all watcher hasn't updated the internal state, so it can
-                # appear that the remote application doesn't exist.
-                if endpoint.application is None:
-                    continue
-                if app_name == endpoint.application.name and \
+                if app_name == endpoint.application_name and \
+                   model_application_exists(app_name) and \
                    endpoint_name in (endpoint.name, None):
                     # found a match for this spec, so move to next one
                     break
