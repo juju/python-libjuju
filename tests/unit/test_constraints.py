@@ -55,3 +55,76 @@ class TestConstraints(unittest.TestCase):
              "tags": ["tag1"],
              "spaces": ["space1", "space2"]}
         )
+
+    def test_parse_storage_constraint(self):
+        _ = constraints.parse_storage_constraint
+
+        self.assertEqual(
+            _("pool,1M"),
+            {"pool": "pool",
+             "count": 1,
+             "size": 1 * 1024 ** 0}
+        )
+        self.assertEqual(
+            _("pool,"),
+            {"pool": "pool",
+             "count": 1}
+        )
+        self.assertEqual(
+            _("1M"),
+            {"size": 1 * 1024 ** 0,
+             "count": 1}
+        )
+        self.assertEqual(
+            _("p,1G"),
+            {"pool": "p",
+             "count": 1,
+             "size": 1 * 1024 ** 1}
+        )
+        self.assertEqual(
+            _("p,0.5T"),
+            {"pool": "p",
+             "count": 1,
+             "size": 512 * 1024 ** 1}
+        )
+        self.assertEqual(
+            _("3,0.5T"),
+            {"count": 3,
+             "size": 512 * 1024 ** 1}
+        )
+        self.assertEqual(
+            _("0.5T,3"),
+            {"count": 3,
+             "size": 512 * 1024 ** 1}
+        )
+
+    def test_parse_device_constraint(self):
+        _ = constraints.parse_device_constraint
+
+        self.assertEqual(
+            _("nvidia.com/gpu"),
+            {"type": "nvidia.com/gpu",
+             "count": 1}
+        )
+        self.assertEqual(
+            _("2,nvidia.com/gpu"),
+            {"type": "nvidia.com/gpu",
+             "count": 2}
+        )
+        self.assertEqual(
+            _("3,nvidia.com/gpu,gpu=nvidia-tesla-p100"),
+            {"type": "nvidia.com/gpu",
+             "count": 3,
+             "attributes": {
+                 "gpu": "nvidia-tesla-p100"
+             }}
+        )
+        self.assertEqual(
+            _("3,nvidia.com/gpu,gpu=nvidia-tesla-p100;2ndattr=another-attr"),
+            {"type": "nvidia.com/gpu",
+             "count": 3,
+             "attributes": {
+                 "gpu": "nvidia-tesla-p100",
+                 "2ndattr": "another-attr"
+             }}
+        )
