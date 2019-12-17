@@ -11,12 +11,14 @@ import logging
 
 from juju import loop
 from juju.client import client
-from juju.client.connection import Connection
+from juju.model import Model
 
 
 async def watch():
-    conn = await Connection.connect()
-    allwatcher = client.AllWatcherFacade.from_connection(conn)
+    model = Model()
+    await model.connect()
+
+    allwatcher = client.AllWatcherFacade.from_connection(model.connection())
     while True:
         change = await allwatcher.Next()
         for delta in change.deltas:
