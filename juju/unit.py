@@ -256,12 +256,13 @@ class Unit(model.ModelEntity):
         method.
 
         """
-        app = self.name.split("/")[0]
+        unit_parts = self.name.split("/")
+        app = unit_parts[0]
+        unit_index = unit_parts[1]
 
-        c = client.ClientFacade.from_connection(self.connection)
+        client_facade = client.ClientFacade.from_connection(self.connection)
 
-        status = await c.FullStatus(patterns=None)
-
+        status = await client_facade.FullStatus(patterns=None)
         # FullStatus may be more up to date than our model, and the
         # unit may have gone away, or we may be doing something silly,
         # like trying to fetch leadership for a subordinate, which
@@ -271,14 +272,30 @@ class Unit(model.ModelEntity):
         if not status.applications.get(app):
             return False
 
-        if not status.applications[app].get('units'):
+        # We will attempt to look in two places for a leader property based on
+        # if the unit is subordinate or not. These variables allow for more
+        # generic non discriminate checks
+        app_data = status.applications.get(app)
+        target_unit = self.name
+
+        # Is the application a subordinate? If so change our data variables to
+        # the parent
+        if status.applications[app].get('subordinate-to'):
+            parent = status.applications[app]['subordinate-to'][0]
+            app_data = status.applications[parent]
+            target_unit = parent + "/" + unit_index
+
+        if not app_data.get('units') or not app_data['units'].get(target_unit):
             return False
 
-        if not status.applications[app]['units'].get(self.name):
-            return False
+        unit = app_data['units'][target_unit]
+        if target_unit == self.name:
+            return unit.get('leader', False)
 
-        return status.applications[app]['units'][self.name].get('leader',
-                                                                False)
+        if unit.get('subordinates') and unit['subordinates'].get(self.name):
+            return unit['subordinates'][self.name].get('leader', False)
+
+        return False
 
     async def get_metrics(self):
         """Get metrics for the unit.
