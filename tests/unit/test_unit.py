@@ -31,7 +31,7 @@ async def test_unit_is_leader(mock_cf):
                     ]
                 }
             },
-            'description': "Tests that subordinate units report is leader correctly",
+            'description': "Tests that subordinate units reports is leader correctly",
             'unit': 'test-sub/0',
             'rval': True
         },
@@ -65,6 +65,72 @@ async def test_unit_is_leader(mock_cf):
             'unit': 'test/0',
             'rval': False
         },
+        {
+            'applications': {
+                'test': {
+                    'units': {
+                        'test/0': {
+                            'subordinates': {
+                                'test-sub/0': {}
+                            }
+                        }
+                    }
+                },
+                'test1': {
+                    'units': {
+                        'test1/0': {
+                            'subordinates': {
+                                'test-sub/1': {
+                                    'leader': True
+                                }
+                            }
+                        }
+                    }
+                },
+                'test-sub': {
+                    'subordinate-to': [
+                        'test',
+                        'test1'
+                    ]
+                }
+            },
+            'description': "Tests that subordinate units of multiple applications reports is leader correctly",
+            'unit': 'test-sub/1',
+            'rval': True
+        },
+        {
+            'applications': {
+                'test': {
+                    'units': {
+                        'test/0': {
+                            'subordinates': {
+                                'test-sub/0': {
+                                    'leader': True
+                                }
+                            }
+                        }
+                    }
+                },
+                'test1': {
+                    'units': {
+                        'test1/0': {
+                            'subordinates': {
+                                'test-sub/1': {}
+                            }
+                        }
+                    }
+                },
+                'test-sub': {
+                    'subordinate-to': [
+                        'test',
+                        'test1'
+                    ]
+                }
+            },
+            'description': "Tests that subordinate units of multiple applications reports is leader correctly",
+            'unit': 'test-sub/1',
+            'rval': False
+        }
     ]
 
     model = Model()

@@ -275,25 +275,31 @@ class Unit(model.ModelEntity):
         # We will attempt to look in two places for a leader property based on
         # if the unit is subordinate or not. These variables allow for more
         # generic non discriminate checks
-        app_data = status.applications.get(app)
-        target_unit = self.name
+        target_apps = [app]
+        is_subordinate = False
 
         # Is the application a subordinate? If so change our data variables to
         # the parent
         if status.applications[app].get('subordinate-to'):
-            parent = status.applications[app]['subordinate-to'][0]
-            app_data = status.applications[parent]
-            target_unit = parent + "/" + unit_index
+            is_subordinate = True
+            target_apps = status.applications[app]['subordinate-to']
 
-        if not app_data.get('units') or not app_data['units'].get(target_unit):
-            return False
+        for target_app in target_apps:
+            app_data = status.applications[target_app]
+            target_unit = target_app + "/" + unit_index
 
-        unit = app_data['units'][target_unit]
-        if target_unit == self.name:
-            return unit.get('leader', False)
+            if not app_data.get('units'):
+                continue
 
-        if unit.get('subordinates') and unit['subordinates'].get(self.name):
-            return unit['subordinates'][self.name].get('leader', False)
+            if app_data['units'].get(self.name):
+                return app_data['units'][self.name].get('leader', False)
+
+            if not is_subordinate:
+                continue
+
+            for key, unit in app_data['units'].items():
+                if unit.get('subordinates') and unit['subordinates'].get(self.name):
+                    return unit['subordinates'][self.name].get('leader', False)
 
         return False
 
