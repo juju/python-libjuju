@@ -258,7 +258,6 @@ class Unit(model.ModelEntity):
         """
         unit_parts = self.name.split("/")
         app = unit_parts[0]
-        unit_index = unit_parts[1]
 
         client_facade = client.ClientFacade.from_connection(self.connection)
 
@@ -286,7 +285,6 @@ class Unit(model.ModelEntity):
 
         for target_app in target_apps:
             app_data = status.applications[target_app]
-            target_unit = target_app + "/" + unit_index
 
             if not app_data.get('units'):
                 continue
