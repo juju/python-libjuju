@@ -1267,7 +1267,17 @@ class CAASOperatorFacade(Type):
                      'Version': {'additionalProperties': False,
                                  'properties': {'version': {'$ref': '#/definitions/Binary'}},
                                  'required': ['version'],
-                                 'type': 'object'}},
+                                 'type': 'object'},
+                     'WatchContainerStartArg': {'additionalProperties': False,
+                                                'properties': {'container': {'type': 'string'},
+                                                               'entity': {'$ref': '#/definitions/Entity'}},
+                                                'required': ['entity'],
+                                                'type': 'object'},
+                     'WatchContainerStartArgs': {'additionalProperties': False,
+                                                 'properties': {'args': {'items': {'$ref': '#/definitions/WatchContainerStartArg'},
+                                                                         'type': 'array'}},
+                                                 'required': ['args'],
+                                                 'type': 'object'}},
      'properties': {'APIAddresses': {'properties': {'Result': {'$ref': '#/definitions/StringsResult'}},
                                      'type': 'object'},
                     'APIHostPorts': {'properties': {'Result': {'$ref': '#/definitions/APIHostPortsResult'}},
@@ -1299,6 +1309,9 @@ class CAASOperatorFacade(Type):
                               'type': 'object'},
                     'WatchAPIHostPorts': {'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
                                           'type': 'object'},
+                    'WatchContainerStart': {'properties': {'Params': {'$ref': '#/definitions/WatchContainerStartArgs'},
+                                                           'Result': {'$ref': '#/definitions/StringsWatchResults'}},
+                                            'type': 'object'},
                     'WatchUnits': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                   'Result': {'$ref': '#/definitions/StringsWatchResults'}},
                                    'type': 'object'}},
@@ -1548,6 +1561,27 @@ class CAASOperatorFacade(Type):
 
 
     @ReturnMapping(StringsWatchResults)
+    async def WatchContainerStart(self, args=None):
+        '''
+        args : typing.Sequence[~WatchContainerStartArg]
+        Returns -> typing.Sequence[~StringsWatchResult]
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASOperator',
+                   request='WatchContainerStart',
+                   version=1,
+                   params=_params)
+        _params['args'] = args
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResults)
     async def WatchUnits(self, entities=None):
         '''
         entities : typing.Sequence[~Entity]
@@ -1634,6 +1668,20 @@ class CAASOperatorProvisionerFacade(Type):
                                                'Address',
                                                'port'],
                                   'type': 'object'},
+                     'IssueOperatorCertificateResult': {'additionalProperties': False,
+                                                        'properties': {'ca-cert': {'type': 'string'},
+                                                                       'cert': {'type': 'string'},
+                                                                       'error': {'$ref': '#/definitions/Error'},
+                                                                       'private-key': {'type': 'string'}},
+                                                        'required': ['ca-cert',
+                                                                     'cert',
+                                                                     'private-key'],
+                                                        'type': 'object'},
+                     'IssueOperatorCertificateResults': {'additionalProperties': False,
+                                                         'properties': {'results': {'items': {'$ref': '#/definitions/IssueOperatorCertificateResult'},
+                                                                                    'type': 'array'}},
+                                                         'required': ['results'],
+                                                         'type': 'object'},
                      'KubernetesFilesystemAttachmentParams': {'additionalProperties': False,
                                                               'properties': {'mount-point': {'type': 'string'},
                                                                              'provider': {'type': 'string'},
@@ -1715,6 +1763,9 @@ class CAASOperatorProvisionerFacade(Type):
                                      'type': 'object'},
                     'APIHostPorts': {'properties': {'Result': {'$ref': '#/definitions/APIHostPortsResult'}},
                                      'type': 'object'},
+                    'IssueOperatorCertificate': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                                'Result': {'$ref': '#/definitions/IssueOperatorCertificateResults'}},
+                                                 'type': 'object'},
                     'Life': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                             'Result': {'$ref': '#/definitions/LifeResults'}},
                              'type': 'object'},
@@ -1765,6 +1816,27 @@ class CAASOperatorProvisionerFacade(Type):
                    version=1,
                    params=_params)
 
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(IssueOperatorCertificateResults)
+    async def IssueOperatorCertificate(self, entities=None):
+        '''
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~IssueOperatorCertificateResult]
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASOperatorProvisioner',
+                   request='IssueOperatorCertificate',
+                   version=1,
+                   params=_params)
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
@@ -1967,6 +2039,12 @@ class CAASUnitProvisionerFacade(Type):
                                                                                 'type': 'array'}},
                                                      'required': ['Results'],
                                                      'type': 'object'},
+                     'ApplicationUnitInfo': {'additionalProperties': False,
+                                             'properties': {'provider-id': {'type': 'string'},
+                                                            'unit-tag': {'type': 'string'}},
+                                             'required': ['provider-id',
+                                                          'unit-tag'],
+                                             'type': 'object'},
                      'ApplicationUnitParams': {'additionalProperties': False,
                                                'properties': {'address': {'type': 'string'},
                                                               'data': {'patternProperties': {'.*': {'additionalProperties': True,
@@ -2115,6 +2193,7 @@ class CAASUnitProvisionerFacade(Type):
                                                                                'type': 'array'},
                                                                    'filesystems': {'items': {'$ref': '#/definitions/KubernetesFilesystemParams'},
                                                                                    'type': 'array'},
+                                                                   'operator-image-path': {'type': 'string'},
                                                                    'pod-spec': {'type': 'string'},
                                                                    'tags': {'patternProperties': {'.*': {'type': 'string'}},
                                                                             'type': 'object'},
@@ -2221,6 +2300,15 @@ class CAASUnitProvisionerFacade(Type):
                                                                            'type': 'array'}},
                                                    'required': ['args'],
                                                    'type': 'object'},
+                     'UpdateApplicationUnitResult': {'additionalProperties': False,
+                                                     'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                                    'info': {'$ref': '#/definitions/UpdateApplicationUnitsInfo'}},
+                                                     'type': 'object'},
+                     'UpdateApplicationUnitResults': {'additionalProperties': False,
+                                                      'properties': {'results': {'items': {'$ref': '#/definitions/UpdateApplicationUnitResult'},
+                                                                                 'type': 'array'}},
+                                                      'required': ['results'],
+                                                      'type': 'object'},
                      'UpdateApplicationUnits': {'additionalProperties': False,
                                                 'properties': {'application-tag': {'type': 'string'},
                                                                'generation': {'type': 'integer'},
@@ -2231,6 +2319,11 @@ class CAASUnitProvisionerFacade(Type):
                                                 'required': ['application-tag',
                                                              'units'],
                                                 'type': 'object'},
+                     'UpdateApplicationUnitsInfo': {'additionalProperties': False,
+                                                    'properties': {'units': {'items': {'$ref': '#/definitions/ApplicationUnitInfo'},
+                                                                             'type': 'array'}},
+                                                    'required': ['units'],
+                                                    'type': 'object'},
                      'Value': {'additionalProperties': False,
                                'properties': {'arch': {'type': 'string'},
                                               'container': {'type': 'string'},
@@ -2267,7 +2360,7 @@ class CAASUnitProvisionerFacade(Type):
                                                                  'Result': {'$ref': '#/definitions/ErrorResults'}},
                                                   'type': 'object'},
                     'UpdateApplicationsUnits': {'properties': {'Params': {'$ref': '#/definitions/UpdateApplicationUnitArgs'},
-                                                               'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                                               'Result': {'$ref': '#/definitions/UpdateApplicationUnitResults'}},
                                                 'type': 'object'},
                     'WatchApplications': {'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
                                           'type': 'object'},
@@ -2406,11 +2499,11 @@ class CAASUnitProvisionerFacade(Type):
 
 
 
-    @ReturnMapping(ErrorResults)
+    @ReturnMapping(UpdateApplicationUnitResults)
     async def UpdateApplicationsUnits(self, args=None):
         '''
         args : typing.Sequence[~UpdateApplicationUnits]
-        Returns -> typing.Sequence[~ErrorResult]
+        Returns -> typing.Sequence[~UpdateApplicationUnitResult]
         '''
         if args is not None and not isinstance(args, (bytes, str, list)):
             raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
@@ -4535,7 +4628,9 @@ class CrossModelRelationsFacade(Type):
                                                     'required': ['results'],
                                                     'type': 'object'},
                      'RelationUnitsChange': {'additionalProperties': False,
-                                             'properties': {'changed': {'patternProperties': {'.*': {'$ref': '#/definitions/UnitSettings'}},
+                                             'properties': {'app-changed': {'patternProperties': {'.*': {'type': 'integer'}},
+                                                                            'type': 'object'},
+                                                            'changed': {'patternProperties': {'.*': {'$ref': '#/definitions/UnitSettings'}},
                                                                         'type': 'object'},
                                                             'departed': {'items': {'type': 'string'},
                                                                          'type': 'array'}},
@@ -6180,6 +6275,12 @@ class MachineActionsFacade(Type):
                                                 'properties': {'results': {'items': {'$ref': '#/definitions/ActionExecutionResult'},
                                                                            'type': 'array'}},
                                                 'type': 'object'},
+                     'ActionMessage': {'additionalProperties': False,
+                                       'properties': {'message': {'type': 'string'},
+                                                      'timestamp': {'format': 'date-time',
+                                                                    'type': 'string'}},
+                                       'required': ['timestamp', 'message'],
+                                       'type': 'object'},
                      'ActionResult': {'additionalProperties': False,
                                       'properties': {'action': {'$ref': '#/definitions/Action'},
                                                      'completed': {'format': 'date-time',
@@ -6187,6 +6288,8 @@ class MachineActionsFacade(Type):
                                                      'enqueued': {'format': 'date-time',
                                                                   'type': 'string'},
                                                      'error': {'$ref': '#/definitions/Error'},
+                                                     'log': {'items': {'$ref': '#/definitions/ActionMessage'},
+                                                             'type': 'array'},
                                                      'message': {'type': 'string'},
                                                      'output': {'patternProperties': {'.*': {'additionalProperties': True,
                                                                                              'type': 'object'}},
@@ -6644,6 +6747,7 @@ class MachinerFacade(Type):
                                                       'parent-interface-name': {'type': 'string'},
                                                       'provider-address-id': {'type': 'string'},
                                                       'provider-id': {'type': 'string'},
+                                                      'provider-network-id': {'type': 'string'},
                                                       'provider-space-id': {'type': 'string'},
                                                       'provider-subnet-id': {'type': 'string'},
                                                       'provider-vlan-id': {'type': 'string'},
@@ -6655,6 +6759,7 @@ class MachinerFacade(Type):
                                                     'cidr',
                                                     'mtu',
                                                     'provider-id',
+                                                    'provider-network-id',
                                                     'provider-subnet-id',
                                                     'provider-space-id',
                                                     'provider-address-id',
@@ -9344,7 +9449,9 @@ class RelationUnitsWatcherFacade(Type):
                                'required': ['message', 'code'],
                                'type': 'object'},
                      'RelationUnitsChange': {'additionalProperties': False,
-                                             'properties': {'changed': {'patternProperties': {'.*': {'$ref': '#/definitions/UnitSettings'}},
+                                             'properties': {'app-changed': {'patternProperties': {'.*': {'type': 'integer'}},
+                                                                            'type': 'object'},
+                                                            'changed': {'patternProperties': {'.*': {'$ref': '#/definitions/UnitSettings'}},
                                                                         'type': 'object'},
                                                             'departed': {'items': {'type': 'string'},
                                                                          'type': 'array'}},
@@ -9596,7 +9703,9 @@ class RemoteRelationsFacade(Type):
                                        'required': ['relation-units'],
                                        'type': 'object'},
                      'RelationUnitsChange': {'additionalProperties': False,
-                                             'properties': {'changed': {'patternProperties': {'.*': {'$ref': '#/definitions/UnitSettings'}},
+                                             'properties': {'app-changed': {'patternProperties': {'.*': {'type': 'integer'}},
+                                                                            'type': 'object'},
+                                                            'changed': {'patternProperties': {'.*': {'$ref': '#/definitions/UnitSettings'}},
                                                                         'type': 'object'},
                                                             'departed': {'items': {'type': 'string'},
                                                                          'type': 'array'}},

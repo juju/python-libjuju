@@ -3292,8 +3292,11 @@ class ClientFacade(Type):
                                       'properties': {'assigned-units': {'patternProperties': {'.*': {'items': {'type': 'string'},
                                                                                                      'type': 'array'}},
                                                                         'type': 'object'},
-                                                     'created': {'type': 'integer'}},
-                                      'required': ['assigned-units', 'created'],
+                                                     'created': {'type': 'integer'},
+                                                     'created-by': {'type': 'string'}},
+                                      'required': ['assigned-units',
+                                                   'created',
+                                                   'created-by'],
                                       'type': 'object'},
                      'BundleChange': {'additionalProperties': False,
                                       'properties': {'args': {'items': {'additionalProperties': True,
@@ -3560,6 +3563,7 @@ class ClientFacade(Type):
                      'ModelInfo': {'additionalProperties': False,
                                    'properties': {'agent-version': {'$ref': '#/definitions/Number'},
                                                   'cloud-credential-tag': {'type': 'string'},
+                                                  'cloud-credential-validity': {'type': 'boolean'},
                                                   'cloud-region': {'type': 'string'},
                                                   'cloud-tag': {'type': 'string'},
                                                   'controller-uuid': {'type': 'string'},
@@ -5075,6 +5079,7 @@ class DiskManagerFacade(Type):
                                                     'InUse': {'type': 'boolean'},
                                                     'Label': {'type': 'string'},
                                                     'MountPoint': {'type': 'string'},
+                                                    'SerialId': {'type': 'string'},
                                                     'Size': {'type': 'integer'},
                                                     'UUID': {'type': 'string'},
                                                     'WWN': {'type': 'string'}},
@@ -5088,7 +5093,8 @@ class DiskManagerFacade(Type):
                                                   'Size',
                                                   'FilesystemType',
                                                   'InUse',
-                                                  'MountPoint'],
+                                                  'MountPoint',
+                                                  'SerialId'],
                                      'type': 'object'},
                      'Error': {'additionalProperties': False,
                                'properties': {'code': {'type': 'string'},
@@ -5278,19 +5284,7 @@ class FilesystemAttachmentsWatcherFacade(Type):
 class HighAvailabilityFacade(Type):
     name = 'HighAvailability'
     version = 2
-    schema =     {'definitions': {'Address': {'additionalProperties': False,
-                                 'properties': {'Scope': {'type': 'string'},
-                                                'SpaceName': {'type': 'string'},
-                                                'SpaceProviderId': {'type': 'string'},
-                                                'Type': {'type': 'string'},
-                                                'Value': {'type': 'string'}},
-                                 'required': ['Value',
-                                              'Type',
-                                              'Scope',
-                                              'SpaceName',
-                                              'SpaceProviderId'],
-                                 'type': 'object'},
-                     'ControllersChangeResult': {'additionalProperties': False,
+    schema =     {'definitions': {'ControllersChangeResult': {'additionalProperties': False,
                                                  'properties': {'error': {'$ref': '#/definitions/Error'},
                                                                 'result': {'$ref': '#/definitions/ControllersChanges'}},
                                                  'required': ['result'],
@@ -5305,12 +5299,8 @@ class HighAvailabilityFacade(Type):
                                                                      'type': 'array'},
                                                            'converted': {'items': {'type': 'string'},
                                                                          'type': 'array'},
-                                                           'demoted': {'items': {'type': 'string'},
-                                                                       'type': 'array'},
                                                            'maintained': {'items': {'type': 'string'},
                                                                           'type': 'array'},
-                                                           'promoted': {'items': {'type': 'string'},
-                                                                        'type': 'array'},
                                                            'removed': {'items': {'type': 'string'},
                                                                        'type': 'array'}},
                                             'type': 'object'},
@@ -5335,62 +5325,6 @@ class HighAvailabilityFacade(Type):
                                               'message': {'type': 'string'}},
                                'required': ['message', 'code'],
                                'type': 'object'},
-                     'HAMember': {'additionalProperties': False,
-                                  'properties': {'public-address': {'$ref': '#/definitions/Address'},
-                                                 'series': {'type': 'string'},
-                                                 'tag': {'type': 'string'}},
-                                  'required': ['tag', 'public-address', 'series'],
-                                  'type': 'object'},
-                     'Member': {'additionalProperties': False,
-                                'properties': {'Address': {'type': 'string'},
-                                               'Arbiter': {'type': 'boolean'},
-                                               'BuildIndexes': {'type': 'boolean'},
-                                               'Hidden': {'type': 'boolean'},
-                                               'Id': {'type': 'integer'},
-                                               'Priority': {'type': 'number'},
-                                               'SlaveDelay': {'type': 'integer'},
-                                               'Tags': {'patternProperties': {'.*': {'type': 'string'}},
-                                                        'type': 'object'},
-                                               'Votes': {'type': 'integer'}},
-                                'required': ['Id',
-                                             'Address',
-                                             'Arbiter',
-                                             'BuildIndexes',
-                                             'Hidden',
-                                             'Priority',
-                                             'Tags',
-                                             'SlaveDelay',
-                                             'Votes'],
-                                'type': 'object'},
-                     'MongoUpgradeResults': {'additionalProperties': False,
-                                             'properties': {'ha-members': {'items': {'$ref': '#/definitions/HAMember'},
-                                                                           'type': 'array'},
-                                                            'master': {'$ref': '#/definitions/HAMember'},
-                                                            'rs-members': {'items': {'$ref': '#/definitions/Member'},
-                                                                           'type': 'array'}},
-                                             'required': ['rs-members',
-                                                          'master',
-                                                          'ha-members'],
-                                             'type': 'object'},
-                     'MongoVersion': {'additionalProperties': False,
-                                      'properties': {'engine': {'type': 'string'},
-                                                     'major': {'type': 'integer'},
-                                                     'minor': {'type': 'integer'},
-                                                     'patch': {'type': 'string'}},
-                                      'required': ['major',
-                                                   'minor',
-                                                   'patch',
-                                                   'engine'],
-                                      'type': 'object'},
-                     'ResumeReplicationParams': {'additionalProperties': False,
-                                                 'properties': {'members': {'items': {'$ref': '#/definitions/Member'},
-                                                                            'type': 'array'}},
-                                                 'required': ['members'],
-                                                 'type': 'object'},
-                     'UpgradeMongoParams': {'additionalProperties': False,
-                                            'properties': {'target': {'$ref': '#/definitions/MongoVersion'}},
-                                            'required': ['target'],
-                                            'type': 'object'},
                      'Value': {'additionalProperties': False,
                                'properties': {'arch': {'type': 'string'},
                                               'container': {'type': 'string'},
@@ -5410,12 +5344,7 @@ class HighAvailabilityFacade(Type):
                                'type': 'object'}},
      'properties': {'EnableHA': {'properties': {'Params': {'$ref': '#/definitions/ControllersSpecs'},
                                                 'Result': {'$ref': '#/definitions/ControllersChangeResults'}},
-                                 'type': 'object'},
-                    'ResumeHAReplicationAfterUpgrade': {'properties': {'Params': {'$ref': '#/definitions/ResumeReplicationParams'}},
-                                                        'type': 'object'},
-                    'StopHAReplicationForUpgrade': {'properties': {'Params': {'$ref': '#/definitions/UpgradeMongoParams'},
-                                                                   'Result': {'$ref': '#/definitions/MongoUpgradeResults'}},
-                                                    'type': 'object'}},
+                                 'type': 'object'}},
      'type': 'object'}
     
 
@@ -5435,48 +5364,6 @@ class HighAvailabilityFacade(Type):
                    version=2,
                    params=_params)
         _params['specs'] = specs
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(None)
-    async def ResumeHAReplicationAfterUpgrade(self, members=None):
-        '''
-        members : typing.Sequence[~Member]
-        Returns -> None
-        '''
-        if members is not None and not isinstance(members, (bytes, str, list)):
-            raise Exception("Expected members to be a Sequence, received: {}".format(type(members)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='HighAvailability',
-                   request='ResumeHAReplicationAfterUpgrade',
-                   version=2,
-                   params=_params)
-        _params['members'] = members
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(MongoUpgradeResults)
-    async def StopHAReplicationForUpgrade(self, target=None):
-        '''
-        target : MongoVersion
-        Returns -> typing.Union[typing.Sequence[~HAMember], _ForwardRef('HAMember'), typing.Sequence[~Member]]
-        '''
-        if target is not None and not isinstance(target, (dict, MongoVersion)):
-            raise Exception("Expected target to be a MongoVersion, received: {}".format(type(target)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='HighAvailability',
-                   request='StopHAReplicationForUpgrade',
-                   version=2,
-                   params=_params)
-        _params['target'] = target
         reply = await self.rpc(msg)
         return reply
 
@@ -7576,7 +7463,8 @@ class ProxyUpdaterFacade(Type):
                                                           'legacy-proxy-settings': {'$ref': '#/definitions/ProxyConfig'},
                                                           'snap-proxy-settings': {'$ref': '#/definitions/ProxyConfig'},
                                                           'snap-store-assertions': {'type': 'string'},
-                                                          'snap-store-id': {'type': 'string'}},
+                                                          'snap-store-id': {'type': 'string'},
+                                                          'snap-store-proxy-url': {'type': 'string'}},
                                            'required': ['legacy-proxy-settings',
                                                         'juju-proxy-settings'],
                                            'type': 'object'},

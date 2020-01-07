@@ -1,6 +1,17 @@
 Changelog
 ---------
 
+2.7.0
+^^^^^
+
+Tuesday January 7 2020
+
+ * Update facade methods for Juju 2.7.0
+ * Fix an issue when querying CMR relations (#366) 
+ * Fix storage support in bundles (#361)
+ * Fix reporting of unit leaders (#374)
+ * AddCloud API support (#370)
+
 2.6.3
 ^^^^^
 
