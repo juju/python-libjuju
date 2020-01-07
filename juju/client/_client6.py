@@ -5,6 +5,733 @@ from juju.client.facade import Type, ReturnMapping
 from juju.client._definitions import *
 
 
+class CloudFacade(Type):
+    name = 'Cloud'
+    version = 6
+    schema =     {'definitions': {'AddCloudArgs': {'additionalProperties': False,
+                                      'properties': {'cloud': {'$ref': '#/definitions/Cloud'},
+                                                     'force': {'type': 'boolean'},
+                                                     'name': {'type': 'string'}},
+                                      'required': ['cloud', 'name'],
+                                      'type': 'object'},
+                     'Cloud': {'additionalProperties': False,
+                               'properties': {'auth-types': {'items': {'type': 'string'},
+                                                             'type': 'array'},
+                                              'ca-certificates': {'items': {'type': 'string'},
+                                                                  'type': 'array'},
+                                              'config': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                      'type': 'object'}},
+                                                         'type': 'object'},
+                                              'endpoint': {'type': 'string'},
+                                              'host-cloud-region': {'type': 'string'},
+                                              'identity-endpoint': {'type': 'string'},
+                                              'region-config': {'patternProperties': {'.*': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                                          'type': 'object'}},
+                                                                                             'type': 'object'}},
+                                                                'type': 'object'},
+                                              'regions': {'items': {'$ref': '#/definitions/CloudRegion'},
+                                                          'type': 'array'},
+                                              'storage-endpoint': {'type': 'string'},
+                                              'type': {'type': 'string'}},
+                               'required': ['type'],
+                               'type': 'object'},
+                     'CloudCredential': {'additionalProperties': False,
+                                         'properties': {'attrs': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                  'type': 'object'},
+                                                        'auth-type': {'type': 'string'},
+                                                        'redacted': {'items': {'type': 'string'},
+                                                                     'type': 'array'}},
+                                         'required': ['auth-type'],
+                                         'type': 'object'},
+                     'CloudCredentialArg': {'additionalProperties': False,
+                                            'properties': {'cloud-name': {'type': 'string'},
+                                                           'credential-name': {'type': 'string'}},
+                                            'required': ['cloud-name',
+                                                         'credential-name'],
+                                            'type': 'object'},
+                     'CloudCredentialArgs': {'additionalProperties': False,
+                                             'properties': {'credentials': {'items': {'$ref': '#/definitions/CloudCredentialArg'},
+                                                                            'type': 'array'},
+                                                            'include-secrets': {'type': 'boolean'}},
+                                             'required': ['include-secrets'],
+                                             'type': 'object'},
+                     'CloudCredentialResult': {'additionalProperties': False,
+                                               'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                              'result': {'$ref': '#/definitions/CloudCredential'}},
+                                               'type': 'object'},
+                     'CloudCredentialResults': {'additionalProperties': False,
+                                                'properties': {'results': {'items': {'$ref': '#/definitions/CloudCredentialResult'},
+                                                                           'type': 'array'}},
+                                                'type': 'object'},
+                     'CloudDetails': {'additionalProperties': False,
+                                      'properties': {'auth-types': {'items': {'type': 'string'},
+                                                                    'type': 'array'},
+                                                     'endpoint': {'type': 'string'},
+                                                     'identity-endpoint': {'type': 'string'},
+                                                     'regions': {'items': {'$ref': '#/definitions/CloudRegion'},
+                                                                 'type': 'array'},
+                                                     'storage-endpoint': {'type': 'string'},
+                                                     'type': {'type': 'string'}},
+                                      'required': ['type'],
+                                      'type': 'object'},
+                     'CloudInfo': {'additionalProperties': False,
+                                   'properties': {'CloudDetails': {'$ref': '#/definitions/CloudDetails'},
+                                                  'users': {'items': {'$ref': '#/definitions/CloudUserInfo'},
+                                                            'type': 'array'}},
+                                   'required': ['CloudDetails', 'users'],
+                                   'type': 'object'},
+                     'CloudInfoResult': {'additionalProperties': False,
+                                         'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                        'result': {'$ref': '#/definitions/CloudInfo'}},
+                                         'type': 'object'},
+                     'CloudInfoResults': {'additionalProperties': False,
+                                          'properties': {'results': {'items': {'$ref': '#/definitions/CloudInfoResult'},
+                                                                     'type': 'array'}},
+                                          'required': ['results'],
+                                          'type': 'object'},
+                     'CloudInstanceTypesConstraint': {'additionalProperties': False,
+                                                      'properties': {'cloud-tag': {'type': 'string'},
+                                                                     'constraints': {'$ref': '#/definitions/Value'},
+                                                                     'region': {'type': 'string'}},
+                                                      'required': ['cloud-tag',
+                                                                   'region'],
+                                                      'type': 'object'},
+                     'CloudInstanceTypesConstraints': {'additionalProperties': False,
+                                                       'properties': {'constraints': {'items': {'$ref': '#/definitions/CloudInstanceTypesConstraint'},
+                                                                                      'type': 'array'}},
+                                                       'required': ['constraints'],
+                                                       'type': 'object'},
+                     'CloudRegion': {'additionalProperties': False,
+                                     'properties': {'endpoint': {'type': 'string'},
+                                                    'identity-endpoint': {'type': 'string'},
+                                                    'name': {'type': 'string'},
+                                                    'storage-endpoint': {'type': 'string'}},
+                                     'required': ['name'],
+                                     'type': 'object'},
+                     'CloudResult': {'additionalProperties': False,
+                                     'properties': {'cloud': {'$ref': '#/definitions/Cloud'},
+                                                    'error': {'$ref': '#/definitions/Error'}},
+                                     'type': 'object'},
+                     'CloudResults': {'additionalProperties': False,
+                                      'properties': {'results': {'items': {'$ref': '#/definitions/CloudResult'},
+                                                                 'type': 'array'}},
+                                      'type': 'object'},
+                     'CloudUserInfo': {'additionalProperties': False,
+                                       'properties': {'access': {'type': 'string'},
+                                                      'display-name': {'type': 'string'},
+                                                      'user': {'type': 'string'}},
+                                       'required': ['user',
+                                                    'display-name',
+                                                    'access'],
+                                       'type': 'object'},
+                     'CloudsResult': {'additionalProperties': False,
+                                      'properties': {'clouds': {'patternProperties': {'.*': {'$ref': '#/definitions/Cloud'}},
+                                                                'type': 'object'}},
+                                      'type': 'object'},
+                     'ControllerCredentialInfo': {'additionalProperties': False,
+                                                  'properties': {'content': {'$ref': '#/definitions/CredentialContent'},
+                                                                 'models': {'items': {'$ref': '#/definitions/ModelAccess'},
+                                                                            'type': 'array'}},
+                                                  'type': 'object'},
+                     'CredentialContent': {'additionalProperties': False,
+                                           'properties': {'attrs': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                    'type': 'object'},
+                                                          'auth-type': {'type': 'string'},
+                                                          'cloud': {'type': 'string'},
+                                                          'name': {'type': 'string'},
+                                                          'valid': {'type': 'boolean'}},
+                                           'required': ['name',
+                                                        'cloud',
+                                                        'auth-type'],
+                                           'type': 'object'},
+                     'CredentialContentResult': {'additionalProperties': False,
+                                                 'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                                'result': {'$ref': '#/definitions/ControllerCredentialInfo'}},
+                                                 'type': 'object'},
+                     'CredentialContentResults': {'additionalProperties': False,
+                                                  'properties': {'results': {'items': {'$ref': '#/definitions/CredentialContentResult'},
+                                                                             'type': 'array'}},
+                                                  'type': 'object'},
+                     'Entities': {'additionalProperties': False,
+                                  'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
+                                                              'type': 'array'}},
+                                  'required': ['entities'],
+                                  'type': 'object'},
+                     'Entity': {'additionalProperties': False,
+                                'properties': {'tag': {'type': 'string'}},
+                                'required': ['tag'],
+                                'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ErrorResult': {'additionalProperties': False,
+                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
+                                     'type': 'object'},
+                     'ErrorResults': {'additionalProperties': False,
+                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
+                                                                 'type': 'array'}},
+                                      'required': ['results'],
+                                      'type': 'object'},
+                     'InstanceType': {'additionalProperties': False,
+                                      'properties': {'arches': {'items': {'type': 'string'},
+                                                                'type': 'array'},
+                                                     'cost': {'type': 'integer'},
+                                                     'cpu-cores': {'type': 'integer'},
+                                                     'deprecated': {'type': 'boolean'},
+                                                     'memory': {'type': 'integer'},
+                                                     'name': {'type': 'string'},
+                                                     'root-disk': {'type': 'integer'},
+                                                     'virt-type': {'type': 'string'}},
+                                      'required': ['arches', 'cpu-cores', 'memory'],
+                                      'type': 'object'},
+                     'InstanceTypesResult': {'additionalProperties': False,
+                                             'properties': {'cost-currency': {'type': 'string'},
+                                                            'cost-divisor': {'type': 'integer'},
+                                                            'cost-unit': {'type': 'string'},
+                                                            'error': {'$ref': '#/definitions/Error'},
+                                                            'instance-types': {'items': {'$ref': '#/definitions/InstanceType'},
+                                                                               'type': 'array'}},
+                                             'type': 'object'},
+                     'InstanceTypesResults': {'additionalProperties': False,
+                                              'properties': {'results': {'items': {'$ref': '#/definitions/InstanceTypesResult'},
+                                                                         'type': 'array'}},
+                                              'required': ['results'],
+                                              'type': 'object'},
+                     'ListCloudInfo': {'additionalProperties': False,
+                                       'properties': {'CloudDetails': {'$ref': '#/definitions/CloudDetails'},
+                                                      'user-access': {'type': 'string'}},
+                                       'required': ['CloudDetails', 'user-access'],
+                                       'type': 'object'},
+                     'ListCloudInfoResult': {'additionalProperties': False,
+                                             'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                            'result': {'$ref': '#/definitions/ListCloudInfo'}},
+                                             'type': 'object'},
+                     'ListCloudInfoResults': {'additionalProperties': False,
+                                              'properties': {'results': {'items': {'$ref': '#/definitions/ListCloudInfoResult'},
+                                                                         'type': 'array'}},
+                                              'required': ['results'],
+                                              'type': 'object'},
+                     'ListCloudsRequest': {'additionalProperties': False,
+                                           'properties': {'all': {'type': 'boolean'},
+                                                          'user-tag': {'type': 'string'}},
+                                           'required': ['user-tag'],
+                                           'type': 'object'},
+                     'ModelAccess': {'additionalProperties': False,
+                                     'properties': {'access': {'type': 'string'},
+                                                    'model': {'type': 'string'}},
+                                     'type': 'object'},
+                     'ModifyCloudAccess': {'additionalProperties': False,
+                                           'properties': {'access': {'type': 'string'},
+                                                          'action': {'type': 'string'},
+                                                          'cloud-tag': {'type': 'string'},
+                                                          'user-tag': {'type': 'string'}},
+                                           'required': ['user-tag',
+                                                        'cloud-tag',
+                                                        'action',
+                                                        'access'],
+                                           'type': 'object'},
+                     'ModifyCloudAccessRequest': {'additionalProperties': False,
+                                                  'properties': {'changes': {'items': {'$ref': '#/definitions/ModifyCloudAccess'},
+                                                                             'type': 'array'}},
+                                                  'required': ['changes'],
+                                                  'type': 'object'},
+                     'RevokeCredentialArg': {'additionalProperties': False,
+                                             'properties': {'force': {'type': 'boolean'},
+                                                            'tag': {'type': 'string'}},
+                                             'required': ['tag', 'force'],
+                                             'type': 'object'},
+                     'RevokeCredentialArgs': {'additionalProperties': False,
+                                              'properties': {'credentials': {'items': {'$ref': '#/definitions/RevokeCredentialArg'},
+                                                                             'type': 'array'}},
+                                              'required': ['credentials'],
+                                              'type': 'object'},
+                     'StringsResult': {'additionalProperties': False,
+                                       'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                      'result': {'items': {'type': 'string'},
+                                                                 'type': 'array'}},
+                                       'type': 'object'},
+                     'StringsResults': {'additionalProperties': False,
+                                        'properties': {'results': {'items': {'$ref': '#/definitions/StringsResult'},
+                                                                   'type': 'array'}},
+                                        'required': ['results'],
+                                        'type': 'object'},
+                     'TaggedCredential': {'additionalProperties': False,
+                                          'properties': {'credential': {'$ref': '#/definitions/CloudCredential'},
+                                                         'tag': {'type': 'string'}},
+                                          'required': ['tag', 'credential'],
+                                          'type': 'object'},
+                     'TaggedCredentials': {'additionalProperties': False,
+                                           'properties': {'credentials': {'items': {'$ref': '#/definitions/TaggedCredential'},
+                                                                          'type': 'array'}},
+                                           'type': 'object'},
+                     'UpdateCloudArgs': {'additionalProperties': False,
+                                         'properties': {'clouds': {'items': {'$ref': '#/definitions/AddCloudArgs'},
+                                                                   'type': 'array'}},
+                                         'required': ['clouds'],
+                                         'type': 'object'},
+                     'UpdateCredentialArgs': {'additionalProperties': False,
+                                              'properties': {'credentials': {'items': {'$ref': '#/definitions/TaggedCredential'},
+                                                                             'type': 'array'},
+                                                             'force': {'type': 'boolean'}},
+                                              'required': ['credentials', 'force'],
+                                              'type': 'object'},
+                     'UpdateCredentialModelResult': {'additionalProperties': False,
+                                                     'properties': {'errors': {'items': {'$ref': '#/definitions/ErrorResult'},
+                                                                               'type': 'array'},
+                                                                    'name': {'type': 'string'},
+                                                                    'uuid': {'type': 'string'}},
+                                                     'required': ['uuid', 'name'],
+                                                     'type': 'object'},
+                     'UpdateCredentialResult': {'additionalProperties': False,
+                                                'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                               'models': {'items': {'$ref': '#/definitions/UpdateCredentialModelResult'},
+                                                                          'type': 'array'},
+                                                               'tag': {'type': 'string'}},
+                                                'required': ['tag'],
+                                                'type': 'object'},
+                     'UpdateCredentialResults': {'additionalProperties': False,
+                                                 'properties': {'results': {'items': {'$ref': '#/definitions/UpdateCredentialResult'},
+                                                                            'type': 'array'}},
+                                                 'type': 'object'},
+                     'UserCloud': {'additionalProperties': False,
+                                   'properties': {'cloud-tag': {'type': 'string'},
+                                                  'user-tag': {'type': 'string'}},
+                                   'required': ['user-tag', 'cloud-tag'],
+                                   'type': 'object'},
+                     'UserClouds': {'additionalProperties': False,
+                                    'properties': {'user-clouds': {'items': {'$ref': '#/definitions/UserCloud'},
+                                                                   'type': 'array'}},
+                                    'type': 'object'},
+                     'Value': {'additionalProperties': False,
+                               'properties': {'arch': {'type': 'string'},
+                                              'container': {'type': 'string'},
+                                              'cores': {'type': 'integer'},
+                                              'cpu-power': {'type': 'integer'},
+                                              'instance-type': {'type': 'string'},
+                                              'mem': {'type': 'integer'},
+                                              'root-disk': {'type': 'integer'},
+                                              'root-disk-source': {'type': 'string'},
+                                              'spaces': {'items': {'type': 'string'},
+                                                         'type': 'array'},
+                                              'tags': {'items': {'type': 'string'},
+                                                       'type': 'array'},
+                                              'virt-type': {'type': 'string'},
+                                              'zones': {'items': {'type': 'string'},
+                                                        'type': 'array'}},
+                               'type': 'object'}},
+     'properties': {'AddCloud': {'properties': {'Params': {'$ref': '#/definitions/AddCloudArgs'}},
+                                 'type': 'object'},
+                    'AddCredentials': {'properties': {'Params': {'$ref': '#/definitions/TaggedCredentials'},
+                                                      'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                       'type': 'object'},
+                    'CheckCredentialsModels': {'properties': {'Params': {'$ref': '#/definitions/TaggedCredentials'},
+                                                              'Result': {'$ref': '#/definitions/UpdateCredentialResults'}},
+                                               'type': 'object'},
+                    'Cloud': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                             'Result': {'$ref': '#/definitions/CloudResults'}},
+                              'type': 'object'},
+                    'CloudInfo': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                 'Result': {'$ref': '#/definitions/CloudInfoResults'}},
+                                  'type': 'object'},
+                    'Clouds': {'properties': {'Result': {'$ref': '#/definitions/CloudsResult'}},
+                               'type': 'object'},
+                    'Credential': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                  'Result': {'$ref': '#/definitions/CloudCredentialResults'}},
+                                   'type': 'object'},
+                    'CredentialContents': {'properties': {'Params': {'$ref': '#/definitions/CloudCredentialArgs'},
+                                                          'Result': {'$ref': '#/definitions/CredentialContentResults'}},
+                                           'type': 'object'},
+                    'InstanceTypes': {'properties': {'Params': {'$ref': '#/definitions/CloudInstanceTypesConstraints'},
+                                                     'Result': {'$ref': '#/definitions/InstanceTypesResults'}},
+                                      'type': 'object'},
+                    'ListCloudInfo': {'properties': {'Params': {'$ref': '#/definitions/ListCloudsRequest'},
+                                                     'Result': {'$ref': '#/definitions/ListCloudInfoResults'}},
+                                      'type': 'object'},
+                    'ModifyCloudAccess': {'properties': {'Params': {'$ref': '#/definitions/ModifyCloudAccessRequest'},
+                                                         'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                          'type': 'object'},
+                    'RemoveClouds': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                    'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                     'type': 'object'},
+                    'RevokeCredentialsCheckModels': {'properties': {'Params': {'$ref': '#/definitions/RevokeCredentialArgs'},
+                                                                    'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                                     'type': 'object'},
+                    'UpdateCloud': {'properties': {'Params': {'$ref': '#/definitions/UpdateCloudArgs'},
+                                                   'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                    'type': 'object'},
+                    'UpdateCredentialsCheckModels': {'properties': {'Params': {'$ref': '#/definitions/UpdateCredentialArgs'},
+                                                                    'Result': {'$ref': '#/definitions/UpdateCredentialResults'}},
+                                                     'type': 'object'},
+                    'UserCredentials': {'properties': {'Params': {'$ref': '#/definitions/UserClouds'},
+                                                       'Result': {'$ref': '#/definitions/StringsResults'}},
+                                        'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(None)
+    async def AddCloud(self, cloud=None, force=None, name=None):
+        '''
+        cloud : Cloud
+        force : bool
+        name : str
+        Returns -> None
+        '''
+        if cloud is not None and not isinstance(cloud, (dict, Cloud)):
+            raise Exception("Expected cloud to be a Cloud, received: {}".format(type(cloud)))
+
+        if force is not None and not isinstance(force, bool):
+            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
+
+        if name is not None and not isinstance(name, (bytes, str)):
+            raise Exception("Expected name to be a str, received: {}".format(type(name)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Cloud',
+                   request='AddCloud',
+                   version=6,
+                   params=_params)
+        _params['cloud'] = cloud
+        _params['force'] = force
+        _params['name'] = name
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def AddCredentials(self, credentials=None):
+        '''
+        credentials : typing.Sequence[~TaggedCredential]
+        Returns -> typing.Sequence[~ErrorResult]
+        '''
+        if credentials is not None and not isinstance(credentials, (bytes, str, list)):
+            raise Exception("Expected credentials to be a Sequence, received: {}".format(type(credentials)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Cloud',
+                   request='AddCredentials',
+                   version=6,
+                   params=_params)
+        _params['credentials'] = credentials
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(UpdateCredentialResults)
+    async def CheckCredentialsModels(self, credentials=None):
+        '''
+        credentials : typing.Sequence[~TaggedCredential]
+        Returns -> typing.Sequence[~UpdateCredentialResult]
+        '''
+        if credentials is not None and not isinstance(credentials, (bytes, str, list)):
+            raise Exception("Expected credentials to be a Sequence, received: {}".format(type(credentials)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Cloud',
+                   request='CheckCredentialsModels',
+                   version=6,
+                   params=_params)
+        _params['credentials'] = credentials
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CloudResults)
+    async def Cloud(self, entities=None):
+        '''
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~CloudResult]
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Cloud',
+                   request='Cloud',
+                   version=6,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CloudInfoResults)
+    async def CloudInfo(self, entities=None):
+        '''
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~CloudInfoResult]
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Cloud',
+                   request='CloudInfo',
+                   version=6,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CloudsResult)
+    async def Clouds(self):
+        '''
+
+        Returns -> typing.Mapping[str, ~Cloud]
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Cloud',
+                   request='Clouds',
+                   version=6,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CloudCredentialResults)
+    async def Credential(self, entities=None):
+        '''
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~CloudCredentialResult]
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Cloud',
+                   request='Credential',
+                   version=6,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CredentialContentResults)
+    async def CredentialContents(self, credentials=None, include_secrets=None):
+        '''
+        credentials : typing.Sequence[~CloudCredentialArg]
+        include_secrets : bool
+        Returns -> typing.Sequence[~CredentialContentResult]
+        '''
+        if credentials is not None and not isinstance(credentials, (bytes, str, list)):
+            raise Exception("Expected credentials to be a Sequence, received: {}".format(type(credentials)))
+
+        if include_secrets is not None and not isinstance(include_secrets, bool):
+            raise Exception("Expected include_secrets to be a bool, received: {}".format(type(include_secrets)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Cloud',
+                   request='CredentialContents',
+                   version=6,
+                   params=_params)
+        _params['credentials'] = credentials
+        _params['include-secrets'] = include_secrets
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(InstanceTypesResults)
+    async def InstanceTypes(self, constraints=None):
+        '''
+        constraints : typing.Sequence[~CloudInstanceTypesConstraint]
+        Returns -> typing.Sequence[~InstanceTypesResult]
+        '''
+        if constraints is not None and not isinstance(constraints, (bytes, str, list)):
+            raise Exception("Expected constraints to be a Sequence, received: {}".format(type(constraints)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Cloud',
+                   request='InstanceTypes',
+                   version=6,
+                   params=_params)
+        _params['constraints'] = constraints
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ListCloudInfoResults)
+    async def ListCloudInfo(self, all_=None, user_tag=None):
+        '''
+        all_ : bool
+        user_tag : str
+        Returns -> typing.Sequence[~ListCloudInfoResult]
+        '''
+        if all_ is not None and not isinstance(all_, bool):
+            raise Exception("Expected all_ to be a bool, received: {}".format(type(all_)))
+
+        if user_tag is not None and not isinstance(user_tag, (bytes, str)):
+            raise Exception("Expected user_tag to be a str, received: {}".format(type(user_tag)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Cloud',
+                   request='ListCloudInfo',
+                   version=6,
+                   params=_params)
+        _params['all'] = all_
+        _params['user-tag'] = user_tag
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def ModifyCloudAccess(self, changes=None):
+        '''
+        changes : typing.Sequence[~ModifyCloudAccess]
+        Returns -> typing.Sequence[~ErrorResult]
+        '''
+        if changes is not None and not isinstance(changes, (bytes, str, list)):
+            raise Exception("Expected changes to be a Sequence, received: {}".format(type(changes)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Cloud',
+                   request='ModifyCloudAccess',
+                   version=6,
+                   params=_params)
+        _params['changes'] = changes
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def RemoveClouds(self, entities=None):
+        '''
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~ErrorResult]
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Cloud',
+                   request='RemoveClouds',
+                   version=6,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def RevokeCredentialsCheckModels(self, credentials=None):
+        '''
+        credentials : typing.Sequence[~RevokeCredentialArg]
+        Returns -> typing.Sequence[~ErrorResult]
+        '''
+        if credentials is not None and not isinstance(credentials, (bytes, str, list)):
+            raise Exception("Expected credentials to be a Sequence, received: {}".format(type(credentials)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Cloud',
+                   request='RevokeCredentialsCheckModels',
+                   version=6,
+                   params=_params)
+        _params['credentials'] = credentials
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def UpdateCloud(self, clouds=None):
+        '''
+        clouds : typing.Sequence[~AddCloudArgs]
+        Returns -> typing.Sequence[~ErrorResult]
+        '''
+        if clouds is not None and not isinstance(clouds, (bytes, str, list)):
+            raise Exception("Expected clouds to be a Sequence, received: {}".format(type(clouds)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Cloud',
+                   request='UpdateCloud',
+                   version=6,
+                   params=_params)
+        _params['clouds'] = clouds
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(UpdateCredentialResults)
+    async def UpdateCredentialsCheckModels(self, credentials=None, force=None):
+        '''
+        credentials : typing.Sequence[~TaggedCredential]
+        force : bool
+        Returns -> typing.Sequence[~UpdateCredentialResult]
+        '''
+        if credentials is not None and not isinstance(credentials, (bytes, str, list)):
+            raise Exception("Expected credentials to be a Sequence, received: {}".format(type(credentials)))
+
+        if force is not None and not isinstance(force, bool):
+            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Cloud',
+                   request='UpdateCredentialsCheckModels',
+                   version=6,
+                   params=_params)
+        _params['credentials'] = credentials
+        _params['force'] = force
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsResults)
+    async def UserCredentials(self, user_clouds=None):
+        '''
+        user_clouds : typing.Sequence[~UserCloud]
+        Returns -> typing.Sequence[~StringsResult]
+        '''
+        if user_clouds is not None and not isinstance(user_clouds, (bytes, str, list)):
+            raise Exception("Expected user_clouds to be a Sequence, received: {}".format(type(user_clouds)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Cloud',
+                   request='UserCredentials',
+                   version=6,
+                   params=_params)
+        _params['user-clouds'] = user_clouds
+        reply = await self.rpc(msg)
+        return reply
+
+
+
 class MachineManagerFacade(Type):
     name = 'MachineManager'
     version = 6

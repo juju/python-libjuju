@@ -971,6 +971,147 @@ class ApplicationFacade(Type):
 
 
 
+class BundleFacade(Type):
+    name = 'Bundle'
+    version = 4
+    schema =     {'definitions': {'BundleChange': {'additionalProperties': False,
+                                      'properties': {'args': {'items': {'additionalProperties': True,
+                                                                        'type': 'object'},
+                                                              'type': 'array'},
+                                                     'id': {'type': 'string'},
+                                                     'method': {'type': 'string'},
+                                                     'requires': {'items': {'type': 'string'},
+                                                                  'type': 'array'}},
+                                      'required': ['id',
+                                                   'method',
+                                                   'args',
+                                                   'requires'],
+                                      'type': 'object'},
+                     'BundleChangesMapArgs': {'additionalProperties': False,
+                                              'properties': {'args': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                   'type': 'object'}},
+                                                                      'type': 'object'},
+                                                             'id': {'type': 'string'},
+                                                             'method': {'type': 'string'},
+                                                             'requires': {'items': {'type': 'string'},
+                                                                          'type': 'array'}},
+                                              'required': ['id',
+                                                           'method',
+                                                           'args',
+                                                           'requires'],
+                                              'type': 'object'},
+                     'BundleChangesMapArgsResults': {'additionalProperties': False,
+                                                     'properties': {'changes': {'items': {'$ref': '#/definitions/BundleChangesMapArgs'},
+                                                                                'type': 'array'},
+                                                                    'errors': {'items': {'type': 'string'},
+                                                                               'type': 'array'}},
+                                                     'type': 'object'},
+                     'BundleChangesParams': {'additionalProperties': False,
+                                             'properties': {'bundleURL': {'type': 'string'},
+                                                            'yaml': {'type': 'string'}},
+                                             'required': ['yaml', 'bundleURL'],
+                                             'type': 'object'},
+                     'BundleChangesResults': {'additionalProperties': False,
+                                              'properties': {'changes': {'items': {'$ref': '#/definitions/BundleChange'},
+                                                                         'type': 'array'},
+                                                             'errors': {'items': {'type': 'string'},
+                                                                        'type': 'array'}},
+                                              'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'StringResult': {'additionalProperties': False,
+                                      'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                     'result': {'type': 'string'}},
+                                      'required': ['result'],
+                                      'type': 'object'}},
+     'properties': {'ExportBundle': {'properties': {'Result': {'$ref': '#/definitions/StringResult'}},
+                                     'type': 'object'},
+                    'GetChanges': {'properties': {'Params': {'$ref': '#/definitions/BundleChangesParams'},
+                                                  'Result': {'$ref': '#/definitions/BundleChangesResults'}},
+                                   'type': 'object'},
+                    'GetChangesMapArgs': {'properties': {'Params': {'$ref': '#/definitions/BundleChangesParams'},
+                                                         'Result': {'$ref': '#/definitions/BundleChangesMapArgsResults'}},
+                                          'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(StringResult)
+    async def ExportBundle(self):
+        '''
+
+        Returns -> typing.Union[_ForwardRef('Error'), str]
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Bundle',
+                   request='ExportBundle',
+                   version=4,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(BundleChangesResults)
+    async def GetChanges(self, bundleurl=None, yaml=None):
+        '''
+        bundleurl : str
+        yaml : str
+        Returns -> typing.Union[typing.Sequence[~BundleChange], typing.Sequence[str]]
+        '''
+        if bundleurl is not None and not isinstance(bundleurl, (bytes, str)):
+            raise Exception("Expected bundleurl to be a str, received: {}".format(type(bundleurl)))
+
+        if yaml is not None and not isinstance(yaml, (bytes, str)):
+            raise Exception("Expected yaml to be a str, received: {}".format(type(yaml)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Bundle',
+                   request='GetChanges',
+                   version=4,
+                   params=_params)
+        _params['bundleURL'] = bundleurl
+        _params['yaml'] = yaml
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(BundleChangesMapArgsResults)
+    async def GetChangesMapArgs(self, bundleurl=None, yaml=None):
+        '''
+        bundleurl : str
+        yaml : str
+        Returns -> typing.Union[typing.Sequence[~BundleChangesMapArgs], typing.Sequence[str]]
+        '''
+        if bundleurl is not None and not isinstance(bundleurl, (bytes, str)):
+            raise Exception("Expected bundleurl to be a str, received: {}".format(type(bundleurl)))
+
+        if yaml is not None and not isinstance(yaml, (bytes, str)):
+            raise Exception("Expected yaml to be a str, received: {}".format(type(yaml)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Bundle',
+                   request='GetChangesMapArgs',
+                   version=4,
+                   params=_params)
+        _params['bundleURL'] = bundleurl
+        _params['yaml'] = yaml
+        reply = await self.rpc(msg)
+        return reply
+
+
+
 class StorageFacade(Type):
     name = 'Storage'
     version = 4
@@ -1560,6 +1701,7 @@ class StorageProvisionerFacade(Type):
                                                     'InUse': {'type': 'boolean'},
                                                     'Label': {'type': 'string'},
                                                     'MountPoint': {'type': 'string'},
+                                                    'SerialId': {'type': 'string'},
                                                     'Size': {'type': 'integer'},
                                                     'UUID': {'type': 'string'},
                                                     'WWN': {'type': 'string'}},
@@ -1573,7 +1715,8 @@ class StorageProvisionerFacade(Type):
                                                   'Size',
                                                   'FilesystemType',
                                                   'InUse',
-                                                  'MountPoint'],
+                                                  'MountPoint',
+                                                  'SerialId'],
                                      'type': 'object'},
                      'BlockDeviceResult': {'additionalProperties': False,
                                            'properties': {'error': {'$ref': '#/definitions/Error'},

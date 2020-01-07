@@ -3741,6 +3741,249 @@ class MachineManagerFacade(Type):
 
 
 
+class ModelGenerationFacade(Type):
+    name = 'ModelGeneration'
+    version = 3
+    schema =     {'definitions': {'BoolResult': {'additionalProperties': False,
+                                    'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                   'result': {'type': 'boolean'}},
+                                    'required': ['result'],
+                                    'type': 'object'},
+                     'BranchArg': {'additionalProperties': False,
+                                   'properties': {'branch': {'type': 'string'}},
+                                   'required': ['branch'],
+                                   'type': 'object'},
+                     'BranchInfoArgs': {'additionalProperties': False,
+                                        'properties': {'branches': {'items': {'type': 'string'},
+                                                                    'type': 'array'},
+                                                       'detailed': {'type': 'boolean'}},
+                                        'required': ['branches', 'detailed'],
+                                        'type': 'object'},
+                     'BranchTrackArg': {'additionalProperties': False,
+                                        'properties': {'branch': {'type': 'string'},
+                                                       'entities': {'items': {'$ref': '#/definitions/Entity'},
+                                                                    'type': 'array'},
+                                                       'num-units': {'type': 'integer'}},
+                                        'required': ['branch', 'entities'],
+                                        'type': 'object'},
+                     'Entity': {'additionalProperties': False,
+                                'properties': {'tag': {'type': 'string'}},
+                                'required': ['tag'],
+                                'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ErrorResult': {'additionalProperties': False,
+                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
+                                     'type': 'object'},
+                     'ErrorResults': {'additionalProperties': False,
+                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
+                                                                 'type': 'array'}},
+                                      'required': ['results'],
+                                      'type': 'object'},
+                     'Generation': {'additionalProperties': False,
+                                    'properties': {'applications': {'items': {'$ref': '#/definitions/GenerationApplication'},
+                                                                    'type': 'array'},
+                                                   'branch': {'type': 'string'},
+                                                   'created': {'type': 'integer'},
+                                                   'created-by': {'type': 'string'}},
+                                    'required': ['branch',
+                                                 'created',
+                                                 'created-by',
+                                                 'applications'],
+                                    'type': 'object'},
+                     'GenerationApplication': {'additionalProperties': False,
+                                               'properties': {'application': {'type': 'string'},
+                                                              'config': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                      'type': 'object'}},
+                                                                         'type': 'object'},
+                                                              'pending': {'items': {'type': 'string'},
+                                                                          'type': 'array'},
+                                                              'progress': {'type': 'string'},
+                                                              'tracking': {'items': {'type': 'string'},
+                                                                           'type': 'array'}},
+                                               'required': ['application',
+                                                            'progress',
+                                                            'config'],
+                                               'type': 'object'},
+                     'GenerationResults': {'additionalProperties': False,
+                                           'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                          'generations': {'items': {'$ref': '#/definitions/Generation'},
+                                                                          'type': 'array'}},
+                                           'required': ['generations'],
+                                           'type': 'object'},
+                     'IntResult': {'additionalProperties': False,
+                                   'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                  'result': {'type': 'integer'}},
+                                   'required': ['result'],
+                                   'type': 'object'}},
+     'properties': {'AbortBranch': {'properties': {'Params': {'$ref': '#/definitions/BranchArg'},
+                                                   'Result': {'$ref': '#/definitions/ErrorResult'}},
+                                    'type': 'object'},
+                    'AddBranch': {'properties': {'Params': {'$ref': '#/definitions/BranchArg'},
+                                                 'Result': {'$ref': '#/definitions/ErrorResult'}},
+                                  'type': 'object'},
+                    'BranchInfo': {'properties': {'Params': {'$ref': '#/definitions/BranchInfoArgs'},
+                                                  'Result': {'$ref': '#/definitions/GenerationResults'}},
+                                   'type': 'object'},
+                    'CommitBranch': {'properties': {'Params': {'$ref': '#/definitions/BranchArg'},
+                                                    'Result': {'$ref': '#/definitions/IntResult'}},
+                                     'type': 'object'},
+                    'HasActiveBranch': {'properties': {'Params': {'$ref': '#/definitions/BranchArg'},
+                                                       'Result': {'$ref': '#/definitions/BoolResult'}},
+                                        'type': 'object'},
+                    'TrackBranch': {'properties': {'Params': {'$ref': '#/definitions/BranchTrackArg'},
+                                                   'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                    'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(ErrorResult)
+    async def AbortBranch(self, branch=None):
+        '''
+        branch : str
+        Returns -> Error
+        '''
+        if branch is not None and not isinstance(branch, (bytes, str)):
+            raise Exception("Expected branch to be a str, received: {}".format(type(branch)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ModelGeneration',
+                   request='AbortBranch',
+                   version=3,
+                   params=_params)
+        _params['branch'] = branch
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResult)
+    async def AddBranch(self, branch=None):
+        '''
+        branch : str
+        Returns -> Error
+        '''
+        if branch is not None and not isinstance(branch, (bytes, str)):
+            raise Exception("Expected branch to be a str, received: {}".format(type(branch)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ModelGeneration',
+                   request='AddBranch',
+                   version=3,
+                   params=_params)
+        _params['branch'] = branch
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(GenerationResults)
+    async def BranchInfo(self, branches=None, detailed=None):
+        '''
+        branches : typing.Sequence[str]
+        detailed : bool
+        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence[~Generation]]
+        '''
+        if branches is not None and not isinstance(branches, (bytes, str, list)):
+            raise Exception("Expected branches to be a Sequence, received: {}".format(type(branches)))
+
+        if detailed is not None and not isinstance(detailed, bool):
+            raise Exception("Expected detailed to be a bool, received: {}".format(type(detailed)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ModelGeneration',
+                   request='BranchInfo',
+                   version=3,
+                   params=_params)
+        _params['branches'] = branches
+        _params['detailed'] = detailed
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(IntResult)
+    async def CommitBranch(self, branch=None):
+        '''
+        branch : str
+        Returns -> typing.Union[_ForwardRef('Error'), int]
+        '''
+        if branch is not None and not isinstance(branch, (bytes, str)):
+            raise Exception("Expected branch to be a str, received: {}".format(type(branch)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ModelGeneration',
+                   request='CommitBranch',
+                   version=3,
+                   params=_params)
+        _params['branch'] = branch
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(BoolResult)
+    async def HasActiveBranch(self, branch=None):
+        '''
+        branch : str
+        Returns -> typing.Union[_ForwardRef('Error'), bool]
+        '''
+        if branch is not None and not isinstance(branch, (bytes, str)):
+            raise Exception("Expected branch to be a str, received: {}".format(type(branch)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ModelGeneration',
+                   request='HasActiveBranch',
+                   version=3,
+                   params=_params)
+        _params['branch'] = branch
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def TrackBranch(self, branch=None, entities=None, num_units=None):
+        '''
+        branch : str
+        entities : typing.Sequence[~Entity]
+        num_units : int
+        Returns -> typing.Sequence[~ErrorResult]
+        '''
+        if branch is not None and not isinstance(branch, (bytes, str)):
+            raise Exception("Expected branch to be a str, received: {}".format(type(branch)))
+
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        if num_units is not None and not isinstance(num_units, int):
+            raise Exception("Expected num_units to be a int, received: {}".format(type(num_units)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ModelGeneration',
+                   request='TrackBranch',
+                   version=3,
+                   params=_params)
+        _params['branch'] = branch
+        _params['entities'] = entities
+        _params['num-units'] = num_units
+        reply = await self.rpc(msg)
+        return reply
+
+
+
 class ModelManagerFacade(Type):
     name = 'ModelManager'
     version = 3
@@ -7451,6 +7694,185 @@ class StorageProvisionerFacade(Type):
                    version=3,
                    params=_params)
         _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+class SubnetsFacade(Type):
+    name = 'Subnets'
+    version = 3
+    schema =     {'definitions': {'AddSubnetParams': {'additionalProperties': False,
+                                         'properties': {'cidr': {'type': 'string'},
+                                                        'provider-network-id': {'type': 'string'},
+                                                        'space-tag': {'type': 'string'},
+                                                        'subnet-provider-id': {'type': 'string'},
+                                                        'vlan-tag': {'type': 'integer'},
+                                                        'zones': {'items': {'type': 'string'},
+                                                                  'type': 'array'}},
+                                         'required': ['space-tag'],
+                                         'type': 'object'},
+                     'AddSubnetsParams': {'additionalProperties': False,
+                                          'properties': {'subnets': {'items': {'$ref': '#/definitions/AddSubnetParams'},
+                                                                     'type': 'array'}},
+                                          'required': ['subnets'],
+                                          'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ErrorResult': {'additionalProperties': False,
+                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
+                                     'type': 'object'},
+                     'ErrorResults': {'additionalProperties': False,
+                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
+                                                                 'type': 'array'}},
+                                      'required': ['results'],
+                                      'type': 'object'},
+                     'ListSubnetsResults': {'additionalProperties': False,
+                                            'properties': {'results': {'items': {'$ref': '#/definitions/Subnet'},
+                                                                       'type': 'array'}},
+                                            'required': ['results'],
+                                            'type': 'object'},
+                     'SpaceResult': {'additionalProperties': False,
+                                     'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                    'tag': {'type': 'string'}},
+                                     'required': ['tag'],
+                                     'type': 'object'},
+                     'SpaceResults': {'additionalProperties': False,
+                                      'properties': {'results': {'items': {'$ref': '#/definitions/SpaceResult'},
+                                                                 'type': 'array'}},
+                                      'required': ['results'],
+                                      'type': 'object'},
+                     'Subnet': {'additionalProperties': False,
+                                'properties': {'cidr': {'type': 'string'},
+                                               'life': {'type': 'string'},
+                                               'provider-id': {'type': 'string'},
+                                               'provider-network-id': {'type': 'string'},
+                                               'provider-space-id': {'type': 'string'},
+                                               'space-tag': {'type': 'string'},
+                                               'status': {'type': 'string'},
+                                               'vlan-tag': {'type': 'integer'},
+                                               'zones': {'items': {'type': 'string'},
+                                                         'type': 'array'}},
+                                'required': ['cidr',
+                                             'vlan-tag',
+                                             'life',
+                                             'space-tag',
+                                             'zones'],
+                                'type': 'object'},
+                     'SubnetsFilters': {'additionalProperties': False,
+                                        'properties': {'space-tag': {'type': 'string'},
+                                                       'zone': {'type': 'string'}},
+                                        'type': 'object'},
+                     'ZoneResult': {'additionalProperties': False,
+                                    'properties': {'available': {'type': 'boolean'},
+                                                   'error': {'$ref': '#/definitions/Error'},
+                                                   'name': {'type': 'string'}},
+                                    'required': ['name', 'available'],
+                                    'type': 'object'},
+                     'ZoneResults': {'additionalProperties': False,
+                                     'properties': {'results': {'items': {'$ref': '#/definitions/ZoneResult'},
+                                                                'type': 'array'}},
+                                     'required': ['results'],
+                                     'type': 'object'}},
+     'properties': {'AddSubnets': {'properties': {'Params': {'$ref': '#/definitions/AddSubnetsParams'},
+                                                  'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                   'type': 'object'},
+                    'AllSpaces': {'properties': {'Result': {'$ref': '#/definitions/SpaceResults'}},
+                                  'type': 'object'},
+                    'AllZones': {'properties': {'Result': {'$ref': '#/definitions/ZoneResults'}},
+                                 'type': 'object'},
+                    'ListSubnets': {'properties': {'Params': {'$ref': '#/definitions/SubnetsFilters'},
+                                                   'Result': {'$ref': '#/definitions/ListSubnetsResults'}},
+                                    'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(ErrorResults)
+    async def AddSubnets(self, subnets=None):
+        '''
+        subnets : typing.Sequence[~AddSubnetParams]
+        Returns -> typing.Sequence[~ErrorResult]
+        '''
+        if subnets is not None and not isinstance(subnets, (bytes, str, list)):
+            raise Exception("Expected subnets to be a Sequence, received: {}".format(type(subnets)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Subnets',
+                   request='AddSubnets',
+                   version=3,
+                   params=_params)
+        _params['subnets'] = subnets
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SpaceResults)
+    async def AllSpaces(self):
+        '''
+
+        Returns -> typing.Sequence[~SpaceResult]
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Subnets',
+                   request='AllSpaces',
+                   version=3,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ZoneResults)
+    async def AllZones(self):
+        '''
+
+        Returns -> typing.Sequence[~ZoneResult]
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Subnets',
+                   request='AllZones',
+                   version=3,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ListSubnetsResults)
+    async def ListSubnets(self, space_tag=None, zone=None):
+        '''
+        space_tag : str
+        zone : str
+        Returns -> typing.Sequence[~Subnet]
+        '''
+        if space_tag is not None and not isinstance(space_tag, (bytes, str)):
+            raise Exception("Expected space_tag to be a str, received: {}".format(type(space_tag)))
+
+        if zone is not None and not isinstance(zone, (bytes, str)):
+            raise Exception("Expected zone to be a str, received: {}".format(type(zone)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Subnets',
+                   request='ListSubnets',
+                   version=3,
+                   params=_params)
+        _params['space-tag'] = space_tag
+        _params['zone'] = zone
         reply = await self.rpc(msg)
         return reply
 
