@@ -224,7 +224,7 @@ def strcast(kind, keep_builtins=False):
         return str(kind)[1:]
     if kind is typing.Any:
         return 'Any'
-    if kind is typing.GenericMeta:
+    if issubclass(kind, typing.GenericMeta):
         return str(kind)[1:]
     return kind
 
