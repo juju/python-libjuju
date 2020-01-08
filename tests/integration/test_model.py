@@ -28,7 +28,6 @@ SSH_KEY = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCsYMJGNGG74HAJha3n2CFmWYsOOaORn
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_deploy_local_bundle_dir(event_loop):
-    pytest.skip('test_deploy_local_bundle_dir intermittent test failure')
     tests_dir = Path(__file__).absolute().parent.parent
     bundle_path = tests_dir / 'bundle'
 

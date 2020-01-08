@@ -108,5 +108,7 @@ _delta_types = {
     'relation': RelationDelta,
     'remoteApplication': RemoteApplicationDelta,
     'charm': CharmDelta,
-    'applicationOffer': ApplicationOfferDelta,
+    'applicationOffer': ApplicationOfferDelta
+    # TODO (stickupkid): Currently ModelDelta is missing from the all watcher,
+    # adding this should enable updating of the internal state cache per model.
 }
