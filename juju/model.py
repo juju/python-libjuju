@@ -902,7 +902,7 @@ class Model:
                             # the all watcher. Currently they're ignored, causing
                             # issue.
                             # raise JujuError("unknown delta type {}".format(e.args))
-                            log.warn("unknown delta type: %s", e.args[0])
+                            log.warning("unknown delta type: %s", e.args[0])
                     self._watch_received.set()
             except CancelledError:
                 pass
@@ -1419,7 +1419,7 @@ class Model:
                                                             entity=entity)
             else:
                 if not application_name:
-                    metadata = yaml.load(metadata_path.read_text())
+                    metadata = yaml.load(metadata_path.read_text(), Loader=yaml.FullLoader)
                     application_name = metadata['name']
                 # We have a local charm dir that needs to be uploaded
                 charm_dir = os.path.abspath(
