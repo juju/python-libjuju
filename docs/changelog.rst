@@ -1,6 +1,14 @@
 Changelog
 ---------
 
+
+2.7.1
+^^^^^
+
+Thursday January 9 2020
+
+ * Added the missing facade type, when attempting to connect to a model.
+
 2.7.0
 ^^^^^
 
