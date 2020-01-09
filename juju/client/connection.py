@@ -690,8 +690,10 @@ class Connection:
                 # client can define the non-conservitive facade client pinning.
                 if name in self.specified_facades:
                     known = self.specified_facades[name]['versions']
-                else:
+                elif name in client_facades:
                     known = client_facades[name]['versions']
+                else:
+                    raise errors.JujuConnectionError("unexpected facade {}".format(name))
                 discovered = facade['versions']
                 version = max(set(known).intersection(set(discovered)))
             except ValueError:
@@ -699,6 +701,12 @@ class Connection:
                 # there is just no way to know how to communicate with the
                 # facades we're trying to call.
                 log.warning("unknown common facade version for {}".format(name))
+            except errors.JujuConnectionError:
+                # If the facade isn't with in the local facades then it's not
+                # possible to reason about what version should be used. In this
+                # case we should log the facade was found, but we couldn't
+                # handle it.
+                log.warning("unexpected facade {} found, unable to decipher version to use".format(name))
             else:
                 self.facades[name] = version
 
