@@ -38,5 +38,12 @@ release:
 
 upload: release
 
+install-deb-build-deps:
+	pip3 install stdeb
 
-.PHONY: clean client test docs upload release
+build-deb: install-deb-build-deps
+	rm -rf deb_dist
+	python3 setup.py --command-packages=stdeb.command bdist_deb
+
+
+.PHONY: clean client test docs upload release usan-download install-deb-build-deps
