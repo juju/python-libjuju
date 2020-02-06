@@ -39,6 +39,7 @@ release:
 upload: release
 
 install-deb-build-deps:
+	sudo apt install -y python3-all debhelper sbuild schroot ubuntu-dev-tools
 	pip3 install stdeb
 
 build-deb: install-deb-build-deps
