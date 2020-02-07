@@ -1230,6 +1230,186 @@ class MachineManagerFacade(Type):
 
 
 
+class SpacesFacade(Type):
+    name = 'Spaces'
+    version = 6
+    schema =     {'definitions': {'CreateSpaceParams': {'additionalProperties': False,
+                                           'properties': {'cidrs': {'items': {'type': 'string'},
+                                                                    'type': 'array'},
+                                                          'provider-id': {'type': 'string'},
+                                                          'public': {'type': 'boolean'},
+                                                          'space-tag': {'type': 'string'}},
+                                           'required': ['cidrs',
+                                                        'space-tag',
+                                                        'public'],
+                                           'type': 'object'},
+                     'CreateSpacesParams': {'additionalProperties': False,
+                                            'properties': {'spaces': {'items': {'$ref': '#/definitions/CreateSpaceParams'},
+                                                                      'type': 'array'}},
+                                            'required': ['spaces'],
+                                            'type': 'object'},
+                     'Entities': {'additionalProperties': False,
+                                  'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
+                                                              'type': 'array'}},
+                                  'required': ['entities'],
+                                  'type': 'object'},
+                     'Entity': {'additionalProperties': False,
+                                'properties': {'tag': {'type': 'string'}},
+                                'required': ['tag'],
+                                'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ErrorResult': {'additionalProperties': False,
+                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
+                                     'type': 'object'},
+                     'ErrorResults': {'additionalProperties': False,
+                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
+                                                                 'type': 'array'}},
+                                      'required': ['results'],
+                                      'type': 'object'},
+                     'ListSpacesResults': {'additionalProperties': False,
+                                           'properties': {'results': {'items': {'$ref': '#/definitions/Space'},
+                                                                      'type': 'array'}},
+                                           'required': ['results'],
+                                           'type': 'object'},
+                     'ShowSpaceResult': {'additionalProperties': False,
+                                         'properties': {'applications': {'items': {'type': 'string'},
+                                                                         'type': 'array'},
+                                                        'error': {'$ref': '#/definitions/Error'},
+                                                        'machine-count': {'type': 'integer'},
+                                                        'space': {'$ref': '#/definitions/Space'}},
+                                         'required': ['space',
+                                                      'applications',
+                                                      'machine-count'],
+                                         'type': 'object'},
+                     'ShowSpaceResults': {'additionalProperties': False,
+                                          'properties': {'results': {'items': {'$ref': '#/definitions/ShowSpaceResult'},
+                                                                     'type': 'array'}},
+                                          'required': ['results'],
+                                          'type': 'object'},
+                     'Space': {'additionalProperties': False,
+                               'properties': {'error': {'$ref': '#/definitions/Error'},
+                                              'id': {'type': 'string'},
+                                              'name': {'type': 'string'},
+                                              'subnets': {'items': {'$ref': '#/definitions/Subnet'},
+                                                          'type': 'array'}},
+                               'required': ['id', 'name', 'subnets'],
+                               'type': 'object'},
+                     'Subnet': {'additionalProperties': False,
+                                'properties': {'cidr': {'type': 'string'},
+                                               'life': {'type': 'string'},
+                                               'provider-id': {'type': 'string'},
+                                               'provider-network-id': {'type': 'string'},
+                                               'provider-space-id': {'type': 'string'},
+                                               'space-tag': {'type': 'string'},
+                                               'status': {'type': 'string'},
+                                               'vlan-tag': {'type': 'integer'},
+                                               'zones': {'items': {'type': 'string'},
+                                                         'type': 'array'}},
+                                'required': ['cidr',
+                                             'vlan-tag',
+                                             'life',
+                                             'space-tag',
+                                             'zones'],
+                                'type': 'object'}},
+     'properties': {'CreateSpaces': {'properties': {'Params': {'$ref': '#/definitions/CreateSpacesParams'},
+                                                    'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                     'type': 'object'},
+                    'ListSpaces': {'properties': {'Result': {'$ref': '#/definitions/ListSpacesResults'}},
+                                   'type': 'object'},
+                    'ReloadSpaces': {'type': 'object'},
+                    'ShowSpace': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                 'Result': {'$ref': '#/definitions/ShowSpaceResults'}},
+                                  'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(ErrorResults)
+    async def CreateSpaces(self, spaces=None):
+        '''
+        spaces : typing.Sequence[~CreateSpaceParams]
+        Returns -> typing.Sequence[~ErrorResult]
+        '''
+        if spaces is not None and not isinstance(spaces, (bytes, str, list)):
+            raise Exception("Expected spaces to be a Sequence, received: {}".format(type(spaces)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Spaces',
+                   request='CreateSpaces',
+                   version=6,
+                   params=_params)
+        _params['spaces'] = spaces
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ListSpacesResults)
+    async def ListSpaces(self):
+        '''
+
+        Returns -> typing.Sequence[~Space]
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Spaces',
+                   request='ListSpaces',
+                   version=6,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def ReloadSpaces(self):
+        '''
+
+        Returns -> None
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Spaces',
+                   request='ReloadSpaces',
+                   version=6,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ShowSpaceResults)
+    async def ShowSpace(self, entities=None):
+        '''
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~ShowSpaceResult]
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Spaces',
+                   request='ShowSpace',
+                   version=6,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
 class StorageFacade(Type):
     name = 'Storage'
     version = 6

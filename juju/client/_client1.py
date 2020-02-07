@@ -8631,6 +8631,91 @@ class ModelGenerationFacade(Type):
 
 
 
+class ModelSummaryWatcherFacade(Type):
+    name = 'ModelSummaryWatcher'
+    version = 1
+    schema =     {'definitions': {'ModelAbstract': {'additionalProperties': False,
+                                       'properties': {'admins': {'items': {'type': 'string'},
+                                                                 'type': 'array'},
+                                                      'cloud': {'type': 'string'},
+                                                      'controller': {'type': 'string'},
+                                                      'credential': {'type': 'string'},
+                                                      'messages': {'items': {'$ref': '#/definitions/ModelSummaryMessage'},
+                                                                   'type': 'array'},
+                                                      'name': {'type': 'string'},
+                                                      'region': {'type': 'string'},
+                                                      'removed': {'type': 'boolean'},
+                                                      'size': {'$ref': '#/definitions/ModelSummarySize'},
+                                                      'status': {'type': 'string'},
+                                                      'uuid': {'type': 'string'}},
+                                       'required': ['uuid'],
+                                       'type': 'object'},
+                     'ModelSummaryMessage': {'additionalProperties': False,
+                                             'properties': {'Agent': {'type': 'string'},
+                                                            'Message': {'type': 'string'}},
+                                             'required': ['Agent', 'Message'],
+                                             'type': 'object'},
+                     'ModelSummarySize': {'additionalProperties': False,
+                                          'properties': {'Applications': {'type': 'integer'},
+                                                         'Containers': {'type': 'integer'},
+                                                         'Machines': {'type': 'integer'},
+                                                         'Relations': {'type': 'integer'},
+                                                         'Units': {'type': 'integer'}},
+                                          'required': ['Machines',
+                                                       'Containers',
+                                                       'Applications',
+                                                       'Units',
+                                                       'Relations'],
+                                          'type': 'object'},
+                     'SummaryWatcherNextResults': {'additionalProperties': False,
+                                                   'properties': {'models': {'items': {'$ref': '#/definitions/ModelAbstract'},
+                                                                             'type': 'array'}},
+                                                   'required': ['models'],
+                                                   'type': 'object'}},
+     'properties': {'Next': {'properties': {'Result': {'$ref': '#/definitions/SummaryWatcherNextResults'}},
+                             'type': 'object'},
+                    'Stop': {'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(SummaryWatcherNextResults)
+    async def Next(self):
+        '''
+
+        Returns -> typing.Sequence[~ModelAbstract]
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ModelSummaryWatcher',
+                   request='Next',
+                   version=1,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def Stop(self):
+        '''
+
+        Returns -> None
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ModelSummaryWatcher',
+                   request='Stop',
+                   version=1,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
 class ModelUpgraderFacade(Type):
     name = 'ModelUpgrader'
     version = 1
@@ -9604,6 +9689,97 @@ class RemoteApplicationWatcherFacade(Type):
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='RemoteApplicationWatcher',
+                   request='Stop',
+                   version=1,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+class RemoteRelationWatcherFacade(Type):
+    name = 'RemoteRelationWatcher'
+    version = 1
+    schema =     {'definitions': {'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
+                     'RemoteRelationChangeEvent': {'additionalProperties': False,
+                                                   'properties': {'application-settings': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                                        'type': 'object'}},
+                                                                                           'type': 'object'},
+                                                                  'application-token': {'type': 'string'},
+                                                                  'bakery-version': {'type': 'integer'},
+                                                                  'changed-units': {'items': {'$ref': '#/definitions/RemoteRelationUnitChange'},
+                                                                                    'type': 'array'},
+                                                                  'departed-units': {'items': {'type': 'integer'},
+                                                                                     'type': 'array'},
+                                                                  'force-cleanup': {'type': 'boolean'},
+                                                                  'life': {'type': 'string'},
+                                                                  'macaroons': {'items': {'$ref': '#/definitions/Macaroon'},
+                                                                                'type': 'array'},
+                                                                  'relation-token': {'type': 'string'},
+                                                                  'suspended': {'type': 'boolean'},
+                                                                  'suspended-reason': {'type': 'string'}},
+                                                   'required': ['relation-token',
+                                                                'application-token',
+                                                                'life'],
+                                                   'type': 'object'},
+                     'RemoteRelationUnitChange': {'additionalProperties': False,
+                                                  'properties': {'settings': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                           'type': 'object'}},
+                                                                              'type': 'object'},
+                                                                 'unit-id': {'type': 'integer'}},
+                                                  'required': ['unit-id'],
+                                                  'type': 'object'},
+                     'RemoteRelationWatchResult': {'additionalProperties': False,
+                                                   'properties': {'changes': {'$ref': '#/definitions/RemoteRelationChangeEvent'},
+                                                                  'error': {'$ref': '#/definitions/Error'},
+                                                                  'watcher-id': {'type': 'string'}},
+                                                   'required': ['watcher-id',
+                                                                'changes'],
+                                                   'type': 'object'}},
+     'properties': {'Next': {'properties': {'Result': {'$ref': '#/definitions/RemoteRelationWatchResult'}},
+                             'type': 'object'},
+                    'Stop': {'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(RemoteRelationWatchResult)
+    async def Next(self):
+        '''
+
+        Returns -> typing.Union[_ForwardRef('RemoteRelationChangeEvent'), _ForwardRef('Error'), str]
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='RemoteRelationWatcher',
+                   request='Next',
+                   version=1,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def Stop(self):
+        '''
+
+        Returns -> None
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='RemoteRelationWatcher',
                    request='Stop',
                    version=1,
                    params=_params)

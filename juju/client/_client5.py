@@ -3168,6 +3168,8 @@ class FirewallerFacade(Type):
                     'WatchIngressAddressesForRelations': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                                          'Result': {'$ref': '#/definitions/StringsWatchResults'}},
                                                           'type': 'object'},
+                    'WatchModelMachineStartTimes': {'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
+                                                    'type': 'object'},
                     'WatchModelMachines': {'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
                                            'type': 'object'},
                     'WatchOpenedPorts': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
@@ -3586,6 +3588,25 @@ class FirewallerFacade(Type):
                    version=5,
                    params=_params)
         _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResult)
+    async def WatchModelMachineStartTimes(self):
+        '''
+
+        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error'), str]
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='WatchModelMachineStartTimes',
+                   version=5,
+                   params=_params)
+
         reply = await self.rpc(msg)
         return reply
 
