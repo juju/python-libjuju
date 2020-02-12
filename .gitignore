@@ -13,3 +13,5 @@ dev/
 .pytest_cache
 pytestdebug.log
 .vscode/
+deb_dist
+*.tar.gz
