@@ -40,7 +40,7 @@ client_facades = {
     'CAASOperatorProvisioner': {'versions': [1]},
     'CAASUnitProvisioner': {'versions': [1]},
     'CAASOperatorUpgrader': {'versions': [1]},
-    'Controller': {'versions': [3, 4, 5]},
+    'Controller': {'versions': [3, 4, 5, 6, 7, 8, 9]},
     'CrossModelRelations': {'versions': [1]},
     'CrossController': {'versions': [1]},
     'CredentialManager': {'versions': [1]},
@@ -116,7 +116,8 @@ client_facades = {
     'VolumeAttachmentPlansWatcher': {'versions': [1]},
     'FilesystemAttachmentsWatcher': {'versions': [2]},
     'EntityWatcher': {'versions': [2]},
-    'MigrationStatusWatcher': {'versions': [1]}
+    'MigrationStatusWatcher': {'versions': [1]},
+    'ModelSummaryWatcher': {'versions': [1]},
 }
 
 

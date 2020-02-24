@@ -2628,7 +2628,7 @@ class ProvisionerFacade(Type):
                                        'type': 'object'},
                      'LifeResult': {'additionalProperties': False,
                                     'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                   'life': {'$ref': '#/definitions/Value'}},
+                                                   'life': {'type': 'string'}},
                                     'required': ['life'],
                                     'type': 'object'},
                      'LifeResults': {'additionalProperties': False,
@@ -2680,8 +2680,6 @@ class ProvisionerFacade(Type):
                                            'type': 'object'},
                      'NetworkConfig': {'additionalProperties': False,
                                        'properties': {'address': {'type': 'string'},
-                                                      'addresses': {'items': {'$ref': '#/definitions/Address'},
-                                                                    'type': 'array'},
                                                       'cidr': {'type': 'string'},
                                                       'config-type': {'type': 'string'},
                                                       'device-index': {'type': 'integer'},
@@ -2706,8 +2704,6 @@ class ProvisionerFacade(Type):
                                                       'provider-vlan-id': {'type': 'string'},
                                                       'routes': {'items': {'$ref': '#/definitions/NetworkRoute'},
                                                                  'type': 'array'},
-                                                      'shadow-addresses': {'items': {'$ref': '#/definitions/Address'},
-                                                                           'type': 'array'},
                                                       'vlan-tag': {'type': 'integer'}},
                                        'required': ['device-index',
                                                     'mac-address',
@@ -2833,7 +2829,7 @@ class ProvisionerFacade(Type):
                                                      'error': {'$ref': '#/definitions/Error'},
                                                      'id': {'type': 'string'},
                                                      'info': {'type': 'string'},
-                                                     'life': {'$ref': '#/definitions/Value'},
+                                                     'life': {'type': 'string'},
                                                      'since': {'format': 'date-time',
                                                                'type': 'string'},
                                                      'status': {'type': 'string'}},
@@ -3119,8 +3115,6 @@ class ProvisionerFacade(Type):
                                                    'type': 'object'},
                     'WatchMachineErrorRetry': {'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
                                                'type': 'object'},
-                    'WatchModelMachineStartTimes': {'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
-                                                    'type': 'object'},
                     'WatchModelMachines': {'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
                                            'type': 'object'}},
      'type': 'object'}
@@ -4158,25 +4152,6 @@ class ProvisionerFacade(Type):
         _params = dict()
         msg = dict(type='Provisioner',
                    request='WatchMachineErrorRetry',
-                   version=9,
-                   params=_params)
-
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(StringsWatchResult)
-    async def WatchModelMachineStartTimes(self):
-        '''
-
-        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error'), str]
-        '''
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Provisioner',
-                   request='WatchModelMachineStartTimes',
                    version=9,
                    params=_params)
 

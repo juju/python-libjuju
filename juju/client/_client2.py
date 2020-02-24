@@ -2353,9 +2353,14 @@ class BackupsFacade(Type):
                                                               'ca-private-key': {'type': 'string'},
                                                               'checksum': {'type': 'string'},
                                                               'checksum-format': {'type': 'string'},
+                                                              'controller-machine-id': {'type': 'string'},
+                                                              'controller-machine-inst-id': {'type': 'string'},
+                                                              'controller-uuid': {'type': 'string'},
                                                               'filename': {'type': 'string'},
                                                               'finished': {'format': 'date-time',
                                                                            'type': 'string'},
+                                                              'format-version': {'type': 'integer'},
+                                                              'ha-nodes': {'type': 'integer'},
                                                               'hostname': {'type': 'string'},
                                                               'id': {'type': 'string'},
                                                               'machine': {'type': 'string'},
@@ -2383,7 +2388,12 @@ class BackupsFacade(Type):
                                                             'series',
                                                             'ca-cert',
                                                             'ca-private-key',
-                                                            'filename'],
+                                                            'filename',
+                                                            'format-version',
+                                                            'controller-uuid',
+                                                            'controller-machine-id',
+                                                            'controller-machine-inst-id',
+                                                            'ha-nodes'],
                                                'type': 'object'},
                      'BackupsRemoveArgs': {'additionalProperties': False,
                                            'properties': {'ids': {'items': {'type': 'string'},
@@ -3255,7 +3265,7 @@ class ClientFacade(Type):
                                                           'err': {'$ref': '#/definitions/Error'},
                                                           'exposed': {'type': 'boolean'},
                                                           'int': {'type': 'integer'},
-                                                          'life': {'$ref': '#/definitions/Value'},
+                                                          'life': {'type': 'string'},
                                                           'meter-statuses': {'patternProperties': {'.*': {'$ref': '#/definitions/MeterStatus'}},
                                                                              'type': 'object'},
                                                           'provider-id': {'type': 'string'},
@@ -3368,7 +3378,7 @@ class ClientFacade(Type):
                                                        'err': {'$ref': '#/definitions/Error'},
                                                        'info': {'type': 'string'},
                                                        'kind': {'type': 'string'},
-                                                       'life': {'$ref': '#/definitions/Value'},
+                                                       'life': {'type': 'string'},
                                                        'since': {'format': 'date-time',
                                                                  'type': 'string'},
                                                        'status': {'type': 'string'},
@@ -3586,7 +3596,7 @@ class ClientFacade(Type):
                                                   'controller-uuid': {'type': 'string'},
                                                   'default-series': {'type': 'string'},
                                                   'is-controller': {'type': 'boolean'},
-                                                  'life': {'$ref': '#/definitions/Value'},
+                                                  'life': {'type': 'string'},
                                                   'machines': {'items': {'$ref': '#/definitions/ModelMachineInfo'},
                                                                'type': 'array'},
                                                   'migration': {'$ref': '#/definitions/ModelMigrationStatus'},
@@ -3777,7 +3787,7 @@ class ClientFacade(Type):
                                                  'properties': {'endpoints': {'items': {'$ref': '#/definitions/RemoteEndpoint'},
                                                                               'type': 'array'},
                                                                 'err': {'$ref': '#/definitions/Error'},
-                                                                'life': {'$ref': '#/definitions/Value'},
+                                                                'life': {'type': 'string'},
                                                                 'offer-name': {'type': 'string'},
                                                                 'offer-url': {'type': 'string'},
                                                                 'relations': {'patternProperties': {'.*': {'items': {'type': 'string'},
@@ -4367,7 +4377,7 @@ class ClientFacade(Type):
     async def ModelInfo(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Number'), str, bool, _ForwardRef('Value'), typing.Sequence[~ModelMachineInfo], _ForwardRef('ModelMigrationStatus'), _ForwardRef('ModelSLAInfo'), _ForwardRef('EntityStatus'), typing.Sequence[~ModelUserInfo]]
+        Returns -> typing.Union[_ForwardRef('Number'), str, bool, typing.Sequence[~ModelMachineInfo], _ForwardRef('ModelMigrationStatus'), _ForwardRef('ModelSLAInfo'), _ForwardRef('EntityStatus'), typing.Sequence[~ModelUserInfo]]
         '''
 
         # map input types to rpc msg

@@ -27,6 +27,8 @@ async def watch():
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
+    ws_logger = logging.getLogger('websockets.protocol')
+    ws_logger.setLevel(logging.INFO)
     # Run loop until the process is manually stopped (watch will loop
     # forever).
     loop.run(watch())

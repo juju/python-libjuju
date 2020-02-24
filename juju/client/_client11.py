@@ -559,7 +559,7 @@ class ApplicationFacade(Type):
                                       'type': 'object'},
                      'Subnet': {'additionalProperties': False,
                                 'properties': {'cidr': {'type': 'string'},
-                                               'life': {'$ref': '#/definitions/Value'},
+                                               'life': {'type': 'string'},
                                                'provider-id': {'type': 'string'},
                                                'provider-network-id': {'type': 'string'},
                                                'provider-space-id': {'type': 'string'},
