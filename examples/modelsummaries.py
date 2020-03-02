@@ -7,28 +7,35 @@ This example:
 4. Runs forever (kill with Ctrl-C)
 
 """
+import asyncio
 import logging
 
 from juju import loop
-from juju.client import client
-from juju.model import Model
+from juju.controller import Controller
 
 
 async def watch():
-    model = Model()
-    await model.connect()
+    controller = Controller()
+    # connect to current
+    # controller with current user, per Juju CLI
+    await controller.connect()
 
-    allwatcher = client.AllWatcherFacade.from_connection(model.connection())
+    # Need to call the WatchModelSummaries or WatchAllModelSummaries on the
+    # controller.
+    def callback(summary):
+        print("-- change --\n{}\n".format(summary))
+
+    await controller.watch_model_summaries(callback)
+
     while True:
-        change = await allwatcher.Next()
-        for delta in change.deltas:
-            print(delta.deltas)
+        await asyncio.sleep(1)
 
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     ws_logger = logging.getLogger('websockets.protocol')
     ws_logger.setLevel(logging.INFO)
+    logging.getLogger('juju.client.connection').setLevel(logging.INFO)
     # Run loop until the process is manually stopped (watch will loop
     # forever).
     loop.run(watch())

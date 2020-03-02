@@ -3,7 +3,7 @@
 
 from juju.client._definitions import *
 
-from juju.client import _client2, _client1, _client3, _client4, _client5, _client8, _client7, _client9, _client10, _client6, _client12, _client11, _client13
+from juju.client import _client2, _client1, _client3, _client4, _client5, _client8, _client7, _client9, _client10, _client6, _client12, _client11, _client13, _client15
 
 
 CLIENTS = {
@@ -19,7 +19,8 @@ CLIENTS = {
     "6": _client6,
     "12": _client12,
     "11": _client11,
-    "13": _client13
+    "13": _client13,
+    "15": _client15
 }
 
 
@@ -351,6 +352,10 @@ class ModelManagerFacade(TypeFactory):
     pass
 
 
+class ModelSummaryWatcherFacade(TypeFactory):
+    pass
+
+
 class ModelUpgraderFacade(TypeFactory):
     pass
 
@@ -396,6 +401,10 @@ class RelationUnitsWatcherFacade(TypeFactory):
 
 
 class RemoteApplicationWatcherFacade(TypeFactory):
+    pass
+
+
+class RemoteRelationWatcherFacade(TypeFactory):
     pass
 
 

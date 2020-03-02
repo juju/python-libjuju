@@ -44,6 +44,8 @@ class Machine(model.ModelEntity):
         Luckily, the timestamps on the `since` field does seem to be accurate.
 
         See https://bugs.launchpad.net/juju/+bug/1695335
+
+        NOTE: this was fixed in 2.2.3 and 2.3-beta1.
         """
         if delta.data.get('synthetic', False):
             # prevent infinite loops re-processing already processed deltas

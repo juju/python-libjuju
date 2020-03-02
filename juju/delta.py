@@ -45,6 +45,13 @@ class AnnotationDelta(EntityDelta):
         return Annotation
 
 
+class ModelDelta(EntityDelta):
+    @classmethod
+    def get_entity_class(self):
+        from .model import ModelInfo
+        return ModelInfo
+
+
 class MachineDelta(EntityDelta):
     @classmethod
     def get_entity_class(self):
@@ -101,14 +108,13 @@ class ApplicationOfferDelta(EntityDelta):
 
 _delta_types = {
     'action': ActionDelta,
-    'application': ApplicationDelta,
     'annotation': AnnotationDelta,
+    'application': ApplicationDelta,
+    'applicationOffer': ApplicationOfferDelta,
+    'charm': CharmDelta,
     'machine': MachineDelta,
-    'unit': UnitDelta,
+    'model': ModelDelta,
     'relation': RelationDelta,
     'remoteApplication': RemoteApplicationDelta,
-    'charm': CharmDelta,
-    'applicationOffer': ApplicationOfferDelta
-    # TODO (stickupkid): Currently ModelDelta is missing from the all watcher,
-    # adding this should enable updating of the internal state cache per model.
+    'unit': UnitDelta,
 }

@@ -2243,3 +2243,9 @@ class CharmArchiveGenerator:
             return True
         if path.startswith('.'):
             return True
+
+
+class ModelInfo(ModelEntity):
+    @property
+    def tag(self):
+        return tag.model(self.uuid)

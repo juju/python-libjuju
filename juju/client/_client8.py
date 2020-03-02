@@ -2429,6 +2429,7 @@ class ModelManagerFacade(Type):
                                           'type': 'object'},
                      'ModelMachineInfo': {'additionalProperties': False,
                                           'properties': {'display-name': {'type': 'string'},
+                                                         'ha-primary': {'type': 'boolean'},
                                                          'hardware': {'$ref': '#/definitions/MachineHardware'},
                                                          'has-vote': {'type': 'boolean'},
                                                          'id': {'type': 'string'},

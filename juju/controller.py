@@ -1,7 +1,10 @@
 import asyncio
 import json
 import logging
+from concurrent.futures import CancelledError
 from pathlib import Path
+
+import websockets
 
 from . import errors, tag, utils
 from .client import client, connector
@@ -776,3 +779,56 @@ class Controller:
             raise JujuAPIError(result.error)
 
         return result
+
+    async def watch_model_summaries(self, callback, as_admin=False):
+        """
+        Watch the controller for model summary updates.
+
+        If as_admin is true, a call will be made as the admin to watch
+        all models in the controller. If the user isn't a superuser they
+        will get a permission error.
+        """
+        stop_event = asyncio.Event(loop=self._connector.loop)
+
+        async def _watcher(stop_event):
+            try:
+                facade = client.ControllerFacade.from_connection(
+                    self.connection())
+                watcher = client.ModelSummaryWatcherFacade.from_connection(
+                    self.connection())
+                if as_admin:
+                    result = await facade.WatchAllModelSummaries()
+                    watcher.Id = result.watcher_id
+                else:
+                    result = await facade.WatchModelSummaries()
+                    log.debug("watcher id: {}".format(result.watcher_id))
+                    watcher.Id = result.watcher_id
+
+                while True:
+                    try:
+                        results = await utils.run_with_interrupt(
+                            watcher.Next(),
+                            stop_event,
+                            loop=self._connector.loop)
+                    except JujuAPIError as e:
+                        if 'watcher was stopped' not in str(e):
+                            raise
+                    except websockets.ConnectionClosed:
+                        break
+                    if stop_event.is_set():
+                        try:
+                            await watcher.Stop()
+                        except websockets.ConnectionClosed:
+                            pass  # can't stop on a closed conn
+                        break
+                    for summary in results.models:
+                        callback(summary)
+            except CancelledError:
+                pass
+            except Exception:
+                log.exception('Error in watcher')
+                raise
+
+        log.debug('Starting watcher task for model summaries')
+        self._connector.loop.create_task(_watcher(stop_event))
+        return stop_event
