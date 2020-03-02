@@ -789,6 +789,7 @@ class Controller:
         will get a permission error.
         """
         stop_event = asyncio.Event(loop=self._connector.loop)
+
         async def _watcher(stop_event):
             try:
                 facade = client.ControllerFacade.from_connection(

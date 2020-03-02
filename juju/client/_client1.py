@@ -8637,6 +8637,8 @@ class ModelSummaryWatcherFacade(Type):
     schema =     {'definitions': {'ModelAbstract': {'additionalProperties': False,
                                        'properties': {'admins': {'items': {'type': 'string'},
                                                                  'type': 'array'},
+                                                      'annotations': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                      'type': 'object'},
                                                       'cloud': {'type': 'string'},
                                                       'controller': {'type': 'string'},
                                                       'credential': {'type': 'string'},

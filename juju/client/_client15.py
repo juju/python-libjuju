@@ -146,6 +146,24 @@ class UniterFacade(Type):
                                          'properties': {'error': {'$ref': '#/definitions/Error'},
                                                         'result': {'$ref': '#/definitions/CloudSpec'}},
                                          'type': 'object'},
+                     'CommitHookChangesArg': {'additionalProperties': False,
+                                              'properties': {'close-ports': {'items': {'$ref': '#/definitions/EntityPortRange'},
+                                                                             'type': 'array'},
+                                                             'open-ports': {'items': {'$ref': '#/definitions/EntityPortRange'},
+                                                                            'type': 'array'},
+                                                             'relation-unit-settings': {'items': {'$ref': '#/definitions/RelationUnitSettings'},
+                                                                                        'type': 'array'},
+                                                             'tag': {'type': 'string'},
+                                                             'unit-state': {'$ref': '#/definitions/SetUnitStateArg'},
+                                                             'update-network-info': {'type': 'boolean'}},
+                                              'required': ['tag',
+                                                           'update-network-info'],
+                                              'type': 'object'},
+                     'CommitHookChangesArgs': {'additionalProperties': False,
+                                               'properties': {'args': {'items': {'$ref': '#/definitions/CommitHookChangesArg'},
+                                                                       'type': 'array'}},
+                                               'required': ['args'],
+                                               'type': 'object'},
                      'ConfigSettingsResult': {'additionalProperties': False,
                                               'properties': {'error': {'$ref': '#/definitions/Error'},
                                                              'settings': {'patternProperties': {'.*': {'additionalProperties': True,
@@ -442,6 +460,11 @@ class UniterFacade(Type):
                                                                        'type': 'array'}},
                                             'required': ['results'],
                                             'type': 'object'},
+                     'PodSpec': {'additionalProperties': False,
+                                 'properties': {'spec': {'type': 'string'},
+                                                'tag': {'type': 'string'}},
+                                 'required': ['tag'],
+                                 'type': 'object'},
                      'PortRange': {'additionalProperties': False,
                                    'properties': {'from-port': {'type': 'integer'},
                                                   'protocol': {'type': 'string'},
@@ -576,11 +599,11 @@ class UniterFacade(Type):
                                                                         'type': 'array'}},
                                              'required': ['results'],
                                              'type': 'object'},
-                     'SetPodSpecParams': {'additionalProperties': False,
-                                          'properties': {'specs': {'items': {'$ref': '#/definitions/EntityString'},
-                                                                   'type': 'array'}},
-                                          'required': ['specs'],
-                                          'type': 'object'},
+                     'SetPodSpecParamsV2': {'additionalProperties': False,
+                                            'properties': {'specs': {'items': {'$ref': '#/definitions/PodSpec'},
+                                                                     'type': 'array'}},
+                                            'required': ['specs'],
+                                            'type': 'object'},
                      'SetStatus': {'additionalProperties': False,
                                    'properties': {'entities': {'items': {'$ref': '#/definitions/EntityStatusArgs'},
                                                                'type': 'array'}},
@@ -592,11 +615,6 @@ class UniterFacade(Type):
                                                         'tag': {'type': 'string'}},
                                          'required': ['tag', 'state'],
                                          'type': 'object'},
-                     'SetUnitStateArgs': {'additionalProperties': False,
-                                          'properties': {'args': {'items': {'$ref': '#/definitions/SetUnitStateArg'},
-                                                                  'type': 'array'}},
-                                          'required': ['args'],
-                                          'type': 'object'},
                      'SettingsResult': {'additionalProperties': False,
                                         'properties': {'error': {'$ref': '#/definitions/Error'},
                                                        'settings': {'patternProperties': {'.*': {'type': 'string'}},
@@ -828,6 +846,9 @@ class UniterFacade(Type):
                                         'type': 'object'},
                     'CloudSpec': {'properties': {'Result': {'$ref': '#/definitions/CloudSpecResult'}},
                                   'type': 'object'},
+                    'CommitHookChanges': {'properties': {'Params': {'$ref': '#/definitions/CommitHookChangesArgs'},
+                                                         'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                          'type': 'object'},
                     'ConfigSettings': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                       'Result': {'$ref': '#/definitions/ConfigSettingsResults'}},
                                        'type': 'object'},
@@ -937,15 +958,12 @@ class UniterFacade(Type):
                     'SetCharmURL': {'properties': {'Params': {'$ref': '#/definitions/EntitiesCharmURL'},
                                                    'Result': {'$ref': '#/definitions/ErrorResults'}},
                                     'type': 'object'},
-                    'SetPodSpec': {'properties': {'Params': {'$ref': '#/definitions/SetPodSpecParams'},
+                    'SetPodSpec': {'properties': {'Params': {'$ref': '#/definitions/SetPodSpecParamsV2'},
                                                   'Result': {'$ref': '#/definitions/ErrorResults'}},
                                    'type': 'object'},
                     'SetRelationStatus': {'properties': {'Params': {'$ref': '#/definitions/RelationStatusArgs'},
                                                          'Result': {'$ref': '#/definitions/ErrorResults'}},
                                           'type': 'object'},
-                    'SetState': {'properties': {'Params': {'$ref': '#/definitions/SetUnitStateArgs'},
-                                                'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                 'type': 'object'},
                     'SetStatus': {'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
                                                  'Result': {'$ref': '#/definitions/ErrorResults'}},
                                   'type': 'object'},
@@ -1393,6 +1411,27 @@ class UniterFacade(Type):
                    version=15,
                    params=_params)
 
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def CommitHookChanges(self, args=None):
+        '''
+        args : typing.Sequence[~CommitHookChangesArg]
+        Returns -> typing.Sequence[~ErrorResult]
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='CommitHookChanges',
+                   version=15,
+                   params=_params)
+        _params['args'] = args
         reply = await self.rpc(msg)
         return reply
 
@@ -2199,7 +2238,7 @@ class UniterFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetPodSpec(self, specs=None):
         '''
-        specs : typing.Sequence[~EntityString]
+        specs : typing.Sequence[~PodSpec]
         Returns -> typing.Sequence[~ErrorResult]
         '''
         if specs is not None and not isinstance(specs, (bytes, str, list)):
@@ -2230,27 +2269,6 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='SetRelationStatus',
-                   version=15,
-                   params=_params)
-        _params['args'] = args
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
-    async def SetState(self, args=None):
-        '''
-        args : typing.Sequence[~SetUnitStateArg]
-        Returns -> typing.Sequence[~ErrorResult]
-        '''
-        if args is not None and not isinstance(args, (bytes, str, list)):
-            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='SetState',
                    version=15,
                    params=_params)
         _params['args'] = args

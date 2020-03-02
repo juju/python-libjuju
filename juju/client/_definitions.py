@@ -5514,6 +5514,72 @@ class CloudsResult(Type):
 
 
 
+class CommitHookChangesArg(Type):
+    _toSchema = {'close_ports': 'close-ports', 'open_ports': 'open-ports', 'relation_unit_settings': 'relation-unit-settings', 'tag': 'tag', 'unit_state': 'unit-state', 'update_network_info': 'update-network-info'}
+    _toPy = {'close-ports': 'close_ports', 'open-ports': 'open_ports', 'relation-unit-settings': 'relation_unit_settings', 'tag': 'tag', 'unit-state': 'unit_state', 'update-network-info': 'update_network_info'}
+    def __init__(self, close_ports=None, open_ports=None, relation_unit_settings=None, tag=None, unit_state=None, update_network_info=None, **unknown_fields):
+        '''
+        close_ports : typing.Sequence[~EntityPortRange]
+        open_ports : typing.Sequence[~EntityPortRange]
+        relation_unit_settings : typing.Sequence[~RelationUnitSettings]
+        tag : str
+        unit_state : SetUnitStateArg
+        update_network_info : bool
+        '''
+        close_ports_ = [EntityPortRange.from_json(o) for o in close_ports or []]
+        open_ports_ = [EntityPortRange.from_json(o) for o in open_ports or []]
+        relation_unit_settings_ = [RelationUnitSettings.from_json(o) for o in relation_unit_settings or []]
+        tag_ = tag
+        unit_state_ = SetUnitStateArg.from_json(unit_state) if unit_state else None
+        update_network_info_ = update_network_info
+
+        # Validate arguments against known Juju API types.
+        if close_ports_ is not None and not isinstance(close_ports_, (bytes, str, list)):
+            raise Exception("Expected close_ports_ to be a Sequence, received: {}".format(type(close_ports_)))
+
+        if open_ports_ is not None and not isinstance(open_ports_, (bytes, str, list)):
+            raise Exception("Expected open_ports_ to be a Sequence, received: {}".format(type(open_ports_)))
+
+        if relation_unit_settings_ is not None and not isinstance(relation_unit_settings_, (bytes, str, list)):
+            raise Exception("Expected relation_unit_settings_ to be a Sequence, received: {}".format(type(relation_unit_settings_)))
+
+        if tag_ is not None and not isinstance(tag_, (bytes, str)):
+            raise Exception("Expected tag_ to be a str, received: {}".format(type(tag_)))
+
+        if unit_state_ is not None and not isinstance(unit_state_, (dict, SetUnitStateArg)):
+            raise Exception("Expected unit_state_ to be a SetUnitStateArg, received: {}".format(type(unit_state_)))
+
+        if update_network_info_ is not None and not isinstance(update_network_info_, bool):
+            raise Exception("Expected update_network_info_ to be a bool, received: {}".format(type(update_network_info_)))
+
+        self.close_ports = close_ports_
+        self.open_ports = open_ports_
+        self.relation_unit_settings = relation_unit_settings_
+        self.tag = tag_
+        self.unit_state = unit_state_
+        self.update_network_info = update_network_info_
+        self.unknown_fields = unknown_fields
+
+
+
+class CommitHookChangesArgs(Type):
+    _toSchema = {'args': 'args'}
+    _toPy = {'args': 'args'}
+    def __init__(self, args=None, **unknown_fields):
+        '''
+        args : typing.Sequence[~CommitHookChangesArg]
+        '''
+        args_ = [CommitHookChangesArg.from_json(o) for o in args or []]
+
+        # Validate arguments against known Juju API types.
+        if args_ is not None and not isinstance(args_, (bytes, str, list)):
+            raise Exception("Expected args_ to be a Sequence, received: {}".format(type(args_)))
+
+        self.args = args_
+        self.unknown_fields = unknown_fields
+
+
+
 class ConfigResult(Type):
     _toSchema = {'config': 'config', 'error': 'error'}
     _toPy = {'config': 'config', 'error': 'error'}
@@ -13026,11 +13092,12 @@ class Model(Type):
 
 
 class ModelAbstract(Type):
-    _toSchema = {'admins': 'admins', 'cloud': 'cloud', 'controller': 'controller', 'credential': 'credential', 'messages': 'messages', 'name': 'name', 'region': 'region', 'removed': 'removed', 'size': 'size', 'status': 'status', 'uuid': 'uuid'}
-    _toPy = {'admins': 'admins', 'cloud': 'cloud', 'controller': 'controller', 'credential': 'credential', 'messages': 'messages', 'name': 'name', 'region': 'region', 'removed': 'removed', 'size': 'size', 'status': 'status', 'uuid': 'uuid'}
-    def __init__(self, admins=None, cloud=None, controller=None, credential=None, messages=None, name=None, region=None, removed=None, size=None, status=None, uuid=None, **unknown_fields):
+    _toSchema = {'admins': 'admins', 'annotations': 'annotations', 'cloud': 'cloud', 'controller': 'controller', 'credential': 'credential', 'messages': 'messages', 'name': 'name', 'region': 'region', 'removed': 'removed', 'size': 'size', 'status': 'status', 'uuid': 'uuid'}
+    _toPy = {'admins': 'admins', 'annotations': 'annotations', 'cloud': 'cloud', 'controller': 'controller', 'credential': 'credential', 'messages': 'messages', 'name': 'name', 'region': 'region', 'removed': 'removed', 'size': 'size', 'status': 'status', 'uuid': 'uuid'}
+    def __init__(self, admins=None, annotations=None, cloud=None, controller=None, credential=None, messages=None, name=None, region=None, removed=None, size=None, status=None, uuid=None, **unknown_fields):
         '''
         admins : typing.Sequence[str]
+        annotations : typing.Mapping[str, str]
         cloud : str
         controller : str
         credential : str
@@ -13043,6 +13110,7 @@ class ModelAbstract(Type):
         uuid : str
         '''
         admins_ = admins
+        annotations_ = annotations
         cloud_ = cloud
         controller_ = controller
         credential_ = credential
@@ -13057,6 +13125,9 @@ class ModelAbstract(Type):
         # Validate arguments against known Juju API types.
         if admins_ is not None and not isinstance(admins_, (bytes, str, list)):
             raise Exception("Expected admins_ to be a Sequence, received: {}".format(type(admins_)))
+
+        if annotations_ is not None and not isinstance(annotations_, dict):
+            raise Exception("Expected annotations_ to be a Mapping, received: {}".format(type(annotations_)))
 
         if cloud_ is not None and not isinstance(cloud_, (bytes, str)):
             raise Exception("Expected cloud_ to be a str, received: {}".format(type(cloud_)))
@@ -13089,6 +13160,7 @@ class ModelAbstract(Type):
             raise Exception("Expected uuid_ to be a str, received: {}".format(type(uuid_)))
 
         self.admins = admins_
+        self.annotations = annotations_
         self.cloud = cloud_
         self.controller = controller_
         self.credential = credential_
@@ -15984,6 +16056,30 @@ class Placement(Type):
 
         self.directive = directive_
         self.scope = scope_
+        self.unknown_fields = unknown_fields
+
+
+
+class PodSpec(Type):
+    _toSchema = {'spec': 'spec', 'tag': 'tag'}
+    _toPy = {'spec': 'spec', 'tag': 'tag'}
+    def __init__(self, spec=None, tag=None, **unknown_fields):
+        '''
+        spec : str
+        tag : str
+        '''
+        spec_ = spec
+        tag_ = tag
+
+        # Validate arguments against known Juju API types.
+        if spec_ is not None and not isinstance(spec_, (bytes, str)):
+            raise Exception("Expected spec_ to be a str, received: {}".format(type(spec_)))
+
+        if tag_ is not None and not isinstance(tag_, (bytes, str)):
+            raise Exception("Expected tag_ to be a str, received: {}".format(type(tag_)))
+
+        self.spec = spec_
+        self.tag = tag_
         self.unknown_fields = unknown_fields
 
 
@@ -20383,6 +20479,24 @@ class SetPodSpecParams(Type):
 
 
 
+class SetPodSpecParamsV2(Type):
+    _toSchema = {'specs': 'specs'}
+    _toPy = {'specs': 'specs'}
+    def __init__(self, specs=None, **unknown_fields):
+        '''
+        specs : typing.Sequence[~PodSpec]
+        '''
+        specs_ = [PodSpec.from_json(o) for o in specs or []]
+
+        # Validate arguments against known Juju API types.
+        if specs_ is not None and not isinstance(specs_, (bytes, str, list)):
+            raise Exception("Expected specs_ to be a Sequence, received: {}".format(type(specs_)))
+
+        self.specs = specs_
+        self.unknown_fields = unknown_fields
+
+
+
 class SetProfileArg(Type):
     _toSchema = {'entity': 'entity', 'profiles': 'profiles'}
     _toPy = {'entity': 'entity', 'profiles': 'profiles'}
@@ -20613,24 +20727,6 @@ class SetUnitStateArg(Type):
 
         self.state = state_
         self.tag = tag_
-        self.unknown_fields = unknown_fields
-
-
-
-class SetUnitStateArgs(Type):
-    _toSchema = {'args': 'args'}
-    _toPy = {'args': 'args'}
-    def __init__(self, args=None, **unknown_fields):
-        '''
-        args : typing.Sequence[~SetUnitStateArg]
-        '''
-        args_ = [SetUnitStateArg.from_json(o) for o in args or []]
-
-        # Validate arguments against known Juju API types.
-        if args_ is not None and not isinstance(args_, (bytes, str, list)):
-            raise Exception("Expected args_ to be a Sequence, received: {}".format(type(args_)))
-
-        self.args = args_
         self.unknown_fields = unknown_fields
 
 

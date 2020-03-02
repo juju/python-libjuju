@@ -12,12 +12,11 @@ import logging
 
 from juju import loop
 from juju.controller import Controller
-from juju.model import Model
 
 
 async def watch():
     controller = Controller()
-    # connect to current 
+    # connect to current
     # controller with current user, per Juju CLI
     await controller.connect()
 
@@ -25,8 +24,8 @@ async def watch():
     # controller.
     def callback(summary):
         print("-- change --\n{}\n".format(summary))
-    
-    event = await controller.watch_model_summaries(callback)
+
+    await controller.watch_model_summaries(callback)
 
     while True:
         await asyncio.sleep(1)
