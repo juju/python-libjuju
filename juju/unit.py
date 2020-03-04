@@ -232,7 +232,7 @@ class Unit(model.ModelEntity):
         :param str ssh_opts: Additional options to the `ssh` command
 
         """
-        raise NotImplementedError()
+        self.machine.ssh(command, user, proxy, ssh_opts)
 
     def status_history(self, num=20, utc=False):
         """Get status history for this unit.

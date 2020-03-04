@@ -101,6 +101,33 @@ async def test_scp(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_ssh(event_loop):
+    # ensure that asyncio.subprocess will work;
+    try:
+        asyncio.get_child_watcher().attach_loop(event_loop)
+    except RuntimeError:
+        pytest.skip('test_ssh will always fail outside of MainThread')
+    async with base.CleanModel() as model:
+        app = await model.deploy('ubuntu')
+
+        await asyncio.wait_for(
+            model.block_until(lambda: app.units),
+            timeout=60)
+        unit = app.units[0]
+        await asyncio.wait_for(
+            model.block_until(lambda: unit.machine),
+            timeout=60)
+        machine = unit.machine
+        await asyncio.wait_for(
+            model.block_until(lambda: (machine.status == 'running' and
+                                       machine.agent_status == 'started')),
+            timeout=480)
+        output = await unit.ssh("echo test")
+        assert(output == "test")
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_resolve(event_loop):
 
     async with base.CleanModel() as model:
