@@ -1,0 +1,7 @@
+name: simple
+summary: A simple example charm with the new operator framework
+description: |
+    Simple is an example charm
+series:
+- xenial
+- bionic
