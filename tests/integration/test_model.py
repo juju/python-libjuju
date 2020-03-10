@@ -95,6 +95,25 @@ async def test_deploy_bundle(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_deploy_local_charm_folder_symlink(event_loop):
+    from pathlib import Path
+    tests_dir = Path(__file__).absolute().parent.parent
+    charm_path = tests_dir / 'charm-folder-symlink'
+
+    async with base.CleanModel() as model:
+        simple = await model.deploy(str(charm_path))
+        assert 'simple' in model.applications
+        terminal_statuses = ('active', 'error', 'blocked')
+        await model.block_until(
+            lambda: (
+                len(simple.units) > 0 and
+                simple.units[0].workload_status in terminal_statuses)
+        )
+        assert simple.units[0].workload_status == 'active'
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_deploy_trusted_bundle(event_loop):
     async with base.CleanModel() as model:
         await model.deploy('cs:~juju-qa/bundle/basic-trusted-1', trust=True)

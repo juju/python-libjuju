@@ -1,0 +1,4 @@
+#!/bin/bash
+set -eux
+./lib/module/hello.sh
+status-set active

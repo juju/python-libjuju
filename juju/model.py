@@ -2192,6 +2192,12 @@ class CharmArchiveGenerator:
             relative_path = dirpath[len(self.path) + 1:]
             if relative_path and not self._ignore(relative_path):
                 zf.write(dirpath, relative_path)
+            for dirname in dirnames:
+                archive_name = os.path.join(relative_path, dirname)
+                real_path = os.path.join(dirpath, dirname)
+                if os.path.islink(real_path):
+                    self._check_link(real_path)
+                    self._write_symlink(zf, os.readlink(real_path), archive_name)
             for name in filenames:
                 archive_name = os.path.join(relative_path, name)
                 if not self._ignore(archive_name):
