@@ -194,7 +194,7 @@ class Machine(model.ModelEntity):
         if process.returncode != 0:
             raise JujuError("command failed: %s" % cmd)
 
-    def ssh(
+    async def ssh(
             self, command, user=None, proxy=False, ssh_opts=None):
         """Execute a command over SSH on this machine.
 
@@ -204,7 +204,24 @@ class Machine(model.ModelEntity):
         :param str ssh_opts: Additional options to the `ssh` command
 
         """
-        raise NotImplementedError()
+        if proxy:
+            raise NotImplementedError('proxy option is not implemented')
+        address = self.dns_name
+        destination = "{}@{}".format(user, address)
+        cmd = [
+            'ssh',
+            '-i', os.path.expanduser('~/.local/share/juju/ssh/juju_id_rsa'),
+            '-o', 'StrictHostKeyChecking=no',
+            '-q',
+            destination
+        ]
+        cmd.extend(ssh_opts.split() if isinstance(ssh_opts, str) else ssh_opts)
+        cmd.extend([command])
+        loop = self.model.loop
+        process = await asyncio.create_subprocess_exec(*cmd, loop=loop)
+        await process.wait()
+        if process.returncode != 0:
+            raise JujuError("command failed: %s" % cmd)
 
     def status_history(self, num=20, utc=False):
         """Get status history for this machine.
