@@ -304,3 +304,9 @@ class Machine(model.ModelEntity):
     @property
     def tag(self):
         return tag.machine(self.id)
+
+    @property
+    def is_manual(self):
+        if 'instance-id' in self.safe_data:
+            return self.safe_data['instance-id'].startswith('manual:')
+        return False
