@@ -44,10 +44,6 @@ before_script:
   - lxd init --auto --network-address='[::]' --network-port=8443 --storage-backend=dir
   - lxc network set lxdbr0 ipv6.address none
 
-  # Horrible workaround to LP Bug #1738614
-  - sudo mkdir /var/snap/lxd/common/lxd/storage-pools/juju-zfs
-  - lxc storage create juju-zfs dir source=/var/snap/lxd/common/lxd/storage-pools/juju-zfs
-
 script:
   - set -e
   - juju bootstrap localhost test --config 'identity-url=https://api.staging.jujucharms.com/identity' --config 'allow-model-access=true'
