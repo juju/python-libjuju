@@ -230,7 +230,7 @@ class Connection:
         If uuid is None, the connection will be to the controller. Otherwise it
         will be to the model.
 
-        :param str endpoint: The hostname:port of the controller to connect to.
+        :param str endpoint: The hostname:port of the controller to connect to (or list of strings).
         :param str uuid: The model UUID to connect to (None for a
             controller-only connection).
         :param str username: The username for controller-local users (or None
@@ -256,6 +256,8 @@ class Connection:
         self = cls()
         if endpoint is None:
             raise ValueError('no endpoint provided')
+        if not isinstance(endpoint, str) and not isinstance(endpoint, list):
+            raise TypeError("Endpoint should be either str or list")
         self.uuid = uuid
         if bakery_client is None:
             bakery_client = httpbakery.Client()
@@ -279,6 +281,7 @@ class Connection:
         self.addr = None
         self.ws = None
         self.endpoint = None
+        self.endpoints = None
         self.cacert = None
         self.info = None
 
@@ -297,7 +300,11 @@ class Connection:
         if max_frame_size is None:
             max_frame_size = self.MAX_FRAME_SIZE
         self.max_frame_size = max_frame_size
-        await self._connect_with_redirect([(endpoint, cacert)])
+        await self._connect_with_redirect(
+            [(endpoint, cacert)]
+            if isinstance(endpoint, str)
+            else [(e, cacert) for e in endpoint]
+        )
         return self
 
     @property
@@ -570,7 +577,11 @@ class Connection:
             return
         async with monitor.reconnecting:
             await self.close()
-            await self._connect_with_login([(self.endpoint, self.cacert)])
+            await self._connect_with_login(
+                [(self.endpoint, self.cacert)]
+                if not self.endpoints else
+                self.endpoints
+            )
 
     async def _connect(self, endpoints):
         if len(endpoints) == 0:
@@ -660,6 +671,8 @@ class Connection:
         finally:
             if not success:
                 await self.close()
+            else:
+                self._pinger_task.start()
 
     async def _connect_with_redirect(self, endpoints):
         try:
