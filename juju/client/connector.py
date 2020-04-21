@@ -67,6 +67,13 @@ class Connector:
             for macaroon in kwargs.pop('macaroons'):
                 jar.set_cookie(go_to_py_cookie(macaroon))
         self._connection = await Connection.connect(**kwargs)
+        controller = self.jujudata.controllers()[
+            self.jujudata.current_controller()
+        ]
+        self._connection.endpoints = [
+            (e, controller["ca-cert"])
+            for e in controller["api-endpoints"]
+        ]
 
     async def disconnect(self):
         """Shut down the watcher task and close websockets.
@@ -86,13 +93,11 @@ class Connector:
             raise JujuConnectionError('No current controller')
 
         controller = self.jujudata.controllers()[controller_name]
-        # TODO change Connection so we can pass all the endpoints
-        # instead of just the first.
-        endpoint = controller['api-endpoints'][0]
+        endpoints = controller['api-endpoints']
         accounts = self.jujudata.accounts().get(controller_name, {})
 
         await self.connect(
-            endpoint=endpoint,
+            endpoint=endpoints,
             uuid=None,
             username=accounts.get('user'),
             password=accounts.get('password'),
@@ -119,9 +124,7 @@ class Connector:
         if controller is None:
             raise JujuConnectionError('Controller {} not found'.format(
                 controller_name))
-        # TODO change Connection so we can pass all the endpoints
-        # instead of just the first one.
-        endpoint = controller['api-endpoints'][0]
+        endpoints = controller['api-endpoints']
         account = self.jujudata.accounts().get(controller_name, {})
         models = self.jujudata.models().get(controller_name, {}).get('models',
                                                                      {})
@@ -135,7 +138,7 @@ class Connector:
         # and also remove the need for base.CleanModel to
         # subclass JujuData.
         await self.connect(
-            endpoint=endpoint,
+            endpoint=endpoints,
             uuid=models[model_name]['uuid'],
             username=account.get('user'),
             password=account.get('password'),

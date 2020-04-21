@@ -180,6 +180,14 @@ class Controller:
     def controller_uuid(self):
         return self._connector.controller_uuid
 
+    @property
+    def api_endpoints(self):
+        controller_name = self._connector.jujudata.current_controller()
+        if controller_name:
+            return self._connector.jujudata.controllers().get(controller_name).get(
+                "api-endpoints"
+            )
+
     async def disconnect(self):
         """Shut down the watcher task and close websockets.
 
