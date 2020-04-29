@@ -67,13 +67,6 @@ class Connector:
             for macaroon in kwargs.pop('macaroons'):
                 jar.set_cookie(go_to_py_cookie(macaroon))
         self._connection = await Connection.connect(**kwargs)
-        controller = self.jujudata.controllers()[
-            self.jujudata.current_controller()
-        ]
-        self._connection.endpoints = [
-            (e, controller["ca-cert"])
-            for e in controller["api-endpoints"]
-        ]
 
     async def disconnect(self):
         """Shut down the watcher task and close websockets.
