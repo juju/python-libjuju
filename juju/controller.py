@@ -144,6 +144,11 @@ class Controller:
                 raise ValueError('Authentication parameters are required '
                                  'if controller_name not given')
             await self._connector.connect(**kwargs)
+        info = await self.info()
+        self._connector._connection.endpoints = [
+            (e, info.results[0].cacert)
+            for e in info.results[0].addresses
+        ]
 
     async def connect_current(self):
         """
@@ -181,12 +186,13 @@ class Controller:
         return self._connector.controller_uuid
 
     @property
-    def api_endpoints(self):
-        controller_name = self._connector.jujudata.current_controller()
-        if controller_name:
-            return self._connector.jujudata.controllers().get(controller_name).get(
-                "api-endpoints"
-            )
+    async def api_endpoints(self):
+        """Get API endpoints
+
+        :return list string: List of API Endpoints
+        """
+        info = await self.info()
+        return info.results[0].addresses
 
     async def disconnect(self):
         """Shut down the watcher task and close websockets.
@@ -272,6 +278,17 @@ class Controller:
         await cloud_facade.AddCloud(cloud=cloud, name=name)
         result = await self.cloud(name=name)
         return result.cloud
+
+    async def info(self):
+        """Show Controller Info from connection
+
+        :return ControllerAPIInfoResult
+        """
+        log.debug('Getting information')
+        uuids = await self.model_uuids()
+        controller_facade = client.ControllerFacade.from_connection(self.connection())
+        params = [client.Entity(tag.model(uuids["controller"]))]
+        return await controller_facade.ControllerAPIInfoForModels(entities=params)
 
     async def remove_cloud(self, name):
         """Remove a cloud from this controller.
