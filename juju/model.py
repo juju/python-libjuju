@@ -20,7 +20,7 @@ import theblues.charmstore
 import theblues.errors
 import websockets
 
-from . import provisioner, tag, utils
+from . import asyncprovisioner, tag, utils
 from .annotationhelper import _get_annotations, _set_annotations
 from .bundle import BundleHandler, get_charm_series
 from .client import client, connector
@@ -1077,13 +1077,13 @@ class Model:
                 placement, target, private_key_path = spec.split(":")
                 user, host = target.split("@")
 
-                sshProvisioner = provisioner.SSHProvisioner(
+                sshProvisioner = asyncprovisioner.SSHProvisioner(
                     host=host,
                     user=user,
                     private_key_path=private_key_path,
                 )
 
-                params = sshProvisioner.provision_machine()
+                params = await sshProvisioner.provision_machine()
             else:
                 placement = parse_placement(spec)
                 if placement:

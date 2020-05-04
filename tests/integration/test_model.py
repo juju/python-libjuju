@@ -9,7 +9,6 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import mock
-import paramiko
 
 import pylxd
 import pytest
@@ -17,6 +16,7 @@ from juju.client.client import ApplicationFacade, ConfigValue
 from juju.errors import JujuError
 from juju.model import Model, ModelObserver
 from juju.utils import block_until, run_with_interrupt
+from subprocess import CalledProcessError
 
 from .. import base
 
@@ -286,7 +286,7 @@ async def test_add_manual_machine_ssh(event_loop):
                     host['address'],
                     private_key_path,
                 ))
-            except paramiko.ssh_exception.NoValidConnectionsError:
+            except CalledProcessError:
                 # retry the ssh connection a few times if it fails
                 time.sleep(attempt * 5)
             else:
@@ -400,7 +400,7 @@ async def test_add_manual_machine_ssh_root(event_loop):
                     host['address'],
                     private_key_path,
                 ))
-            except (paramiko.ssh_exception.NoValidConnectionsError, paramiko.ssh_exception.AuthenticationException):
+            except CalledProcessError:
                 time.sleep(attempt * 5)
             else:
                 break
