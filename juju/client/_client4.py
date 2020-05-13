@@ -654,7 +654,7 @@ class ApplicationFacade(Type):
     async def Get(self, application=None):
         '''
         application : str
-        Returns -> typing.Union[str, typing.Mapping[str, typing.Any], _ForwardRef('Value')]
+        Returns -> typing.Union[str, typing.Mapping[str, typing.Any], ForwardRef('Value')]
         '''
         if application is not None and not isinstance(application, (bytes, str)):
             raise Exception("Expected application to be a str, received: {}".format(type(application)))
@@ -675,7 +675,7 @@ class ApplicationFacade(Type):
     async def GetCharmURL(self, application=None):
         '''
         application : str
-        Returns -> typing.Union[_ForwardRef('Error'), str]
+        Returns -> typing.Union[ForwardRef('Error'), str]
         '''
         if application is not None and not isinstance(application, (bytes, str)):
             raise Exception("Expected application to be a str, received: {}".format(type(application)))
@@ -1045,7 +1045,7 @@ class BundleFacade(Type):
     async def ExportBundle(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), str]
+        Returns -> typing.Union[ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -1222,6 +1222,7 @@ class InstancePollerFacade(Type):
                                                       'mac-address': {'type': 'string'},
                                                       'mtu': {'type': 'integer'},
                                                       'no-auto-start': {'type': 'boolean'},
+                                                      'origin': {'type': 'string'},
                                                       'parent-interface-name': {'type': 'string'},
                                                       'provider-address-id': {'type': 'string'},
                                                       'provider-id': {'type': 'string'},
@@ -1587,7 +1588,7 @@ class InstancePollerFacade(Type):
     async def WatchForModelConfigChanges(self):
         '''
 
-        Returns -> typing.Union[str, _ForwardRef('Error')]
+        Returns -> typing.Union[str, ForwardRef('Error')]
         '''
 
         # map input types to rpc msg
@@ -1606,7 +1607,7 @@ class InstancePollerFacade(Type):
     async def WatchModelMachineStartTimes(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error'), str]
+        Returns -> typing.Union[typing.Sequence[str], ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -1625,7 +1626,7 @@ class InstancePollerFacade(Type):
     async def WatchModelMachines(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error'), str]
+        Returns -> typing.Union[typing.Sequence[str], ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -1806,7 +1807,7 @@ class ModelGenerationFacade(Type):
         '''
         branches : typing.Sequence[str]
         detailed : bool
-        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence[~Generation]]
+        Returns -> typing.Union[ForwardRef('Error'), typing.Sequence[~Generation]]
         '''
         if branches is not None and not isinstance(branches, (bytes, str, list)):
             raise Exception("Expected branches to be a Sequence, received: {}".format(type(branches)))
@@ -1831,7 +1832,7 @@ class ModelGenerationFacade(Type):
     async def CommitBranch(self, branch=None):
         '''
         branch : str
-        Returns -> typing.Union[_ForwardRef('Error'), int]
+        Returns -> typing.Union[ForwardRef('Error'), int]
         '''
         if branch is not None and not isinstance(branch, (bytes, str)):
             raise Exception("Expected branch to be a str, received: {}".format(type(branch)))
@@ -1852,7 +1853,7 @@ class ModelGenerationFacade(Type):
     async def HasActiveBranch(self, branch=None):
         '''
         branch : str
-        Returns -> typing.Union[_ForwardRef('Error'), bool]
+        Returns -> typing.Union[ForwardRef('Error'), bool]
         '''
         if branch is not None and not isinstance(branch, (bytes, str)):
             raise Exception("Expected branch to be a str, received: {}".format(type(branch)))
@@ -1873,7 +1874,7 @@ class ModelGenerationFacade(Type):
     async def ListCommits(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence[~Generation]]
+        Returns -> typing.Union[ForwardRef('Error'), typing.Sequence[~Generation]]
         '''
 
         # map input types to rpc msg
@@ -1892,7 +1893,7 @@ class ModelGenerationFacade(Type):
     async def ShowCommit(self, generation_id=None):
         '''
         generation_id : int
-        Returns -> typing.Union[_ForwardRef('Error'), _ForwardRef('Generation')]
+        Returns -> typing.Union[ForwardRef('Error'), ForwardRef('Generation')]
         '''
         if generation_id is not None and not isinstance(generation_id, int):
             raise Exception("Expected generation_id to be a int, received: {}".format(type(generation_id)))
@@ -3600,7 +3601,7 @@ class StorageProvisionerFacade(Type):
     async def WatchApplications(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error'), str]
+        Returns -> typing.Union[typing.Sequence[str], ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -3757,6 +3758,213 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+class SubnetsFacade(Type):
+    name = 'Subnets'
+    version = 4
+    schema =     {'definitions': {'AddSubnetParams': {'additionalProperties': False,
+                                         'properties': {'cidr': {'type': 'string'},
+                                                        'provider-network-id': {'type': 'string'},
+                                                        'space-tag': {'type': 'string'},
+                                                        'subnet-provider-id': {'type': 'string'},
+                                                        'vlan-tag': {'type': 'integer'},
+                                                        'zones': {'items': {'type': 'string'},
+                                                                  'type': 'array'}},
+                                         'required': ['space-tag'],
+                                         'type': 'object'},
+                     'AddSubnetsParams': {'additionalProperties': False,
+                                          'properties': {'subnets': {'items': {'$ref': '#/definitions/AddSubnetParams'},
+                                                                     'type': 'array'}},
+                                          'required': ['subnets'],
+                                          'type': 'object'},
+                     'CIDRParams': {'additionalProperties': False,
+                                    'properties': {'cidrs': {'items': {'type': 'string'},
+                                                             'type': 'array'}},
+                                    'required': ['cidrs'],
+                                    'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ErrorResult': {'additionalProperties': False,
+                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
+                                     'type': 'object'},
+                     'ErrorResults': {'additionalProperties': False,
+                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
+                                                                 'type': 'array'}},
+                                      'required': ['results'],
+                                      'type': 'object'},
+                     'ListSubnetsResults': {'additionalProperties': False,
+                                            'properties': {'results': {'items': {'$ref': '#/definitions/Subnet'},
+                                                                       'type': 'array'}},
+                                            'required': ['results'],
+                                            'type': 'object'},
+                     'Subnet': {'additionalProperties': False,
+                                'properties': {'cidr': {'type': 'string'},
+                                               'life': {'type': 'string'},
+                                               'provider-id': {'type': 'string'},
+                                               'provider-network-id': {'type': 'string'},
+                                               'provider-space-id': {'type': 'string'},
+                                               'space-tag': {'type': 'string'},
+                                               'status': {'type': 'string'},
+                                               'vlan-tag': {'type': 'integer'},
+                                               'zones': {'items': {'type': 'string'},
+                                                         'type': 'array'}},
+                                'required': ['cidr',
+                                             'vlan-tag',
+                                             'life',
+                                             'space-tag',
+                                             'zones'],
+                                'type': 'object'},
+                     'SubnetV2': {'additionalProperties': False,
+                                  'properties': {'Subnet': {'$ref': '#/definitions/Subnet'},
+                                                 'cidr': {'type': 'string'},
+                                                 'id': {'type': 'string'},
+                                                 'life': {'type': 'string'},
+                                                 'provider-id': {'type': 'string'},
+                                                 'provider-network-id': {'type': 'string'},
+                                                 'provider-space-id': {'type': 'string'},
+                                                 'space-tag': {'type': 'string'},
+                                                 'status': {'type': 'string'},
+                                                 'vlan-tag': {'type': 'integer'},
+                                                 'zones': {'items': {'type': 'string'},
+                                                           'type': 'array'}},
+                                  'required': ['cidr',
+                                               'vlan-tag',
+                                               'life',
+                                               'space-tag',
+                                               'zones',
+                                               'Subnet'],
+                                  'type': 'object'},
+                     'SubnetsFilters': {'additionalProperties': False,
+                                        'properties': {'space-tag': {'type': 'string'},
+                                                       'zone': {'type': 'string'}},
+                                        'type': 'object'},
+                     'SubnetsResult': {'additionalProperties': False,
+                                       'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                      'subnets': {'items': {'$ref': '#/definitions/SubnetV2'},
+                                                                  'type': 'array'}},
+                                       'type': 'object'},
+                     'SubnetsResults': {'additionalProperties': False,
+                                        'properties': {'results': {'items': {'$ref': '#/definitions/SubnetsResult'},
+                                                                   'type': 'array'}},
+                                        'required': ['results'],
+                                        'type': 'object'},
+                     'ZoneResult': {'additionalProperties': False,
+                                    'properties': {'available': {'type': 'boolean'},
+                                                   'error': {'$ref': '#/definitions/Error'},
+                                                   'name': {'type': 'string'}},
+                                    'required': ['name', 'available'],
+                                    'type': 'object'},
+                     'ZoneResults': {'additionalProperties': False,
+                                     'properties': {'results': {'items': {'$ref': '#/definitions/ZoneResult'},
+                                                                'type': 'array'}},
+                                     'required': ['results'],
+                                     'type': 'object'}},
+     'properties': {'AddSubnets': {'properties': {'Params': {'$ref': '#/definitions/AddSubnetsParams'},
+                                                  'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                   'type': 'object'},
+                    'AllZones': {'properties': {'Result': {'$ref': '#/definitions/ZoneResults'}},
+                                 'type': 'object'},
+                    'ListSubnets': {'properties': {'Params': {'$ref': '#/definitions/SubnetsFilters'},
+                                                   'Result': {'$ref': '#/definitions/ListSubnetsResults'}},
+                                    'type': 'object'},
+                    'SubnetsByCIDR': {'properties': {'Params': {'$ref': '#/definitions/CIDRParams'},
+                                                     'Result': {'$ref': '#/definitions/SubnetsResults'}},
+                                      'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(ErrorResults)
+    async def AddSubnets(self, subnets=None):
+        '''
+        subnets : typing.Sequence[~AddSubnetParams]
+        Returns -> typing.Sequence[~ErrorResult]
+        '''
+        if subnets is not None and not isinstance(subnets, (bytes, str, list)):
+            raise Exception("Expected subnets to be a Sequence, received: {}".format(type(subnets)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Subnets',
+                   request='AddSubnets',
+                   version=4,
+                   params=_params)
+        _params['subnets'] = subnets
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ZoneResults)
+    async def AllZones(self):
+        '''
+
+        Returns -> typing.Sequence[~ZoneResult]
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Subnets',
+                   request='AllZones',
+                   version=4,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ListSubnetsResults)
+    async def ListSubnets(self, space_tag=None, zone=None):
+        '''
+        space_tag : str
+        zone : str
+        Returns -> typing.Sequence[~Subnet]
+        '''
+        if space_tag is not None and not isinstance(space_tag, (bytes, str)):
+            raise Exception("Expected space_tag to be a str, received: {}".format(type(space_tag)))
+
+        if zone is not None and not isinstance(zone, (bytes, str)):
+            raise Exception("Expected zone to be a str, received: {}".format(type(zone)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Subnets',
+                   request='ListSubnets',
+                   version=4,
+                   params=_params)
+        _params['space-tag'] = space_tag
+        _params['zone'] = zone
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SubnetsResults)
+    async def SubnetsByCIDR(self, cidrs=None):
+        '''
+        cidrs : typing.Sequence[str]
+        Returns -> typing.Sequence[~SubnetsResult]
+        '''
+        if cidrs is not None and not isinstance(cidrs, (bytes, str, list)):
+            raise Exception("Expected cidrs to be a Sequence, received: {}".format(type(cidrs)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Subnets',
+                   request='SubnetsByCIDR',
+                   version=4,
+                   params=_params)
+        _params['cidrs'] = cidrs
         reply = await self.rpc(msg)
         return reply
 
@@ -4607,7 +4815,7 @@ class UniterFacade(Type):
     async def APIAddresses(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence[str]]
+        Returns -> typing.Union[ForwardRef('Error'), typing.Sequence[str]]
         '''
 
         # map input types to rpc msg
@@ -4958,7 +5166,7 @@ class UniterFacade(Type):
     async def CurrentModel(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), str]
+        Returns -> typing.Union[ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -5269,7 +5477,7 @@ class UniterFacade(Type):
     async def ModelUUID(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), str]
+        Returns -> typing.Union[ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -5351,7 +5559,7 @@ class UniterFacade(Type):
     async def ProviderType(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), str]
+        Returns -> typing.Union[ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -5811,7 +6019,7 @@ class UniterFacade(Type):
     async def WatchAPIHostPorts(self):
         '''
 
-        Returns -> typing.Union[str, _ForwardRef('Error')]
+        Returns -> typing.Union[str, ForwardRef('Error')]
         '''
 
         # map input types to rpc msg
@@ -5893,7 +6101,7 @@ class UniterFacade(Type):
     async def WatchForModelConfigChanges(self):
         '''
 
-        Returns -> typing.Union[str, _ForwardRef('Error')]
+        Returns -> typing.Union[str, ForwardRef('Error')]
         '''
 
         # map input types to rpc msg

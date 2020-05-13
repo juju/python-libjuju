@@ -1,6 +1,21 @@
 Changelog
 ---------
 
+2.8.0
+^^^^^
+
+Wednesday May 13 2020
+
+ * Update facade methods for Juju 2.8.0
+ * Fixes codegen for Python 3.7+
+ * Nested facade definitions are now deserialised properly (e.g. storage on ApplicationDeploy)
+ * Missing client facades are now ignored and a warning is printed (#382)
+ * Add SCP example (#383)
+ * Add watch_model_summaries method to Controller (#390)
+ * Bug fix - make_archive on Model handles symlinks (#391 #392)
+ * Add SSH support for units and machines (#393)
+ * Add connection HA support (#402)
+ * Bug fix - resolve api_endpoints from controller (#406 #407)
 
 2.7.1
 ^^^^^

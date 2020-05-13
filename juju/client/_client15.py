@@ -147,12 +147,16 @@ class UniterFacade(Type):
                                                         'result': {'$ref': '#/definitions/CloudSpec'}},
                                          'type': 'object'},
                      'CommitHookChangesArg': {'additionalProperties': False,
-                                              'properties': {'close-ports': {'items': {'$ref': '#/definitions/EntityPortRange'},
+                                              'properties': {'add-storage': {'items': {'$ref': '#/definitions/StorageAddParams'},
+                                                                             'type': 'array'},
+                                                             'close-ports': {'items': {'$ref': '#/definitions/EntityPortRange'},
                                                                              'type': 'array'},
                                                              'open-ports': {'items': {'$ref': '#/definitions/EntityPortRange'},
                                                                             'type': 'array'},
+                                                             'pod-spec': {'$ref': '#/definitions/PodSpec'},
                                                              'relation-unit-settings': {'items': {'$ref': '#/definitions/RelationUnitSettings'},
                                                                                         'type': 'array'},
+                                                             'set-raw-k8s-spec': {'$ref': '#/definitions/PodSpec'},
                                                              'tag': {'type': 'string'},
                                                              'unit-state': {'$ref': '#/definitions/SetUnitStateArg'},
                                                              'update-network-info': {'type': 'boolean'}},
@@ -599,22 +603,27 @@ class UniterFacade(Type):
                                                                         'type': 'array'}},
                                              'required': ['results'],
                                              'type': 'object'},
-                     'SetPodSpecParamsV2': {'additionalProperties': False,
-                                            'properties': {'specs': {'items': {'$ref': '#/definitions/PodSpec'},
-                                                                     'type': 'array'}},
-                                            'required': ['specs'],
-                                            'type': 'object'},
                      'SetStatus': {'additionalProperties': False,
                                    'properties': {'entities': {'items': {'$ref': '#/definitions/EntityStatusArgs'},
                                                                'type': 'array'}},
                                    'required': ['entities'],
                                    'type': 'object'},
                      'SetUnitStateArg': {'additionalProperties': False,
-                                         'properties': {'state': {'patternProperties': {'.*': {'type': 'string'}},
-                                                                  'type': 'object'},
-                                                        'tag': {'type': 'string'}},
-                                         'required': ['tag', 'state'],
+                                         'properties': {'charm-state': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                        'type': 'object'},
+                                                        'meter-status-state': {'type': 'string'},
+                                                        'relation-state': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                           'type': 'object'},
+                                                        'storage-state': {'type': 'string'},
+                                                        'tag': {'type': 'string'},
+                                                        'uniter-state': {'type': 'string'}},
+                                         'required': ['tag'],
                                          'type': 'object'},
+                     'SetUnitStateArgs': {'additionalProperties': False,
+                                          'properties': {'args': {'items': {'$ref': '#/definitions/SetUnitStateArg'},
+                                                                  'type': 'array'}},
+                                          'required': ['args'],
+                                          'type': 'object'},
                      'SettingsResult': {'additionalProperties': False,
                                         'properties': {'error': {'$ref': '#/definitions/Error'},
                                                        'settings': {'patternProperties': {'.*': {'type': 'string'}},
@@ -765,10 +774,14 @@ class UniterFacade(Type):
                                       'required': ['version'],
                                       'type': 'object'},
                      'UnitStateResult': {'additionalProperties': False,
-                                         'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                        'state': {'patternProperties': {'.*': {'type': 'string'}},
-                                                                  'type': 'object'}},
-                                         'required': ['state'],
+                                         'properties': {'charm-state': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                        'type': 'object'},
+                                                        'error': {'$ref': '#/definitions/Error'},
+                                                        'meter-status-state': {'type': 'string'},
+                                                        'relation-state': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                           'type': 'object'},
+                                                        'storage-state': {'type': 'string'},
+                                                        'uniter-state': {'type': 'string'}},
                                          'type': 'object'},
                      'UnitStateResults': {'additionalProperties': False,
                                           'properties': {'results': {'items': {'$ref': '#/definitions/UnitStateResult'},
@@ -881,6 +894,9 @@ class UniterFacade(Type):
                     'GetPrincipal': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                     'Result': {'$ref': '#/definitions/StringBoolResults'}},
                                      'type': 'object'},
+                    'GetRawK8sSpec': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                     'Result': {'$ref': '#/definitions/StringResults'}},
+                                      'type': 'object'},
                     'GoalStates': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                   'Result': {'$ref': '#/definitions/GoalStateResults'}},
                                    'type': 'object'},
@@ -920,6 +936,9 @@ class UniterFacade(Type):
                     'Read': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                             'Result': {'$ref': '#/definitions/GetLeadershipSettingsBulkResults'}},
                              'type': 'object'},
+                    'ReadLocalApplicationSettings': {'properties': {'Params': {'$ref': '#/definitions/RelationUnit'},
+                                                                    'Result': {'$ref': '#/definitions/SettingsResult'}},
+                                                     'type': 'object'},
                     'ReadRemoteSettings': {'properties': {'Params': {'$ref': '#/definitions/RelationUnitPairs'},
                                                           'Result': {'$ref': '#/definitions/SettingsResults'}},
                                            'type': 'object'},
@@ -958,12 +977,12 @@ class UniterFacade(Type):
                     'SetCharmURL': {'properties': {'Params': {'$ref': '#/definitions/EntitiesCharmURL'},
                                                    'Result': {'$ref': '#/definitions/ErrorResults'}},
                                     'type': 'object'},
-                    'SetPodSpec': {'properties': {'Params': {'$ref': '#/definitions/SetPodSpecParamsV2'},
-                                                  'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                   'type': 'object'},
                     'SetRelationStatus': {'properties': {'Params': {'$ref': '#/definitions/RelationStatusArgs'},
                                                          'Result': {'$ref': '#/definitions/ErrorResults'}},
                                           'type': 'object'},
+                    'SetState': {'properties': {'Params': {'$ref': '#/definitions/SetUnitStateArgs'},
+                                                'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                 'type': 'object'},
                     'SetStatus': {'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
                                                  'Result': {'$ref': '#/definitions/ErrorResults'}},
                                   'type': 'object'},
@@ -1050,7 +1069,7 @@ class UniterFacade(Type):
     async def APIAddresses(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence[str]]
+        Returns -> typing.Union[ForwardRef('Error'), typing.Sequence[str]]
         '''
 
         # map input types to rpc msg
@@ -1382,7 +1401,7 @@ class UniterFacade(Type):
     async def CloudAPIVersion(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), str]
+        Returns -> typing.Union[ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -1401,7 +1420,7 @@ class UniterFacade(Type):
     async def CloudSpec(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), _ForwardRef('CloudSpec')]
+        Returns -> typing.Union[ForwardRef('Error'), ForwardRef('CloudSpec')]
         '''
 
         # map input types to rpc msg
@@ -1462,7 +1481,7 @@ class UniterFacade(Type):
     async def CurrentModel(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), str]
+        Returns -> typing.Union[ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -1666,6 +1685,27 @@ class UniterFacade(Type):
 
 
 
+    @ReturnMapping(StringResults)
+    async def GetRawK8sSpec(self, entities=None):
+        '''
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~StringResult]
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='GetRawK8sSpec',
+                   version=15,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
     @ReturnMapping(GoalStateResults)
     async def GoalStates(self, entities=None):
         '''
@@ -1815,7 +1855,7 @@ class UniterFacade(Type):
     async def ModelUUID(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), str]
+        Returns -> typing.Union[ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -1907,7 +1947,7 @@ class UniterFacade(Type):
     async def ProviderType(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), str]
+        Returns -> typing.Union[ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -1959,6 +1999,32 @@ class UniterFacade(Type):
                    version=15,
                    params=_params)
         _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SettingsResult)
+    async def ReadLocalApplicationSettings(self, relation=None, unit=None):
+        '''
+        relation : str
+        unit : str
+        Returns -> typing.Union[ForwardRef('Error'), typing.Mapping[str, str]]
+        '''
+        if relation is not None and not isinstance(relation, (bytes, str)):
+            raise Exception("Expected relation to be a str, received: {}".format(type(relation)))
+
+        if unit is not None and not isinstance(unit, (bytes, str)):
+            raise Exception("Expected unit to be a str, received: {}".format(type(unit)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='ReadLocalApplicationSettings',
+                   version=15,
+                   params=_params)
+        _params['relation'] = relation
+        _params['unit'] = unit
         reply = await self.rpc(msg)
         return reply
 
@@ -2157,7 +2223,7 @@ class UniterFacade(Type):
     async def SLALevel(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), str]
+        Returns -> typing.Union[ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -2236,27 +2302,6 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def SetPodSpec(self, specs=None):
-        '''
-        specs : typing.Sequence[~PodSpec]
-        Returns -> typing.Sequence[~ErrorResult]
-        '''
-        if specs is not None and not isinstance(specs, (bytes, str, list)):
-            raise Exception("Expected specs to be a Sequence, received: {}".format(type(specs)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='SetPodSpec',
-                   version=15,
-                   params=_params)
-        _params['specs'] = specs
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
     async def SetRelationStatus(self, args=None):
         '''
         args : typing.Sequence[~RelationStatusArg]
@@ -2269,6 +2314,27 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='SetRelationStatus',
+                   version=15,
+                   params=_params)
+        _params['args'] = args
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def SetState(self, args=None):
+        '''
+        args : typing.Sequence[~SetUnitStateArg]
+        Returns -> typing.Sequence[~ErrorResult]
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='SetState',
                    version=15,
                    params=_params)
         _params['args'] = args
@@ -2554,7 +2620,7 @@ class UniterFacade(Type):
     async def WatchAPIHostPorts(self):
         '''
 
-        Returns -> typing.Union[str, _ForwardRef('Error')]
+        Returns -> typing.Union[str, ForwardRef('Error')]
         '''
 
         # map input types to rpc msg
@@ -2615,7 +2681,7 @@ class UniterFacade(Type):
     async def WatchForModelConfigChanges(self):
         '''
 
-        Returns -> typing.Union[str, _ForwardRef('Error')]
+        Returns -> typing.Union[str, ForwardRef('Error')]
         '''
 
         # map input types to rpc msg

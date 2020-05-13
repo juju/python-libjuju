@@ -996,7 +996,7 @@ class ApplicationFacade(Type):
         '''
         application : str
         branch : str
-        Returns -> typing.Union[str, typing.Mapping[str, typing.Any], _ForwardRef('Value')]
+        Returns -> typing.Union[str, typing.Mapping[str, typing.Any], ForwardRef('Value')]
         '''
         if application is not None and not isinstance(application, (bytes, str)):
             raise Exception("Expected application to be a str, received: {}".format(type(application)))
@@ -1022,7 +1022,7 @@ class ApplicationFacade(Type):
         '''
         application : str
         branch : str
-        Returns -> typing.Union[_ForwardRef('Error'), str]
+        Returns -> typing.Union[ForwardRef('Error'), str]
         '''
         if application is not None and not isinstance(application, (bytes, str)):
             raise Exception("Expected application to be a str, received: {}".format(type(application)))
@@ -1876,6 +1876,7 @@ class ProvisionerFacade(Type):
                                                       'mac-address': {'type': 'string'},
                                                       'mtu': {'type': 'integer'},
                                                       'no-auto-start': {'type': 'boolean'},
+                                                      'origin': {'type': 'string'},
                                                       'parent-interface-name': {'type': 'string'},
                                                       'provider-address-id': {'type': 'string'},
                                                       'provider-id': {'type': 'string'},
@@ -2357,7 +2358,7 @@ class ProvisionerFacade(Type):
     async def APIAddresses(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence[str]]
+        Returns -> typing.Union[ForwardRef('Error'), typing.Sequence[str]]
         '''
 
         # map input types to rpc msg
@@ -2456,7 +2457,7 @@ class ProvisionerFacade(Type):
     async def ContainerConfig(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('UpdateBehavior'), str, _ForwardRef('Settings'), typing.Mapping[str, typing.Any], bool]
+        Returns -> typing.Union[ForwardRef('UpdateBehavior'), str, ForwardRef('Settings'), typing.Mapping[str, typing.Any], bool]
         '''
 
         # map input types to rpc msg
@@ -2604,7 +2605,7 @@ class ProvisionerFacade(Type):
         minor : int
         number : Number
         series : str
-        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence[~Tools]]
+        Returns -> typing.Union[ForwardRef('Error'), typing.Sequence[~Tools]]
         '''
         if agentstream is not None and not isinstance(agentstream, (bytes, str)):
             raise Exception("Expected agentstream to be a str, received: {}".format(type(agentstream)))
@@ -2851,7 +2852,7 @@ class ProvisionerFacade(Type):
     async def ModelUUID(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), str]
+        Returns -> typing.Union[ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -3195,7 +3196,7 @@ class ProvisionerFacade(Type):
     async def StateAddresses(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence[str]]
+        Returns -> typing.Union[ForwardRef('Error'), typing.Sequence[str]]
         '''
 
         # map input types to rpc msg
@@ -3298,7 +3299,7 @@ class ProvisionerFacade(Type):
     async def WatchAPIHostPorts(self):
         '''
 
-        Returns -> typing.Union[str, _ForwardRef('Error')]
+        Returns -> typing.Union[str, ForwardRef('Error')]
         '''
 
         # map input types to rpc msg
@@ -3359,7 +3360,7 @@ class ProvisionerFacade(Type):
     async def WatchForModelConfigChanges(self):
         '''
 
-        Returns -> typing.Union[str, _ForwardRef('Error')]
+        Returns -> typing.Union[str, ForwardRef('Error')]
         '''
 
         # map input types to rpc msg
@@ -3378,7 +3379,7 @@ class ProvisionerFacade(Type):
     async def WatchMachineErrorRetry(self):
         '''
 
-        Returns -> typing.Union[str, _ForwardRef('Error')]
+        Returns -> typing.Union[str, ForwardRef('Error')]
         '''
 
         # map input types to rpc msg
@@ -3397,7 +3398,7 @@ class ProvisionerFacade(Type):
     async def WatchModelMachineStartTimes(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error'), str]
+        Returns -> typing.Union[typing.Sequence[str], ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -3416,7 +3417,7 @@ class ProvisionerFacade(Type):
     async def WatchModelMachines(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error'), str]
+        Returns -> typing.Union[typing.Sequence[str], ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg

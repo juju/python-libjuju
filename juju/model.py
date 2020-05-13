@@ -2218,7 +2218,7 @@ class CharmArchiveGenerator:
         s = os.stat(path)
         if stat.S_ISDIR(s.st_mode) or stat.S_ISREG(s.st_mode):
             return path
-        raise ValueError("Invalid Charm at % %s" % (
+        raise ValueError("Invalid Charm at %s %s" % (
             path, "Invalid file type for a charm"))
 
     def _check_link(self, path):
