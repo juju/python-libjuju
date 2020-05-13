@@ -715,7 +715,7 @@ class AgentFacade(Type):
     async def GetCloudSpec(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), _ForwardRef('CloudSpec')]
+        Returns -> typing.Union[ForwardRef('Error'), ForwardRef('CloudSpec')]
         '''
 
         # map input types to rpc msg
@@ -875,7 +875,7 @@ class AgentFacade(Type):
     async def WatchForModelConfigChanges(self):
         '''
 
-        Returns -> typing.Union[str, _ForwardRef('Error')]
+        Returns -> typing.Union[str, ForwardRef('Error')]
         '''
 
         # map input types to rpc msg
@@ -1526,7 +1526,7 @@ class ApplicationFacade(Type):
     async def Get(self, application=None):
         '''
         application : str
-        Returns -> typing.Union[str, typing.Mapping[str, typing.Any], _ForwardRef('Value')]
+        Returns -> typing.Union[str, typing.Mapping[str, typing.Any], ForwardRef('Value')]
         '''
         if application is not None and not isinstance(application, (bytes, str)):
             raise Exception("Expected application to be a str, received: {}".format(type(application)))
@@ -1547,7 +1547,7 @@ class ApplicationFacade(Type):
     async def GetCharmURL(self, application=None):
         '''
         application : str
-        Returns -> typing.Union[_ForwardRef('Error'), str]
+        Returns -> typing.Union[ForwardRef('Error'), str]
         '''
         if application is not None and not isinstance(application, (bytes, str)):
             raise Exception("Expected application to be a str, received: {}".format(type(application)))
@@ -2457,7 +2457,7 @@ class BackupsFacade(Type):
         keep_copy : bool
         no_download : bool
         notes : str
-        Returns -> typing.Union[str, int, _ForwardRef('Number')]
+        Returns -> typing.Union[str, int, ForwardRef('Number')]
         '''
         if keep_copy is not None and not isinstance(keep_copy, bool):
             raise Exception("Expected keep_copy to be a bool, received: {}".format(type(keep_copy)))
@@ -2505,7 +2505,7 @@ class BackupsFacade(Type):
     async def Info(self, id_=None):
         '''
         id_ : str
-        Returns -> typing.Union[str, int, _ForwardRef('Number')]
+        Returns -> typing.Union[str, int, ForwardRef('Number')]
         '''
         if id_ is not None and not isinstance(id_, (bytes, str)):
             raise Exception("Expected id_ to be a str, received: {}".format(type(id_)))
@@ -2771,7 +2771,7 @@ class BundleFacade(Type):
     async def ExportBundle(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), str]
+        Returns -> typing.Union[ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -3039,7 +3039,7 @@ class CharmsFacade(Type):
     async def CharmInfo(self, url=None):
         '''
         url : str
-        Returns -> typing.Union[_ForwardRef('CharmActions'), typing.Mapping[str, ~CharmOption], _ForwardRef('CharmLXDProfile'), _ForwardRef('CharmMeta'), _ForwardRef('CharmMetrics'), int, str]
+        Returns -> typing.Union[ForwardRef('CharmActions'), typing.Mapping[str, ~CharmOption], ForwardRef('CharmLXDProfile'), ForwardRef('CharmMeta'), ForwardRef('CharmMetrics'), int, str]
         '''
         if url is not None and not isinstance(url, (bytes, str)):
             raise Exception("Expected url to be a str, received: {}".format(type(url)))
@@ -3143,7 +3143,7 @@ class CleanerFacade(Type):
     async def WatchCleanups(self):
         '''
 
-        Returns -> typing.Union[str, _ForwardRef('Error')]
+        Returns -> typing.Union[str, ForwardRef('Error')]
         '''
 
         # map input types to rpc msg
@@ -3259,7 +3259,7 @@ class ClientFacade(Type):
                                            'properties': {'can-upgrade-to': {'type': 'string'},
                                                           'charm': {'type': 'string'},
                                                           'charm-profile': {'type': 'string'},
-                                                          'charm-verion': {'type': 'string'},
+                                                          'charm-version': {'type': 'string'},
                                                           'endpoint-bindings': {'patternProperties': {'.*': {'type': 'string'}},
                                                                                 'type': 'object'},
                                                           'err': {'$ref': '#/definitions/Error'},
@@ -3291,7 +3291,7 @@ class ClientFacade(Type):
                                                         'meter-statuses',
                                                         'status',
                                                         'workload-version',
-                                                        'charm-verion',
+                                                        'charm-version',
                                                         'charm-profile',
                                                         'endpoint-bindings',
                                                         'public-address'],
@@ -4230,7 +4230,7 @@ class ClientFacade(Type):
         minor : int
         number : Number
         series : str
-        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence[~Tools]]
+        Returns -> typing.Union[ForwardRef('Error'), typing.Sequence[~Tools]]
         '''
         if agentstream is not None and not isinstance(agentstream, (bytes, str)):
             raise Exception("Expected agentstream to be a str, received: {}".format(type(agentstream)))
@@ -4271,7 +4271,7 @@ class ClientFacade(Type):
     async def FullStatus(self, patterns=None):
         '''
         patterns : typing.Sequence[str]
-        Returns -> typing.Union[typing.Mapping[str, ~ApplicationStatus], typing.Mapping[str, ~BranchStatus], str, typing.Mapping[str, ~MachineStatus], _ForwardRef('ModelStatusInfo'), typing.Mapping[str, ~ApplicationOfferStatus], typing.Sequence[~RelationStatus], typing.Mapping[str, ~RemoteApplicationStatus]]
+        Returns -> typing.Union[typing.Mapping[str, ~ApplicationStatus], typing.Mapping[str, ~BranchStatus], str, typing.Mapping[str, ~MachineStatus], ForwardRef('ModelStatusInfo'), typing.Mapping[str, ~ApplicationOfferStatus], typing.Sequence[~RelationStatus], typing.Mapping[str, ~RemoteApplicationStatus]]
         '''
         if patterns is not None and not isinstance(patterns, (bytes, str, list)):
             raise Exception("Expected patterns to be a Sequence, received: {}".format(type(patterns)))
@@ -4377,7 +4377,7 @@ class ClientFacade(Type):
     async def ModelInfo(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Number'), str, bool, typing.Sequence[~ModelMachineInfo], _ForwardRef('ModelMigrationStatus'), _ForwardRef('ModelSLAInfo'), _ForwardRef('EntityStatus'), typing.Sequence[~ModelUserInfo]]
+        Returns -> typing.Union[ForwardRef('Number'), str, bool, typing.Sequence[~ModelMachineInfo], ForwardRef('ModelMigrationStatus'), ForwardRef('ModelSLAInfo'), ForwardRef('EntityStatus'), typing.Sequence[~ModelUserInfo]]
         '''
 
         # map input types to rpc msg
@@ -4603,7 +4603,7 @@ class ClientFacade(Type):
     async def SLALevel(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), str]
+        Returns -> typing.Union[ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -4837,7 +4837,7 @@ class CredentialValidatorFacade(Type):
     async def WatchCredential(self, tag=None):
         '''
         tag : str
-        Returns -> typing.Union[str, _ForwardRef('Error')]
+        Returns -> typing.Union[str, ForwardRef('Error')]
         '''
         if tag is not None and not isinstance(tag, (bytes, str)):
             raise Exception("Expected tag to be a str, received: {}".format(type(tag)))
@@ -4858,7 +4858,7 @@ class CredentialValidatorFacade(Type):
     async def WatchModelCredential(self):
         '''
 
-        Returns -> typing.Union[str, _ForwardRef('Error')]
+        Returns -> typing.Union[str, ForwardRef('Error')]
         '''
 
         # map input types to rpc msg
@@ -5625,7 +5625,7 @@ class EntityWatcherFacade(Type):
     async def Next(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error'), str]
+        Returns -> typing.Union[typing.Sequence[str], ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -5694,7 +5694,7 @@ class FilesystemAttachmentsWatcherFacade(Type):
     async def Next(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence[~MachineStorageId], _ForwardRef('Error'), str]
+        Returns -> typing.Union[typing.Sequence[~MachineStorageId], ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -6255,7 +6255,7 @@ class InstanceMutaterFacade(Type):
     async def CharmProfilingInfo(self, tag=None):
         '''
         tag : str
-        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error'), str, typing.Sequence[~ProfileInfoResult]]
+        Returns -> typing.Union[typing.Sequence[str], ForwardRef('Error'), str, typing.Sequence[~ProfileInfoResult]]
         '''
         if tag is not None and not isinstance(tag, (bytes, str)):
             raise Exception("Expected tag to be a str, received: {}".format(type(tag)))
@@ -6276,7 +6276,7 @@ class InstanceMutaterFacade(Type):
     async def ContainerType(self, tag=None):
         '''
         tag : str
-        Returns -> typing.Union[str, _ForwardRef('Error')]
+        Returns -> typing.Union[str, ForwardRef('Error')]
         '''
         if tag is not None and not isinstance(tag, (bytes, str)):
             raise Exception("Expected tag to be a str, received: {}".format(type(tag)))
@@ -6360,7 +6360,7 @@ class InstanceMutaterFacade(Type):
     async def WatchContainers(self, tag=None):
         '''
         tag : str
-        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error'), str]
+        Returns -> typing.Union[typing.Sequence[str], ForwardRef('Error'), str]
         '''
         if tag is not None and not isinstance(tag, (bytes, str)):
             raise Exception("Expected tag to be a str, received: {}".format(type(tag)))
@@ -6402,7 +6402,7 @@ class InstanceMutaterFacade(Type):
     async def WatchMachines(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error'), str]
+        Returns -> typing.Union[typing.Sequence[str], ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -6798,6 +6798,7 @@ class MachinerFacade(Type):
                                                       'mac-address': {'type': 'string'},
                                                       'mtu': {'type': 'integer'},
                                                       'no-auto-start': {'type': 'boolean'},
+                                                      'origin': {'type': 'string'},
                                                       'parent-interface-name': {'type': 'string'},
                                                       'provider-address-id': {'type': 'string'},
                                                       'provider-id': {'type': 'string'},
@@ -6914,7 +6915,7 @@ class MachinerFacade(Type):
     async def APIAddresses(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence[str]]
+        Returns -> typing.Union[ForwardRef('Error'), typing.Sequence[str]]
         '''
 
         # map input types to rpc msg
@@ -7015,7 +7016,7 @@ class MachinerFacade(Type):
     async def ModelUUID(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), str]
+        Returns -> typing.Union[ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -7186,7 +7187,7 @@ class MachinerFacade(Type):
     async def WatchAPIHostPorts(self):
         '''
 
-        Returns -> typing.Union[str, _ForwardRef('Error')]
+        Returns -> typing.Union[str, ForwardRef('Error')]
         '''
 
         # map input types to rpc msg
@@ -7196,6 +7197,185 @@ class MachinerFacade(Type):
                    version=2,
                    params=_params)
 
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+class MeterStatusFacade(Type):
+    name = 'MeterStatus'
+    version = 2
+    schema =     {'definitions': {'Entities': {'additionalProperties': False,
+                                  'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
+                                                              'type': 'array'}},
+                                  'required': ['entities'],
+                                  'type': 'object'},
+                     'Entity': {'additionalProperties': False,
+                                'properties': {'tag': {'type': 'string'}},
+                                'required': ['tag'],
+                                'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ErrorResult': {'additionalProperties': False,
+                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
+                                     'type': 'object'},
+                     'ErrorResults': {'additionalProperties': False,
+                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
+                                                                 'type': 'array'}},
+                                      'required': ['results'],
+                                      'type': 'object'},
+                     'MeterStatusResult': {'additionalProperties': False,
+                                           'properties': {'code': {'type': 'string'},
+                                                          'error': {'$ref': '#/definitions/Error'},
+                                                          'info': {'type': 'string'}},
+                                           'required': ['code', 'info'],
+                                           'type': 'object'},
+                     'MeterStatusResults': {'additionalProperties': False,
+                                            'properties': {'results': {'items': {'$ref': '#/definitions/MeterStatusResult'},
+                                                                       'type': 'array'}},
+                                            'required': ['results'],
+                                            'type': 'object'},
+                     'NotifyWatchResult': {'additionalProperties': False,
+                                           'properties': {'NotifyWatcherId': {'type': 'string'},
+                                                          'error': {'$ref': '#/definitions/Error'}},
+                                           'required': ['NotifyWatcherId'],
+                                           'type': 'object'},
+                     'NotifyWatchResults': {'additionalProperties': False,
+                                            'properties': {'results': {'items': {'$ref': '#/definitions/NotifyWatchResult'},
+                                                                       'type': 'array'}},
+                                            'required': ['results'],
+                                            'type': 'object'},
+                     'SetUnitStateArg': {'additionalProperties': False,
+                                         'properties': {'charm-state': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                        'type': 'object'},
+                                                        'meter-status-state': {'type': 'string'},
+                                                        'relation-state': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                           'type': 'object'},
+                                                        'storage-state': {'type': 'string'},
+                                                        'tag': {'type': 'string'},
+                                                        'uniter-state': {'type': 'string'}},
+                                         'required': ['tag'],
+                                         'type': 'object'},
+                     'SetUnitStateArgs': {'additionalProperties': False,
+                                          'properties': {'args': {'items': {'$ref': '#/definitions/SetUnitStateArg'},
+                                                                  'type': 'array'}},
+                                          'required': ['args'],
+                                          'type': 'object'},
+                     'UnitStateResult': {'additionalProperties': False,
+                                         'properties': {'charm-state': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                        'type': 'object'},
+                                                        'error': {'$ref': '#/definitions/Error'},
+                                                        'meter-status-state': {'type': 'string'},
+                                                        'relation-state': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                           'type': 'object'},
+                                                        'storage-state': {'type': 'string'},
+                                                        'uniter-state': {'type': 'string'}},
+                                         'type': 'object'},
+                     'UnitStateResults': {'additionalProperties': False,
+                                          'properties': {'results': {'items': {'$ref': '#/definitions/UnitStateResult'},
+                                                                     'type': 'array'}},
+                                          'required': ['results'],
+                                          'type': 'object'}},
+     'properties': {'GetMeterStatus': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                      'Result': {'$ref': '#/definitions/MeterStatusResults'}},
+                                       'type': 'object'},
+                    'SetState': {'properties': {'Params': {'$ref': '#/definitions/SetUnitStateArgs'},
+                                                'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                 'type': 'object'},
+                    'State': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                             'Result': {'$ref': '#/definitions/UnitStateResults'}},
+                              'type': 'object'},
+                    'WatchMeterStatus': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                        'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
+                                         'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(MeterStatusResults)
+    async def GetMeterStatus(self, entities=None):
+        '''
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~MeterStatusResult]
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='MeterStatus',
+                   request='GetMeterStatus',
+                   version=2,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def SetState(self, args=None):
+        '''
+        args : typing.Sequence[~SetUnitStateArg]
+        Returns -> typing.Sequence[~ErrorResult]
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='MeterStatus',
+                   request='SetState',
+                   version=2,
+                   params=_params)
+        _params['args'] = args
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(UnitStateResults)
+    async def State(self, entities=None):
+        '''
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~UnitStateResult]
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='MeterStatus',
+                   request='State',
+                   version=2,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResults)
+    async def WatchMeterStatus(self, entities=None):
+        '''
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~NotifyWatchResult]
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='MeterStatus',
+                   request='WatchMeterStatus',
+                   version=2,
+                   params=_params)
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
@@ -7588,7 +7768,7 @@ class MigrationMasterFacade(Type):
     async def MigrationStatus(self):
         '''
 
-        Returns -> typing.Union[str, _ForwardRef('MigrationSpec')]
+        Returns -> typing.Union[str, ForwardRef('MigrationSpec')]
         '''
 
         # map input types to rpc msg
@@ -7626,7 +7806,7 @@ class MigrationMasterFacade(Type):
     async def ModelInfo(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Number'), str]
+        Returns -> typing.Union[ForwardRef('Number'), str]
         '''
 
         # map input types to rpc msg
@@ -7746,7 +7926,7 @@ class MigrationMasterFacade(Type):
     async def Watch(self):
         '''
 
-        Returns -> typing.Union[str, _ForwardRef('Error')]
+        Returns -> typing.Union[str, ForwardRef('Error')]
         '''
 
         # map input types to rpc msg
@@ -7765,7 +7945,7 @@ class MigrationMasterFacade(Type):
     async def WatchMinionReports(self):
         '''
 
-        Returns -> typing.Union[str, _ForwardRef('Error')]
+        Returns -> typing.Union[str, ForwardRef('Error')]
         '''
 
         # map input types to rpc msg
@@ -7919,7 +8099,7 @@ class ModelConfigFacade(Type):
     async def SLALevel(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), str]
+        Returns -> typing.Union[ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -8137,7 +8317,7 @@ class ModelGenerationFacade(Type):
         '''
         branches : typing.Sequence[str]
         detailed : bool
-        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence[~Generation]]
+        Returns -> typing.Union[ForwardRef('Error'), typing.Sequence[~Generation]]
         '''
         if branches is not None and not isinstance(branches, (bytes, str, list)):
             raise Exception("Expected branches to be a Sequence, received: {}".format(type(branches)))
@@ -8162,7 +8342,7 @@ class ModelGenerationFacade(Type):
     async def CommitBranch(self, branch=None):
         '''
         branch : str
-        Returns -> typing.Union[_ForwardRef('Error'), int]
+        Returns -> typing.Union[ForwardRef('Error'), int]
         '''
         if branch is not None and not isinstance(branch, (bytes, str)):
             raise Exception("Expected branch to be a str, received: {}".format(type(branch)))
@@ -8183,7 +8363,7 @@ class ModelGenerationFacade(Type):
     async def HasActiveBranch(self, branch=None):
         '''
         branch : str
-        Returns -> typing.Union[_ForwardRef('Error'), bool]
+        Returns -> typing.Union[ForwardRef('Error'), bool]
         '''
         if branch is not None and not isinstance(branch, (bytes, str)):
             raise Exception("Expected branch to be a str, received: {}".format(type(branch)))
@@ -8523,7 +8703,7 @@ class ModelManagerFacade(Type):
         name : str
         owner_tag : str
         region : str
-        Returns -> typing.Union[_ForwardRef('Number'), str, typing.Sequence[~ModelMachineInfo], _ForwardRef('ModelMigrationStatus'), _ForwardRef('ModelSLAInfo'), _ForwardRef('EntityStatus'), typing.Sequence[~ModelUserInfo]]
+        Returns -> typing.Union[ForwardRef('Number'), str, typing.Sequence[~ModelMachineInfo], ForwardRef('ModelMigrationStatus'), ForwardRef('ModelSLAInfo'), ForwardRef('EntityStatus'), typing.Sequence[~ModelUserInfo]]
         '''
         if cloud_tag is not None and not isinstance(cloud_tag, (bytes, str)):
             raise Exception("Expected cloud_tag to be a str, received: {}".format(type(cloud_tag)))
@@ -8998,7 +9178,7 @@ class RebootFacade(Type):
     async def WatchForRebootEvent(self):
         '''
 
-        Returns -> typing.Union[str, _ForwardRef('Error')]
+        Returns -> typing.Union[str, ForwardRef('Error')]
         '''
 
         # map input types to rpc msg
@@ -9582,7 +9762,7 @@ class RemoteRelationsFacade(Type):
     async def WatchRemoteApplications(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error'), str]
+        Returns -> typing.Union[typing.Sequence[str], ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -9601,7 +9781,7 @@ class RemoteRelationsFacade(Type):
     async def WatchRemoteRelations(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error'), str]
+        Returns -> typing.Union[typing.Sequence[str], ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -10107,7 +10287,7 @@ class StatusHistoryFacade(Type):
     async def WatchForModelConfigChanges(self):
         '''
 
-        Returns -> typing.Union[str, _ForwardRef('Error')]
+        Returns -> typing.Union[str, ForwardRef('Error')]
         '''
 
         # map input types to rpc msg
@@ -10296,6 +10476,96 @@ class SubnetsFacade(Type):
                    params=_params)
         _params['space-tag'] = space_tag
         _params['zone'] = zone
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+class UpgradeStepsFacade(Type):
+    name = 'UpgradeSteps'
+    version = 2
+    schema =     {'definitions': {'Entity': {'additionalProperties': False,
+                                'properties': {'tag': {'type': 'string'}},
+                                'required': ['tag'],
+                                'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ErrorResult': {'additionalProperties': False,
+                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
+                                     'type': 'object'},
+                     'ErrorResults': {'additionalProperties': False,
+                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
+                                                                 'type': 'array'}},
+                                      'required': ['results'],
+                                      'type': 'object'},
+                     'SetUnitStateArg': {'additionalProperties': False,
+                                         'properties': {'charm-state': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                        'type': 'object'},
+                                                        'meter-status-state': {'type': 'string'},
+                                                        'relation-state': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                           'type': 'object'},
+                                                        'storage-state': {'type': 'string'},
+                                                        'tag': {'type': 'string'},
+                                                        'uniter-state': {'type': 'string'}},
+                                         'required': ['tag'],
+                                         'type': 'object'},
+                     'SetUnitStateArgs': {'additionalProperties': False,
+                                          'properties': {'args': {'items': {'$ref': '#/definitions/SetUnitStateArg'},
+                                                                  'type': 'array'}},
+                                          'required': ['args'],
+                                          'type': 'object'}},
+     'properties': {'ResetKVMMachineModificationStatusIdle': {'properties': {'Params': {'$ref': '#/definitions/Entity'},
+                                                                             'Result': {'$ref': '#/definitions/ErrorResult'}},
+                                                              'type': 'object'},
+                    'WriteAgentState': {'properties': {'Params': {'$ref': '#/definitions/SetUnitStateArgs'},
+                                                       'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                        'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(ErrorResult)
+    async def ResetKVMMachineModificationStatusIdle(self, tag=None):
+        '''
+        tag : str
+        Returns -> Error
+        '''
+        if tag is not None and not isinstance(tag, (bytes, str)):
+            raise Exception("Expected tag to be a str, received: {}".format(type(tag)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='UpgradeSteps',
+                   request='ResetKVMMachineModificationStatusIdle',
+                   version=2,
+                   params=_params)
+        _params['tag'] = tag
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def WriteAgentState(self, args=None):
+        '''
+        args : typing.Sequence[~SetUnitStateArg]
+        Returns -> typing.Sequence[~ErrorResult]
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='UpgradeSteps',
+                   request='WriteAgentState',
+                   version=2,
+                   params=_params)
+        _params['args'] = args
         reply = await self.rpc(msg)
         return reply
 
@@ -10605,7 +10875,7 @@ class VolumeAttachmentsWatcherFacade(Type):
     async def Next(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence[~MachineStorageId], _ForwardRef('Error'), str]
+        Returns -> typing.Union[typing.Sequence[~MachineStorageId], ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg

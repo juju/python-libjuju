@@ -1226,7 +1226,7 @@ class ApplicationFacade(Type):
     async def Get(self, application=None):
         '''
         application : str
-        Returns -> typing.Union[str, typing.Mapping[str, typing.Any], _ForwardRef('Value')]
+        Returns -> typing.Union[str, typing.Mapping[str, typing.Any], ForwardRef('Value')]
         '''
         if application is not None and not isinstance(application, (bytes, str)):
             raise Exception("Expected application to be a str, received: {}".format(type(application)))
@@ -1247,7 +1247,7 @@ class ApplicationFacade(Type):
     async def GetCharmURL(self, application=None):
         '''
         application : str
-        Returns -> typing.Union[_ForwardRef('Error'), str]
+        Returns -> typing.Union[ForwardRef('Error'), str]
         '''
         if application is not None and not isinstance(application, (bytes, str)):
             raise Exception("Expected application to be a str, received: {}".format(type(application)))
@@ -2693,7 +2693,7 @@ class ControllerFacade(Type):
     async def GetCloudSpec(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), _ForwardRef('CloudSpec')]
+        Returns -> typing.Union[ForwardRef('Error'), ForwardRef('CloudSpec')]
         '''
 
         # map input types to rpc msg
@@ -3309,7 +3309,7 @@ class FirewallerFacade(Type):
     async def GetCloudSpec(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), _ForwardRef('CloudSpec')]
+        Returns -> typing.Union[ForwardRef('Error'), ForwardRef('CloudSpec')]
         '''
 
         # map input types to rpc msg
@@ -3557,7 +3557,7 @@ class FirewallerFacade(Type):
     async def WatchForModelConfigChanges(self):
         '''
 
-        Returns -> typing.Union[str, _ForwardRef('Error')]
+        Returns -> typing.Union[str, ForwardRef('Error')]
         '''
 
         # map input types to rpc msg
@@ -3597,7 +3597,7 @@ class FirewallerFacade(Type):
     async def WatchModelMachineStartTimes(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error'), str]
+        Returns -> typing.Union[typing.Sequence[str], ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -3616,7 +3616,7 @@ class FirewallerFacade(Type):
     async def WatchModelMachines(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error'), str]
+        Returns -> typing.Union[typing.Sequence[str], ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -4604,7 +4604,7 @@ class ModelManagerFacade(Type):
         name : str
         owner_tag : str
         region : str
-        Returns -> typing.Union[_ForwardRef('Number'), str, typing.Sequence[~ModelMachineInfo], _ForwardRef('ModelMigrationStatus'), _ForwardRef('ModelSLAInfo'), _ForwardRef('EntityStatus'), typing.Sequence[~ModelUserInfo]]
+        Returns -> typing.Union[ForwardRef('Number'), str, typing.Sequence[~ModelMachineInfo], ForwardRef('ModelMigrationStatus'), ForwardRef('ModelSLAInfo'), ForwardRef('EntityStatus'), typing.Sequence[~ModelUserInfo]]
         '''
         if cloud_tag is not None and not isinstance(cloud_tag, (bytes, str)):
             raise Exception("Expected cloud_tag to be a str, received: {}".format(type(cloud_tag)))
@@ -5821,7 +5821,7 @@ class UniterFacade(Type):
     async def APIAddresses(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence[str]]
+        Returns -> typing.Union[ForwardRef('Error'), typing.Sequence[str]]
         '''
 
         # map input types to rpc msg
@@ -6172,7 +6172,7 @@ class UniterFacade(Type):
     async def CurrentModel(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), str]
+        Returns -> typing.Union[ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -6483,7 +6483,7 @@ class UniterFacade(Type):
     async def ModelUUID(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), str]
+        Returns -> typing.Union[ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -6570,7 +6570,7 @@ class UniterFacade(Type):
     async def ProviderType(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), str]
+        Returns -> typing.Union[ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -6778,7 +6778,7 @@ class UniterFacade(Type):
     async def SLALevel(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), str]
+        Returns -> typing.Union[ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -7049,7 +7049,7 @@ class UniterFacade(Type):
     async def WatchAPIHostPorts(self):
         '''
 
-        Returns -> typing.Union[str, _ForwardRef('Error')]
+        Returns -> typing.Union[str, ForwardRef('Error')]
         '''
 
         # map input types to rpc msg
@@ -7110,7 +7110,7 @@ class UniterFacade(Type):
     async def WatchForModelConfigChanges(self):
         '''
 
-        Returns -> typing.Union[str, _ForwardRef('Error')]
+        Returns -> typing.Union[str, ForwardRef('Error')]
         '''
 
         # map input types to rpc msg

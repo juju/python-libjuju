@@ -144,6 +144,9 @@ class Controller:
                 raise ValueError('Authentication parameters are required '
                                  'if controller_name not given')
             await self._connector.connect(**kwargs)
+        await self.update_endpoints()
+
+    async def update_endpoints(self):
         info = await self.info()
         self._connector._connection.endpoints = [
             (e, info.results[0].cacert)

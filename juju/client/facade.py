@@ -7,6 +7,7 @@ import pprint
 import re
 import textwrap
 import typing
+import typing_inspect
 from collections import defaultdict
 from glob import glob
 from pathlib import Path
@@ -206,7 +207,14 @@ def var_type_to_py(kind):
 def kind_to_py(kind):
     if kind is None or kind is typing.Any:
         return 'None', '', False
-    name = kind.__name__
+
+    name = ""
+    if typing_inspect.is_generic_type(kind):
+        origin = typing_inspect.get_origin(kind)
+        name = origin.__name__
+    else:
+        name = kind.__name__
+
     if (kind in basic_types or type(kind) in basic_types):
         return name, type_mapping.get(name) or name, True
     if (name in type_mapping):
@@ -224,8 +232,11 @@ def strcast(kind, keep_builtins=False):
         return str(kind)[1:]
     if kind is typing.Any:
         return 'Any'
-    if issubclass(kind, typing.GenericMeta):
-        return str(kind)[1:]
+    try:
+        if issubclass(kind, typing.GenericMeta):
+            return str(kind)[1:]
+    except AttributeError:
+        pass
     return kind
 
 
@@ -247,12 +258,13 @@ class Args(list):
     def do_explode(self, kind):
         if kind in basic_types or type(kind) is typing.TypeVar:
             return False
-        if not issubclass(kind, (typing.Sequence,
-                                 typing.Mapping)):
-            self.clear()
-            self.extend(Args(self.schema, kind))
-            return True
-        return False
+        if typing_inspect.is_generic_type(kind) and issubclass(typing_inspect.get_origin(kind), Sequence):
+            return False
+        if typing_inspect.is_generic_type(kind) and issubclass(typing_inspect.get_origin(kind), Mapping):
+            return False
+        self.clear()
+        self.extend(Args(self.schema, kind))
+        return True
 
     def PyToSchemaMapping(self):
         m = {}
@@ -375,10 +387,11 @@ class {}(Type):
                                                            arg_type_name,
                                                            arg_name,
                                                            arg_name))
-                elif issubclass(arg_type, typing.Sequence):
+                elif typing_inspect.is_generic_type(arg_type) and issubclass(typing_inspect.get_origin(arg_type), Sequence):
+                    parameters = typing_inspect.get_parameters(arg_type)
                     value_type = (
-                        arg_type_name.__parameters__[0]
-                        if len(arg_type_name.__parameters__)
+                        parameters[0]
+                        if len(parameters)
                         else None
                     )
                     if type(value_type) is typing.TypeVar:
@@ -392,15 +405,16 @@ class {}(Type):
                         source.append("{}{}_ = {}".format(INDENT * 2,
                                                           arg_name,
                                                           arg_name))
-                elif issubclass(arg_type, typing.Mapping):
+                elif typing_inspect.is_generic_type(arg_type) and issubclass(typing_inspect.get_origin(arg_type), Mapping):
+                    parameters = typing_inspect.get_parameters(arg_type)
                     value_type = (
-                        arg_type_name.__parameters__[1]
-                        if len(arg_type_name.__parameters__) > 1
+                        parameters[0]
+                        if len(parameters)
                         else None
                     )
                     if type(value_type) is typing.TypeVar:
                         source.append(
-                            "{}s{}_ = {{k: {}.from_json(v) "
+                            "{}{}_ = {{k: {}.from_json(v) "
                             "for k, v in ({} or dict()).items()}}".format(
                                 INDENT * 2,
                                 arg_name,
@@ -473,9 +487,10 @@ def ReturnMapping(cls):
                 return reply
             if 'error' in reply:
                 cls = CLASSES['Error']
-            if issubclass(cls, typing.Sequence):
+            if typing_inspect.is_generic_type(cls) and issubclass(typing_inspect.get_origin(cls), Sequence):
+                parameters = typing_inspect.get_parameters(cls)
                 result = []
-                item_cls = cls.__parameters__[0]
+                item_cls = parameters[0]
                 for item in reply:
                     result.append(item_cls.from_json(item))
                     """

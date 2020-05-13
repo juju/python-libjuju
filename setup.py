@@ -38,7 +38,8 @@ setup(
         'websockets>=7.0,<8.0',
         'paramiko>=2.4.0,<3.0.0',
         'pyasn1>=0.4.4',
-        'toposort>=1.5,<2'
+        'toposort>=1.5,<2',
+        'typing_inspect>=0.6.0'
     ],
     include_package_data=True,
     maintainer='Juju Ecosystem Engineering',
@@ -55,6 +56,7 @@ setup(
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
     ],
     entry_points={
         'console_scripts': [

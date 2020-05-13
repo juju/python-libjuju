@@ -140,6 +140,10 @@ class BundleFacade(TypeFactory):
     pass
 
 
+class CAASAdmissionFacade(TypeFactory):
+    pass
+
+
 class CAASAgentFacade(TypeFactory):
     pass
 
@@ -253,6 +257,10 @@ class ImageManagerFacade(TypeFactory):
 
 
 class ImageMetadataFacade(TypeFactory):
+    pass
+
+
+class ImageMetadataManagerFacade(TypeFactory):
     pass
 
 

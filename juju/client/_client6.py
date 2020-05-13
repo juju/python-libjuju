@@ -1919,6 +1919,38 @@ class SpacesFacade(Type):
                                                                       'type': 'array'}},
                                            'required': ['results'],
                                            'type': 'object'},
+                     'MoveSubnetsParam': {'additionalProperties': False,
+                                          'properties': {'force': {'type': 'boolean'},
+                                                         'space-tag': {'type': 'string'},
+                                                         'subnets': {'items': {'type': 'string'},
+                                                                     'type': 'array'}},
+                                          'required': ['subnets',
+                                                       'space-tag',
+                                                       'force'],
+                                          'type': 'object'},
+                     'MoveSubnetsParams': {'additionalProperties': False,
+                                           'properties': {'args': {'items': {'$ref': '#/definitions/MoveSubnetsParam'},
+                                                                   'type': 'array'}},
+                                           'required': ['args'],
+                                           'type': 'object'},
+                     'MoveSubnetsResult': {'additionalProperties': False,
+                                           'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                          'moved-subnets': {'items': {'$ref': '#/definitions/MovedSubnet'},
+                                                                            'type': 'array'},
+                                                          'new-space': {'type': 'string'}},
+                                           'required': ['new-space'],
+                                           'type': 'object'},
+                     'MoveSubnetsResults': {'additionalProperties': False,
+                                            'properties': {'results': {'items': {'$ref': '#/definitions/MoveSubnetsResult'},
+                                                                       'type': 'array'}},
+                                            'required': ['results'],
+                                            'type': 'object'},
+                     'MovedSubnet': {'additionalProperties': False,
+                                     'properties': {'cidr': {'type': 'string'},
+                                                    'old-space': {'type': 'string'},
+                                                    'subnet': {'type': 'string'}},
+                                     'required': ['subnet', 'old-space', 'cidr'],
+                                     'type': 'object'},
                      'RemoveSpaceParam': {'additionalProperties': False,
                                           'properties': {'dry-run': {'type': 'boolean'},
                                                          'force': {'type': 'boolean'},
@@ -1951,9 +1983,9 @@ class SpacesFacade(Type):
                                                         'to-space-tag'],
                                            'type': 'object'},
                      'RenameSpacesParams': {'additionalProperties': False,
-                                            'properties': {'rename-spaces': {'items': {'$ref': '#/definitions/RenameSpaceParams'},
-                                                                             'type': 'array'}},
-                                            'required': ['rename-spaces'],
+                                            'properties': {'changes': {'items': {'$ref': '#/definitions/RenameSpaceParams'},
+                                                                       'type': 'array'}},
+                                            'required': ['changes'],
                                             'type': 'object'},
                      'ShowSpaceResult': {'additionalProperties': False,
                                          'properties': {'applications': {'items': {'type': 'string'},
@@ -2000,6 +2032,9 @@ class SpacesFacade(Type):
                                      'type': 'object'},
                     'ListSpaces': {'properties': {'Result': {'$ref': '#/definitions/ListSpacesResults'}},
                                    'type': 'object'},
+                    'MoveSubnets': {'properties': {'Params': {'$ref': '#/definitions/MoveSubnetsParams'},
+                                                   'Result': {'$ref': '#/definitions/MoveSubnetsResults'}},
+                                    'type': 'object'},
                     'ReloadSpaces': {'type': 'object'},
                     'RemoveSpace': {'properties': {'Params': {'$ref': '#/definitions/RemoveSpaceParams'},
                                                    'Result': {'$ref': '#/definitions/RemoveSpaceResults'}},
@@ -2053,6 +2088,27 @@ class SpacesFacade(Type):
 
 
 
+    @ReturnMapping(MoveSubnetsResults)
+    async def MoveSubnets(self, args=None):
+        '''
+        args : typing.Sequence[~MoveSubnetsParam]
+        Returns -> typing.Sequence[~MoveSubnetsResult]
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Spaces',
+                   request='MoveSubnets',
+                   version=6,
+                   params=_params)
+        _params['args'] = args
+        reply = await self.rpc(msg)
+        return reply
+
+
+
     @ReturnMapping(None)
     async def ReloadSpaces(self):
         '''
@@ -2094,13 +2150,13 @@ class SpacesFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def RenameSpace(self, rename_spaces=None):
+    async def RenameSpace(self, changes=None):
         '''
-        rename_spaces : typing.Sequence[~RenameSpaceParams]
+        changes : typing.Sequence[~RenameSpaceParams]
         Returns -> typing.Sequence[~ErrorResult]
         '''
-        if rename_spaces is not None and not isinstance(rename_spaces, (bytes, str, list)):
-            raise Exception("Expected rename_spaces to be a Sequence, received: {}".format(type(rename_spaces)))
+        if changes is not None and not isinstance(changes, (bytes, str, list)):
+            raise Exception("Expected changes to be a Sequence, received: {}".format(type(changes)))
 
         # map input types to rpc msg
         _params = dict()
@@ -2108,7 +2164,7 @@ class SpacesFacade(Type):
                    request='RenameSpace',
                    version=6,
                    params=_params)
-        _params['rename-spaces'] = rename_spaces
+        _params['changes'] = changes
         reply = await self.rpc(msg)
         return reply
 

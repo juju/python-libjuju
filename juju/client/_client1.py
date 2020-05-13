@@ -91,7 +91,7 @@ class ActionPrunerFacade(Type):
     async def WatchForModelConfigChanges(self):
         '''
 
-        Returns -> typing.Union[str, _ForwardRef('Error')]
+        Returns -> typing.Union[str, ForwardRef('Error')]
         '''
 
         # map input types to rpc msg
@@ -239,7 +239,7 @@ class ApplicationRelationsWatcherFacade(Type):
     async def Next(self):
         '''
 
-        Returns -> typing.Union[str, _ForwardRef('ApplicationRelationsChange'), _ForwardRef('Error')]
+        Returns -> typing.Union[str, ForwardRef('ApplicationRelationsChange'), ForwardRef('Error')]
         '''
 
         # map input types to rpc msg
@@ -341,7 +341,7 @@ class ApplicationScalerFacade(Type):
     async def Watch(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error'), str]
+        Returns -> typing.Union[typing.Sequence[str], ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -451,7 +451,7 @@ class BackupsFacade(Type):
     async def Create(self, notes=None):
         '''
         notes : str
-        Returns -> typing.Union[str, int, _ForwardRef('Number')]
+        Returns -> typing.Union[str, int, ForwardRef('Number')]
         '''
         if notes is not None and not isinstance(notes, (bytes, str)):
             raise Exception("Expected notes to be a str, received: {}".format(type(notes)))
@@ -491,7 +491,7 @@ class BackupsFacade(Type):
     async def Info(self, id_=None):
         '''
         id_ : str
-        Returns -> typing.Union[str, int, _ForwardRef('Number')]
+        Returns -> typing.Union[str, int, ForwardRef('Number')]
         '''
         if id_ is not None and not isinstance(id_, (bytes, str)):
             raise Exception("Expected id_ to be a str, received: {}".format(type(id_)))
@@ -636,6 +636,93 @@ class BundleFacade(Type):
                    version=1,
                    params=_params)
         _params['yaml'] = yaml
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+class CAASAdmissionFacade(Type):
+    name = 'CAASAdmission'
+    version = 1
+    schema =     {'definitions': {'ControllerAPIInfoResult': {'additionalProperties': False,
+                                                 'properties': {'addresses': {'items': {'type': 'string'},
+                                                                              'type': 'array'},
+                                                                'cacert': {'type': 'string'},
+                                                                'error': {'$ref': '#/definitions/Error'}},
+                                                 'required': ['addresses',
+                                                              'cacert'],
+                                                 'type': 'object'},
+                     'ControllerAPIInfoResults': {'additionalProperties': False,
+                                                  'properties': {'results': {'items': {'$ref': '#/definitions/ControllerAPIInfoResult'},
+                                                                             'type': 'array'}},
+                                                  'required': ['results'],
+                                                  'type': 'object'},
+                     'ControllerConfigResult': {'additionalProperties': False,
+                                                'properties': {'config': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                       'type': 'object'}},
+                                                                          'type': 'object'}},
+                                                'required': ['config'],
+                                                'type': 'object'},
+                     'Entities': {'additionalProperties': False,
+                                  'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
+                                                              'type': 'array'}},
+                                  'required': ['entities'],
+                                  'type': 'object'},
+                     'Entity': {'additionalProperties': False,
+                                'properties': {'tag': {'type': 'string'}},
+                                'required': ['tag'],
+                                'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'}},
+     'properties': {'ControllerAPIInfoForModels': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                                  'Result': {'$ref': '#/definitions/ControllerAPIInfoResults'}},
+                                                   'type': 'object'},
+                    'ControllerConfig': {'properties': {'Result': {'$ref': '#/definitions/ControllerConfigResult'}},
+                                         'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(ControllerAPIInfoResults)
+    async def ControllerAPIInfoForModels(self, entities=None):
+        '''
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~ControllerAPIInfoResult]
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASAdmission',
+                   request='ControllerAPIInfoForModels',
+                   version=1,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ControllerConfigResult)
+    async def ControllerConfig(self):
+        '''
+
+        Returns -> typing.Mapping[str, typing.Any]
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASAdmission',
+                   request='ControllerConfig',
+                   version=1,
+                   params=_params)
+
         reply = await self.rpc(msg)
         return reply
 
@@ -811,7 +898,7 @@ class CAASAgentFacade(Type):
     async def GetCloudSpec(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), _ForwardRef('CloudSpec')]
+        Returns -> typing.Union[ForwardRef('Error'), ForwardRef('CloudSpec')]
         '''
 
         # map input types to rpc msg
@@ -870,7 +957,7 @@ class CAASAgentFacade(Type):
     async def WatchForModelConfigChanges(self):
         '''
 
-        Returns -> typing.Union[str, _ForwardRef('Error')]
+        Returns -> typing.Union[str, ForwardRef('Error')]
         '''
 
         # map input types to rpc msg
@@ -1059,7 +1146,7 @@ class CAASFirewallerFacade(Type):
     async def WatchApplications(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error'), str]
+        Returns -> typing.Union[typing.Sequence[str], ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -1093,6 +1180,7 @@ class CAASOperatorFacade(Type):
                                  'type': 'object'},
                      'ApplicationCharm': {'additionalProperties': False,
                                           'properties': {'charm-modified-version': {'type': 'integer'},
+                                                         'deployment-mode': {'type': 'string'},
                                                          'force-upgrade': {'type': 'boolean'},
                                                          'sha256': {'type': 'string'},
                                                          'url': {'type': 'string'}},
@@ -1322,7 +1410,7 @@ class CAASOperatorFacade(Type):
     async def APIAddresses(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence[str]]
+        Returns -> typing.Union[ForwardRef('Error'), typing.Sequence[str]]
         '''
 
         # map input types to rpc msg
@@ -1381,7 +1469,7 @@ class CAASOperatorFacade(Type):
     async def CurrentModel(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), str]
+        Returns -> typing.Union[ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -1421,7 +1509,7 @@ class CAASOperatorFacade(Type):
     async def ModelUUID(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), str]
+        Returns -> typing.Union[ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -1545,7 +1633,7 @@ class CAASOperatorFacade(Type):
     async def WatchAPIHostPorts(self):
         '''
 
-        Returns -> typing.Union[str, _ForwardRef('Error')]
+        Returns -> typing.Union[str, ForwardRef('Error')]
         '''
 
         # map input types to rpc msg
@@ -1733,15 +1821,20 @@ class CAASOperatorProvisionerFacade(Type):
                                                   'properties': {'api-addresses': {'items': {'type': 'string'},
                                                                                    'type': 'array'},
                                                                  'charm-storage': {'$ref': '#/definitions/KubernetesFilesystemParams'},
+                                                                 'error': {'$ref': '#/definitions/Error'},
                                                                  'image-path': {'type': 'string'},
                                                                  'tags': {'patternProperties': {'.*': {'type': 'string'}},
                                                                           'type': 'object'},
                                                                  'version': {'$ref': '#/definitions/Number'}},
                                                   'required': ['image-path',
                                                                'version',
-                                                               'api-addresses',
-                                                               'charm-storage'],
+                                                               'api-addresses'],
                                                   'type': 'object'},
+                     'OperatorProvisioningInfoResults': {'additionalProperties': False,
+                                                         'properties': {'results': {'items': {'$ref': '#/definitions/OperatorProvisioningInfo'},
+                                                                                    'type': 'array'}},
+                                                         'required': ['results'],
+                                                         'type': 'object'},
                      'StringResult': {'additionalProperties': False,
                                       'properties': {'error': {'$ref': '#/definitions/Error'},
                                                      'result': {'type': 'string'}},
@@ -1771,7 +1864,8 @@ class CAASOperatorProvisionerFacade(Type):
                              'type': 'object'},
                     'ModelUUID': {'properties': {'Result': {'$ref': '#/definitions/StringResult'}},
                                   'type': 'object'},
-                    'OperatorProvisioningInfo': {'properties': {'Result': {'$ref': '#/definitions/OperatorProvisioningInfo'}},
+                    'OperatorProvisioningInfo': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                                'Result': {'$ref': '#/definitions/OperatorProvisioningInfoResults'}},
                                                  'type': 'object'},
                     'SetPasswords': {'properties': {'Params': {'$ref': '#/definitions/EntityPasswords'},
                                                     'Result': {'$ref': '#/definitions/ErrorResults'}},
@@ -1787,7 +1881,7 @@ class CAASOperatorProvisionerFacade(Type):
     async def APIAddresses(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence[str]]
+        Returns -> typing.Union[ForwardRef('Error'), typing.Sequence[str]]
         '''
 
         # map input types to rpc msg
@@ -1867,7 +1961,7 @@ class CAASOperatorProvisionerFacade(Type):
     async def ModelUUID(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), str]
+        Returns -> typing.Union[ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -1882,12 +1976,14 @@ class CAASOperatorProvisionerFacade(Type):
 
 
 
-    @ReturnMapping(OperatorProvisioningInfo)
-    async def OperatorProvisioningInfo(self):
+    @ReturnMapping(OperatorProvisioningInfoResults)
+    async def OperatorProvisioningInfo(self, entities=None):
         '''
-
-        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('KubernetesFilesystemParams'), str, typing.Mapping[str, str], _ForwardRef('Number')]
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~OperatorProvisioningInfo]
         '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
 
         # map input types to rpc msg
         _params = dict()
@@ -1895,7 +1991,7 @@ class CAASOperatorProvisionerFacade(Type):
                    request='OperatorProvisioningInfo',
                    version=1,
                    params=_params)
-
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
@@ -1926,7 +2022,7 @@ class CAASOperatorProvisionerFacade(Type):
     async def WatchAPIHostPorts(self):
         '''
 
-        Returns -> typing.Union[str, _ForwardRef('Error')]
+        Returns -> typing.Union[str, ForwardRef('Error')]
         '''
 
         # map input types to rpc msg
@@ -1945,7 +2041,7 @@ class CAASOperatorProvisionerFacade(Type):
     async def WatchApplications(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error'), str]
+        Returns -> typing.Union[typing.Sequence[str], ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -2195,6 +2291,7 @@ class CAASUnitProvisionerFacade(Type):
                                                                                    'type': 'array'},
                                                                    'operator-image-path': {'type': 'string'},
                                                                    'pod-spec': {'type': 'string'},
+                                                                   'raw-k8s-spec': {'type': 'string'},
                                                                    'tags': {'patternProperties': {'.*': {'type': 'string'}},
                                                                             'type': 'object'},
                                                                    'volumes': {'items': {'$ref': '#/definitions/KubernetesVolumeParams'},
@@ -2272,6 +2369,16 @@ class CAASUnitProvisionerFacade(Type):
                                                                'type': 'array'}},
                                    'required': ['entities'],
                                    'type': 'object'},
+                     'StringResult': {'additionalProperties': False,
+                                      'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                     'result': {'type': 'string'}},
+                                      'required': ['result'],
+                                      'type': 'object'},
+                     'StringResults': {'additionalProperties': False,
+                                       'properties': {'results': {'items': {'$ref': '#/definitions/StringResult'},
+                                                                  'type': 'array'}},
+                                       'required': ['results'],
+                                       'type': 'object'},
                      'StringsWatchResult': {'additionalProperties': False,
                                             'properties': {'changes': {'items': {'type': 'string'},
                                                                        'type': 'array'},
@@ -2347,6 +2454,12 @@ class CAASUnitProvisionerFacade(Type):
                     'ApplicationsScale': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                          'Result': {'$ref': '#/definitions/IntResults'}},
                                           'type': 'object'},
+                    'ClearApplicationsResources': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                                  'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                                   'type': 'object'},
+                    'DeploymentMode': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                      'Result': {'$ref': '#/definitions/StringResults'}},
+                                       'type': 'object'},
                     'Life': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                             'Result': {'$ref': '#/definitions/LifeResults'}},
                              'type': 'object'},
@@ -2407,6 +2520,48 @@ class CAASUnitProvisionerFacade(Type):
         _params = dict()
         msg = dict(type='CAASUnitProvisioner',
                    request='ApplicationsScale',
+                   version=1,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def ClearApplicationsResources(self, entities=None):
+        '''
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~ErrorResult]
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASUnitProvisioner',
+                   request='ClearApplicationsResources',
+                   version=1,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResults)
+    async def DeploymentMode(self, entities=None):
+        '''
+        entities : typing.Sequence[~Entity]
+        Returns -> typing.Sequence[~StringResult]
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASUnitProvisioner',
+                   request='DeploymentMode',
                    version=1,
                    params=_params)
         _params['entities'] = entities
@@ -2524,7 +2679,7 @@ class CAASUnitProvisionerFacade(Type):
     async def WatchApplications(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error'), str]
+        Returns -> typing.Union[typing.Sequence[str], ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -3533,7 +3688,7 @@ class ClientFacade(Type):
         minor : int
         number : Number
         series : str
-        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence[~Tools]]
+        Returns -> typing.Union[ForwardRef('Error'), typing.Sequence[~Tools]]
         '''
         if arch is not None and not isinstance(arch, (bytes, str)):
             raise Exception("Expected arch to be a str, received: {}".format(type(arch)))
@@ -3570,7 +3725,7 @@ class ClientFacade(Type):
     async def FullStatus(self, patterns=None):
         '''
         patterns : typing.Sequence[str]
-        Returns -> typing.Union[typing.Mapping[str, ~ApplicationStatus], typing.Mapping[str, ~MachineStatus], _ForwardRef('ModelStatusInfo'), typing.Sequence[~RelationStatus], typing.Mapping[str, ~RemoteApplicationStatus]]
+        Returns -> typing.Union[typing.Mapping[str, ~ApplicationStatus], typing.Mapping[str, ~MachineStatus], ForwardRef('ModelStatusInfo'), typing.Sequence[~RelationStatus], typing.Mapping[str, ~RemoteApplicationStatus]]
         '''
         if patterns is not None and not isinstance(patterns, (bytes, str, list)):
             raise Exception("Expected patterns to be a Sequence, received: {}".format(type(patterns)))
@@ -3671,7 +3826,7 @@ class ClientFacade(Type):
     async def ModelInfo(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Number'), str, typing.Sequence[~ModelMachineInfo], _ForwardRef('ModelMigrationStatus'), _ForwardRef('ModelSLAInfo'), _ForwardRef('EntityStatus'), typing.Sequence[~ModelUserInfo]]
+        Returns -> typing.Union[ForwardRef('Number'), str, typing.Sequence[~ModelMachineInfo], ForwardRef('ModelMigrationStatus'), ForwardRef('ModelSLAInfo'), ForwardRef('EntityStatus'), typing.Sequence[~ModelUserInfo]]
         '''
 
         # map input types to rpc msg
@@ -3897,7 +4052,7 @@ class ClientFacade(Type):
     async def SLALevel(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), str]
+        Returns -> typing.Union[ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -4276,7 +4431,7 @@ class CloudFacade(Type):
     async def DefaultCloud(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), str]
+        Returns -> typing.Union[ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -5128,7 +5283,7 @@ class DeployerFacade(Type):
     async def APIAddresses(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence[str]]
+        Returns -> typing.Union[ForwardRef('Error'), typing.Sequence[str]]
         '''
 
         # map input types to rpc msg
@@ -5206,7 +5361,7 @@ class DeployerFacade(Type):
     async def ModelUUID(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), str]
+        Returns -> typing.Union[ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -5309,7 +5464,7 @@ class DeployerFacade(Type):
     async def WatchAPIHostPorts(self):
         '''
 
-        Returns -> typing.Union[str, _ForwardRef('Error')]
+        Returns -> typing.Union[str, ForwardRef('Error')]
         '''
 
         # map input types to rpc msg
@@ -5544,7 +5699,7 @@ class FanConfigurerFacade(Type):
     async def WatchForFanConfigChanges(self):
         '''
 
-        Returns -> typing.Union[str, _ForwardRef('Error')]
+        Returns -> typing.Union[str, ForwardRef('Error')]
         '''
 
         # map input types to rpc msg
@@ -5694,6 +5849,173 @@ class HostKeyReporterFacade(Type):
                    version=1,
                    params=_params)
         _params['entity-keys'] = entity_keys
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+class ImageMetadataManagerFacade(Type):
+    name = 'ImageMetadataManager'
+    version = 1
+    schema =     {'definitions': {'CloudImageMetadata': {'additionalProperties': False,
+                                            'properties': {'arch': {'type': 'string'},
+                                                           'image-id': {'type': 'string'},
+                                                           'priority': {'type': 'integer'},
+                                                           'region': {'type': 'string'},
+                                                           'root-storage-size': {'type': 'integer'},
+                                                           'root-storage-type': {'type': 'string'},
+                                                           'series': {'type': 'string'},
+                                                           'source': {'type': 'string'},
+                                                           'stream': {'type': 'string'},
+                                                           'version': {'type': 'string'},
+                                                           'virt-type': {'type': 'string'}},
+                                            'required': ['image-id',
+                                                         'region',
+                                                         'version',
+                                                         'series',
+                                                         'arch',
+                                                         'source',
+                                                         'priority'],
+                                            'type': 'object'},
+                     'CloudImageMetadataList': {'additionalProperties': False,
+                                                'properties': {'metadata': {'items': {'$ref': '#/definitions/CloudImageMetadata'},
+                                                                            'type': 'array'}},
+                                                'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ErrorResult': {'additionalProperties': False,
+                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
+                                     'type': 'object'},
+                     'ErrorResults': {'additionalProperties': False,
+                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
+                                                                 'type': 'array'}},
+                                      'required': ['results'],
+                                      'type': 'object'},
+                     'ImageMetadataFilter': {'additionalProperties': False,
+                                             'properties': {'arches': {'items': {'type': 'string'},
+                                                                       'type': 'array'},
+                                                            'region': {'type': 'string'},
+                                                            'root-storage-type': {'type': 'string'},
+                                                            'series': {'items': {'type': 'string'},
+                                                                       'type': 'array'},
+                                                            'stream': {'type': 'string'},
+                                                            'virt-type': {'type': 'string'}},
+                                             'type': 'object'},
+                     'ListCloudImageMetadataResult': {'additionalProperties': False,
+                                                      'properties': {'result': {'items': {'$ref': '#/definitions/CloudImageMetadata'},
+                                                                                'type': 'array'}},
+                                                      'required': ['result'],
+                                                      'type': 'object'},
+                     'MetadataImageIds': {'additionalProperties': False,
+                                          'properties': {'image-ids': {'items': {'type': 'string'},
+                                                                       'type': 'array'}},
+                                          'required': ['image-ids'],
+                                          'type': 'object'},
+                     'MetadataSaveParams': {'additionalProperties': False,
+                                            'properties': {'metadata': {'items': {'$ref': '#/definitions/CloudImageMetadataList'},
+                                                                        'type': 'array'}},
+                                            'type': 'object'}},
+     'properties': {'Delete': {'properties': {'Params': {'$ref': '#/definitions/MetadataImageIds'},
+                                              'Result': {'$ref': '#/definitions/ErrorResults'}},
+                               'type': 'object'},
+                    'List': {'properties': {'Params': {'$ref': '#/definitions/ImageMetadataFilter'},
+                                            'Result': {'$ref': '#/definitions/ListCloudImageMetadataResult'}},
+                             'type': 'object'},
+                    'Save': {'properties': {'Params': {'$ref': '#/definitions/MetadataSaveParams'},
+                                            'Result': {'$ref': '#/definitions/ErrorResults'}},
+                             'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(ErrorResults)
+    async def Delete(self, image_ids=None):
+        '''
+        image_ids : typing.Sequence[str]
+        Returns -> typing.Sequence[~ErrorResult]
+        '''
+        if image_ids is not None and not isinstance(image_ids, (bytes, str, list)):
+            raise Exception("Expected image_ids to be a Sequence, received: {}".format(type(image_ids)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ImageMetadataManager',
+                   request='Delete',
+                   version=1,
+                   params=_params)
+        _params['image-ids'] = image_ids
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ListCloudImageMetadataResult)
+    async def List(self, arches=None, region=None, root_storage_type=None, series=None, stream=None, virt_type=None):
+        '''
+        arches : typing.Sequence[str]
+        region : str
+        root_storage_type : str
+        series : typing.Sequence[str]
+        stream : str
+        virt_type : str
+        Returns -> typing.Sequence[~CloudImageMetadata]
+        '''
+        if arches is not None and not isinstance(arches, (bytes, str, list)):
+            raise Exception("Expected arches to be a Sequence, received: {}".format(type(arches)))
+
+        if region is not None and not isinstance(region, (bytes, str)):
+            raise Exception("Expected region to be a str, received: {}".format(type(region)))
+
+        if root_storage_type is not None and not isinstance(root_storage_type, (bytes, str)):
+            raise Exception("Expected root_storage_type to be a str, received: {}".format(type(root_storage_type)))
+
+        if series is not None and not isinstance(series, (bytes, str, list)):
+            raise Exception("Expected series to be a Sequence, received: {}".format(type(series)))
+
+        if stream is not None and not isinstance(stream, (bytes, str)):
+            raise Exception("Expected stream to be a str, received: {}".format(type(stream)))
+
+        if virt_type is not None and not isinstance(virt_type, (bytes, str)):
+            raise Exception("Expected virt_type to be a str, received: {}".format(type(virt_type)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ImageMetadataManager',
+                   request='List',
+                   version=1,
+                   params=_params)
+        _params['arches'] = arches
+        _params['region'] = region
+        _params['root-storage-type'] = root_storage_type
+        _params['series'] = series
+        _params['stream'] = stream
+        _params['virt-type'] = virt_type
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def Save(self, metadata=None):
+        '''
+        metadata : typing.Sequence[~CloudImageMetadataList]
+        Returns -> typing.Sequence[~ErrorResult]
+        '''
+        if metadata is not None and not isinstance(metadata, (bytes, str, list)):
+            raise Exception("Expected metadata to be a Sequence, received: {}".format(type(metadata)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ImageMetadataManager',
+                   request='Save',
+                   version=1,
+                   params=_params)
+        _params['metadata'] = metadata
         reply = await self.rpc(msg)
         return reply
 
@@ -6855,7 +7177,7 @@ class MachinerFacade(Type):
     async def APIAddresses(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence[str]]
+        Returns -> typing.Union[ForwardRef('Error'), typing.Sequence[str]]
         '''
 
         # map input types to rpc msg
@@ -6956,7 +7278,7 @@ class MachinerFacade(Type):
     async def ModelUUID(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), str]
+        Returns -> typing.Union[ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -7106,7 +7428,7 @@ class MachinerFacade(Type):
     async def WatchAPIHostPorts(self):
         '''
 
-        Returns -> typing.Union[str, _ForwardRef('Error')]
+        Returns -> typing.Union[str, ForwardRef('Error')]
         '''
 
         # map input types to rpc msg
@@ -7592,7 +7914,7 @@ class MigrationMasterFacade(Type):
     async def MigrationStatus(self):
         '''
 
-        Returns -> typing.Union[str, _ForwardRef('MigrationSpec')]
+        Returns -> typing.Union[str, ForwardRef('MigrationSpec')]
         '''
 
         # map input types to rpc msg
@@ -7630,7 +7952,7 @@ class MigrationMasterFacade(Type):
     async def ModelInfo(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Number'), str]
+        Returns -> typing.Union[ForwardRef('Number'), str]
         '''
 
         # map input types to rpc msg
@@ -7729,7 +8051,7 @@ class MigrationMasterFacade(Type):
     async def Watch(self):
         '''
 
-        Returns -> typing.Union[str, _ForwardRef('Error')]
+        Returns -> typing.Union[str, ForwardRef('Error')]
         '''
 
         # map input types to rpc msg
@@ -7748,7 +8070,7 @@ class MigrationMasterFacade(Type):
     async def WatchMinionReports(self):
         '''
 
-        Returns -> typing.Union[str, _ForwardRef('Error')]
+        Returns -> typing.Union[str, ForwardRef('Error')]
         '''
 
         # map input types to rpc msg
@@ -7829,7 +8151,7 @@ class MigrationMinionFacade(Type):
     async def Watch(self):
         '''
 
-        Returns -> typing.Union[str, _ForwardRef('Error')]
+        Returns -> typing.Union[str, ForwardRef('Error')]
         '''
 
         # map input types to rpc msg
@@ -8377,7 +8699,7 @@ class ModelConfigFacade(Type):
     async def SLALevel(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), str]
+        Returns -> typing.Union[ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -8542,7 +8864,7 @@ class ModelGenerationFacade(Type):
         '''
         branches : typing.Sequence[str]
         detailed : bool
-        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence[~Generation]]
+        Returns -> typing.Union[ForwardRef('Error'), typing.Sequence[~Generation]]
         '''
         if branches is not None and not isinstance(branches, (bytes, str, list)):
             raise Exception("Expected branches to be a Sequence, received: {}".format(type(branches)))
@@ -8567,7 +8889,7 @@ class ModelGenerationFacade(Type):
     async def CommitBranch(self, branch=None):
         '''
         branch : str
-        Returns -> typing.Union[_ForwardRef('Error'), int]
+        Returns -> typing.Union[ForwardRef('Error'), int]
         '''
         if branch is not None and not isinstance(branch, (bytes, str)):
             raise Exception("Expected branch to be a str, received: {}".format(type(branch)))
@@ -8588,7 +8910,7 @@ class ModelGenerationFacade(Type):
     async def HasActiveBranch(self, branch=None):
         '''
         branch : str
-        Returns -> typing.Union[_ForwardRef('Error'), bool]
+        Returns -> typing.Union[ForwardRef('Error'), bool]
         '''
         if branch is not None and not isinstance(branch, (bytes, str)):
             raise Exception("Expected branch to be a str, received: {}".format(type(branch)))
@@ -9000,7 +9322,7 @@ class OfferStatusWatcherFacade(Type):
     async def Next(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence[~OfferStatusChange], _ForwardRef('Error'), str]
+        Returns -> typing.Union[typing.Sequence[~OfferStatusChange], ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -9485,7 +9807,7 @@ class RelationStatusWatcherFacade(Type):
     async def Next(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence[~RelationLifeSuspendedStatusChange], _ForwardRef('Error'), str]
+        Returns -> typing.Union[typing.Sequence[~RelationLifeSuspendedStatusChange], ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -9560,7 +9882,7 @@ class RelationUnitsWatcherFacade(Type):
     async def Next(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('RelationUnitsChange'), _ForwardRef('Error'), str]
+        Returns -> typing.Union[ForwardRef('RelationUnitsChange'), ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -9661,7 +9983,7 @@ class RemoteApplicationWatcherFacade(Type):
     async def Next(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('RemoteApplicationChange'), _ForwardRef('Error'), str]
+        Returns -> typing.Union[ForwardRef('RemoteApplicationChange'), ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -9752,7 +10074,7 @@ class RemoteRelationWatcherFacade(Type):
     async def Next(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('RemoteRelationChangeEvent'), _ForwardRef('Error'), str]
+        Returns -> typing.Union[ForwardRef('RemoteRelationChangeEvent'), ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -10364,7 +10686,7 @@ class RemoteRelationsFacade(Type):
     async def WatchRemoteApplications(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error'), str]
+        Returns -> typing.Union[typing.Sequence[str], ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -10383,7 +10705,7 @@ class RemoteRelationsFacade(Type):
     async def WatchRemoteRelations(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error'), str]
+        Returns -> typing.Union[typing.Sequence[str], ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -10457,7 +10779,7 @@ class RemoteRelationsWatcherFacade(Type):
     async def Next(self):
         '''
 
-        Returns -> typing.Union[str, _ForwardRef('RemoteRelationsChange'), _ForwardRef('Error')]
+        Returns -> typing.Union[str, ForwardRef('RemoteRelationsChange'), ForwardRef('Error')]
         '''
 
         # map input types to rpc msg
@@ -10652,7 +10974,7 @@ class ResourcesFacade(Type):
         resources : typing.Sequence[~CharmResource]
         tag : str
         url : str
-        Returns -> typing.Union[_ForwardRef('ErrorResult'), _ForwardRef('Error'), typing.Sequence[str]]
+        Returns -> typing.Union[ForwardRef('ErrorResult'), ForwardRef('Error'), typing.Sequence[str]]
         '''
         if addcharmwithauthorization is not None and not isinstance(addcharmwithauthorization, (dict, AddCharmWithAuthorization)):
             raise Exception("Expected addcharmwithauthorization to be a AddCharmWithAuthorization, received: {}".format(type(addcharmwithauthorization)))
@@ -10810,7 +11132,7 @@ class ResourcesHookContextFacade(Type):
     async def GetResourceInfo(self, resource_names=None):
         '''
         resource_names : typing.Sequence[str]
-        Returns -> typing.Union[_ForwardRef('ErrorResult'), _ForwardRef('Error'), typing.Sequence[~UnitResourceResult]]
+        Returns -> typing.Union[ForwardRef('ErrorResult'), ForwardRef('Error'), typing.Sequence[~UnitResourceResult]]
         '''
         if resource_names is not None and not isinstance(resource_names, (bytes, str, list)):
             raise Exception("Expected resource_names to be a Sequence, received: {}".format(type(resource_names)))
@@ -11194,7 +11516,7 @@ class StringsWatcherFacade(Type):
     async def Next(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error'), str]
+        Returns -> typing.Union[typing.Sequence[str], ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -11339,7 +11661,7 @@ class UndertakerFacade(Type):
     async def ModelInfo(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), _ForwardRef('UndertakerModelInfo')]
+        Returns -> typing.Union[ForwardRef('Error'), ForwardRef('UndertakerModelInfo')]
         '''
 
         # map input types to rpc msg
@@ -11562,7 +11884,7 @@ class UnitAssignerFacade(Type):
     async def WatchUnitAssignments(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence[str], _ForwardRef('Error'), str]
+        Returns -> typing.Union[typing.Sequence[str], ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -12539,7 +12861,7 @@ class VolumeAttachmentPlansWatcherFacade(Type):
     async def Next(self):
         '''
 
-        Returns -> typing.Union[typing.Sequence[~MachineStorageId], _ForwardRef('Error'), str]
+        Returns -> typing.Union[typing.Sequence[~MachineStorageId], ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg

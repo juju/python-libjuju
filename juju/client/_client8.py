@@ -942,7 +942,7 @@ class ApplicationFacade(Type):
     async def Get(self, application=None):
         '''
         application : str
-        Returns -> typing.Union[str, typing.Mapping[str, typing.Any], _ForwardRef('Value')]
+        Returns -> typing.Union[str, typing.Mapping[str, typing.Any], ForwardRef('Value')]
         '''
         if application is not None and not isinstance(application, (bytes, str)):
             raise Exception("Expected application to be a str, received: {}".format(type(application)))
@@ -963,7 +963,7 @@ class ApplicationFacade(Type):
     async def GetCharmURL(self, application=None):
         '''
         application : str
-        Returns -> typing.Union[_ForwardRef('Error'), str]
+        Returns -> typing.Union[ForwardRef('Error'), str]
         '''
         if application is not None and not isinstance(application, (bytes, str)):
             raise Exception("Expected application to be a str, received: {}".format(type(application)))
@@ -1461,7 +1461,7 @@ class ApplicationFacade(Type):
     async def WatchLXDProfileUpgradeNotifications(self, tag=None):
         '''
         tag : str
-        Returns -> typing.Union[str, _ForwardRef('Error')]
+        Returns -> typing.Union[str, ForwardRef('Error')]
         '''
         if tag is not None and not isinstance(tag, (bytes, str)):
             raise Exception("Expected tag to be a str, received: {}".format(type(tag)))
@@ -1981,7 +1981,7 @@ class ControllerFacade(Type):
     async def GetCloudSpec(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), _ForwardRef('CloudSpec')]
+        Returns -> typing.Union[ForwardRef('Error'), ForwardRef('CloudSpec')]
         '''
 
         # map input types to rpc msg
@@ -2040,7 +2040,7 @@ class ControllerFacade(Type):
     async def IdentityProviderURL(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), str]
+        Returns -> typing.Union[ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -2160,7 +2160,7 @@ class ControllerFacade(Type):
     async def MongoVersion(self):
         '''
 
-        Returns -> typing.Union[_ForwardRef('Error'), str]
+        Returns -> typing.Union[ForwardRef('Error'), str]
         '''
 
         # map input types to rpc msg
@@ -2692,7 +2692,7 @@ class ModelManagerFacade(Type):
         name : str
         owner_tag : str
         region : str
-        Returns -> typing.Union[_ForwardRef('Number'), str, bool, typing.Sequence[~ModelMachineInfo], _ForwardRef('ModelMigrationStatus'), _ForwardRef('ModelSLAInfo'), _ForwardRef('EntityStatus'), typing.Sequence[~ModelUserInfo]]
+        Returns -> typing.Union[ForwardRef('Number'), str, bool, typing.Sequence[~ModelMachineInfo], ForwardRef('ModelMigrationStatus'), ForwardRef('ModelSLAInfo'), ForwardRef('EntityStatus'), typing.Sequence[~ModelUserInfo]]
         '''
         if cloud_tag is not None and not isinstance(cloud_tag, (bytes, str)):
             raise Exception("Expected cloud_tag to be a str, received: {}".format(type(cloud_tag)))
