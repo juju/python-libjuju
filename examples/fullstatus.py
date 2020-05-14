@@ -1,15 +1,13 @@
 from juju import loop
-from juju.client.client import ClientFacade
-from juju.client.connection import Connection
+from juju.model import Model
 
 
 async def status():
-    conn = await Connection.connect()
-    client = ClientFacade.from_connection(conn)
+    model = Model()
+    await model.connect()
 
-    patterns = None
-    status = await client.FullStatus(patterns)
-    await conn.close()
+    status = await model.get_status()
+    await model.disconnect()
 
     print('Applications:', list(status.applications.keys()))
     print('Machines:', list(status.machines.keys()))

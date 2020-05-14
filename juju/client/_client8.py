@@ -640,7 +640,7 @@ class ApplicationFacade(Type):
         '''
         endpoints : typing.Sequence[str]
         via_cidrs : typing.Sequence[str]
-        Returns -> typing.Mapping[str, ~CharmRelation]
+        Returns -> AddRelationResults
         '''
         if endpoints is not None and not isinstance(endpoints, (bytes, str, list)):
             raise Exception("Expected endpoints to be a Sequence, received: {}".format(type(endpoints)))
@@ -669,7 +669,7 @@ class ApplicationFacade(Type):
         num_units : int
         placement : typing.Sequence[~Placement]
         policy : str
-        Returns -> typing.Sequence[str]
+        Returns -> AddApplicationUnitsResults
         '''
         if application is not None and not isinstance(application, (bytes, str)):
             raise Exception("Expected application to be a str, received: {}".format(type(application)))
@@ -706,7 +706,7 @@ class ApplicationFacade(Type):
     async def CharmConfig(self, entities=None):
         '''
         entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ConfigResult]
+        Returns -> ApplicationGetConfigResults
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
             raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
@@ -727,7 +727,7 @@ class ApplicationFacade(Type):
     async def CharmRelations(self, application=None):
         '''
         application : str
-        Returns -> typing.Sequence[str]
+        Returns -> ApplicationCharmRelationsResults
         '''
         if application is not None and not isinstance(application, (bytes, str)):
             raise Exception("Expected application to be a str, received: {}".format(type(application)))
@@ -748,7 +748,7 @@ class ApplicationFacade(Type):
     async def Consume(self, args=None):
         '''
         args : typing.Sequence[~ConsumeApplicationArg]
-        Returns -> typing.Sequence[~ErrorResult]
+        Returns -> ErrorResults
         '''
         if args is not None and not isinstance(args, (bytes, str, list)):
             raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
@@ -769,7 +769,7 @@ class ApplicationFacade(Type):
     async def Deploy(self, applications=None):
         '''
         applications : typing.Sequence[~ApplicationDeploy]
-        Returns -> typing.Sequence[~ErrorResult]
+        Returns -> ErrorResults
         '''
         if applications is not None and not isinstance(applications, (bytes, str, list)):
             raise Exception("Expected applications to be a Sequence, received: {}".format(type(applications)))
@@ -811,7 +811,7 @@ class ApplicationFacade(Type):
     async def DestroyApplication(self, applications=None):
         '''
         applications : typing.Sequence[~DestroyApplicationParams]
-        Returns -> typing.Sequence[~DestroyApplicationResult]
+        Returns -> DestroyApplicationResults
         '''
         if applications is not None and not isinstance(applications, (bytes, str, list)):
             raise Exception("Expected applications to be a Sequence, received: {}".format(type(applications)))
@@ -832,7 +832,7 @@ class ApplicationFacade(Type):
     async def DestroyConsumedApplications(self, applications=None):
         '''
         applications : typing.Sequence[~DestroyConsumedApplicationParams]
-        Returns -> typing.Sequence[~ErrorResult]
+        Returns -> ErrorResults
         '''
         if applications is not None and not isinstance(applications, (bytes, str, list)):
             raise Exception("Expected applications to be a Sequence, received: {}".format(type(applications)))
@@ -879,7 +879,7 @@ class ApplicationFacade(Type):
     async def DestroyUnit(self, units=None):
         '''
         units : typing.Sequence[~DestroyUnitParams]
-        Returns -> typing.Sequence[~DestroyUnitResult]
+        Returns -> DestroyUnitResults
         '''
         if units is not None and not isinstance(units, (bytes, str, list)):
             raise Exception("Expected units to be a Sequence, received: {}".format(type(units)))
@@ -942,7 +942,7 @@ class ApplicationFacade(Type):
     async def Get(self, application=None):
         '''
         application : str
-        Returns -> typing.Union[str, typing.Mapping[str, typing.Any], ForwardRef('Value')]
+        Returns -> ApplicationGetResults
         '''
         if application is not None and not isinstance(application, (bytes, str)):
             raise Exception("Expected application to be a str, received: {}".format(type(application)))
@@ -963,7 +963,7 @@ class ApplicationFacade(Type):
     async def GetCharmURL(self, application=None):
         '''
         application : str
-        Returns -> typing.Union[ForwardRef('Error'), str]
+        Returns -> StringResult
         '''
         if application is not None and not isinstance(application, (bytes, str)):
             raise Exception("Expected application to be a str, received: {}".format(type(application)))
@@ -984,7 +984,7 @@ class ApplicationFacade(Type):
     async def GetConfig(self, entities=None):
         '''
         entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ConfigResult]
+        Returns -> ApplicationGetConfigResults
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
             raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
@@ -1005,7 +1005,7 @@ class ApplicationFacade(Type):
     async def GetConstraints(self, entities=None):
         '''
         entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ApplicationConstraint]
+        Returns -> ApplicationGetConstraintsResults
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
             raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
@@ -1027,7 +1027,7 @@ class ApplicationFacade(Type):
         '''
         application : Entity
         watcher_id : str
-        Returns -> typing.Sequence[~LXDProfileUpgradeMessagesResult]
+        Returns -> LXDProfileUpgradeMessagesResults
         '''
         if application is not None and not isinstance(application, (dict, Entity)):
             raise Exception("Expected application to be a Entity, received: {}".format(type(application)))
@@ -1054,7 +1054,7 @@ class ApplicationFacade(Type):
         all_ : bool
         retry : bool
         tags : Entities
-        Returns -> typing.Sequence[~ErrorResult]
+        Returns -> ErrorResults
         '''
         if all_ is not None and not isinstance(all_, bool):
             raise Exception("Expected all_ to be a bool, received: {}".format(type(all_)))
@@ -1083,7 +1083,7 @@ class ApplicationFacade(Type):
     async def ScaleApplications(self, applications=None):
         '''
         applications : typing.Sequence[~ScaleApplicationParams]
-        Returns -> typing.Sequence[~ScaleApplicationResult]
+        Returns -> ScaleApplicationResults
         '''
         if applications is not None and not isinstance(applications, (bytes, str, list)):
             raise Exception("Expected applications to be a Sequence, received: {}".format(type(applications)))
@@ -1130,7 +1130,7 @@ class ApplicationFacade(Type):
     async def SetApplicationsConfig(self, args=None):
         '''
         args : typing.Sequence[~ApplicationConfigSet]
-        Returns -> typing.Sequence[~ErrorResult]
+        Returns -> ErrorResults
         '''
         if args is not None and not isinstance(args, (bytes, str, list)):
             raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
@@ -1269,7 +1269,7 @@ class ApplicationFacade(Type):
     async def SetMetricCredentials(self, creds=None):
         '''
         creds : typing.Sequence[~ApplicationMetricCredential]
-        Returns -> typing.Sequence[~ErrorResult]
+        Returns -> ErrorResults
         '''
         if creds is not None and not isinstance(creds, (bytes, str, list)):
             raise Exception("Expected creds to be a Sequence, received: {}".format(type(creds)))
@@ -1290,7 +1290,7 @@ class ApplicationFacade(Type):
     async def SetRelationsSuspended(self, args=None):
         '''
         args : typing.Sequence[~RelationSuspendedArg]
-        Returns -> typing.Sequence[~ErrorResult]
+        Returns -> ErrorResults
         '''
         if args is not None and not isinstance(args, (bytes, str, list)):
             raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
@@ -1358,7 +1358,7 @@ class ApplicationFacade(Type):
     async def UnsetApplicationsConfig(self, args=None):
         '''
         args : typing.Sequence[~ApplicationUnset]
-        Returns -> typing.Sequence[~ErrorResult]
+        Returns -> ErrorResults
         '''
         if args is not None and not isinstance(args, (bytes, str, list)):
             raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
@@ -1440,7 +1440,7 @@ class ApplicationFacade(Type):
     async def UpdateApplicationSeries(self, args=None):
         '''
         args : typing.Sequence[~UpdateSeriesArg]
-        Returns -> typing.Sequence[~ErrorResult]
+        Returns -> ErrorResults
         '''
         if args is not None and not isinstance(args, (bytes, str, list)):
             raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
@@ -1461,7 +1461,7 @@ class ApplicationFacade(Type):
     async def WatchLXDProfileUpgradeNotifications(self, tag=None):
         '''
         tag : str
-        Returns -> typing.Union[str, ForwardRef('Error')]
+        Returns -> NotifyWatchResult
         '''
         if tag is not None and not isinstance(tag, (bytes, str)):
             raise Exception("Expected tag to be a str, received: {}".format(type(tag)))
@@ -1835,7 +1835,7 @@ class ControllerFacade(Type):
     async def AllModels(self):
         '''
 
-        Returns -> typing.Sequence[~UserModel]
+        Returns -> UserModelList
         '''
 
         # map input types to rpc msg
@@ -1854,7 +1854,7 @@ class ControllerFacade(Type):
     async def CloudSpec(self, entities=None):
         '''
         entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~CloudSpecResult]
+        Returns -> CloudSpecResults
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
             raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
@@ -1896,7 +1896,7 @@ class ControllerFacade(Type):
     async def ControllerAPIInfoForModels(self, entities=None):
         '''
         entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ControllerAPIInfoResult]
+        Returns -> ControllerAPIInfoResults
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
             raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
@@ -1917,7 +1917,7 @@ class ControllerFacade(Type):
     async def ControllerConfig(self):
         '''
 
-        Returns -> typing.Mapping[str, typing.Any]
+        Returns -> ControllerConfigResult
         '''
 
         # map input types to rpc msg
@@ -1936,7 +1936,7 @@ class ControllerFacade(Type):
     async def ControllerVersion(self):
         '''
 
-        Returns -> <class 'str'>
+        Returns -> ControllerVersionResults
         '''
 
         # map input types to rpc msg
@@ -1981,7 +1981,7 @@ class ControllerFacade(Type):
     async def GetCloudSpec(self):
         '''
 
-        Returns -> typing.Union[ForwardRef('Error'), ForwardRef('CloudSpec')]
+        Returns -> CloudSpecResult
         '''
 
         # map input types to rpc msg
@@ -2000,7 +2000,7 @@ class ControllerFacade(Type):
     async def GetControllerAccess(self, entities=None):
         '''
         entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~UserAccessResult]
+        Returns -> UserAccessResults
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
             raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
@@ -2021,7 +2021,7 @@ class ControllerFacade(Type):
     async def HostedModelConfigs(self):
         '''
 
-        Returns -> typing.Sequence[~HostedModelConfig]
+        Returns -> HostedModelConfigsResults
         '''
 
         # map input types to rpc msg
@@ -2040,7 +2040,7 @@ class ControllerFacade(Type):
     async def IdentityProviderURL(self):
         '''
 
-        Returns -> typing.Union[ForwardRef('Error'), str]
+        Returns -> StringResult
         '''
 
         # map input types to rpc msg
@@ -2059,7 +2059,7 @@ class ControllerFacade(Type):
     async def InitiateMigration(self, specs=None):
         '''
         specs : typing.Sequence[~MigrationSpec]
-        Returns -> typing.Sequence[~InitiateMigrationResult]
+        Returns -> InitiateMigrationResults
         '''
         if specs is not None and not isinstance(specs, (bytes, str, list)):
             raise Exception("Expected specs to be a Sequence, received: {}".format(type(specs)))
@@ -2080,7 +2080,7 @@ class ControllerFacade(Type):
     async def ListBlockedModels(self):
         '''
 
-        Returns -> typing.Sequence[~ModelBlockInfo]
+        Returns -> ModelBlockInfoList
         '''
 
         # map input types to rpc msg
@@ -2099,7 +2099,7 @@ class ControllerFacade(Type):
     async def ModelConfig(self):
         '''
 
-        Returns -> typing.Mapping[str, ~ConfigValue]
+        Returns -> ModelConfigResults
         '''
 
         # map input types to rpc msg
@@ -2118,7 +2118,7 @@ class ControllerFacade(Type):
     async def ModelStatus(self, entities=None):
         '''
         entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ModelStatus]
+        Returns -> ModelStatusResults
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
             raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
@@ -2139,7 +2139,7 @@ class ControllerFacade(Type):
     async def ModifyControllerAccess(self, changes=None):
         '''
         changes : typing.Sequence[~ModifyControllerAccess]
-        Returns -> typing.Sequence[~ErrorResult]
+        Returns -> ErrorResults
         '''
         if changes is not None and not isinstance(changes, (bytes, str, list)):
             raise Exception("Expected changes to be a Sequence, received: {}".format(type(changes)))
@@ -2160,7 +2160,7 @@ class ControllerFacade(Type):
     async def MongoVersion(self):
         '''
 
-        Returns -> typing.Union[ForwardRef('Error'), str]
+        Returns -> StringResult
         '''
 
         # map input types to rpc msg
@@ -2200,7 +2200,7 @@ class ControllerFacade(Type):
     async def WatchAllModels(self):
         '''
 
-        Returns -> str
+        Returns -> AllWatcherId
         '''
 
         # map input types to rpc msg
@@ -2219,7 +2219,7 @@ class ControllerFacade(Type):
     async def WatchCloudSpecsChanges(self, entities=None):
         '''
         entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~NotifyWatchResult]
+        Returns -> NotifyWatchResults
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
             raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
@@ -2666,7 +2666,7 @@ class ModelManagerFacade(Type):
     async def ChangeModelCredential(self, model_credentials=None):
         '''
         model_credentials : typing.Sequence[~ChangeModelCredentialParams]
-        Returns -> typing.Sequence[~ErrorResult]
+        Returns -> ErrorResults
         '''
         if model_credentials is not None and not isinstance(model_credentials, (bytes, str, list)):
             raise Exception("Expected model_credentials to be a Sequence, received: {}".format(type(model_credentials)))
@@ -2692,7 +2692,7 @@ class ModelManagerFacade(Type):
         name : str
         owner_tag : str
         region : str
-        Returns -> typing.Union[ForwardRef('Number'), str, bool, typing.Sequence[~ModelMachineInfo], ForwardRef('ModelMigrationStatus'), ForwardRef('ModelSLAInfo'), ForwardRef('EntityStatus'), typing.Sequence[~ModelUserInfo]]
+        Returns -> ModelInfo
         '''
         if cloud_tag is not None and not isinstance(cloud_tag, (bytes, str)):
             raise Exception("Expected cloud_tag to be a str, received: {}".format(type(cloud_tag)))
@@ -2733,7 +2733,7 @@ class ModelManagerFacade(Type):
     async def DestroyModels(self, models=None):
         '''
         models : typing.Sequence[~DestroyModelParams]
-        Returns -> typing.Sequence[~ErrorResult]
+        Returns -> ErrorResults
         '''
         if models is not None and not isinstance(models, (bytes, str, list)):
             raise Exception("Expected models to be a Sequence, received: {}".format(type(models)))
@@ -2755,7 +2755,7 @@ class ModelManagerFacade(Type):
         '''
         entities : typing.Sequence[~Entity]
         simplified : bool
-        Returns -> typing.Sequence[~StringResult]
+        Returns -> StringResults
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
             raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
@@ -2780,7 +2780,7 @@ class ModelManagerFacade(Type):
     async def DumpModelsDB(self, entities=None):
         '''
         entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~MapResult]
+        Returns -> MapResults
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
             raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
@@ -2802,7 +2802,7 @@ class ModelManagerFacade(Type):
         '''
         all_ : bool
         user_tag : str
-        Returns -> typing.Sequence[~ModelSummaryResult]
+        Returns -> ModelSummaryResults
         '''
         if all_ is not None and not isinstance(all_, bool):
             raise Exception("Expected all_ to be a bool, received: {}".format(type(all_)))
@@ -2827,7 +2827,7 @@ class ModelManagerFacade(Type):
     async def ListModels(self, tag=None):
         '''
         tag : str
-        Returns -> typing.Sequence[~UserModel]
+        Returns -> UserModelList
         '''
         if tag is not None and not isinstance(tag, (bytes, str)):
             raise Exception("Expected tag to be a str, received: {}".format(type(tag)))
@@ -2848,7 +2848,7 @@ class ModelManagerFacade(Type):
     async def ModelDefaultsForClouds(self, entities=None):
         '''
         entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ModelDefaultsResult]
+        Returns -> ModelDefaultsResults
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
             raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
@@ -2869,7 +2869,7 @@ class ModelManagerFacade(Type):
     async def ModelInfo(self, entities=None):
         '''
         entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ModelInfoResult]
+        Returns -> ModelInfoResults
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
             raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
@@ -2890,7 +2890,7 @@ class ModelManagerFacade(Type):
     async def ModelStatus(self, entities=None):
         '''
         entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ModelStatus]
+        Returns -> ModelStatusResults
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
             raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
@@ -2911,7 +2911,7 @@ class ModelManagerFacade(Type):
     async def ModifyModelAccess(self, changes=None):
         '''
         changes : typing.Sequence[~ModifyModelAccess]
-        Returns -> typing.Sequence[~ErrorResult]
+        Returns -> ErrorResults
         '''
         if changes is not None and not isinstance(changes, (bytes, str, list)):
             raise Exception("Expected changes to be a Sequence, received: {}".format(type(changes)))
@@ -2932,7 +2932,7 @@ class ModelManagerFacade(Type):
     async def SetModelDefaults(self, config=None):
         '''
         config : typing.Sequence[~ModelDefaultValues]
-        Returns -> typing.Sequence[~ErrorResult]
+        Returns -> ErrorResults
         '''
         if config is not None and not isinstance(config, (bytes, str, list)):
             raise Exception("Expected config to be a Sequence, received: {}".format(type(config)))
@@ -2953,7 +2953,7 @@ class ModelManagerFacade(Type):
     async def UnsetModelDefaults(self, keys=None):
         '''
         keys : typing.Sequence[~ModelUnsetKeys]
-        Returns -> typing.Sequence[~ErrorResult]
+        Returns -> ErrorResults
         '''
         if keys is not None and not isinstance(keys, (bytes, str, list)):
             raise Exception("Expected keys to be a Sequence, received: {}".format(type(keys)))
