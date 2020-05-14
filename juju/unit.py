@@ -99,7 +99,7 @@ class Unit(model.ModelEntity):
         log.debug(
             'Destroying %s', self.name)
 
-        return await app_facade.DestroyUnits([self.name])
+        return await app_facade.DestroyUnits(unit_names=[self.name])
     remove = destroy
 
     def get_resources(self, details=False):

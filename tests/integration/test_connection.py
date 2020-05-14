@@ -66,7 +66,7 @@ async def test_full_status(event_loop):
 
         c = client.ClientFacade.from_connection(model.connection())
 
-        await c.FullStatus(None)
+        await c.FullStatus(patterns=None)
 
 
 @base.bootstrapped

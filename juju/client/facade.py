@@ -654,6 +654,16 @@ class Type:
         attr = self._toPy[key]
         setattr(self, attr, value)
 
+    # legacy: generated definitions used to not correctly
+    # create typed objects and would use dict instead (from JSON)
+    # so we emulate some dict methods.
+    def get(self, key, default=None):
+        try:
+            attr = self._toPy[key]
+        except KeyError:
+            return default
+        return getattr(self, attr, default)
+
 
 class Schema(dict):
     def __init__(self, schema):

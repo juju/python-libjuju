@@ -447,7 +447,7 @@ class Controller:
         user_facade = client.UserManagerFacade.from_connection(
             self.connection())
         entity = client.Entity(tag.user(username))
-        results = await user_facade.ResetPassword([entity])
+        results = await user_facade.ResetPassword(entities=[entity])
         secret_key = results.results[0].secret_key
         return await self.get_user(username, secret_key=secret_key)
 
@@ -755,7 +755,7 @@ class Controller:
         params.model_tag = tag.model(model_uuid)
 
         facade = client.ApplicationOffersFacade.from_connection(self.connection())
-        return await facade.Offer([params])
+        return await facade.Offer(offers=[params])
 
     async def list_offers(self, model_name):
         """
@@ -766,7 +766,7 @@ class Controller:
         params.model_name = model_name
 
         facade = client.ApplicationOffersFacade.from_connection(self.connection())
-        return await facade.ListApplicationOffers([params])
+        return await facade.ListApplicationOffers(filters=[params])
 
     async def remove_offer(self, model_uuid, offer, force=False):
         """
@@ -791,7 +791,7 @@ class Controller:
             raise RemoveError("removing offer will also remove relations, use force and try again.")
 
         facade = client.ApplicationOffersFacade.from_connection(self.connection())
-        return await facade.DestroyOffers(force, [url.string()])
+        return await facade.DestroyOffers(force=force, offer_urls=[url.string()])
 
     async def get_consume_details(self, endpoint):
         """
@@ -799,7 +799,7 @@ class Controller:
         model to consume the specified offers represented by the urls.
         """
         facade = client.ApplicationOffersFacade.from_connection(self.connection())
-        offers = await facade.GetConsumeDetails([endpoint])
+        offers = await facade.GetConsumeDetails(offer_urls=[endpoint])
         if len(offers.results) != 1:
             raise JujuAPIError("expected to find one result")
         result = offers.results[0]

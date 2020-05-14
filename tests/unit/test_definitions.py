@@ -68,5 +68,5 @@ class TestDefinitions(unittest.TestCase):
             raise Exception("status relation is not a RelationStatus")
         if not isinstance(status.relations[0].endpoints[0], client.EndpointStatus):
             raise Exception("status relation endpoint is not a EndpointStatus")
-        if not isinstance(status.applications['app'], client.ApplicationStatus):
+        if not isinstance(status.get('applications')['app'], client.ApplicationStatus):
             raise Exception("status application is not a ApplicationStatus")
