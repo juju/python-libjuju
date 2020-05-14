@@ -1,6 +1,6 @@
 name: Run tests with Tox
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:
