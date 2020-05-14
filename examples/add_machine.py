@@ -38,7 +38,9 @@ async def main():
         )
         # add a lxd container to machine2
         machine3 = await model.add_machine(
-            'lxd:{}'.format(machine2.id))
+            'lxd:{}'.format(machine2.id),
+            series='xenial'
+        )
 
         # deploy charm to the lxd container
         application = await model.deploy(
