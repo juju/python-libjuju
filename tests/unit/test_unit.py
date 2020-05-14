@@ -4,6 +4,7 @@ import pytest
 
 from juju.model import Model
 from juju.unit import Unit
+from juju.client._definitions import FullStatus
 
 from .. import base
 
@@ -137,8 +138,7 @@ async def test_unit_is_leader(mock_cf):
     model._connector = mock.MagicMock()
 
     for test in tests:
-        status = mock.Mock()
-        status.applications = test['applications']
+        status = FullStatus.from_json(test)
         client_facade = mock_cf.from_connection()
         client_facade.FullStatus = base.AsyncMock(return_value=status)
 

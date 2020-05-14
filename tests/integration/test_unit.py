@@ -57,10 +57,25 @@ async def test_run_action(event_loop):
 
         for unit in app.units:
             action = await run_action(unit)
-            assert action.results == {'dir': '/var/git/myrepo.git'}
+            assert action.results == {
+                'Code': '0',
+                'Stdout': "Adding group `myrepo' (GID 1001) ...\n"
+                          'Done.\n'
+                          'Initialized empty Git repository in '
+                          '/var/git/myrepo.git/\n',
+                'dir': '/var/git/myrepo.git',
+            }
             out = await model.get_action_output(action.entity_id, wait=5)
-            assert out == {'dir': '/var/git/myrepo.git'}
-            status = await model.get_action_status(uuid_or_prefix=action.entity_id)
+            assert out == {
+                'Code': '0',
+                'Stdout': "Adding group `myrepo' (GID 1001) ...\n"
+                          'Done.\n'
+                          'Initialized empty Git repository in '
+                          '/var/git/myrepo.git/\n',
+                'dir': '/var/git/myrepo.git',
+            }
+            status = await model.get_action_status(
+                uuid_or_prefix=action.entity_id)
             assert status[action.entity_id] == 'completed'
             break
 
