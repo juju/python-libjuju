@@ -2649,7 +2649,7 @@ class ApplicationStatus(Type):
         meter_statuses : typing.Mapping[str, ~MeterStatus]
         provider_id : str
         public_address : str
-        relations : typing.Sequence[str]
+        relations : typing.Mapping[str, typing.Sequence[str]]
         series : str
         status : DetailedStatus
         subordinate_to : typing.Sequence[str]
@@ -2712,8 +2712,8 @@ class ApplicationStatus(Type):
         if public_address_ is not None and not isinstance(public_address_, (bytes, str)):
             raise Exception("Expected public_address_ to be a str, received: {}".format(type(public_address_)))
 
-        if relations_ is not None and not isinstance(relations_, (bytes, str, list)):
-            raise Exception("Expected relations_ to be a Sequence, received: {}".format(type(relations_)))
+        if relations_ is not None and not isinstance(relations_, dict):
+            raise Exception("Expected relations_ to be a Mapping, received: {}".format(type(relations_)))
 
         if series_ is not None and not isinstance(series_, (bytes, str)):
             raise Exception("Expected series_ to be a str, received: {}".format(type(series_)))
@@ -3716,7 +3716,7 @@ class BranchStatus(Type):
     _toPy = {'assigned-units': 'assigned_units', 'created': 'created', 'created-by': 'created_by'}
     def __init__(self, assigned_units=None, created=None, created_by=None, **unknown_fields):
         '''
-        assigned_units : typing.Sequence[str]
+        assigned_units : typing.Mapping[str, typing.Sequence[str]]
         created : int
         created_by : str
         '''
@@ -3725,8 +3725,8 @@ class BranchStatus(Type):
         created_by_ = created_by
 
         # Validate arguments against known Juju API types.
-        if assigned_units_ is not None and not isinstance(assigned_units_, (bytes, str, list)):
-            raise Exception("Expected assigned_units_ to be a Sequence, received: {}".format(type(assigned_units_)))
+        if assigned_units_ is not None and not isinstance(assigned_units_, dict):
+            raise Exception("Expected assigned_units_ to be a Mapping, received: {}".format(type(assigned_units_)))
 
         if created_ is not None and not isinstance(created_, int):
             raise Exception("Expected created_ to be a int, received: {}".format(type(created_)))
@@ -8957,13 +8957,13 @@ class FindTagsResults(Type):
     _toPy = {'matches': 'matches'}
     def __init__(self, matches=None, **unknown_fields):
         '''
-        matches : typing.Sequence[~Entity]
+        matches : typing.Mapping[str, typing.Sequence[~Entity]]
         '''
-        matches_ = [Entity.from_json(o) for o in matches or []]
+        matches_ = {k: Entity.from_json(v) for k, v in (matches or dict()).items()}
 
         # Validate arguments against known Juju API types.
-        if matches_ is not None and not isinstance(matches_, (bytes, str, list)):
-            raise Exception("Expected matches_ to be a Sequence, received: {}".format(type(matches_)))
+        if matches_ is not None and not isinstance(matches_, dict):
+            raise Exception("Expected matches_ to be a Mapping, received: {}".format(type(matches_)))
 
         self.matches = matches_
         self.unknown_fields = unknown_fields
@@ -16227,13 +16227,13 @@ class PinnedLeadershipResult(Type):
     _toPy = {'result': 'result'}
     def __init__(self, result=None, **unknown_fields):
         '''
-        result : typing.Sequence[str]
+        result : typing.Mapping[str, typing.Sequence[str]]
         '''
         result_ = result
 
         # Validate arguments against known Juju API types.
-        if result_ is not None and not isinstance(result_, (bytes, str, list)):
-            raise Exception("Expected result_ to be a Sequence, received: {}".format(type(result_)))
+        if result_ is not None and not isinstance(result_, dict):
+            raise Exception("Expected result_ to be a Mapping, received: {}".format(type(result_)))
 
         self.result = result_
         self.unknown_fields = unknown_fields
@@ -16620,7 +16620,7 @@ class ProvisioningInfo(Type):
         jobs : typing.Sequence[str]
         placement : str
         series : str
-        subnets_to_zones : typing.Sequence[str]
+        subnets_to_zones : typing.Mapping[str, typing.Sequence[str]]
         tags : typing.Mapping[str, str]
         volume_attachments : typing.Sequence[~VolumeAttachmentParams]
         volumes : typing.Sequence[~VolumeParams]
@@ -16667,8 +16667,8 @@ class ProvisioningInfo(Type):
         if series_ is not None and not isinstance(series_, (bytes, str)):
             raise Exception("Expected series_ to be a str, received: {}".format(type(series_)))
 
-        if subnets_to_zones_ is not None and not isinstance(subnets_to_zones_, (bytes, str, list)):
-            raise Exception("Expected subnets_to_zones_ to be a Sequence, received: {}".format(type(subnets_to_zones_)))
+        if subnets_to_zones_ is not None and not isinstance(subnets_to_zones_, dict):
+            raise Exception("Expected subnets_to_zones_ to be a Mapping, received: {}".format(type(subnets_to_zones_)))
 
         if tags_ is not None and not isinstance(tags_, dict):
             raise Exception("Expected tags_ to be a Mapping, received: {}".format(type(tags_)))
@@ -16880,8 +16880,8 @@ class ProvisioningInfoV10(Type):
         jobs : typing.Sequence[str]
         placement : str
         series : str
-        space_subnets : typing.Sequence[str]
-        subnet_zones : typing.Sequence[str]
+        space_subnets : typing.Mapping[str, typing.Sequence[str]]
+        subnet_zones : typing.Mapping[str, typing.Sequence[str]]
         tags : typing.Mapping[str, str]
         volume_attachments : typing.Sequence[~VolumeAttachmentParams]
         volumes : typing.Sequence[~VolumeParams]
@@ -16937,11 +16937,11 @@ class ProvisioningInfoV10(Type):
         if series_ is not None and not isinstance(series_, (bytes, str)):
             raise Exception("Expected series_ to be a str, received: {}".format(type(series_)))
 
-        if space_subnets_ is not None and not isinstance(space_subnets_, (bytes, str, list)):
-            raise Exception("Expected space_subnets_ to be a Sequence, received: {}".format(type(space_subnets_)))
+        if space_subnets_ is not None and not isinstance(space_subnets_, dict):
+            raise Exception("Expected space_subnets_ to be a Mapping, received: {}".format(type(space_subnets_)))
 
-        if subnet_zones_ is not None and not isinstance(subnet_zones_, (bytes, str, list)):
-            raise Exception("Expected subnet_zones_ to be a Sequence, received: {}".format(type(subnet_zones_)))
+        if subnet_zones_ is not None and not isinstance(subnet_zones_, dict):
+            raise Exception("Expected subnet_zones_ to be a Mapping, received: {}".format(type(subnet_zones_)))
 
         if tags_ is not None and not isinstance(tags_, dict):
             raise Exception("Expected tags_ to be a Mapping, received: {}".format(type(tags_)))
@@ -16977,18 +16977,18 @@ class ProvisioningNetworkTopology(Type):
     _toPy = {'space-subnets': 'space_subnets', 'subnet-zones': 'subnet_zones'}
     def __init__(self, space_subnets=None, subnet_zones=None, **unknown_fields):
         '''
-        space_subnets : typing.Sequence[str]
-        subnet_zones : typing.Sequence[str]
+        space_subnets : typing.Mapping[str, typing.Sequence[str]]
+        subnet_zones : typing.Mapping[str, typing.Sequence[str]]
         '''
         space_subnets_ = space_subnets
         subnet_zones_ = subnet_zones
 
         # Validate arguments against known Juju API types.
-        if space_subnets_ is not None and not isinstance(space_subnets_, (bytes, str, list)):
-            raise Exception("Expected space_subnets_ to be a Sequence, received: {}".format(type(space_subnets_)))
+        if space_subnets_ is not None and not isinstance(space_subnets_, dict):
+            raise Exception("Expected space_subnets_ to be a Mapping, received: {}".format(type(space_subnets_)))
 
-        if subnet_zones_ is not None and not isinstance(subnet_zones_, (bytes, str, list)):
-            raise Exception("Expected subnet_zones_ to be a Sequence, received: {}".format(type(subnet_zones_)))
+        if subnet_zones_ is not None and not isinstance(subnet_zones_, dict):
+            raise Exception("Expected subnet_zones_ to be a Mapping, received: {}".format(type(subnet_zones_)))
 
         self.space_subnets = space_subnets_
         self.subnet_zones = subnet_zones_
@@ -18311,7 +18311,7 @@ class RemoteApplicationStatus(Type):
         life : str
         offer_name : str
         offer_url : str
-        relations : typing.Sequence[str]
+        relations : typing.Mapping[str, typing.Sequence[str]]
         status : DetailedStatus
         '''
         endpoints_ = [RemoteEndpoint.from_json(o) for o in endpoints or []]
@@ -18338,8 +18338,8 @@ class RemoteApplicationStatus(Type):
         if offer_url_ is not None and not isinstance(offer_url_, (bytes, str)):
             raise Exception("Expected offer_url_ to be a str, received: {}".format(type(offer_url_)))
 
-        if relations_ is not None and not isinstance(relations_, (bytes, str, list)):
-            raise Exception("Expected relations_ to be a Sequence, received: {}".format(type(relations_)))
+        if relations_ is not None and not isinstance(relations_, dict):
+            raise Exception("Expected relations_ to be a Mapping, received: {}".format(type(relations_)))
 
         if status_ is not None and not isinstance(status_, (dict, DetailedStatus)):
             raise Exception("Expected status_ to be a DetailedStatus, received: {}".format(type(status_)))
