@@ -19,13 +19,13 @@ jobs:
           python-version: ${{ matrix.python }}
       - name: Install Tox and any other packages
         run: pip install tox
+      - name: Run Lint and Unit Tests
+        run: tox -e lint,py3
       - name: Install Snaps
         run: |
           sudo snap install lxd
           sudo snap install juju --classic --channel ${{ matrix.juju }}
           sudo snap install juju-wait --classic
-      - name: Run Lint and Unit Tests
-        run: tox -e lint,py3
       - name: Configure LXD
         run: |
           sudo lxd waitready --timeout 30
