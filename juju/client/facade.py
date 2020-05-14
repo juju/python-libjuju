@@ -11,7 +11,7 @@ import typing_inspect
 from collections import defaultdict
 from glob import glob
 from pathlib import Path
-from typing import Any, Mapping, Sequence, TypeVar, Union
+from typing import Any, Mapping, Sequence, TypeVar
 
 from . import codegen
 
@@ -467,12 +467,7 @@ def retspec(schema, defs):
         return None
     if defs in basic_types:
         return strcast(defs, False)
-    rtypes = schema.registry.getObj(schema.types[defs])
-    if not rtypes:
-        return None
-    if len(rtypes) > 1:
-        return Union[tuple([strcast(r[1], True) for r in rtypes])]
-    return strcast(rtypes[0][1], False)
+    return strcast(defs, False)
 
 
 def ReturnMapping(cls):
@@ -649,6 +644,16 @@ class Type:
     def to_json(self):
         return json.dumps(self.serialize(), cls=TypeEncoder, sort_keys=True)
 
+    # treat subscript gets as JSON representation
+    def __getitem__(self, key):
+        attr = self._toPy[key]
+        return getattr(self, attr)
+
+    # treat subscript sets as JSON representation
+    def __setitem__(self, key, value):
+        attr = self._toPy[key]
+        setattr(self, attr, value)
+
 
 class Schema(dict):
     def __init__(self, schema):
@@ -720,7 +725,7 @@ class Schema(dict):
                 return struct
             ppkind = pprop["type"]
             if ppkind == "array":
-                add((name, self.buildArray(pprop)))
+                add((name, Mapping[str, self.buildArray(pprop)]))
             else:
                 add((name, Mapping[str, SCHEMA_TO_PYTHON[ppkind]]))
 

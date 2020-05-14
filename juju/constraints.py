@@ -131,6 +131,6 @@ def parse_device_constraint(constraint):
     device['type'] = m.group('type')
     attrs = m.group('attrs')
     if attrs:
-        device['attributes'] = {kv['key']: kv['value']
-                                for kv in ATTR.finditer(attrs)}
+        device['attributes'] = {match.group('key'): match.group('value')
+                                for match in ATTR.finditer(attrs)}
     return device

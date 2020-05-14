@@ -239,7 +239,7 @@ class ActionFacade(Type):
     async def Actions(self, entities=None):
         '''
         entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ActionResult]
+        Returns -> ActionResults
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
             raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
@@ -260,7 +260,7 @@ class ActionFacade(Type):
     async def ApplicationsCharmsActions(self, entities=None):
         '''
         entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ApplicationCharmActionsResult]
+        Returns -> ApplicationsCharmActionsResults
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
             raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
@@ -281,7 +281,7 @@ class ActionFacade(Type):
     async def Cancel(self, entities=None):
         '''
         entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ActionResult]
+        Returns -> ActionResults
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
             raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
@@ -302,7 +302,7 @@ class ActionFacade(Type):
     async def Enqueue(self, actions=None):
         '''
         actions : typing.Sequence[~Action]
-        Returns -> typing.Sequence[~ActionResult]
+        Returns -> ActionResults
         '''
         if actions is not None and not isinstance(actions, (bytes, str, list)):
             raise Exception("Expected actions to be a Sequence, received: {}".format(type(actions)))
@@ -323,7 +323,7 @@ class ActionFacade(Type):
     async def EnqueueOperation(self, actions=None):
         '''
         actions : typing.Sequence[~Action]
-        Returns -> typing.Union[typing.Sequence[~StringResult], str]
+        Returns -> EnqueuedActions
         '''
         if actions is not None and not isinstance(actions, (bytes, str, list)):
             raise Exception("Expected actions to be a Sequence, received: {}".format(type(actions)))
@@ -344,7 +344,7 @@ class ActionFacade(Type):
     async def FindActionTagsByPrefix(self, prefixes=None):
         '''
         prefixes : typing.Sequence[str]
-        Returns -> typing.Sequence[~Entity]
+        Returns -> FindTagsResults
         '''
         if prefixes is not None and not isinstance(prefixes, (bytes, str, list)):
             raise Exception("Expected prefixes to be a Sequence, received: {}".format(type(prefixes)))
@@ -365,7 +365,7 @@ class ActionFacade(Type):
     async def FindActionsByNames(self, names=None):
         '''
         names : typing.Sequence[str]
-        Returns -> typing.Sequence[~ActionsByName]
+        Returns -> ActionsByNames
         '''
         if names is not None and not isinstance(names, (bytes, str, list)):
             raise Exception("Expected names to be a Sequence, received: {}".format(type(names)))
@@ -386,7 +386,7 @@ class ActionFacade(Type):
     async def ListAll(self, entities=None):
         '''
         entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ActionsByReceiver]
+        Returns -> ActionsByReceivers
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
             raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
@@ -407,7 +407,7 @@ class ActionFacade(Type):
     async def ListCompleted(self, entities=None):
         '''
         entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ActionsByReceiver]
+        Returns -> ActionsByReceivers
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
             raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
@@ -433,7 +433,7 @@ class ActionFacade(Type):
         offset : int
         status : typing.Sequence[str]
         units : typing.Sequence[str]
-        Returns -> typing.Union[typing.Sequence[~OperationResult], bool]
+        Returns -> OperationResults
         '''
         if actions is not None and not isinstance(actions, (bytes, str, list)):
             raise Exception("Expected actions to be a Sequence, received: {}".format(type(actions)))
@@ -474,7 +474,7 @@ class ActionFacade(Type):
     async def ListPending(self, entities=None):
         '''
         entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ActionsByReceiver]
+        Returns -> ActionsByReceivers
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
             raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
@@ -495,7 +495,7 @@ class ActionFacade(Type):
     async def ListRunning(self, entities=None):
         '''
         entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ActionsByReceiver]
+        Returns -> ActionsByReceivers
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
             raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
@@ -516,7 +516,7 @@ class ActionFacade(Type):
     async def Operations(self, entities=None):
         '''
         entities : typing.Sequence[~Entity]
-        Returns -> typing.Union[typing.Sequence[~OperationResult], bool]
+        Returns -> OperationResults
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
             raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
@@ -542,7 +542,7 @@ class ActionFacade(Type):
         timeout : int
         units : typing.Sequence[str]
         workload_context : bool
-        Returns -> typing.Sequence[~ActionResult]
+        Returns -> ActionResults
         '''
         if applications is not None and not isinstance(applications, (bytes, str, list)):
             raise Exception("Expected applications to be a Sequence, received: {}".format(type(applications)))
@@ -588,7 +588,7 @@ class ActionFacade(Type):
         timeout : int
         units : typing.Sequence[str]
         workload_context : bool
-        Returns -> typing.Sequence[~ActionResult]
+        Returns -> ActionResults
         '''
         if applications is not None and not isinstance(applications, (bytes, str, list)):
             raise Exception("Expected applications to be a Sequence, received: {}".format(type(applications)))
@@ -629,7 +629,7 @@ class ActionFacade(Type):
     async def WatchActionsProgress(self, entities=None):
         '''
         entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~StringsWatchResult]
+        Returns -> StringsWatchResults
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
             raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
@@ -1049,7 +1049,7 @@ class CloudFacade(Type):
     async def AddCredentials(self, credentials=None):
         '''
         credentials : typing.Sequence[~TaggedCredential]
-        Returns -> typing.Sequence[~ErrorResult]
+        Returns -> ErrorResults
         '''
         if credentials is not None and not isinstance(credentials, (bytes, str, list)):
             raise Exception("Expected credentials to be a Sequence, received: {}".format(type(credentials)))
@@ -1070,7 +1070,7 @@ class CloudFacade(Type):
     async def CheckCredentialsModels(self, credentials=None):
         '''
         credentials : typing.Sequence[~TaggedCredential]
-        Returns -> typing.Sequence[~UpdateCredentialResult]
+        Returns -> UpdateCredentialResults
         '''
         if credentials is not None and not isinstance(credentials, (bytes, str, list)):
             raise Exception("Expected credentials to be a Sequence, received: {}".format(type(credentials)))
@@ -1091,7 +1091,7 @@ class CloudFacade(Type):
     async def Cloud(self, entities=None):
         '''
         entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~CloudResult]
+        Returns -> CloudResults
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
             raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
@@ -1112,7 +1112,7 @@ class CloudFacade(Type):
     async def CloudInfo(self, entities=None):
         '''
         entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~CloudInfoResult]
+        Returns -> CloudInfoResults
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
             raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
@@ -1133,7 +1133,7 @@ class CloudFacade(Type):
     async def Clouds(self):
         '''
 
-        Returns -> typing.Mapping[str, ~Cloud]
+        Returns -> CloudsResult
         '''
 
         # map input types to rpc msg
@@ -1152,7 +1152,7 @@ class CloudFacade(Type):
     async def Credential(self, entities=None):
         '''
         entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~CloudCredentialResult]
+        Returns -> CloudCredentialResults
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
             raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
@@ -1174,7 +1174,7 @@ class CloudFacade(Type):
         '''
         credentials : typing.Sequence[~CloudCredentialArg]
         include_secrets : bool
-        Returns -> typing.Sequence[~CredentialContentResult]
+        Returns -> CredentialContentResults
         '''
         if credentials is not None and not isinstance(credentials, (bytes, str, list)):
             raise Exception("Expected credentials to be a Sequence, received: {}".format(type(credentials)))
@@ -1199,7 +1199,7 @@ class CloudFacade(Type):
     async def InstanceTypes(self, constraints=None):
         '''
         constraints : typing.Sequence[~CloudInstanceTypesConstraint]
-        Returns -> typing.Sequence[~InstanceTypesResult]
+        Returns -> InstanceTypesResults
         '''
         if constraints is not None and not isinstance(constraints, (bytes, str, list)):
             raise Exception("Expected constraints to be a Sequence, received: {}".format(type(constraints)))
@@ -1221,7 +1221,7 @@ class CloudFacade(Type):
         '''
         all_ : bool
         user_tag : str
-        Returns -> typing.Sequence[~ListCloudInfoResult]
+        Returns -> ListCloudInfoResults
         '''
         if all_ is not None and not isinstance(all_, bool):
             raise Exception("Expected all_ to be a bool, received: {}".format(type(all_)))
@@ -1246,7 +1246,7 @@ class CloudFacade(Type):
     async def ModifyCloudAccess(self, changes=None):
         '''
         changes : typing.Sequence[~ModifyCloudAccess]
-        Returns -> typing.Sequence[~ErrorResult]
+        Returns -> ErrorResults
         '''
         if changes is not None and not isinstance(changes, (bytes, str, list)):
             raise Exception("Expected changes to be a Sequence, received: {}".format(type(changes)))
@@ -1267,7 +1267,7 @@ class CloudFacade(Type):
     async def RemoveClouds(self, entities=None):
         '''
         entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ErrorResult]
+        Returns -> ErrorResults
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
             raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
@@ -1288,7 +1288,7 @@ class CloudFacade(Type):
     async def RevokeCredentialsCheckModels(self, credentials=None):
         '''
         credentials : typing.Sequence[~RevokeCredentialArg]
-        Returns -> typing.Sequence[~ErrorResult]
+        Returns -> ErrorResults
         '''
         if credentials is not None and not isinstance(credentials, (bytes, str, list)):
             raise Exception("Expected credentials to be a Sequence, received: {}".format(type(credentials)))
@@ -1309,7 +1309,7 @@ class CloudFacade(Type):
     async def UpdateCloud(self, clouds=None):
         '''
         clouds : typing.Sequence[~AddCloudArgs]
-        Returns -> typing.Sequence[~ErrorResult]
+        Returns -> ErrorResults
         '''
         if clouds is not None and not isinstance(clouds, (bytes, str, list)):
             raise Exception("Expected clouds to be a Sequence, received: {}".format(type(clouds)))
@@ -1331,7 +1331,7 @@ class CloudFacade(Type):
         '''
         credentials : typing.Sequence[~TaggedCredential]
         force : bool
-        Returns -> typing.Sequence[~UpdateCredentialResult]
+        Returns -> UpdateCredentialResults
         '''
         if credentials is not None and not isinstance(credentials, (bytes, str, list)):
             raise Exception("Expected credentials to be a Sequence, received: {}".format(type(credentials)))
@@ -1356,7 +1356,7 @@ class CloudFacade(Type):
     async def UserCredentials(self, user_clouds=None):
         '''
         user_clouds : typing.Sequence[~UserCloud]
-        Returns -> typing.Sequence[~StringsResult]
+        Returns -> StringsResults
         '''
         if user_clouds is not None and not isinstance(user_clouds, (bytes, str, list)):
             raise Exception("Expected user_clouds to be a Sequence, received: {}".format(type(user_clouds)))
@@ -1630,7 +1630,7 @@ class MachineManagerFacade(Type):
     async def AddMachines(self, params=None):
         '''
         params : typing.Sequence[~AddMachineParams]
-        Returns -> typing.Sequence[~AddMachinesResult]
+        Returns -> AddMachinesResults
         '''
         if params is not None and not isinstance(params, (bytes, str, list)):
             raise Exception("Expected params to be a Sequence, received: {}".format(type(params)))
@@ -1651,7 +1651,7 @@ class MachineManagerFacade(Type):
     async def DestroyMachine(self, entities=None):
         '''
         entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~DestroyMachineResult]
+        Returns -> DestroyMachineResults
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
             raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
@@ -1675,7 +1675,7 @@ class MachineManagerFacade(Type):
         keep : bool
         machine_tags : typing.Sequence[str]
         max_wait : int
-        Returns -> typing.Sequence[~DestroyMachineResult]
+        Returns -> DestroyMachineResults
         '''
         if force is not None and not isinstance(force, bool):
             raise Exception("Expected force to be a bool, received: {}".format(type(force)))
@@ -1708,7 +1708,7 @@ class MachineManagerFacade(Type):
     async def ForceDestroyMachine(self, entities=None):
         '''
         entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~DestroyMachineResult]
+        Returns -> DestroyMachineResults
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
             raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
@@ -1729,7 +1729,7 @@ class MachineManagerFacade(Type):
     async def GetUpgradeSeriesMessages(self, params=None):
         '''
         params : typing.Sequence[~UpgradeSeriesNotificationParam]
-        Returns -> typing.Sequence[~StringsResult]
+        Returns -> StringsResults
         '''
         if params is not None and not isinstance(params, (bytes, str, list)):
             raise Exception("Expected params to be a Sequence, received: {}".format(type(params)))
@@ -1750,7 +1750,7 @@ class MachineManagerFacade(Type):
     async def InstanceTypes(self, constraints=None):
         '''
         constraints : typing.Sequence[~ModelInstanceTypesConstraint]
-        Returns -> typing.Sequence[~InstanceTypesResult]
+        Returns -> InstanceTypesResults
         '''
         if constraints is not None and not isinstance(constraints, (bytes, str, list)):
             raise Exception("Expected constraints to be a Sequence, received: {}".format(type(constraints)))
@@ -1773,7 +1773,7 @@ class MachineManagerFacade(Type):
         force : bool
         series : str
         tag : Entity
-        Returns -> Error
+        Returns -> ErrorResult
         '''
         if force is not None and not isinstance(force, bool):
             raise Exception("Expected force to be a bool, received: {}".format(type(force)))
@@ -1804,7 +1804,7 @@ class MachineManagerFacade(Type):
         force : bool
         series : str
         tag : Entity
-        Returns -> Error
+        Returns -> ErrorResult
         '''
         if force is not None and not isinstance(force, bool):
             raise Exception("Expected force to be a bool, received: {}".format(type(force)))
@@ -1833,7 +1833,7 @@ class MachineManagerFacade(Type):
     async def UpgradeSeriesValidate(self, args=None):
         '''
         args : typing.Sequence[~UpdateSeriesArg]
-        Returns -> typing.Sequence[~UpgradeSeriesUnitsResult]
+        Returns -> UpgradeSeriesUnitsResults
         '''
         if args is not None and not isinstance(args, (bytes, str, list)):
             raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
@@ -1854,7 +1854,7 @@ class MachineManagerFacade(Type):
     async def WatchUpgradeSeriesNotifications(self, entities=None):
         '''
         entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~NotifyWatchResult]
+        Returns -> NotifyWatchResults
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
             raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
@@ -2052,7 +2052,7 @@ class SpacesFacade(Type):
     async def CreateSpaces(self, spaces=None):
         '''
         spaces : typing.Sequence[~CreateSpaceParams]
-        Returns -> typing.Sequence[~ErrorResult]
+        Returns -> ErrorResults
         '''
         if spaces is not None and not isinstance(spaces, (bytes, str, list)):
             raise Exception("Expected spaces to be a Sequence, received: {}".format(type(spaces)))
@@ -2073,7 +2073,7 @@ class SpacesFacade(Type):
     async def ListSpaces(self):
         '''
 
-        Returns -> typing.Sequence[~Space]
+        Returns -> ListSpacesResults
         '''
 
         # map input types to rpc msg
@@ -2092,7 +2092,7 @@ class SpacesFacade(Type):
     async def MoveSubnets(self, args=None):
         '''
         args : typing.Sequence[~MoveSubnetsParam]
-        Returns -> typing.Sequence[~MoveSubnetsResult]
+        Returns -> MoveSubnetsResults
         '''
         if args is not None and not isinstance(args, (bytes, str, list)):
             raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
@@ -2132,7 +2132,7 @@ class SpacesFacade(Type):
     async def RemoveSpace(self, space_param=None):
         '''
         space_param : typing.Sequence[~RemoveSpaceParam]
-        Returns -> typing.Sequence[~RemoveSpaceResult]
+        Returns -> RemoveSpaceResults
         '''
         if space_param is not None and not isinstance(space_param, (bytes, str, list)):
             raise Exception("Expected space_param to be a Sequence, received: {}".format(type(space_param)))
@@ -2153,7 +2153,7 @@ class SpacesFacade(Type):
     async def RenameSpace(self, changes=None):
         '''
         changes : typing.Sequence[~RenameSpaceParams]
-        Returns -> typing.Sequence[~ErrorResult]
+        Returns -> ErrorResults
         '''
         if changes is not None and not isinstance(changes, (bytes, str, list)):
             raise Exception("Expected changes to be a Sequence, received: {}".format(type(changes)))
@@ -2174,7 +2174,7 @@ class SpacesFacade(Type):
     async def ShowSpace(self, entities=None):
         '''
         entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~ShowSpaceResult]
+        Returns -> ShowSpaceResults
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
             raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
@@ -2563,7 +2563,7 @@ class StorageFacade(Type):
     async def AddToUnit(self, storages=None):
         '''
         storages : typing.Sequence[~StorageAddParams]
-        Returns -> typing.Sequence[~AddStorageResult]
+        Returns -> AddStorageResults
         '''
         if storages is not None and not isinstance(storages, (bytes, str, list)):
             raise Exception("Expected storages to be a Sequence, received: {}".format(type(storages)))
@@ -2584,7 +2584,7 @@ class StorageFacade(Type):
     async def Attach(self, ids=None):
         '''
         ids : typing.Sequence[~StorageAttachmentId]
-        Returns -> typing.Sequence[~ErrorResult]
+        Returns -> ErrorResults
         '''
         if ids is not None and not isinstance(ids, (bytes, str, list)):
             raise Exception("Expected ids to be a Sequence, received: {}".format(type(ids)))
@@ -2605,7 +2605,7 @@ class StorageFacade(Type):
     async def CreatePool(self, pools=None):
         '''
         pools : typing.Sequence[~StoragePool]
-        Returns -> typing.Sequence[~ErrorResult]
+        Returns -> ErrorResults
         '''
         if pools is not None and not isinstance(pools, (bytes, str, list)):
             raise Exception("Expected pools to be a Sequence, received: {}".format(type(pools)))
@@ -2628,7 +2628,7 @@ class StorageFacade(Type):
         force : bool
         ids : StorageAttachmentIds
         max_wait : int
-        Returns -> typing.Sequence[~ErrorResult]
+        Returns -> ErrorResults
         '''
         if force is not None and not isinstance(force, bool):
             raise Exception("Expected force to be a bool, received: {}".format(type(force)))
@@ -2657,7 +2657,7 @@ class StorageFacade(Type):
     async def Import(self, storage=None):
         '''
         storage : typing.Sequence[~ImportStorageParams]
-        Returns -> typing.Sequence[~ImportStorageResult]
+        Returns -> ImportStorageResults
         '''
         if storage is not None and not isinstance(storage, (bytes, str, list)):
             raise Exception("Expected storage to be a Sequence, received: {}".format(type(storage)))
@@ -2678,7 +2678,7 @@ class StorageFacade(Type):
     async def ListFilesystems(self, filters=None):
         '''
         filters : typing.Sequence[~FilesystemFilter]
-        Returns -> typing.Sequence[~FilesystemDetailsListResult]
+        Returns -> FilesystemDetailsListResults
         '''
         if filters is not None and not isinstance(filters, (bytes, str, list)):
             raise Exception("Expected filters to be a Sequence, received: {}".format(type(filters)))
@@ -2699,7 +2699,7 @@ class StorageFacade(Type):
     async def ListPools(self, filters=None):
         '''
         filters : typing.Sequence[~StoragePoolFilter]
-        Returns -> typing.Sequence[~StoragePoolsResult]
+        Returns -> StoragePoolsResults
         '''
         if filters is not None and not isinstance(filters, (bytes, str, list)):
             raise Exception("Expected filters to be a Sequence, received: {}".format(type(filters)))
@@ -2720,7 +2720,7 @@ class StorageFacade(Type):
     async def ListStorageDetails(self, filters=None):
         '''
         filters : typing.Sequence[~StorageFilter]
-        Returns -> typing.Sequence[~StorageDetailsListResult]
+        Returns -> StorageDetailsListResults
         '''
         if filters is not None and not isinstance(filters, (bytes, str, list)):
             raise Exception("Expected filters to be a Sequence, received: {}".format(type(filters)))
@@ -2741,7 +2741,7 @@ class StorageFacade(Type):
     async def ListVolumes(self, filters=None):
         '''
         filters : typing.Sequence[~VolumeFilter]
-        Returns -> typing.Sequence[~VolumeDetailsListResult]
+        Returns -> VolumeDetailsListResults
         '''
         if filters is not None and not isinstance(filters, (bytes, str, list)):
             raise Exception("Expected filters to be a Sequence, received: {}".format(type(filters)))
@@ -2762,7 +2762,7 @@ class StorageFacade(Type):
     async def Remove(self, storage=None):
         '''
         storage : typing.Sequence[~RemoveStorageInstance]
-        Returns -> typing.Sequence[~ErrorResult]
+        Returns -> ErrorResults
         '''
         if storage is not None and not isinstance(storage, (bytes, str, list)):
             raise Exception("Expected storage to be a Sequence, received: {}".format(type(storage)))
@@ -2783,7 +2783,7 @@ class StorageFacade(Type):
     async def RemovePool(self, pools=None):
         '''
         pools : typing.Sequence[~StoragePoolDeleteArg]
-        Returns -> typing.Sequence[~ErrorResult]
+        Returns -> ErrorResults
         '''
         if pools is not None and not isinstance(pools, (bytes, str, list)):
             raise Exception("Expected pools to be a Sequence, received: {}".format(type(pools)))
@@ -2804,7 +2804,7 @@ class StorageFacade(Type):
     async def StorageDetails(self, entities=None):
         '''
         entities : typing.Sequence[~Entity]
-        Returns -> typing.Sequence[~StorageDetailsResult]
+        Returns -> StorageDetailsResults
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
             raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
@@ -2825,7 +2825,7 @@ class StorageFacade(Type):
     async def UpdatePool(self, pools=None):
         '''
         pools : typing.Sequence[~StoragePool]
-        Returns -> typing.Sequence[~ErrorResult]
+        Returns -> ErrorResults
         '''
         if pools is not None and not isinstance(pools, (bytes, str, list)):
             raise Exception("Expected pools to be a Sequence, received: {}".format(type(pools)))
