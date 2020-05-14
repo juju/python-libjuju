@@ -279,25 +279,27 @@ class Unit(model.ModelEntity):
 
         # Is the application a subordinate? If so change our data variables to
         # the parent
-        if status.applications[app].get('subordinate-to'):
+        if status.applications[app].subordinate_to:
             is_subordinate = True
-            target_apps = status.applications[app]['subordinate-to']
+            target_apps = status.applications[app].subordinate_to
 
         for target_app in target_apps:
             app_data = status.applications[target_app]
 
-            if not app_data.get('units'):
+            if not app_data.units:
                 continue
 
-            if app_data['units'].get(self.name):
-                return app_data['units'][self.name].get('leader', False)
+            if app_data.units.get(self.name):
+                is_leader = app_data.units[self.name].leader
+                return is_leader if is_leader else False
 
             if not is_subordinate:
                 continue
 
-            for key, unit in app_data['units'].items():
-                if unit.get('subordinates') and unit['subordinates'].get(self.name):
-                    return unit['subordinates'][self.name].get('leader', False)
+            for key, unit in app_data.units.items():
+                if unit.subordinates and unit.subordinates.get(self.name):
+                    is_leader = unit.subordinates[self.name].leader
+                    return is_leader if is_leader else False
 
         return False
 
