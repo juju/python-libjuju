@@ -311,7 +311,7 @@ class Application(model.ModelEntity):
                 actions = result.actions
                 break
         if not schema:
-            actions = {k: v['description'] for k, v in actions.items()}
+            actions = {k: v.description for k, v in actions.items()}
         return actions
 
     async def get_resources(self):
