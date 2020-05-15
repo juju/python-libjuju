@@ -18,7 +18,7 @@ async def test_juju_api_error(event_loop):
 
     async with base.CleanModel() as model:
         with pytest.raises(JujuAPIError):
-            await model.add_machine(constraints={'mem': 'foo'})
+            await model.add_machine(constraints={'mem': -50})
 
 
 @base.bootstrapped
