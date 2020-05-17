@@ -1,40 +1,17 @@
-name: Run tests with Tox
+name: Unit Tests
 
 on: [push, pull_request]
 
 jobs:
-  build:
-
+  unit-tests:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python: [3.6, 3.7, 3.8]
-        juju: [stable, edge]
-
     steps:
       - uses: actions/checkout@v2
       - name: Setup Python
         uses: actions/setup-python@v1
         with:
-          python-version: ${{ matrix.python }}
+          python-version: 3.8
       - name: Install Tox and any other packages
         run: pip install tox
       - name: Run Lint and Unit Tests
         run: tox -e lint,py3
-      - name: Install Snaps
-        run: |
-          sudo snap install lxd
-          sudo snap install juju --classic --channel ${{ matrix.juju }}
-          sudo snap install juju-wait --classic
-      - name: Configure LXD
-        run: |
-          sudo lxd waitready --timeout 30
-          sudo chmod 666 /var/snap/lxd/common/lxd/unix.socket
-          lxd init --auto --network-address='[::]' --network-port=8443 --storage-backend=dir
-          lxc network set lxdbr0 ipv6.address none
-      - name: Bootstrap Juju Controller
-        run: juju bootstrap localhost test --config 'identity-url=https://api.staging.jujucharms.com/identity' --config 'allow-model-access=true' --config 'test-mode=true'
-      - name: Run Integration Tests
-        run: tox -e integration,serial
-        env:
-          TEST_AGENTS: '{"agents":[{"url":"https://api.staging.jujucharms.com/identity","username":"libjuju-ci@yellow"}],"key":{"private":"88OOCxIHQNguRG7zFg2y2Hx5Ob0SeVKKBRnjyehverc=","public":"fDn20+5FGyN2hYO7z0rFUyoHGUnfrleslUNtoYsjNSs="}}'
