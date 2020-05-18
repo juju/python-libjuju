@@ -215,7 +215,8 @@ class Machine(model.ModelEntity):
             '-q',
             destination
         ]
-        cmd.extend(ssh_opts.split() if isinstance(ssh_opts, str) else ssh_opts)
+        if ssh_opts:
+            cmd.extend(ssh_opts.split() if isinstance(ssh_opts, str) else ssh_opts)
         cmd.extend([command])
         loop = self.model.loop
         process = await asyncio.create_subprocess_exec(*cmd, loop=loop)

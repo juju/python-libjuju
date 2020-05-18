@@ -99,7 +99,7 @@ class Unit(model.ModelEntity):
         log.debug(
             'Destroying %s', self.name)
 
-        return await app_facade.DestroyUnits([self.name])
+        return await app_facade.DestroyUnits(unit_names=[self.name])
     remove = destroy
 
     def get_resources(self, details=False):
@@ -222,7 +222,7 @@ class Unit(model.ModelEntity):
         """
         raise NotImplementedError()
 
-    def ssh(
+    async def ssh(
             self, command, user=None, proxy=False, ssh_opts=None):
         """Execute a command over SSH on this unit.
 
@@ -232,7 +232,7 @@ class Unit(model.ModelEntity):
         :param str ssh_opts: Additional options to the `ssh` command
 
         """
-        self.machine.ssh(command, user, proxy, ssh_opts)
+        return await self.machine.ssh(command, user, proxy, ssh_opts)
 
     def status_history(self, num=20, utc=False):
         """Get status history for this unit.
