@@ -1,6 +1,22 @@
 Changelog
 ---------
 
+2.8.1
+^^^^^
+
+Monday May 18 2020
+
+ * Fix positional argument usage in facade calls.
+ * Add get shim to facade types.
+ * Fix SSH await on unit
+ * Fix integration tests
+ * Fix tox.ini to use supported python versions.
+ * Fix constraints regex using subscript on matches (py36).
+ * Fix facade return type documentation.
+ * Fix schema objects with array values.
+ * Fix subscript lookups by using JSON keys.
+ * Add definition test.
+
 2.8.0
 ^^^^^
 
