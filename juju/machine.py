@@ -1,4 +1,5 @@
 import asyncio
+import ipaddress
 import logging
 import os
 
@@ -139,6 +140,22 @@ class Machine(model.ModelEntity):
         """
         return await _set_annotations(self.tag, annotations, self.connection)
 
+    def _format_addr(self, addr):
+        """Validate and format IP address.
+
+        :param addr: IPv6 or IPv4 address
+        :type addr: str
+        :returns: Address string, optionally encapsulated in brackets ([])
+        :rtype: str
+        :raises: ValueError
+        """
+        ipaddr = ipaddress.ip_address(addr)
+        if isinstance(ipaddr, ipaddress.IPv6Address):
+            fmt = '[{}]'
+        else:
+            fmt = '{}'
+        return fmt.format(ipaddr)
+
     async def scp_to(self, source, destination, user='ubuntu', proxy=False,
                      scp_opts=''):
         """Transfer files to this machine.
@@ -153,8 +170,13 @@ class Machine(model.ModelEntity):
         if proxy:
             raise NotImplementedError('proxy option is not implemented')
 
-        address = self.dns_name
-        destination = '%s@%s:%s' % (user, address, destination)
+        try:
+            # if dns_name is an IP address format it appropriately
+            address = self._format_addr(self.dns_name)
+        except ValueError:
+            # otherwise we assume it to be a DNS resolvable string
+            address = self.dns_name
+        destination = '{}@{}:{}'.format(user, address, destination)
         await self._scp(source, destination, scp_opts)
 
     async def scp_from(self, source, destination, user='ubuntu', proxy=False,
@@ -171,8 +193,13 @@ class Machine(model.ModelEntity):
         if proxy:
             raise NotImplementedError('proxy option is not implemented')
 
-        address = self.dns_name
-        source = '%s@%s:%s' % (user, address, source)
+        try:
+            # if dns_name is an IP address format it appropriately
+            address = self._format_addr(self.dns_name)
+        except ValueError:
+            # otherwise we assume it to be a DNS resolvable string
+            address = self.dns_name
+        source = '{}@{}:{}'.format(user, address, source)
         await self._scp(source, destination, scp_opts)
 
     async def _scp(self, source, destination, scp_opts):
