@@ -17,6 +17,7 @@ import json
 import logging
 
 from . import model, tag
+from .status import derive_status
 from .annotationhelper import _get_annotations, _set_annotations
 from .client import client
 from .errors import JujuError
@@ -76,6 +77,13 @@ class Application(model.ModelEntity):
         """Get the application status, as set by the charm's leader.
 
         """
+        status = self.safe_data['status']['current']
+        if status == 'unset':
+            unit_status = []
+            for unit in self.units:
+                unit_status.append(unit.workload_status)
+            return derive_status(unit_status)
+
         return self.safe_data['status']['current']
 
     @property
