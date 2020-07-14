@@ -3,7 +3,7 @@
 
 from juju.client._definitions import *
 
-from juju.client import _client2, _client1, _client3, _client4, _client5, _client8, _client7, _client9, _client10, _client6, _client12, _client11, _client13, _client15
+from juju.client import _client2, _client1, _client3, _client4, _client5, _client8, _client7, _client9, _client10, _client6, _client12, _client11, _client13, _client15, _client16
 
 
 CLIENTS = {
@@ -20,7 +20,8 @@ CLIENTS = {
     "12": _client12,
     "11": _client11,
     "13": _client13,
-    "15": _client15
+    "15": _client15,
+    "16": _client16
 }
 
 
@@ -92,6 +93,10 @@ class ActionPrunerFacade(TypeFactory):
     pass
 
 
+class AdminFacade(TypeFactory):
+    pass
+
+
 class AgentFacade(TypeFactory):
     pass
 
@@ -149,6 +154,10 @@ class CAASAgentFacade(TypeFactory):
 
 
 class CAASFirewallerFacade(TypeFactory):
+    pass
+
+
+class CAASModelOperatorFacade(TypeFactory):
     pass
 
 
@@ -225,6 +234,10 @@ class EntityWatcherFacade(TypeFactory):
 
 
 class ExternalControllerUpdaterFacade(TypeFactory):
+    pass
+
+
+class FacadeVersions(TypeFactory):
     pass
 
 

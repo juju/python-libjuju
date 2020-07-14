@@ -324,50 +324,204 @@ class CloudFacade(Type):
                                               'zones': {'items': {'type': 'string'},
                                                         'type': 'array'}},
                                'type': 'object'}},
-     'properties': {'AddCloud': {'properties': {'Params': {'$ref': '#/definitions/AddCloudArgs'}},
+     'properties': {'AddCloud': {'description': 'AddCloud adds a new cloud, '
+                                                'different from the one managed by '
+                                                'the controller.',
+                                 'properties': {'Params': {'$ref': '#/definitions/AddCloudArgs'}},
                                  'type': 'object'},
-                    'AddCredentials': {'properties': {'Params': {'$ref': '#/definitions/TaggedCredentials'},
+                    'AddCredentials': {'description': 'AddCredentials adds new '
+                                                      'credentials.\n'
+                                                      'In contrast to '
+                                                      'UpdateCredentials() below, '
+                                                      'the new credentials can be\n'
+                                                      'for a cloud that the '
+                                                      'controller does not manage '
+                                                      '(this is required\n'
+                                                      'for CAAS models)',
+                                       'properties': {'Params': {'$ref': '#/definitions/TaggedCredentials'},
                                                       'Result': {'$ref': '#/definitions/ErrorResults'}},
                                        'type': 'object'},
-                    'CheckCredentialsModels': {'properties': {'Params': {'$ref': '#/definitions/TaggedCredentials'},
+                    'CheckCredentialsModels': {'description': 'CheckCredentialsModels '
+                                                              'validates supplied '
+                                                              "cloud credentials' "
+                                                              'content against\n'
+                                                              'models that '
+                                                              'currently use these '
+                                                              'credentials.\n'
+                                                              'If there are any '
+                                                              'models that are '
+                                                              'using a credential '
+                                                              'and these models or '
+                                                              'their\n'
+                                                              'cloud instances are '
+                                                              'not going to be '
+                                                              'accessible with '
+                                                              'corresponding '
+                                                              'credential,\n'
+                                                              'there will be '
+                                                              'detailed validation '
+                                                              'errors per model.\n'
+                                                              "There's no Juju API "
+                                                              'client which uses '
+                                                              'this, but JAAS '
+                                                              'does,',
+                                               'properties': {'Params': {'$ref': '#/definitions/TaggedCredentials'},
                                                               'Result': {'$ref': '#/definitions/UpdateCredentialResults'}},
                                                'type': 'object'},
-                    'Cloud': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'Cloud': {'description': 'Cloud returns the cloud definitions '
+                                             'for the specified clouds.',
+                              'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                              'Result': {'$ref': '#/definitions/CloudResults'}},
                               'type': 'object'},
-                    'CloudInfo': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'CloudInfo': {'description': 'CloudInfo returns information '
+                                                 'about the specified clouds.',
+                                  'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                  'Result': {'$ref': '#/definitions/CloudInfoResults'}},
                                   'type': 'object'},
-                    'Clouds': {'properties': {'Result': {'$ref': '#/definitions/CloudsResult'}},
+                    'Clouds': {'description': 'Clouds returns the definitions of '
+                                              'all clouds supported by the '
+                                              'controller\n'
+                                              'that the logged in user can see.',
+                               'properties': {'Result': {'$ref': '#/definitions/CloudsResult'}},
                                'type': 'object'},
-                    'Credential': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'Credential': {'description': 'Credential returns the '
+                                                  'specified cloud credential for '
+                                                  'each tag, minus secrets.',
+                                   'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                   'Result': {'$ref': '#/definitions/CloudCredentialResults'}},
                                    'type': 'object'},
-                    'CredentialContents': {'properties': {'Params': {'$ref': '#/definitions/CloudCredentialArgs'},
+                    'CredentialContents': {'description': 'CredentialContents '
+                                                          'returns the specified '
+                                                          'cloud credentials,\n'
+                                                          'including the secrets '
+                                                          'if requested.\n'
+                                                          'If no specific '
+                                                          'credential name/cloud '
+                                                          'was passed in, all '
+                                                          'credentials for this '
+                                                          'user\n'
+                                                          'are returned.\n'
+                                                          'Only credential owner '
+                                                          'can see its contents as '
+                                                          'well as what models use '
+                                                          'it.\n'
+                                                          'Controller admin has no '
+                                                          'special superpowers '
+                                                          'here and is treated the '
+                                                          'same as all other '
+                                                          'users.',
+                                           'properties': {'Params': {'$ref': '#/definitions/CloudCredentialArgs'},
                                                           'Result': {'$ref': '#/definitions/CredentialContentResults'}},
                                            'type': 'object'},
-                    'InstanceTypes': {'properties': {'Params': {'$ref': '#/definitions/CloudInstanceTypesConstraints'},
+                    'InstanceTypes': {'description': 'InstanceTypes returns '
+                                                     'instance type information '
+                                                     'for the cloud and region\n'
+                                                     'in which the current model '
+                                                     'is deployed.',
+                                      'properties': {'Params': {'$ref': '#/definitions/CloudInstanceTypesConstraints'},
                                                      'Result': {'$ref': '#/definitions/InstanceTypesResults'}},
                                       'type': 'object'},
-                    'ListCloudInfo': {'properties': {'Params': {'$ref': '#/definitions/ListCloudsRequest'},
+                    'ListCloudInfo': {'description': 'ListCloudInfo returns clouds '
+                                                     'that the specified user has '
+                                                     'access to.\n'
+                                                     'Controller admins '
+                                                     '(superuser) can list clouds '
+                                                     'for any user.\n'
+                                                     'Other users can only ask '
+                                                     'about their own clouds.',
+                                      'properties': {'Params': {'$ref': '#/definitions/ListCloudsRequest'},
                                                      'Result': {'$ref': '#/definitions/ListCloudInfoResults'}},
                                       'type': 'object'},
-                    'ModifyCloudAccess': {'properties': {'Params': {'$ref': '#/definitions/ModifyCloudAccessRequest'},
+                    'ModifyCloudAccess': {'description': 'ModifyCloudAccess '
+                                                         'changes the model access '
+                                                         'granted to users.',
+                                          'properties': {'Params': {'$ref': '#/definitions/ModifyCloudAccessRequest'},
                                                          'Result': {'$ref': '#/definitions/ErrorResults'}},
                                           'type': 'object'},
-                    'RemoveClouds': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'RemoveClouds': {'description': 'RemoveClouds removes the '
+                                                    'specified clouds from the '
+                                                    'controller.\n'
+                                                    'If a cloud is in use (has '
+                                                    'models deployed to it), the '
+                                                    'removal will fail.',
+                                     'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                     'Result': {'$ref': '#/definitions/ErrorResults'}},
                                      'type': 'object'},
-                    'RevokeCredentialsCheckModels': {'properties': {'Params': {'$ref': '#/definitions/RevokeCredentialArgs'},
+                    'RevokeCredentialsCheckModels': {'description': 'RevokeCredentialsCheckModels '
+                                                                    'revokes a set '
+                                                                    'of cloud '
+                                                                    'credentials.\n'
+                                                                    'If the '
+                                                                    'credentials '
+                                                                    'are used by '
+                                                                    'any of the '
+                                                                    'models, the '
+                                                                    'credential '
+                                                                    'deletion will '
+                                                                    'be aborted.\n'
+                                                                    'If '
+                                                                    'credential-in-use '
+                                                                    'needs to be '
+                                                                    'revoked '
+                                                                    'nonetheless, '
+                                                                    'this method '
+                                                                    'allows the '
+                                                                    'use of force.',
+                                                     'properties': {'Params': {'$ref': '#/definitions/RevokeCredentialArgs'},
                                                                     'Result': {'$ref': '#/definitions/ErrorResults'}},
                                                      'type': 'object'},
-                    'UpdateCloud': {'properties': {'Params': {'$ref': '#/definitions/UpdateCloudArgs'},
+                    'UpdateCloud': {'description': 'UpdateCloud updates an '
+                                                   'existing cloud that the '
+                                                   'controller knows about.',
+                                    'properties': {'Params': {'$ref': '#/definitions/UpdateCloudArgs'},
                                                    'Result': {'$ref': '#/definitions/ErrorResults'}},
                                     'type': 'object'},
-                    'UpdateCredentialsCheckModels': {'properties': {'Params': {'$ref': '#/definitions/UpdateCredentialArgs'},
+                    'UpdateCredentialsCheckModels': {'description': 'UpdateCredentialsCheckModels '
+                                                                    'updates a set '
+                                                                    'of cloud '
+                                                                    "credentials' "
+                                                                    'content.\n'
+                                                                    'If there are '
+                                                                    'any models '
+                                                                    'that are '
+                                                                    'using a '
+                                                                    'credential '
+                                                                    'and these '
+                                                                    'models\n'
+                                                                    'are not going '
+                                                                    'to be visible '
+                                                                    'with updated '
+                                                                    'credential '
+                                                                    'content,\n'
+                                                                    'there will be '
+                                                                    'detailed '
+                                                                    'validation '
+                                                                    'errors per '
+                                                                    'model.  Such '
+                                                                    'model errors '
+                                                                    'are returned\n'
+                                                                    'separately '
+                                                                    'and do not '
+                                                                    'contribute to '
+                                                                    'the overall '
+                                                                    'method error '
+                                                                    'status.\n'
+                                                                    'Controller '
+                                                                    'admins can '
+                                                                    "'force' an "
+                                                                    'update of the '
+                                                                    'credential\n'
+                                                                    'regardless of '
+                                                                    'whether it is '
+                                                                    'deemed valid '
+                                                                    'or not.',
+                                                     'properties': {'Params': {'$ref': '#/definitions/UpdateCredentialArgs'},
                                                                     'Result': {'$ref': '#/definitions/UpdateCredentialResults'}},
                                                      'type': 'object'},
-                    'UserCredentials': {'properties': {'Params': {'$ref': '#/definitions/UserClouds'},
+                    'UserCredentials': {'description': 'UserCredentials returns '
+                                                       'the cloud credentials for '
+                                                       'a set of users.',
+                                        'properties': {'Params': {'$ref': '#/definitions/UserClouds'},
                                                        'Result': {'$ref': '#/definitions/StringsResults'}},
                                         'type': 'object'}},
      'type': 'object'}
@@ -376,6 +530,8 @@ class CloudFacade(Type):
     @ReturnMapping(None)
     async def AddCloud(self, cloud=None, force=None, name=None):
         '''
+        AddCloud adds a new cloud, different from the one managed by the controller.
+
         cloud : Cloud
         force : bool
         name : str
@@ -407,6 +563,11 @@ class CloudFacade(Type):
     @ReturnMapping(ErrorResults)
     async def AddCredentials(self, credentials=None):
         '''
+        AddCredentials adds new credentials.
+        In contrast to UpdateCredentials() below, the new credentials can be
+        for a cloud that the controller does not manage (this is required
+        for CAAS models)
+
         credentials : typing.Sequence[~TaggedCredential]
         Returns -> ErrorResults
         '''
@@ -428,6 +589,13 @@ class CloudFacade(Type):
     @ReturnMapping(UpdateCredentialResults)
     async def CheckCredentialsModels(self, credentials=None):
         '''
+        CheckCredentialsModels validates supplied cloud credentials' content against
+        models that currently use these credentials.
+        If there are any models that are using a credential and these models or their
+        cloud instances are not going to be accessible with corresponding credential,
+        there will be detailed validation errors per model.
+        There's no Juju API client which uses this, but JAAS does,
+
         credentials : typing.Sequence[~TaggedCredential]
         Returns -> UpdateCredentialResults
         '''
@@ -449,6 +617,8 @@ class CloudFacade(Type):
     @ReturnMapping(CloudResults)
     async def Cloud(self, entities=None):
         '''
+        Cloud returns the cloud definitions for the specified clouds.
+
         entities : typing.Sequence[~Entity]
         Returns -> CloudResults
         '''
@@ -470,6 +640,8 @@ class CloudFacade(Type):
     @ReturnMapping(CloudInfoResults)
     async def CloudInfo(self, entities=None):
         '''
+        CloudInfo returns information about the specified clouds.
+
         entities : typing.Sequence[~Entity]
         Returns -> CloudInfoResults
         '''
@@ -491,6 +663,9 @@ class CloudFacade(Type):
     @ReturnMapping(CloudsResult)
     async def Clouds(self):
         '''
+        Clouds returns the definitions of all clouds supported by the controller
+        that the logged in user can see.
+
 
         Returns -> CloudsResult
         '''
@@ -510,6 +685,8 @@ class CloudFacade(Type):
     @ReturnMapping(CloudCredentialResults)
     async def Credential(self, entities=None):
         '''
+        Credential returns the specified cloud credential for each tag, minus secrets.
+
         entities : typing.Sequence[~Entity]
         Returns -> CloudCredentialResults
         '''
@@ -531,6 +708,13 @@ class CloudFacade(Type):
     @ReturnMapping(CredentialContentResults)
     async def CredentialContents(self, credentials=None, include_secrets=None):
         '''
+        CredentialContents returns the specified cloud credentials,
+        including the secrets if requested.
+        If no specific credential name/cloud was passed in, all credentials for this user
+        are returned.
+        Only credential owner can see its contents as well as what models use it.
+        Controller admin has no special superpowers here and is treated the same as all other users.
+
         credentials : typing.Sequence[~CloudCredentialArg]
         include_secrets : bool
         Returns -> CredentialContentResults
@@ -557,6 +741,9 @@ class CloudFacade(Type):
     @ReturnMapping(InstanceTypesResults)
     async def InstanceTypes(self, constraints=None):
         '''
+        InstanceTypes returns instance type information for the cloud and region
+        in which the current model is deployed.
+
         constraints : typing.Sequence[~CloudInstanceTypesConstraint]
         Returns -> InstanceTypesResults
         '''
@@ -578,6 +765,10 @@ class CloudFacade(Type):
     @ReturnMapping(ListCloudInfoResults)
     async def ListCloudInfo(self, all_=None, user_tag=None):
         '''
+        ListCloudInfo returns clouds that the specified user has access to.
+        Controller admins (superuser) can list clouds for any user.
+        Other users can only ask about their own clouds.
+
         all_ : bool
         user_tag : str
         Returns -> ListCloudInfoResults
@@ -604,6 +795,8 @@ class CloudFacade(Type):
     @ReturnMapping(ErrorResults)
     async def ModifyCloudAccess(self, changes=None):
         '''
+        ModifyCloudAccess changes the model access granted to users.
+
         changes : typing.Sequence[~ModifyCloudAccess]
         Returns -> ErrorResults
         '''
@@ -625,6 +818,9 @@ class CloudFacade(Type):
     @ReturnMapping(ErrorResults)
     async def RemoveClouds(self, entities=None):
         '''
+        RemoveClouds removes the specified clouds from the controller.
+        If a cloud is in use (has models deployed to it), the removal will fail.
+
         entities : typing.Sequence[~Entity]
         Returns -> ErrorResults
         '''
@@ -646,6 +842,10 @@ class CloudFacade(Type):
     @ReturnMapping(ErrorResults)
     async def RevokeCredentialsCheckModels(self, credentials=None):
         '''
+        RevokeCredentialsCheckModels revokes a set of cloud credentials.
+        If the credentials are used by any of the models, the credential deletion will be aborted.
+        If credential-in-use needs to be revoked nonetheless, this method allows the use of force.
+
         credentials : typing.Sequence[~RevokeCredentialArg]
         Returns -> ErrorResults
         '''
@@ -667,6 +867,8 @@ class CloudFacade(Type):
     @ReturnMapping(ErrorResults)
     async def UpdateCloud(self, clouds=None):
         '''
+        UpdateCloud updates an existing cloud that the controller knows about.
+
         clouds : typing.Sequence[~AddCloudArgs]
         Returns -> ErrorResults
         '''
@@ -688,6 +890,14 @@ class CloudFacade(Type):
     @ReturnMapping(UpdateCredentialResults)
     async def UpdateCredentialsCheckModels(self, credentials=None, force=None):
         '''
+        UpdateCredentialsCheckModels updates a set of cloud credentials' content.
+        If there are any models that are using a credential and these models
+        are not going to be visible with updated credential content,
+        there will be detailed validation errors per model.  Such model errors are returned
+        separately and do not contribute to the overall method error status.
+        Controller admins can 'force' an update of the credential
+        regardless of whether it is deemed valid or not.
+
         credentials : typing.Sequence[~TaggedCredential]
         force : bool
         Returns -> UpdateCredentialResults
@@ -714,6 +924,8 @@ class CloudFacade(Type):
     @ReturnMapping(StringsResults)
     async def UserCredentials(self, user_clouds=None):
         '''
+        UserCredentials returns the cloud credentials for a set of users.
+
         user_clouds : typing.Sequence[~UserCloud]
         Returns -> StringsResults
         '''
