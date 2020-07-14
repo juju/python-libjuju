@@ -33,11 +33,33 @@ class ActionPrunerFacade(Type):
                                                           'error': {'$ref': '#/definitions/Error'}},
                                            'required': ['NotifyWatcherId'],
                                            'type': 'object'}},
-     'properties': {'ModelConfig': {'properties': {'Result': {'$ref': '#/definitions/ModelConfigResult'}},
+     'properties': {'ModelConfig': {'description': 'ModelConfig returns the '
+                                                   "current model's configuration.",
+                                    'properties': {'Result': {'$ref': '#/definitions/ModelConfigResult'}},
                                     'type': 'object'},
                     'Prune': {'properties': {'Params': {'$ref': '#/definitions/ActionPruneArgs'}},
                               'type': 'object'},
-                    'WatchForModelConfigChanges': {'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
+                    'WatchForModelConfigChanges': {'description': 'WatchForModelConfigChanges '
+                                                                  'returns a '
+                                                                  'NotifyWatcher '
+                                                                  'that observes\n'
+                                                                  'changes to the '
+                                                                  'model '
+                                                                  'configuration.\n'
+                                                                  'Note that '
+                                                                  'although the '
+                                                                  'NotifyWatchResult '
+                                                                  'contains an '
+                                                                  'Error field,\n'
+                                                                  "it's not used "
+                                                                  'because we are '
+                                                                  'only returning '
+                                                                  'a single '
+                                                                  'watcher,\n'
+                                                                  'so we use the '
+                                                                  'regular error '
+                                                                  'return.',
+                                                   'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
                                                    'type': 'object'}},
      'type': 'object'}
     
@@ -45,6 +67,8 @@ class ActionPrunerFacade(Type):
     @ReturnMapping(ModelConfigResult)
     async def ModelConfig(self):
         '''
+        ModelConfig returns the current model's configuration.
+
 
         Returns -> ModelConfigResult
         '''
@@ -90,6 +114,12 @@ class ActionPrunerFacade(Type):
     @ReturnMapping(NotifyWatchResult)
     async def WatchForModelConfigChanges(self):
         '''
+        WatchForModelConfigChanges returns a NotifyWatcher that observes
+        changes to the model configuration.
+        Note that although the NotifyWatchResult contains an Error field,
+        it's not used because we are only returning a single watcher,
+        so we use the regular error return.
+
 
         Returns -> NotifyWatchResult
         '''
@@ -109,12 +139,23 @@ class ActionPrunerFacade(Type):
 class AgentToolsFacade(Type):
     name = 'AgentTools'
     version = 1
-    schema =     {'properties': {'UpdateToolsAvailable': {'type': 'object'}}, 'type': 'object'}
+    schema =     {'properties': {'UpdateToolsAvailable': {'description': 'UpdateToolsAvailable '
+                                                            'invokes a lookup and '
+                                                            'further update in '
+                                                            'environ\n'
+                                                            'for new patches of '
+                                                            'the current tool '
+                                                            'versions.',
+                                             'type': 'object'}},
+     'type': 'object'}
     
 
     @ReturnMapping(None)
     async def UpdateToolsAvailable(self):
         '''
+        UpdateToolsAvailable invokes a lookup and further update in environ
+        for new patches of the current tool versions.
+
 
         Returns -> None
         '''
@@ -145,15 +186,22 @@ class AllWatcherFacade(Type):
                                               'removed': {'type': 'boolean'}},
                                'required': ['removed', 'entity'],
                                'type': 'object'}},
-     'properties': {'Next': {'properties': {'Result': {'$ref': '#/definitions/AllWatcherNextResults'}},
+     'properties': {'Next': {'description': 'Next will return the current state of '
+                                            'everything on the first call\n'
+                                            'and subsequent calls will',
+                             'properties': {'Result': {'$ref': '#/definitions/AllWatcherNextResults'}},
                              'type': 'object'},
-                    'Stop': {'type': 'object'}},
+                    'Stop': {'description': 'Stop stops the watcher.',
+                             'type': 'object'}},
      'type': 'object'}
     
 
     @ReturnMapping(AllWatcherNextResults)
     async def Next(self):
         '''
+        Next will return the current state of everything on the first call
+        and subsequent calls will
+
 
         Returns -> AllWatcherNextResults
         '''
@@ -173,6 +221,8 @@ class AllWatcherFacade(Type):
     @ReturnMapping(None)
     async def Stop(self):
         '''
+        Stop stops the watcher.
+
 
         Returns -> None
         '''
@@ -308,10 +358,17 @@ class ApplicationScalerFacade(Type):
                                                            'watcher-id': {'type': 'string'}},
                                             'required': ['watcher-id'],
                                             'type': 'object'}},
-     'properties': {'Rescale': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+     'properties': {'Rescale': {'description': 'Rescale causes any supplied '
+                                               'services to be scaled up to their\n'
+                                               'minimum size.',
+                                'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                'Result': {'$ref': '#/definitions/ErrorResults'}},
                                 'type': 'object'},
-                    'Watch': {'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
+                    'Watch': {'description': 'Watch returns a watcher that sends '
+                                             'the names of services whose\n'
+                                             'unit count may be below their '
+                                             'configured minimum.',
+                              'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
                               'type': 'object'}},
      'type': 'object'}
     
@@ -319,6 +376,9 @@ class ApplicationScalerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Rescale(self, entities=None):
         '''
+        Rescale causes any supplied services to be scaled up to their
+        minimum size.
+
         entities : typing.Sequence[~Entity]
         Returns -> ErrorResults
         '''
@@ -340,6 +400,9 @@ class ApplicationScalerFacade(Type):
     @ReturnMapping(StringsWatchResult)
     async def Watch(self):
         '''
+        Watch returns a watcher that sends the names of services whose
+        unit count may be below their configured minimum.
+
 
         Returns -> StringsWatchResult
         '''
@@ -680,10 +743,20 @@ class CAASAdmissionFacade(Type):
                                               'message': {'type': 'string'}},
                                'required': ['message', 'code'],
                                'type': 'object'}},
-     'properties': {'ControllerAPIInfoForModels': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+     'properties': {'ControllerAPIInfoForModels': {'description': 'ControllerAPIInfoForModels '
+                                                                  'returns the '
+                                                                  'controller api '
+                                                                  'connection '
+                                                                  'details for the '
+                                                                  'specified '
+                                                                  'models.',
+                                                   'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                                   'Result': {'$ref': '#/definitions/ControllerAPIInfoResults'}},
                                                    'type': 'object'},
-                    'ControllerConfig': {'properties': {'Result': {'$ref': '#/definitions/ControllerConfigResult'}},
+                    'ControllerConfig': {'description': 'ControllerConfig returns '
+                                                        "the controller's "
+                                                        'configuration.',
+                                         'properties': {'Result': {'$ref': '#/definitions/ControllerConfigResult'}},
                                          'type': 'object'}},
      'type': 'object'}
     
@@ -691,6 +764,8 @@ class CAASAdmissionFacade(Type):
     @ReturnMapping(ControllerAPIInfoResults)
     async def ControllerAPIInfoForModels(self, entities=None):
         '''
+        ControllerAPIInfoForModels returns the controller api connection details for the specified models.
+
         entities : typing.Sequence[~Entity]
         Returns -> ControllerAPIInfoResults
         '''
@@ -712,6 +787,8 @@ class CAASAdmissionFacade(Type):
     @ReturnMapping(ControllerConfigResult)
     async def ControllerConfig(self):
         '''
+        ControllerConfig returns the controller's configuration.
+
 
         Returns -> ControllerConfigResult
         '''
@@ -812,23 +889,64 @@ class CAASAgentFacade(Type):
                                                                        'type': 'array'}},
                                             'required': ['results'],
                                             'type': 'object'}},
-     'properties': {'CloudSpec': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+     'properties': {'CloudSpec': {'description': "CloudSpec returns the model's "
+                                                 'cloud spec.',
+                                  'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                  'Result': {'$ref': '#/definitions/CloudSpecResults'}},
                                   'type': 'object'},
-                    'ControllerAPIInfoForModels': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'ControllerAPIInfoForModels': {'description': 'ControllerAPIInfoForModels '
+                                                                  'returns the '
+                                                                  'controller api '
+                                                                  'connection '
+                                                                  'details for the '
+                                                                  'specified '
+                                                                  'models.',
+                                                   'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                                   'Result': {'$ref': '#/definitions/ControllerAPIInfoResults'}},
                                                    'type': 'object'},
-                    'ControllerConfig': {'properties': {'Result': {'$ref': '#/definitions/ControllerConfigResult'}},
+                    'ControllerConfig': {'description': 'ControllerConfig returns '
+                                                        "the controller's "
+                                                        'configuration.',
+                                         'properties': {'Result': {'$ref': '#/definitions/ControllerConfigResult'}},
                                          'type': 'object'},
-                    'GetCloudSpec': {'properties': {'Params': {'$ref': '#/definitions/ModelTag'},
+                    'GetCloudSpec': {'description': 'GetCloudSpec constructs the '
+                                                    'CloudSpec for a validated and '
+                                                    'authorized model.',
+                                     'properties': {'Params': {'$ref': '#/definitions/ModelTag'},
                                                     'Result': {'$ref': '#/definitions/CloudSpecResult'}},
                                      'type': 'object'},
-                    'ModelConfig': {'properties': {'Result': {'$ref': '#/definitions/ModelConfigResult'}},
+                    'ModelConfig': {'description': 'ModelConfig returns the '
+                                                   "current model's configuration.",
+                                    'properties': {'Result': {'$ref': '#/definitions/ModelConfigResult'}},
                                     'type': 'object'},
-                    'WatchCloudSpecsChanges': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'WatchCloudSpecsChanges': {'description': 'WatchCloudSpecsChanges '
+                                                              'returns a watcher '
+                                                              'for cloud spec '
+                                                              'changes.',
+                                               'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                               'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
                                                'type': 'object'},
-                    'WatchForModelConfigChanges': {'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
+                    'WatchForModelConfigChanges': {'description': 'WatchForModelConfigChanges '
+                                                                  'returns a '
+                                                                  'NotifyWatcher '
+                                                                  'that observes\n'
+                                                                  'changes to the '
+                                                                  'model '
+                                                                  'configuration.\n'
+                                                                  'Note that '
+                                                                  'although the '
+                                                                  'NotifyWatchResult '
+                                                                  'contains an '
+                                                                  'Error field,\n'
+                                                                  "it's not used "
+                                                                  'because we are '
+                                                                  'only returning '
+                                                                  'a single '
+                                                                  'watcher,\n'
+                                                                  'so we use the '
+                                                                  'regular error '
+                                                                  'return.',
+                                                   'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
                                                    'type': 'object'}},
      'type': 'object'}
     
@@ -836,6 +954,8 @@ class CAASAgentFacade(Type):
     @ReturnMapping(CloudSpecResults)
     async def CloudSpec(self, entities=None):
         '''
+        CloudSpec returns the model's cloud spec.
+
         entities : typing.Sequence[~Entity]
         Returns -> CloudSpecResults
         '''
@@ -857,6 +977,8 @@ class CAASAgentFacade(Type):
     @ReturnMapping(ControllerAPIInfoResults)
     async def ControllerAPIInfoForModels(self, entities=None):
         '''
+        ControllerAPIInfoForModels returns the controller api connection details for the specified models.
+
         entities : typing.Sequence[~Entity]
         Returns -> ControllerAPIInfoResults
         '''
@@ -878,6 +1000,8 @@ class CAASAgentFacade(Type):
     @ReturnMapping(ControllerConfigResult)
     async def ControllerConfig(self):
         '''
+        ControllerConfig returns the controller's configuration.
+
 
         Returns -> ControllerConfigResult
         '''
@@ -897,6 +1021,8 @@ class CAASAgentFacade(Type):
     @ReturnMapping(CloudSpecResult)
     async def GetCloudSpec(self):
         '''
+        GetCloudSpec constructs the CloudSpec for a validated and authorized model.
+
 
         Returns -> CloudSpecResult
         '''
@@ -916,6 +1042,8 @@ class CAASAgentFacade(Type):
     @ReturnMapping(ModelConfigResult)
     async def ModelConfig(self):
         '''
+        ModelConfig returns the current model's configuration.
+
 
         Returns -> ModelConfigResult
         '''
@@ -935,6 +1063,8 @@ class CAASAgentFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def WatchCloudSpecsChanges(self, entities=None):
         '''
+        WatchCloudSpecsChanges returns a watcher for cloud spec changes.
+
         entities : typing.Sequence[~Entity]
         Returns -> NotifyWatchResults
         '''
@@ -956,6 +1086,12 @@ class CAASAgentFacade(Type):
     @ReturnMapping(NotifyWatchResult)
     async def WatchForModelConfigChanges(self):
         '''
+        WatchForModelConfigChanges returns a NotifyWatcher that observes
+        changes to the model configuration.
+        Note that although the NotifyWatchResult contains an Error field,
+        it's not used because we are only returning a single watcher,
+        so we use the regular error return.
+
 
         Returns -> NotifyWatchResult
         '''
@@ -1041,19 +1177,34 @@ class CAASFirewallerFacade(Type):
                                                            'watcher-id': {'type': 'string'}},
                                             'required': ['watcher-id'],
                                             'type': 'object'}},
-     'properties': {'ApplicationsConfig': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+     'properties': {'ApplicationsConfig': {'description': 'ApplicationsConfig '
+                                                          'returns the config for '
+                                                          'the specified '
+                                                          'applications.',
+                                           'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                           'Result': {'$ref': '#/definitions/ApplicationGetConfigResults'}},
                                            'type': 'object'},
-                    'IsExposed': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'IsExposed': {'description': 'IsExposed returns whether the '
+                                                 'specified applications are '
+                                                 'exposed.',
+                                  'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                  'Result': {'$ref': '#/definitions/BoolResults'}},
                                   'type': 'object'},
-                    'Life': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'Life': {'description': 'Life returns the life status of every '
+                                            'supplied entity, where available.',
+                             'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                             'Result': {'$ref': '#/definitions/LifeResults'}},
                              'type': 'object'},
-                    'Watch': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'Watch': {'description': 'Watch starts an NotifyWatcher for '
+                                             'each given entity.',
+                              'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                              'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
                               'type': 'object'},
-                    'WatchApplications': {'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
+                    'WatchApplications': {'description': 'WatchApplications starts '
+                                                         'a StringsWatcher to '
+                                                         'watch CAAS applications\n'
+                                                         'deployed to this model.',
+                                          'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
                                           'type': 'object'}},
      'type': 'object'}
     
@@ -1061,6 +1212,8 @@ class CAASFirewallerFacade(Type):
     @ReturnMapping(ApplicationGetConfigResults)
     async def ApplicationsConfig(self, entities=None):
         '''
+        ApplicationsConfig returns the config for the specified applications.
+
         entities : typing.Sequence[~Entity]
         Returns -> ApplicationGetConfigResults
         '''
@@ -1082,6 +1235,8 @@ class CAASFirewallerFacade(Type):
     @ReturnMapping(BoolResults)
     async def IsExposed(self, entities=None):
         '''
+        IsExposed returns whether the specified applications are exposed.
+
         entities : typing.Sequence[~Entity]
         Returns -> BoolResults
         '''
@@ -1103,6 +1258,8 @@ class CAASFirewallerFacade(Type):
     @ReturnMapping(LifeResults)
     async def Life(self, entities=None):
         '''
+        Life returns the life status of every supplied entity, where available.
+
         entities : typing.Sequence[~Entity]
         Returns -> LifeResults
         '''
@@ -1124,6 +1281,8 @@ class CAASFirewallerFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def Watch(self, entities=None):
         '''
+        Watch starts an NotifyWatcher for each given entity.
+
         entities : typing.Sequence[~Entity]
         Returns -> NotifyWatchResults
         '''
@@ -1145,6 +1304,9 @@ class CAASFirewallerFacade(Type):
     @ReturnMapping(StringsWatchResult)
     async def WatchApplications(self):
         '''
+        WatchApplications starts a StringsWatcher to watch CAAS applications
+        deployed to this model.
+
 
         Returns -> StringsWatchResult
         '''
@@ -1153,6 +1315,269 @@ class CAASFirewallerFacade(Type):
         _params = dict()
         msg = dict(type='CAASFirewaller',
                    request='WatchApplications',
+                   version=1,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+class CAASModelOperatorFacade(Type):
+    name = 'CAASModelOperator'
+    version = 1
+    schema =     {'definitions': {'APIHostPortsResult': {'additionalProperties': False,
+                                            'properties': {'servers': {'items': {'items': {'$ref': '#/definitions/HostPort'},
+                                                                                 'type': 'array'},
+                                                                       'type': 'array'}},
+                                            'required': ['servers'],
+                                            'type': 'object'},
+                     'Address': {'additionalProperties': False,
+                                 'properties': {'scope': {'type': 'string'},
+                                                'space-id': {'type': 'string'},
+                                                'space-name': {'type': 'string'},
+                                                'type': {'type': 'string'},
+                                                'value': {'type': 'string'}},
+                                 'required': ['value', 'type', 'scope'],
+                                 'type': 'object'},
+                     'EntityPassword': {'additionalProperties': False,
+                                        'properties': {'password': {'type': 'string'},
+                                                       'tag': {'type': 'string'}},
+                                        'required': ['tag', 'password'],
+                                        'type': 'object'},
+                     'EntityPasswords': {'additionalProperties': False,
+                                         'properties': {'changes': {'items': {'$ref': '#/definitions/EntityPassword'},
+                                                                    'type': 'array'}},
+                                         'required': ['changes'],
+                                         'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ErrorResult': {'additionalProperties': False,
+                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
+                                     'type': 'object'},
+                     'ErrorResults': {'additionalProperties': False,
+                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
+                                                                 'type': 'array'}},
+                                      'required': ['results'],
+                                      'type': 'object'},
+                     'HostPort': {'additionalProperties': False,
+                                  'properties': {'Address': {'$ref': '#/definitions/Address'},
+                                                 'port': {'type': 'integer'},
+                                                 'scope': {'type': 'string'},
+                                                 'space-id': {'type': 'string'},
+                                                 'space-name': {'type': 'string'},
+                                                 'type': {'type': 'string'},
+                                                 'value': {'type': 'string'}},
+                                  'required': ['value',
+                                               'type',
+                                               'scope',
+                                               'Address',
+                                               'port'],
+                                  'type': 'object'},
+                     'ModelOperatorInfo': {'additionalProperties': False,
+                                           'properties': {'api-addresses': {'items': {'type': 'string'},
+                                                                            'type': 'array'},
+                                                          'image-path': {'type': 'string'},
+                                                          'version': {'$ref': '#/definitions/Number'}},
+                                           'required': ['api-addresses',
+                                                        'image-path',
+                                                        'version'],
+                                           'type': 'object'},
+                     'NotifyWatchResult': {'additionalProperties': False,
+                                           'properties': {'NotifyWatcherId': {'type': 'string'},
+                                                          'error': {'$ref': '#/definitions/Error'}},
+                                           'required': ['NotifyWatcherId'],
+                                           'type': 'object'},
+                     'Number': {'additionalProperties': False,
+                                'properties': {'Build': {'type': 'integer'},
+                                               'Major': {'type': 'integer'},
+                                               'Minor': {'type': 'integer'},
+                                               'Patch': {'type': 'integer'},
+                                               'Tag': {'type': 'string'}},
+                                'required': ['Major',
+                                             'Minor',
+                                             'Tag',
+                                             'Patch',
+                                             'Build'],
+                                'type': 'object'},
+                     'StringResult': {'additionalProperties': False,
+                                      'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                     'result': {'type': 'string'}},
+                                      'required': ['result'],
+                                      'type': 'object'},
+                     'StringsResult': {'additionalProperties': False,
+                                       'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                      'result': {'items': {'type': 'string'},
+                                                                 'type': 'array'}},
+                                       'type': 'object'}},
+     'properties': {'APIAddresses': {'description': 'APIAddresses returns the list '
+                                                    'of addresses used to connect '
+                                                    'to the API.',
+                                     'properties': {'Result': {'$ref': '#/definitions/StringsResult'}},
+                                     'type': 'object'},
+                    'APIHostPorts': {'description': 'APIHostPorts returns the API '
+                                                    'server addresses.',
+                                     'properties': {'Result': {'$ref': '#/definitions/APIHostPortsResult'}},
+                                     'type': 'object'},
+                    'ModelOperatorProvisioningInfo': {'description': 'ModelOperatorProvisioningInfo '
+                                                                     'returns the '
+                                                                     'information '
+                                                                     'needed for '
+                                                                     'provisioning\n'
+                                                                     'a new model '
+                                                                     'operator '
+                                                                     'into a caas '
+                                                                     'cluster.',
+                                                      'properties': {'Result': {'$ref': '#/definitions/ModelOperatorInfo'}},
+                                                      'type': 'object'},
+                    'ModelUUID': {'description': 'ModelUUID returns the model UUID '
+                                                 'to connect to the model\n'
+                                                 'that the current connection is '
+                                                 'for.',
+                                  'properties': {'Result': {'$ref': '#/definitions/StringResult'}},
+                                  'type': 'object'},
+                    'SetPasswords': {'description': 'SetPasswords sets the given '
+                                                    'password for each supplied '
+                                                    'entity, if possible.',
+                                     'properties': {'Params': {'$ref': '#/definitions/EntityPasswords'},
+                                                    'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                     'type': 'object'},
+                    'WatchAPIHostPorts': {'description': 'WatchAPIHostPorts '
+                                                         'watches the API server '
+                                                         'addresses.',
+                                          'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
+                                          'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(StringsResult)
+    async def APIAddresses(self):
+        '''
+        APIAddresses returns the list of addresses used to connect to the API.
+
+
+        Returns -> StringsResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASModelOperator',
+                   request='APIAddresses',
+                   version=1,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(APIHostPortsResult)
+    async def APIHostPorts(self):
+        '''
+        APIHostPorts returns the API server addresses.
+
+
+        Returns -> APIHostPortsResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASModelOperator',
+                   request='APIHostPorts',
+                   version=1,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ModelOperatorInfo)
+    async def ModelOperatorProvisioningInfo(self):
+        '''
+        ModelOperatorProvisioningInfo returns the information needed for provisioning
+        a new model operator into a caas cluster.
+
+
+        Returns -> ModelOperatorInfo
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASModelOperator',
+                   request='ModelOperatorProvisioningInfo',
+                   version=1,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResult)
+    async def ModelUUID(self):
+        '''
+        ModelUUID returns the model UUID to connect to the model
+        that the current connection is for.
+
+
+        Returns -> StringResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASModelOperator',
+                   request='ModelUUID',
+                   version=1,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def SetPasswords(self, changes=None):
+        '''
+        SetPasswords sets the given password for each supplied entity, if possible.
+
+        changes : typing.Sequence[~EntityPassword]
+        Returns -> ErrorResults
+        '''
+        if changes is not None and not isinstance(changes, (bytes, str, list)):
+            raise Exception("Expected changes to be a Sequence, received: {}".format(type(changes)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASModelOperator',
+                   request='SetPasswords',
+                   version=1,
+                   params=_params)
+        _params['changes'] = changes
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResult)
+    async def WatchAPIHostPorts(self):
+        '''
+        WatchAPIHostPorts watches the API server addresses.
+
+
+        Returns -> NotifyWatchResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASModelOperator',
+                   request='WatchAPIHostPorts',
                    version=1,
                    params=_params)
 
@@ -1366,41 +1791,87 @@ class CAASOperatorFacade(Type):
                                                                          'type': 'array'}},
                                                  'required': ['args'],
                                                  'type': 'object'}},
-     'properties': {'APIAddresses': {'properties': {'Result': {'$ref': '#/definitions/StringsResult'}},
+     'properties': {'APIAddresses': {'description': 'APIAddresses returns the list '
+                                                    'of addresses used to connect '
+                                                    'to the API.',
+                                     'properties': {'Result': {'$ref': '#/definitions/StringsResult'}},
                                      'type': 'object'},
-                    'APIHostPorts': {'properties': {'Result': {'$ref': '#/definitions/APIHostPortsResult'}},
+                    'APIHostPorts': {'description': 'APIHostPorts returns the API '
+                                                    'server addresses.',
+                                     'properties': {'Result': {'$ref': '#/definitions/APIHostPortsResult'}},
                                      'type': 'object'},
-                    'Charm': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'Charm': {'description': 'Charm returns the charm info for all '
+                                             'given applications.',
+                              'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                              'Result': {'$ref': '#/definitions/ApplicationCharmResults'}},
                               'type': 'object'},
-                    'CurrentModel': {'properties': {'Result': {'$ref': '#/definitions/ModelResult'}},
+                    'CurrentModel': {'description': 'CurrentModel returns the name '
+                                                    'and UUID for the current juju '
+                                                    'model.',
+                                     'properties': {'Result': {'$ref': '#/definitions/ModelResult'}},
                                      'type': 'object'},
-                    'Life': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'Life': {'description': 'Life returns the life status of every '
+                                            'supplied entity, where available.',
+                             'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                             'Result': {'$ref': '#/definitions/LifeResults'}},
                              'type': 'object'},
-                    'ModelUUID': {'properties': {'Result': {'$ref': '#/definitions/StringResult'}},
+                    'ModelUUID': {'description': 'ModelUUID returns the model UUID '
+                                                 'to connect to the model\n'
+                                                 'that the current connection is '
+                                                 'for.',
+                                  'properties': {'Result': {'$ref': '#/definitions/StringResult'}},
                                   'type': 'object'},
-                    'Remove': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'Remove': {'description': 'Remove removes every given entity '
+                                              'from state, calling EnsureDead\n'
+                                              'first, then Remove. It will fail if '
+                                              'the entity is not present.',
+                               'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                               'Result': {'$ref': '#/definitions/ErrorResults'}},
                                'type': 'object'},
-                    'SetPodSpec': {'properties': {'Params': {'$ref': '#/definitions/SetPodSpecParams'},
+                    'SetPodSpec': {'description': 'SetPodSpec sets the container '
+                                                  'specs for a set of '
+                                                  'applications.\n'
+                                                  'TODO(juju3) - remove',
+                                   'properties': {'Params': {'$ref': '#/definitions/SetPodSpecParams'},
                                                   'Result': {'$ref': '#/definitions/ErrorResults'}},
                                    'type': 'object'},
-                    'SetStatus': {'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
+                    'SetStatus': {'description': 'SetStatus sets the status of '
+                                                 'each given entity.',
+                                  'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
                                                  'Result': {'$ref': '#/definitions/ErrorResults'}},
                                   'type': 'object'},
-                    'SetTools': {'properties': {'Params': {'$ref': '#/definitions/EntitiesVersion'},
+                    'SetTools': {'description': 'SetTools updates the recorded '
+                                                'tools version for the agents.',
+                                 'properties': {'Params': {'$ref': '#/definitions/EntitiesVersion'},
                                                 'Result': {'$ref': '#/definitions/ErrorResults'}},
                                  'type': 'object'},
-                    'Watch': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'Watch': {'description': 'Watch starts an NotifyWatcher for '
+                                             'each given entity.',
+                              'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                              'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
                               'type': 'object'},
-                    'WatchAPIHostPorts': {'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
+                    'WatchAPIHostPorts': {'description': 'WatchAPIHostPorts '
+                                                         'watches the API server '
+                                                         'addresses.',
+                                          'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
                                           'type': 'object'},
-                    'WatchContainerStart': {'properties': {'Params': {'$ref': '#/definitions/WatchContainerStartArgs'},
+                    'WatchContainerStart': {'description': 'WatchContainerStart '
+                                                           'starts a StringWatcher '
+                                                           'to watch for container '
+                                                           'start events\n'
+                                                           'on the CAAS api for a '
+                                                           'specific application '
+                                                           'and container.',
+                                            'properties': {'Params': {'$ref': '#/definitions/WatchContainerStartArgs'},
                                                            'Result': {'$ref': '#/definitions/StringsWatchResults'}},
                                             'type': 'object'},
-                    'WatchUnits': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'WatchUnits': {'description': 'WatchUnits starts a '
+                                                  'StringsWatcher to watch changes '
+                                                  'to the\n'
+                                                  'lifecycle states of units for '
+                                                  'the specified applications in\n'
+                                                  'this model.',
+                                   'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                   'Result': {'$ref': '#/definitions/StringsWatchResults'}},
                                    'type': 'object'}},
      'type': 'object'}
@@ -1409,6 +1880,8 @@ class CAASOperatorFacade(Type):
     @ReturnMapping(StringsResult)
     async def APIAddresses(self):
         '''
+        APIAddresses returns the list of addresses used to connect to the API.
+
 
         Returns -> StringsResult
         '''
@@ -1428,6 +1901,8 @@ class CAASOperatorFacade(Type):
     @ReturnMapping(APIHostPortsResult)
     async def APIHostPorts(self):
         '''
+        APIHostPorts returns the API server addresses.
+
 
         Returns -> APIHostPortsResult
         '''
@@ -1447,6 +1922,8 @@ class CAASOperatorFacade(Type):
     @ReturnMapping(ApplicationCharmResults)
     async def Charm(self, entities=None):
         '''
+        Charm returns the charm info for all given applications.
+
         entities : typing.Sequence[~Entity]
         Returns -> ApplicationCharmResults
         '''
@@ -1468,6 +1945,8 @@ class CAASOperatorFacade(Type):
     @ReturnMapping(ModelResult)
     async def CurrentModel(self):
         '''
+        CurrentModel returns the name and UUID for the current juju model.
+
 
         Returns -> ModelResult
         '''
@@ -1487,6 +1966,8 @@ class CAASOperatorFacade(Type):
     @ReturnMapping(LifeResults)
     async def Life(self, entities=None):
         '''
+        Life returns the life status of every supplied entity, where available.
+
         entities : typing.Sequence[~Entity]
         Returns -> LifeResults
         '''
@@ -1508,6 +1989,9 @@ class CAASOperatorFacade(Type):
     @ReturnMapping(StringResult)
     async def ModelUUID(self):
         '''
+        ModelUUID returns the model UUID to connect to the model
+        that the current connection is for.
+
 
         Returns -> StringResult
         '''
@@ -1527,6 +2011,9 @@ class CAASOperatorFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Remove(self, entities=None):
         '''
+        Remove removes every given entity from state, calling EnsureDead
+        first, then Remove. It will fail if the entity is not present.
+
         entities : typing.Sequence[~Entity]
         Returns -> ErrorResults
         '''
@@ -1548,6 +2035,9 @@ class CAASOperatorFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetPodSpec(self, specs=None):
         '''
+        SetPodSpec sets the container specs for a set of applications.
+        TODO(juju3) - remove
+
         specs : typing.Sequence[~EntityString]
         Returns -> ErrorResults
         '''
@@ -1569,6 +2059,8 @@ class CAASOperatorFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetStatus(self, entities=None):
         '''
+        SetStatus sets the status of each given entity.
+
         entities : typing.Sequence[~EntityStatusArgs]
         Returns -> ErrorResults
         '''
@@ -1590,6 +2082,8 @@ class CAASOperatorFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetTools(self, agent_tools=None):
         '''
+        SetTools updates the recorded tools version for the agents.
+
         agent_tools : typing.Sequence[~EntityVersion]
         Returns -> ErrorResults
         '''
@@ -1611,6 +2105,8 @@ class CAASOperatorFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def Watch(self, entities=None):
         '''
+        Watch starts an NotifyWatcher for each given entity.
+
         entities : typing.Sequence[~Entity]
         Returns -> NotifyWatchResults
         '''
@@ -1632,6 +2128,8 @@ class CAASOperatorFacade(Type):
     @ReturnMapping(NotifyWatchResult)
     async def WatchAPIHostPorts(self):
         '''
+        WatchAPIHostPorts watches the API server addresses.
+
 
         Returns -> NotifyWatchResult
         '''
@@ -1651,6 +2149,9 @@ class CAASOperatorFacade(Type):
     @ReturnMapping(StringsWatchResults)
     async def WatchContainerStart(self, args=None):
         '''
+        WatchContainerStart starts a StringWatcher to watch for container start events
+        on the CAAS api for a specific application and container.
+
         args : typing.Sequence[~WatchContainerStartArg]
         Returns -> StringsWatchResults
         '''
@@ -1672,6 +2173,10 @@ class CAASOperatorFacade(Type):
     @ReturnMapping(StringsWatchResults)
     async def WatchUnits(self, entities=None):
         '''
+        WatchUnits starts a StringsWatcher to watch changes to the
+        lifecycle states of units for the specified applications in
+        this model.
+
         entities : typing.Sequence[~Entity]
         Returns -> StringsWatchResults
         '''
@@ -1852,27 +2357,60 @@ class CAASOperatorProvisionerFacade(Type):
                                                            'watcher-id': {'type': 'string'}},
                                             'required': ['watcher-id'],
                                             'type': 'object'}},
-     'properties': {'APIAddresses': {'properties': {'Result': {'$ref': '#/definitions/StringsResult'}},
+     'properties': {'APIAddresses': {'description': 'APIAddresses returns the list '
+                                                    'of addresses used to connect '
+                                                    'to the API.',
+                                     'properties': {'Result': {'$ref': '#/definitions/StringsResult'}},
                                      'type': 'object'},
-                    'APIHostPorts': {'properties': {'Result': {'$ref': '#/definitions/APIHostPortsResult'}},
+                    'APIHostPorts': {'description': 'APIHostPorts returns the API '
+                                                    'server addresses.',
+                                     'properties': {'Result': {'$ref': '#/definitions/APIHostPortsResult'}},
                                      'type': 'object'},
-                    'IssueOperatorCertificate': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'IssueOperatorCertificate': {'description': 'IssueOperatorCertificate '
+                                                                'issues an x509 '
+                                                                'certificate for '
+                                                                'use by the '
+                                                                'specified '
+                                                                'application '
+                                                                'operator.',
+                                                 'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                                 'Result': {'$ref': '#/definitions/IssueOperatorCertificateResults'}},
                                                  'type': 'object'},
-                    'Life': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'Life': {'description': 'Life returns the life status of every '
+                                            'supplied entity, where available.',
+                             'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                             'Result': {'$ref': '#/definitions/LifeResults'}},
                              'type': 'object'},
-                    'ModelUUID': {'properties': {'Result': {'$ref': '#/definitions/StringResult'}},
+                    'ModelUUID': {'description': 'ModelUUID returns the model UUID '
+                                                 'to connect to the model\n'
+                                                 'that the current connection is '
+                                                 'for.',
+                                  'properties': {'Result': {'$ref': '#/definitions/StringResult'}},
                                   'type': 'object'},
-                    'OperatorProvisioningInfo': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'OperatorProvisioningInfo': {'description': 'OperatorProvisioningInfo '
+                                                                'returns the info '
+                                                                'needed to '
+                                                                'provision an '
+                                                                'operator.',
+                                                 'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                                 'Result': {'$ref': '#/definitions/OperatorProvisioningInfoResults'}},
                                                  'type': 'object'},
-                    'SetPasswords': {'properties': {'Params': {'$ref': '#/definitions/EntityPasswords'},
+                    'SetPasswords': {'description': 'SetPasswords sets the given '
+                                                    'password for each supplied '
+                                                    'entity, if possible.',
+                                     'properties': {'Params': {'$ref': '#/definitions/EntityPasswords'},
                                                     'Result': {'$ref': '#/definitions/ErrorResults'}},
                                      'type': 'object'},
-                    'WatchAPIHostPorts': {'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
+                    'WatchAPIHostPorts': {'description': 'WatchAPIHostPorts '
+                                                         'watches the API server '
+                                                         'addresses.',
+                                          'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
                                           'type': 'object'},
-                    'WatchApplications': {'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
+                    'WatchApplications': {'description': 'WatchApplications starts '
+                                                         'a StringsWatcher to '
+                                                         'watch CAAS applications\n'
+                                                         'deployed to this model.',
+                                          'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
                                           'type': 'object'}},
      'type': 'object'}
     
@@ -1880,6 +2418,8 @@ class CAASOperatorProvisionerFacade(Type):
     @ReturnMapping(StringsResult)
     async def APIAddresses(self):
         '''
+        APIAddresses returns the list of addresses used to connect to the API.
+
 
         Returns -> StringsResult
         '''
@@ -1899,6 +2439,8 @@ class CAASOperatorProvisionerFacade(Type):
     @ReturnMapping(APIHostPortsResult)
     async def APIHostPorts(self):
         '''
+        APIHostPorts returns the API server addresses.
+
 
         Returns -> APIHostPortsResult
         '''
@@ -1918,6 +2460,8 @@ class CAASOperatorProvisionerFacade(Type):
     @ReturnMapping(IssueOperatorCertificateResults)
     async def IssueOperatorCertificate(self, entities=None):
         '''
+        IssueOperatorCertificate issues an x509 certificate for use by the specified application operator.
+
         entities : typing.Sequence[~Entity]
         Returns -> IssueOperatorCertificateResults
         '''
@@ -1939,6 +2483,8 @@ class CAASOperatorProvisionerFacade(Type):
     @ReturnMapping(LifeResults)
     async def Life(self, entities=None):
         '''
+        Life returns the life status of every supplied entity, where available.
+
         entities : typing.Sequence[~Entity]
         Returns -> LifeResults
         '''
@@ -1960,6 +2506,9 @@ class CAASOperatorProvisionerFacade(Type):
     @ReturnMapping(StringResult)
     async def ModelUUID(self):
         '''
+        ModelUUID returns the model UUID to connect to the model
+        that the current connection is for.
+
 
         Returns -> StringResult
         '''
@@ -1979,6 +2528,8 @@ class CAASOperatorProvisionerFacade(Type):
     @ReturnMapping(OperatorProvisioningInfoResults)
     async def OperatorProvisioningInfo(self, entities=None):
         '''
+        OperatorProvisioningInfo returns the info needed to provision an operator.
+
         entities : typing.Sequence[~Entity]
         Returns -> OperatorProvisioningInfoResults
         '''
@@ -2000,6 +2551,8 @@ class CAASOperatorProvisionerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetPasswords(self, changes=None):
         '''
+        SetPasswords sets the given password for each supplied entity, if possible.
+
         changes : typing.Sequence[~EntityPassword]
         Returns -> ErrorResults
         '''
@@ -2021,6 +2574,8 @@ class CAASOperatorProvisionerFacade(Type):
     @ReturnMapping(NotifyWatchResult)
     async def WatchAPIHostPorts(self):
         '''
+        WatchAPIHostPorts watches the API server addresses.
+
 
         Returns -> NotifyWatchResult
         '''
@@ -2040,6 +2595,9 @@ class CAASOperatorProvisionerFacade(Type):
     @ReturnMapping(StringsWatchResult)
     async def WatchApplications(self):
         '''
+        WatchApplications starts a StringsWatcher to watch CAAS applications
+        deployed to this model.
+
 
         Returns -> StringsWatchResult
         '''
@@ -2087,7 +2645,10 @@ class CAASOperatorUpgraderFacade(Type):
                                              'Patch',
                                              'Build'],
                                 'type': 'object'}},
-     'properties': {'UpgradeOperator': {'properties': {'Params': {'$ref': '#/definitions/KubernetesUpgradeArg'},
+     'properties': {'UpgradeOperator': {'description': 'UpgradeOperator upgrades '
+                                                       'the operator for the '
+                                                       'specified agents.',
+                                        'properties': {'Params': {'$ref': '#/definitions/KubernetesUpgradeArg'},
                                                        'Result': {'$ref': '#/definitions/ErrorResult'}},
                                         'type': 'object'}},
      'type': 'object'}
@@ -2096,6 +2657,8 @@ class CAASOperatorUpgraderFacade(Type):
     @ReturnMapping(ErrorResult)
     async def UpgradeOperator(self, agent_tag=None, version=None):
         '''
+        UpgradeOperator upgrades the operator for the specified agents.
+
         agent_tag : str
         version : Number
         Returns -> ErrorResult
@@ -2448,39 +3011,100 @@ class CAASUnitProvisionerFacade(Type):
                                               'zones': {'items': {'type': 'string'},
                                                         'type': 'array'}},
                                'type': 'object'}},
-     'properties': {'ApplicationsConfig': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+     'properties': {'ApplicationsConfig': {'description': 'ApplicationsConfig '
+                                                          'returns the config for '
+                                                          'the specified '
+                                                          'applications.',
+                                           'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                           'Result': {'$ref': '#/definitions/ApplicationGetConfigResults'}},
                                            'type': 'object'},
-                    'ApplicationsScale': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'ApplicationsScale': {'description': 'ApplicationsScale '
+                                                         'returns the scaling info '
+                                                         'for specified '
+                                                         'applications in this '
+                                                         'model.',
+                                          'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                          'Result': {'$ref': '#/definitions/IntResults'}},
                                           'type': 'object'},
-                    'ClearApplicationsResources': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'ClearApplicationsResources': {'description': 'ClearApplicationsResources '
+                                                                  'clears the '
+                                                                  'flags which '
+                                                                  'indicate\n'
+                                                                  'applications '
+                                                                  'still have '
+                                                                  'resources in '
+                                                                  'the cluster.',
+                                                   'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                                   'Result': {'$ref': '#/definitions/ErrorResults'}},
                                                    'type': 'object'},
-                    'DeploymentMode': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'DeploymentMode': {'description': 'DeploymentMode returns the '
+                                                      'deployment mode of the '
+                                                      "given applications' charms.",
+                                       'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                       'Result': {'$ref': '#/definitions/StringResults'}},
                                        'type': 'object'},
-                    'Life': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'Life': {'description': 'Life returns the life status of every '
+                                            'supplied entity, where available.',
+                             'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                             'Result': {'$ref': '#/definitions/LifeResults'}},
                              'type': 'object'},
-                    'ProvisioningInfo': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'ProvisioningInfo': {'description': 'ProvisioningInfo returns '
+                                                        'the provisioning info for '
+                                                        'specified applications in '
+                                                        'this model.',
+                                         'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                         'Result': {'$ref': '#/definitions/KubernetesProvisioningInfoResults'}},
                                          'type': 'object'},
-                    'SetOperatorStatus': {'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
+                    'SetOperatorStatus': {'description': 'SetOperatorStatus '
+                                                         'updates the operator '
+                                                         'status for each given '
+                                                         'application.',
+                                          'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
                                                          'Result': {'$ref': '#/definitions/ErrorResults'}},
                                           'type': 'object'},
-                    'UpdateApplicationsService': {'properties': {'Params': {'$ref': '#/definitions/UpdateApplicationServiceArgs'},
+                    'UpdateApplicationsService': {'description': 'UpdateApplicationsService '
+                                                                 'updates the Juju '
+                                                                 'data model to '
+                                                                 'reflect the '
+                                                                 'given\n'
+                                                                 'service details '
+                                                                 'of the specified '
+                                                                 'application.',
+                                                  'properties': {'Params': {'$ref': '#/definitions/UpdateApplicationServiceArgs'},
                                                                  'Result': {'$ref': '#/definitions/ErrorResults'}},
                                                   'type': 'object'},
-                    'UpdateApplicationsUnits': {'properties': {'Params': {'$ref': '#/definitions/UpdateApplicationUnitArgs'},
+                    'UpdateApplicationsUnits': {'description': 'UpdateApplicationsUnits '
+                                                               'updates the Juju '
+                                                               'data model to '
+                                                               'reflect the given\n'
+                                                               'units of the '
+                                                               'specified '
+                                                               'application.',
+                                                'properties': {'Params': {'$ref': '#/definitions/UpdateApplicationUnitArgs'},
                                                                'Result': {'$ref': '#/definitions/UpdateApplicationUnitResults'}},
                                                 'type': 'object'},
-                    'WatchApplications': {'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
+                    'WatchApplications': {'description': 'WatchApplications starts '
+                                                         'a StringsWatcher to '
+                                                         'watch CAAS applications\n'
+                                                         'deployed to this model.',
+                                          'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
                                           'type': 'object'},
-                    'WatchApplicationsScale': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'WatchApplicationsScale': {'description': 'WatchApplicationsScale '
+                                                              'starts a '
+                                                              'NotifyWatcher to '
+                                                              'watch changes\n'
+                                                              'to the '
+                                                              "applications' "
+                                                              'scale.',
+                                               'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                               'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
                                                'type': 'object'},
-                    'WatchPodSpec': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'WatchPodSpec': {'description': 'WatchPodSpec starts a '
+                                                    'NotifyWatcher to watch '
+                                                    'changes to the\n'
+                                                    'pod spec for specified units '
+                                                    'in this model.',
+                                     'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                     'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
                                      'type': 'object'}},
      'type': 'object'}
@@ -2489,6 +3113,8 @@ class CAASUnitProvisionerFacade(Type):
     @ReturnMapping(ApplicationGetConfigResults)
     async def ApplicationsConfig(self, entities=None):
         '''
+        ApplicationsConfig returns the config for the specified applications.
+
         entities : typing.Sequence[~Entity]
         Returns -> ApplicationGetConfigResults
         '''
@@ -2510,6 +3136,8 @@ class CAASUnitProvisionerFacade(Type):
     @ReturnMapping(IntResults)
     async def ApplicationsScale(self, entities=None):
         '''
+        ApplicationsScale returns the scaling info for specified applications in this model.
+
         entities : typing.Sequence[~Entity]
         Returns -> IntResults
         '''
@@ -2531,6 +3159,9 @@ class CAASUnitProvisionerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def ClearApplicationsResources(self, entities=None):
         '''
+        ClearApplicationsResources clears the flags which indicate
+        applications still have resources in the cluster.
+
         entities : typing.Sequence[~Entity]
         Returns -> ErrorResults
         '''
@@ -2552,6 +3183,8 @@ class CAASUnitProvisionerFacade(Type):
     @ReturnMapping(StringResults)
     async def DeploymentMode(self, entities=None):
         '''
+        DeploymentMode returns the deployment mode of the given applications' charms.
+
         entities : typing.Sequence[~Entity]
         Returns -> StringResults
         '''
@@ -2573,6 +3206,8 @@ class CAASUnitProvisionerFacade(Type):
     @ReturnMapping(LifeResults)
     async def Life(self, entities=None):
         '''
+        Life returns the life status of every supplied entity, where available.
+
         entities : typing.Sequence[~Entity]
         Returns -> LifeResults
         '''
@@ -2594,6 +3229,8 @@ class CAASUnitProvisionerFacade(Type):
     @ReturnMapping(KubernetesProvisioningInfoResults)
     async def ProvisioningInfo(self, entities=None):
         '''
+        ProvisioningInfo returns the provisioning info for specified applications in this model.
+
         entities : typing.Sequence[~Entity]
         Returns -> KubernetesProvisioningInfoResults
         '''
@@ -2615,6 +3252,8 @@ class CAASUnitProvisionerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetOperatorStatus(self, entities=None):
         '''
+        SetOperatorStatus updates the operator status for each given application.
+
         entities : typing.Sequence[~EntityStatusArgs]
         Returns -> ErrorResults
         '''
@@ -2636,6 +3275,9 @@ class CAASUnitProvisionerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def UpdateApplicationsService(self, args=None):
         '''
+        UpdateApplicationsService updates the Juju data model to reflect the given
+        service details of the specified application.
+
         args : typing.Sequence[~UpdateApplicationServiceArg]
         Returns -> ErrorResults
         '''
@@ -2657,6 +3299,9 @@ class CAASUnitProvisionerFacade(Type):
     @ReturnMapping(UpdateApplicationUnitResults)
     async def UpdateApplicationsUnits(self, args=None):
         '''
+        UpdateApplicationsUnits updates the Juju data model to reflect the given
+        units of the specified application.
+
         args : typing.Sequence[~UpdateApplicationUnits]
         Returns -> UpdateApplicationUnitResults
         '''
@@ -2678,6 +3323,9 @@ class CAASUnitProvisionerFacade(Type):
     @ReturnMapping(StringsWatchResult)
     async def WatchApplications(self):
         '''
+        WatchApplications starts a StringsWatcher to watch CAAS applications
+        deployed to this model.
+
 
         Returns -> StringsWatchResult
         '''
@@ -2697,6 +3345,9 @@ class CAASUnitProvisionerFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def WatchApplicationsScale(self, entities=None):
         '''
+        WatchApplicationsScale starts a NotifyWatcher to watch changes
+        to the applications' scale.
+
         entities : typing.Sequence[~Entity]
         Returns -> NotifyWatchResults
         '''
@@ -2718,6 +3369,9 @@ class CAASUnitProvisionerFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def WatchPodSpec(self, entities=None):
         '''
+        WatchPodSpec starts a NotifyWatcher to watch changes to the
+        pod spec for specified units in this model.
+
         entities : typing.Sequence[~Entity]
         Returns -> NotifyWatchResults
         '''
@@ -4547,7 +5201,12 @@ class CredentialManagerFacade(Type):
                      'InvalidateCredentialArg': {'additionalProperties': False,
                                                  'properties': {'reason': {'type': 'string'}},
                                                  'type': 'object'}},
-     'properties': {'InvalidateModelCredential': {'properties': {'Params': {'$ref': '#/definitions/InvalidateCredentialArg'},
+     'properties': {'InvalidateModelCredential': {'description': 'InvalidateModelCredential '
+                                                                 'marks the cloud '
+                                                                 'credential for '
+                                                                 'this model as '
+                                                                 'invalid.',
+                                                  'properties': {'Params': {'$ref': '#/definitions/InvalidateCredentialArg'},
                                                                  'Result': {'$ref': '#/definitions/ErrorResult'}},
                                                   'type': 'object'}},
      'type': 'object'}
@@ -4556,6 +5215,8 @@ class CredentialManagerFacade(Type):
     @ReturnMapping(ErrorResult)
     async def InvalidateModelCredential(self, reason=None):
         '''
+        InvalidateModelCredential marks the cloud credential for this model as invalid.
+
         reason : str
         Returns -> ErrorResult
         '''
@@ -4608,9 +5269,18 @@ class CrossControllerFacade(Type):
                                                                        'type': 'array'}},
                                             'required': ['results'],
                                             'type': 'object'}},
-     'properties': {'ControllerInfo': {'properties': {'Result': {'$ref': '#/definitions/ControllerAPIInfoResults'}},
+     'properties': {'ControllerInfo': {'description': 'ControllerInfo returns the '
+                                                      'API info for the '
+                                                      'controller.',
+                                       'properties': {'Result': {'$ref': '#/definitions/ControllerAPIInfoResults'}},
                                        'type': 'object'},
-                    'WatchControllerInfo': {'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
+                    'WatchControllerInfo': {'description': 'WatchControllerInfo '
+                                                           'creates a watcher that '
+                                                           'notifies when the API '
+                                                           'info\n'
+                                                           'for the controller '
+                                                           'changes.',
+                                            'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
                                             'type': 'object'}},
      'type': 'object'}
     
@@ -4618,6 +5288,8 @@ class CrossControllerFacade(Type):
     @ReturnMapping(ControllerAPIInfoResults)
     async def ControllerInfo(self):
         '''
+        ControllerInfo returns the API info for the controller.
+
 
         Returns -> ControllerAPIInfoResults
         '''
@@ -4637,6 +5309,9 @@ class CrossControllerFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def WatchControllerInfo(self):
         '''
+        WatchControllerInfo creates a watcher that notifies when the API info
+        for the controller changes.
+
 
         Returns -> NotifyWatchResults
         '''
@@ -5248,32 +5923,76 @@ class DeployerFacade(Type):
                                                                         'type': 'array'}},
                                              'required': ['results'],
                                              'type': 'object'}},
-     'properties': {'APIAddresses': {'properties': {'Result': {'$ref': '#/definitions/StringsResult'}},
+     'properties': {'APIAddresses': {'description': 'APIAddresses returns the list '
+                                                    'of addresses used to connect '
+                                                    'to the API.',
+                                     'properties': {'Result': {'$ref': '#/definitions/StringsResult'}},
                                      'type': 'object'},
-                    'APIHostPorts': {'properties': {'Result': {'$ref': '#/definitions/APIHostPortsResult'}},
+                    'APIHostPorts': {'description': 'APIHostPorts returns the API '
+                                                    'server addresses.',
+                                     'properties': {'Result': {'$ref': '#/definitions/APIHostPortsResult'}},
                                      'type': 'object'},
-                    'ConnectionInfo': {'properties': {'Result': {'$ref': '#/definitions/DeployerConnectionValues'}},
+                    'ConnectionInfo': {'description': 'ConnectionInfo returns all '
+                                                      'the address information '
+                                                      'that the\n'
+                                                      'deployer task needs in one '
+                                                      'call.',
+                                       'properties': {'Result': {'$ref': '#/definitions/DeployerConnectionValues'}},
                                        'type': 'object'},
-                    'Life': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'Life': {'description': 'Life returns the life status of every '
+                                            'supplied entity, where available.',
+                             'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                             'Result': {'$ref': '#/definitions/LifeResults'}},
                              'type': 'object'},
-                    'ModelUUID': {'properties': {'Result': {'$ref': '#/definitions/StringResult'}},
+                    'ModelUUID': {'description': 'ModelUUID returns the model UUID '
+                                                 'to connect to the model\n'
+                                                 'that the current connection is '
+                                                 'for.',
+                                  'properties': {'Result': {'$ref': '#/definitions/StringResult'}},
                                   'type': 'object'},
-                    'Remove': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'Remove': {'description': 'Remove removes every given entity '
+                                              'from state, calling EnsureDead\n'
+                                              'first, then Remove. It will fail if '
+                                              'the entity is not present.',
+                               'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                               'Result': {'$ref': '#/definitions/ErrorResults'}},
                                'type': 'object'},
-                    'SetPasswords': {'properties': {'Params': {'$ref': '#/definitions/EntityPasswords'},
+                    'SetPasswords': {'description': 'SetPasswords sets the given '
+                                                    'password for each supplied '
+                                                    'entity, if possible.',
+                                     'properties': {'Params': {'$ref': '#/definitions/EntityPasswords'},
                                                     'Result': {'$ref': '#/definitions/ErrorResults'}},
                                      'type': 'object'},
-                    'SetStatus': {'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
+                    'SetStatus': {'description': 'SetStatus sets the status of the '
+                                                 'specified entities.',
+                                  'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
                                                  'Result': {'$ref': '#/definitions/ErrorResults'}},
                                   'type': 'object'},
-                    'UpdateStatus': {'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
+                    'UpdateStatus': {'description': 'UpdateStatus updates the '
+                                                    'status data of each given '
+                                                    'entity.\n'
+                                                    'TODO(fwereade): WTF. This '
+                                                    'method exists *only* for the '
+                                                    'convenience of the\n'
+                                                    '*client* API -- and is itself '
+                                                    'completely broken -- but we '
+                                                    'still expose it\n'
+                                                    'in every facade with a '
+                                                    'StatusSetter? FFS.',
+                                     'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
                                                     'Result': {'$ref': '#/definitions/ErrorResults'}},
                                      'type': 'object'},
-                    'WatchAPIHostPorts': {'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
+                    'WatchAPIHostPorts': {'description': 'WatchAPIHostPorts '
+                                                         'watches the API server '
+                                                         'addresses.',
+                                          'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
                                           'type': 'object'},
-                    'WatchUnits': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'WatchUnits': {'description': 'WatchUnits starts a '
+                                                  'StringsWatcher to watch all '
+                                                  'units belonging to\n'
+                                                  'to any entity (machine or '
+                                                  'service) passed in args.',
+                                   'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                   'Result': {'$ref': '#/definitions/StringsWatchResults'}},
                                    'type': 'object'}},
      'type': 'object'}
@@ -5282,6 +6001,8 @@ class DeployerFacade(Type):
     @ReturnMapping(StringsResult)
     async def APIAddresses(self):
         '''
+        APIAddresses returns the list of addresses used to connect to the API.
+
 
         Returns -> StringsResult
         '''
@@ -5301,6 +6022,8 @@ class DeployerFacade(Type):
     @ReturnMapping(APIHostPortsResult)
     async def APIHostPorts(self):
         '''
+        APIHostPorts returns the API server addresses.
+
 
         Returns -> APIHostPortsResult
         '''
@@ -5320,6 +6043,9 @@ class DeployerFacade(Type):
     @ReturnMapping(DeployerConnectionValues)
     async def ConnectionInfo(self):
         '''
+        ConnectionInfo returns all the address information that the
+        deployer task needs in one call.
+
 
         Returns -> DeployerConnectionValues
         '''
@@ -5339,6 +6065,8 @@ class DeployerFacade(Type):
     @ReturnMapping(LifeResults)
     async def Life(self, entities=None):
         '''
+        Life returns the life status of every supplied entity, where available.
+
         entities : typing.Sequence[~Entity]
         Returns -> LifeResults
         '''
@@ -5360,6 +6088,9 @@ class DeployerFacade(Type):
     @ReturnMapping(StringResult)
     async def ModelUUID(self):
         '''
+        ModelUUID returns the model UUID to connect to the model
+        that the current connection is for.
+
 
         Returns -> StringResult
         '''
@@ -5379,6 +6110,9 @@ class DeployerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Remove(self, entities=None):
         '''
+        Remove removes every given entity from state, calling EnsureDead
+        first, then Remove. It will fail if the entity is not present.
+
         entities : typing.Sequence[~Entity]
         Returns -> ErrorResults
         '''
@@ -5400,6 +6134,8 @@ class DeployerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetPasswords(self, changes=None):
         '''
+        SetPasswords sets the given password for each supplied entity, if possible.
+
         changes : typing.Sequence[~EntityPassword]
         Returns -> ErrorResults
         '''
@@ -5421,6 +6157,8 @@ class DeployerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetStatus(self, entities=None):
         '''
+        SetStatus sets the status of the specified entities.
+
         entities : typing.Sequence[~EntityStatusArgs]
         Returns -> ErrorResults
         '''
@@ -5442,6 +6180,11 @@ class DeployerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def UpdateStatus(self, entities=None):
         '''
+        UpdateStatus updates the status data of each given entity.
+        TODO(fwereade): WTF. This method exists *only* for the convenience of the
+        *client* API -- and is itself completely broken -- but we still expose it
+        in every facade with a StatusSetter? FFS.
+
         entities : typing.Sequence[~EntityStatusArgs]
         Returns -> ErrorResults
         '''
@@ -5463,6 +6206,8 @@ class DeployerFacade(Type):
     @ReturnMapping(NotifyWatchResult)
     async def WatchAPIHostPorts(self):
         '''
+        WatchAPIHostPorts watches the API server addresses.
+
 
         Returns -> NotifyWatchResult
         '''
@@ -5482,6 +6227,9 @@ class DeployerFacade(Type):
     @ReturnMapping(StringsWatchResults)
     async def WatchUnits(self, entities=None):
         '''
+        WatchUnits starts a StringsWatcher to watch all units belonging to
+        to any entity (machine or service) passed in args.
+
         entities : typing.Sequence[~Entity]
         Returns -> StringsWatchResults
         '''
@@ -5571,13 +6319,34 @@ class ExternalControllerUpdaterFacade(Type):
                                                                         'type': 'array'}},
                                              'required': ['results'],
                                              'type': 'object'}},
-     'properties': {'ExternalControllerInfo': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+     'properties': {'ExternalControllerInfo': {'description': 'ExternalControllerInfo '
+                                                              'returns the info '
+                                                              'for the specified '
+                                                              'external '
+                                                              'controllers.',
+                                               'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                               'Result': {'$ref': '#/definitions/ExternalControllerInfoResults'}},
                                                'type': 'object'},
-                    'SetExternalControllerInfo': {'properties': {'Params': {'$ref': '#/definitions/SetExternalControllersInfoParams'},
+                    'SetExternalControllerInfo': {'description': 'SetExternalControllerInfo '
+                                                                 'saves the info '
+                                                                 'for the '
+                                                                 'specified '
+                                                                 'external '
+                                                                 'controllers.',
+                                                  'properties': {'Params': {'$ref': '#/definitions/SetExternalControllersInfoParams'},
                                                                  'Result': {'$ref': '#/definitions/ErrorResults'}},
                                                   'type': 'object'},
-                    'WatchExternalControllers': {'properties': {'Result': {'$ref': '#/definitions/StringsWatchResults'}},
+                    'WatchExternalControllers': {'description': 'WatchExternalControllers '
+                                                                'watches for the '
+                                                                'addition and '
+                                                                'removal of '
+                                                                'external\n'
+                                                                'controller '
+                                                                'records to the '
+                                                                'local '
+                                                                "controller's "
+                                                                'database.',
+                                                 'properties': {'Result': {'$ref': '#/definitions/StringsWatchResults'}},
                                                  'type': 'object'}},
      'type': 'object'}
     
@@ -5585,6 +6354,8 @@ class ExternalControllerUpdaterFacade(Type):
     @ReturnMapping(ExternalControllerInfoResults)
     async def ExternalControllerInfo(self, entities=None):
         '''
+        ExternalControllerInfo returns the info for the specified external controllers.
+
         entities : typing.Sequence[~Entity]
         Returns -> ExternalControllerInfoResults
         '''
@@ -5606,6 +6377,8 @@ class ExternalControllerUpdaterFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetExternalControllerInfo(self, controllers=None):
         '''
+        SetExternalControllerInfo saves the info for the specified external controllers.
+
         controllers : typing.Sequence[~SetExternalControllerInfoParams]
         Returns -> ErrorResults
         '''
@@ -5627,6 +6400,9 @@ class ExternalControllerUpdaterFacade(Type):
     @ReturnMapping(StringsWatchResults)
     async def WatchExternalControllers(self):
         '''
+        WatchExternalControllers watches for the addition and removal of external
+        controller records to the local controller's database.
+
 
         Returns -> StringsWatchResults
         '''
@@ -5669,9 +6445,28 @@ class FanConfigurerFacade(Type):
                                                           'error': {'$ref': '#/definitions/Error'}},
                                            'required': ['NotifyWatcherId'],
                                            'type': 'object'}},
-     'properties': {'FanConfig': {'properties': {'Result': {'$ref': '#/definitions/FanConfigResult'}},
+     'properties': {'FanConfig': {'description': 'FanConfig returns current FAN '
+                                                 'configuration.',
+                                  'properties': {'Result': {'$ref': '#/definitions/FanConfigResult'}},
                                   'type': 'object'},
-                    'WatchForFanConfigChanges': {'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
+                    'WatchForFanConfigChanges': {'description': 'WatchForFanConfigChanges '
+                                                                'returns a '
+                                                                'NotifyWatcher '
+                                                                'that observes\n'
+                                                                'changes to the '
+                                                                'FAN '
+                                                                'configuration.\n'
+                                                                'so we use the '
+                                                                'regular error '
+                                                                'return.\n'
+                                                                'TODO(wpk) '
+                                                                '2017-09-21 We '
+                                                                'should use Model '
+                                                                'directly, and '
+                                                                'watch only for '
+                                                                'FanConfig '
+                                                                'changes.',
+                                                 'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
                                                  'type': 'object'}},
      'type': 'object'}
     
@@ -5679,6 +6474,8 @@ class FanConfigurerFacade(Type):
     @ReturnMapping(FanConfigResult)
     async def FanConfig(self):
         '''
+        FanConfig returns current FAN configuration.
+
 
         Returns -> FanConfigResult
         '''
@@ -5698,6 +6495,11 @@ class FanConfigurerFacade(Type):
     @ReturnMapping(NotifyWatchResult)
     async def WatchForFanConfigChanges(self):
         '''
+        WatchForFanConfigChanges returns a NotifyWatcher that observes
+        changes to the FAN configuration.
+        so we use the regular error return.
+        TODO(wpk) 2017-09-21 We should use Model directly, and watch only for FanConfig changes.
+
 
         Returns -> NotifyWatchResult
         '''
@@ -5749,9 +6551,15 @@ class FirewallRulesFacade(Type):
                                                                            'type': 'array'}},
                                                   'required': ['Rules'],
                                                   'type': 'object'}},
-     'properties': {'ListFirewallRules': {'properties': {'Result': {'$ref': '#/definitions/ListFirewallRulesResults'}},
+     'properties': {'ListFirewallRules': {'description': 'ListFirewallRules '
+                                                         'returns all the firewall '
+                                                         'rules.',
+                                          'properties': {'Result': {'$ref': '#/definitions/ListFirewallRulesResults'}},
                                           'type': 'object'},
-                    'SetFirewallRules': {'properties': {'Params': {'$ref': '#/definitions/FirewallRuleArgs'},
+                    'SetFirewallRules': {'description': 'SetFirewallRules creates '
+                                                        'or updates the specified '
+                                                        'firewall rules.',
+                                         'properties': {'Params': {'$ref': '#/definitions/FirewallRuleArgs'},
                                                         'Result': {'$ref': '#/definitions/ErrorResults'}},
                                          'type': 'object'}},
      'type': 'object'}
@@ -5760,6 +6568,8 @@ class FirewallRulesFacade(Type):
     @ReturnMapping(ListFirewallRulesResults)
     async def ListFirewallRules(self):
         '''
+        ListFirewallRules returns all the firewall rules.
+
 
         Returns -> ListFirewallRulesResults
         '''
@@ -5779,6 +6589,8 @@ class FirewallRulesFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetFirewallRules(self, args=None):
         '''
+        SetFirewallRules creates or updates the specified firewall rules.
+
         args : typing.Sequence[~FirewallRule]
         Returns -> ErrorResults
         '''
@@ -5827,7 +6639,9 @@ class HostKeyReporterFacade(Type):
                                                     'tag': {'type': 'string'}},
                                      'required': ['tag', 'public-keys'],
                                      'type': 'object'}},
-     'properties': {'ReportKeys': {'properties': {'Params': {'$ref': '#/definitions/SSHHostKeySet'},
+     'properties': {'ReportKeys': {'description': 'ReportKeys sets the SSH host '
+                                                  'keys for one or more entities.',
+                                   'properties': {'Params': {'$ref': '#/definitions/SSHHostKeySet'},
                                                   'Result': {'$ref': '#/definitions/ErrorResults'}},
                                    'type': 'object'}},
      'type': 'object'}
@@ -5836,6 +6650,8 @@ class HostKeyReporterFacade(Type):
     @ReturnMapping(ErrorResults)
     async def ReportKeys(self, entity_keys=None):
         '''
+        ReportKeys sets the SSH host keys for one or more entities.
+
         entity_keys : typing.Sequence[~SSHHostKeys]
         Returns -> ErrorResults
         '''
@@ -5921,13 +6737,24 @@ class ImageMetadataManagerFacade(Type):
                                             'properties': {'metadata': {'items': {'$ref': '#/definitions/CloudImageMetadataList'},
                                                                         'type': 'array'}},
                                             'type': 'object'}},
-     'properties': {'Delete': {'properties': {'Params': {'$ref': '#/definitions/MetadataImageIds'},
+     'properties': {'Delete': {'description': 'Delete deletes cloud image metadata '
+                                              'for given image ids.\n'
+                                              'It supports bulk calls.',
+                               'properties': {'Params': {'$ref': '#/definitions/MetadataImageIds'},
                                               'Result': {'$ref': '#/definitions/ErrorResults'}},
                                'type': 'object'},
-                    'List': {'properties': {'Params': {'$ref': '#/definitions/ImageMetadataFilter'},
+                    'List': {'description': 'List returns all found cloud image '
+                                            'metadata that satisfy\n'
+                                            'given filter.\n'
+                                            'Returned list contains metadata '
+                                            'ordered by priority.',
+                             'properties': {'Params': {'$ref': '#/definitions/ImageMetadataFilter'},
                                             'Result': {'$ref': '#/definitions/ListCloudImageMetadataResult'}},
                              'type': 'object'},
-                    'Save': {'properties': {'Params': {'$ref': '#/definitions/MetadataSaveParams'},
+                    'Save': {'description': 'Save stores given cloud image '
+                                            'metadata.\n'
+                                            'It supports bulk calls.',
+                             'properties': {'Params': {'$ref': '#/definitions/MetadataSaveParams'},
                                             'Result': {'$ref': '#/definitions/ErrorResults'}},
                              'type': 'object'}},
      'type': 'object'}
@@ -5936,6 +6763,9 @@ class ImageMetadataManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Delete(self, image_ids=None):
         '''
+        Delete deletes cloud image metadata for given image ids.
+        It supports bulk calls.
+
         image_ids : typing.Sequence[str]
         Returns -> ErrorResults
         '''
@@ -5957,6 +6787,10 @@ class ImageMetadataManagerFacade(Type):
     @ReturnMapping(ListCloudImageMetadataResult)
     async def List(self, arches=None, region=None, root_storage_type=None, series=None, stream=None, virt_type=None):
         '''
+        List returns all found cloud image metadata that satisfy
+        given filter.
+        Returned list contains metadata ordered by priority.
+
         arches : typing.Sequence[str]
         region : str
         root_storage_type : str
@@ -6003,6 +6837,9 @@ class ImageMetadataManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Save(self, metadata=None):
         '''
+        Save stores given cloud image metadata.
+        It supports bulk calls.
+
         metadata : typing.Sequence[~CloudImageMetadataList]
         Returns -> ErrorResults
         '''
@@ -6070,16 +6907,27 @@ class KeyManagerFacade(Type):
                                                                    'type': 'array'}},
                                         'required': ['results'],
                                         'type': 'object'}},
-     'properties': {'AddKeys': {'properties': {'Params': {'$ref': '#/definitions/ModifyUserSSHKeys'},
+     'properties': {'AddKeys': {'description': 'AddKeys adds new authorised ssh '
+                                               'keys for the specified user.',
+                                'properties': {'Params': {'$ref': '#/definitions/ModifyUserSSHKeys'},
                                                'Result': {'$ref': '#/definitions/ErrorResults'}},
                                 'type': 'object'},
-                    'DeleteKeys': {'properties': {'Params': {'$ref': '#/definitions/ModifyUserSSHKeys'},
+                    'DeleteKeys': {'description': 'DeleteKeys deletes the '
+                                                  'authorised ssh keys for the '
+                                                  'specified user.',
+                                   'properties': {'Params': {'$ref': '#/definitions/ModifyUserSSHKeys'},
                                                   'Result': {'$ref': '#/definitions/ErrorResults'}},
                                    'type': 'object'},
-                    'ImportKeys': {'properties': {'Params': {'$ref': '#/definitions/ModifyUserSSHKeys'},
+                    'ImportKeys': {'description': 'ImportKeys imports new '
+                                                  'authorised ssh keys from the '
+                                                  'specified key ids for the '
+                                                  'specified user.',
+                                   'properties': {'Params': {'$ref': '#/definitions/ModifyUserSSHKeys'},
                                                   'Result': {'$ref': '#/definitions/ErrorResults'}},
                                    'type': 'object'},
-                    'ListKeys': {'properties': {'Params': {'$ref': '#/definitions/ListSSHKeys'},
+                    'ListKeys': {'description': 'ListKeys returns the authorised '
+                                                'ssh keys for the specified users.',
+                                 'properties': {'Params': {'$ref': '#/definitions/ListSSHKeys'},
                                                 'Result': {'$ref': '#/definitions/StringsResults'}},
                                  'type': 'object'}},
      'type': 'object'}
@@ -6088,6 +6936,8 @@ class KeyManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def AddKeys(self, ssh_keys=None, user=None):
         '''
+        AddKeys adds new authorised ssh keys for the specified user.
+
         ssh_keys : typing.Sequence[str]
         user : str
         Returns -> ErrorResults
@@ -6114,6 +6964,8 @@ class KeyManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def DeleteKeys(self, ssh_keys=None, user=None):
         '''
+        DeleteKeys deletes the authorised ssh keys for the specified user.
+
         ssh_keys : typing.Sequence[str]
         user : str
         Returns -> ErrorResults
@@ -6140,6 +6992,8 @@ class KeyManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def ImportKeys(self, ssh_keys=None, user=None):
         '''
+        ImportKeys imports new authorised ssh keys from the specified key ids for the specified user.
+
         ssh_keys : typing.Sequence[str]
         user : str
         Returns -> ErrorResults
@@ -6166,6 +7020,8 @@ class KeyManagerFacade(Type):
     @ReturnMapping(StringsResults)
     async def ListKeys(self, entities=None, mode=None):
         '''
+        ListKeys returns the authorised ssh keys for the specified users.
+
         entities : Entities
         mode : bool
         Returns -> StringsResults
@@ -6229,10 +7085,37 @@ class KeyUpdaterFacade(Type):
                                                                    'type': 'array'}},
                                         'required': ['results'],
                                         'type': 'object'}},
-     'properties': {'AuthorisedKeys': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+     'properties': {'AuthorisedKeys': {'description': 'AuthorisedKeys reports the '
+                                                      'authorised ssh keys for the '
+                                                      'specified machines.\n'
+                                                      'The current implementation '
+                                                      'relies on global authorised '
+                                                      'keys being stored in the '
+                                                      'model config.\n'
+                                                      'This will change as new '
+                                                      'user management and '
+                                                      'authorisation functionality '
+                                                      'is added.',
+                                       'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                       'Result': {'$ref': '#/definitions/StringsResults'}},
                                        'type': 'object'},
-                    'WatchAuthorisedKeys': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'WatchAuthorisedKeys': {'description': 'WatchAuthorisedKeys '
+                                                           'starts a watcher to '
+                                                           'track changes to the '
+                                                           'authorised ssh keys\n'
+                                                           'for the specified '
+                                                           'machines.\n'
+                                                           'The current '
+                                                           'implementation relies '
+                                                           'on global authorised '
+                                                           'keys being stored in '
+                                                           'the model config.\n'
+                                                           'This will change as '
+                                                           'new user management '
+                                                           'and authorisation '
+                                                           'functionality is '
+                                                           'added.',
+                                            'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                            'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
                                             'type': 'object'}},
      'type': 'object'}
@@ -6241,6 +7124,10 @@ class KeyUpdaterFacade(Type):
     @ReturnMapping(StringsResults)
     async def AuthorisedKeys(self, entities=None):
         '''
+        AuthorisedKeys reports the authorised ssh keys for the specified machines.
+        The current implementation relies on global authorised keys being stored in the model config.
+        This will change as new user management and authorisation functionality is added.
+
         entities : typing.Sequence[~Entity]
         Returns -> StringsResults
         '''
@@ -6262,6 +7149,11 @@ class KeyUpdaterFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def WatchAuthorisedKeys(self, entities=None):
         '''
+        WatchAuthorisedKeys starts a watcher to track changes to the authorised ssh keys
+        for the specified machines.
+        The current implementation relies on global authorised keys being stored in the model config.
+        This will change as new user management and authorisation functionality is added.
+
         entities : typing.Sequence[~Entity]
         Returns -> NotifyWatchResults
         '''
@@ -6320,10 +7212,14 @@ class LifeFlagFacade(Type):
                                                                        'type': 'array'}},
                                             'required': ['results'],
                                             'type': 'object'}},
-     'properties': {'Life': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+     'properties': {'Life': {'description': 'Life returns the life status of every '
+                                            'supplied entity, where available.',
+                             'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                             'Result': {'$ref': '#/definitions/LifeResults'}},
                              'type': 'object'},
-                    'Watch': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'Watch': {'description': 'Watch starts an NotifyWatcher for '
+                                             'each given entity.',
+                              'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                              'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
                               'type': 'object'}},
      'type': 'object'}
@@ -6332,6 +7228,8 @@ class LifeFlagFacade(Type):
     @ReturnMapping(LifeResults)
     async def Life(self, entities=None):
         '''
+        Life returns the life status of every supplied entity, where available.
+
         entities : typing.Sequence[~Entity]
         Returns -> LifeResults
         '''
@@ -6353,6 +7251,8 @@ class LifeFlagFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def Watch(self, entities=None):
         '''
+        Watch starts an NotifyWatcher for each given entity.
+
         entities : typing.Sequence[~Entity]
         Returns -> NotifyWatchResults
         '''
@@ -6430,10 +7330,20 @@ class LogForwardingFacade(Type):
                                                                                   'type': 'array'}},
                                                         'required': ['params'],
                                                         'type': 'object'}},
-     'properties': {'GetLastSent': {'properties': {'Params': {'$ref': '#/definitions/LogForwardingGetLastSentParams'},
+     'properties': {'GetLastSent': {'description': 'GetLastSent is a bulk call '
+                                                   'that gets the log forwarding '
+                                                   '"last sent"\n'
+                                                   'record ID for each requested '
+                                                   'target.',
+                                    'properties': {'Params': {'$ref': '#/definitions/LogForwardingGetLastSentParams'},
                                                    'Result': {'$ref': '#/definitions/LogForwardingGetLastSentResults'}},
                                     'type': 'object'},
-                    'SetLastSent': {'properties': {'Params': {'$ref': '#/definitions/LogForwardingSetLastSentParams'},
+                    'SetLastSent': {'description': 'SetLastSent is a bulk call '
+                                                   'that sets the log forwarding '
+                                                   '"last sent"\n'
+                                                   'record ID for each requested '
+                                                   'target.',
+                                    'properties': {'Params': {'$ref': '#/definitions/LogForwardingSetLastSentParams'},
                                                    'Result': {'$ref': '#/definitions/ErrorResults'}},
                                     'type': 'object'}},
      'type': 'object'}
@@ -6442,6 +7352,9 @@ class LogForwardingFacade(Type):
     @ReturnMapping(LogForwardingGetLastSentResults)
     async def GetLastSent(self, ids=None):
         '''
+        GetLastSent is a bulk call that gets the log forwarding "last sent"
+        record ID for each requested target.
+
         ids : typing.Sequence[~LogForwardingID]
         Returns -> LogForwardingGetLastSentResults
         '''
@@ -6463,6 +7376,9 @@ class LogForwardingFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetLastSent(self, params=None):
         '''
+        SetLastSent is a bulk call that sets the log forwarding "last sent"
+        record ID for each requested target.
+
         params : typing.Sequence[~LogForwardingSetLastSentParam]
         Returns -> ErrorResults
         '''
@@ -6521,10 +7437,29 @@ class LoggerFacade(Type):
                                                                   'type': 'array'}},
                                        'required': ['results'],
                                        'type': 'object'}},
-     'properties': {'LoggingConfig': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+     'properties': {'LoggingConfig': {'description': 'LoggingConfig reports the '
+                                                     'logging configuration for '
+                                                     'the agents specified.',
+                                      'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                      'Result': {'$ref': '#/definitions/StringResults'}},
                                       'type': 'object'},
-                    'WatchLoggingConfig': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'WatchLoggingConfig': {'description': 'WatchLoggingConfig '
+                                                          'starts a watcher to '
+                                                          'track changes to the '
+                                                          'logging config\n'
+                                                          'for the agents '
+                                                          'specified..  '
+                                                          'Unfortunately the '
+                                                          'current infrastructure '
+                                                          'makes\n'
+                                                          'watching parts of the '
+                                                          'config non-trivial, so '
+                                                          'currently any change to '
+                                                          'the\n'
+                                                          'config will cause the '
+                                                          'watcher to notify the '
+                                                          'client.',
+                                           'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                           'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
                                            'type': 'object'}},
      'type': 'object'}
@@ -6533,6 +7468,8 @@ class LoggerFacade(Type):
     @ReturnMapping(StringResults)
     async def LoggingConfig(self, entities=None):
         '''
+        LoggingConfig reports the logging configuration for the agents specified.
+
         entities : typing.Sequence[~Entity]
         Returns -> StringResults
         '''
@@ -6554,6 +7491,11 @@ class LoggerFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def WatchLoggingConfig(self, entities=None):
         '''
+        WatchLoggingConfig starts a watcher to track changes to the logging config
+        for the agents specified..  Unfortunately the current infrastructure makes
+        watching parts of the config non-trivial, so currently any change to the
+        config will cause the watcher to notify the client.
+
         entities : typing.Sequence[~Entity]
         Returns -> NotifyWatchResults
         '''
@@ -6671,19 +7613,45 @@ class MachineActionsFacade(Type):
                                                                         'type': 'array'}},
                                              'required': ['results'],
                                              'type': 'object'}},
-     'properties': {'Actions': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+     'properties': {'Actions': {'description': 'Actions returns the Actions by '
+                                               'Tags passed and ensures that the '
+                                               'machine asking\n'
+                                               'for them is the machine that has '
+                                               'the actions',
+                                'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                'Result': {'$ref': '#/definitions/ActionResults'}},
                                 'type': 'object'},
-                    'BeginActions': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'BeginActions': {'description': 'BeginActions marks the '
+                                                    'actions represented by the '
+                                                    'passed in Tags as running.',
+                                     'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                     'Result': {'$ref': '#/definitions/ErrorResults'}},
                                      'type': 'object'},
-                    'FinishActions': {'properties': {'Params': {'$ref': '#/definitions/ActionExecutionResults'},
+                    'FinishActions': {'description': 'FinishActions saves the '
+                                                     'result of a completed Action',
+                                      'properties': {'Params': {'$ref': '#/definitions/ActionExecutionResults'},
                                                      'Result': {'$ref': '#/definitions/ErrorResults'}},
                                       'type': 'object'},
-                    'RunningActions': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'RunningActions': {'description': 'RunningActions lists the '
+                                                      'actions running for the '
+                                                      'entities passed in.\n'
+                                                      'If we end up needing more '
+                                                      'than ListRunning at some '
+                                                      'point we could '
+                                                      'follow/abstract\n'
+                                                      "what's done in the client "
+                                                      'actions package.',
+                                       'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                       'Result': {'$ref': '#/definitions/ActionsByReceivers'}},
                                        'type': 'object'},
-                    'WatchActionNotifications': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'WatchActionNotifications': {'description': 'WatchActionNotifications '
+                                                                'returns a '
+                                                                'StringsWatcher '
+                                                                'for observing\n'
+                                                                'incoming action '
+                                                                'calls to a '
+                                                                'machine.',
+                                                 'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                                 'Result': {'$ref': '#/definitions/StringsWatchResults'}},
                                                  'type': 'object'}},
      'type': 'object'}
@@ -6692,6 +7660,9 @@ class MachineActionsFacade(Type):
     @ReturnMapping(ActionResults)
     async def Actions(self, entities=None):
         '''
+        Actions returns the Actions by Tags passed and ensures that the machine asking
+        for them is the machine that has the actions
+
         entities : typing.Sequence[~Entity]
         Returns -> ActionResults
         '''
@@ -6713,6 +7684,8 @@ class MachineActionsFacade(Type):
     @ReturnMapping(ErrorResults)
     async def BeginActions(self, entities=None):
         '''
+        BeginActions marks the actions represented by the passed in Tags as running.
+
         entities : typing.Sequence[~Entity]
         Returns -> ErrorResults
         '''
@@ -6734,6 +7707,8 @@ class MachineActionsFacade(Type):
     @ReturnMapping(ErrorResults)
     async def FinishActions(self, results=None):
         '''
+        FinishActions saves the result of a completed Action
+
         results : typing.Sequence[~ActionExecutionResult]
         Returns -> ErrorResults
         '''
@@ -6755,6 +7730,10 @@ class MachineActionsFacade(Type):
     @ReturnMapping(ActionsByReceivers)
     async def RunningActions(self, entities=None):
         '''
+        RunningActions lists the actions running for the entities passed in.
+        If we end up needing more than ListRunning at some point we could follow/abstract
+        what's done in the client actions package.
+
         entities : typing.Sequence[~Entity]
         Returns -> ActionsByReceivers
         '''
@@ -6776,6 +7755,9 @@ class MachineActionsFacade(Type):
     @ReturnMapping(StringsWatchResults)
     async def WatchActionNotifications(self, entities=None):
         '''
+        WatchActionNotifications returns a StringsWatcher for observing
+        incoming action calls to a machine.
+
         entities : typing.Sequence[~Entity]
         Returns -> StringsWatchResults
         '''
@@ -6856,15 +7838,50 @@ class MachineUndertakerFacade(Type):
                                                                                  'type': 'array'}},
                                                       'required': ['results'],
                                                       'type': 'object'}},
-     'properties': {'AllMachineRemovals': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+     'properties': {'AllMachineRemovals': {'description': 'AllMachineRemovals '
+                                                          'returns tags for all of '
+                                                          'the machines that have\n'
+                                                          'been marked for removal '
+                                                          'in the requested model.',
+                                           'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                           'Result': {'$ref': '#/definitions/EntitiesResults'}},
                                            'type': 'object'},
-                    'CompleteMachineRemovals': {'properties': {'Params': {'$ref': '#/definitions/Entities'}},
+                    'CompleteMachineRemovals': {'description': 'CompleteMachineRemovals '
+                                                               'removes the '
+                                                               'specified machines '
+                                                               'from the\n'
+                                                               'model database. It '
+                                                               'should only be '
+                                                               'called once any '
+                                                               'provider-level\n'
+                                                               'cleanup has been '
+                                                               'done for those '
+                                                               'machines.',
+                                                'properties': {'Params': {'$ref': '#/definitions/Entities'}},
                                                 'type': 'object'},
-                    'GetMachineProviderInterfaceInfo': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'GetMachineProviderInterfaceInfo': {'description': 'GetMachineProviderInterfaceInfo '
+                                                                       'returns '
+                                                                       'the '
+                                                                       'provider '
+                                                                       'details '
+                                                                       'for\n'
+                                                                       'all '
+                                                                       'network '
+                                                                       'interfaces '
+                                                                       'attached '
+                                                                       'to the '
+                                                                       'machines '
+                                                                       'requested.',
+                                                        'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                                        'Result': {'$ref': '#/definitions/ProviderInterfaceInfoResults'}},
                                                         'type': 'object'},
-                    'WatchMachineRemovals': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'WatchMachineRemovals': {'description': 'WatchMachineRemovals '
+                                                            'returns a watcher '
+                                                            'that will signal each '
+                                                            'time a\n'
+                                                            'machine is marked for '
+                                                            'removal.',
+                                             'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                             'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
                                              'type': 'object'}},
      'type': 'object'}
@@ -6873,6 +7890,9 @@ class MachineUndertakerFacade(Type):
     @ReturnMapping(EntitiesResults)
     async def AllMachineRemovals(self, entities=None):
         '''
+        AllMachineRemovals returns tags for all of the machines that have
+        been marked for removal in the requested model.
+
         entities : typing.Sequence[~Entity]
         Returns -> EntitiesResults
         '''
@@ -6894,6 +7914,10 @@ class MachineUndertakerFacade(Type):
     @ReturnMapping(None)
     async def CompleteMachineRemovals(self, entities=None):
         '''
+        CompleteMachineRemovals removes the specified machines from the
+        model database. It should only be called once any provider-level
+        cleanup has been done for those machines.
+
         entities : typing.Sequence[~Entity]
         Returns -> None
         '''
@@ -6915,6 +7939,9 @@ class MachineUndertakerFacade(Type):
     @ReturnMapping(ProviderInterfaceInfoResults)
     async def GetMachineProviderInterfaceInfo(self, entities=None):
         '''
+        GetMachineProviderInterfaceInfo returns the provider details for
+        all network interfaces attached to the machines requested.
+
         entities : typing.Sequence[~Entity]
         Returns -> ProviderInterfaceInfoResults
         '''
@@ -6936,6 +7963,9 @@ class MachineUndertakerFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def WatchMachineRemovals(self, entities=None):
         '''
+        WatchMachineRemovals returns a watcher that will signal each time a
+        machine is marked for removal.
+
         entities : typing.Sequence[~Entity]
         Returns -> NotifyWatchResults
         '''
@@ -7563,11 +8593,34 @@ class MetricsManagerFacade(Type):
                                                                  'type': 'array'}},
                                       'required': ['results'],
                                       'type': 'object'}},
-     'properties': {'AddJujuMachineMetrics': {'type': 'object'},
-                    'CleanupOldMetrics': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+     'properties': {'AddJujuMachineMetrics': {'description': 'AddJujuMachineMetrics '
+                                                             'adds a metric that '
+                                                             'counts the number '
+                                                             'of\n'
+                                                             'non-container '
+                                                             'machines in the '
+                                                             'current model.',
+                                              'type': 'object'},
+                    'CleanupOldMetrics': {'description': 'CleanupOldMetrics '
+                                                         'removes old metrics from '
+                                                         'the collection.\n'
+                                                         'The single arg params is '
+                                                         'expected to contain and '
+                                                         'model uuid.\n'
+                                                         'Even though the call '
+                                                         'will delete all metrics '
+                                                         'across models\n'
+                                                         'it serves to validate '
+                                                         'that the connection has '
+                                                         'access to at least one '
+                                                         'model.',
+                                          'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                          'Result': {'$ref': '#/definitions/ErrorResults'}},
                                           'type': 'object'},
-                    'SendMetrics': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'SendMetrics': {'description': 'SendMetrics will send any '
+                                                   'unsent metrics onto the metric '
+                                                   'collection service.',
+                                    'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                    'Result': {'$ref': '#/definitions/ErrorResults'}},
                                     'type': 'object'}},
      'type': 'object'}
@@ -7576,6 +8629,9 @@ class MetricsManagerFacade(Type):
     @ReturnMapping(None)
     async def AddJujuMachineMetrics(self):
         '''
+        AddJujuMachineMetrics adds a metric that counts the number of
+        non-container machines in the current model.
+
 
         Returns -> None
         '''
@@ -7595,6 +8651,11 @@ class MetricsManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def CleanupOldMetrics(self, entities=None):
         '''
+        CleanupOldMetrics removes old metrics from the collection.
+        The single arg params is expected to contain and model uuid.
+        Even though the call will delete all metrics across models
+        it serves to validate that the connection has access to at least one model.
+
         entities : typing.Sequence[~Entity]
         Returns -> ErrorResults
         '''
@@ -7616,6 +8677,8 @@ class MetricsManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SendMetrics(self, entities=None):
         '''
+        SendMetrics will send any unsent metrics onto the metric collection service.
+
         entities : typing.Sequence[~Entity]
         Returns -> ErrorResults
         '''
@@ -7673,10 +8736,16 @@ class MigrationFlagFacade(Type):
                                                                  'type': 'array'}},
                                       'required': ['results'],
                                       'type': 'object'}},
-     'properties': {'Phase': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+     'properties': {'Phase': {'description': 'Phase returns the current migration '
+                                             'phase or an error for every\n'
+                                             'supplied entity.',
+                              'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                              'Result': {'$ref': '#/definitions/PhaseResults'}},
                               'type': 'object'},
-                    'Watch': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'Watch': {'description': 'Watch returns an id for use with the '
+                                             'NotifyWatcher facade, or an\n'
+                                             'error, for every supplied entity.',
+                              'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                              'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
                               'type': 'object'}},
      'type': 'object'}
@@ -7685,6 +8754,9 @@ class MigrationFlagFacade(Type):
     @ReturnMapping(PhaseResults)
     async def Phase(self, entities=None):
         '''
+        Phase returns the current migration phase or an error for every
+        supplied entity.
+
         entities : typing.Sequence[~Entity]
         Returns -> PhaseResults
         '''
@@ -7706,6 +8778,9 @@ class MigrationFlagFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def Watch(self, entities=None):
         '''
+        Watch returns an id for use with the NotifyWatcher facade, or an
+        error, for every supplied entity.
+
         entities : typing.Sequence[~Entity]
         Returns -> NotifyWatchResults
         '''
@@ -8109,9 +9184,25 @@ class MigrationMinionFacade(Type):
                                                           'error': {'$ref': '#/definitions/Error'}},
                                            'required': ['NotifyWatcherId'],
                                            'type': 'object'}},
-     'properties': {'Report': {'properties': {'Params': {'$ref': '#/definitions/MinionReport'}},
+     'properties': {'Report': {'description': 'Report allows a migration minion to '
+                                              'submit whether it succeeded or\n'
+                                              'failed for a specific migration '
+                                              'phase.',
+                               'properties': {'Params': {'$ref': '#/definitions/MinionReport'}},
                                'type': 'object'},
-                    'Watch': {'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
+                    'Watch': {'description': 'Watch starts watching for status '
+                                             'updates for a migration attempt\n'
+                                             'for the model. It will report when a '
+                                             'migration starts and when its\n'
+                                             'status changes (including when it '
+                                             'finishes). An initial event will\n'
+                                             'be fired if there has ever been a '
+                                             'migration attempt for the model.\n'
+                                             '\n'
+                                             'The MigrationStatusWatcher facade '
+                                             'must be used to receive events\n'
+                                             'from the watcher.',
+                              'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
                               'type': 'object'}},
      'type': 'object'}
     
@@ -8119,6 +9210,9 @@ class MigrationMinionFacade(Type):
     @ReturnMapping(None)
     async def Report(self, migration_id=None, phase=None, success=None):
         '''
+        Report allows a migration minion to submit whether it succeeded or
+        failed for a specific migration phase.
+
         migration_id : str
         phase : str
         success : bool
@@ -8150,6 +9244,14 @@ class MigrationMinionFacade(Type):
     @ReturnMapping(NotifyWatchResult)
     async def Watch(self):
         '''
+        Watch starts watching for status updates for a migration attempt
+        for the model. It will report when a migration starts and when its
+        status changes (including when it finishes). An initial event will
+        be fired if there has ever been a migration attempt for the model.
+
+        The MigrationStatusWatcher facade must be used to receive events
+        from the watcher.
+
 
         Returns -> NotifyWatchResult
         '''
@@ -8187,15 +9289,25 @@ class MigrationStatusWatcherFacade(Type):
                                                       'target-api-addrs',
                                                       'target-ca-cert'],
                                          'type': 'object'}},
-     'properties': {'Next': {'properties': {'Result': {'$ref': '#/definitions/MigrationStatus'}},
+     'properties': {'Next': {'description': 'Next returns when the status for a '
+                                            'model migration for the\n'
+                                            'associated model changes. The current '
+                                            'details for the active\n'
+                                            'migration are returned.',
+                             'properties': {'Result': {'$ref': '#/definitions/MigrationStatus'}},
                              'type': 'object'},
-                    'Stop': {'type': 'object'}},
+                    'Stop': {'description': 'Stop stops the watcher.',
+                             'type': 'object'}},
      'type': 'object'}
     
 
     @ReturnMapping(MigrationStatus)
     async def Next(self):
         '''
+        Next returns when the status for a model migration for the
+        associated model changes. The current details for the active
+        migration are returned.
+
 
         Returns -> MigrationStatus
         '''
@@ -8215,6 +9327,8 @@ class MigrationStatusWatcherFacade(Type):
     @ReturnMapping(None)
     async def Stop(self):
         '''
+        Stop stops the watcher.
+
 
         Returns -> None
         '''
@@ -8341,24 +9455,98 @@ class MigrationTargetFacade(Type):
                                                              'version': {'type': 'string'}},
                                               'required': ['version', 'uri'],
                                               'type': 'object'}},
-     'properties': {'Abort': {'properties': {'Params': {'$ref': '#/definitions/ModelArgs'}},
+     'properties': {'Abort': {'description': 'Abort removes the specified model '
+                                             'from the database. It is an error '
+                                             'to\n'
+                                             'attempt to Abort a model that has a '
+                                             'migration mode other than importing.',
+                              'properties': {'Params': {'$ref': '#/definitions/ModelArgs'}},
                               'type': 'object'},
-                    'Activate': {'properties': {'Params': {'$ref': '#/definitions/ModelArgs'}},
+                    'Activate': {'description': 'Activate sets the migration mode '
+                                                'of the model to "none", meaning '
+                                                'it\n'
+                                                'is ready for use. It is an error '
+                                                'to attempt to Abort a model that\n'
+                                                'has a migration mode other than '
+                                                'importing.',
+                                 'properties': {'Params': {'$ref': '#/definitions/ModelArgs'}},
                                  'type': 'object'},
-                    'AdoptResources': {'properties': {'Params': {'$ref': '#/definitions/AdoptResourcesArgs'}},
+                    'AdoptResources': {'description': 'AdoptResources asks the '
+                                                      'cloud provider to update '
+                                                      'the controller\n'
+                                                      "tags for a model's "
+                                                      'resources. This prevents '
+                                                      'the resources from\n'
+                                                      'being destroyed if the '
+                                                      'source controller is '
+                                                      'destroyed after the\n'
+                                                      'model is migrated away.',
+                                       'properties': {'Params': {'$ref': '#/definitions/AdoptResourcesArgs'}},
                                        'type': 'object'},
-                    'CACert': {'properties': {'Result': {'$ref': '#/definitions/BytesResult'}},
+                    'CACert': {'description': 'CACert returns the certificate used '
+                                              'to validate the state connection.',
+                               'properties': {'Result': {'$ref': '#/definitions/BytesResult'}},
                                'type': 'object'},
-                    'CheckMachines': {'properties': {'Params': {'$ref': '#/definitions/ModelArgs'},
+                    'CheckMachines': {'description': 'CheckMachines compares the '
+                                                     'machines in state with the '
+                                                     'ones reported\n'
+                                                     'by the provider and reports '
+                                                     'any discrepancies.',
+                                      'properties': {'Params': {'$ref': '#/definitions/ModelArgs'},
                                                      'Result': {'$ref': '#/definitions/ErrorResults'}},
                                       'type': 'object'},
-                    'Import': {'properties': {'Params': {'$ref': '#/definitions/SerializedModel'}},
+                    'Import': {'description': 'Import takes a serialized Juju '
+                                              'model, deserializes it, and\n'
+                                              'recreates it in the receiving '
+                                              'controller.',
+                               'properties': {'Params': {'$ref': '#/definitions/SerializedModel'}},
                                'type': 'object'},
-                    'LatestLogTime': {'properties': {'Params': {'$ref': '#/definitions/ModelArgs'},
+                    'LatestLogTime': {'description': 'LatestLogTime returns the '
+                                                     'time of the most recent log '
+                                                     'record\n'
+                                                     'received by the logtransfer '
+                                                     'endpoint. This can be used '
+                                                     'as the start\n'
+                                                     'point for streaming logs '
+                                                     'from the source if the '
+                                                     'transfer was\n'
+                                                     'interrupted.\n'
+                                                     '\n'
+                                                     'For performance reasons, not '
+                                                     'every time is tracked, so if '
+                                                     'the\n'
+                                                     'target controller died '
+                                                     'during the transfer the '
+                                                     'latest log time\n'
+                                                     'might be up to 2 minutes '
+                                                     'earlier. If the transfer was '
+                                                     'interrupted\n'
+                                                     'in some other way (like the '
+                                                     'source controller going away '
+                                                     'or a\n'
+                                                     'network partition) the time '
+                                                     'will be up-to-date.\n'
+                                                     '\n'
+                                                     'Log messages are assumed to '
+                                                     'be sent in time order (which '
+                                                     'is how\n'
+                                                     'debug-log emits them). If '
+                                                     "that isn't the case then "
+                                                     'this mechanism\n'
+                                                     "can't be used to avoid "
+                                                     'duplicates when logtransfer '
+                                                     'is restarted.\n'
+                                                     '\n'
+                                                     'Returns the zero time if no '
+                                                     'logs have been transferred.',
+                                      'properties': {'Params': {'$ref': '#/definitions/ModelArgs'},
                                                      'Result': {'format': 'date-time',
                                                                 'type': 'string'}},
                                       'type': 'object'},
-                    'Prechecks': {'properties': {'Params': {'$ref': '#/definitions/MigrationModelInfo'}},
+                    'Prechecks': {'description': 'Prechecks ensure that the target '
+                                                 'controller is ready to accept a\n'
+                                                 'model migration.',
+                                  'properties': {'Params': {'$ref': '#/definitions/MigrationModelInfo'}},
                                   'type': 'object'}},
      'type': 'object'}
     
@@ -8366,6 +9554,9 @@ class MigrationTargetFacade(Type):
     @ReturnMapping(None)
     async def Abort(self, model_tag=None):
         '''
+        Abort removes the specified model from the database. It is an error to
+        attempt to Abort a model that has a migration mode other than importing.
+
         model_tag : str
         Returns -> None
         '''
@@ -8387,6 +9578,10 @@ class MigrationTargetFacade(Type):
     @ReturnMapping(None)
     async def Activate(self, model_tag=None):
         '''
+        Activate sets the migration mode of the model to "none", meaning it
+        is ready for use. It is an error to attempt to Abort a model that
+        has a migration mode other than importing.
+
         model_tag : str
         Returns -> None
         '''
@@ -8408,6 +9603,11 @@ class MigrationTargetFacade(Type):
     @ReturnMapping(None)
     async def AdoptResources(self, model_tag=None, source_controller_version=None):
         '''
+        AdoptResources asks the cloud provider to update the controller
+        tags for a model's resources. This prevents the resources from
+        being destroyed if the source controller is destroyed after the
+        model is migrated away.
+
         model_tag : str
         source_controller_version : Number
         Returns -> None
@@ -8434,6 +9634,8 @@ class MigrationTargetFacade(Type):
     @ReturnMapping(BytesResult)
     async def CACert(self):
         '''
+        CACert returns the certificate used to validate the state connection.
+
 
         Returns -> BytesResult
         '''
@@ -8453,6 +9655,9 @@ class MigrationTargetFacade(Type):
     @ReturnMapping(ErrorResults)
     async def CheckMachines(self, model_tag=None):
         '''
+        CheckMachines compares the machines in state with the ones reported
+        by the provider and reports any discrepancies.
+
         model_tag : str
         Returns -> ErrorResults
         '''
@@ -8474,6 +9679,9 @@ class MigrationTargetFacade(Type):
     @ReturnMapping(None)
     async def Import(self, bytes_=None, charms=None, resources=None, tools=None):
         '''
+        Import takes a serialized Juju model, deserializes it, and
+        recreates it in the receiving controller.
+
         bytes_ : typing.Sequence[int]
         charms : typing.Sequence[str]
         resources : typing.Sequence[~SerializedModelResource]
@@ -8510,6 +9718,23 @@ class MigrationTargetFacade(Type):
     @ReturnMapping(str)
     async def LatestLogTime(self, model_tag=None):
         '''
+        LatestLogTime returns the time of the most recent log record
+        received by the logtransfer endpoint. This can be used as the start
+        point for streaming logs from the source if the transfer was
+        interrupted.
+
+        For performance reasons, not every time is tracked, so if the
+        target controller died during the transfer the latest log time
+        might be up to 2 minutes earlier. If the transfer was interrupted
+        in some other way (like the source controller going away or a
+        network partition) the time will be up-to-date.
+
+        Log messages are assumed to be sent in time order (which is how
+        debug-log emits them). If that isn't the case then this mechanism
+        can't be used to avoid duplicates when logtransfer is restarted.
+
+        Returns the zero time if no logs have been transferred.
+
         model_tag : str
         Returns -> str
         '''
@@ -8531,6 +9756,9 @@ class MigrationTargetFacade(Type):
     @ReturnMapping(None)
     async def Prechecks(self, agent_version=None, controller_agent_version=None, name=None, owner_tag=None, uuid=None):
         '''
+        Prechecks ensure that the target controller is ready to accept a
+        model migration.
+
         agent_version : Number
         controller_agent_version : Number
         name : str
@@ -8991,15 +10219,25 @@ class ModelSummaryWatcherFacade(Type):
                                                                              'type': 'array'}},
                                                    'required': ['models'],
                                                    'type': 'object'}},
-     'properties': {'Next': {'properties': {'Result': {'$ref': '#/definitions/SummaryWatcherNextResults'}},
+     'properties': {'Next': {'description': 'Next will return the current state of '
+                                            'everything on the first call\n'
+                                            'and subsequent calls will return just '
+                                            'those model summaries that have\n'
+                                            'changed.',
+                             'properties': {'Result': {'$ref': '#/definitions/SummaryWatcherNextResults'}},
                              'type': 'object'},
-                    'Stop': {'type': 'object'}},
+                    'Stop': {'description': 'Stop stops the watcher.',
+                             'type': 'object'}},
      'type': 'object'}
     
 
     @ReturnMapping(SummaryWatcherNextResults)
     async def Next(self):
         '''
+        Next will return the current state of everything on the first call
+        and subsequent calls will return just those model summaries that have
+        changed.
+
 
         Returns -> SummaryWatcherNextResults
         '''
@@ -9019,6 +10257,8 @@ class ModelSummaryWatcherFacade(Type):
     @ReturnMapping(None)
     async def Stop(self):
         '''
+        Stop stops the watcher.
+
 
         Returns -> None
         '''
@@ -9110,19 +10350,65 @@ class ModelUpgraderFacade(Type):
                                                                'type': 'array'}},
                                    'required': ['entities'],
                                    'type': 'object'}},
-     'properties': {'ModelEnvironVersion': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+     'properties': {'ModelEnvironVersion': {'description': 'ModelEnvironVersion '
+                                                           'returns the current '
+                                                           'version of the environ '
+                                                           'corresponding\n'
+                                                           'to each specified '
+                                                           'model.',
+                                            'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                            'Result': {'$ref': '#/definitions/IntResults'}},
                                             'type': 'object'},
-                    'ModelTargetEnvironVersion': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'ModelTargetEnvironVersion': {'description': 'ModelTargetEnvironVersion '
+                                                                 'returns the '
+                                                                 'target version '
+                                                                 'of the environ\n'
+                                                                 'corresponding to '
+                                                                 'each specified '
+                                                                 'model. The '
+                                                                 'target version '
+                                                                 'is the\n'
+                                                                 'environ '
+                                                                 "provider's "
+                                                                 'version.',
+                                                  'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                                  'Result': {'$ref': '#/definitions/IntResults'}},
                                                   'type': 'object'},
-                    'SetModelEnvironVersion': {'properties': {'Params': {'$ref': '#/definitions/SetModelEnvironVersions'},
+                    'SetModelEnvironVersion': {'description': 'SetModelEnvironVersion '
+                                                              'sets the current '
+                                                              'version of the '
+                                                              'environ '
+                                                              'corresponding\n'
+                                                              'to each specified '
+                                                              'model.',
+                                               'properties': {'Params': {'$ref': '#/definitions/SetModelEnvironVersions'},
                                                               'Result': {'$ref': '#/definitions/ErrorResults'}},
                                                'type': 'object'},
-                    'SetModelStatus': {'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
+                    'SetModelStatus': {'description': 'SetModelStatus sets the '
+                                                      'status of each given model.',
+                                       'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
                                                       'Result': {'$ref': '#/definitions/ErrorResults'}},
                                        'type': 'object'},
-                    'WatchModelEnvironVersion': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'WatchModelEnvironVersion': {'description': 'WatchModelEnvironVersion '
+                                                                'watches for '
+                                                                'changes to the '
+                                                                'environ version '
+                                                                'of the\n'
+                                                                'specified '
+                                                                'models.\n'
+                                                                '\n'
+                                                                'NOTE(axw) this is '
+                                                                'currently '
+                                                                'implemented in '
+                                                                'terms of '
+                                                                'state.Model.Watch, '
+                                                                'so\n'
+                                                                'the client may be '
+                                                                'notified of '
+                                                                'changes unrelated '
+                                                                'to the environ '
+                                                                'version.',
+                                                 'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                                 'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
                                                  'type': 'object'}},
      'type': 'object'}
@@ -9131,6 +10417,9 @@ class ModelUpgraderFacade(Type):
     @ReturnMapping(IntResults)
     async def ModelEnvironVersion(self, entities=None):
         '''
+        ModelEnvironVersion returns the current version of the environ corresponding
+        to each specified model.
+
         entities : typing.Sequence[~Entity]
         Returns -> IntResults
         '''
@@ -9152,6 +10441,10 @@ class ModelUpgraderFacade(Type):
     @ReturnMapping(IntResults)
     async def ModelTargetEnvironVersion(self, entities=None):
         '''
+        ModelTargetEnvironVersion returns the target version of the environ
+        corresponding to each specified model. The target version is the
+        environ provider's version.
+
         entities : typing.Sequence[~Entity]
         Returns -> IntResults
         '''
@@ -9173,6 +10466,9 @@ class ModelUpgraderFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetModelEnvironVersion(self, models=None):
         '''
+        SetModelEnvironVersion sets the current version of the environ corresponding
+        to each specified model.
+
         models : typing.Sequence[~SetModelEnvironVersion]
         Returns -> ErrorResults
         '''
@@ -9194,6 +10490,8 @@ class ModelUpgraderFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetModelStatus(self, entities=None):
         '''
+        SetModelStatus sets the status of each given model.
+
         entities : typing.Sequence[~EntityStatusArgs]
         Returns -> ErrorResults
         '''
@@ -9215,6 +10513,12 @@ class ModelUpgraderFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def WatchModelEnvironVersion(self, entities=None):
         '''
+        WatchModelEnvironVersion watches for changes to the environ version of the
+        specified models.
+
+        NOTE(axw) this is currently implemented in terms of state.Model.Watch, so
+        the client may be notified of changes unrelated to the environ version.
+
         entities : typing.Sequence[~Entity]
         Returns -> NotifyWatchResults
         '''
@@ -9236,13 +10540,25 @@ class ModelUpgraderFacade(Type):
 class NotifyWatcherFacade(Type):
     name = 'NotifyWatcher'
     version = 1
-    schema =     {'properties': {'Next': {'type': 'object'}, 'Stop': {'type': 'object'}},
+    schema =     {'properties': {'Next': {'description': 'Next returns when a change has '
+                                            'occurred to the\n'
+                                            'entity being watched since the most '
+                                            'recent call to Next\n'
+                                            'or the Watch call that created the '
+                                            'NotifyWatcher.',
+                             'type': 'object'},
+                    'Stop': {'description': 'Stop stops the watcher.',
+                             'type': 'object'}},
      'type': 'object'}
     
 
     @ReturnMapping(None)
     async def Next(self):
         '''
+        Next returns when a change has occurred to the
+        entity being watched since the most recent call to Next
+        or the Watch call that created the NotifyWatcher.
+
 
         Returns -> None
         '''
@@ -9262,6 +10578,8 @@ class NotifyWatcherFacade(Type):
     @ReturnMapping(None)
     async def Stop(self):
         '''
+        Stop stops the watcher.
+
 
         Returns -> None
         '''
@@ -9312,15 +10630,26 @@ class OfferStatusWatcherFacade(Type):
                                                 'required': ['watcher-id',
                                                              'changes'],
                                                 'type': 'object'}},
-     'properties': {'Next': {'properties': {'Result': {'$ref': '#/definitions/OfferStatusWatchResult'}},
+     'properties': {'Next': {'description': 'Next returns when a change has '
+                                            'occurred to an entity of the\n'
+                                            'collection being watched since the '
+                                            'most recent call to Next\n'
+                                            'or the Watch call that created the '
+                                            'srvOfferStatusWatcher.',
+                             'properties': {'Result': {'$ref': '#/definitions/OfferStatusWatchResult'}},
                              'type': 'object'},
-                    'Stop': {'type': 'object'}},
+                    'Stop': {'description': 'Stop stops the watcher.',
+                             'type': 'object'}},
      'type': 'object'}
     
 
     @ReturnMapping(OfferStatusWatchResult)
     async def Next(self):
         '''
+        Next returns when a change has occurred to an entity of the
+        collection being watched since the most recent call to Next
+        or the Watch call that created the srvOfferStatusWatcher.
+
 
         Returns -> OfferStatusWatchResult
         '''
@@ -9340,6 +10669,8 @@ class OfferStatusWatcherFacade(Type):
     @ReturnMapping(None)
     async def Stop(self):
         '''
+        Stop stops the watcher.
+
 
         Returns -> None
         '''
@@ -9386,7 +10717,12 @@ class PayloadsFacade(Type):
                                                                        'type': 'array'}},
                                             'required': ['results'],
                                             'type': 'object'}},
-     'properties': {'List': {'properties': {'Params': {'$ref': '#/definitions/PayloadListArgs'},
+     'properties': {'List': {'description': 'List builds the list of payloads '
+                                            'being tracked for\n'
+                                            'the given unit and IDs. If no IDs are '
+                                            'provided then all tracked\n'
+                                            'payloads for the unit are returned.',
+                             'properties': {'Params': {'$ref': '#/definitions/PayloadListArgs'},
                                             'Result': {'$ref': '#/definitions/PayloadListResults'}},
                              'type': 'object'}},
      'type': 'object'}
@@ -9395,6 +10731,10 @@ class PayloadsFacade(Type):
     @ReturnMapping(PayloadListResults)
     async def List(self, patterns=None):
         '''
+        List builds the list of payloads being tracked for
+        the given unit and IDs. If no IDs are provided then all tracked
+        payloads for the unit are returned.
+
         patterns : typing.Sequence[str]
         Returns -> PayloadListResults
         '''
@@ -9494,19 +10834,33 @@ class PayloadsHookContextFacade(Type):
                                                                       'type': 'array'}},
                                           'required': ['payloads'],
                                           'type': 'object'}},
-     'properties': {'List': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+     'properties': {'List': {'description': 'List builds the list of payload being '
+                                            'tracked for\n'
+                                            'the given unit and IDs. If no IDs are '
+                                            'provided then all tracked\n'
+                                            'payloads for the unit are returned.',
+                             'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                             'Result': {'$ref': '#/definitions/PayloadResults'}},
                              'type': 'object'},
-                    'LookUp': {'properties': {'Params': {'$ref': '#/definitions/LookUpPayloadArgs'},
+                    'LookUp': {'description': 'LookUp identifies the payload with '
+                                              'the provided name and raw ID.',
+                               'properties': {'Params': {'$ref': '#/definitions/LookUpPayloadArgs'},
                                               'Result': {'$ref': '#/definitions/PayloadResults'}},
                                'type': 'object'},
-                    'SetStatus': {'properties': {'Params': {'$ref': '#/definitions/SetPayloadStatusArgs'},
+                    'SetStatus': {'description': 'SetStatus sets the raw status of '
+                                                 'a payload.',
+                                  'properties': {'Params': {'$ref': '#/definitions/SetPayloadStatusArgs'},
                                                  'Result': {'$ref': '#/definitions/PayloadResults'}},
                                   'type': 'object'},
-                    'Track': {'properties': {'Params': {'$ref': '#/definitions/TrackPayloadArgs'},
+                    'Track': {'description': 'Track stores a payload to be tracked '
+                                             'in state.',
+                              'properties': {'Params': {'$ref': '#/definitions/TrackPayloadArgs'},
                                              'Result': {'$ref': '#/definitions/PayloadResults'}},
                               'type': 'object'},
-                    'Untrack': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'Untrack': {'description': 'Untrack marks the identified '
+                                               'payload as no longer being '
+                                               'tracked.',
+                                'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                'Result': {'$ref': '#/definitions/PayloadResults'}},
                                 'type': 'object'}},
      'type': 'object'}
@@ -9515,6 +10869,10 @@ class PayloadsHookContextFacade(Type):
     @ReturnMapping(PayloadResults)
     async def List(self, entities=None):
         '''
+        List builds the list of payload being tracked for
+        the given unit and IDs. If no IDs are provided then all tracked
+        payloads for the unit are returned.
+
         entities : typing.Sequence[~Entity]
         Returns -> PayloadResults
         '''
@@ -9536,6 +10894,8 @@ class PayloadsHookContextFacade(Type):
     @ReturnMapping(PayloadResults)
     async def LookUp(self, args=None):
         '''
+        LookUp identifies the payload with the provided name and raw ID.
+
         args : typing.Sequence[~LookUpPayloadArg]
         Returns -> PayloadResults
         '''
@@ -9557,6 +10917,8 @@ class PayloadsHookContextFacade(Type):
     @ReturnMapping(PayloadResults)
     async def SetStatus(self, args=None):
         '''
+        SetStatus sets the raw status of a payload.
+
         args : typing.Sequence[~SetPayloadStatusArg]
         Returns -> PayloadResults
         '''
@@ -9578,6 +10940,8 @@ class PayloadsHookContextFacade(Type):
     @ReturnMapping(PayloadResults)
     async def Track(self, payloads=None):
         '''
+        Track stores a payload to be tracked in state.
+
         payloads : typing.Sequence[~Payload]
         Returns -> PayloadResults
         '''
@@ -9599,6 +10963,8 @@ class PayloadsHookContextFacade(Type):
     @ReturnMapping(PayloadResults)
     async def Untrack(self, entities=None):
         '''
+        Untrack marks the identified payload as no longer being tracked.
+
         entities : typing.Sequence[~Entity]
         Returns -> PayloadResults
         '''
@@ -9797,15 +11163,26 @@ class RelationStatusWatcherFacade(Type):
                                                                 'required': ['watcher-id',
                                                                              'changes'],
                                                                 'type': 'object'}},
-     'properties': {'Next': {'properties': {'Result': {'$ref': '#/definitions/RelationLifeSuspendedStatusWatchResult'}},
+     'properties': {'Next': {'description': 'Next returns when a change has '
+                                            'occurred to an entity of the\n'
+                                            'collection being watched since the '
+                                            'most recent call to Next\n'
+                                            'or the Watch call that created the '
+                                            'srvRelationStatusWatcher.',
+                             'properties': {'Result': {'$ref': '#/definitions/RelationLifeSuspendedStatusWatchResult'}},
                              'type': 'object'},
-                    'Stop': {'type': 'object'}},
+                    'Stop': {'description': 'Stop stops the watcher.',
+                             'type': 'object'}},
      'type': 'object'}
     
 
     @ReturnMapping(RelationLifeSuspendedStatusWatchResult)
     async def Next(self):
         '''
+        Next returns when a change has occurred to an entity of the
+        collection being watched since the most recent call to Next
+        or the Watch call that created the srvRelationStatusWatcher.
+
 
         Returns -> RelationLifeSuspendedStatusWatchResult
         '''
@@ -9825,6 +11202,8 @@ class RelationStatusWatcherFacade(Type):
     @ReturnMapping(None)
     async def Stop(self):
         '''
+        Stop stops the watcher.
+
 
         Returns -> None
         '''
@@ -9872,15 +11251,26 @@ class RelationUnitsWatcherFacade(Type):
                                       'properties': {'version': {'type': 'integer'}},
                                       'required': ['version'],
                                       'type': 'object'}},
-     'properties': {'Next': {'properties': {'Result': {'$ref': '#/definitions/RelationUnitsWatchResult'}},
+     'properties': {'Next': {'description': 'Next returns when a change has '
+                                            'occurred to an entity of the\n'
+                                            'collection being watched since the '
+                                            'most recent call to Next\n'
+                                            'or the Watch call that created the '
+                                            'srvRelationUnitsWatcher.',
+                             'properties': {'Result': {'$ref': '#/definitions/RelationUnitsWatchResult'}},
                              'type': 'object'},
-                    'Stop': {'type': 'object'}},
+                    'Stop': {'description': 'Stop stops the watcher.',
+                             'type': 'object'}},
      'type': 'object'}
     
 
     @ReturnMapping(RelationUnitsWatchResult)
     async def Next(self):
         '''
+        Next returns when a change has occurred to an entity of the
+        collection being watched since the most recent call to Next
+        or the Watch call that created the srvRelationUnitsWatcher.
+
 
         Returns -> RelationUnitsWatchResult
         '''
@@ -9900,6 +11290,8 @@ class RelationUnitsWatcherFacade(Type):
     @ReturnMapping(None)
     async def Stop(self):
         '''
+        Stop stops the watcher.
+
 
         Returns -> None
         '''
@@ -10045,7 +11437,8 @@ class RemoteRelationWatcherFacade(Type):
                                                                                 'type': 'array'},
                                                                   'relation-token': {'type': 'string'},
                                                                   'suspended': {'type': 'boolean'},
-                                                                  'suspended-reason': {'type': 'string'}},
+                                                                  'suspended-reason': {'type': 'string'},
+                                                                  'unit-count': {'type': 'integer'}},
                                                    'required': ['relation-token',
                                                                 'application-token',
                                                                 'life'],
@@ -10066,7 +11459,8 @@ class RemoteRelationWatcherFacade(Type):
                                                    'type': 'object'}},
      'properties': {'Next': {'properties': {'Result': {'$ref': '#/definitions/RemoteRelationWatchResult'}},
                              'type': 'object'},
-                    'Stop': {'type': 'object'}},
+                    'Stop': {'description': 'Stop stops the watcher.',
+                             'type': 'object'}},
      'type': 'object'}
     
 
@@ -10092,6 +11486,8 @@ class RemoteRelationWatcherFacade(Type):
     @ReturnMapping(None)
     async def Stop(self):
         '''
+        Stop stops the watcher.
+
 
         Returns -> None
         '''
@@ -10954,10 +12350,22 @@ class ResourcesFacade(Type):
                                                     'resources',
                                                     'download-progress'],
                                        'type': 'object'}},
-     'properties': {'AddPendingResources': {'properties': {'Params': {'$ref': '#/definitions/AddPendingResourcesArgs'},
+     'properties': {'AddPendingResources': {'description': 'AddPendingResources '
+                                                           'adds the provided '
+                                                           'resources (info) to '
+                                                           'the Juju\n'
+                                                           'model in a pending '
+                                                           'state, meaning they '
+                                                           'are not available '
+                                                           'until\n'
+                                                           'resolved.',
+                                            'properties': {'Params': {'$ref': '#/definitions/AddPendingResourcesArgs'},
                                                            'Result': {'$ref': '#/definitions/AddPendingResourcesResult'}},
                                             'type': 'object'},
-                    'ListResources': {'properties': {'Params': {'$ref': '#/definitions/ListResourcesArgs'},
+                    'ListResources': {'description': 'ListResources returns the '
+                                                     'list of resources for the '
+                                                     'given application.',
+                                      'properties': {'Params': {'$ref': '#/definitions/ListResourcesArgs'},
                                                      'Result': {'$ref': '#/definitions/ResourcesResults'}},
                                       'type': 'object'}},
      'type': 'object'}
@@ -10966,6 +12374,10 @@ class ResourcesFacade(Type):
     @ReturnMapping(AddPendingResourcesResult)
     async def AddPendingResources(self, addcharmwithauthorization=None, entity=None, channel=None, force=None, macaroon=None, resources=None, tag=None, url=None):
         '''
+        AddPendingResources adds the provided resources (info) to the Juju
+        model in a pending state, meaning they are not available until
+        resolved.
+
         addcharmwithauthorization : AddCharmWithAuthorization
         entity : Entity
         channel : str
@@ -11022,6 +12434,8 @@ class ResourcesFacade(Type):
     @ReturnMapping(ResourcesResults)
     async def ListResources(self, entities=None):
         '''
+        ListResources returns the list of resources for the given application.
+
         entities : typing.Sequence[~Entity]
         Returns -> ResourcesResults
         '''
@@ -11122,7 +12536,16 @@ class ResourcesHookContextFacade(Type):
                                              'required': ['ErrorResult',
                                                           'resources'],
                                              'type': 'object'}},
-     'properties': {'GetResourceInfo': {'properties': {'Params': {'$ref': '#/definitions/ListUnitResourcesArgs'},
+     'properties': {'GetResourceInfo': {'description': 'GetResourceInfo returns '
+                                                       'the resource info for each '
+                                                       'of the given\n'
+                                                       'resource names (for the '
+                                                       'implicit application). If '
+                                                       'any one is missing then\n'
+                                                       'the corresponding result '
+                                                       'is set with '
+                                                       'errors.NotFound.',
+                                        'properties': {'Params': {'$ref': '#/definitions/ListUnitResourcesArgs'},
                                                        'Result': {'$ref': '#/definitions/UnitResourcesResult'}},
                                         'type': 'object'}},
      'type': 'object'}
@@ -11131,6 +12554,10 @@ class ResourcesHookContextFacade(Type):
     @ReturnMapping(UnitResourcesResult)
     async def GetResourceInfo(self, resource_names=None):
         '''
+        GetResourceInfo returns the resource info for each of the given
+        resource names (for the implicit application). If any one is missing then
+        the corresponding result is set with errors.NotFound.
+
         resource_names : typing.Sequence[str]
         Returns -> UnitResourcesResult
         '''
@@ -11200,10 +12627,25 @@ class RetryStrategyFacade(Type):
                                                                          'type': 'array'}},
                                               'required': ['results'],
                                               'type': 'object'}},
-     'properties': {'RetryStrategy': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+     'properties': {'RetryStrategy': {'description': 'RetryStrategy returns '
+                                                     'RetryStrategyResults that '
+                                                     'can be used by any code that '
+                                                     'uses\n'
+                                                     'to configure the retry timer '
+                                                     "that's currently in juju "
+                                                     'utils.',
+                                      'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                      'Result': {'$ref': '#/definitions/RetryStrategyResults'}},
                                       'type': 'object'},
-                    'WatchRetryStrategy': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'WatchRetryStrategy': {'description': 'WatchRetryStrategy '
+                                                          'watches for changes to '
+                                                          'the model. Currently we '
+                                                          'only allow\n'
+                                                          'changes to the boolean '
+                                                          'that determines whether '
+                                                          'retries should be '
+                                                          'attempted or not.',
+                                           'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                           'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
                                            'type': 'object'}},
      'type': 'object'}
@@ -11212,6 +12654,9 @@ class RetryStrategyFacade(Type):
     @ReturnMapping(RetryStrategyResults)
     async def RetryStrategy(self, entities=None):
         '''
+        RetryStrategy returns RetryStrategyResults that can be used by any code that uses
+        to configure the retry timer that's currently in juju utils.
+
         entities : typing.Sequence[~Entity]
         Returns -> RetryStrategyResults
         '''
@@ -11233,6 +12678,9 @@ class RetryStrategyFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def WatchRetryStrategy(self, entities=None):
         '''
+        WatchRetryStrategy watches for changes to the model. Currently we only allow
+        changes to the boolean that determines whether retries should be attempted or not.
+
         entities : typing.Sequence[~Entity]
         Returns -> NotifyWatchResults
         '''
@@ -11506,15 +12954,26 @@ class StringsWatcherFacade(Type):
                                                            'watcher-id': {'type': 'string'}},
                                             'required': ['watcher-id'],
                                             'type': 'object'}},
-     'properties': {'Next': {'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
+     'properties': {'Next': {'description': 'Next returns when a change has '
+                                            'occurred to an entity of the\n'
+                                            'collection being watched since the '
+                                            'most recent call to Next\n'
+                                            'or the Watch call that created the '
+                                            'srvStringsWatcher.',
+                             'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
                              'type': 'object'},
-                    'Stop': {'type': 'object'}},
+                    'Stop': {'description': 'Stop stops the watcher.',
+                             'type': 'object'}},
      'type': 'object'}
     
 
     @ReturnMapping(StringsWatchResult)
     async def Next(self):
         '''
+        Next returns when a change has occurred to an entity of the
+        collection being watched since the most recent call to Next
+        or the Watch call that created the srvStringsWatcher.
+
 
         Returns -> StringsWatchResult
         '''
@@ -11534,6 +12993,8 @@ class StringsWatcherFacade(Type):
     @ReturnMapping(None)
     async def Stop(self):
         '''
+        Stop stops the watcher.
+
 
         Returns -> None
         '''
@@ -11621,19 +13082,53 @@ class UndertakerFacade(Type):
                                                                   'result': {'$ref': '#/definitions/UndertakerModelInfo'}},
                                                    'required': ['result'],
                                                    'type': 'object'}},
-     'properties': {'ModelConfig': {'properties': {'Result': {'$ref': '#/definitions/ModelConfigResult'}},
+     'properties': {'ModelConfig': {'description': 'ModelConfig returns the '
+                                                   "model's configuration.",
+                                    'properties': {'Result': {'$ref': '#/definitions/ModelConfigResult'}},
                                     'type': 'object'},
-                    'ModelInfo': {'properties': {'Result': {'$ref': '#/definitions/UndertakerModelInfoResult'}},
+                    'ModelInfo': {'description': 'ModelInfo returns information on '
+                                                 'the model needed by the '
+                                                 'undertaker worker.',
+                                  'properties': {'Result': {'$ref': '#/definitions/UndertakerModelInfoResult'}},
                                   'type': 'object'},
-                    'ProcessDyingModel': {'type': 'object'},
-                    'RemoveModel': {'type': 'object'},
-                    'SetStatus': {'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
+                    'ProcessDyingModel': {'description': 'ProcessDyingModel checks '
+                                                         'if a dying model has any '
+                                                         'machines or '
+                                                         'applications.\n'
+                                                         'If there are none, the '
+                                                         "model's life is changed "
+                                                         'from dying to dead.',
+                                          'type': 'object'},
+                    'RemoveModel': {'description': 'RemoveModel removes any '
+                                                   'records of this model from '
+                                                   'Juju.',
+                                    'type': 'object'},
+                    'SetStatus': {'description': 'SetStatus sets the status of '
+                                                 'each given entity.',
+                                  'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
                                                  'Result': {'$ref': '#/definitions/ErrorResults'}},
                                   'type': 'object'},
-                    'UpdateStatus': {'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
+                    'UpdateStatus': {'description': 'UpdateStatus updates the '
+                                                    'status data of each given '
+                                                    'entity.\n'
+                                                    'TODO(fwereade): WTF. This '
+                                                    'method exists *only* for the '
+                                                    'convenience of the\n'
+                                                    '*client* API -- and is itself '
+                                                    'completely broken -- but we '
+                                                    'still expose it\n'
+                                                    'in every facade with a '
+                                                    'StatusSetter? FFS.',
+                                     'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
                                                     'Result': {'$ref': '#/definitions/ErrorResults'}},
                                      'type': 'object'},
-                    'WatchModelResources': {'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
+                    'WatchModelResources': {'description': 'WatchModelResources '
+                                                           'creates watchers for '
+                                                           'changes to the '
+                                                           'lifecycle of an\n'
+                                                           "model's machines and "
+                                                           'services.',
+                                            'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
                                             'type': 'object'}},
      'type': 'object'}
     
@@ -11641,6 +13136,8 @@ class UndertakerFacade(Type):
     @ReturnMapping(ModelConfigResult)
     async def ModelConfig(self):
         '''
+        ModelConfig returns the model's configuration.
+
 
         Returns -> ModelConfigResult
         '''
@@ -11660,6 +13157,8 @@ class UndertakerFacade(Type):
     @ReturnMapping(UndertakerModelInfoResult)
     async def ModelInfo(self):
         '''
+        ModelInfo returns information on the model needed by the undertaker worker.
+
 
         Returns -> UndertakerModelInfoResult
         '''
@@ -11679,6 +13178,9 @@ class UndertakerFacade(Type):
     @ReturnMapping(None)
     async def ProcessDyingModel(self):
         '''
+        ProcessDyingModel checks if a dying model has any machines or applications.
+        If there are none, the model's life is changed from dying to dead.
+
 
         Returns -> None
         '''
@@ -11698,6 +13200,8 @@ class UndertakerFacade(Type):
     @ReturnMapping(None)
     async def RemoveModel(self):
         '''
+        RemoveModel removes any records of this model from Juju.
+
 
         Returns -> None
         '''
@@ -11717,6 +13221,8 @@ class UndertakerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetStatus(self, entities=None):
         '''
+        SetStatus sets the status of each given entity.
+
         entities : typing.Sequence[~EntityStatusArgs]
         Returns -> ErrorResults
         '''
@@ -11738,6 +13244,11 @@ class UndertakerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def UpdateStatus(self, entities=None):
         '''
+        UpdateStatus updates the status data of each given entity.
+        TODO(fwereade): WTF. This method exists *only* for the convenience of the
+        *client* API -- and is itself completely broken -- but we still expose it
+        in every facade with a StatusSetter? FFS.
+
         entities : typing.Sequence[~EntityStatusArgs]
         Returns -> ErrorResults
         '''
@@ -11759,6 +13270,9 @@ class UndertakerFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def WatchModelResources(self):
         '''
+        WatchModelResources creates watchers for changes to the lifecycle of an
+        model's machines and services.
+
 
         Returns -> NotifyWatchResults
         '''
@@ -11827,13 +13341,31 @@ class UnitAssignerFacade(Type):
                                                            'watcher-id': {'type': 'string'}},
                                             'required': ['watcher-id'],
                                             'type': 'object'}},
-     'properties': {'AssignUnits': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+     'properties': {'AssignUnits': {'description': 'AssignUnits assigns the units '
+                                                   'with the given ids to the '
+                                                   'correct machine. The\n'
+                                                   ' error results are returned in '
+                                                   'the same order as the given '
+                                                   'entities.',
+                                    'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                    'Result': {'$ref': '#/definitions/ErrorResults'}},
                                     'type': 'object'},
-                    'SetAgentStatus': {'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
+                    'SetAgentStatus': {'description': 'SetAgentStatus will set '
+                                                      'status for agents of Units '
+                                                      'passed in args, if one\n'
+                                                      'of the args is not an Unit '
+                                                      'it will fail.',
+                                       'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
                                                       'Result': {'$ref': '#/definitions/ErrorResults'}},
                                        'type': 'object'},
-                    'WatchUnitAssignments': {'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
+                    'WatchUnitAssignments': {'description': 'WatchUnitAssignments '
+                                                            'returns a strings '
+                                                            'watcher that is '
+                                                            'notified when new '
+                                                            'unit\n'
+                                                            'assignments are added '
+                                                            'to the db.',
+                                             'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
                                              'type': 'object'}},
      'type': 'object'}
     
@@ -11841,6 +13373,9 @@ class UnitAssignerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def AssignUnits(self, entities=None):
         '''
+        AssignUnits assigns the units with the given ids to the correct machine. The
+         error results are returned in the same order as the given entities.
+
         entities : typing.Sequence[~Entity]
         Returns -> ErrorResults
         '''
@@ -11862,6 +13397,9 @@ class UnitAssignerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetAgentStatus(self, entities=None):
         '''
+        SetAgentStatus will set status for agents of Units passed in args, if one
+        of the args is not an Unit it will fail.
+
         entities : typing.Sequence[~EntityStatusArgs]
         Returns -> ErrorResults
         '''
@@ -11883,6 +13421,9 @@ class UnitAssignerFacade(Type):
     @ReturnMapping(StringsWatchResult)
     async def WatchUnitAssignments(self):
         '''
+        WatchUnitAssignments returns a strings watcher that is notified when new unit
+        assignments are added to the db.
+
 
         Returns -> StringsWatchResult
         '''
@@ -12851,15 +14392,26 @@ class VolumeAttachmentPlansWatcherFacade(Type):
                                                       'required': ['watcher-id',
                                                                    'changes'],
                                                       'type': 'object'}},
-     'properties': {'Next': {'properties': {'Result': {'$ref': '#/definitions/MachineStorageIdsWatchResult'}},
+     'properties': {'Next': {'description': 'Next returns when a change has '
+                                            'occurred to an entity of the\n'
+                                            'collection being watched since the '
+                                            'most recent call to Next\n'
+                                            'or the Watch call that created the '
+                                            'srvMachineStorageIdsWatcher.',
+                             'properties': {'Result': {'$ref': '#/definitions/MachineStorageIdsWatchResult'}},
                              'type': 'object'},
-                    'Stop': {'type': 'object'}},
+                    'Stop': {'description': 'Stop stops the watcher.',
+                             'type': 'object'}},
      'type': 'object'}
     
 
     @ReturnMapping(MachineStorageIdsWatchResult)
     async def Next(self):
         '''
+        Next returns when a change has occurred to an entity of the
+        collection being watched since the most recent call to Next
+        or the Watch call that created the srvMachineStorageIdsWatcher.
+
 
         Returns -> MachineStorageIdsWatchResult
         '''
@@ -12879,6 +14431,8 @@ class VolumeAttachmentPlansWatcherFacade(Type):
     @ReturnMapping(None)
     async def Stop(self):
         '''
+        Stop stops the watcher.
+
 
         Returns -> None
         '''

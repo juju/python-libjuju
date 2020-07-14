@@ -1,6 +1,16 @@
 Changelog
 ---------
 
+2.8.2
+^^^^^
+
+Tuesday July 14 2020
+
+ * Update facade methods for Juju 2.8.1
+ * Add documentation to the client API methods (using the 2.8.1 changes)
+ * Bug fix -Fixes application status being reported as unset (#430)
+ * Bug fix - Handle Network Unreachable OSErrors (#426)
+
 2.8.1
 ^^^^^
 
