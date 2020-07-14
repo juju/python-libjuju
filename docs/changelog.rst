@@ -4,8 +4,10 @@ Changelog
 2.8.1
 ^^^^^
 
-Monday May 18 2020
+Monday July 14 2020
 
+ * Update facade methods for Juju 2.8.1
+ * Add documentation to the client API methods (using the 2.8.1 changes)
  * Fix positional argument usage in facade calls.
  * Add get shim to facade types.
  * Fix SSH await on unit

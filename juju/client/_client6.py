@@ -184,52 +184,139 @@ class ActionFacade(Type):
                                                                         'type': 'array'}},
                                              'required': ['results'],
                                              'type': 'object'}},
-     'properties': {'Actions': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+     'properties': {'Actions': {'description': 'Actions takes a list of '
+                                               'ActionTags, and returns the full '
+                                               'Action for\n'
+                                               'each ID.',
+                                'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                'Result': {'$ref': '#/definitions/ActionResults'}},
                                 'type': 'object'},
-                    'ApplicationsCharmsActions': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'ApplicationsCharmsActions': {'description': 'ApplicationsCharmsActions '
+                                                                 'returns a slice '
+                                                                 'of charm Actions '
+                                                                 'for a slice of\n'
+                                                                 'services.',
+                                                  'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                                  'Result': {'$ref': '#/definitions/ApplicationsCharmActionsResults'}},
                                                   'type': 'object'},
-                    'Cancel': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'Cancel': {'description': 'Cancel attempts to cancel enqueued '
+                                              'Actions from running.',
+                               'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                               'Result': {'$ref': '#/definitions/ActionResults'}},
                                'type': 'object'},
-                    'Enqueue': {'properties': {'Params': {'$ref': '#/definitions/Actions'},
+                    'Enqueue': {'description': 'Enqueue takes a list of Actions '
+                                               'and queues them up to be executed '
+                                               'by\n'
+                                               'the designated ActionReceiver, '
+                                               'returning the params.Action for '
+                                               'each\n'
+                                               'enqueued Action, or an error if '
+                                               'there was a problem enqueueing '
+                                               'the\n'
+                                               'Action.',
+                                'properties': {'Params': {'$ref': '#/definitions/Actions'},
                                                'Result': {'$ref': '#/definitions/ActionResults'}},
                                 'type': 'object'},
-                    'EnqueueOperation': {'properties': {'Params': {'$ref': '#/definitions/Actions'},
+                    'EnqueueOperation': {'description': 'EnqueueOperation takes a '
+                                                        'list of Actions and '
+                                                        'queues them up to be '
+                                                        'executed as\n'
+                                                        'an operation, each action '
+                                                        'running as a task on the '
+                                                        'the designated '
+                                                        'ActionReceiver.\n'
+                                                        'We return the ID of the '
+                                                        'overall operation and '
+                                                        'each individual task.',
+                                         'properties': {'Params': {'$ref': '#/definitions/Actions'},
                                                         'Result': {'$ref': '#/definitions/EnqueuedActions'}},
                                          'type': 'object'},
-                    'FindActionTagsByPrefix': {'properties': {'Params': {'$ref': '#/definitions/FindTags'},
+                    'FindActionTagsByPrefix': {'description': 'FindActionTagsByPrefix '
+                                                              'takes a list of '
+                                                              'string prefixes and '
+                                                              'finds\n'
+                                                              'corresponding '
+                                                              'ActionTags that '
+                                                              'match that prefix.\n'
+                                                              'TODO(juju3) - '
+                                                              'rename API method '
+                                                              'since we only need '
+                                                              'prefix matching for '
+                                                              'UUIDs',
+                                               'properties': {'Params': {'$ref': '#/definitions/FindTags'},
                                                               'Result': {'$ref': '#/definitions/FindTagsResults'}},
                                                'type': 'object'},
                     'FindActionsByNames': {'properties': {'Params': {'$ref': '#/definitions/FindActionsByNames'},
                                                           'Result': {'$ref': '#/definitions/ActionsByNames'}},
                                            'type': 'object'},
-                    'ListAll': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'ListAll': {'description': 'ListAll takes a list of Entities '
+                                               'representing ActionReceivers and\n'
+                                               'returns all of the Actions that '
+                                               'have been enqueued or run by each '
+                                               'of\n'
+                                               'those Entities.',
+                                'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                'Result': {'$ref': '#/definitions/ActionsByReceivers'}},
                                 'type': 'object'},
-                    'ListCompleted': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'ListCompleted': {'description': 'ListCompleted takes a list '
+                                                     'of Entities representing '
+                                                     'ActionReceivers\n'
+                                                     'and returns all of the '
+                                                     'Actions that have been run '
+                                                     'on each of those\n'
+                                                     'Entities.',
+                                      'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                      'Result': {'$ref': '#/definitions/ActionsByReceivers'}},
                                       'type': 'object'},
-                    'ListOperations': {'properties': {'Params': {'$ref': '#/definitions/OperationQueryArgs'},
+                    'ListOperations': {'description': 'ListOperations fetches the '
+                                                      'called actions for '
+                                                      'specified apps/units.',
+                                       'properties': {'Params': {'$ref': '#/definitions/OperationQueryArgs'},
                                                       'Result': {'$ref': '#/definitions/OperationResults'}},
                                        'type': 'object'},
-                    'ListPending': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'ListPending': {'description': 'ListPending takes a list of '
+                                                   'Entities representing '
+                                                   'ActionReceivers\n'
+                                                   'and returns all of the Actions '
+                                                   'that are enqueued for each of '
+                                                   'those\n'
+                                                   'Entities.',
+                                    'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                    'Result': {'$ref': '#/definitions/ActionsByReceivers'}},
                                     'type': 'object'},
-                    'ListRunning': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'ListRunning': {'description': 'ListRunning takes a list of '
+                                                   'Entities representing '
+                                                   'ActionReceivers and\n'
+                                                   'returns all of the Actions '
+                                                   'that have are running on each '
+                                                   'of those\n'
+                                                   'Entities.',
+                                    'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                    'Result': {'$ref': '#/definitions/ActionsByReceivers'}},
                                     'type': 'object'},
-                    'Operations': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'Operations': {'description': 'Operations fetches the '
+                                                  'specified operation ids.',
+                                   'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                   'Result': {'$ref': '#/definitions/OperationResults'}},
                                    'type': 'object'},
-                    'Run': {'properties': {'Params': {'$ref': '#/definitions/RunParams'},
+                    'Run': {'description': 'Run the commands specified on the '
+                                           'machines identified through the\n'
+                                           'list of machines, units and services.',
+                            'properties': {'Params': {'$ref': '#/definitions/RunParams'},
                                            'Result': {'$ref': '#/definitions/ActionResults'}},
                             'type': 'object'},
-                    'RunOnAllMachines': {'properties': {'Params': {'$ref': '#/definitions/RunParams'},
+                    'RunOnAllMachines': {'description': 'RunOnAllMachines attempts '
+                                                        'to run the specified '
+                                                        'command on all the '
+                                                        'machines.',
+                                         'properties': {'Params': {'$ref': '#/definitions/RunParams'},
                                                         'Result': {'$ref': '#/definitions/ActionResults'}},
                                          'type': 'object'},
-                    'WatchActionsProgress': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'WatchActionsProgress': {'description': 'WatchActionsProgress '
+                                                            'creates a watcher '
+                                                            'that reports on '
+                                                            'action log messages.',
+                                             'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                             'Result': {'$ref': '#/definitions/StringsWatchResults'}},
                                              'type': 'object'}},
      'type': 'object'}
@@ -238,6 +325,9 @@ class ActionFacade(Type):
     @ReturnMapping(ActionResults)
     async def Actions(self, entities=None):
         '''
+        Actions takes a list of ActionTags, and returns the full Action for
+        each ID.
+
         entities : typing.Sequence[~Entity]
         Returns -> ActionResults
         '''
@@ -259,6 +349,9 @@ class ActionFacade(Type):
     @ReturnMapping(ApplicationsCharmActionsResults)
     async def ApplicationsCharmsActions(self, entities=None):
         '''
+        ApplicationsCharmsActions returns a slice of charm Actions for a slice of
+        services.
+
         entities : typing.Sequence[~Entity]
         Returns -> ApplicationsCharmActionsResults
         '''
@@ -280,6 +373,8 @@ class ActionFacade(Type):
     @ReturnMapping(ActionResults)
     async def Cancel(self, entities=None):
         '''
+        Cancel attempts to cancel enqueued Actions from running.
+
         entities : typing.Sequence[~Entity]
         Returns -> ActionResults
         '''
@@ -301,6 +396,11 @@ class ActionFacade(Type):
     @ReturnMapping(ActionResults)
     async def Enqueue(self, actions=None):
         '''
+        Enqueue takes a list of Actions and queues them up to be executed by
+        the designated ActionReceiver, returning the params.Action for each
+        enqueued Action, or an error if there was a problem enqueueing the
+        Action.
+
         actions : typing.Sequence[~Action]
         Returns -> ActionResults
         '''
@@ -322,6 +422,10 @@ class ActionFacade(Type):
     @ReturnMapping(EnqueuedActions)
     async def EnqueueOperation(self, actions=None):
         '''
+        EnqueueOperation takes a list of Actions and queues them up to be executed as
+        an operation, each action running as a task on the the designated ActionReceiver.
+        We return the ID of the overall operation and each individual task.
+
         actions : typing.Sequence[~Action]
         Returns -> EnqueuedActions
         '''
@@ -343,6 +447,10 @@ class ActionFacade(Type):
     @ReturnMapping(FindTagsResults)
     async def FindActionTagsByPrefix(self, prefixes=None):
         '''
+        FindActionTagsByPrefix takes a list of string prefixes and finds
+        corresponding ActionTags that match that prefix.
+        TODO(juju3) - rename API method since we only need prefix matching for UUIDs
+
         prefixes : typing.Sequence[str]
         Returns -> FindTagsResults
         '''
@@ -385,6 +493,10 @@ class ActionFacade(Type):
     @ReturnMapping(ActionsByReceivers)
     async def ListAll(self, entities=None):
         '''
+        ListAll takes a list of Entities representing ActionReceivers and
+        returns all of the Actions that have been enqueued or run by each of
+        those Entities.
+
         entities : typing.Sequence[~Entity]
         Returns -> ActionsByReceivers
         '''
@@ -406,6 +518,10 @@ class ActionFacade(Type):
     @ReturnMapping(ActionsByReceivers)
     async def ListCompleted(self, entities=None):
         '''
+        ListCompleted takes a list of Entities representing ActionReceivers
+        and returns all of the Actions that have been run on each of those
+        Entities.
+
         entities : typing.Sequence[~Entity]
         Returns -> ActionsByReceivers
         '''
@@ -427,6 +543,8 @@ class ActionFacade(Type):
     @ReturnMapping(OperationResults)
     async def ListOperations(self, actions=None, applications=None, limit=None, offset=None, status=None, units=None):
         '''
+        ListOperations fetches the called actions for specified apps/units.
+
         actions : typing.Sequence[str]
         applications : typing.Sequence[str]
         limit : int
@@ -473,6 +591,10 @@ class ActionFacade(Type):
     @ReturnMapping(ActionsByReceivers)
     async def ListPending(self, entities=None):
         '''
+        ListPending takes a list of Entities representing ActionReceivers
+        and returns all of the Actions that are enqueued for each of those
+        Entities.
+
         entities : typing.Sequence[~Entity]
         Returns -> ActionsByReceivers
         '''
@@ -494,6 +616,10 @@ class ActionFacade(Type):
     @ReturnMapping(ActionsByReceivers)
     async def ListRunning(self, entities=None):
         '''
+        ListRunning takes a list of Entities representing ActionReceivers and
+        returns all of the Actions that have are running on each of those
+        Entities.
+
         entities : typing.Sequence[~Entity]
         Returns -> ActionsByReceivers
         '''
@@ -515,6 +641,8 @@ class ActionFacade(Type):
     @ReturnMapping(OperationResults)
     async def Operations(self, entities=None):
         '''
+        Operations fetches the specified operation ids.
+
         entities : typing.Sequence[~Entity]
         Returns -> OperationResults
         '''
@@ -536,6 +664,9 @@ class ActionFacade(Type):
     @ReturnMapping(ActionResults)
     async def Run(self, applications=None, commands=None, machines=None, timeout=None, units=None, workload_context=None):
         '''
+        Run the commands specified on the machines identified through the
+        list of machines, units and services.
+
         applications : typing.Sequence[str]
         commands : str
         machines : typing.Sequence[str]
@@ -582,6 +713,8 @@ class ActionFacade(Type):
     @ReturnMapping(ActionResults)
     async def RunOnAllMachines(self, applications=None, commands=None, machines=None, timeout=None, units=None, workload_context=None):
         '''
+        RunOnAllMachines attempts to run the specified command on all the machines.
+
         applications : typing.Sequence[str]
         commands : str
         machines : typing.Sequence[str]
@@ -628,6 +761,8 @@ class ActionFacade(Type):
     @ReturnMapping(StringsWatchResults)
     async def WatchActionsProgress(self, entities=None):
         '''
+        WatchActionsProgress creates a watcher that reports on action log messages.
+
         entities : typing.Sequence[~Entity]
         Returns -> StringsWatchResults
         '''
@@ -1593,34 +1728,104 @@ class MachineManagerFacade(Type):
                                               'zones': {'items': {'type': 'string'},
                                                         'type': 'array'}},
                                'type': 'object'}},
-     'properties': {'AddMachines': {'properties': {'Params': {'$ref': '#/definitions/AddMachines'},
+     'properties': {'AddMachines': {'description': 'AddMachines adds new machines '
+                                                   'with the supplied parameters.',
+                                    'properties': {'Params': {'$ref': '#/definitions/AddMachines'},
                                                    'Result': {'$ref': '#/definitions/AddMachinesResults'}},
                                     'type': 'object'},
-                    'DestroyMachine': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'DestroyMachine': {'description': 'DestroyMachine removes a '
+                                                      'set of machines from the '
+                                                      'model.',
+                                       'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                       'Result': {'$ref': '#/definitions/DestroyMachineResults'}},
                                        'type': 'object'},
-                    'DestroyMachineWithParams': {'properties': {'Params': {'$ref': '#/definitions/DestroyMachinesParams'},
+                    'DestroyMachineWithParams': {'description': 'DestroyMachineWithParams '
+                                                                'removes a set of '
+                                                                'machines from the '
+                                                                'model.',
+                                                 'properties': {'Params': {'$ref': '#/definitions/DestroyMachinesParams'},
                                                                 'Result': {'$ref': '#/definitions/DestroyMachineResults'}},
                                                  'type': 'object'},
-                    'ForceDestroyMachine': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'ForceDestroyMachine': {'description': 'ForceDestroyMachine '
+                                                           'forcibly removes a set '
+                                                           'of machines from the '
+                                                           'model.\n'
+                                                           'TODO (anastasiamac '
+                                                           '2019-4-24) From Juju '
+                                                           '3.0 this call will be '
+                                                           'removed in favour of '
+                                                           'DestroyMachinesWithParams.\n'
+                                                           'Also from ModelManger '
+                                                           'v6 this call is less '
+                                                           'useful as it does not '
+                                                           'support MaxWait '
+                                                           'customisation.',
+                                            'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                            'Result': {'$ref': '#/definitions/DestroyMachineResults'}},
                                             'type': 'object'},
-                    'GetUpgradeSeriesMessages': {'properties': {'Params': {'$ref': '#/definitions/UpgradeSeriesNotificationParams'},
+                    'GetUpgradeSeriesMessages': {'description': 'GetUpgradeSeriesMessages '
+                                                                'returns all new '
+                                                                'messages '
+                                                                'associated with '
+                                                                'upgrade\n'
+                                                                'series events. '
+                                                                'Messages that '
+                                                                'have already been '
+                                                                'retrieved once '
+                                                                'are not\n'
+                                                                'returned by this '
+                                                                'method.',
+                                                 'properties': {'Params': {'$ref': '#/definitions/UpgradeSeriesNotificationParams'},
                                                                 'Result': {'$ref': '#/definitions/StringsResults'}},
                                                  'type': 'object'},
-                    'InstanceTypes': {'properties': {'Params': {'$ref': '#/definitions/ModelInstanceTypesConstraints'},
+                    'InstanceTypes': {'description': 'InstanceTypes returns '
+                                                     'instance type information '
+                                                     'for the cloud and region\n'
+                                                     'in which the current model '
+                                                     'is deployed.',
+                                      'properties': {'Params': {'$ref': '#/definitions/ModelInstanceTypesConstraints'},
                                                      'Result': {'$ref': '#/definitions/InstanceTypesResults'}},
                                       'type': 'object'},
-                    'UpgradeSeriesComplete': {'properties': {'Params': {'$ref': '#/definitions/UpdateSeriesArg'},
+                    'UpgradeSeriesComplete': {'description': 'UpgradeSeriesComplete '
+                                                             'marks a machine as '
+                                                             'having completed a '
+                                                             'managed series '
+                                                             'upgrade.',
+                                              'properties': {'Params': {'$ref': '#/definitions/UpdateSeriesArg'},
                                                              'Result': {'$ref': '#/definitions/ErrorResult'}},
                                               'type': 'object'},
-                    'UpgradeSeriesPrepare': {'properties': {'Params': {'$ref': '#/definitions/UpdateSeriesArg'},
+                    'UpgradeSeriesPrepare': {'description': 'UpgradeSeriesPrepare '
+                                                            'prepares a machine '
+                                                            'for a OS series '
+                                                            'upgrade.',
+                                             'properties': {'Params': {'$ref': '#/definitions/UpdateSeriesArg'},
                                                             'Result': {'$ref': '#/definitions/ErrorResult'}},
                                              'type': 'object'},
-                    'UpgradeSeriesValidate': {'properties': {'Params': {'$ref': '#/definitions/UpdateSeriesArgs'},
+                    'UpgradeSeriesValidate': {'description': 'UpgradeSeriesValidate '
+                                                             'validates that the '
+                                                             'incoming arguments '
+                                                             'correspond to a\n'
+                                                             'valid series upgrade '
+                                                             'for the target '
+                                                             'machine.\n'
+                                                             'If they do, a list '
+                                                             "of the machine's "
+                                                             'current units is '
+                                                             'returned for use in\n'
+                                                             'soliciting user '
+                                                             'confirmation of the '
+                                                             'command.',
+                                              'properties': {'Params': {'$ref': '#/definitions/UpdateSeriesArgs'},
                                                              'Result': {'$ref': '#/definitions/UpgradeSeriesUnitsResults'}},
                                               'type': 'object'},
-                    'WatchUpgradeSeriesNotifications': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'WatchUpgradeSeriesNotifications': {'description': 'WatchUpgradeSeriesNotifications '
+                                                                       'returns a '
+                                                                       'watcher '
+                                                                       'that fires '
+                                                                       'on upgrade '
+                                                                       'series '
+                                                                       'events.',
+                                                        'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                                        'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
                                                         'type': 'object'}},
      'type': 'object'}
@@ -1629,6 +1834,8 @@ class MachineManagerFacade(Type):
     @ReturnMapping(AddMachinesResults)
     async def AddMachines(self, params=None):
         '''
+        AddMachines adds new machines with the supplied parameters.
+
         params : typing.Sequence[~AddMachineParams]
         Returns -> AddMachinesResults
         '''
@@ -1650,6 +1857,8 @@ class MachineManagerFacade(Type):
     @ReturnMapping(DestroyMachineResults)
     async def DestroyMachine(self, entities=None):
         '''
+        DestroyMachine removes a set of machines from the model.
+
         entities : typing.Sequence[~Entity]
         Returns -> DestroyMachineResults
         '''
@@ -1671,6 +1880,8 @@ class MachineManagerFacade(Type):
     @ReturnMapping(DestroyMachineResults)
     async def DestroyMachineWithParams(self, force=None, keep=None, machine_tags=None, max_wait=None):
         '''
+        DestroyMachineWithParams removes a set of machines from the model.
+
         force : bool
         keep : bool
         machine_tags : typing.Sequence[str]
@@ -1707,6 +1918,10 @@ class MachineManagerFacade(Type):
     @ReturnMapping(DestroyMachineResults)
     async def ForceDestroyMachine(self, entities=None):
         '''
+        ForceDestroyMachine forcibly removes a set of machines from the model.
+        TODO (anastasiamac 2019-4-24) From Juju 3.0 this call will be removed in favour of DestroyMachinesWithParams.
+        Also from ModelManger v6 this call is less useful as it does not support MaxWait customisation.
+
         entities : typing.Sequence[~Entity]
         Returns -> DestroyMachineResults
         '''
@@ -1728,6 +1943,10 @@ class MachineManagerFacade(Type):
     @ReturnMapping(StringsResults)
     async def GetUpgradeSeriesMessages(self, params=None):
         '''
+        GetUpgradeSeriesMessages returns all new messages associated with upgrade
+        series events. Messages that have already been retrieved once are not
+        returned by this method.
+
         params : typing.Sequence[~UpgradeSeriesNotificationParam]
         Returns -> StringsResults
         '''
@@ -1749,6 +1968,9 @@ class MachineManagerFacade(Type):
     @ReturnMapping(InstanceTypesResults)
     async def InstanceTypes(self, constraints=None):
         '''
+        InstanceTypes returns instance type information for the cloud and region
+        in which the current model is deployed.
+
         constraints : typing.Sequence[~ModelInstanceTypesConstraint]
         Returns -> InstanceTypesResults
         '''
@@ -1770,6 +1992,8 @@ class MachineManagerFacade(Type):
     @ReturnMapping(ErrorResult)
     async def UpgradeSeriesComplete(self, force=None, series=None, tag=None):
         '''
+        UpgradeSeriesComplete marks a machine as having completed a managed series upgrade.
+
         force : bool
         series : str
         tag : Entity
@@ -1801,6 +2025,8 @@ class MachineManagerFacade(Type):
     @ReturnMapping(ErrorResult)
     async def UpgradeSeriesPrepare(self, force=None, series=None, tag=None):
         '''
+        UpgradeSeriesPrepare prepares a machine for a OS series upgrade.
+
         force : bool
         series : str
         tag : Entity
@@ -1832,6 +2058,11 @@ class MachineManagerFacade(Type):
     @ReturnMapping(UpgradeSeriesUnitsResults)
     async def UpgradeSeriesValidate(self, args=None):
         '''
+        UpgradeSeriesValidate validates that the incoming arguments correspond to a
+        valid series upgrade for the target machine.
+        If they do, a list of the machine's current units is returned for use in
+        soliciting user confirmation of the command.
+
         args : typing.Sequence[~UpdateSeriesArg]
         Returns -> UpgradeSeriesUnitsResults
         '''
@@ -1853,6 +2084,8 @@ class MachineManagerFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def WatchUpgradeSeriesNotifications(self, entities=None):
         '''
+        WatchUpgradeSeriesNotifications returns a watcher that fires on upgrade series events.
+
         entities : typing.Sequence[~Entity]
         Returns -> NotifyWatchResults
         '''
@@ -2027,22 +2260,43 @@ class SpacesFacade(Type):
                                              'space-tag',
                                              'zones'],
                                 'type': 'object'}},
-     'properties': {'CreateSpaces': {'properties': {'Params': {'$ref': '#/definitions/CreateSpacesParams'},
+     'properties': {'CreateSpaces': {'description': 'CreateSpaces creates a new '
+                                                    'Juju network space, '
+                                                    'associating the\n'
+                                                    'specified subnets with it '
+                                                    '(optional; can be empty).',
+                                     'properties': {'Params': {'$ref': '#/definitions/CreateSpacesParams'},
                                                     'Result': {'$ref': '#/definitions/ErrorResults'}},
                                      'type': 'object'},
-                    'ListSpaces': {'properties': {'Result': {'$ref': '#/definitions/ListSpacesResults'}},
+                    'ListSpaces': {'description': 'ListSpaces lists all the '
+                                                  'available spaces and their '
+                                                  'associated subnets.',
+                                   'properties': {'Result': {'$ref': '#/definitions/ListSpacesResults'}},
                                    'type': 'object'},
-                    'MoveSubnets': {'properties': {'Params': {'$ref': '#/definitions/MoveSubnetsParams'},
+                    'MoveSubnets': {'description': 'MoveSubnets ensures that the '
+                                                   'input subnets are in the input '
+                                                   'space.',
+                                    'properties': {'Params': {'$ref': '#/definitions/MoveSubnetsParams'},
                                                    'Result': {'$ref': '#/definitions/MoveSubnetsResults'}},
                                     'type': 'object'},
-                    'ReloadSpaces': {'type': 'object'},
-                    'RemoveSpace': {'properties': {'Params': {'$ref': '#/definitions/RemoveSpaceParams'},
+                    'ReloadSpaces': {'description': 'ReloadSpaces refreshes spaces '
+                                                    'from substrate',
+                                     'type': 'object'},
+                    'RemoveSpace': {'description': 'RemoveSpace removes a space.\n'
+                                                   'Returns SpaceResults if '
+                                                   'entities/settings are found '
+                                                   'which makes the deletion not '
+                                                   'possible.',
+                                    'properties': {'Params': {'$ref': '#/definitions/RemoveSpaceParams'},
                                                    'Result': {'$ref': '#/definitions/RemoveSpaceResults'}},
                                     'type': 'object'},
-                    'RenameSpace': {'properties': {'Params': {'$ref': '#/definitions/RenameSpacesParams'},
+                    'RenameSpace': {'description': 'RenameSpace renames a space.',
+                                    'properties': {'Params': {'$ref': '#/definitions/RenameSpacesParams'},
                                                    'Result': {'$ref': '#/definitions/ErrorResults'}},
                                     'type': 'object'},
-                    'ShowSpace': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'ShowSpace': {'description': 'ShowSpace shows the spaces for a '
+                                                 'set of given entities.',
+                                  'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                  'Result': {'$ref': '#/definitions/ShowSpaceResults'}},
                                   'type': 'object'}},
      'type': 'object'}
@@ -2051,6 +2305,9 @@ class SpacesFacade(Type):
     @ReturnMapping(ErrorResults)
     async def CreateSpaces(self, spaces=None):
         '''
+        CreateSpaces creates a new Juju network space, associating the
+        specified subnets with it (optional; can be empty).
+
         spaces : typing.Sequence[~CreateSpaceParams]
         Returns -> ErrorResults
         '''
@@ -2072,6 +2329,8 @@ class SpacesFacade(Type):
     @ReturnMapping(ListSpacesResults)
     async def ListSpaces(self):
         '''
+        ListSpaces lists all the available spaces and their associated subnets.
+
 
         Returns -> ListSpacesResults
         '''
@@ -2091,6 +2350,8 @@ class SpacesFacade(Type):
     @ReturnMapping(MoveSubnetsResults)
     async def MoveSubnets(self, args=None):
         '''
+        MoveSubnets ensures that the input subnets are in the input space.
+
         args : typing.Sequence[~MoveSubnetsParam]
         Returns -> MoveSubnetsResults
         '''
@@ -2112,6 +2373,8 @@ class SpacesFacade(Type):
     @ReturnMapping(None)
     async def ReloadSpaces(self):
         '''
+        ReloadSpaces refreshes spaces from substrate
+
 
         Returns -> None
         '''
@@ -2131,6 +2394,9 @@ class SpacesFacade(Type):
     @ReturnMapping(RemoveSpaceResults)
     async def RemoveSpace(self, space_param=None):
         '''
+        RemoveSpace removes a space.
+        Returns SpaceResults if entities/settings are found which makes the deletion not possible.
+
         space_param : typing.Sequence[~RemoveSpaceParam]
         Returns -> RemoveSpaceResults
         '''
@@ -2152,6 +2418,8 @@ class SpacesFacade(Type):
     @ReturnMapping(ErrorResults)
     async def RenameSpace(self, changes=None):
         '''
+        RenameSpace renames a space.
+
         changes : typing.Sequence[~RenameSpaceParams]
         Returns -> ErrorResults
         '''
@@ -2173,6 +2441,8 @@ class SpacesFacade(Type):
     @ReturnMapping(ShowSpaceResults)
     async def ShowSpace(self, entities=None):
         '''
+        ShowSpace shows the spaces for a set of given entities.
+
         entities : typing.Sequence[~Entity]
         Returns -> ShowSpaceResults
         '''
@@ -2517,43 +2787,128 @@ class StorageFacade(Type):
                                                    'wwn': {'type': 'string'}},
                                     'required': ['volume-id', 'size', 'persistent'],
                                     'type': 'object'}},
-     'properties': {'AddToUnit': {'properties': {'Params': {'$ref': '#/definitions/StoragesAddParams'},
+     'properties': {'AddToUnit': {'description': 'AddToUnit validates and creates '
+                                                 'additional storage instances for '
+                                                 'units.\n'
+                                                 'A "CHANGE" block can block this '
+                                                 'operation.',
+                                  'properties': {'Params': {'$ref': '#/definitions/StoragesAddParams'},
                                                  'Result': {'$ref': '#/definitions/AddStorageResults'}},
                                   'type': 'object'},
-                    'Attach': {'properties': {'Params': {'$ref': '#/definitions/StorageAttachmentIds'},
+                    'Attach': {'description': 'Attach attaches existing storage '
+                                              'instances to units.\n'
+                                              'A "CHANGE" block can block this '
+                                              'operation.',
+                               'properties': {'Params': {'$ref': '#/definitions/StorageAttachmentIds'},
                                               'Result': {'$ref': '#/definitions/ErrorResults'}},
                                'type': 'object'},
-                    'CreatePool': {'properties': {'Params': {'$ref': '#/definitions/StoragePoolArgs'},
+                    'CreatePool': {'description': 'CreatePool creates a new pool '
+                                                  'with specified parameters.',
+                                   'properties': {'Params': {'$ref': '#/definitions/StoragePoolArgs'},
                                                   'Result': {'$ref': '#/definitions/ErrorResults'}},
                                    'type': 'object'},
-                    'DetachStorage': {'properties': {'Params': {'$ref': '#/definitions/StorageDetachmentParams'},
+                    'DetachStorage': {'description': 'DetachStorage sets the '
+                                                     'specified storage '
+                                                     'attachments to Dying, unless '
+                                                     'they are\n'
+                                                     'already Dying or Dead. Any '
+                                                     'associated, persistent '
+                                                     'storage will remain\n'
+                                                     'alive. This call can be '
+                                                     'forced.',
+                                      'properties': {'Params': {'$ref': '#/definitions/StorageDetachmentParams'},
                                                      'Result': {'$ref': '#/definitions/ErrorResults'}},
                                       'type': 'object'},
-                    'Import': {'properties': {'Params': {'$ref': '#/definitions/BulkImportStorageParams'},
+                    'Import': {'description': 'Import imports existing storage '
+                                              'into the model.\n'
+                                              'A "CHANGE" block can block this '
+                                              'operation.',
+                               'properties': {'Params': {'$ref': '#/definitions/BulkImportStorageParams'},
                                               'Result': {'$ref': '#/definitions/ImportStorageResults'}},
                                'type': 'object'},
-                    'ListFilesystems': {'properties': {'Params': {'$ref': '#/definitions/FilesystemFilters'},
+                    'ListFilesystems': {'description': 'ListFilesystems returns a '
+                                                       'list of filesystems in the '
+                                                       'environment matching\n'
+                                                       'the provided filter. Each '
+                                                       'result describes a '
+                                                       'filesystem in detail, '
+                                                       'including\n'
+                                                       "the filesystem's "
+                                                       'attachments.',
+                                        'properties': {'Params': {'$ref': '#/definitions/FilesystemFilters'},
                                                        'Result': {'$ref': '#/definitions/FilesystemDetailsListResults'}},
                                         'type': 'object'},
-                    'ListPools': {'properties': {'Params': {'$ref': '#/definitions/StoragePoolFilters'},
+                    'ListPools': {'description': 'ListPools returns a list of '
+                                                 'pools.\n'
+                                                 'If filter is provided, returned '
+                                                 'list only contains pools that '
+                                                 'match\n'
+                                                 'the filter.\n'
+                                                 'Pools can be filtered on names '
+                                                 'and provider types.\n'
+                                                 'If both names and types are '
+                                                 'provided as filter,\n'
+                                                 'pools that match either are '
+                                                 'returned.\n'
+                                                 'This method lists union of pools '
+                                                 'and environment provider types.\n'
+                                                 'If no filter is provided, all '
+                                                 'pools are returned.',
+                                  'properties': {'Params': {'$ref': '#/definitions/StoragePoolFilters'},
                                                  'Result': {'$ref': '#/definitions/StoragePoolsResults'}},
                                   'type': 'object'},
-                    'ListStorageDetails': {'properties': {'Params': {'$ref': '#/definitions/StorageFilters'},
+                    'ListStorageDetails': {'description': 'ListStorageDetails '
+                                                          'returns storage '
+                                                          'matching a filter.',
+                                           'properties': {'Params': {'$ref': '#/definitions/StorageFilters'},
                                                           'Result': {'$ref': '#/definitions/StorageDetailsListResults'}},
                                            'type': 'object'},
-                    'ListVolumes': {'properties': {'Params': {'$ref': '#/definitions/VolumeFilters'},
+                    'ListVolumes': {'description': 'ListVolumes lists volumes with '
+                                                   'the given filters. Each filter '
+                                                   'produces\n'
+                                                   'an independent list of '
+                                                   'volumes, or an error if the '
+                                                   'filter is invalid\n'
+                                                   'or the volumes could not be '
+                                                   'listed.',
+                                    'properties': {'Params': {'$ref': '#/definitions/VolumeFilters'},
                                                    'Result': {'$ref': '#/definitions/VolumeDetailsListResults'}},
                                     'type': 'object'},
-                    'Remove': {'properties': {'Params': {'$ref': '#/definitions/RemoveStorage'},
+                    'Remove': {'description': 'Remove sets the specified storage '
+                                              'entities to Dying, unless they are\n'
+                                              'already Dying or Dead, such that '
+                                              'the storage will eventually be '
+                                              'removed\n'
+                                              'from the model. If the arguments '
+                                              'specify that the storage should be\n'
+                                              'destroyed, then the associated '
+                                              'cloud storage will be destroyed '
+                                              'first;\n'
+                                              'otherwise it will only be released '
+                                              "from Juju's control.",
+                               'properties': {'Params': {'$ref': '#/definitions/RemoveStorage'},
                                               'Result': {'$ref': '#/definitions/ErrorResults'}},
                                'type': 'object'},
-                    'RemovePool': {'properties': {'Params': {'$ref': '#/definitions/StoragePoolDeleteArgs'},
+                    'RemovePool': {'description': 'RemovePool deletes the named '
+                                                  'pool',
+                                   'properties': {'Params': {'$ref': '#/definitions/StoragePoolDeleteArgs'},
                                                   'Result': {'$ref': '#/definitions/ErrorResults'}},
                                    'type': 'object'},
-                    'StorageDetails': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'StorageDetails': {'description': 'StorageDetails retrieves '
+                                                      'and returns detailed '
+                                                      'information about desired\n'
+                                                      'storage identified by '
+                                                      'supplied tags. If specified '
+                                                      'storage cannot be\n'
+                                                      'retrieved, individual error '
+                                                      'is returned instead of '
+                                                      'storage information.',
+                                       'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                       'Result': {'$ref': '#/definitions/StorageDetailsResults'}},
                                        'type': 'object'},
-                    'UpdatePool': {'properties': {'Params': {'$ref': '#/definitions/StoragePoolArgs'},
+                    'UpdatePool': {'description': 'UpdatePool deletes the named '
+                                                  'pool',
+                                   'properties': {'Params': {'$ref': '#/definitions/StoragePoolArgs'},
                                                   'Result': {'$ref': '#/definitions/ErrorResults'}},
                                    'type': 'object'}},
      'type': 'object'}
@@ -2562,6 +2917,9 @@ class StorageFacade(Type):
     @ReturnMapping(AddStorageResults)
     async def AddToUnit(self, storages=None):
         '''
+        AddToUnit validates and creates additional storage instances for units.
+        A "CHANGE" block can block this operation.
+
         storages : typing.Sequence[~StorageAddParams]
         Returns -> AddStorageResults
         '''
@@ -2583,6 +2941,9 @@ class StorageFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Attach(self, ids=None):
         '''
+        Attach attaches existing storage instances to units.
+        A "CHANGE" block can block this operation.
+
         ids : typing.Sequence[~StorageAttachmentId]
         Returns -> ErrorResults
         '''
@@ -2604,6 +2965,8 @@ class StorageFacade(Type):
     @ReturnMapping(ErrorResults)
     async def CreatePool(self, pools=None):
         '''
+        CreatePool creates a new pool with specified parameters.
+
         pools : typing.Sequence[~StoragePool]
         Returns -> ErrorResults
         '''
@@ -2625,6 +2988,10 @@ class StorageFacade(Type):
     @ReturnMapping(ErrorResults)
     async def DetachStorage(self, force=None, ids=None, max_wait=None):
         '''
+        DetachStorage sets the specified storage attachments to Dying, unless they are
+        already Dying or Dead. Any associated, persistent storage will remain
+        alive. This call can be forced.
+
         force : bool
         ids : StorageAttachmentIds
         max_wait : int
@@ -2656,6 +3023,9 @@ class StorageFacade(Type):
     @ReturnMapping(ImportStorageResults)
     async def Import(self, storage=None):
         '''
+        Import imports existing storage into the model.
+        A "CHANGE" block can block this operation.
+
         storage : typing.Sequence[~ImportStorageParams]
         Returns -> ImportStorageResults
         '''
@@ -2677,6 +3047,10 @@ class StorageFacade(Type):
     @ReturnMapping(FilesystemDetailsListResults)
     async def ListFilesystems(self, filters=None):
         '''
+        ListFilesystems returns a list of filesystems in the environment matching
+        the provided filter. Each result describes a filesystem in detail, including
+        the filesystem's attachments.
+
         filters : typing.Sequence[~FilesystemFilter]
         Returns -> FilesystemDetailsListResults
         '''
@@ -2698,6 +3072,15 @@ class StorageFacade(Type):
     @ReturnMapping(StoragePoolsResults)
     async def ListPools(self, filters=None):
         '''
+        ListPools returns a list of pools.
+        If filter is provided, returned list only contains pools that match
+        the filter.
+        Pools can be filtered on names and provider types.
+        If both names and types are provided as filter,
+        pools that match either are returned.
+        This method lists union of pools and environment provider types.
+        If no filter is provided, all pools are returned.
+
         filters : typing.Sequence[~StoragePoolFilter]
         Returns -> StoragePoolsResults
         '''
@@ -2719,6 +3102,8 @@ class StorageFacade(Type):
     @ReturnMapping(StorageDetailsListResults)
     async def ListStorageDetails(self, filters=None):
         '''
+        ListStorageDetails returns storage matching a filter.
+
         filters : typing.Sequence[~StorageFilter]
         Returns -> StorageDetailsListResults
         '''
@@ -2740,6 +3125,10 @@ class StorageFacade(Type):
     @ReturnMapping(VolumeDetailsListResults)
     async def ListVolumes(self, filters=None):
         '''
+        ListVolumes lists volumes with the given filters. Each filter produces
+        an independent list of volumes, or an error if the filter is invalid
+        or the volumes could not be listed.
+
         filters : typing.Sequence[~VolumeFilter]
         Returns -> VolumeDetailsListResults
         '''
@@ -2761,6 +3150,12 @@ class StorageFacade(Type):
     @ReturnMapping(ErrorResults)
     async def Remove(self, storage=None):
         '''
+        Remove sets the specified storage entities to Dying, unless they are
+        already Dying or Dead, such that the storage will eventually be removed
+        from the model. If the arguments specify that the storage should be
+        destroyed, then the associated cloud storage will be destroyed first;
+        otherwise it will only be released from Juju's control.
+
         storage : typing.Sequence[~RemoveStorageInstance]
         Returns -> ErrorResults
         '''
@@ -2782,6 +3177,8 @@ class StorageFacade(Type):
     @ReturnMapping(ErrorResults)
     async def RemovePool(self, pools=None):
         '''
+        RemovePool deletes the named pool
+
         pools : typing.Sequence[~StoragePoolDeleteArg]
         Returns -> ErrorResults
         '''
@@ -2803,6 +3200,10 @@ class StorageFacade(Type):
     @ReturnMapping(StorageDetailsResults)
     async def StorageDetails(self, entities=None):
         '''
+        StorageDetails retrieves and returns detailed information about desired
+        storage identified by supplied tags. If specified storage cannot be
+        retrieved, individual error is returned instead of storage information.
+
         entities : typing.Sequence[~Entity]
         Returns -> StorageDetailsResults
         '''
@@ -2824,6 +3225,8 @@ class StorageFacade(Type):
     @ReturnMapping(ErrorResults)
     async def UpdatePool(self, pools=None):
         '''
+        UpdatePool deletes the named pool
+
         pools : typing.Sequence[~StoragePool]
         Returns -> ErrorResults
         '''

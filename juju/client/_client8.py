@@ -2620,43 +2620,120 @@ class ModelManagerFacade(Type):
                                                                       'type': 'array'}},
                                        'required': ['user-models'],
                                        'type': 'object'}},
-     'properties': {'ChangeModelCredential': {'properties': {'Params': {'$ref': '#/definitions/ChangeModelCredentialsParams'},
+     'properties': {'ChangeModelCredential': {'description': 'ChangeModelCredentials '
+                                                             'changes cloud '
+                                                             'credential reference '
+                                                             'for models.\n'
+                                                             'These new cloud '
+                                                             'credentials must '
+                                                             'already exist on the '
+                                                             'controller.',
+                                              'properties': {'Params': {'$ref': '#/definitions/ChangeModelCredentialsParams'},
                                                              'Result': {'$ref': '#/definitions/ErrorResults'}},
                                               'type': 'object'},
-                    'CreateModel': {'properties': {'Params': {'$ref': '#/definitions/ModelCreateArgs'},
+                    'CreateModel': {'description': 'CreateModel creates a new '
+                                                   'model using the account and\n'
+                                                   'model config specified in the '
+                                                   'args.',
+                                    'properties': {'Params': {'$ref': '#/definitions/ModelCreateArgs'},
                                                    'Result': {'$ref': '#/definitions/ModelInfo'}},
                                     'type': 'object'},
-                    'DestroyModels': {'properties': {'Params': {'$ref': '#/definitions/DestroyModelsParams'},
+                    'DestroyModels': {'description': 'DestroyModels will try to '
+                                                     'destroy the specified '
+                                                     'models.\n'
+                                                     'If there is a block on '
+                                                     'destruction, this method '
+                                                     'will return an error.\n'
+                                                     'From ModelManager v7 '
+                                                     'onwards, DestroyModels gains '
+                                                     "'force' and 'max-wait' "
+                                                     'parameters.',
+                                      'properties': {'Params': {'$ref': '#/definitions/DestroyModelsParams'},
                                                      'Result': {'$ref': '#/definitions/ErrorResults'}},
                                       'type': 'object'},
-                    'DumpModels': {'properties': {'Params': {'$ref': '#/definitions/DumpModelRequest'},
+                    'DumpModels': {'description': 'DumpModels will export the '
+                                                  'models into the database '
+                                                  'agnostic\n'
+                                                  'representation. The user needs '
+                                                  'to either be a controller '
+                                                  'admin, or have\n'
+                                                  'admin privileges on the model '
+                                                  'itself.',
+                                   'properties': {'Params': {'$ref': '#/definitions/DumpModelRequest'},
                                                   'Result': {'$ref': '#/definitions/StringResults'}},
                                    'type': 'object'},
-                    'DumpModelsDB': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'DumpModelsDB': {'description': 'DumpModelsDB will gather all '
+                                                    'documents from all model '
+                                                    'collections\n'
+                                                    'for the specified model. The '
+                                                    'map result contains a map of '
+                                                    'collection\n'
+                                                    'names to lists of documents '
+                                                    'represented as maps.',
+                                     'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                     'Result': {'$ref': '#/definitions/MapResults'}},
                                      'type': 'object'},
-                    'ListModelSummaries': {'properties': {'Params': {'$ref': '#/definitions/ModelSummariesRequest'},
+                    'ListModelSummaries': {'description': 'ListModelSummaries '
+                                                          'returns models that the '
+                                                          'specified user\n'
+                                                          'has access to in the '
+                                                          'current server.  '
+                                                          'Controller admins '
+                                                          '(superuser)\n'
+                                                          'can list models for any '
+                                                          'user.  Other users\n'
+                                                          'can only ask about '
+                                                          'their own models.',
+                                           'properties': {'Params': {'$ref': '#/definitions/ModelSummariesRequest'},
                                                           'Result': {'$ref': '#/definitions/ModelSummaryResults'}},
                                            'type': 'object'},
-                    'ListModels': {'properties': {'Params': {'$ref': '#/definitions/Entity'},
+                    'ListModels': {'description': 'ListModels returns the models '
+                                                  'that the specified user\n'
+                                                  'has access to in the current '
+                                                  'server.  Controller admins '
+                                                  '(superuser)\n'
+                                                  'can list models for any user.  '
+                                                  'Other users\n'
+                                                  'can only ask about their own '
+                                                  'models.',
+                                   'properties': {'Params': {'$ref': '#/definitions/Entity'},
                                                   'Result': {'$ref': '#/definitions/UserModelList'}},
                                    'type': 'object'},
-                    'ModelDefaultsForClouds': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'ModelDefaultsForClouds': {'description': 'ModelDefaults '
+                                                              'returns the default '
+                                                              'config values for '
+                                                              'the specified '
+                                                              'clouds.',
+                                               'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                               'Result': {'$ref': '#/definitions/ModelDefaultsResults'}},
                                                'type': 'object'},
-                    'ModelInfo': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'ModelInfo': {'description': 'ModelInfo returns information '
+                                                 'about the specified models.',
+                                  'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                  'Result': {'$ref': '#/definitions/ModelInfoResults'}},
                                   'type': 'object'},
-                    'ModelStatus': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'ModelStatus': {'description': 'ModelStatus returns a summary '
+                                                   'of the model.',
+                                    'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                    'Result': {'$ref': '#/definitions/ModelStatusResults'}},
                                     'type': 'object'},
-                    'ModifyModelAccess': {'properties': {'Params': {'$ref': '#/definitions/ModifyModelAccessRequest'},
+                    'ModifyModelAccess': {'description': 'ModifyModelAccess '
+                                                         'changes the model access '
+                                                         'granted to users.',
+                                          'properties': {'Params': {'$ref': '#/definitions/ModifyModelAccessRequest'},
                                                          'Result': {'$ref': '#/definitions/ErrorResults'}},
                                           'type': 'object'},
-                    'SetModelDefaults': {'properties': {'Params': {'$ref': '#/definitions/SetModelDefaults'},
+                    'SetModelDefaults': {'description': 'SetModelDefaults writes '
+                                                        'new values for the '
+                                                        'specified default model '
+                                                        'settings.',
+                                         'properties': {'Params': {'$ref': '#/definitions/SetModelDefaults'},
                                                         'Result': {'$ref': '#/definitions/ErrorResults'}},
                                          'type': 'object'},
-                    'UnsetModelDefaults': {'properties': {'Params': {'$ref': '#/definitions/UnsetModelDefaults'},
+                    'UnsetModelDefaults': {'description': 'UnsetModelDefaults '
+                                                          'removes the specified '
+                                                          'default model settings.',
+                                           'properties': {'Params': {'$ref': '#/definitions/UnsetModelDefaults'},
                                                           'Result': {'$ref': '#/definitions/ErrorResults'}},
                                            'type': 'object'}},
      'type': 'object'}
@@ -2665,6 +2742,9 @@ class ModelManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def ChangeModelCredential(self, model_credentials=None):
         '''
+        ChangeModelCredentials changes cloud credential reference for models.
+        These new cloud credentials must already exist on the controller.
+
         model_credentials : typing.Sequence[~ChangeModelCredentialParams]
         Returns -> ErrorResults
         '''
@@ -2686,6 +2766,9 @@ class ModelManagerFacade(Type):
     @ReturnMapping(ModelInfo)
     async def CreateModel(self, cloud_tag=None, config=None, credential=None, name=None, owner_tag=None, region=None):
         '''
+        CreateModel creates a new model using the account and
+        model config specified in the args.
+
         cloud_tag : str
         config : typing.Mapping[str, typing.Any]
         credential : str
@@ -2732,6 +2815,10 @@ class ModelManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def DestroyModels(self, models=None):
         '''
+        DestroyModels will try to destroy the specified models.
+        If there is a block on destruction, this method will return an error.
+        From ModelManager v7 onwards, DestroyModels gains 'force' and 'max-wait' parameters.
+
         models : typing.Sequence[~DestroyModelParams]
         Returns -> ErrorResults
         '''
@@ -2753,6 +2840,10 @@ class ModelManagerFacade(Type):
     @ReturnMapping(StringResults)
     async def DumpModels(self, entities=None, simplified=None):
         '''
+        DumpModels will export the models into the database agnostic
+        representation. The user needs to either be a controller admin, or have
+        admin privileges on the model itself.
+
         entities : typing.Sequence[~Entity]
         simplified : bool
         Returns -> StringResults
@@ -2779,6 +2870,10 @@ class ModelManagerFacade(Type):
     @ReturnMapping(MapResults)
     async def DumpModelsDB(self, entities=None):
         '''
+        DumpModelsDB will gather all documents from all model collections
+        for the specified model. The map result contains a map of collection
+        names to lists of documents represented as maps.
+
         entities : typing.Sequence[~Entity]
         Returns -> MapResults
         '''
@@ -2800,6 +2895,11 @@ class ModelManagerFacade(Type):
     @ReturnMapping(ModelSummaryResults)
     async def ListModelSummaries(self, all_=None, user_tag=None):
         '''
+        ListModelSummaries returns models that the specified user
+        has access to in the current server.  Controller admins (superuser)
+        can list models for any user.  Other users
+        can only ask about their own models.
+
         all_ : bool
         user_tag : str
         Returns -> ModelSummaryResults
@@ -2826,6 +2926,11 @@ class ModelManagerFacade(Type):
     @ReturnMapping(UserModelList)
     async def ListModels(self, tag=None):
         '''
+        ListModels returns the models that the specified user
+        has access to in the current server.  Controller admins (superuser)
+        can list models for any user.  Other users
+        can only ask about their own models.
+
         tag : str
         Returns -> UserModelList
         '''
@@ -2847,6 +2952,8 @@ class ModelManagerFacade(Type):
     @ReturnMapping(ModelDefaultsResults)
     async def ModelDefaultsForClouds(self, entities=None):
         '''
+        ModelDefaults returns the default config values for the specified clouds.
+
         entities : typing.Sequence[~Entity]
         Returns -> ModelDefaultsResults
         '''
@@ -2868,6 +2975,8 @@ class ModelManagerFacade(Type):
     @ReturnMapping(ModelInfoResults)
     async def ModelInfo(self, entities=None):
         '''
+        ModelInfo returns information about the specified models.
+
         entities : typing.Sequence[~Entity]
         Returns -> ModelInfoResults
         '''
@@ -2889,6 +2998,8 @@ class ModelManagerFacade(Type):
     @ReturnMapping(ModelStatusResults)
     async def ModelStatus(self, entities=None):
         '''
+        ModelStatus returns a summary of the model.
+
         entities : typing.Sequence[~Entity]
         Returns -> ModelStatusResults
         '''
@@ -2910,6 +3021,8 @@ class ModelManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def ModifyModelAccess(self, changes=None):
         '''
+        ModifyModelAccess changes the model access granted to users.
+
         changes : typing.Sequence[~ModifyModelAccess]
         Returns -> ErrorResults
         '''
@@ -2931,6 +3044,8 @@ class ModelManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetModelDefaults(self, config=None):
         '''
+        SetModelDefaults writes new values for the specified default model settings.
+
         config : typing.Sequence[~ModelDefaultValues]
         Returns -> ErrorResults
         '''
@@ -2952,6 +3067,8 @@ class ModelManagerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def UnsetModelDefaults(self, keys=None):
         '''
+        UnsetModelDefaults removes the specified default model settings.
+
         keys : typing.Sequence[~ModelUnsetKeys]
         Returns -> ErrorResults
         '''

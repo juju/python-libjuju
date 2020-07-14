@@ -451,6 +451,187 @@ class ActionFacade(Type):
 
 
 
+class AdminFacade(Type):
+    name = 'Admin'
+    version = 3
+    schema =     {'definitions': {'Address': {'additionalProperties': False,
+                                 'properties': {'scope': {'type': 'string'},
+                                                'space-id': {'type': 'string'},
+                                                'space-name': {'type': 'string'},
+                                                'type': {'type': 'string'},
+                                                'value': {'type': 'string'}},
+                                 'required': ['value', 'type', 'scope'],
+                                 'type': 'object'},
+                     'AuthUserInfo': {'additionalProperties': False,
+                                      'properties': {'controller-access': {'type': 'string'},
+                                                     'credentials': {'type': 'string'},
+                                                     'display-name': {'type': 'string'},
+                                                     'identity': {'type': 'string'},
+                                                     'last-connection': {'format': 'date-time',
+                                                                         'type': 'string'},
+                                                     'model-access': {'type': 'string'}},
+                                      'required': ['display-name',
+                                                   'identity',
+                                                   'controller-access',
+                                                   'model-access'],
+                                      'type': 'object'},
+                     'FacadeVersions': {'additionalProperties': False,
+                                        'properties': {'name': {'type': 'string'},
+                                                       'versions': {'items': {'type': 'integer'},
+                                                                    'type': 'array'}},
+                                        'required': ['name', 'versions'],
+                                        'type': 'object'},
+                     'HostPort': {'additionalProperties': False,
+                                  'properties': {'Address': {'$ref': '#/definitions/Address'},
+                                                 'port': {'type': 'integer'},
+                                                 'scope': {'type': 'string'},
+                                                 'space-id': {'type': 'string'},
+                                                 'space-name': {'type': 'string'},
+                                                 'type': {'type': 'string'},
+                                                 'value': {'type': 'string'}},
+                                  'required': ['value',
+                                               'type',
+                                               'scope',
+                                               'Address',
+                                               'port'],
+                                  'type': 'object'},
+                     'LoginRequest': {'additionalProperties': False,
+                                      'properties': {'auth-tag': {'type': 'string'},
+                                                     'bakery-version': {'type': 'integer'},
+                                                     'cli-args': {'type': 'string'},
+                                                     'credentials': {'type': 'string'},
+                                                     'macaroons': {'items': {'items': {'$ref': '#/definitions/Macaroon'},
+                                                                             'type': 'array'},
+                                                                   'type': 'array'},
+                                                     'nonce': {'type': 'string'},
+                                                     'user-data': {'type': 'string'}},
+                                      'required': ['auth-tag',
+                                                   'credentials',
+                                                   'nonce',
+                                                   'macaroons',
+                                                   'user-data'],
+                                      'type': 'object'},
+                     'LoginResult': {'additionalProperties': False,
+                                     'properties': {'bakery-discharge-required': {'$ref': '#/definitions/Macaroon'},
+                                                    'controller-tag': {'type': 'string'},
+                                                    'discharge-required': {'$ref': '#/definitions/Macaroon'},
+                                                    'discharge-required-error': {'type': 'string'},
+                                                    'facades': {'items': {'$ref': '#/definitions/FacadeVersions'},
+                                                                'type': 'array'},
+                                                    'model-tag': {'type': 'string'},
+                                                    'public-dns-name': {'type': 'string'},
+                                                    'server-version': {'type': 'string'},
+                                                    'servers': {'items': {'items': {'$ref': '#/definitions/HostPort'},
+                                                                          'type': 'array'},
+                                                                'type': 'array'},
+                                                    'user-info': {'$ref': '#/definitions/AuthUserInfo'}},
+                                     'type': 'object'},
+                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
+                     'RedirectInfoResult': {'additionalProperties': False,
+                                            'properties': {'ca-cert': {'type': 'string'},
+                                                           'servers': {'items': {'items': {'$ref': '#/definitions/HostPort'},
+                                                                                 'type': 'array'},
+                                                                       'type': 'array'}},
+                                            'required': ['servers', 'ca-cert'],
+                                            'type': 'object'}},
+     'properties': {'Login': {'description': 'Login logs in with the provided '
+                                             'credentials.  All subsequent '
+                                             'requests on the\n'
+                                             'connection will act as the '
+                                             'authenticated user.',
+                              'properties': {'Params': {'$ref': '#/definitions/LoginRequest'},
+                                             'Result': {'$ref': '#/definitions/LoginResult'}},
+                              'type': 'object'},
+                    'RedirectInfo': {'description': 'RedirectInfo returns '
+                                                    'redirected host information '
+                                                    'for the model.\n'
+                                                    'In Juju it always returns an '
+                                                    'error because the Juju '
+                                                    'controller\n'
+                                                    'does not multiplex '
+                                                    'controllers.',
+                                     'properties': {'Result': {'$ref': '#/definitions/RedirectInfoResult'}},
+                                     'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(LoginResult)
+    async def Login(self, auth_tag=None, bakery_version=None, cli_args=None, credentials=None, macaroons=None, nonce=None, user_data=None):
+        '''
+        Login logs in with the provided credentials.  All subsequent requests on the
+        connection will act as the authenticated user.
+
+        auth_tag : str
+        bakery_version : int
+        cli_args : str
+        credentials : str
+        macaroons : typing.Sequence[~Macaroon]
+        nonce : str
+        user_data : str
+        Returns -> LoginResult
+        '''
+        if auth_tag is not None and not isinstance(auth_tag, (bytes, str)):
+            raise Exception("Expected auth_tag to be a str, received: {}".format(type(auth_tag)))
+
+        if bakery_version is not None and not isinstance(bakery_version, int):
+            raise Exception("Expected bakery_version to be a int, received: {}".format(type(bakery_version)))
+
+        if cli_args is not None and not isinstance(cli_args, (bytes, str)):
+            raise Exception("Expected cli_args to be a str, received: {}".format(type(cli_args)))
+
+        if credentials is not None and not isinstance(credentials, (bytes, str)):
+            raise Exception("Expected credentials to be a str, received: {}".format(type(credentials)))
+
+        if macaroons is not None and not isinstance(macaroons, (bytes, str, list)):
+            raise Exception("Expected macaroons to be a Sequence, received: {}".format(type(macaroons)))
+
+        if nonce is not None and not isinstance(nonce, (bytes, str)):
+            raise Exception("Expected nonce to be a str, received: {}".format(type(nonce)))
+
+        if user_data is not None and not isinstance(user_data, (bytes, str)):
+            raise Exception("Expected user_data to be a str, received: {}".format(type(user_data)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Admin',
+                   request='Login',
+                   version=3,
+                   params=_params)
+        _params['auth-tag'] = auth_tag
+        _params['bakery-version'] = bakery_version
+        _params['cli-args'] = cli_args
+        _params['credentials'] = credentials
+        _params['macaroons'] = macaroons
+        _params['nonce'] = nonce
+        _params['user-data'] = user_data
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(RedirectInfoResult)
+    async def RedirectInfo(self):
+        '''
+        RedirectInfo returns redirected host information for the model.
+        In Juju it always returns an error because the Juju controller
+        does not multiplex controllers.
+
+
+        Returns -> RedirectInfoResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Admin',
+                   request='RedirectInfo',
+                   version=3,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
 class ApplicationFacade(Type):
     name = 'Application'
     version = 3
@@ -3061,13 +3242,21 @@ class FirewallerFacade(Type):
 class ImageMetadataFacade(Type):
     name = 'ImageMetadata'
     version = 3
-    schema =     {'properties': {'UpdateFromPublishedImages': {'type': 'object'}},
+    schema =     {'properties': {'UpdateFromPublishedImages': {'description': 'UpdateFromPublishedImages '
+                                                                 'is now a no-op.\n'
+                                                                 'It is retained '
+                                                                 'for '
+                                                                 'compatibility.',
+                                                  'type': 'object'}},
      'type': 'object'}
     
 
     @ReturnMapping(None)
     async def UpdateFromPublishedImages(self):
         '''
+        UpdateFromPublishedImages is now a no-op.
+        It is retained for compatibility.
+
 
         Returns -> None
         '''

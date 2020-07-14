@@ -1811,57 +1811,213 @@ class ControllerFacade(Type):
                                                                       'type': 'array'}},
                                        'required': ['user-models'],
                                        'type': 'object'}},
-     'properties': {'AllModels': {'properties': {'Result': {'$ref': '#/definitions/UserModelList'}},
+     'properties': {'AllModels': {'description': 'AllModels allows controller '
+                                                 'administrators to get the list '
+                                                 'of all the\n'
+                                                 'models in the controller.',
+                                  'properties': {'Result': {'$ref': '#/definitions/UserModelList'}},
                                   'type': 'object'},
-                    'CloudSpec': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'CloudSpec': {'description': "CloudSpec returns the model's "
+                                                 'cloud spec.',
+                                  'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                  'Result': {'$ref': '#/definitions/CloudSpecResults'}},
                                   'type': 'object'},
-                    'ConfigSet': {'properties': {'Params': {'$ref': '#/definitions/ControllerConfigSet'}},
+                    'ConfigSet': {'description': 'ConfigSet changes the value of '
+                                                 'specified controller '
+                                                 'configuration\n'
+                                                 'settings. Only some settings can '
+                                                 'be changed after bootstrap.\n'
+                                                 "Settings that aren't specified "
+                                                 'in the params are left '
+                                                 'unchanged.',
+                                  'properties': {'Params': {'$ref': '#/definitions/ControllerConfigSet'}},
                                   'type': 'object'},
-                    'ControllerAPIInfoForModels': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'ControllerAPIInfoForModels': {'description': 'ControllerAPIInfoForModels '
+                                                                  'returns the '
+                                                                  'controller api '
+                                                                  'connection '
+                                                                  'details for the '
+                                                                  'specified '
+                                                                  'models.',
+                                                   'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                                   'Result': {'$ref': '#/definitions/ControllerAPIInfoResults'}},
                                                    'type': 'object'},
-                    'ControllerConfig': {'properties': {'Result': {'$ref': '#/definitions/ControllerConfigResult'}},
+                    'ControllerConfig': {'description': 'ControllerConfig returns '
+                                                        "the controller's "
+                                                        'configuration.',
+                                         'properties': {'Result': {'$ref': '#/definitions/ControllerConfigResult'}},
                                          'type': 'object'},
-                    'ControllerVersion': {'properties': {'Result': {'$ref': '#/definitions/ControllerVersionResults'}},
+                    'ControllerVersion': {'description': 'ControllerVersion '
+                                                         'returns the version '
+                                                         'information associated '
+                                                         'with this\n'
+                                                         'controller binary.\n'
+                                                         '\n'
+                                                         'NOTE: the implementation '
+                                                         'intentionally does not '
+                                                         'check for '
+                                                         'SuperuserAccess\n'
+                                                         'as the Version is known '
+                                                         'even to users with login '
+                                                         'access.',
+                                          'properties': {'Result': {'$ref': '#/definitions/ControllerVersionResults'}},
                                           'type': 'object'},
-                    'DestroyController': {'properties': {'Params': {'$ref': '#/definitions/DestroyControllerArgs'}},
+                    'DestroyController': {'description': 'DestroyController '
+                                                         'destroys the '
+                                                         'controller.\n'
+                                                         '\n'
+                                                         'If the args specify the '
+                                                         'destruction of the '
+                                                         'models, this method '
+                                                         'will\n'
+                                                         'attempt to do so. '
+                                                         'Otherwise, if the '
+                                                         'controller has any '
+                                                         'non-empty,\n'
+                                                         'non-Dead hosted models, '
+                                                         'then an error with the '
+                                                         'code\n'
+                                                         'params.CodeHasHostedModels '
+                                                         'will be transmitted.',
+                                          'properties': {'Params': {'$ref': '#/definitions/DestroyControllerArgs'}},
                                           'type': 'object'},
-                    'GetCloudSpec': {'properties': {'Params': {'$ref': '#/definitions/ModelTag'},
+                    'GetCloudSpec': {'description': 'GetCloudSpec constructs the '
+                                                    'CloudSpec for a validated and '
+                                                    'authorized model.',
+                                     'properties': {'Params': {'$ref': '#/definitions/ModelTag'},
                                                     'Result': {'$ref': '#/definitions/CloudSpecResult'}},
                                      'type': 'object'},
-                    'GetControllerAccess': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'GetControllerAccess': {'description': 'GetControllerAccess '
+                                                           'returns the level of '
+                                                           'access the specified '
+                                                           'users\n'
+                                                           'have on the '
+                                                           'controller.',
+                                            'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                            'Result': {'$ref': '#/definitions/UserAccessResults'}},
                                             'type': 'object'},
-                    'HostedModelConfigs': {'properties': {'Result': {'$ref': '#/definitions/HostedModelConfigsResults'}},
+                    'HostedModelConfigs': {'description': 'HostedModelConfigs '
+                                                          'returns all the '
+                                                          'information that the '
+                                                          'client needs in\n'
+                                                          'order to connect '
+                                                          'directly with the host '
+                                                          "model's provider and "
+                                                          'destroy it\n'
+                                                          'directly.',
+                                           'properties': {'Result': {'$ref': '#/definitions/HostedModelConfigsResults'}},
                                            'type': 'object'},
-                    'IdentityProviderURL': {'properties': {'Result': {'$ref': '#/definitions/StringResult'}},
+                    'IdentityProviderURL': {'description': 'IdentityProviderURL '
+                                                           'returns the URL of the '
+                                                           'configured external '
+                                                           'identity\n'
+                                                           'provider for this '
+                                                           'controller or an empty '
+                                                           'string if no external '
+                                                           'identity\n'
+                                                           'provider has been '
+                                                           'configured when the '
+                                                           'controller was '
+                                                           'bootstrapped.\n'
+                                                           '\n'
+                                                           'NOTE: the '
+                                                           'implementation '
+                                                           'intentionally does not '
+                                                           'check for '
+                                                           'SuperuserAccess\n'
+                                                           'as the URL is known '
+                                                           'even to users with '
+                                                           'login access.',
+                                            'properties': {'Result': {'$ref': '#/definitions/StringResult'}},
                                             'type': 'object'},
-                    'InitiateMigration': {'properties': {'Params': {'$ref': '#/definitions/InitiateMigrationArgs'},
+                    'InitiateMigration': {'description': 'InitiateMigration '
+                                                         'attempts to begin the '
+                                                         'migration of one or\n'
+                                                         'more models to other '
+                                                         'controllers.',
+                                          'properties': {'Params': {'$ref': '#/definitions/InitiateMigrationArgs'},
                                                          'Result': {'$ref': '#/definitions/InitiateMigrationResults'}},
                                           'type': 'object'},
-                    'ListBlockedModels': {'properties': {'Result': {'$ref': '#/definitions/ModelBlockInfoList'}},
+                    'ListBlockedModels': {'description': 'ListBlockedModels '
+                                                         'returns a list of all '
+                                                         'models on the '
+                                                         'controller\n'
+                                                         'which have a block in '
+                                                         'place.  The resulting '
+                                                         'slice is sorted by '
+                                                         'model\n'
+                                                         'name, then owner. '
+                                                         'Callers must be '
+                                                         'controller '
+                                                         'administrators to '
+                                                         'retrieve the\n'
+                                                         'list.',
+                                          'properties': {'Result': {'$ref': '#/definitions/ModelBlockInfoList'}},
                                           'type': 'object'},
-                    'ModelConfig': {'properties': {'Result': {'$ref': '#/definitions/ModelConfigResults'}},
+                    'ModelConfig': {'description': 'ModelConfig returns the model '
+                                                   'config for the controller\n'
+                                                   'model.  For information on the '
+                                                   'current model, use\n'
+                                                   'client.ModelGet',
+                                    'properties': {'Result': {'$ref': '#/definitions/ModelConfigResults'}},
                                     'type': 'object'},
-                    'ModelStatus': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'ModelStatus': {'description': 'ModelStatus returns a summary '
+                                                   'of the model.',
+                                    'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                    'Result': {'$ref': '#/definitions/ModelStatusResults'}},
                                     'type': 'object'},
-                    'ModifyControllerAccess': {'properties': {'Params': {'$ref': '#/definitions/ModifyControllerAccessRequest'},
+                    'ModifyControllerAccess': {'description': 'ModifyControllerAccess '
+                                                              'changes the model '
+                                                              'access granted to '
+                                                              'users.',
+                                               'properties': {'Params': {'$ref': '#/definitions/ModifyControllerAccessRequest'},
                                                               'Result': {'$ref': '#/definitions/ErrorResults'}},
                                                'type': 'object'},
-                    'MongoVersion': {'properties': {'Result': {'$ref': '#/definitions/StringResult'}},
+                    'MongoVersion': {'description': 'MongoVersion allows the '
+                                                    'introspection of the mongo '
+                                                    'version per controller',
+                                     'properties': {'Result': {'$ref': '#/definitions/StringResult'}},
                                      'type': 'object'},
-                    'RemoveBlocks': {'properties': {'Params': {'$ref': '#/definitions/RemoveBlocksArgs'}},
+                    'RemoveBlocks': {'description': 'RemoveBlocks removes all the '
+                                                    'blocks in the controller.',
+                                     'properties': {'Params': {'$ref': '#/definitions/RemoveBlocksArgs'}},
                                      'type': 'object'},
-                    'WatchAllModelSummaries': {'properties': {'Result': {'$ref': '#/definitions/SummaryWatcherID'}},
+                    'WatchAllModelSummaries': {'description': 'WatchAllModelSummaries '
+                                                              'starts watching the '
+                                                              'summary updates '
+                                                              'from the cache.\n'
+                                                              'This method is '
+                                                              'superuser access '
+                                                              'only, and watches '
+                                                              'all models in the\n'
+                                                              'controller.',
+                                               'properties': {'Result': {'$ref': '#/definitions/SummaryWatcherID'}},
                                                'type': 'object'},
-                    'WatchAllModels': {'properties': {'Result': {'$ref': '#/definitions/AllWatcherId'}},
+                    'WatchAllModels': {'description': 'WatchAllModels starts '
+                                                      'watching events for all '
+                                                      'models in the\n'
+                                                      'controller. The returned '
+                                                      'AllWatcherId should be used '
+                                                      'with Next on the\n'
+                                                      'AllModelWatcher endpoint to '
+                                                      'receive deltas.',
+                                       'properties': {'Result': {'$ref': '#/definitions/AllWatcherId'}},
                                        'type': 'object'},
-                    'WatchCloudSpecsChanges': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'WatchCloudSpecsChanges': {'description': 'WatchCloudSpecsChanges '
+                                                              'returns a watcher '
+                                                              'for cloud spec '
+                                                              'changes.',
+                                               'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                               'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
                                                'type': 'object'},
-                    'WatchModelSummaries': {'properties': {'Result': {'$ref': '#/definitions/SummaryWatcherID'}},
+                    'WatchModelSummaries': {'description': 'WatchModelSummaries '
+                                                           'starts watching the '
+                                                           'summary updates from '
+                                                           'the cache.\n'
+                                                           'Only models that the '
+                                                           'user has access to are '
+                                                           'returned.',
+                                            'properties': {'Result': {'$ref': '#/definitions/SummaryWatcherID'}},
                                             'type': 'object'}},
      'type': 'object'}
     
@@ -1869,6 +2025,9 @@ class ControllerFacade(Type):
     @ReturnMapping(UserModelList)
     async def AllModels(self):
         '''
+        AllModels allows controller administrators to get the list of all the
+        models in the controller.
+
 
         Returns -> UserModelList
         '''
@@ -1888,6 +2047,8 @@ class ControllerFacade(Type):
     @ReturnMapping(CloudSpecResults)
     async def CloudSpec(self, entities=None):
         '''
+        CloudSpec returns the model's cloud spec.
+
         entities : typing.Sequence[~Entity]
         Returns -> CloudSpecResults
         '''
@@ -1909,6 +2070,10 @@ class ControllerFacade(Type):
     @ReturnMapping(None)
     async def ConfigSet(self, config=None):
         '''
+        ConfigSet changes the value of specified controller configuration
+        settings. Only some settings can be changed after bootstrap.
+        Settings that aren't specified in the params are left unchanged.
+
         config : typing.Mapping[str, typing.Any]
         Returns -> None
         '''
@@ -1930,6 +2095,8 @@ class ControllerFacade(Type):
     @ReturnMapping(ControllerAPIInfoResults)
     async def ControllerAPIInfoForModels(self, entities=None):
         '''
+        ControllerAPIInfoForModels returns the controller api connection details for the specified models.
+
         entities : typing.Sequence[~Entity]
         Returns -> ControllerAPIInfoResults
         '''
@@ -1951,6 +2118,8 @@ class ControllerFacade(Type):
     @ReturnMapping(ControllerConfigResult)
     async def ControllerConfig(self):
         '''
+        ControllerConfig returns the controller's configuration.
+
 
         Returns -> ControllerConfigResult
         '''
@@ -1970,6 +2139,12 @@ class ControllerFacade(Type):
     @ReturnMapping(ControllerVersionResults)
     async def ControllerVersion(self):
         '''
+        ControllerVersion returns the version information associated with this
+        controller binary.
+
+        NOTE: the implementation intentionally does not check for SuperuserAccess
+        as the Version is known even to users with login access.
+
 
         Returns -> ControllerVersionResults
         '''
@@ -1989,6 +2164,13 @@ class ControllerFacade(Type):
     @ReturnMapping(None)
     async def DestroyController(self, destroy_models=None, destroy_storage=None):
         '''
+        DestroyController destroys the controller.
+
+        If the args specify the destruction of the models, this method will
+        attempt to do so. Otherwise, if the controller has any non-empty,
+        non-Dead hosted models, then an error with the code
+        params.CodeHasHostedModels will be transmitted.
+
         destroy_models : bool
         destroy_storage : bool
         Returns -> None
@@ -2015,6 +2197,8 @@ class ControllerFacade(Type):
     @ReturnMapping(CloudSpecResult)
     async def GetCloudSpec(self):
         '''
+        GetCloudSpec constructs the CloudSpec for a validated and authorized model.
+
 
         Returns -> CloudSpecResult
         '''
@@ -2034,6 +2218,9 @@ class ControllerFacade(Type):
     @ReturnMapping(UserAccessResults)
     async def GetControllerAccess(self, entities=None):
         '''
+        GetControllerAccess returns the level of access the specified users
+        have on the controller.
+
         entities : typing.Sequence[~Entity]
         Returns -> UserAccessResults
         '''
@@ -2055,6 +2242,10 @@ class ControllerFacade(Type):
     @ReturnMapping(HostedModelConfigsResults)
     async def HostedModelConfigs(self):
         '''
+        HostedModelConfigs returns all the information that the client needs in
+        order to connect directly with the host model's provider and destroy it
+        directly.
+
 
         Returns -> HostedModelConfigsResults
         '''
@@ -2074,6 +2265,13 @@ class ControllerFacade(Type):
     @ReturnMapping(StringResult)
     async def IdentityProviderURL(self):
         '''
+        IdentityProviderURL returns the URL of the configured external identity
+        provider for this controller or an empty string if no external identity
+        provider has been configured when the controller was bootstrapped.
+
+        NOTE: the implementation intentionally does not check for SuperuserAccess
+        as the URL is known even to users with login access.
+
 
         Returns -> StringResult
         '''
@@ -2093,6 +2291,9 @@ class ControllerFacade(Type):
     @ReturnMapping(InitiateMigrationResults)
     async def InitiateMigration(self, specs=None):
         '''
+        InitiateMigration attempts to begin the migration of one or
+        more models to other controllers.
+
         specs : typing.Sequence[~MigrationSpec]
         Returns -> InitiateMigrationResults
         '''
@@ -2114,6 +2315,11 @@ class ControllerFacade(Type):
     @ReturnMapping(ModelBlockInfoList)
     async def ListBlockedModels(self):
         '''
+        ListBlockedModels returns a list of all models on the controller
+        which have a block in place.  The resulting slice is sorted by model
+        name, then owner. Callers must be controller administrators to retrieve the
+        list.
+
 
         Returns -> ModelBlockInfoList
         '''
@@ -2133,6 +2339,10 @@ class ControllerFacade(Type):
     @ReturnMapping(ModelConfigResults)
     async def ModelConfig(self):
         '''
+        ModelConfig returns the model config for the controller
+        model.  For information on the current model, use
+        client.ModelGet
+
 
         Returns -> ModelConfigResults
         '''
@@ -2152,6 +2362,8 @@ class ControllerFacade(Type):
     @ReturnMapping(ModelStatusResults)
     async def ModelStatus(self, entities=None):
         '''
+        ModelStatus returns a summary of the model.
+
         entities : typing.Sequence[~Entity]
         Returns -> ModelStatusResults
         '''
@@ -2173,6 +2385,8 @@ class ControllerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def ModifyControllerAccess(self, changes=None):
         '''
+        ModifyControllerAccess changes the model access granted to users.
+
         changes : typing.Sequence[~ModifyControllerAccess]
         Returns -> ErrorResults
         '''
@@ -2194,6 +2408,8 @@ class ControllerFacade(Type):
     @ReturnMapping(StringResult)
     async def MongoVersion(self):
         '''
+        MongoVersion allows the introspection of the mongo version per controller
+
 
         Returns -> StringResult
         '''
@@ -2213,6 +2429,8 @@ class ControllerFacade(Type):
     @ReturnMapping(None)
     async def RemoveBlocks(self, all_=None):
         '''
+        RemoveBlocks removes all the blocks in the controller.
+
         all_ : bool
         Returns -> None
         '''
@@ -2234,6 +2452,10 @@ class ControllerFacade(Type):
     @ReturnMapping(SummaryWatcherID)
     async def WatchAllModelSummaries(self):
         '''
+        WatchAllModelSummaries starts watching the summary updates from the cache.
+        This method is superuser access only, and watches all models in the
+        controller.
+
 
         Returns -> SummaryWatcherID
         '''
@@ -2253,6 +2475,10 @@ class ControllerFacade(Type):
     @ReturnMapping(AllWatcherId)
     async def WatchAllModels(self):
         '''
+        WatchAllModels starts watching events for all models in the
+        controller. The returned AllWatcherId should be used with Next on the
+        AllModelWatcher endpoint to receive deltas.
+
 
         Returns -> AllWatcherId
         '''
@@ -2272,6 +2498,8 @@ class ControllerFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def WatchCloudSpecsChanges(self, entities=None):
         '''
+        WatchCloudSpecsChanges returns a watcher for cloud spec changes.
+
         entities : typing.Sequence[~Entity]
         Returns -> NotifyWatchResults
         '''
@@ -2293,6 +2521,9 @@ class ControllerFacade(Type):
     @ReturnMapping(SummaryWatcherID)
     async def WatchModelSummaries(self):
         '''
+        WatchModelSummaries starts watching the summary updates from the cache.
+        Only models that the user has access to are returned.
+
 
         Returns -> SummaryWatcherID
         '''

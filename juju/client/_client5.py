@@ -3111,71 +3111,237 @@ class FirewallerFacade(Type):
                                                                         'type': 'array'}},
                                              'required': ['results'],
                                              'type': 'object'}},
-     'properties': {'AreManuallyProvisioned': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+     'properties': {'AreManuallyProvisioned': {'description': 'AreManuallyProvisioned '
+                                                              'returns whether '
+                                                              'each given entity '
+                                                              'is\n'
+                                                              'manually '
+                                                              'provisioned or not. '
+                                                              'Only machine tags '
+                                                              'are accepted.',
+                                               'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                               'Result': {'$ref': '#/definitions/BoolResults'}},
                                                'type': 'object'},
-                    'CloudSpec': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'CloudSpec': {'description': "CloudSpec returns the model's "
+                                                 'cloud spec.',
+                                  'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                  'Result': {'$ref': '#/definitions/CloudSpecResults'}},
                                   'type': 'object'},
-                    'ControllerAPIInfoForModels': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'ControllerAPIInfoForModels': {'description': 'ControllerAPIInfoForModels '
+                                                                  'returns the '
+                                                                  'controller api '
+                                                                  'connection '
+                                                                  'details for the '
+                                                                  'specified '
+                                                                  'models.',
+                                                   'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                                   'Result': {'$ref': '#/definitions/ControllerAPIInfoResults'}},
                                                    'type': 'object'},
-                    'ControllerConfig': {'properties': {'Result': {'$ref': '#/definitions/ControllerConfigResult'}},
+                    'ControllerConfig': {'description': 'ControllerConfig returns '
+                                                        "the controller's "
+                                                        'configuration.',
+                                         'properties': {'Result': {'$ref': '#/definitions/ControllerConfigResult'}},
                                          'type': 'object'},
-                    'FirewallRules': {'properties': {'Params': {'$ref': '#/definitions/KnownServiceArgs'},
+                    'FirewallRules': {'description': 'FirewallRules returns the '
+                                                     'firewall rules for the '
+                                                     'specified well known service '
+                                                     'types.',
+                                      'properties': {'Params': {'$ref': '#/definitions/KnownServiceArgs'},
                                                      'Result': {'$ref': '#/definitions/ListFirewallRulesResults'}},
                                       'type': 'object'},
-                    'GetAssignedMachine': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'GetAssignedMachine': {'description': 'GetAssignedMachine '
+                                                          'returns the assigned '
+                                                          'machine tag (if any) '
+                                                          'for\n'
+                                                          'each given unit.',
+                                           'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                           'Result': {'$ref': '#/definitions/StringResults'}},
                                            'type': 'object'},
-                    'GetCloudSpec': {'properties': {'Params': {'$ref': '#/definitions/ModelTag'},
+                    'GetCloudSpec': {'description': 'GetCloudSpec constructs the '
+                                                    'CloudSpec for a validated and '
+                                                    'authorized model.',
+                                     'properties': {'Params': {'$ref': '#/definitions/ModelTag'},
                                                     'Result': {'$ref': '#/definitions/CloudSpecResult'}},
                                      'type': 'object'},
-                    'GetExposed': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'GetExposed': {'description': 'GetExposed returns the exposed '
+                                                  'flag value for each given '
+                                                  'application.',
+                                   'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                   'Result': {'$ref': '#/definitions/BoolResults'}},
                                    'type': 'object'},
-                    'GetMachineActiveSubnets': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'GetMachineActiveSubnets': {'description': 'GetMachineActiveSubnets '
+                                                               'returns the tags '
+                                                               'of the all subnets '
+                                                               'that each machine\n'
+                                                               '(in args) has open '
+                                                               'ports on.',
+                                                'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                                'Result': {'$ref': '#/definitions/StringsResults'}},
                                                 'type': 'object'},
-                    'GetMachinePorts': {'properties': {'Params': {'$ref': '#/definitions/MachinePortsParams'},
+                    'GetMachinePorts': {'description': 'GetMachinePorts returns '
+                                                       'the port ranges opened on '
+                                                       'a machine for the '
+                                                       'specified\n'
+                                                       'subnet as a map mapping '
+                                                       'port ranges to the tags of '
+                                                       'the units that opened\n'
+                                                       'them.',
+                                        'properties': {'Params': {'$ref': '#/definitions/MachinePortsParams'},
                                                        'Result': {'$ref': '#/definitions/MachinePortsResults'}},
                                         'type': 'object'},
-                    'InstanceId': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'InstanceId': {'description': 'InstanceId returns the provider '
+                                                  'specific instance id for each '
+                                                  'given\n'
+                                                  'machine or an '
+                                                  'CodeNotProvisioned error, if '
+                                                  'not set.',
+                                   'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                   'Result': {'$ref': '#/definitions/StringResults'}},
                                    'type': 'object'},
-                    'Life': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'Life': {'description': 'Life returns the life status of every '
+                                            'supplied entity, where available.',
+                             'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                             'Result': {'$ref': '#/definitions/LifeResults'}},
                              'type': 'object'},
-                    'MacaroonForRelations': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'MacaroonForRelations': {'description': 'MacaroonForRelations '
+                                                            'returns the macaroon '
+                                                            'for the specified '
+                                                            'relations.',
+                                             'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                             'Result': {'$ref': '#/definitions/MacaroonResults'}},
                                              'type': 'object'},
-                    'ModelConfig': {'properties': {'Result': {'$ref': '#/definitions/ModelConfigResult'}},
+                    'ModelConfig': {'description': 'ModelConfig returns the '
+                                                   "current model's configuration.",
+                                    'properties': {'Result': {'$ref': '#/definitions/ModelConfigResult'}},
                                     'type': 'object'},
-                    'SetRelationsStatus': {'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
+                    'SetRelationsStatus': {'description': 'SetRelationsStatus sets '
+                                                          'the status for the '
+                                                          'specified relations.',
+                                           'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
                                                           'Result': {'$ref': '#/definitions/ErrorResults'}},
                                            'type': 'object'},
-                    'Watch': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'Watch': {'description': 'Watch starts an NotifyWatcher for '
+                                             'each given entity.',
+                              'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                              'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
                               'type': 'object'},
-                    'WatchCloudSpecsChanges': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'WatchCloudSpecsChanges': {'description': 'WatchCloudSpecsChanges '
+                                                              'returns a watcher '
+                                                              'for cloud spec '
+                                                              'changes.',
+                                               'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                               'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
                                                'type': 'object'},
-                    'WatchEgressAddressesForRelations': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'WatchEgressAddressesForRelations': {'description': 'WatchEgressAddressesForRelations '
+                                                                        'creates a '
+                                                                        'watcher '
+                                                                        'that '
+                                                                        'notifies '
+                                                                        'when '
+                                                                        'addresses, '
+                                                                        'from '
+                                                                        'which\n'
+                                                                        'connections '
+                                                                        'will '
+                                                                        'originate '
+                                                                        'for the '
+                                                                        'relation, '
+                                                                        'change.\n'
+                                                                        'Each '
+                                                                        'event '
+                                                                        'contains '
+                                                                        'the '
+                                                                        'entire '
+                                                                        'set of '
+                                                                        'addresses '
+                                                                        'which are '
+                                                                        'required '
+                                                                        'for '
+                                                                        'ingress '
+                                                                        'for the '
+                                                                        'relation.',
+                                                         'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                                         'Result': {'$ref': '#/definitions/StringsWatchResults'}},
                                                          'type': 'object'},
-                    'WatchForModelConfigChanges': {'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
+                    'WatchForModelConfigChanges': {'description': 'WatchForModelConfigChanges '
+                                                                  'returns a '
+                                                                  'NotifyWatcher '
+                                                                  'that observes\n'
+                                                                  'changes to the '
+                                                                  'model '
+                                                                  'configuration.\n'
+                                                                  'Note that '
+                                                                  'although the '
+                                                                  'NotifyWatchResult '
+                                                                  'contains an '
+                                                                  'Error field,\n'
+                                                                  "it's not used "
+                                                                  'because we are '
+                                                                  'only returning '
+                                                                  'a single '
+                                                                  'watcher,\n'
+                                                                  'so we use the '
+                                                                  'regular error '
+                                                                  'return.',
+                                                   'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
                                                    'type': 'object'},
-                    'WatchIngressAddressesForRelations': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'WatchIngressAddressesForRelations': {'description': 'WatchIngressAddressesForRelations '
+                                                                         'creates '
+                                                                         'a '
+                                                                         'watcher '
+                                                                         'that '
+                                                                         'returns '
+                                                                         'the '
+                                                                         'ingress '
+                                                                         'networks\n'
+                                                                         'that '
+                                                                         'have '
+                                                                         'been '
+                                                                         'recorded '
+                                                                         'against '
+                                                                         'the '
+                                                                         'specified '
+                                                                         'relations.',
+                                                          'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                                          'Result': {'$ref': '#/definitions/StringsWatchResults'}},
                                                           'type': 'object'},
-                    'WatchModelMachineStartTimes': {'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
+                    'WatchModelMachineStartTimes': {'description': 'WatchModelMachineStartTimes '
+                                                                   'watches the '
+                                                                   'non-container '
+                                                                   'machines in '
+                                                                   'the model\n'
+                                                                   'for changes to '
+                                                                   'the Life or '
+                                                                   'AgentStartTime '
+                                                                   'fields and '
+                                                                   'reports them '
+                                                                   'as a batch.',
+                                                    'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
                                                     'type': 'object'},
-                    'WatchModelMachines': {'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
+                    'WatchModelMachines': {'description': 'WatchModelMachines '
+                                                          'returns a '
+                                                          'StringsWatcher that '
+                                                          'notifies of\n'
+                                                          'changes to the life '
+                                                          'cycles of the top level '
+                                                          'machines in the '
+                                                          'current\n'
+                                                          'model.',
+                                           'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
                                            'type': 'object'},
-                    'WatchOpenedPorts': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'WatchOpenedPorts': {'description': 'WatchOpenedPorts returns '
+                                                        'a new StringsWatcher for '
+                                                        'each given\n'
+                                                        'model tag.',
+                                         'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                         'Result': {'$ref': '#/definitions/StringsWatchResults'}},
                                          'type': 'object'},
-                    'WatchUnits': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'WatchUnits': {'description': 'WatchUnits starts a '
+                                                  'StringsWatcher to watch all '
+                                                  'units belonging to\n'
+                                                  'to any entity (machine or '
+                                                  'service) passed in args.',
+                                   'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                   'Result': {'$ref': '#/definitions/StringsWatchResults'}},
                                    'type': 'object'}},
      'type': 'object'}
@@ -3184,6 +3350,9 @@ class FirewallerFacade(Type):
     @ReturnMapping(BoolResults)
     async def AreManuallyProvisioned(self, entities=None):
         '''
+        AreManuallyProvisioned returns whether each given entity is
+        manually provisioned or not. Only machine tags are accepted.
+
         entities : typing.Sequence[~Entity]
         Returns -> BoolResults
         '''
@@ -3205,6 +3374,8 @@ class FirewallerFacade(Type):
     @ReturnMapping(CloudSpecResults)
     async def CloudSpec(self, entities=None):
         '''
+        CloudSpec returns the model's cloud spec.
+
         entities : typing.Sequence[~Entity]
         Returns -> CloudSpecResults
         '''
@@ -3226,6 +3397,8 @@ class FirewallerFacade(Type):
     @ReturnMapping(ControllerAPIInfoResults)
     async def ControllerAPIInfoForModels(self, entities=None):
         '''
+        ControllerAPIInfoForModels returns the controller api connection details for the specified models.
+
         entities : typing.Sequence[~Entity]
         Returns -> ControllerAPIInfoResults
         '''
@@ -3247,6 +3420,8 @@ class FirewallerFacade(Type):
     @ReturnMapping(ControllerConfigResult)
     async def ControllerConfig(self):
         '''
+        ControllerConfig returns the controller's configuration.
+
 
         Returns -> ControllerConfigResult
         '''
@@ -3266,6 +3441,8 @@ class FirewallerFacade(Type):
     @ReturnMapping(ListFirewallRulesResults)
     async def FirewallRules(self, known_services=None):
         '''
+        FirewallRules returns the firewall rules for the specified well known service types.
+
         known_services : typing.Sequence[str]
         Returns -> ListFirewallRulesResults
         '''
@@ -3287,6 +3464,9 @@ class FirewallerFacade(Type):
     @ReturnMapping(StringResults)
     async def GetAssignedMachine(self, entities=None):
         '''
+        GetAssignedMachine returns the assigned machine tag (if any) for
+        each given unit.
+
         entities : typing.Sequence[~Entity]
         Returns -> StringResults
         '''
@@ -3308,6 +3488,8 @@ class FirewallerFacade(Type):
     @ReturnMapping(CloudSpecResult)
     async def GetCloudSpec(self):
         '''
+        GetCloudSpec constructs the CloudSpec for a validated and authorized model.
+
 
         Returns -> CloudSpecResult
         '''
@@ -3327,6 +3509,8 @@ class FirewallerFacade(Type):
     @ReturnMapping(BoolResults)
     async def GetExposed(self, entities=None):
         '''
+        GetExposed returns the exposed flag value for each given application.
+
         entities : typing.Sequence[~Entity]
         Returns -> BoolResults
         '''
@@ -3348,6 +3532,9 @@ class FirewallerFacade(Type):
     @ReturnMapping(StringsResults)
     async def GetMachineActiveSubnets(self, entities=None):
         '''
+        GetMachineActiveSubnets returns the tags of the all subnets that each machine
+        (in args) has open ports on.
+
         entities : typing.Sequence[~Entity]
         Returns -> StringsResults
         '''
@@ -3369,6 +3556,10 @@ class FirewallerFacade(Type):
     @ReturnMapping(MachinePortsResults)
     async def GetMachinePorts(self, params=None):
         '''
+        GetMachinePorts returns the port ranges opened on a machine for the specified
+        subnet as a map mapping port ranges to the tags of the units that opened
+        them.
+
         params : typing.Sequence[~MachinePorts]
         Returns -> MachinePortsResults
         '''
@@ -3390,6 +3581,9 @@ class FirewallerFacade(Type):
     @ReturnMapping(StringResults)
     async def InstanceId(self, entities=None):
         '''
+        InstanceId returns the provider specific instance id for each given
+        machine or an CodeNotProvisioned error, if not set.
+
         entities : typing.Sequence[~Entity]
         Returns -> StringResults
         '''
@@ -3411,6 +3605,8 @@ class FirewallerFacade(Type):
     @ReturnMapping(LifeResults)
     async def Life(self, entities=None):
         '''
+        Life returns the life status of every supplied entity, where available.
+
         entities : typing.Sequence[~Entity]
         Returns -> LifeResults
         '''
@@ -3432,6 +3628,8 @@ class FirewallerFacade(Type):
     @ReturnMapping(MacaroonResults)
     async def MacaroonForRelations(self, entities=None):
         '''
+        MacaroonForRelations returns the macaroon for the specified relations.
+
         entities : typing.Sequence[~Entity]
         Returns -> MacaroonResults
         '''
@@ -3453,6 +3651,8 @@ class FirewallerFacade(Type):
     @ReturnMapping(ModelConfigResult)
     async def ModelConfig(self):
         '''
+        ModelConfig returns the current model's configuration.
+
 
         Returns -> ModelConfigResult
         '''
@@ -3472,6 +3672,8 @@ class FirewallerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetRelationsStatus(self, entities=None):
         '''
+        SetRelationsStatus sets the status for the specified relations.
+
         entities : typing.Sequence[~EntityStatusArgs]
         Returns -> ErrorResults
         '''
@@ -3493,6 +3695,8 @@ class FirewallerFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def Watch(self, entities=None):
         '''
+        Watch starts an NotifyWatcher for each given entity.
+
         entities : typing.Sequence[~Entity]
         Returns -> NotifyWatchResults
         '''
@@ -3514,6 +3718,8 @@ class FirewallerFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def WatchCloudSpecsChanges(self, entities=None):
         '''
+        WatchCloudSpecsChanges returns a watcher for cloud spec changes.
+
         entities : typing.Sequence[~Entity]
         Returns -> NotifyWatchResults
         '''
@@ -3535,6 +3741,10 @@ class FirewallerFacade(Type):
     @ReturnMapping(StringsWatchResults)
     async def WatchEgressAddressesForRelations(self, entities=None):
         '''
+        WatchEgressAddressesForRelations creates a watcher that notifies when addresses, from which
+        connections will originate for the relation, change.
+        Each event contains the entire set of addresses which are required for ingress for the relation.
+
         entities : typing.Sequence[~Entity]
         Returns -> StringsWatchResults
         '''
@@ -3556,6 +3766,12 @@ class FirewallerFacade(Type):
     @ReturnMapping(NotifyWatchResult)
     async def WatchForModelConfigChanges(self):
         '''
+        WatchForModelConfigChanges returns a NotifyWatcher that observes
+        changes to the model configuration.
+        Note that although the NotifyWatchResult contains an Error field,
+        it's not used because we are only returning a single watcher,
+        so we use the regular error return.
+
 
         Returns -> NotifyWatchResult
         '''
@@ -3575,6 +3791,9 @@ class FirewallerFacade(Type):
     @ReturnMapping(StringsWatchResults)
     async def WatchIngressAddressesForRelations(self, entities=None):
         '''
+        WatchIngressAddressesForRelations creates a watcher that returns the ingress networks
+        that have been recorded against the specified relations.
+
         entities : typing.Sequence[~Entity]
         Returns -> StringsWatchResults
         '''
@@ -3596,6 +3815,9 @@ class FirewallerFacade(Type):
     @ReturnMapping(StringsWatchResult)
     async def WatchModelMachineStartTimes(self):
         '''
+        WatchModelMachineStartTimes watches the non-container machines in the model
+        for changes to the Life or AgentStartTime fields and reports them as a batch.
+
 
         Returns -> StringsWatchResult
         '''
@@ -3615,6 +3837,10 @@ class FirewallerFacade(Type):
     @ReturnMapping(StringsWatchResult)
     async def WatchModelMachines(self):
         '''
+        WatchModelMachines returns a StringsWatcher that notifies of
+        changes to the life cycles of the top level machines in the current
+        model.
+
 
         Returns -> StringsWatchResult
         '''
@@ -3634,6 +3860,9 @@ class FirewallerFacade(Type):
     @ReturnMapping(StringsWatchResults)
     async def WatchOpenedPorts(self, entities=None):
         '''
+        WatchOpenedPorts returns a new StringsWatcher for each given
+        model tag.
+
         entities : typing.Sequence[~Entity]
         Returns -> StringsWatchResults
         '''
@@ -3655,6 +3884,9 @@ class FirewallerFacade(Type):
     @ReturnMapping(StringsWatchResults)
     async def WatchUnits(self, entities=None):
         '''
+        WatchUnits starts a StringsWatcher to watch all units belonging to
+        to any entity (machine or service) passed in args.
+
         entities : typing.Sequence[~Entity]
         Returns -> StringsWatchResults
         '''

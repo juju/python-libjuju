@@ -503,7 +503,7 @@ def ReturnMapping(cls):
     return decorator
 
 
-def makeFunc(cls, name, params, result, _async=True):
+def makeFunc(cls, name, description, params, result, _async=True):
     INDENT = "    "
     args = Args(cls.schema, params)
     assignments = []
@@ -535,6 +535,9 @@ def makeFunc(cls, name, params, result, _async=True):
 
 """
 
+    if description != "":
+        description = "{}\n\n".format(description)
+    doc_string = "{}{}".format(description, args.get_doc())
     fsource = source.format(_async="async " if _async else "",
                             name=name,
                             argsep=", " if args else "",
@@ -542,7 +545,7 @@ def makeFunc(cls, name, params, result, _async=True):
                             res=res,
                             validation=args.as_validation(),
                             rettype=result.__name__ if result else None,
-                            docstring=textwrap.indent(args.get_doc(), INDENT),
+                            docstring=textwrap.indent(doc_string, INDENT),
                             cls=cls,
                             assignments=assignments,
                             _await="await " if _async else "")
@@ -564,6 +567,9 @@ def _buildMethod(cls, name):
     params = None
     result = None
     method = cls.schema['properties'][name]
+    description = ""
+    if 'description' in method:
+        description = method['description'] 
     if 'properties' in method:
         prop = method['properties']
         spec = prop.get('Params')
@@ -575,7 +581,7 @@ def _buildMethod(cls, name):
                 result = cls.schema.types.get(spec['$ref'])
             else:
                 result = SCHEMA_TO_PYTHON[spec['type']]
-    return makeFunc(cls, name, params, result)
+    return makeFunc(cls, name, description, params, result)
 
 
 def buildFacade(schema):

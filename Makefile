@@ -1,6 +1,6 @@
 BIN := .tox/py3/bin
-PY := $(BIN)/python
-PIP := $(BIN)/pip
+PY := $(BIN)/python3
+PIP := $(BIN)/pip3
 VERSION=$(shell cat VERSION)
 
 .PHONY: clean
@@ -15,7 +15,8 @@ clean:
 	tox -r --notest
 
 .PHONY: client
-client: .tox
+client:
+	tox -r --notest -e lint,py38
 	$(PY) -m juju.client.facade -s "juju/client/schemas*" -o juju/client/
 
 .PHONY: test
