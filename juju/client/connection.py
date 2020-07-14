@@ -302,12 +302,17 @@ class Connection:
         if max_frame_size is None:
             max_frame_size = self.MAX_FRAME_SIZE
         self.max_frame_size = max_frame_size
-        await self._connect_with_redirect(
-            [(endpoint, cacert)]
-            if isinstance(endpoint, str)
-            else [(e, cacert) for e in endpoint]
-        )
-        return self
+
+        _endpoints = [(endpoint, cacert)] if isinstance(endpoint, str) else [(e, cacert) for e in endpoint]
+        for _ep in _endpoints:
+            try:
+                await self._connect_with_redirect([_ep])
+                return self
+            except OSError as e:
+                logging.debug(
+                    "Cannot access endpoint {}: {}".format(_ep, e.strerror))
+                continue
+        raise Exception("Unable to connect to websocket")
 
     @property
     def username(self):
