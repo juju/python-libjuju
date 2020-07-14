@@ -84,7 +84,7 @@ class Application(model.ModelEntity):
                 unit_status.append(unit.workload_status)
             return derive_status(unit_status)
 
-        return self.safe_data['status']['current']
+        return status
 
     @property
     def status_message(self):

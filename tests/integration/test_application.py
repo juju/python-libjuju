@@ -47,6 +47,21 @@ async def test_action(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_status(event_loop):
+
+    async with base.CleanModel() as model:
+        app = await model.deploy(
+            'ubuntu-0',
+            application_name='ubuntu',
+            series='trusty',
+            channel='stable',
+        )
+
+        assert app.status != 'unset'
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_add_units(event_loop):
     from juju.unit import Unit
 
