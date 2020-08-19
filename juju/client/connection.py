@@ -41,6 +41,7 @@ client_facades = {
     'CAASOperatorProvisioner': {'versions': [1]},
     'CAASUnitProvisioner': {'versions': [1]},
     'CAASOperatorUpgrader': {'versions': [1]},
+    'CAASModelOperator': {'versions': [1]},
     'Controller': {'versions': [3, 4, 5, 6, 7, 8, 9]},
     'CrossModelRelations': {'versions': [1]},
     'CrossController': {'versions': [1]},
