@@ -1998,11 +1998,13 @@ class Model:
         controller = await self.get_controller()
         return await controller.remove_offer(self.info.uuid, endpoint, force)
 
-    async def consume(self, endpoint, application_alias="", controller_name=None):
+    async def consume(self, endpoint, application_alias="", controller_name=None, controller=None):
         """
         Adds a remote offer to the model. Relations can be created later using
         "juju relate".
         """
+        if controller and controller_name:
+            raise JujuError("cannot set both controller_name and controller")
         try:
             offer = parse_offer_url(endpoint)
         except OfferParseError as e:
@@ -2014,8 +2016,24 @@ class Model:
             offer.user = self.info.username
             endpoint = offer.string()
 
-        source = await self._get_source_api(offer, controller_name=controller_name)
+        source = None
+        if controller_name:
+            source = await self._get_source_api(offer, controller_name=controller_name)
+        else:
+            if controller:
+                source = controller
+            else:
+                source = Controller()
+                kwargs = self.connection().connect_params()
+                kwargs["uuid"] = None
+                await source._connect_direct(**kwargs)
+
         consume_details = await source.get_consume_details(offer.as_local().string())
+
+        # Only disconnect when the controller object has been created within with function
+        # We don't want to disconnect the object passed by the user in the controller argument
+        if not controller:
+            await source.disconnect()
         if consume_details is None or consume_details.offer is None:
             raise JujuAPIError("missing consuming offer url for {}".format(offer.string()))
 
