@@ -1,6 +1,15 @@
 Changelog
 ---------
 
+2.8.3
+^^^^^
+
+Friday August 28 2020
+
+ * Bug fix - Export the CAAS model operator facade (#434)
+ * Bug fix - Allow passing controllers to prevent consume reading local filesystem (#436)
+
+
 2.8.2
 ^^^^^
 
