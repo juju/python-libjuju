@@ -74,17 +74,16 @@ class Application(model.ModelEntity):
 
     @property
     def status(self):
-        """Get the application status, as set by the charm's leader.
+        """Get the application status.
 
+        If the application is unknown it will attempt to derive the unit
+        workload status and highlight the most relevant (severity).
         """
         status = self.safe_data['status']['current']
-        if status == 'unset':
-            unit_status = []
-            for unit in self.units:
-                unit_status.append(unit.workload_status)
-            return derive_status(unit_status)
-
-        return status
+        unit_status = [status]
+        for unit in self.units:
+            unit_status.append(unit.workload_status)
+        return derive_status(unit_status)
 
     @property
     def status_message(self):

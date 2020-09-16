@@ -47,8 +47,7 @@ async def test_action(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_status(event_loop):
-
+async def test_status_is_not_unset(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy(
             'ubuntu-0',
@@ -58,6 +57,21 @@ async def test_status(event_loop):
         )
 
         assert app.status != 'unset'
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_status(event_loop):
+    async with base.CleanModel() as model:
+        app = await model.deploy('cs:~juju-qa/blocked-0')
+
+        def app_ready():
+            if not app.units:
+                return False
+            return app.status == 'blocked'
+
+        await asyncio.wait_for(model.block_until(app_ready), timeout=480)
+        assert app.status == 'blocked'
 
 
 @base.bootstrapped
