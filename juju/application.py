@@ -80,10 +80,12 @@ class Application(model.ModelEntity):
         workload status and highlight the most relevant (severity).
         """
         status = self.safe_data['status']['current']
-        unit_status = [status]
-        for unit in self.units:
-            unit_status.append(unit.workload_status)
-        return derive_status(unit_status)
+        if status == "unset":
+            unit_status = []
+            for unit in self.units:
+                unit_status.append(unit.workload_status)
+            return derive_status(unit_status)
+        return status
 
     @property
     def status_message(self):
