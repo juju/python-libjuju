@@ -80,7 +80,7 @@ client_facades = {
     'MigrationTarget': {'versions': [1]},
     'ModelConfig': {'versions': [1, 2]},
     'ModelGeneration': {'versions': [1, 2]},
-    'ModelManager': {'versions': [2, 3, 4]},
+    'ModelManager': {'versions': [2, 3, 4, 5]},
     'ModelUpgrader': {'versions': [1]},
     'Payloads': {'versions': [1]},
     'PayloadsHookContext': {'versions': [1]},
