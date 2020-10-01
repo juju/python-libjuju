@@ -2613,16 +2613,17 @@ class ProvisionerFacade(Type):
                     'SetObservedNetworkConfig': {'description': 'SetObservedNetworkConfig '
                                                                 'reads the network '
                                                                 'config for the '
-                                                                'machine '
-                                                                'identified\n'
-                                                                'by the input '
-                                                                'args. This config '
-                                                                'is merged with '
-                                                                'the new network '
-                                                                'config supplied\n'
-                                                                'in the same args '
-                                                                'and updated if it '
-                                                                'has changed.',
+                                                                'machine\n'
+                                                                'identified by the '
+                                                                'input args.\n'
+                                                                'This config is '
+                                                                'merged with the '
+                                                                'new network '
+                                                                'config supplied '
+                                                                'in the\n'
+                                                                'same args and '
+                                                                'updated if it has '
+                                                                'changed.',
                                                  'properties': {'Params': {'$ref': '#/definitions/SetMachineNetworkConfig'}},
                                                  'type': 'object'},
                     'SetPasswords': {'description': 'SetPasswords sets the given '
@@ -3597,9 +3598,10 @@ class ProvisionerFacade(Type):
     @ReturnMapping(None)
     async def SetObservedNetworkConfig(self, config=None, tag=None):
         '''
-        SetObservedNetworkConfig reads the network config for the machine identified
-        by the input args. This config is merged with the new network config supplied
-        in the same args and updated if it has changed.
+        SetObservedNetworkConfig reads the network config for the machine
+        identified by the input args.
+        This config is merged with the new network config supplied in the
+        same args and updated if it has changed.
 
         config : typing.Sequence[~NetworkConfig]
         tag : str

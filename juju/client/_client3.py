@@ -8066,3 +8066,650 @@ class SubnetsFacade(Type):
         return reply
 
 
+
+class UpgradeSeriesFacade(Type):
+    name = 'UpgradeSeries'
+    version = 3
+    schema =     {'definitions': {'Entities': {'additionalProperties': False,
+                                  'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
+                                                              'type': 'array'}},
+                                  'required': ['entities'],
+                                  'type': 'object'},
+                     'EntitiesResult': {'additionalProperties': False,
+                                        'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
+                                                                    'type': 'array'},
+                                                       'error': {'$ref': '#/definitions/Error'}},
+                                        'required': ['entities'],
+                                        'type': 'object'},
+                     'EntitiesResults': {'additionalProperties': False,
+                                         'properties': {'results': {'items': {'$ref': '#/definitions/EntitiesResult'},
+                                                                    'type': 'array'}},
+                                         'required': ['results'],
+                                         'type': 'object'},
+                     'Entity': {'additionalProperties': False,
+                                'properties': {'tag': {'type': 'string'}},
+                                'required': ['tag'],
+                                'type': 'object'},
+                     'EntityStatusArgs': {'additionalProperties': False,
+                                          'properties': {'data': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                               'type': 'object'}},
+                                                                  'type': 'object'},
+                                                         'info': {'type': 'string'},
+                                                         'status': {'type': 'string'},
+                                                         'tag': {'type': 'string'}},
+                                          'required': ['tag',
+                                                       'status',
+                                                       'info',
+                                                       'data'],
+                                          'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ErrorResult': {'additionalProperties': False,
+                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
+                                     'type': 'object'},
+                     'ErrorResults': {'additionalProperties': False,
+                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
+                                                                 'type': 'array'}},
+                                      'required': ['results'],
+                                      'type': 'object'},
+                     'NotifyWatchResult': {'additionalProperties': False,
+                                           'properties': {'NotifyWatcherId': {'type': 'string'},
+                                                          'error': {'$ref': '#/definitions/Error'}},
+                                           'required': ['NotifyWatcherId'],
+                                           'type': 'object'},
+                     'NotifyWatchResults': {'additionalProperties': False,
+                                            'properties': {'results': {'items': {'$ref': '#/definitions/NotifyWatchResult'},
+                                                                       'type': 'array'}},
+                                            'required': ['results'],
+                                            'type': 'object'},
+                     'PinApplicationResult': {'additionalProperties': False,
+                                              'properties': {'application-name': {'type': 'string'},
+                                                             'error': {'$ref': '#/definitions/Error'}},
+                                              'required': ['application-name'],
+                                              'type': 'object'},
+                     'PinApplicationsResults': {'additionalProperties': False,
+                                                'properties': {'results': {'items': {'$ref': '#/definitions/PinApplicationResult'},
+                                                                           'type': 'array'}},
+                                                'required': ['results'],
+                                                'type': 'object'},
+                     'PinnedLeadershipResult': {'additionalProperties': False,
+                                                'properties': {'result': {'patternProperties': {'.*': {'items': {'type': 'string'},
+                                                                                                       'type': 'array'}},
+                                                                          'type': 'object'}},
+                                                'type': 'object'},
+                     'SetStatus': {'additionalProperties': False,
+                                   'properties': {'entities': {'items': {'$ref': '#/definitions/EntityStatusArgs'},
+                                                               'type': 'array'}},
+                                   'required': ['entities'],
+                                   'type': 'object'},
+                     'StringResult': {'additionalProperties': False,
+                                      'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                     'result': {'type': 'string'}},
+                                      'required': ['result'],
+                                      'type': 'object'},
+                     'StringResults': {'additionalProperties': False,
+                                       'properties': {'results': {'items': {'$ref': '#/definitions/StringResult'},
+                                                                  'type': 'array'}},
+                                       'required': ['results'],
+                                       'type': 'object'},
+                     'UpdateSeriesArg': {'additionalProperties': False,
+                                         'properties': {'force': {'type': 'boolean'},
+                                                        'series': {'type': 'string'},
+                                                        'tag': {'$ref': '#/definitions/Entity'}},
+                                         'required': ['tag', 'force', 'series'],
+                                         'type': 'object'},
+                     'UpdateSeriesArgs': {'additionalProperties': False,
+                                          'properties': {'args': {'items': {'$ref': '#/definitions/UpdateSeriesArg'},
+                                                                  'type': 'array'}},
+                                          'required': ['args'],
+                                          'type': 'object'},
+                     'UpgradeSeriesStartUnitCompletionParam': {'additionalProperties': False,
+                                                               'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
+                                                                                           'type': 'array'},
+                                                                              'message': {'type': 'string'}},
+                                                               'required': ['entities',
+                                                                            'message'],
+                                                               'type': 'object'},
+                     'UpgradeSeriesStatusParam': {'additionalProperties': False,
+                                                  'properties': {'entity': {'$ref': '#/definitions/Entity'},
+                                                                 'message': {'type': 'string'},
+                                                                 'status': {'type': 'string'}},
+                                                  'required': ['entity',
+                                                               'status',
+                                                               'message'],
+                                                  'type': 'object'},
+                     'UpgradeSeriesStatusParams': {'additionalProperties': False,
+                                                   'properties': {'params': {'items': {'$ref': '#/definitions/UpgradeSeriesStatusParam'},
+                                                                             'type': 'array'}},
+                                                   'required': ['params'],
+                                                   'type': 'object'},
+                     'UpgradeSeriesStatusResult': {'additionalProperties': False,
+                                                   'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                                  'status': {'type': 'string'}},
+                                                   'type': 'object'},
+                     'UpgradeSeriesStatusResults': {'additionalProperties': False,
+                                                    'properties': {'results': {'items': {'$ref': '#/definitions/UpgradeSeriesStatusResult'},
+                                                                               'type': 'array'}},
+                                                    'type': 'object'}},
+     'properties': {'CurrentSeries': {'description': 'CurrentSeries returns what '
+                                                     'Juju thinks the current '
+                                                     'series of the machine is.\n'
+                                                     'Note that a machine could '
+                                                     'have been upgraded '
+                                                     'out-of-band by running\n'
+                                                     'do-release-upgrade outside '
+                                                     'of the upgrade-series '
+                                                     'workflow,\n'
+                                                     'making this value incorrect.',
+                                      'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                     'Result': {'$ref': '#/definitions/StringResults'}},
+                                      'type': 'object'},
+                    'FinishUpgradeSeries': {'description': 'FinishUpgradeSeries is '
+                                                           'the last action in the '
+                                                           'upgrade workflow and '
+                                                           'is\n'
+                                                           'called after all '
+                                                           'machine and unit '
+                                                           'statuses are '
+                                                           '"completed".\n'
+                                                           'It updates the machine '
+                                                           'series to reflect the '
+                                                           'completed upgrade, '
+                                                           'then\n'
+                                                           'removes the '
+                                                           'upgrade-series lock.',
+                                            'properties': {'Params': {'$ref': '#/definitions/UpdateSeriesArgs'},
+                                                           'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                            'type': 'object'},
+                    'MachineStatus': {'description': 'MachineStatus gets the '
+                                                     'current upgrade-series '
+                                                     'status of a machine.',
+                                      'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                     'Result': {'$ref': '#/definitions/UpgradeSeriesStatusResults'}},
+                                      'type': 'object'},
+                    'PinMachineApplications': {'description': 'PinMachineApplications '
+                                                              'pins leadership for '
+                                                              'applications '
+                                                              'represented by '
+                                                              'units\n'
+                                                              'running on the '
+                                                              "auth'd machine.",
+                                               'properties': {'Result': {'$ref': '#/definitions/PinApplicationsResults'}},
+                                               'type': 'object'},
+                    'PinnedLeadership': {'description': 'PinnedLeadership returns '
+                                                        'all pinned applications '
+                                                        'and the entities that\n'
+                                                        'require their pinned '
+                                                        'behaviour, for leadership '
+                                                        'in the current model.',
+                                         'properties': {'Result': {'$ref': '#/definitions/PinnedLeadershipResult'}},
+                                         'type': 'object'},
+                    'SetInstanceStatus': {'description': 'SetInstanceStatus sets '
+                                                         'the status of the '
+                                                         'machine.',
+                                          'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
+                                                         'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                          'type': 'object'},
+                    'SetMachineStatus': {'description': 'SetMachineStatus sets the '
+                                                        'current upgrade-series '
+                                                        'status of a machine.',
+                                         'properties': {'Params': {'$ref': '#/definitions/UpgradeSeriesStatusParams'},
+                                                        'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                         'type': 'object'},
+                    'SetUpgradeSeriesUnitStatus': {'description': 'SetUpgradeSeriesUnitStatus '
+                                                                  'sets the '
+                                                                  'upgrade series '
+                                                                  'status of the '
+                                                                  'unit.\n'
+                                                                  'If no upgrade '
+                                                                  'is in progress '
+                                                                  'an error is '
+                                                                  'returned '
+                                                                  'instead.',
+                                                   'properties': {'Params': {'$ref': '#/definitions/UpgradeSeriesStatusParams'},
+                                                                  'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                                   'type': 'object'},
+                    'StartUnitCompletion': {'description': 'StartUnitCompletion '
+                                                           'starts the upgrade '
+                                                           'series completion '
+                                                           'phase for all '
+                                                           'subordinate\n'
+                                                           'units of a given '
+                                                           'machine.',
+                                            'properties': {'Params': {'$ref': '#/definitions/UpgradeSeriesStartUnitCompletionParam'},
+                                                           'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                            'type': 'object'},
+                    'TargetSeries': {'description': 'TargetSeries returns the '
+                                                    'series that a machine has '
+                                                    'been locked\n'
+                                                    'for upgrading to.',
+                                     'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                    'Result': {'$ref': '#/definitions/StringResults'}},
+                                     'type': 'object'},
+                    'UnitsCompleted': {'description': 'UnitsCompleted returns the '
+                                                      'units running on this '
+                                                      'machine that have '
+                                                      'completed\n'
+                                                      'the upgrade-series workflow '
+                                                      'and are in their normal '
+                                                      'running state.',
+                                       'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                      'Result': {'$ref': '#/definitions/EntitiesResults'}},
+                                       'type': 'object'},
+                    'UnitsPrepared': {'description': 'UnitsPrepared returns the '
+                                                     'units running on this '
+                                                     'machine that have completed\n'
+                                                     'their upgrade-series '
+                                                     'preparation, and are ready '
+                                                     'to be stopped and have '
+                                                     'their\n'
+                                                     'unit agent services '
+                                                     'converted for the target '
+                                                     'series.',
+                                      'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                     'Result': {'$ref': '#/definitions/EntitiesResults'}},
+                                      'type': 'object'},
+                    'UnpinMachineApplications': {'description': 'UnpinMachineApplications '
+                                                                'unpins leadership '
+                                                                'for applications '
+                                                                'represented by\n'
+                                                                'units running on '
+                                                                "the auth'd "
+                                                                'machine.',
+                                                 'properties': {'Result': {'$ref': '#/definitions/PinApplicationsResults'}},
+                                                 'type': 'object'},
+                    'UpgradeSeriesUnitStatus': {'description': 'UpgradeSeriesUnitStatus '
+                                                               'returns the '
+                                                               'current '
+                                                               'preparation status '
+                                                               'of an\n'
+                                                               'upgrading unit.\n'
+                                                               'If no series '
+                                                               'upgrade is in '
+                                                               'progress an error '
+                                                               'is returned '
+                                                               'instead.',
+                                                'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                               'Result': {'$ref': '#/definitions/UpgradeSeriesStatusResults'}},
+                                                'type': 'object'},
+                    'WatchUpgradeSeriesNotifications': {'description': 'WatchUpgradeSeriesNotifications '
+                                                                       'returns a '
+                                                                       'NotifyWatcher '
+                                                                       'for '
+                                                                       'observing '
+                                                                       'changes to '
+                                                                       'upgrade '
+                                                                       'series '
+                                                                       'locks.',
+                                                        'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                                       'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
+                                                        'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(StringResults)
+    async def CurrentSeries(self, entities=None):
+        '''
+        CurrentSeries returns what Juju thinks the current series of the machine is.
+        Note that a machine could have been upgraded out-of-band by running
+        do-release-upgrade outside of the upgrade-series workflow,
+        making this value incorrect.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='UpgradeSeries',
+                   request='CurrentSeries',
+                   version=3,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def FinishUpgradeSeries(self, args=None):
+        '''
+        FinishUpgradeSeries is the last action in the upgrade workflow and is
+        called after all machine and unit statuses are "completed".
+        It updates the machine series to reflect the completed upgrade, then
+        removes the upgrade-series lock.
+
+        args : typing.Sequence[~UpdateSeriesArg]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='UpgradeSeries',
+                   request='FinishUpgradeSeries',
+                   version=3,
+                   params=_params)
+        _params['args'] = args
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(UpgradeSeriesStatusResults)
+    async def MachineStatus(self, entities=None):
+        '''
+        MachineStatus gets the current upgrade-series status of a machine.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> UpgradeSeriesStatusResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='UpgradeSeries',
+                   request='MachineStatus',
+                   version=3,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(PinApplicationsResults)
+    async def PinMachineApplications(self):
+        '''
+        PinMachineApplications pins leadership for applications represented by units
+        running on the auth'd machine.
+
+
+        Returns -> PinApplicationsResults
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='UpgradeSeries',
+                   request='PinMachineApplications',
+                   version=3,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(PinnedLeadershipResult)
+    async def PinnedLeadership(self):
+        '''
+        PinnedLeadership returns all pinned applications and the entities that
+        require their pinned behaviour, for leadership in the current model.
+
+
+        Returns -> PinnedLeadershipResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='UpgradeSeries',
+                   request='PinnedLeadership',
+                   version=3,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def SetInstanceStatus(self, entities=None):
+        '''
+        SetInstanceStatus sets the status of the machine.
+
+        entities : typing.Sequence[~EntityStatusArgs]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='UpgradeSeries',
+                   request='SetInstanceStatus',
+                   version=3,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def SetMachineStatus(self, params=None):
+        '''
+        SetMachineStatus sets the current upgrade-series status of a machine.
+
+        params : typing.Sequence[~UpgradeSeriesStatusParam]
+        Returns -> ErrorResults
+        '''
+        if params is not None and not isinstance(params, (bytes, str, list)):
+            raise Exception("Expected params to be a Sequence, received: {}".format(type(params)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='UpgradeSeries',
+                   request='SetMachineStatus',
+                   version=3,
+                   params=_params)
+        _params['params'] = params
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def SetUpgradeSeriesUnitStatus(self, params=None):
+        '''
+        SetUpgradeSeriesUnitStatus sets the upgrade series status of the unit.
+        If no upgrade is in progress an error is returned instead.
+
+        params : typing.Sequence[~UpgradeSeriesStatusParam]
+        Returns -> ErrorResults
+        '''
+        if params is not None and not isinstance(params, (bytes, str, list)):
+            raise Exception("Expected params to be a Sequence, received: {}".format(type(params)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='UpgradeSeries',
+                   request='SetUpgradeSeriesUnitStatus',
+                   version=3,
+                   params=_params)
+        _params['params'] = params
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def StartUnitCompletion(self, entities=None, message=None):
+        '''
+        StartUnitCompletion starts the upgrade series completion phase for all subordinate
+        units of a given machine.
+
+        entities : typing.Sequence[~Entity]
+        message : str
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        if message is not None and not isinstance(message, (bytes, str)):
+            raise Exception("Expected message to be a str, received: {}".format(type(message)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='UpgradeSeries',
+                   request='StartUnitCompletion',
+                   version=3,
+                   params=_params)
+        _params['entities'] = entities
+        _params['message'] = message
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResults)
+    async def TargetSeries(self, entities=None):
+        '''
+        TargetSeries returns the series that a machine has been locked
+        for upgrading to.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='UpgradeSeries',
+                   request='TargetSeries',
+                   version=3,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(EntitiesResults)
+    async def UnitsCompleted(self, entities=None):
+        '''
+        UnitsCompleted returns the units running on this machine that have completed
+        the upgrade-series workflow and are in their normal running state.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> EntitiesResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='UpgradeSeries',
+                   request='UnitsCompleted',
+                   version=3,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(EntitiesResults)
+    async def UnitsPrepared(self, entities=None):
+        '''
+        UnitsPrepared returns the units running on this machine that have completed
+        their upgrade-series preparation, and are ready to be stopped and have their
+        unit agent services converted for the target series.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> EntitiesResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='UpgradeSeries',
+                   request='UnitsPrepared',
+                   version=3,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(PinApplicationsResults)
+    async def UnpinMachineApplications(self):
+        '''
+        UnpinMachineApplications unpins leadership for applications represented by
+        units running on the auth'd machine.
+
+
+        Returns -> PinApplicationsResults
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='UpgradeSeries',
+                   request='UnpinMachineApplications',
+                   version=3,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(UpgradeSeriesStatusResults)
+    async def UpgradeSeriesUnitStatus(self, entities=None):
+        '''
+        UpgradeSeriesUnitStatus returns the current preparation status of an
+        upgrading unit.
+        If no series upgrade is in progress an error is returned instead.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> UpgradeSeriesStatusResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='UpgradeSeries',
+                   request='UpgradeSeriesUnitStatus',
+                   version=3,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResults)
+    async def WatchUpgradeSeriesNotifications(self, entities=None):
+        '''
+        WatchUpgradeSeriesNotifications returns a NotifyWatcher for observing changes to upgrade series locks.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> NotifyWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='UpgradeSeries',
+                   request='WatchUpgradeSeriesNotifications',
+                   version=3,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+

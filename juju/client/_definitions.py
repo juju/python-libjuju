@@ -10891,10 +10891,11 @@ class KubernetesFilesystemParams(Type):
 
 
 class KubernetesProvisioningInfo(Type):
-    _toSchema = {'constraints': 'constraints', 'deployment_info': 'deployment-info', 'devices': 'devices', 'filesystems': 'filesystems', 'operator_image_path': 'operator-image-path', 'pod_spec': 'pod-spec', 'raw_k8s_spec': 'raw-k8s-spec', 'tags': 'tags', 'volumes': 'volumes'}
-    _toPy = {'constraints': 'constraints', 'deployment-info': 'deployment_info', 'devices': 'devices', 'filesystems': 'filesystems', 'operator-image-path': 'operator_image_path', 'pod-spec': 'pod_spec', 'raw-k8s-spec': 'raw_k8s_spec', 'tags': 'tags', 'volumes': 'volumes'}
-    def __init__(self, constraints=None, deployment_info=None, devices=None, filesystems=None, operator_image_path=None, pod_spec=None, raw_k8s_spec=None, tags=None, volumes=None, **unknown_fields):
+    _toSchema = {'charm_modified_version': 'charm-modified-version', 'constraints': 'constraints', 'deployment_info': 'deployment-info', 'devices': 'devices', 'filesystems': 'filesystems', 'operator_image_path': 'operator-image-path', 'pod_spec': 'pod-spec', 'raw_k8s_spec': 'raw-k8s-spec', 'tags': 'tags', 'volumes': 'volumes'}
+    _toPy = {'charm-modified-version': 'charm_modified_version', 'constraints': 'constraints', 'deployment-info': 'deployment_info', 'devices': 'devices', 'filesystems': 'filesystems', 'operator-image-path': 'operator_image_path', 'pod-spec': 'pod_spec', 'raw-k8s-spec': 'raw_k8s_spec', 'tags': 'tags', 'volumes': 'volumes'}
+    def __init__(self, charm_modified_version=None, constraints=None, deployment_info=None, devices=None, filesystems=None, operator_image_path=None, pod_spec=None, raw_k8s_spec=None, tags=None, volumes=None, **unknown_fields):
         '''
+        charm_modified_version : int
         constraints : Value
         deployment_info : KubernetesDeploymentInfo
         devices : typing.Sequence[~KubernetesDeviceParams]
@@ -10905,6 +10906,7 @@ class KubernetesProvisioningInfo(Type):
         tags : typing.Mapping[str, str]
         volumes : typing.Sequence[~KubernetesVolumeParams]
         '''
+        charm_modified_version_ = charm_modified_version
         constraints_ = Value.from_json(constraints) if constraints else None
         deployment_info_ = KubernetesDeploymentInfo.from_json(deployment_info) if deployment_info else None
         devices_ = [KubernetesDeviceParams.from_json(o) for o in devices or []]
@@ -10916,6 +10918,9 @@ class KubernetesProvisioningInfo(Type):
         volumes_ = [KubernetesVolumeParams.from_json(o) for o in volumes or []]
 
         # Validate arguments against known Juju API types.
+        if charm_modified_version_ is not None and not isinstance(charm_modified_version_, int):
+            raise Exception("Expected charm_modified_version_ to be a int, received: {}".format(type(charm_modified_version_)))
+
         if constraints_ is not None and not isinstance(constraints_, (dict, Value)):
             raise Exception("Expected constraints_ to be a Value, received: {}".format(type(constraints_)))
 
@@ -10943,6 +10948,7 @@ class KubernetesProvisioningInfo(Type):
         if volumes_ is not None and not isinstance(volumes_, (bytes, str, list)):
             raise Exception("Expected volumes_ to be a Sequence, received: {}".format(type(volumes_)))
 
+        self.charm_modified_version = charm_modified_version_
         self.constraints = constraints_
         self.deployment_info = deployment_info_
         self.devices = devices_
