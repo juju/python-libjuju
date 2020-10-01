@@ -367,12 +367,15 @@ class Controller:
 
         return model
 
-    async def destroy_models(self, *models, destroy_storage=False):
+    async def destroy_models(self, *models, destroy_storage=False, force=False, max_wait=None):
         """Destroy one or more models.
 
         :param str *models: Names or UUIDs of models to destroy
         :param bool destroy_storage: Whether or not to destroy storage when
             destroying the models. Defaults to false.
+        :param bool force: Whether or not to force when destroying the models.
+            Defaults to false.
+        :param int max_wait : Max time in seconds to wait when destroying the models.
 
         """
         uuids = await self.model_uuids()
@@ -390,13 +393,18 @@ class Controller:
 
         if model_facade.version >= 5:
             params = [
-                client.DestroyModelParams(model_tag=tag.model(model),
-                                          destroy_storage=destroy_storage)
+                client.DestroyModelParams(
+                    model_tag=tag.model(model),
+                    destroy_storage=destroy_storage,
+                    force=force,
+                    max_wait=max_wait,
+                )
                 for model in models]
+            await model_facade.DestroyModels(models=params)
         else:
             params = [client.Entity(tag.model(model)) for model in models]
 
-        await model_facade.DestroyModels(entities=params)
+            await model_facade.DestroyModels(entities=params)
     destroy_model = destroy_models
 
     async def add_user(self, username, password=None, display_name=None):
