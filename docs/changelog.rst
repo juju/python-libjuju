@@ -1,6 +1,15 @@
 Changelog
 ---------
 
+2.8.4
+^^^^^
+
+Thursday October 1 2020
+
+ * Update facade methods for Juju 2.8.3
+ * Bug fix - Add force and max wait for destroying a model
+ * Bug fix - Fix derivation of the application status
+
 2.8.3
 ^^^^^
 
