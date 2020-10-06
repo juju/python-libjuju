@@ -3507,6 +3507,8 @@ class ClientFacade(Type):
                                                                                 'type': 'object'},
                                                           'err': {'$ref': '#/definitions/Error'},
                                                           'exposed': {'type': 'boolean'},
+                                                          'exposed-endpoints': {'patternProperties': {'.*': {'$ref': '#/definitions/ExposedEndpoint'}},
+                                                                                'type': 'object'},
                                                           'int': {'type': 'integer'},
                                                           'life': {'type': 'string'},
                                                           'meter-statuses': {'patternProperties': {'.*': {'$ref': '#/definitions/MeterStatus'}},
@@ -3679,6 +3681,12 @@ class ClientFacade(Type):
                                                                  'type': 'array'}},
                                       'required': ['results'],
                                       'type': 'object'},
+                     'ExposedEndpoint': {'additionalProperties': False,
+                                         'properties': {'expose-to-cidrs': {'items': {'type': 'string'},
+                                                                            'type': 'array'},
+                                                        'expose-to-spaces': {'items': {'type': 'string'},
+                                                                             'type': 'array'}},
+                                         'type': 'object'},
                      'FindToolsParams': {'additionalProperties': False,
                                          'properties': {'agentstream': {'type': 'string'},
                                                         'arch': {'type': 'string'},
@@ -4161,7 +4169,8 @@ class ClientFacade(Type):
                                                  'subordinates'],
                                     'type': 'object'},
                      'Value': {'additionalProperties': False,
-                               'properties': {'arch': {'type': 'string'},
+                               'properties': {'allocate-public-ip': {'type': 'boolean'},
+                                              'arch': {'type': 'string'},
                                               'container': {'type': 'string'},
                                               'cores': {'type': 'integer'},
                                               'cpu-power': {'type': 'integer'},
@@ -4188,14 +4197,21 @@ class ClientFacade(Type):
                                                            'synchronisation '
                                                            'record, if any.',
                                             'type': 'object'},
-                    'AddCharm': {'properties': {'Params': {'$ref': '#/definitions/AddCharm'}},
+                    'AddCharm': {'description': 'NOTE: AddCharm is deprecated as '
+                                                'of juju 2.9 and charms facade '
+                                                'version 3.\n'
+                                                'Please discontinue use and move '
+                                                'to the charms facade version.\n'
+                                                '\n'
+                                                'TODO: remove in juju 3.0',
+                                 'properties': {'Params': {'$ref': '#/definitions/AddCharm'}},
                                  'type': 'object'},
                     'AddCharmWithAuthorization': {'description': 'AddCharmWithAuthorization '
                                                                  'adds the given '
                                                                  'charm URL (which '
-                                                                 'must include '
-                                                                 'revision) to\n'
-                                                                 'the model, if it '
+                                                                 'must include\n'
+                                                                 'revision) to the '
+                                                                 'model, if it '
                                                                  'does not exist '
                                                                  'yet. Local '
                                                                  'charms are not\n'
@@ -4208,12 +4224,27 @@ class ClientFacade(Type):
                                                                  'authorization '
                                                                  'macaroon, '
                                                                  'args.CharmStoreMacaroon, '
-                                                                 'may be\n'
-                                                                 'omitted, in '
+                                                                 'may be omitted, '
+                                                                 'in\n'
                                                                  'which case this '
                                                                  'call is '
                                                                  'equivalent to '
-                                                                 'AddCharm.',
+                                                                 'AddCharm.\n'
+                                                                 '\n'
+                                                                 'NOTE: '
+                                                                 'AddCharmWithAuthorization '
+                                                                 'is deprecated as '
+                                                                 'of juju 2.9 and '
+                                                                 'charms\n'
+                                                                 'facade version '
+                                                                 '3. Please '
+                                                                 'discontinue use '
+                                                                 'and move to the '
+                                                                 'charms facade\n'
+                                                                 'version.\n'
+                                                                 '\n'
+                                                                 'TODO: remove in '
+                                                                 'juju 3.0',
                                                   'properties': {'Params': {'$ref': '#/definitions/AddCharmWithAuthorization'}},
                                                   'type': 'object'},
                     'AddMachines': {'description': 'AddMachines adds new machines '
@@ -4334,7 +4365,17 @@ class ClientFacade(Type):
                                                      'best available charm URLs '
                                                      'with series, for charm\n'
                                                      'locations without a series '
-                                                     'specified.',
+                                                     'specified.\n'
+                                                     '\n'
+                                                     'NOTE: ResolveCharms is '
+                                                     'deprecated as of juju 2.9 '
+                                                     'and charms facade version '
+                                                     '3.\n'
+                                                     'Please discontinue use and '
+                                                     'move to the charms facade '
+                                                     'version.\n'
+                                                     '\n'
+                                                     'TODO: remove in juju 3.0',
                                       'properties': {'Params': {'$ref': '#/definitions/ResolveCharms'},
                                                      'Result': {'$ref': '#/definitions/ResolveCharmResults'}},
                                       'type': 'object'},
@@ -4426,6 +4467,11 @@ class ClientFacade(Type):
     @ReturnMapping(None)
     async def AddCharm(self, channel=None, force=None, url=None):
         '''
+        NOTE: AddCharm is deprecated as of juju 2.9 and charms facade version 3.
+        Please discontinue use and move to the charms facade version.
+
+        TODO: remove in juju 3.0
+
         channel : str
         force : bool
         url : str
@@ -4457,12 +4503,18 @@ class ClientFacade(Type):
     @ReturnMapping(None)
     async def AddCharmWithAuthorization(self, channel=None, force=None, macaroon=None, url=None):
         '''
-        AddCharmWithAuthorization adds the given charm URL (which must include revision) to
-        the model, if it does not exist yet. Local charms are not
+        AddCharmWithAuthorization adds the given charm URL (which must include
+        revision) to the model, if it does not exist yet. Local charms are not
         supported, only charm store URLs. See also AddLocalCharm().
 
-        The authorization macaroon, args.CharmStoreMacaroon, may be
-        omitted, in which case this call is equivalent to AddCharm.
+        The authorization macaroon, args.CharmStoreMacaroon, may be omitted, in
+        which case this call is equivalent to AddCharm.
+
+        NOTE: AddCharmWithAuthorization is deprecated as of juju 2.9 and charms
+        facade version 3. Please discontinue use and move to the charms facade
+        version.
+
+        TODO: remove in juju 3.0
 
         channel : str
         force : bool
@@ -4963,6 +5015,11 @@ class ClientFacade(Type):
         '''
         ResolveCharm resolves the best available charm URLs with series, for charm
         locations without a series specified.
+
+        NOTE: ResolveCharms is deprecated as of juju 2.9 and charms facade version 3.
+        Please discontinue use and move to the charms facade version.
+
+        TODO: remove in juju 3.0
 
         references : typing.Sequence[str]
         Returns -> ResolveCharmResults
@@ -6374,7 +6431,8 @@ class HighAvailabilityFacade(Type):
                                'required': ['message', 'code'],
                                'type': 'object'},
                      'Value': {'additionalProperties': False,
-                               'properties': {'arch': {'type': 'string'},
+                               'properties': {'allocate-public-ip': {'type': 'boolean'},
+                                              'arch': {'type': 'string'},
                                               'container': {'type': 'string'},
                                               'cores': {'type': 'integer'},
                                               'cpu-power': {'type': 'integer'},

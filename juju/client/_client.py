@@ -3,7 +3,7 @@
 
 from juju.client._definitions import *
 
-from juju.client import _client2, _client1, _client3, _client4, _client5, _client8, _client7, _client9, _client10, _client6, _client12, _client11, _client13, _client15, _client16
+from juju.client import _client2, _client1, _client3, _client4, _client5, _client8, _client7, _client9, _client10, _client6, _client12, _client11, _client13, _client15, _client16, _client17
 
 
 CLIENTS = {
@@ -21,7 +21,8 @@ CLIENTS = {
     "11": _client11,
     "13": _client13,
     "15": _client15,
-    "16": _client16
+    "16": _client16,
+    "17": _client17
 }
 
 
@@ -174,6 +175,10 @@ class CAASOperatorUpgraderFacade(TypeFactory):
 
 
 class CAASUnitProvisionerFacade(TypeFactory):
+    pass
+
+
+class CharmHubFacade(TypeFactory):
     pass
 
 
