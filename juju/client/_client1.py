@@ -2996,7 +2996,8 @@ class CAASUnitProvisionerFacade(Type):
                                                     'required': ['units'],
                                                     'type': 'object'},
                      'Value': {'additionalProperties': False,
-                               'properties': {'arch': {'type': 'string'},
+                               'properties': {'allocate-public-ip': {'type': 'boolean'},
+                                              'arch': {'type': 'string'},
                                               'container': {'type': 'string'},
                                               'cores': {'type': 'integer'},
                                               'cpu-power': {'type': 'integer'},
@@ -3386,6 +3387,199 @@ class CAASUnitProvisionerFacade(Type):
                    version=1,
                    params=_params)
         _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+class CharmHubFacade(Type):
+    name = 'CharmHub'
+    version = 1
+    schema =     {'definitions': {'BundleCharm': {'additionalProperties': False,
+                                     'properties': {'name': {'type': 'string'},
+                                                    'revision': {'type': 'integer'}},
+                                     'required': ['name', 'revision'],
+                                     'type': 'object'},
+                     'Channel': {'additionalProperties': False,
+                                 'properties': {'platforms': {'items': {'$ref': '#/definitions/Platform'},
+                                                              'type': 'array'},
+                                                'released-at': {'type': 'string'},
+                                                'revision': {'type': 'integer'},
+                                                'risk': {'type': 'string'},
+                                                'size': {'type': 'integer'},
+                                                'track': {'type': 'string'},
+                                                'version': {'type': 'string'}},
+                                 'required': ['released-at',
+                                              'track',
+                                              'risk',
+                                              'revision',
+                                              'size',
+                                              'version',
+                                              'platforms'],
+                                 'type': 'object'},
+                     'CharmHubBundle': {'additionalProperties': False,
+                                        'properties': {'charms': {'items': {'$ref': '#/definitions/BundleCharm'},
+                                                                  'type': 'array'}},
+                                        'required': ['charms'],
+                                        'type': 'object'},
+                     'CharmHubCharm': {'additionalProperties': False,
+                                       'properties': {'config': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmOption'}},
+                                                                 'type': 'object'},
+                                                      'relations': {'patternProperties': {'.*': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                                                 'type': 'object'}},
+                                                                    'type': 'object'},
+                                                      'subordinate': {'type': 'boolean'},
+                                                      'used-by': {'items': {'type': 'string'},
+                                                                  'type': 'array'}},
+                                       'required': ['config',
+                                                    'relations',
+                                                    'subordinate',
+                                                    'used-by'],
+                                       'type': 'object'},
+                     'CharmHubEntityFindResult': {'additionalProperties': False,
+                                                  'properties': {'errors': {'$ref': '#/definitions/ErrorResponse'},
+                                                                 'result': {'items': {'$ref': '#/definitions/FindResponse'},
+                                                                            'type': 'array'}},
+                                                  'required': ['result', 'errors'],
+                                                  'type': 'object'},
+                     'CharmHubEntityInfoResult': {'additionalProperties': False,
+                                                  'properties': {'errors': {'$ref': '#/definitions/ErrorResponse'},
+                                                                 'result': {'$ref': '#/definitions/InfoResponse'}},
+                                                  'required': ['result', 'errors'],
+                                                  'type': 'object'},
+                     'CharmHubError': {'additionalProperties': False,
+                                       'properties': {'code': {'type': 'string'},
+                                                      'message': {'type': 'string'}},
+                                       'required': ['code', 'message'],
+                                       'type': 'object'},
+                     'CharmOption': {'additionalProperties': False,
+                                     'properties': {'default': {'additionalProperties': True,
+                                                                'type': 'object'},
+                                                    'description': {'type': 'string'},
+                                                    'type': {'type': 'string'}},
+                                     'required': ['type'],
+                                     'type': 'object'},
+                     'Entity': {'additionalProperties': False,
+                                'properties': {'tag': {'type': 'string'}},
+                                'required': ['tag'],
+                                'type': 'object'},
+                     'ErrorResponse': {'additionalProperties': False,
+                                       'properties': {'error-list': {'$ref': '#/definitions/CharmHubError'}},
+                                       'required': ['error-list'],
+                                       'type': 'object'},
+                     'FindResponse': {'additionalProperties': False,
+                                      'properties': {'id': {'type': 'string'},
+                                                     'name': {'type': 'string'},
+                                                     'publisher': {'type': 'string'},
+                                                     'series': {'items': {'type': 'string'},
+                                                                'type': 'array'},
+                                                     'store-url': {'type': 'string'},
+                                                     'summary': {'type': 'string'},
+                                                     'type': {'type': 'string'},
+                                                     'version': {'type': 'string'}},
+                                      'required': ['type',
+                                                   'id',
+                                                   'name',
+                                                   'publisher',
+                                                   'summary',
+                                                   'version',
+                                                   'series',
+                                                   'store-url'],
+                                      'type': 'object'},
+                     'InfoResponse': {'additionalProperties': False,
+                                      'properties': {'bundle': {'$ref': '#/definitions/CharmHubBundle'},
+                                                     'channel-map': {'patternProperties': {'.*': {'$ref': '#/definitions/Channel'}},
+                                                                     'type': 'object'},
+                                                     'charm': {'$ref': '#/definitions/CharmHubCharm'},
+                                                     'description': {'type': 'string'},
+                                                     'id': {'type': 'string'},
+                                                     'name': {'type': 'string'},
+                                                     'publisher': {'type': 'string'},
+                                                     'series': {'items': {'type': 'string'},
+                                                                'type': 'array'},
+                                                     'store-url': {'type': 'string'},
+                                                     'summary': {'type': 'string'},
+                                                     'tags': {'items': {'type': 'string'},
+                                                              'type': 'array'},
+                                                     'tracks': {'items': {'type': 'string'},
+                                                                'type': 'array'},
+                                                     'type': {'type': 'string'}},
+                                      'required': ['type',
+                                                   'id',
+                                                   'name',
+                                                   'description',
+                                                   'publisher',
+                                                   'summary',
+                                                   'series',
+                                                   'store-url',
+                                                   'tags',
+                                                   'channel-map',
+                                                   'tracks'],
+                                      'type': 'object'},
+                     'Platform': {'additionalProperties': False,
+                                  'properties': {'architecture': {'type': 'string'},
+                                                 'os': {'type': 'string'},
+                                                 'series': {'type': 'string'}},
+                                  'required': ['architecture', 'os', 'series'],
+                                  'type': 'object'},
+                     'Query': {'additionalProperties': False,
+                               'properties': {'query': {'type': 'string'}},
+                               'required': ['query'],
+                               'type': 'object'}},
+     'properties': {'Find': {'description': 'Find queries the CharmHub API with a '
+                                            'given entity ID.',
+                             'properties': {'Params': {'$ref': '#/definitions/Query'},
+                                            'Result': {'$ref': '#/definitions/CharmHubEntityFindResult'}},
+                             'type': 'object'},
+                    'Info': {'description': 'Info queries the CharmHub API with a '
+                                            'given entity ID.',
+                             'properties': {'Params': {'$ref': '#/definitions/Entity'},
+                                            'Result': {'$ref': '#/definitions/CharmHubEntityInfoResult'}},
+                             'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(CharmHubEntityFindResult)
+    async def Find(self, query=None):
+        '''
+        Find queries the CharmHub API with a given entity ID.
+
+        query : str
+        Returns -> CharmHubEntityFindResult
+        '''
+        if query is not None and not isinstance(query, (bytes, str)):
+            raise Exception("Expected query to be a str, received: {}".format(type(query)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CharmHub',
+                   request='Find',
+                   version=1,
+                   params=_params)
+        _params['query'] = query
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CharmHubEntityInfoResult)
+    async def Info(self, tag=None):
+        '''
+        Info queries the CharmHub API with a given entity ID.
+
+        tag : str
+        Returns -> CharmHubEntityInfoResult
+        '''
+        if tag is not None and not isinstance(tag, (bytes, str)):
+            raise Exception("Expected tag to be a str, received: {}".format(type(tag)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CharmHub',
+                   request='Info',
+                   version=1,
+                   params=_params)
+        _params['tag'] = tag
         reply = await self.rpc(msg)
         return reply
 
