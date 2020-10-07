@@ -31,6 +31,9 @@ class Application(model.ModelEntity):
     def _unit_match_pattern(self):
         return r'^{}.*$'.format(self.entity_id)
 
+    def _facade(self):
+        return client.ApplicationFacade.from_connection(self.connection)
+
     def on_unit_add(self, callable_):
         """Add a "unit added" observer to this entity, which will be called
         whenever a unit is added to this application.
@@ -123,7 +126,7 @@ class Application(model.ModelEntity):
             If None, a new machine is provisioned.
 
         """
-        app_facade = client.ApplicationFacade.from_connection(self.connection)
+        app_facade = self._facade()
 
         log.debug(
             'Adding %s unit%s to %s',
@@ -152,7 +155,7 @@ class Application(model.ModelEntity):
         :param int scale_change: Amount by which to adjust the scale of this
             application (can be positive or negative).
         """
-        app_facade = client.ApplicationFacade.from_connection(self.connection)
+        app_facade = self._facade()
 
         if (scale, scale_change) == (None, None):
             raise ValueError('Must provide either scale or scale_change')
@@ -202,7 +205,7 @@ class Application(model.ModelEntity):
         if ':' not in local_relation:
             local_relation = '{}:{}'.format(self.name, local_relation)
 
-        app_facade = client.ApplicationFacade.from_connection(self.connection)
+        app_facade = self._facade()
 
         log.debug(
             'Destroying relation %s <-> %s', local_relation, remote_relation)
@@ -222,7 +225,7 @@ class Application(model.ModelEntity):
         """Remove this application from the model.
 
         """
-        app_facade = client.ApplicationFacade.from_connection(self.connection)
+        app_facade = self._facade()
 
         log.debug(
             'Destroying %s', self.name)
@@ -234,7 +237,7 @@ class Application(model.ModelEntity):
         """Make this application publicly available over the network.
 
         """
-        app_facade = client.ApplicationFacade.from_connection(self.connection)
+        app_facade = self._facade()
 
         log.debug(
             'Exposing %s', self.name)
@@ -245,7 +248,7 @@ class Application(model.ModelEntity):
         """Return the configuration settings dict for this application.
 
         """
-        app_facade = client.ApplicationFacade.from_connection(self.connection)
+        app_facade = self._facade()
 
         log.debug(
             'Getting config for %s', self.name)
@@ -259,7 +262,7 @@ class Application(model.ModelEntity):
         if self.model.info.agent_version < client.Number.from_json('2.4.0'):
             raise NotImplementedError("trusted is not supported on model version {}".format(self.model.info.agent_version))
 
-        app_facade = client.ApplicationFacade.from_connection(self.connection)
+        app_facade = self._facade()
 
         log.debug(
             'Getting config for %s', self.name)
@@ -281,7 +284,7 @@ class Application(model.ModelEntity):
 
         # clamp trust to exactly the value juju expects, rather than allowing
         # anything in the config.
-        app_facade = client.ApplicationFacade.from_connection(self.connection)
+        app_facade = self._facade()
 
         config = {'trust': json.dumps(True if trust is True else False)}
         log.debug(
@@ -296,7 +299,7 @@ class Application(model.ModelEntity):
         """Return the machine constraints dict for this application.
 
         """
-        app_facade = client.ApplicationFacade.from_connection(self.connection)
+        app_facade = self._facade()
 
         log.debug(
             'Getting constraints for %s', self.name)
@@ -384,7 +387,7 @@ class Application(model.ModelEntity):
 
         :param config: Dict of configuration to set
         """
-        app_facade = client.ApplicationFacade.from_connection(self.connection)
+        app_facade = self._facade()
 
         log.debug(
             'Setting config for %s: %s', self.name, config)
@@ -398,7 +401,7 @@ class Application(model.ModelEntity):
         :param list to_default: A list of config options to be reset to their
         default value.
         """
-        app_facade = client.ApplicationFacade.from_connection(self.connection)
+        app_facade = self._facade()
 
         log.debug(
             'Restoring default config for %s: %s', self.name, to_default)
@@ -411,7 +414,7 @@ class Application(model.ModelEntity):
         :param dict constraints: Dict of machine constraints
 
         """
-        app_facade = client.ApplicationFacade.from_connection(self.connection)
+        app_facade = self._facade()
 
         log.debug(
             'Setting constraints for %s: %s', self.name, constraints)
@@ -439,7 +442,7 @@ class Application(model.ModelEntity):
         """Remove public availability over the network for this application.
 
         """
-        app_facade = client.ApplicationFacade.from_connection(self.connection)
+        app_facade = self._facade()
 
         log.debug(
             'Unexposing %s', self.name)
@@ -483,7 +486,7 @@ class Application(model.ModelEntity):
         client_facade = client.ClientFacade.from_connection(self.connection)
         resources_facade = client.ResourcesFacade.from_connection(
             self.connection)
-        app_facade = client.ApplicationFacade.from_connection(self.connection)
+        app_facade = self._facade()
 
         charmstore = self.model.charmstore
         charmstore_entity = None
