@@ -34,6 +34,9 @@ class Application(model.ModelEntity):
     def _facade(self):
         return client.ApplicationFacade.from_connection(self.connection)
 
+    def _facade_version(self):
+        return client.ApplicationFacade.best_facade_version(self.connection)
+
     def on_unit_add(self, callable_):
         """Add a "unit added" observer to this entity, which will be called
         whenever a unit is added to this application.
@@ -233,16 +236,115 @@ class Application(model.ModelEntity):
         return await app_facade.Destroy(application=self.name)
     remove = destroy
 
-    async def expose(self):
-        """Make this application publicly available over the network.
+    async def expose(self, exposed_endpoints=None):
+        """Make a subset of the application endpoints or the entire application
+           available over the network.
 
+           If the exposed_endpoints argument is not provided, all opened port
+           ranges for the application will become reachable from 0.0.0.0/0.
+
+           On juju 2.9 and onwards, the exposed_endpoints argument may be used
+           to specify a list of spaces and or CIDRs that should be able to
+           reach the port ranges opened for a particular subnet. The
+           exposed_endpoints parameter is a map where keys are endpoint names
+           or the empty string ("") which works as a wildcard for all endpoints
+           and values are ExposedEndpoint instances.
+
+           When targeting an older juju controller, the exposed_endpoints param
+           is not supported and an error will be raised if it is provided.
         """
         app_facade = self._facade()
+        facade_version = self._facade_version()
 
-        log.debug(
-            'Exposing %s', self.name)
+        if exposed_endpoints is not None:
+            if not isinstance(exposed_endpoints, dict):
+                raise ValueError("endpoints must be a dictionary with ExposedEndpoint values")
 
-        return await app_facade.Expose(application=self.name)
+            # The bundle changes code will pass in raw dicts with the exposed
+            # endpoint data. We need to convert those into ExposedEndpoints
+            for k, v in exposed_endpoints.items():
+                if not isinstance(v, ExposedEndpoint):
+                    exposed_endpoints[k] = ExposedEndpoint.from_dict(v)
+
+            # Check if the specified exposed_endpoints would cause security
+            # issues when applied to a pre 2.9 controller.
+            has_more_than_one_endpoints = len(exposed_endpoints) > 1
+            has_non_wildcard_endpoint = (
+                len(exposed_endpoints) > 0 and "" not in exposed_endpoints
+            )
+            has_wildcard_endpoint_with_spaces_or_non_wildcard_cidrs = (
+                "" in exposed_endpoints and (
+                    exposed_endpoints[""].includes_non_wildcard_cidrs() or
+                    exposed_endpoints[""].includes_spaces()
+                )
+            )
+
+            is_security_risk = (
+                facade_version < 13 and
+                (
+                    has_more_than_one_endpoints or
+                    has_non_wildcard_endpoint or
+                    has_wildcard_endpoint_with_spaces_or_non_wildcard_cidrs
+                )
+            )
+
+            if is_security_risk:
+                raise JujuError("controller does not support granular expose parameters; applying this change would make all open application ports accessible from 0.0.0.0/0")
+
+            for endpoint, expose_details in exposed_endpoints.items():
+                access_from = "from CIDRs 0.0.0.0/0 and ::/0"
+                if isinstance(expose_details, ExposedEndpoint):
+                    access_from = str(expose_details)
+
+                if endpoint == "":
+                    log.debug("expose all endpoints of %s and allow access %s", self.name, access_from)
+                else:
+                    log.debug("override expose settings for endpoint %s of %s and %s", endpoint, self.name, access_from)
+
+            # Map ExposedEndpoint entries to a dict we can pass to the facade.
+            exposed_endpoints = {
+                k: v.to_dict() for k, v in exposed_endpoints.items()
+            }
+        else:
+            log.debug("expose all endpoints of %s and allow access from CIDRs 0.0.0.0/0 and ::/0", self.name)
+
+        if facade_version < 13:
+            return await app_facade.Expose(application=self.name)
+
+        return await app_facade.Expose(application=self.name,
+                                       exposed_endpoints=exposed_endpoints)
+
+    async def unexpose(self, exposed_endpoints=None):
+        """Prevent a subset of the application endpoints or the entire
+           application from being reached over the network.
+
+           If the exposed_endpoints argument is not provided, the entire
+           application will be unexposed.
+
+           On juju 2.9 and onwards, the exposed_endpoints argument may be used
+           to specify a list of endpoint names whose port ranges should be
+           unexposed.
+
+           When targeting an older juju controller, the exposed_endpoints param
+           is not supported and an error will be raised if it is provided.
+        """
+        app_facade = self._facade()
+        facade_version = self._facade_version()
+
+        # Check if an endpoint list is provided
+        if exposed_endpoints is not None and len(exposed_endpoints) > 0:
+            if facade_version < 13:
+                raise JujuError("controller does not support granular expose parameters; applying this change would unexpose the application")
+
+            log.debug("Unexposing endpoints %s of %s",
+                      ",".join(exposed_endpoints), self.name)
+            return await app_facade.Unexpose(application=self.name,
+                                             exposed_endpoints=exposed_endpoints)
+
+        # Just expose the entire application
+        log.debug("Unexposing %s", self.name)
+        return await app_facade.Unexpose(application=self.name)
+
 
     async def get_config(self):
         """Return the configuration settings dict for this application.
@@ -438,17 +540,6 @@ class Application(model.ModelEntity):
         """
         raise NotImplementedError()
 
-    async def unexpose(self):
-        """Remove public availability over the network for this application.
-
-        """
-        app_facade = self._facade()
-
-        log.debug(
-            'Unexposing %s', self.name)
-
-        return await app_facade.Unexpose(application=self.name)
-
     def update_allocation(self, allocation):
         """Update existing allocation for this application.
 
@@ -585,3 +676,70 @@ class Application(model.ModelEntity):
 
         """
         return await self.model.get_metrics(self.tag)
+
+
+class ExposedEndpoint:
+    """ExposedEndpoint stores the list of CIDRs and space names which should be
+    allowed access to the port ranges that the application has opened for a
+    particular endpoint. Both lists are optional; if empty, the opened port
+    ranges will be reachable from any source IP address."""
+
+    def __init__(self, to_spaces=None, to_cidrs=None):
+        if to_spaces is not None and not isinstance(to_spaces, list):
+            raise ValueError("to_spaces must be a list of space names or None")
+        if to_cidrs is not None and not isinstance(to_cidrs, list):
+            raise ValueError("to_cidrs must be a list of CIDRs or None")
+
+        self.to_cidrs = to_cidrs
+        self.to_spaces = to_spaces
+
+    def includes_spaces(self):
+        return self.to_spaces is not None and len(self.to_spaces) > 0
+
+    def includes_non_wildcard_cidrs(self):
+        to_cidrs = (self.to_cidrs or [])
+        non_wildcard_cidrs = filter(lambda x: x == "0.0.0.0/0" or x == "::/0",
+                                    to_cidrs)
+        return len(list(non_wildcard_cidrs)) > 0
+
+    @classmethod
+    def from_dict(cls, data):
+        d = (data or {})
+        if not isinstance(d, dict):
+            raise ValueError("expected a dictionary with fields: expose-to-spaces and expose-to-cidrs")
+
+        to_spaces = None
+        if "expose-to-spaces" in d and isinstance(d["expose-to-spaces"], list):
+            to_spaces = d["expose-to-spaces"]
+        to_cidrs = None
+        if "expose-to-cidrs" in d and isinstance(d["expose-to-cidrs"], list):
+            to_cidrs = d["expose-to-cidrs"]
+
+        return cls(to_spaces=to_spaces, to_cidrs=to_cidrs)
+
+    def to_dict(self):
+        d = {}
+        if self.to_cidrs is not None:
+            d["expose-to-cidrs"] = self.to_cidrs
+        if self.to_spaces is not None:
+            d["expose-to-spaces"] = self.to_spaces
+        return d
+
+    def __str__(self):
+        descr = ""
+        if self.to_spaces is not None and len(self.to_spaces) > 0:
+            if len(self.to_spaces) == 1:
+                descr = "from space {}".format(self.to_spaces[0])
+            elif len(self.to_spaces) > 1:
+                descr = "from spaces {}".format(",".join(self.to_spaces))
+
+            if self.to_cidrs is not None and len(self.to_cidrs) > 0:
+                descr = descr + " and "
+
+        if self.to_cidrs is not None:
+            if len(self.to_cidrs) == 1:
+                descr = descr + "from CIDR {}".format(self.to_cidrs[0])
+            elif len(self.to_cidrs) > 1:
+                descr = descr + "from CIDRs {}".format(",".join(self.to_cidrs))
+
+        return descr
