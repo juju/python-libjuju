@@ -341,8 +341,7 @@ class Application(model.ModelEntity):
             if facade_version < 13:
                 raise JujuError("controller does not support granular expose parameters; applying this change would unexpose the application")
 
-            log.debug("Unexposing endpoints %s of %s",
-                      ",".join(exposed_endpoints), self.name)
+            log.debug("Unexposing endpoints %s of %s", ",".join(exposed_endpoints), self.name)
             return await app_facade.Unexpose(application=self.name,
                                              exposed_endpoints=exposed_endpoints)
 
@@ -350,10 +349,8 @@ class Application(model.ModelEntity):
         log.debug("Unexposing %s", self.name)
         return await app_facade.Unexpose(application=self.name)
 
-
     async def get_config(self):
         """Return the configuration settings dict for this application.
-
         """
         app_facade = self._facade()
 

@@ -94,28 +94,28 @@ class TestExposeApplication(asynctest.TestCase):
         # Case 1: exposed_endpoints includes an entry with a space list.
         with self.assertRaises(JujuError):
             await app.expose(exposed_endpoints={
-             "": ExposedEndpoint(to_spaces=["alpha"]),
+                "": ExposedEndpoint(to_spaces=["alpha"]),
             })
 
         # Case 2: exposed_endpoints only includes the wildcard endpoints key
         # with a non-wildcard CIDR.
         with self.assertRaises(JujuError):
             await app.expose(exposed_endpoints={
-             "": ExposedEndpoint(to_cidrs=["0.0.0.0/0", "10.0.0.0/24"]),
+                "": ExposedEndpoint(to_cidrs=["0.0.0.0/0", "10.0.0.0/24"]),
             })
 
         # Case 3: exposed_endpoints has a single entry for the
         # non-wildcard endpoint.
         with self.assertRaises(JujuError):
             await app.expose(exposed_endpoints={
-             "": ExposedEndpoint(to_cidrs=["0.0.0.0/0", "10.0.0.0/24"]),
+                "": ExposedEndpoint(to_cidrs=["0.0.0.0/0", "10.0.0.0/24"]),
             })
 
         # Case 4: exposed_endpoints has multiple keys.
         with self.assertRaises(JujuError):
             await app.expose(exposed_endpoints={
-             "foo": ExposedEndpoint(to_cidrs=["0.0.0.0/0"]),
-             "bar": ExposedEndpoint(to_spaces=["alpha"]),
+                "foo": ExposedEndpoint(to_cidrs=["0.0.0.0/0"]),
+                "bar": ExposedEndpoint(to_spaces=["alpha"]),
             })
 
         # Check that we call the facade with the right arity.
@@ -139,7 +139,7 @@ class TestUnExposeApplication(asynctest.TestCase):
         # If we try to unexpose individual endpoints on an older controller
         # (app facade < 13) we should get an error back.
         with self.assertRaises(JujuError):
-            await app.unexpose(exposed_endpoints=["outer","inner"])
+            await app.unexpose(exposed_endpoints=["outer", "inner"])
 
         # Check that we call the facade with the right arity.
         await app.unexpose()

@@ -634,14 +634,14 @@ class TestExposeChange(unittest.TestCase):
                           "requires": [],
                           "application": "application",
                           "exposed_endpoints": {
-                            "": {
-                                "to-spaces": ["alpha"],
-                                "to-cidrs": ["10.0.0.0/24"]
-                            },
-                            "foo": {
-                                "to-spaces": ["alien"],
-                                "to-cidrs": ["0.0.0.0/0", "::/0"]
-                            }
+                              "": {
+                                  "to-spaces": ["alpha"],
+                                  "to-cidrs": ["10.0.0.0/24"]
+                              },
+                              "foo": {
+                                  "to-spaces": ["alien"],
+                                  "to-cidrs": ["0.0.0.0/0", "::/0"]
+                              }
                           }}, change.__dict__)
 
 
@@ -678,14 +678,14 @@ class TestExposeChangeRun:
 
         model.applications["application1"].expose.assert_called_once()
         model.applications["application1"].expose.assert_called_with({
-                "": {
-                    "to-spaces": ["alpha"],
-                    "to-cidrs": ["10.0.0.0/24"]
-                },
-                "foo": {
-                    "to-spaces": ["alien"],
-                    "to-cidrs": ["0.0.0.0/0", "::/0"]
-                }
+            "": {
+                "to-spaces": ["alpha"],
+                "to-cidrs": ["10.0.0.0/24"]
+            },
+            "foo": {
+                "to-spaces": ["alien"],
+                "to-cidrs": ["0.0.0.0/0", "::/0"]
+            }
         })
 
 

@@ -12,7 +12,6 @@ from juju import loop
 from juju.model import Model
 from juju.application import ExposedEndpoint
 
-import logging
 
 async def main():
     model = Model()
