@@ -23,7 +23,7 @@ client_facades = {
     'Agent': {'versions': [2]},
     'AgentTools': {'versions': [1]},
     'Annotations': {'versions': [2]},
-    'Application': {'versions': [1, 2, 3, 4, 5, 6, 7, 8]},
+    'Application': {'versions': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]},
     'ApplicationOffers': {'versions': [1, 2]},
     'ApplicationScaler': {'versions': [1]},
     'Backups': {'versions': [1, 2]},

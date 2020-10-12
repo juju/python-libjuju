@@ -605,20 +605,64 @@ class TestExposeChange(unittest.TestCase):
         change = ExposeChange(1, [], params={"application": "application"})
         self.assertEqual({"change_id": 1,
                           "requires": [],
-                          "application": "application"}, change.__dict__)
+                          "application": "application",
+                          "exposed_endpoints": None}, change.__dict__)
 
     def test_dict_params_missing_data(self):
         change = ExposeChange(1, [], params={})
         self.assertEqual({"change_id": 1,
                           "requires": [],
-                          "application": None}, change.__dict__)
+                          "application": None,
+                          "exposed_endpoints": None}, change.__dict__)
+
+    def test_dict_params_with_exposed_endpoints_data(self):
+        params = {
+            "application": "application",
+            "exposed-endpoints": {
+                "": {
+                    "to-spaces": ["alpha"],
+                    "to-cidrs": ["10.0.0.0/24"]
+                },
+                "foo": {
+                    "to-spaces": ["alien"],
+                    "to-cidrs": ["0.0.0.0/0", "::/0"]
+                }
+            }
+        }
+        change = ExposeChange(1, [], params=params)
+        self.assertEqual({"change_id": 1,
+                          "requires": [],
+                          "application": "application",
+                          "exposed_endpoints": {
+                              "": {
+                                  "to-spaces": ["alpha"],
+                                  "to-cidrs": ["10.0.0.0/24"]
+                              },
+                              "foo": {
+                                  "to-spaces": ["alien"],
+                                  "to-cidrs": ["0.0.0.0/0", "::/0"]
+                              }
+                          }}, change.__dict__)
 
 
 class TestExposeChangeRun:
 
     @pytest.mark.asyncio
     async def test_run(self, event_loop):
-        change = ExposeChange(1, [], params={"application": "application"})
+        params = {
+            "application": "application",
+            "exposed-endpoints": {
+                "": {
+                    "to-spaces": ["alpha"],
+                    "to-cidrs": ["10.0.0.0/24"]
+                },
+                "foo": {
+                    "to-spaces": ["alien"],
+                    "to-cidrs": ["0.0.0.0/0", "::/0"]
+                }
+            }
+        }
+        change = ExposeChange(1, [], params=params)
 
         app = mock.Mock()
         app.expose = base.AsyncMock(return_value=None)
@@ -633,6 +677,16 @@ class TestExposeChangeRun:
         assert result is None
 
         model.applications["application1"].expose.assert_called_once()
+        model.applications["application1"].expose.assert_called_with({
+            "": {
+                "to-spaces": ["alpha"],
+                "to-cidrs": ["10.0.0.0/24"]
+            },
+            "foo": {
+                "to-spaces": ["alien"],
+                "to-cidrs": ["0.0.0.0/0", "::/0"]
+            }
+        })
 
 
 class TestScaleChange(unittest.TestCase):

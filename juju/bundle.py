@@ -742,7 +742,10 @@ class ConsumeOfferChange(ChangeInfo):
 
 
 class ExposeChange(ChangeInfo):
-    _toPy = {'application': 'application'}
+    _toPy = {
+        'application': 'application',
+        'exposed-endpoints': 'exposed_endpoints',
+    }
     """ExposeChange holds a change for exposing an application.
 
     :change_id: id of the change that will be used to identify the current
@@ -755,6 +758,10 @@ class ExposeChange(ChangeInfo):
     Params holds the following values:
         :application: placeholder name of the application that must be
             exposed.
+        :exposed_endpoints: a an optional dictionary where keys are endpoint
+            names and values are dicts that specify the space names and CIDRs
+            that should be able to access the port ranges that the application
+            has opened for each endpoint.
     """
     def __init__(self, change_id, requires, params=None):
         super(ExposeChange, self).__init__(change_id, requires)
@@ -781,7 +788,7 @@ class ExposeChange(ChangeInfo):
         """
         application = context.resolve(self.application)
         log.info('Exposing %s', application)
-        return await context.model.applications[application].expose()
+        return await context.model.applications[application].expose(self.exposed_endpoints)
 
     def __str__(self):
         return "expose {application}".format(application=self.application)
