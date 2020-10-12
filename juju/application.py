@@ -236,6 +236,11 @@ class Application(model.ModelEntity):
         return await app_facade.Destroy(application=self.name)
     remove = destroy
 
+    def supports_granular_expose_parameters(self):
+        """Returns true if the controller supports granular, per-endpoint
+           expose parameters."""
+        return self._facade_version() >= 13
+
     async def expose(self, exposed_endpoints=None):
         """Make a subset of the application endpoints or the entire application
            available over the network.
@@ -254,7 +259,7 @@ class Application(model.ModelEntity):
            is not supported and an error will be raised if it is provided.
         """
         app_facade = self._facade()
-        facade_version = self._facade_version()
+        ctrl_supports_expose_parameters = self.supports_granular_expose_parameters()
 
         if exposed_endpoints is not None:
             if not isinstance(exposed_endpoints, dict):
@@ -280,7 +285,7 @@ class Application(model.ModelEntity):
             )
 
             is_security_risk = (
-                facade_version < 13 and
+                not ctrl_supports_expose_parameters and
                 (
                     has_more_than_one_endpoints or
                     has_non_wildcard_endpoint or
@@ -308,7 +313,7 @@ class Application(model.ModelEntity):
         else:
             log.debug("expose all endpoints of %s and allow access from CIDRs 0.0.0.0/0 and ::/0", self.name)
 
-        if facade_version < 13:
+        if not ctrl_supports_expose_parameters:
             return await app_facade.Expose(application=self.name)
 
         return await app_facade.Expose(application=self.name,
