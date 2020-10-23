@@ -165,3 +165,33 @@ SOMECERT
         if con:
             assert con.connect_params()['endpoint'] == "42.42.42.42:4242"
             await con.close()
+
+
+@pytest.mark.asyncio
+async def test_rpc_none_results(event_loop):
+    ws = WebsocketMock([
+        {'request-id': 1, 'response': {'results': None}},
+    ])
+    expected_responses = [
+        {'request-id': 1, 'response': {'results': None}},
+    ]
+    minimal_facades = [{'name': 'Pinger', 'versions': [1]}]
+    con = None
+    try:
+        with \
+                mock.patch('websockets.connect', base.AsyncMock(return_value=ws)), \
+                mock.patch(
+                    'juju.client.connection.Connection.login',
+                    base.AsyncMock(return_value={'response': {
+                        'facades': minimal_facades,
+                    }}),
+                ), \
+                mock.patch('juju.client.connection.Connection._get_ssl'), \
+                mock.patch('juju.client.connection.Connection._pinger', base.AsyncMock()):
+            con = await Connection.connect('0.1.2.3:999')
+        actual_responses = []
+        actual_responses.append(await con.rpc({'version': 1}))
+        assert actual_responses == expected_responses
+    finally:
+        if con:
+            await con.close()
