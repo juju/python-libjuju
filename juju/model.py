@@ -919,14 +919,15 @@ class Model:
                     for delta in results.deltas:
                         try:
                             entity = get_entity_delta(delta)
-                            old_obj, new_obj = self.state.apply_delta(entity)
-                            await self._notify_observers(entity, old_obj, new_obj)
-                            # Post step ensure that we can handle any settings
-                            # that need to be correctly set as a post step.
-                            _post_step(new_obj)
                         except KeyError:
                             if self.strict_mode:
                                 raise JujuError("unknown delta type '{}'".format(delta.entity))
+
+                        old_obj, new_obj = self.state.apply_delta(entity)
+                        await self._notify_observers(entity, old_obj, new_obj)
+                        # Post step ensure that we can handle any settings
+                        # that need to be correctly set as a post step.
+                        _post_step(new_obj)
                     self._watch_received.set()
             except CancelledError:
                 pass
