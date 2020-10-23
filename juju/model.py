@@ -301,6 +301,12 @@ class ModelEntity:
         'application' or 'unit', etc.
 
         """
+        # Allow the overriding of entity names from the type instead of from
+        # the class name. Useful because Model and ModelInfo clash and we really
+        # want ModelInfo to be called Model.
+        if hasattr(self.__class__, "entity_name") and callable(self.__class__.entity_name):
+            return self.__class__.entity_name()
+
         def first_lower(s):
             if len(s) == 0:
                 return s
@@ -449,6 +455,7 @@ class Model:
         self._observers = weakref.WeakValueDictionary()
         self.state = ModelState(self)
         self._info = None
+        self._mode = None
         self._watch_stopping = asyncio.Event(loop=self._connector.loop)
         self._watch_stopped = asyncio.Event(loop=self._connector.loop)
         self._watch_received = asyncio.Event(loop=self._connector.loop)
@@ -797,6 +804,10 @@ class Model:
         """
         return self._info
 
+    @property
+    def strict_mode(self):
+        return self._mode is not None and "strict" in self._mode
+
     def add_observer(
             self, callable_, entity_type=None, action=None, entity_id=None,
             predicate=None):
@@ -843,7 +854,21 @@ class Model:
         See :meth:`add_observer` to register an onchange callback.
 
         """
+        def _post_step(obj):
+            # Once we get the model, ensure we're running in the correct state
+            # as a post step.
+            if isinstance(obj, ModelInfo) and obj.safe_data is not None:
+                model_config = obj.safe_data["config"]
+                if "mode" in model_config:
+                    self._mode = model_config["mode"]
+
         async def _all_watcher():
+            # First attempt to get the model config so we know what mode the
+            # library should be running in.
+            model_config = await self.get_config()
+            if "mode" in model_config:
+                self._mode = model_config["mode"]["value"]
+
             try:
                 allwatcher = client.AllWatcherFacade.from_connection(
                     self.connection())
@@ -893,16 +918,15 @@ class Model:
                         break
                     for delta in results.deltas:
                         try:
-                            delta = get_entity_delta(delta)
-                            old_obj, new_obj = self.state.apply_delta(delta)
-                            await self._notify_observers(delta, old_obj, new_obj)
-                        except KeyError as e:
-                            # TODO (stickupkid): we should raise the unknown delta
-                            # type, so we handle correctly all the types comming from
-                            # the all watcher. Currently they're ignored, causing
-                            # issue.
-                            # raise JujuError("unknown delta type {}".format(e.args))
-                            log.warning("unknown delta type: %s", e.args[0])
+                            entity = get_entity_delta(delta)
+                            old_obj, new_obj = self.state.apply_delta(entity)
+                            await self._notify_observers(entity, old_obj, new_obj)
+                            # Post step ensure that we can handle any settings
+                            # that need to be correctly set as a post step.
+                            _post_step(new_obj)
+                        except KeyError:
+                            if self.strict_mode:
+                                raise JujuError("unknown delta type '{}'".format(delta.entity))
                     self._watch_received.set()
             except CancelledError:
                 pass
@@ -2270,6 +2294,11 @@ class CharmArchiveGenerator:
 
 
 class ModelInfo(ModelEntity):
+
     @property
     def tag(self):
         return tag.model(self.uuid)
+
+    @staticmethod
+    def entity_name():
+        return "model"
