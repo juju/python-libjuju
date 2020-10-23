@@ -304,8 +304,8 @@ class ModelEntity:
         # Allow the overriding of entity names from the type instead of from
         # the class name. Useful because Model and ModelInfo clash and we really
         # want ModelInfo to be called Model.
-        if hasattr(self.__class__, "entity_name") and callable(self.__class__.entity_name):
-            return self.__class__.entity_name()
+        if hasattr(self.__class__, "type_name_override") and callable(self.__class__.type_name_override):
+            return self.__class__.type_name_override()
 
         def first_lower(s):
             if len(s) == 0:
@@ -2300,5 +2300,5 @@ class ModelInfo(ModelEntity):
         return tag.model(self.uuid)
 
     @staticmethod
-    def entity_name():
+    def type_name_override():
         return "model"
