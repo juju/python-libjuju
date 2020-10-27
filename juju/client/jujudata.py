@@ -121,7 +121,8 @@ class FileJujuData(JujuData):
     '''Provide access to the Juju client configuration files.
     Any configuration file is read once and then cached.'''
     def __init__(self):
-        self.path = os.environ.get('JUJU_DATA') or '~/.local/share/juju'
+        default_data_dir = pathlib.Path(pathlib.Path.home(), ".local", "share", "juju")
+        self.path = os.environ.get('JUJU_DATA', default_data_dir)
         self.path = os.path.abspath(os.path.expanduser(self.path))
         # _loaded keeps track of the loaded YAML from
         # the Juju data files so we don't need to load the same
