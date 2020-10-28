@@ -917,12 +917,15 @@ class Model:
                             pass  # can't stop on a closed conn
                         break
                     for delta in results.deltas:
+                        entity = None
                         try:
                             entity = get_entity_delta(delta)
                         except KeyError:
                             if self.strict_mode:
                                 raise JujuError("unknown delta type '{}'".format(delta.entity))
 
+                        if not self.strict_mode and entity is None:
+                            continue
                         old_obj, new_obj = self.state.apply_delta(entity)
                         await self._notify_observers(entity, old_obj, new_obj)
                         # Post step ensure that we can handle any settings
