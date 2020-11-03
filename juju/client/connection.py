@@ -482,7 +482,7 @@ class Connection:
             # errors, or perhaps a keyword parameter to the rpc method
             # could be added to trigger this behaviour.
             err_results = []
-            for res in result['response']['results']:
+            for res in result['response']['results'] or []:
                 if res.get('error', {}).get('message'):
                     err_results.append(res['error']['message'])
             if err_results:

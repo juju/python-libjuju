@@ -46,6 +46,9 @@ class AnnotationDelta(EntityDelta):
 
 
 class ModelDelta(EntityDelta):
+    def get_id(self):
+        return self.data['model-uuid']
+
     @classmethod
     def get_entity_class(self):
         from .model import ModelInfo
