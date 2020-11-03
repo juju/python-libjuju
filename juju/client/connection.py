@@ -29,13 +29,17 @@ client_facades = {
     'Backups': {'versions': [1, 2]},
     'Block': {'versions': [2]},
     'Bundle': {'versions': [1, 2, 3]},
+    'CharmHub': {'versions': [1]},
     'CharmRevisionUpdater': {'versions': [2]},
     'Charms': {'versions': [2]},
     'Cleaner': {'versions': [2]},
     'Client': {'versions': [1, 2]},
     'Cloud': {'versions': [1, 2, 3, 4, 5]},
     'CAASAdmission': {'versions': [1]},
+    'CAASApplication': {'versions': [1]},
+    'CAASApplicationProvisioner': {'versions': [1]},
     'CAASFirewaller': {'versions': [1]},
+    'CAASFirewallerEmbedded': {'versions': [1]},
     'CAASOperator': {'versions': [1]},
     'CAASAgent': {'versions': [1]},
     'CAASOperatorProvisioner': {'versions': [1]},
@@ -482,7 +486,7 @@ class Connection:
             # errors, or perhaps a keyword parameter to the rpc method
             # could be added to trigger this behaviour.
             err_results = []
-            for res in result['response']['results']:
+            for res in result['response']['results'] or []:
                 if res.get('error', {}).get('message'):
                     err_results.append(res['error']['message'])
             if err_results:
