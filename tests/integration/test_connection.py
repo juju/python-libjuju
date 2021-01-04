@@ -58,7 +58,7 @@ async def test_monitor_catches_error(event_loop):
 async def test_full_status(event_loop):
     async with base.CleanModel() as model:
         await model.deploy(
-            'ubuntu-0',
+            'cs:ubuntu-0',
             application_name='ubuntu',
             series='trusty',
             channel='stable',

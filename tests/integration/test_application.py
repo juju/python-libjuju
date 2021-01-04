@@ -50,7 +50,7 @@ async def test_action(event_loop):
 async def test_status_is_not_unset(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy(
-            'ubuntu-0',
+            'cs:ubuntu-0',
             application_name='ubuntu',
             series='trusty',
             channel='stable',
@@ -81,7 +81,7 @@ async def test_add_units(event_loop):
 
     async with base.CleanModel() as model:
         app = await model.deploy(
-            'ubuntu-0',
+            'cs:ubuntu-0',
             application_name='ubuntu',
             series='trusty',
             channel='stable',
@@ -97,7 +97,7 @@ async def test_add_units(event_loop):
 @pytest.mark.asyncio
 async def test_upgrade_charm(event_loop):
     async with base.CleanModel() as model:
-        app = await model.deploy('ubuntu-0')
+        app = await model.deploy('cs:ubuntu-0')
         await model.block_until(lambda: (len(app.units) > 0 and
                                          app.units[0].machine))
         assert app.data['charm-url'] == 'cs:ubuntu-0'
@@ -110,7 +110,7 @@ async def test_upgrade_charm(event_loop):
 @pytest.mark.asyncio
 async def test_upgrade_charm_channel(event_loop):
     async with base.CleanModel() as model:
-        app = await model.deploy('ubuntu-0')
+        app = await model.deploy('cs:ubuntu-0')
         await model.block_until(lambda: (len(app.units) > 0 and
                                          app.units[0].machine))
         assert app.data['charm-url'] == 'cs:ubuntu-0'
@@ -123,7 +123,7 @@ async def test_upgrade_charm_channel(event_loop):
 @pytest.mark.asyncio
 async def test_upgrade_charm_revision(event_loop):
     async with base.CleanModel() as model:
-        app = await model.deploy('ubuntu-0')
+        app = await model.deploy('cs:ubuntu-0')
         await model.block_until(lambda: (len(app.units) > 0 and
                                          app.units[0].machine))
         assert app.data['charm-url'] == 'cs:ubuntu-0'

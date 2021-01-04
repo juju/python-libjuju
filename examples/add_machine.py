@@ -44,7 +44,7 @@ async def main():
 
         # deploy charm to the lxd container
         application = await model.deploy(
-            'ubuntu-10',
+            'cs:ubuntu-10',
             application_name='ubuntu',
             series='xenial',
             channel='stable',

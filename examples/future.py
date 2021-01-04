@@ -15,7 +15,7 @@ async def main():
 
     goal_state = Model.from_yaml('bundle-like-thing')
     ubuntu_app = await model.deploy(
-        'ubuntu-0',
+        'cs:ubuntu-0',
         application_name='ubuntu',
         series='trusty',
         channel='stable',
@@ -23,7 +23,7 @@ async def main():
     ubuntu_app.on_unit_added(callback=lambda unit: True)
 
     await model.deploy(
-        'nrpe-11',
+        'cs:nrpe-11',
         application_name='nrpe',
         series='trusty',
         channel='stable',
