@@ -394,7 +394,18 @@ class Application(model.ModelEntity):
         log.debug(
             'Setting config for %s: %s', self.name, config)
 
-        return await app_facade.SetApplicationsConfig(args=[{
+        # Unfortunately we have to do this in a lazy fashion, attempting to use
+        # the method early will cause an error. Attempting to call this
+        # dynamically causes issues with how the client code is wired up... we
+        # end up with a missing _toPy attr.
+        # Using a lambda to only throw it away when it's wrong seems a problem
+        # as well.
+        config_method = None
+        if self._facade_version() < 13:
+            config_method = app_facade.SetApplicationsConfig
+        else:
+            config_method = app_facade.SetConfigs
+        return await config_method(args=[{
             "application": self.name,
             "config": config,
         }])
