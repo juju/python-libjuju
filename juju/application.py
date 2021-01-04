@@ -550,20 +550,20 @@ class Application(model.ModelEntity):
         """
         raise NotImplementedError()
 
-    async def upgrade_charm(
+    async def refresh(
             self, channel=None, force=False, force_series=False, force_units=False,
             path=None, resources=None, revision=None, switch=None):
-        """Upgrade the charm for this application.
+        """Refresh the charm for this application.
 
         :param str channel: Channel to use when getting the charm from the
             charm store, e.g. 'development'
-        :param bool force_series: Upgrade even if series of deployed
+        :param bool force_series: Refresh even if series of deployed
             application is not supported by the new charm
-        :param bool force_units: Upgrade all units immediately, even if in
+        :param bool force_units: Refresh all units immediately, even if in
             error state
-        :param str path: Uprade to a charm located at path
+        :param str path: Refresh to a charm located at path
         :param dict resources: Dictionary of resource name/filepath pairs
-        :param int revision: Explicit upgrade revision
+        :param int revision: Explicit refresh revision
         :param str switch: Crossgrade charm url
 
         """
@@ -670,6 +670,8 @@ class Application(model.ModelEntity):
         await self.model.block_until(
             lambda: self.data['charm-url'] == charm_url
         )
+
+    upgrade_charm = refresh
 
     async def get_metrics(self):
         """Get metrics for this application's units.
