@@ -499,6 +499,7 @@ class AdminFacade(Type):
                                       'properties': {'auth-tag': {'type': 'string'},
                                                      'bakery-version': {'type': 'integer'},
                                                      'cli-args': {'type': 'string'},
+                                                     'client-version': {'type': 'string'},
                                                      'credentials': {'type': 'string'},
                                                      'macaroons': {'items': {'items': {'$ref': '#/definitions/Macaroon'},
                                                                              'type': 'array'},
@@ -556,7 +557,7 @@ class AdminFacade(Type):
     
 
     @ReturnMapping(LoginResult)
-    async def Login(self, auth_tag=None, bakery_version=None, cli_args=None, credentials=None, macaroons=None, nonce=None, user_data=None):
+    async def Login(self, auth_tag=None, bakery_version=None, cli_args=None, client_version=None, credentials=None, macaroons=None, nonce=None, user_data=None):
         '''
         Login logs in with the provided credentials.  All subsequent requests on the
         connection will act as the authenticated user.
@@ -564,6 +565,7 @@ class AdminFacade(Type):
         auth_tag : str
         bakery_version : int
         cli_args : str
+        client_version : str
         credentials : str
         macaroons : typing.Sequence[~Macaroon]
         nonce : str
@@ -578,6 +580,9 @@ class AdminFacade(Type):
 
         if cli_args is not None and not isinstance(cli_args, (bytes, str)):
             raise Exception("Expected cli_args to be a str, received: {}".format(type(cli_args)))
+
+        if client_version is not None and not isinstance(client_version, (bytes, str)):
+            raise Exception("Expected client_version to be a str, received: {}".format(type(client_version)))
 
         if credentials is not None and not isinstance(credentials, (bytes, str)):
             raise Exception("Expected credentials to be a str, received: {}".format(type(credentials)))
@@ -600,6 +605,7 @@ class AdminFacade(Type):
         _params['auth-tag'] = auth_tag
         _params['bakery-version'] = bakery_version
         _params['cli-args'] = cli_args
+        _params['client-version'] = client_version
         _params['credentials'] = credentials
         _params['macaroons'] = macaroons
         _params['nonce'] = nonce
