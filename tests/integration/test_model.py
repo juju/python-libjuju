@@ -431,7 +431,7 @@ async def test_relate(event_loop):
             channel='stable',
         )
         await model.deploy(
-            'nrpe',
+            'cs:nrpe',
             application_name='nrpe',
             series='bionic',
             channel='stable',
@@ -687,7 +687,7 @@ async def test_machine_annotations(event_loop):
 async def test_application_annotations(event_loop):
 
     async with base.CleanModel() as model:
-        app = await model.deploy('ubuntu')
+        app = await model.deploy('cs:ubuntu')
 
         annotations = await app.get_annotations()
         assert len(annotations) == 0
@@ -704,7 +704,7 @@ async def test_application_annotations(event_loop):
 async def test_unit_annotations(event_loop):
 
     async with base.CleanModel() as model:
-        app = await model.deploy('ubuntu')
+        app = await model.deploy('cs:ubuntu')
         unit = app.units[0]
 
         annotations = await unit.get_annotations()

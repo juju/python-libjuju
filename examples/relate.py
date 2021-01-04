@@ -49,7 +49,7 @@ async def main():
         model.add_observer(MyModelObserver())
 
         ubuntu_app = await model.deploy(
-            'ubuntu',
+            'cs:ubuntu',
             application_name='ubuntu',
             series='trusty',
             channel='stable',
@@ -76,7 +76,7 @@ async def main():
                 print('Unit changed: {}'.format(new_unit.entity_id))
         ))
         await model.deploy(
-            'nrpe',
+            'cs:nrpe',
             application_name='nrpe',
             series='trusty',
             channel='stable',

@@ -49,7 +49,7 @@ async def test_run_action(event_loop):
 
     async with base.CleanModel() as model:
         app = await model.deploy(
-            'git',
+            'cs:git',
             application_name='git',
             series='trusty',
             channel='stable',
@@ -89,7 +89,7 @@ async def test_scp(event_loop):
     except RuntimeError:
         pytest.skip('test_scp will always fail outside of MainThread')
     async with base.CleanModel() as model:
-        app = await model.deploy('ubuntu')
+        app = await model.deploy('cs:ubuntu')
 
         await asyncio.wait_for(
             model.block_until(lambda: app.units),
@@ -123,7 +123,7 @@ async def test_ssh(event_loop):
     except RuntimeError:
         pytest.skip('test_ssh will always fail outside of MainThread')
     async with base.CleanModel() as model:
-        app = await model.deploy('ubuntu')
+        app = await model.deploy('cs:ubuntu')
 
         await asyncio.wait_for(
             model.block_until(lambda: app.units),
@@ -147,7 +147,7 @@ async def test_resolve(event_loop):
 
     async with base.CleanModel() as model:
         app = await model.deploy(
-            'ubuntu-0',
+            'cs:ubuntu-0',
             application_name='ubuntu',
             series='trusty',
             channel='stable',
