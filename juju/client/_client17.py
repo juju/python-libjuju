@@ -138,6 +138,7 @@ class UniterFacade(Type):
                                                   'identity-endpoint': {'type': 'string'},
                                                   'name': {'type': 'string'},
                                                   'region': {'type': 'string'},
+                                                  'skip-tls-verify': {'type': 'boolean'},
                                                   'storage-endpoint': {'type': 'string'},
                                                   'type': {'type': 'string'}},
                                    'required': ['type', 'name'],
@@ -1139,9 +1140,14 @@ class UniterFacade(Type):
                                     'properties': {'Result': {'$ref': '#/definitions/ModelConfigResult'}},
                                     'type': 'object'},
                     'ModelUUID': {'description': 'ModelUUID returns the model UUID '
-                                                 'to connect to the model\n'
-                                                 'that the current connection is '
-                                                 'for.',
+                                                 'that this unit resides in.\n'
+                                                 'It is implemented here directly '
+                                                 'as a result of removing it from\n'
+                                                 'embedded APIAddresser *without* '
+                                                 'bumping the facade version.\n'
+                                                 'It should be blanked when this '
+                                                 'facade version is next '
+                                                 'incremented.',
                                   'properties': {'Result': {'$ref': '#/definitions/StringResult'}},
                                   'type': 'object'},
                     'NetworkInfo': {'description': 'NetworkInfo returns network '
@@ -2637,8 +2643,10 @@ class UniterFacade(Type):
     @ReturnMapping(StringResult)
     async def ModelUUID(self):
         '''
-        ModelUUID returns the model UUID to connect to the model
-        that the current connection is for.
+        ModelUUID returns the model UUID that this unit resides in.
+        It is implemented here directly as a result of removing it from
+        embedded APIAddresser *without* bumping the facade version.
+        It should be blanked when this facade version is next incremented.
 
 
         Returns -> StringResult

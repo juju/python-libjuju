@@ -154,6 +154,18 @@ class CAASAgentFacade(TypeFactory):
     pass
 
 
+class CAASApplicationFacade(TypeFactory):
+    pass
+
+
+class CAASApplicationProvisionerFacade(TypeFactory):
+    pass
+
+
+class CAASFirewallerEmbeddedFacade(TypeFactory):
+    pass
+
+
 class CAASFirewallerFacade(TypeFactory):
     pass
 

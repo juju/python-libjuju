@@ -31,6 +31,7 @@ class CloudFacade(Type):
                                                                 'type': 'object'},
                                               'regions': {'items': {'$ref': '#/definitions/CloudRegion'},
                                                           'type': 'array'},
+                                              'skip-tls-verify': {'type': 'boolean'},
                                               'storage-endpoint': {'type': 'string'},
                                               'type': {'type': 'string'}},
                                'required': ['type'],

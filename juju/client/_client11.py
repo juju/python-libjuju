@@ -2013,6 +2013,7 @@ class ProvisionerFacade(Type):
                                                              'jobs': {'items': {'type': 'string'},
                                                                       'type': 'array'},
                                                              'placement': {'type': 'string'},
+                                                             'root-disk': {'$ref': '#/definitions/VolumeParams'},
                                                              'series': {'type': 'string'},
                                                              'tags': {'patternProperties': {'.*': {'type': 'string'}},
                                                                       'type': 'object'},
@@ -2054,6 +2055,7 @@ class ProvisionerFacade(Type):
                                                             'jobs': {'items': {'type': 'string'},
                                                                      'type': 'array'},
                                                             'placement': {'type': 'string'},
+                                                            'root-disk': {'$ref': '#/definitions/VolumeParams'},
                                                             'series': {'type': 'string'},
                                                             'space-subnets': {'patternProperties': {'.*': {'items': {'type': 'string'},
                                                                                                            'type': 'array'}},
@@ -2498,7 +2500,6 @@ class ProvisionerFacade(Type):
                                     'properties': {'Result': {'$ref': '#/definitions/ModelConfigResult'}},
                                     'type': 'object'},
                     'ModelUUID': {'description': 'ModelUUID returns the model UUID '
-                                                 'to connect to the model\n'
                                                  'that the current connection is '
                                                  'for.',
                                   'properties': {'Result': {'$ref': '#/definitions/StringResult'}},
@@ -2648,11 +2649,6 @@ class ProvisionerFacade(Type):
                                                'properties': {'Params': {'$ref': '#/definitions/MachineContainersParams'},
                                                               'Result': {'$ref': '#/definitions/ErrorResults'}},
                                                'type': 'object'},
-                    'StateAddresses': {'description': 'StateAddresses returns the '
-                                                      'list of addresses used to '
-                                                      'connect to the state.',
-                                       'properties': {'Result': {'$ref': '#/definitions/StringsResult'}},
-                                       'type': 'object'},
                     'Status': {'description': 'Status returns the status of each '
                                               'given entity.',
                                'properties': {'Params': {'$ref': '#/definitions/Entities'},
@@ -3331,8 +3327,7 @@ class ProvisionerFacade(Type):
     @ReturnMapping(StringResult)
     async def ModelUUID(self):
         '''
-        ModelUUID returns the model UUID to connect to the model
-        that the current connection is for.
+        ModelUUID returns the model UUID that the current connection is for.
 
 
         Returns -> StringResult
@@ -3692,27 +3687,6 @@ class ProvisionerFacade(Type):
                    version=11,
                    params=_params)
         _params['params'] = params
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(StringsResult)
-    async def StateAddresses(self):
-        '''
-        StateAddresses returns the list of addresses used to connect to the state.
-
-
-        Returns -> StringsResult
-        '''
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Provisioner',
-                   request='StateAddresses',
-                   version=11,
-                   params=_params)
-
         reply = await self.rpc(msg)
         return reply
 

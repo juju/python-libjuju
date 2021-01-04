@@ -488,6 +488,7 @@ class AgentFacade(Type):
                                                   'identity-endpoint': {'type': 'string'},
                                                   'name': {'type': 'string'},
                                                   'region': {'type': 'string'},
+                                                  'skip-tls-verify': {'type': 'boolean'},
                                                   'storage-endpoint': {'type': 'string'},
                                                   'type': {'type': 'string'}},
                                    'required': ['type', 'name'],
@@ -10982,6 +10983,242 @@ class RemoteRelationsFacade(Type):
                    version=2,
                    params=_params)
 
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+class ResourcesFacade(Type):
+    name = 'Resources'
+    version = 2
+    schema =     {'definitions': {'AddPendingResourcesArgsV2': {'additionalProperties': False,
+                                                   'properties': {'Entity': {'$ref': '#/definitions/Entity'},
+                                                                  'charm-origin': {'$ref': '#/definitions/CharmOrigin'},
+                                                                  'macaroon': {'$ref': '#/definitions/Macaroon'},
+                                                                  'resources': {'items': {'$ref': '#/definitions/CharmResource'},
+                                                                                'type': 'array'},
+                                                                  'tag': {'type': 'string'},
+                                                                  'url': {'type': 'string'}},
+                                                   'required': ['tag',
+                                                                'Entity',
+                                                                'url',
+                                                                'charm-origin',
+                                                                'macaroon',
+                                                                'resources'],
+                                                   'type': 'object'},
+                     'AddPendingResourcesResult': {'additionalProperties': False,
+                                                   'properties': {'ErrorResult': {'$ref': '#/definitions/ErrorResult'},
+                                                                  'error': {'$ref': '#/definitions/Error'},
+                                                                  'pending-ids': {'items': {'type': 'string'},
+                                                                                  'type': 'array'}},
+                                                   'required': ['ErrorResult',
+                                                                'pending-ids'],
+                                                   'type': 'object'},
+                     'CharmOrigin': {'additionalProperties': False,
+                                     'properties': {'architecture': {'type': 'string'},
+                                                    'hash': {'type': 'string'},
+                                                    'id': {'type': 'string'},
+                                                    'os': {'type': 'string'},
+                                                    'revision': {'type': 'integer'},
+                                                    'risk': {'type': 'string'},
+                                                    'series': {'type': 'string'},
+                                                    'source': {'type': 'string'},
+                                                    'track': {'type': 'string'},
+                                                    'type': {'type': 'string'}},
+                                     'required': ['source', 'type', 'id'],
+                                     'type': 'object'},
+                     'CharmResource': {'additionalProperties': False,
+                                       'properties': {'description': {'type': 'string'},
+                                                      'fingerprint': {'items': {'type': 'integer'},
+                                                                      'type': 'array'},
+                                                      'name': {'type': 'string'},
+                                                      'origin': {'type': 'string'},
+                                                      'path': {'type': 'string'},
+                                                      'revision': {'type': 'integer'},
+                                                      'size': {'type': 'integer'},
+                                                      'type': {'type': 'string'}},
+                                       'required': ['name',
+                                                    'type',
+                                                    'path',
+                                                    'origin',
+                                                    'revision',
+                                                    'fingerprint',
+                                                    'size'],
+                                       'type': 'object'},
+                     'Entity': {'additionalProperties': False,
+                                'properties': {'tag': {'type': 'string'}},
+                                'required': ['tag'],
+                                'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ErrorResult': {'additionalProperties': False,
+                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
+                                     'type': 'object'},
+                     'ListResourcesArgs': {'additionalProperties': False,
+                                           'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
+                                                                       'type': 'array'}},
+                                           'required': ['entities'],
+                                           'type': 'object'},
+                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
+                     'Resource': {'additionalProperties': False,
+                                  'properties': {'CharmResource': {'$ref': '#/definitions/CharmResource'},
+                                                 'application': {'type': 'string'},
+                                                 'description': {'type': 'string'},
+                                                 'fingerprint': {'items': {'type': 'integer'},
+                                                                 'type': 'array'},
+                                                 'id': {'type': 'string'},
+                                                 'name': {'type': 'string'},
+                                                 'origin': {'type': 'string'},
+                                                 'path': {'type': 'string'},
+                                                 'pending-id': {'type': 'string'},
+                                                 'revision': {'type': 'integer'},
+                                                 'size': {'type': 'integer'},
+                                                 'timestamp': {'format': 'date-time',
+                                                               'type': 'string'},
+                                                 'type': {'type': 'string'},
+                                                 'username': {'type': 'string'}},
+                                  'required': ['name',
+                                               'type',
+                                               'path',
+                                               'origin',
+                                               'revision',
+                                               'fingerprint',
+                                               'size',
+                                               'CharmResource',
+                                               'id',
+                                               'pending-id',
+                                               'application',
+                                               'username',
+                                               'timestamp'],
+                                  'type': 'object'},
+                     'ResourcesResult': {'additionalProperties': False,
+                                         'properties': {'ErrorResult': {'$ref': '#/definitions/ErrorResult'},
+                                                        'charm-store-resources': {'items': {'$ref': '#/definitions/CharmResource'},
+                                                                                  'type': 'array'},
+                                                        'error': {'$ref': '#/definitions/Error'},
+                                                        'resources': {'items': {'$ref': '#/definitions/Resource'},
+                                                                      'type': 'array'},
+                                                        'unit-resources': {'items': {'$ref': '#/definitions/UnitResources'},
+                                                                           'type': 'array'}},
+                                         'required': ['ErrorResult',
+                                                      'resources',
+                                                      'charm-store-resources',
+                                                      'unit-resources'],
+                                         'type': 'object'},
+                     'ResourcesResults': {'additionalProperties': False,
+                                          'properties': {'results': {'items': {'$ref': '#/definitions/ResourcesResult'},
+                                                                     'type': 'array'}},
+                                          'required': ['results'],
+                                          'type': 'object'},
+                     'UnitResources': {'additionalProperties': False,
+                                       'properties': {'Entity': {'$ref': '#/definitions/Entity'},
+                                                      'download-progress': {'patternProperties': {'.*': {'type': 'integer'}},
+                                                                            'type': 'object'},
+                                                      'resources': {'items': {'$ref': '#/definitions/Resource'},
+                                                                    'type': 'array'},
+                                                      'tag': {'type': 'string'}},
+                                       'required': ['tag',
+                                                    'Entity',
+                                                    'resources',
+                                                    'download-progress'],
+                                       'type': 'object'}},
+     'properties': {'AddPendingResources': {'description': 'AddPendingResources '
+                                                           'adds the provided '
+                                                           'resources (info) to '
+                                                           'the Juju\n'
+                                                           'model in a pending '
+                                                           'state, meaning they '
+                                                           'are not available '
+                                                           'until\n'
+                                                           'resolved. Handles '
+                                                           'CharmHub, CharmStore '
+                                                           'and Local charms.',
+                                            'properties': {'Params': {'$ref': '#/definitions/AddPendingResourcesArgsV2'},
+                                                           'Result': {'$ref': '#/definitions/AddPendingResourcesResult'}},
+                                            'type': 'object'},
+                    'ListResources': {'description': 'ListResources returns the '
+                                                     'list of resources for the '
+                                                     'given application.',
+                                      'properties': {'Params': {'$ref': '#/definitions/ListResourcesArgs'},
+                                                     'Result': {'$ref': '#/definitions/ResourcesResults'}},
+                                      'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(AddPendingResourcesResult)
+    async def AddPendingResources(self, entity=None, charm_origin=None, macaroon=None, resources=None, tag=None, url=None):
+        '''
+        AddPendingResources adds the provided resources (info) to the Juju
+        model in a pending state, meaning they are not available until
+        resolved. Handles CharmHub, CharmStore and Local charms.
+
+        entity : Entity
+        charm_origin : CharmOrigin
+        macaroon : Macaroon
+        resources : typing.Sequence[~CharmResource]
+        tag : str
+        url : str
+        Returns -> AddPendingResourcesResult
+        '''
+        if entity is not None and not isinstance(entity, (dict, Entity)):
+            raise Exception("Expected entity to be a Entity, received: {}".format(type(entity)))
+
+        if charm_origin is not None and not isinstance(charm_origin, (dict, CharmOrigin)):
+            raise Exception("Expected charm_origin to be a CharmOrigin, received: {}".format(type(charm_origin)))
+
+        if macaroon is not None and not isinstance(macaroon, (dict, Macaroon)):
+            raise Exception("Expected macaroon to be a Macaroon, received: {}".format(type(macaroon)))
+
+        if resources is not None and not isinstance(resources, (bytes, str, list)):
+            raise Exception("Expected resources to be a Sequence, received: {}".format(type(resources)))
+
+        if tag is not None and not isinstance(tag, (bytes, str)):
+            raise Exception("Expected tag to be a str, received: {}".format(type(tag)))
+
+        if url is not None and not isinstance(url, (bytes, str)):
+            raise Exception("Expected url to be a str, received: {}".format(type(url)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Resources',
+                   request='AddPendingResources',
+                   version=2,
+                   params=_params)
+        _params['Entity'] = entity
+        _params['charm-origin'] = charm_origin
+        _params['macaroon'] = macaroon
+        _params['resources'] = resources
+        _params['tag'] = tag
+        _params['url'] = url
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ResourcesResults)
+    async def ListResources(self, entities=None):
+        '''
+        ListResources returns the list of resources for the given application.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ResourcesResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Resources',
+                   request='ListResources',
+                   version=2,
+                   params=_params)
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 

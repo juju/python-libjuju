@@ -892,6 +892,54 @@ class AddPendingResourcesArgs(Type):
 
 
 
+class AddPendingResourcesArgsV2(Type):
+    _toSchema = {'charm_origin': 'charm-origin', 'entity': 'Entity', 'macaroon': 'macaroon', 'resources': 'resources', 'tag': 'tag', 'url': 'url'}
+    _toPy = {'Entity': 'entity', 'charm-origin': 'charm_origin', 'macaroon': 'macaroon', 'resources': 'resources', 'tag': 'tag', 'url': 'url'}
+    def __init__(self, entity=None, charm_origin=None, macaroon=None, resources=None, tag=None, url=None, **unknown_fields):
+        '''
+        entity : Entity
+        charm_origin : CharmOrigin
+        macaroon : Macaroon
+        resources : typing.Sequence[~CharmResource]
+        tag : str
+        url : str
+        '''
+        entity_ = Entity.from_json(entity) if entity else None
+        charm_origin_ = CharmOrigin.from_json(charm_origin) if charm_origin else None
+        macaroon_ = Macaroon.from_json(macaroon) if macaroon else None
+        resources_ = [CharmResource.from_json(o) for o in resources or []]
+        tag_ = tag
+        url_ = url
+
+        # Validate arguments against known Juju API types.
+        if entity_ is not None and not isinstance(entity_, (dict, Entity)):
+            raise Exception("Expected entity_ to be a Entity, received: {}".format(type(entity_)))
+
+        if charm_origin_ is not None and not isinstance(charm_origin_, (dict, CharmOrigin)):
+            raise Exception("Expected charm_origin_ to be a CharmOrigin, received: {}".format(type(charm_origin_)))
+
+        if macaroon_ is not None and not isinstance(macaroon_, (dict, Macaroon)):
+            raise Exception("Expected macaroon_ to be a Macaroon, received: {}".format(type(macaroon_)))
+
+        if resources_ is not None and not isinstance(resources_, (bytes, str, list)):
+            raise Exception("Expected resources_ to be a Sequence, received: {}".format(type(resources_)))
+
+        if tag_ is not None and not isinstance(tag_, (bytes, str)):
+            raise Exception("Expected tag_ to be a str, received: {}".format(type(tag_)))
+
+        if url_ is not None and not isinstance(url_, (bytes, str)):
+            raise Exception("Expected url_ to be a str, received: {}".format(type(url_)))
+
+        self.entity = entity_
+        self.charm_origin = charm_origin_
+        self.macaroon = macaroon_
+        self.resources = resources_
+        self.tag = tag_
+        self.url = url_
+        self.unknown_fields = unknown_fields
+
+
+
 class AddPendingResourcesResult(Type):
     _toSchema = {'error': 'error', 'errorresult': 'ErrorResult', 'pending_ids': 'pending-ids'}
     _toPy = {'ErrorResult': 'errorresult', 'error': 'error', 'pending-ids': 'pending_ids'}
@@ -1494,6 +1542,48 @@ class ApplicationCharmActionsResult(Type):
         self.actions = actions_
         self.application_tag = application_tag_
         self.error = error_
+        self.unknown_fields = unknown_fields
+
+
+
+class ApplicationCharmPlacement(Type):
+    _toSchema = {'application': 'application', 'charm_url': 'charm-url'}
+    _toPy = {'application': 'application', 'charm-url': 'charm_url'}
+    def __init__(self, application=None, charm_url=None, **unknown_fields):
+        '''
+        application : str
+        charm_url : str
+        '''
+        application_ = application
+        charm_url_ = charm_url
+
+        # Validate arguments against known Juju API types.
+        if application_ is not None and not isinstance(application_, (bytes, str)):
+            raise Exception("Expected application_ to be a str, received: {}".format(type(application_)))
+
+        if charm_url_ is not None and not isinstance(charm_url_, (bytes, str)):
+            raise Exception("Expected charm_url_ to be a str, received: {}".format(type(charm_url_)))
+
+        self.application = application_
+        self.charm_url = charm_url_
+        self.unknown_fields = unknown_fields
+
+
+
+class ApplicationCharmPlacements(Type):
+    _toSchema = {'placements': 'placements'}
+    _toPy = {'placements': 'placements'}
+    def __init__(self, placements=None, **unknown_fields):
+        '''
+        placements : typing.Sequence[~ApplicationCharmPlacement]
+        '''
+        placements_ = [ApplicationCharmPlacement.from_json(o) for o in placements or []]
+
+        # Validate arguments against known Juju API types.
+        if placements_ is not None and not isinstance(placements_, (bytes, str, list)):
+            raise Exception("Expected placements_ to be a Sequence, received: {}".format(type(placements_)))
+
+        self.placements = placements_
         self.unknown_fields = unknown_fields
 
 
@@ -4096,25 +4186,25 @@ class BundleChangesResults(Type):
 
 
 class BundleCharm(Type):
-    _toSchema = {'name': 'name', 'revision': 'revision'}
-    _toPy = {'name': 'name', 'revision': 'revision'}
-    def __init__(self, name=None, revision=None, **unknown_fields):
+    _toSchema = {'name': 'name', 'package_id': 'package-id'}
+    _toPy = {'name': 'name', 'package-id': 'package_id'}
+    def __init__(self, name=None, package_id=None, **unknown_fields):
         '''
         name : str
-        revision : int
+        package_id : str
         '''
         name_ = name
-        revision_ = revision
+        package_id_ = package_id
 
         # Validate arguments against known Juju API types.
         if name_ is not None and not isinstance(name_, (bytes, str)):
             raise Exception("Expected name_ to be a str, received: {}".format(type(name_)))
 
-        if revision_ is not None and not isinstance(revision_, int):
-            raise Exception("Expected revision_ to be a int, received: {}".format(type(revision_)))
+        if package_id_ is not None and not isinstance(package_id_, (bytes, str)):
+            raise Exception("Expected package_id_ to be a str, received: {}".format(type(package_id_)))
 
         self.name = name_
-        self.revision = revision_
+        self.package_id = package_id_
         self.unknown_fields = unknown_fields
 
 
@@ -4132,6 +4222,312 @@ class BytesResult(Type):
         if result_ is not None and not isinstance(result_, (bytes, str, list)):
             raise Exception("Expected result_ to be a Sequence, received: {}".format(type(result_)))
 
+        self.result = result_
+        self.unknown_fields = unknown_fields
+
+
+
+class CAASApplicationGarbageCollectArg(Type):
+    _toSchema = {'active_pod_names': 'active-pod-names', 'application': 'application', 'desired_replicas': 'desired-replicas', 'force': 'force', 'observed_units': 'observed-units'}
+    _toPy = {'active-pod-names': 'active_pod_names', 'application': 'application', 'desired-replicas': 'desired_replicas', 'force': 'force', 'observed-units': 'observed_units'}
+    def __init__(self, active_pod_names=None, application=None, desired_replicas=None, force=None, observed_units=None, **unknown_fields):
+        '''
+        active_pod_names : typing.Sequence[str]
+        application : Entity
+        desired_replicas : int
+        force : bool
+        observed_units : Entities
+        '''
+        active_pod_names_ = active_pod_names
+        application_ = Entity.from_json(application) if application else None
+        desired_replicas_ = desired_replicas
+        force_ = force
+        observed_units_ = Entities.from_json(observed_units) if observed_units else None
+
+        # Validate arguments against known Juju API types.
+        if active_pod_names_ is not None and not isinstance(active_pod_names_, (bytes, str, list)):
+            raise Exception("Expected active_pod_names_ to be a Sequence, received: {}".format(type(active_pod_names_)))
+
+        if application_ is not None and not isinstance(application_, (dict, Entity)):
+            raise Exception("Expected application_ to be a Entity, received: {}".format(type(application_)))
+
+        if desired_replicas_ is not None and not isinstance(desired_replicas_, int):
+            raise Exception("Expected desired_replicas_ to be a int, received: {}".format(type(desired_replicas_)))
+
+        if force_ is not None and not isinstance(force_, bool):
+            raise Exception("Expected force_ to be a bool, received: {}".format(type(force_)))
+
+        if observed_units_ is not None and not isinstance(observed_units_, (dict, Entities)):
+            raise Exception("Expected observed_units_ to be a Entities, received: {}".format(type(observed_units_)))
+
+        self.active_pod_names = active_pod_names_
+        self.application = application_
+        self.desired_replicas = desired_replicas_
+        self.force = force_
+        self.observed_units = observed_units_
+        self.unknown_fields = unknown_fields
+
+
+
+class CAASApplicationGarbageCollectArgs(Type):
+    _toSchema = {'args': 'args'}
+    _toPy = {'args': 'args'}
+    def __init__(self, args=None, **unknown_fields):
+        '''
+        args : typing.Sequence[~CAASApplicationGarbageCollectArg]
+        '''
+        args_ = [CAASApplicationGarbageCollectArg.from_json(o) for o in args or []]
+
+        # Validate arguments against known Juju API types.
+        if args_ is not None and not isinstance(args_, (bytes, str, list)):
+            raise Exception("Expected args_ to be a Sequence, received: {}".format(type(args_)))
+
+        self.args = args_
+        self.unknown_fields = unknown_fields
+
+
+
+class CAASApplicationOCIResourceResult(Type):
+    _toSchema = {'error': 'error', 'result': 'result'}
+    _toPy = {'error': 'error', 'result': 'result'}
+    def __init__(self, error=None, result=None, **unknown_fields):
+        '''
+        error : Error
+        result : CAASApplicationOCIResources
+        '''
+        error_ = Error.from_json(error) if error else None
+        result_ = CAASApplicationOCIResources.from_json(result) if result else None
+
+        # Validate arguments against known Juju API types.
+        if error_ is not None and not isinstance(error_, (dict, Error)):
+            raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
+
+        if result_ is not None and not isinstance(result_, (dict, CAASApplicationOCIResources)):
+            raise Exception("Expected result_ to be a CAASApplicationOCIResources, received: {}".format(type(result_)))
+
+        self.error = error_
+        self.result = result_
+        self.unknown_fields = unknown_fields
+
+
+
+class CAASApplicationOCIResourceResults(Type):
+    _toSchema = {'results': 'results'}
+    _toPy = {'results': 'results'}
+    def __init__(self, results=None, **unknown_fields):
+        '''
+        results : typing.Sequence[~CAASApplicationOCIResourceResult]
+        '''
+        results_ = [CAASApplicationOCIResourceResult.from_json(o) for o in results or []]
+
+        # Validate arguments against known Juju API types.
+        if results_ is not None and not isinstance(results_, (bytes, str, list)):
+            raise Exception("Expected results_ to be a Sequence, received: {}".format(type(results_)))
+
+        self.results = results_
+        self.unknown_fields = unknown_fields
+
+
+
+class CAASApplicationOCIResources(Type):
+    _toSchema = {'images': 'images'}
+    _toPy = {'images': 'images'}
+    def __init__(self, images=None, **unknown_fields):
+        '''
+        images : typing.Mapping[str, ~DockerImageInfo]
+        '''
+        images_ = {k: DockerImageInfo.from_json(v) for k, v in (images or dict()).items()}
+
+        # Validate arguments against known Juju API types.
+        if images_ is not None and not isinstance(images_, dict):
+            raise Exception("Expected images_ to be a Mapping, received: {}".format(type(images_)))
+
+        self.images = images_
+        self.unknown_fields = unknown_fields
+
+
+
+class CAASApplicationProvisioningInfo(Type):
+    _toSchema = {'api_addresses': 'api-addresses', 'ca_cert': 'ca-cert', 'charm_modified_version': 'charm-modified-version', 'charm_url': 'charm-url', 'constraints': 'constraints', 'devices': 'devices', 'error': 'error', 'filesystems': 'filesystems', 'image_path': 'image-path', 'image_repo': 'image-repo', 'series': 'series', 'tags': 'tags', 'version': 'version', 'volumes': 'volumes'}
+    _toPy = {'api-addresses': 'api_addresses', 'ca-cert': 'ca_cert', 'charm-modified-version': 'charm_modified_version', 'charm-url': 'charm_url', 'constraints': 'constraints', 'devices': 'devices', 'error': 'error', 'filesystems': 'filesystems', 'image-path': 'image_path', 'image-repo': 'image_repo', 'series': 'series', 'tags': 'tags', 'version': 'version', 'volumes': 'volumes'}
+    def __init__(self, api_addresses=None, ca_cert=None, charm_modified_version=None, charm_url=None, constraints=None, devices=None, error=None, filesystems=None, image_path=None, image_repo=None, series=None, tags=None, version=None, volumes=None, **unknown_fields):
+        '''
+        api_addresses : typing.Sequence[str]
+        ca_cert : str
+        charm_modified_version : int
+        charm_url : str
+        constraints : Value
+        devices : typing.Sequence[~KubernetesDeviceParams]
+        error : Error
+        filesystems : typing.Sequence[~KubernetesFilesystemParams]
+        image_path : str
+        image_repo : str
+        series : str
+        tags : typing.Mapping[str, str]
+        version : Number
+        volumes : typing.Sequence[~KubernetesVolumeParams]
+        '''
+        api_addresses_ = api_addresses
+        ca_cert_ = ca_cert
+        charm_modified_version_ = charm_modified_version
+        charm_url_ = charm_url
+        constraints_ = Value.from_json(constraints) if constraints else None
+        devices_ = [KubernetesDeviceParams.from_json(o) for o in devices or []]
+        error_ = Error.from_json(error) if error else None
+        filesystems_ = [KubernetesFilesystemParams.from_json(o) for o in filesystems or []]
+        image_path_ = image_path
+        image_repo_ = image_repo
+        series_ = series
+        tags_ = tags
+        version_ = Number.from_json(version) if version else None
+        volumes_ = [KubernetesVolumeParams.from_json(o) for o in volumes or []]
+
+        # Validate arguments against known Juju API types.
+        if api_addresses_ is not None and not isinstance(api_addresses_, (bytes, str, list)):
+            raise Exception("Expected api_addresses_ to be a Sequence, received: {}".format(type(api_addresses_)))
+
+        if ca_cert_ is not None and not isinstance(ca_cert_, (bytes, str)):
+            raise Exception("Expected ca_cert_ to be a str, received: {}".format(type(ca_cert_)))
+
+        if charm_modified_version_ is not None and not isinstance(charm_modified_version_, int):
+            raise Exception("Expected charm_modified_version_ to be a int, received: {}".format(type(charm_modified_version_)))
+
+        if charm_url_ is not None and not isinstance(charm_url_, (bytes, str)):
+            raise Exception("Expected charm_url_ to be a str, received: {}".format(type(charm_url_)))
+
+        if constraints_ is not None and not isinstance(constraints_, (dict, Value)):
+            raise Exception("Expected constraints_ to be a Value, received: {}".format(type(constraints_)))
+
+        if devices_ is not None and not isinstance(devices_, (bytes, str, list)):
+            raise Exception("Expected devices_ to be a Sequence, received: {}".format(type(devices_)))
+
+        if error_ is not None and not isinstance(error_, (dict, Error)):
+            raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
+
+        if filesystems_ is not None and not isinstance(filesystems_, (bytes, str, list)):
+            raise Exception("Expected filesystems_ to be a Sequence, received: {}".format(type(filesystems_)))
+
+        if image_path_ is not None and not isinstance(image_path_, (bytes, str)):
+            raise Exception("Expected image_path_ to be a str, received: {}".format(type(image_path_)))
+
+        if image_repo_ is not None and not isinstance(image_repo_, (bytes, str)):
+            raise Exception("Expected image_repo_ to be a str, received: {}".format(type(image_repo_)))
+
+        if series_ is not None and not isinstance(series_, (bytes, str)):
+            raise Exception("Expected series_ to be a str, received: {}".format(type(series_)))
+
+        if tags_ is not None and not isinstance(tags_, dict):
+            raise Exception("Expected tags_ to be a Mapping, received: {}".format(type(tags_)))
+
+        if version_ is not None and not isinstance(version_, (dict, Number)):
+            raise Exception("Expected version_ to be a Number, received: {}".format(type(version_)))
+
+        if volumes_ is not None and not isinstance(volumes_, (bytes, str, list)):
+            raise Exception("Expected volumes_ to be a Sequence, received: {}".format(type(volumes_)))
+
+        self.api_addresses = api_addresses_
+        self.ca_cert = ca_cert_
+        self.charm_modified_version = charm_modified_version_
+        self.charm_url = charm_url_
+        self.constraints = constraints_
+        self.devices = devices_
+        self.error = error_
+        self.filesystems = filesystems_
+        self.image_path = image_path_
+        self.image_repo = image_repo_
+        self.series = series_
+        self.tags = tags_
+        self.version = version_
+        self.volumes = volumes_
+        self.unknown_fields = unknown_fields
+
+
+
+class CAASApplicationProvisioningInfoResults(Type):
+    _toSchema = {'results': 'results'}
+    _toPy = {'results': 'results'}
+    def __init__(self, results=None, **unknown_fields):
+        '''
+        results : typing.Sequence[~CAASApplicationProvisioningInfo]
+        '''
+        results_ = [CAASApplicationProvisioningInfo.from_json(o) for o in results or []]
+
+        # Validate arguments against known Juju API types.
+        if results_ is not None and not isinstance(results_, (bytes, str, list)):
+            raise Exception("Expected results_ to be a Sequence, received: {}".format(type(results_)))
+
+        self.results = results_
+        self.unknown_fields = unknown_fields
+
+
+
+class CAASUnitIntroduction(Type):
+    _toSchema = {'agent_conf': 'agent-conf', 'unit_name': 'unit-name'}
+    _toPy = {'agent-conf': 'agent_conf', 'unit-name': 'unit_name'}
+    def __init__(self, agent_conf=None, unit_name=None, **unknown_fields):
+        '''
+        agent_conf : typing.Sequence[int]
+        unit_name : str
+        '''
+        agent_conf_ = agent_conf
+        unit_name_ = unit_name
+
+        # Validate arguments against known Juju API types.
+        if agent_conf_ is not None and not isinstance(agent_conf_, (bytes, str, list)):
+            raise Exception("Expected agent_conf_ to be a Sequence, received: {}".format(type(agent_conf_)))
+
+        if unit_name_ is not None and not isinstance(unit_name_, (bytes, str)):
+            raise Exception("Expected unit_name_ to be a str, received: {}".format(type(unit_name_)))
+
+        self.agent_conf = agent_conf_
+        self.unit_name = unit_name_
+        self.unknown_fields = unknown_fields
+
+
+
+class CAASUnitIntroductionArgs(Type):
+    _toSchema = {'pod_name': 'pod-name', 'pod_uuid': 'pod-uuid'}
+    _toPy = {'pod-name': 'pod_name', 'pod-uuid': 'pod_uuid'}
+    def __init__(self, pod_name=None, pod_uuid=None, **unknown_fields):
+        '''
+        pod_name : str
+        pod_uuid : str
+        '''
+        pod_name_ = pod_name
+        pod_uuid_ = pod_uuid
+
+        # Validate arguments against known Juju API types.
+        if pod_name_ is not None and not isinstance(pod_name_, (bytes, str)):
+            raise Exception("Expected pod_name_ to be a str, received: {}".format(type(pod_name_)))
+
+        if pod_uuid_ is not None and not isinstance(pod_uuid_, (bytes, str)):
+            raise Exception("Expected pod_uuid_ to be a str, received: {}".format(type(pod_uuid_)))
+
+        self.pod_name = pod_name_
+        self.pod_uuid = pod_uuid_
+        self.unknown_fields = unknown_fields
+
+
+
+class CAASUnitIntroductionResult(Type):
+    _toSchema = {'error': 'error', 'result': 'result'}
+    _toPy = {'error': 'error', 'result': 'result'}
+    def __init__(self, error=None, result=None, **unknown_fields):
+        '''
+        error : Error
+        result : CAASUnitIntroduction
+        '''
+        error_ = Error.from_json(error) if error else None
+        result_ = CAASUnitIntroduction.from_json(result) if result else None
+
+        # Validate arguments against known Juju API types.
+        if error_ is not None and not isinstance(error_, (dict, Error)):
+            raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
+
+        if result_ is not None and not isinstance(result_, (dict, CAASUnitIntroduction)):
+            raise Exception("Expected result_ to be a CAASUnitIntroduction, received: {}".format(type(result_)))
+
+        self.error = error_
         self.result = result_
         self.unknown_fields = unknown_fields
 
@@ -4198,12 +4594,13 @@ class ChangeModelCredentialsParams(Type):
 
 
 class Channel(Type):
-    _toSchema = {'platforms': 'platforms', 'released_at': 'released-at', 'revision': 'revision', 'risk': 'risk', 'size': 'size', 'track': 'track', 'version': 'version'}
-    _toPy = {'platforms': 'platforms', 'released-at': 'released_at', 'revision': 'revision', 'risk': 'risk', 'size': 'size', 'track': 'track', 'version': 'version'}
-    def __init__(self, platforms=None, released_at=None, revision=None, risk=None, size=None, track=None, version=None, **unknown_fields):
+    _toSchema = {'platforms': 'platforms', 'released_at': 'released-at', 'resources': 'resources', 'revision': 'revision', 'risk': 'risk', 'size': 'size', 'track': 'track', 'version': 'version'}
+    _toPy = {'platforms': 'platforms', 'released-at': 'released_at', 'resources': 'resources', 'revision': 'revision', 'risk': 'risk', 'size': 'size', 'track': 'track', 'version': 'version'}
+    def __init__(self, platforms=None, released_at=None, resources=None, revision=None, risk=None, size=None, track=None, version=None, **unknown_fields):
         '''
         platforms : typing.Sequence[~Platform]
         released_at : str
+        resources : typing.Sequence[~CharmHubInfoResource]
         revision : int
         risk : str
         size : int
@@ -4212,6 +4609,7 @@ class Channel(Type):
         '''
         platforms_ = [Platform.from_json(o) for o in platforms or []]
         released_at_ = released_at
+        resources_ = [CharmHubInfoResource.from_json(o) for o in resources or []]
         revision_ = revision
         risk_ = risk
         size_ = size
@@ -4224,6 +4622,9 @@ class Channel(Type):
 
         if released_at_ is not None and not isinstance(released_at_, (bytes, str)):
             raise Exception("Expected released_at_ to be a str, received: {}".format(type(released_at_)))
+
+        if resources_ is not None and not isinstance(resources_, (bytes, str, list)):
+            raise Exception("Expected resources_ to be a Sequence, received: {}".format(type(resources_)))
 
         if revision_ is not None and not isinstance(revision_, int):
             raise Exception("Expected revision_ to be a int, received: {}".format(type(revision_)))
@@ -4242,6 +4643,7 @@ class Channel(Type):
 
         self.platforms = platforms_
         self.released_at = released_at_
+        self.resources = resources_
         self.revision = revision_
         self.risk = risk_
         self.size = size_
@@ -4343,6 +4745,66 @@ class CharmActions(Type):
             raise Exception("Expected specs_ to be a Mapping, received: {}".format(type(specs_)))
 
         self.specs = specs_
+        self.unknown_fields = unknown_fields
+
+
+
+class CharmContainer(Type):
+    _toSchema = {'mounts': 'mounts', 'systems': 'systems'}
+    _toPy = {'mounts': 'mounts', 'systems': 'systems'}
+    def __init__(self, mounts=None, systems=None, **unknown_fields):
+        '''
+        mounts : typing.Sequence[~CharmMount]
+        systems : typing.Sequence[~CharmSystem]
+        '''
+        mounts_ = [CharmMount.from_json(o) for o in mounts or []]
+        systems_ = [CharmSystem.from_json(o) for o in systems or []]
+
+        # Validate arguments against known Juju API types.
+        if mounts_ is not None and not isinstance(mounts_, (bytes, str, list)):
+            raise Exception("Expected mounts_ to be a Sequence, received: {}".format(type(mounts_)))
+
+        if systems_ is not None and not isinstance(systems_, (bytes, str, list)):
+            raise Exception("Expected systems_ to be a Sequence, received: {}".format(type(systems_)))
+
+        self.mounts = mounts_
+        self.systems = systems_
+        self.unknown_fields = unknown_fields
+
+
+
+class CharmDeployment(Type):
+    _toSchema = {'min_version': 'min-version', 'mode': 'mode', 'service': 'service', 'type_': 'type'}
+    _toPy = {'min-version': 'min_version', 'mode': 'mode', 'service': 'service', 'type': 'type_'}
+    def __init__(self, min_version=None, mode=None, service=None, type_=None, **unknown_fields):
+        '''
+        min_version : str
+        mode : str
+        service : str
+        type_ : str
+        '''
+        min_version_ = min_version
+        mode_ = mode
+        service_ = service
+        type__ = type_
+
+        # Validate arguments against known Juju API types.
+        if min_version_ is not None and not isinstance(min_version_, (bytes, str)):
+            raise Exception("Expected min_version_ to be a str, received: {}".format(type(min_version_)))
+
+        if mode_ is not None and not isinstance(mode_, (bytes, str)):
+            raise Exception("Expected mode_ to be a str, received: {}".format(type(mode_)))
+
+        if service_ is not None and not isinstance(service_, (bytes, str)):
+            raise Exception("Expected service_ to be a str, received: {}".format(type(service_)))
+
+        if type__ is not None and not isinstance(type__, (bytes, str)):
+            raise Exception("Expected type__ to be a str, received: {}".format(type(type__)))
+
+        self.min_version = min_version_
+        self.mode = mode_
+        self.service = service_
+        self.type_ = type__
         self.unknown_fields = unknown_fields
 
 
@@ -4515,6 +4977,48 @@ class CharmHubError(Type):
 
 
 
+class CharmHubInfoResource(Type):
+    _toSchema = {'name': 'name', 'revision': 'revision', 'size': 'size', 'type_': 'type', 'url': 'url'}
+    _toPy = {'name': 'name', 'revision': 'revision', 'size': 'size', 'type': 'type_', 'url': 'url'}
+    def __init__(self, name=None, revision=None, size=None, type_=None, url=None, **unknown_fields):
+        '''
+        name : str
+        revision : int
+        size : int
+        type_ : str
+        url : str
+        '''
+        name_ = name
+        revision_ = revision
+        size_ = size
+        type__ = type_
+        url_ = url
+
+        # Validate arguments against known Juju API types.
+        if name_ is not None and not isinstance(name_, (bytes, str)):
+            raise Exception("Expected name_ to be a str, received: {}".format(type(name_)))
+
+        if revision_ is not None and not isinstance(revision_, int):
+            raise Exception("Expected revision_ to be a int, received: {}".format(type(revision_)))
+
+        if size_ is not None and not isinstance(size_, int):
+            raise Exception("Expected size_ to be a int, received: {}".format(type(size_)))
+
+        if type__ is not None and not isinstance(type__, (bytes, str)):
+            raise Exception("Expected type__ to be a str, received: {}".format(type(type__)))
+
+        if url_ is not None and not isinstance(url_, (bytes, str)):
+            raise Exception("Expected url_ to be a str, received: {}".format(type(url_)))
+
+        self.name = name_
+        self.revision = revision_
+        self.size = size_
+        self.type_ = type__
+        self.url = url_
+        self.unknown_fields = unknown_fields
+
+
+
 class CharmInfo(Type):
     _toSchema = {'actions': 'actions', 'config': 'config', 'lxd_profile': 'lxd-profile', 'meta': 'meta', 'metrics': 'metrics', 'revision': 'revision', 'url': 'url'}
     _toPy = {'actions': 'actions', 'config': 'config', 'lxd-profile': 'lxd_profile', 'meta': 'meta', 'metrics': 'metrics', 'revision': 'revision', 'url': 'url'}
@@ -4600,11 +5104,14 @@ class CharmLXDProfile(Type):
 
 
 class CharmMeta(Type):
-    _toSchema = {'categories': 'categories', 'description': 'description', 'devices': 'devices', 'extra_bindings': 'extra-bindings', 'min_juju_version': 'min-juju-version', 'name': 'name', 'payload_classes': 'payload-classes', 'peers': 'peers', 'provides': 'provides', 'requires': 'requires', 'resources': 'resources', 'series': 'series', 'storage': 'storage', 'subordinate': 'subordinate', 'summary': 'summary', 'tags': 'tags', 'terms': 'terms'}
-    _toPy = {'categories': 'categories', 'description': 'description', 'devices': 'devices', 'extra-bindings': 'extra_bindings', 'min-juju-version': 'min_juju_version', 'name': 'name', 'payload-classes': 'payload_classes', 'peers': 'peers', 'provides': 'provides', 'requires': 'requires', 'resources': 'resources', 'series': 'series', 'storage': 'storage', 'subordinate': 'subordinate', 'summary': 'summary', 'tags': 'tags', 'terms': 'terms'}
-    def __init__(self, categories=None, description=None, devices=None, extra_bindings=None, min_juju_version=None, name=None, payload_classes=None, peers=None, provides=None, requires=None, resources=None, series=None, storage=None, subordinate=None, summary=None, tags=None, terms=None, **unknown_fields):
+    _toSchema = {'architectures': 'architectures', 'categories': 'categories', 'containers': 'containers', 'deployment': 'deployment', 'description': 'description', 'devices': 'devices', 'extra_bindings': 'extra-bindings', 'min_juju_version': 'min-juju-version', 'name': 'name', 'payload_classes': 'payload-classes', 'peers': 'peers', 'platforms': 'platforms', 'provides': 'provides', 'requires': 'requires', 'resources': 'resources', 'series': 'series', 'storage': 'storage', 'subordinate': 'subordinate', 'summary': 'summary', 'systems': 'systems', 'tags': 'tags', 'terms': 'terms'}
+    _toPy = {'architectures': 'architectures', 'categories': 'categories', 'containers': 'containers', 'deployment': 'deployment', 'description': 'description', 'devices': 'devices', 'extra-bindings': 'extra_bindings', 'min-juju-version': 'min_juju_version', 'name': 'name', 'payload-classes': 'payload_classes', 'peers': 'peers', 'platforms': 'platforms', 'provides': 'provides', 'requires': 'requires', 'resources': 'resources', 'series': 'series', 'storage': 'storage', 'subordinate': 'subordinate', 'summary': 'summary', 'systems': 'systems', 'tags': 'tags', 'terms': 'terms'}
+    def __init__(self, architectures=None, categories=None, containers=None, deployment=None, description=None, devices=None, extra_bindings=None, min_juju_version=None, name=None, payload_classes=None, peers=None, platforms=None, provides=None, requires=None, resources=None, series=None, storage=None, subordinate=None, summary=None, systems=None, tags=None, terms=None, **unknown_fields):
         '''
+        architectures : typing.Sequence[str]
         categories : typing.Sequence[str]
+        containers : typing.Mapping[str, ~CharmContainer]
+        deployment : CharmDeployment
         description : str
         devices : typing.Mapping[str, ~CharmDevice]
         extra_bindings : typing.Mapping[str, str]
@@ -4612,6 +5119,7 @@ class CharmMeta(Type):
         name : str
         payload_classes : typing.Mapping[str, ~CharmPayloadClass]
         peers : typing.Mapping[str, ~CharmRelation]
+        platforms : typing.Sequence[str]
         provides : typing.Mapping[str, ~CharmRelation]
         requires : typing.Mapping[str, ~CharmRelation]
         resources : typing.Mapping[str, ~CharmResourceMeta]
@@ -4619,10 +5127,14 @@ class CharmMeta(Type):
         storage : typing.Mapping[str, ~CharmStorage]
         subordinate : bool
         summary : str
+        systems : typing.Sequence[~CharmSystem]
         tags : typing.Sequence[str]
         terms : typing.Sequence[str]
         '''
+        architectures_ = architectures
         categories_ = categories
+        containers_ = {k: CharmContainer.from_json(v) for k, v in (containers or dict()).items()}
+        deployment_ = CharmDeployment.from_json(deployment) if deployment else None
         description_ = description
         devices_ = {k: CharmDevice.from_json(v) for k, v in (devices or dict()).items()}
         extra_bindings_ = extra_bindings
@@ -4630,6 +5142,7 @@ class CharmMeta(Type):
         name_ = name
         payload_classes_ = {k: CharmPayloadClass.from_json(v) for k, v in (payload_classes or dict()).items()}
         peers_ = {k: CharmRelation.from_json(v) for k, v in (peers or dict()).items()}
+        platforms_ = platforms
         provides_ = {k: CharmRelation.from_json(v) for k, v in (provides or dict()).items()}
         requires_ = {k: CharmRelation.from_json(v) for k, v in (requires or dict()).items()}
         resources_ = {k: CharmResourceMeta.from_json(v) for k, v in (resources or dict()).items()}
@@ -4637,12 +5150,22 @@ class CharmMeta(Type):
         storage_ = {k: CharmStorage.from_json(v) for k, v in (storage or dict()).items()}
         subordinate_ = subordinate
         summary_ = summary
+        systems_ = [CharmSystem.from_json(o) for o in systems or []]
         tags_ = tags
         terms_ = terms
 
         # Validate arguments against known Juju API types.
+        if architectures_ is not None and not isinstance(architectures_, (bytes, str, list)):
+            raise Exception("Expected architectures_ to be a Sequence, received: {}".format(type(architectures_)))
+
         if categories_ is not None and not isinstance(categories_, (bytes, str, list)):
             raise Exception("Expected categories_ to be a Sequence, received: {}".format(type(categories_)))
+
+        if containers_ is not None and not isinstance(containers_, dict):
+            raise Exception("Expected containers_ to be a Mapping, received: {}".format(type(containers_)))
+
+        if deployment_ is not None and not isinstance(deployment_, (dict, CharmDeployment)):
+            raise Exception("Expected deployment_ to be a CharmDeployment, received: {}".format(type(deployment_)))
 
         if description_ is not None and not isinstance(description_, (bytes, str)):
             raise Exception("Expected description_ to be a str, received: {}".format(type(description_)))
@@ -4665,6 +5188,9 @@ class CharmMeta(Type):
         if peers_ is not None and not isinstance(peers_, dict):
             raise Exception("Expected peers_ to be a Mapping, received: {}".format(type(peers_)))
 
+        if platforms_ is not None and not isinstance(platforms_, (bytes, str, list)):
+            raise Exception("Expected platforms_ to be a Sequence, received: {}".format(type(platforms_)))
+
         if provides_ is not None and not isinstance(provides_, dict):
             raise Exception("Expected provides_ to be a Mapping, received: {}".format(type(provides_)))
 
@@ -4686,13 +5212,19 @@ class CharmMeta(Type):
         if summary_ is not None and not isinstance(summary_, (bytes, str)):
             raise Exception("Expected summary_ to be a str, received: {}".format(type(summary_)))
 
+        if systems_ is not None and not isinstance(systems_, (bytes, str, list)):
+            raise Exception("Expected systems_ to be a Sequence, received: {}".format(type(systems_)))
+
         if tags_ is not None and not isinstance(tags_, (bytes, str, list)):
             raise Exception("Expected tags_ to be a Sequence, received: {}".format(type(tags_)))
 
         if terms_ is not None and not isinstance(terms_, (bytes, str, list)):
             raise Exception("Expected terms_ to be a Sequence, received: {}".format(type(terms_)))
 
+        self.architectures = architectures_
         self.categories = categories_
+        self.containers = containers_
+        self.deployment = deployment_
         self.description = description_
         self.devices = devices_
         self.extra_bindings = extra_bindings_
@@ -4700,6 +5232,7 @@ class CharmMeta(Type):
         self.name = name_
         self.payload_classes = payload_classes_
         self.peers = peers_
+        self.platforms = platforms_
         self.provides = provides_
         self.requires = requires_
         self.resources = resources_
@@ -4707,6 +5240,7 @@ class CharmMeta(Type):
         self.storage = storage_
         self.subordinate = subordinate_
         self.summary = summary_
+        self.systems = systems_
         self.tags = tags_
         self.terms = terms_
         self.unknown_fields = unknown_fields
@@ -4761,6 +5295,30 @@ class CharmMetrics(Type):
 
 
 
+class CharmMount(Type):
+    _toSchema = {'location': 'location', 'storage': 'storage'}
+    _toPy = {'location': 'location', 'storage': 'storage'}
+    def __init__(self, location=None, storage=None, **unknown_fields):
+        '''
+        location : str
+        storage : str
+        '''
+        location_ = location
+        storage_ = storage
+
+        # Validate arguments against known Juju API types.
+        if location_ is not None and not isinstance(location_, (bytes, str)):
+            raise Exception("Expected location_ to be a str, received: {}".format(type(location_)))
+
+        if storage_ is not None and not isinstance(storage_, (bytes, str)):
+            raise Exception("Expected storage_ to be a str, received: {}".format(type(storage_)))
+
+        self.location = location_
+        self.storage = storage_
+        self.unknown_fields = unknown_fields
+
+
+
 class CharmOption(Type):
     _toSchema = {'default': 'default', 'description': 'description', 'type_': 'type'}
     _toPy = {'default': 'default', 'description': 'description', 'type': 'type_'}
@@ -4789,30 +5347,44 @@ class CharmOption(Type):
 
 
 class CharmOrigin(Type):
-    _toSchema = {'hash_': 'hash', 'id_': 'id', 'revision': 'revision', 'risk': 'risk', 'source': 'source', 'track': 'track'}
-    _toPy = {'hash': 'hash_', 'id': 'id_', 'revision': 'revision', 'risk': 'risk', 'source': 'source', 'track': 'track'}
-    def __init__(self, hash_=None, id_=None, revision=None, risk=None, source=None, track=None, **unknown_fields):
+    _toSchema = {'architecture': 'architecture', 'hash_': 'hash', 'id_': 'id', 'os': 'os', 'revision': 'revision', 'risk': 'risk', 'series': 'series', 'source': 'source', 'track': 'track', 'type_': 'type'}
+    _toPy = {'architecture': 'architecture', 'hash': 'hash_', 'id': 'id_', 'os': 'os', 'revision': 'revision', 'risk': 'risk', 'series': 'series', 'source': 'source', 'track': 'track', 'type': 'type_'}
+    def __init__(self, architecture=None, hash_=None, id_=None, os=None, revision=None, risk=None, series=None, source=None, track=None, type_=None, **unknown_fields):
         '''
+        architecture : str
         hash_ : str
         id_ : str
+        os : str
         revision : int
         risk : str
+        series : str
         source : str
         track : str
+        type_ : str
         '''
+        architecture_ = architecture
         hash__ = hash_
         id__ = id_
+        os_ = os
         revision_ = revision
         risk_ = risk
+        series_ = series
         source_ = source
         track_ = track
+        type__ = type_
 
         # Validate arguments against known Juju API types.
+        if architecture_ is not None and not isinstance(architecture_, (bytes, str)):
+            raise Exception("Expected architecture_ to be a str, received: {}".format(type(architecture_)))
+
         if hash__ is not None and not isinstance(hash__, (bytes, str)):
             raise Exception("Expected hash__ to be a str, received: {}".format(type(hash__)))
 
         if id__ is not None and not isinstance(id__, (bytes, str)):
             raise Exception("Expected id__ to be a str, received: {}".format(type(id__)))
+
+        if os_ is not None and not isinstance(os_, (bytes, str)):
+            raise Exception("Expected os_ to be a str, received: {}".format(type(os_)))
 
         if revision_ is not None and not isinstance(revision_, int):
             raise Exception("Expected revision_ to be a int, received: {}".format(type(revision_)))
@@ -4820,18 +5392,28 @@ class CharmOrigin(Type):
         if risk_ is not None and not isinstance(risk_, (bytes, str)):
             raise Exception("Expected risk_ to be a str, received: {}".format(type(risk_)))
 
+        if series_ is not None and not isinstance(series_, (bytes, str)):
+            raise Exception("Expected series_ to be a str, received: {}".format(type(series_)))
+
         if source_ is not None and not isinstance(source_, (bytes, str)):
             raise Exception("Expected source_ to be a str, received: {}".format(type(source_)))
 
         if track_ is not None and not isinstance(track_, (bytes, str)):
             raise Exception("Expected track_ to be a str, received: {}".format(type(track_)))
 
+        if type__ is not None and not isinstance(type__, (bytes, str)):
+            raise Exception("Expected type__ to be a str, received: {}".format(type(type__)))
+
+        self.architecture = architecture_
         self.hash_ = hash__
         self.id_ = id__
+        self.os = os_
         self.revision = revision_
         self.risk = risk_
+        self.series = series_
         self.source = source_
         self.track = track_
+        self.type_ = type__
         self.unknown_fields = unknown_fields
 
 
@@ -5160,6 +5742,36 @@ class CharmStorage(Type):
 
 
 
+class CharmSystem(Type):
+    _toSchema = {'channel': 'channel', 'os': 'os', 'resource': 'resource'}
+    _toPy = {'channel': 'channel', 'os': 'os', 'resource': 'resource'}
+    def __init__(self, channel=None, os=None, resource=None, **unknown_fields):
+        '''
+        channel : str
+        os : str
+        resource : str
+        '''
+        channel_ = channel
+        os_ = os
+        resource_ = resource
+
+        # Validate arguments against known Juju API types.
+        if channel_ is not None and not isinstance(channel_, (bytes, str)):
+            raise Exception("Expected channel_ to be a str, received: {}".format(type(channel_)))
+
+        if os_ is not None and not isinstance(os_, (bytes, str)):
+            raise Exception("Expected os_ to be a str, received: {}".format(type(os_)))
+
+        if resource_ is not None and not isinstance(resource_, (bytes, str)):
+            raise Exception("Expected resource_ to be a str, received: {}".format(type(resource_)))
+
+        self.channel = channel_
+        self.os = os_
+        self.resource = resource_
+        self.unknown_fields = unknown_fields
+
+
+
 class CharmURL(Type):
     _toSchema = {'url': 'url'}
     _toPy = {'url': 'url'}
@@ -5174,6 +5786,54 @@ class CharmURL(Type):
             raise Exception("Expected url_ to be a str, received: {}".format(type(url_)))
 
         self.url = url_
+        self.unknown_fields = unknown_fields
+
+
+
+class CharmURLAndOrigin(Type):
+    _toSchema = {'charm_origin': 'charm-origin', 'charm_url': 'charm-url', 'macaroon': 'macaroon'}
+    _toPy = {'charm-origin': 'charm_origin', 'charm-url': 'charm_url', 'macaroon': 'macaroon'}
+    def __init__(self, charm_origin=None, charm_url=None, macaroon=None, **unknown_fields):
+        '''
+        charm_origin : CharmOrigin
+        charm_url : str
+        macaroon : Macaroon
+        '''
+        charm_origin_ = CharmOrigin.from_json(charm_origin) if charm_origin else None
+        charm_url_ = charm_url
+        macaroon_ = Macaroon.from_json(macaroon) if macaroon else None
+
+        # Validate arguments against known Juju API types.
+        if charm_origin_ is not None and not isinstance(charm_origin_, (dict, CharmOrigin)):
+            raise Exception("Expected charm_origin_ to be a CharmOrigin, received: {}".format(type(charm_origin_)))
+
+        if charm_url_ is not None and not isinstance(charm_url_, (bytes, str)):
+            raise Exception("Expected charm_url_ to be a str, received: {}".format(type(charm_url_)))
+
+        if macaroon_ is not None and not isinstance(macaroon_, (dict, Macaroon)):
+            raise Exception("Expected macaroon_ to be a Macaroon, received: {}".format(type(macaroon_)))
+
+        self.charm_origin = charm_origin_
+        self.charm_url = charm_url_
+        self.macaroon = macaroon_
+        self.unknown_fields = unknown_fields
+
+
+
+class CharmURLAndOrigins(Type):
+    _toSchema = {'entities': 'entities'}
+    _toPy = {'entities': 'entities'}
+    def __init__(self, entities=None, **unknown_fields):
+        '''
+        entities : typing.Sequence[~CharmURLAndOrigin]
+        '''
+        entities_ = [CharmURLAndOrigin.from_json(o) for o in entities or []]
+
+        # Validate arguments against known Juju API types.
+        if entities_ is not None and not isinstance(entities_, (bytes, str, list)):
+            raise Exception("Expected entities_ to be a Sequence, received: {}".format(type(entities_)))
+
+        self.entities = entities_
         self.unknown_fields = unknown_fields
 
 
@@ -5329,9 +5989,9 @@ class ClaimLeadershipParams(Type):
 
 
 class Cloud(Type):
-    _toSchema = {'auth_types': 'auth-types', 'ca_certificates': 'ca-certificates', 'config': 'config', 'endpoint': 'endpoint', 'host_cloud_region': 'host-cloud-region', 'identity_endpoint': 'identity-endpoint', 'region_config': 'region-config', 'regions': 'regions', 'storage_endpoint': 'storage-endpoint', 'type_': 'type'}
-    _toPy = {'auth-types': 'auth_types', 'ca-certificates': 'ca_certificates', 'config': 'config', 'endpoint': 'endpoint', 'host-cloud-region': 'host_cloud_region', 'identity-endpoint': 'identity_endpoint', 'region-config': 'region_config', 'regions': 'regions', 'storage-endpoint': 'storage_endpoint', 'type': 'type_'}
-    def __init__(self, auth_types=None, ca_certificates=None, config=None, endpoint=None, host_cloud_region=None, identity_endpoint=None, region_config=None, regions=None, storage_endpoint=None, type_=None, **unknown_fields):
+    _toSchema = {'auth_types': 'auth-types', 'ca_certificates': 'ca-certificates', 'config': 'config', 'endpoint': 'endpoint', 'host_cloud_region': 'host-cloud-region', 'identity_endpoint': 'identity-endpoint', 'region_config': 'region-config', 'regions': 'regions', 'skip_tls_verify': 'skip-tls-verify', 'storage_endpoint': 'storage-endpoint', 'type_': 'type'}
+    _toPy = {'auth-types': 'auth_types', 'ca-certificates': 'ca_certificates', 'config': 'config', 'endpoint': 'endpoint', 'host-cloud-region': 'host_cloud_region', 'identity-endpoint': 'identity_endpoint', 'region-config': 'region_config', 'regions': 'regions', 'skip-tls-verify': 'skip_tls_verify', 'storage-endpoint': 'storage_endpoint', 'type': 'type_'}
+    def __init__(self, auth_types=None, ca_certificates=None, config=None, endpoint=None, host_cloud_region=None, identity_endpoint=None, region_config=None, regions=None, skip_tls_verify=None, storage_endpoint=None, type_=None, **unknown_fields):
         '''
         auth_types : typing.Sequence[str]
         ca_certificates : typing.Sequence[str]
@@ -5341,6 +6001,7 @@ class Cloud(Type):
         identity_endpoint : str
         region_config : typing.Mapping[str, typing.Any]
         regions : typing.Sequence[~CloudRegion]
+        skip_tls_verify : bool
         storage_endpoint : str
         type_ : str
         '''
@@ -5352,6 +6013,7 @@ class Cloud(Type):
         identity_endpoint_ = identity_endpoint
         region_config_ = region_config
         regions_ = [CloudRegion.from_json(o) for o in regions or []]
+        skip_tls_verify_ = skip_tls_verify
         storage_endpoint_ = storage_endpoint
         type__ = type_
 
@@ -5380,6 +6042,9 @@ class Cloud(Type):
         if regions_ is not None and not isinstance(regions_, (bytes, str, list)):
             raise Exception("Expected regions_ to be a Sequence, received: {}".format(type(regions_)))
 
+        if skip_tls_verify_ is not None and not isinstance(skip_tls_verify_, bool):
+            raise Exception("Expected skip_tls_verify_ to be a bool, received: {}".format(type(skip_tls_verify_)))
+
         if storage_endpoint_ is not None and not isinstance(storage_endpoint_, (bytes, str)):
             raise Exception("Expected storage_endpoint_ to be a str, received: {}".format(type(storage_endpoint_)))
 
@@ -5394,6 +6059,7 @@ class Cloud(Type):
         self.identity_endpoint = identity_endpoint_
         self.region_config = region_config_
         self.regions = regions_
+        self.skip_tls_verify = skip_tls_verify_
         self.storage_endpoint = storage_endpoint_
         self.type_ = type__
         self.unknown_fields = unknown_fields
@@ -5857,9 +6523,9 @@ class CloudResults(Type):
 
 
 class CloudSpec(Type):
-    _toSchema = {'cacertificates': 'cacertificates', 'credential': 'credential', 'endpoint': 'endpoint', 'identity_endpoint': 'identity-endpoint', 'name': 'name', 'region': 'region', 'storage_endpoint': 'storage-endpoint', 'type_': 'type'}
-    _toPy = {'cacertificates': 'cacertificates', 'credential': 'credential', 'endpoint': 'endpoint', 'identity-endpoint': 'identity_endpoint', 'name': 'name', 'region': 'region', 'storage-endpoint': 'storage_endpoint', 'type': 'type_'}
-    def __init__(self, cacertificates=None, credential=None, endpoint=None, identity_endpoint=None, name=None, region=None, storage_endpoint=None, type_=None, **unknown_fields):
+    _toSchema = {'cacertificates': 'cacertificates', 'credential': 'credential', 'endpoint': 'endpoint', 'identity_endpoint': 'identity-endpoint', 'name': 'name', 'region': 'region', 'skip_tls_verify': 'skip-tls-verify', 'storage_endpoint': 'storage-endpoint', 'type_': 'type'}
+    _toPy = {'cacertificates': 'cacertificates', 'credential': 'credential', 'endpoint': 'endpoint', 'identity-endpoint': 'identity_endpoint', 'name': 'name', 'region': 'region', 'skip-tls-verify': 'skip_tls_verify', 'storage-endpoint': 'storage_endpoint', 'type': 'type_'}
+    def __init__(self, cacertificates=None, credential=None, endpoint=None, identity_endpoint=None, name=None, region=None, skip_tls_verify=None, storage_endpoint=None, type_=None, **unknown_fields):
         '''
         cacertificates : typing.Sequence[str]
         credential : CloudCredential
@@ -5867,6 +6533,7 @@ class CloudSpec(Type):
         identity_endpoint : str
         name : str
         region : str
+        skip_tls_verify : bool
         storage_endpoint : str
         type_ : str
         '''
@@ -5876,6 +6543,7 @@ class CloudSpec(Type):
         identity_endpoint_ = identity_endpoint
         name_ = name
         region_ = region
+        skip_tls_verify_ = skip_tls_verify
         storage_endpoint_ = storage_endpoint
         type__ = type_
 
@@ -5898,6 +6566,9 @@ class CloudSpec(Type):
         if region_ is not None and not isinstance(region_, (bytes, str)):
             raise Exception("Expected region_ to be a str, received: {}".format(type(region_)))
 
+        if skip_tls_verify_ is not None and not isinstance(skip_tls_verify_, bool):
+            raise Exception("Expected skip_tls_verify_ to be a bool, received: {}".format(type(skip_tls_verify_)))
+
         if storage_endpoint_ is not None and not isinstance(storage_endpoint_, (bytes, str)):
             raise Exception("Expected storage_endpoint_ to be a str, received: {}".format(type(storage_endpoint_)))
 
@@ -5910,6 +6581,7 @@ class CloudSpec(Type):
         self.identity_endpoint = identity_endpoint_
         self.name = name_
         self.region = region_
+        self.skip_tls_verify = skip_tls_verify_
         self.storage_endpoint = storage_endpoint_
         self.type_ = type__
         self.unknown_fields = unknown_fields
@@ -7962,6 +8634,78 @@ class DistributionGroupResults(Type):
 
 
 
+class DockerImageInfo(Type):
+    _toSchema = {'image_name': 'image-name', 'password': 'password', 'username': 'username'}
+    _toPy = {'image-name': 'image_name', 'password': 'password', 'username': 'username'}
+    def __init__(self, image_name=None, password=None, username=None, **unknown_fields):
+        '''
+        image_name : str
+        password : str
+        username : str
+        '''
+        image_name_ = image_name
+        password_ = password
+        username_ = username
+
+        # Validate arguments against known Juju API types.
+        if image_name_ is not None and not isinstance(image_name_, (bytes, str)):
+            raise Exception("Expected image_name_ to be a str, received: {}".format(type(image_name_)))
+
+        if password_ is not None and not isinstance(password_, (bytes, str)):
+            raise Exception("Expected password_ to be a str, received: {}".format(type(password_)))
+
+        if username_ is not None and not isinstance(username_, (bytes, str)):
+            raise Exception("Expected username_ to be a str, received: {}".format(type(username_)))
+
+        self.image_name = image_name_
+        self.password = password_
+        self.username = username_
+        self.unknown_fields = unknown_fields
+
+
+
+class DownloadInfoResult(Type):
+    _toSchema = {'charm_origin': 'charm-origin', 'url': 'url'}
+    _toPy = {'charm-origin': 'charm_origin', 'url': 'url'}
+    def __init__(self, charm_origin=None, url=None, **unknown_fields):
+        '''
+        charm_origin : CharmOrigin
+        url : str
+        '''
+        charm_origin_ = CharmOrigin.from_json(charm_origin) if charm_origin else None
+        url_ = url
+
+        # Validate arguments against known Juju API types.
+        if charm_origin_ is not None and not isinstance(charm_origin_, (dict, CharmOrigin)):
+            raise Exception("Expected charm_origin_ to be a CharmOrigin, received: {}".format(type(charm_origin_)))
+
+        if url_ is not None and not isinstance(url_, (bytes, str)):
+            raise Exception("Expected url_ to be a str, received: {}".format(type(url_)))
+
+        self.charm_origin = charm_origin_
+        self.url = url_
+        self.unknown_fields = unknown_fields
+
+
+
+class DownloadInfoResults(Type):
+    _toSchema = {'results': 'results'}
+    _toPy = {'results': 'results'}
+    def __init__(self, results=None, **unknown_fields):
+        '''
+        results : typing.Sequence[~DownloadInfoResult]
+        '''
+        results_ = [DownloadInfoResult.from_json(o) for o in results or []]
+
+        # Validate arguments against known Juju API types.
+        if results_ is not None and not isinstance(results_, (bytes, str, list)):
+            raise Exception("Expected results_ to be a Sequence, received: {}".format(type(results_)))
+
+        self.results = results_
+        self.unknown_fields = unknown_fields
+
+
+
 class DumpModelRequest(Type):
     _toSchema = {'entities': 'entities', 'simplified': 'simplified'}
     _toPy = {'entities': 'entities', 'simplified': 'simplified'}
@@ -9619,12 +10363,14 @@ class FindActionsByNames(Type):
 
 
 class FindResponse(Type):
-    _toSchema = {'id_': 'id', 'name': 'name', 'publisher': 'publisher', 'series': 'series', 'store_url': 'store-url', 'summary': 'summary', 'type_': 'type', 'version': 'version'}
-    _toPy = {'id': 'id_', 'name': 'name', 'publisher': 'publisher', 'series': 'series', 'store-url': 'store_url', 'summary': 'summary', 'type': 'type_', 'version': 'version'}
-    def __init__(self, id_=None, name=None, publisher=None, series=None, store_url=None, summary=None, type_=None, version=None, **unknown_fields):
+    _toSchema = {'architectures': 'architectures', 'id_': 'id', 'name': 'name', 'os': 'os', 'publisher': 'publisher', 'series': 'series', 'store_url': 'store-url', 'summary': 'summary', 'type_': 'type', 'version': 'version'}
+    _toPy = {'architectures': 'architectures', 'id': 'id_', 'name': 'name', 'os': 'os', 'publisher': 'publisher', 'series': 'series', 'store-url': 'store_url', 'summary': 'summary', 'type': 'type_', 'version': 'version'}
+    def __init__(self, architectures=None, id_=None, name=None, os=None, publisher=None, series=None, store_url=None, summary=None, type_=None, version=None, **unknown_fields):
         '''
+        architectures : typing.Sequence[str]
         id_ : str
         name : str
+        os : typing.Sequence[str]
         publisher : str
         series : typing.Sequence[str]
         store_url : str
@@ -9632,8 +10378,10 @@ class FindResponse(Type):
         type_ : str
         version : str
         '''
+        architectures_ = architectures
         id__ = id_
         name_ = name
+        os_ = os
         publisher_ = publisher
         series_ = series
         store_url_ = store_url
@@ -9642,11 +10390,17 @@ class FindResponse(Type):
         version_ = version
 
         # Validate arguments against known Juju API types.
+        if architectures_ is not None and not isinstance(architectures_, (bytes, str, list)):
+            raise Exception("Expected architectures_ to be a Sequence, received: {}".format(type(architectures_)))
+
         if id__ is not None and not isinstance(id__, (bytes, str)):
             raise Exception("Expected id__ to be a str, received: {}".format(type(id__)))
 
         if name_ is not None and not isinstance(name_, (bytes, str)):
             raise Exception("Expected name_ to be a str, received: {}".format(type(name_)))
+
+        if os_ is not None and not isinstance(os_, (bytes, str, list)):
+            raise Exception("Expected os_ to be a Sequence, received: {}".format(type(os_)))
 
         if publisher_ is not None and not isinstance(publisher_, (bytes, str)):
             raise Exception("Expected publisher_ to be a str, received: {}".format(type(publisher_)))
@@ -9666,8 +10420,10 @@ class FindResponse(Type):
         if version_ is not None and not isinstance(version_, (bytes, str)):
             raise Exception("Expected version_ to be a str, received: {}".format(type(version_)))
 
+        self.architectures = architectures_
         self.id_ = id__
         self.name = name_
+        self.os = os_
         self.publisher = publisher_
         self.series = series_
         self.store_url = store_url_
@@ -10760,6 +11516,30 @@ class ImportStorageResults(Type):
             raise Exception("Expected results_ to be a Sequence, received: {}".format(type(results_)))
 
         self.results = results_
+        self.unknown_fields = unknown_fields
+
+
+
+class Info(Type):
+    _toSchema = {'channel': 'channel', 'tag': 'tag'}
+    _toPy = {'channel': 'channel', 'tag': 'tag'}
+    def __init__(self, channel=None, tag=None, **unknown_fields):
+        '''
+        channel : str
+        tag : str
+        '''
+        channel_ = channel
+        tag_ = tag
+
+        # Validate arguments against known Juju API types.
+        if channel_ is not None and not isinstance(channel_, (bytes, str)):
+            raise Exception("Expected channel_ to be a str, received: {}".format(type(channel_)))
+
+        if tag_ is not None and not isinstance(tag_, (bytes, str)):
+            raise Exception("Expected tag_ to be a str, received: {}".format(type(tag_)))
+
+        self.channel = channel_
+        self.tag = tag_
         self.unknown_fields = unknown_fields
 
 
@@ -12433,13 +13213,14 @@ class LogForwardingSetLastSentParams(Type):
 
 
 class LoginRequest(Type):
-    _toSchema = {'auth_tag': 'auth-tag', 'bakery_version': 'bakery-version', 'cli_args': 'cli-args', 'credentials': 'credentials', 'macaroons': 'macaroons', 'nonce': 'nonce', 'user_data': 'user-data'}
-    _toPy = {'auth-tag': 'auth_tag', 'bakery-version': 'bakery_version', 'cli-args': 'cli_args', 'credentials': 'credentials', 'macaroons': 'macaroons', 'nonce': 'nonce', 'user-data': 'user_data'}
-    def __init__(self, auth_tag=None, bakery_version=None, cli_args=None, credentials=None, macaroons=None, nonce=None, user_data=None, **unknown_fields):
+    _toSchema = {'auth_tag': 'auth-tag', 'bakery_version': 'bakery-version', 'cli_args': 'cli-args', 'client_version': 'client-version', 'credentials': 'credentials', 'macaroons': 'macaroons', 'nonce': 'nonce', 'user_data': 'user-data'}
+    _toPy = {'auth-tag': 'auth_tag', 'bakery-version': 'bakery_version', 'cli-args': 'cli_args', 'client-version': 'client_version', 'credentials': 'credentials', 'macaroons': 'macaroons', 'nonce': 'nonce', 'user-data': 'user_data'}
+    def __init__(self, auth_tag=None, bakery_version=None, cli_args=None, client_version=None, credentials=None, macaroons=None, nonce=None, user_data=None, **unknown_fields):
         '''
         auth_tag : str
         bakery_version : int
         cli_args : str
+        client_version : str
         credentials : str
         macaroons : typing.Sequence[~Macaroon]
         nonce : str
@@ -12448,6 +13229,7 @@ class LoginRequest(Type):
         auth_tag_ = auth_tag
         bakery_version_ = bakery_version
         cli_args_ = cli_args
+        client_version_ = client_version
         credentials_ = credentials
         macaroons_ = [Macaroon.from_json(o) for o in macaroons or []]
         nonce_ = nonce
@@ -12462,6 +13244,9 @@ class LoginRequest(Type):
 
         if cli_args_ is not None and not isinstance(cli_args_, (bytes, str)):
             raise Exception("Expected cli_args_ to be a str, received: {}".format(type(cli_args_)))
+
+        if client_version_ is not None and not isinstance(client_version_, (bytes, str)):
+            raise Exception("Expected client_version_ to be a str, received: {}".format(type(client_version_)))
 
         if credentials_ is not None and not isinstance(credentials_, (bytes, str)):
             raise Exception("Expected credentials_ to be a str, received: {}".format(type(credentials_)))
@@ -12478,6 +13263,7 @@ class LoginRequest(Type):
         self.auth_tag = auth_tag_
         self.bakery_version = bakery_version_
         self.cli_args = cli_args_
+        self.client_version = client_version_
         self.credentials = credentials_
         self.macaroons = macaroons_
         self.nonce = nonce_
@@ -17873,9 +18659,9 @@ class ProvisioningInfo(Type):
 
 
 class ProvisioningInfoBase(Type):
-    _toSchema = {'charm_lxd_profiles': 'charm-lxd-profiles', 'cloudinit_userdata': 'cloudinit-userdata', 'constraints': 'constraints', 'controller_config': 'controller-config', 'endpoint_bindings': 'endpoint-bindings', 'image_metadata': 'image-metadata', 'jobs': 'jobs', 'placement': 'placement', 'series': 'series', 'tags': 'tags', 'volume_attachments': 'volume-attachments', 'volumes': 'volumes'}
-    _toPy = {'charm-lxd-profiles': 'charm_lxd_profiles', 'cloudinit-userdata': 'cloudinit_userdata', 'constraints': 'constraints', 'controller-config': 'controller_config', 'endpoint-bindings': 'endpoint_bindings', 'image-metadata': 'image_metadata', 'jobs': 'jobs', 'placement': 'placement', 'series': 'series', 'tags': 'tags', 'volume-attachments': 'volume_attachments', 'volumes': 'volumes'}
-    def __init__(self, charm_lxd_profiles=None, cloudinit_userdata=None, constraints=None, controller_config=None, endpoint_bindings=None, image_metadata=None, jobs=None, placement=None, series=None, tags=None, volume_attachments=None, volumes=None, **unknown_fields):
+    _toSchema = {'charm_lxd_profiles': 'charm-lxd-profiles', 'cloudinit_userdata': 'cloudinit-userdata', 'constraints': 'constraints', 'controller_config': 'controller-config', 'endpoint_bindings': 'endpoint-bindings', 'image_metadata': 'image-metadata', 'jobs': 'jobs', 'placement': 'placement', 'root_disk': 'root-disk', 'series': 'series', 'tags': 'tags', 'volume_attachments': 'volume-attachments', 'volumes': 'volumes'}
+    _toPy = {'charm-lxd-profiles': 'charm_lxd_profiles', 'cloudinit-userdata': 'cloudinit_userdata', 'constraints': 'constraints', 'controller-config': 'controller_config', 'endpoint-bindings': 'endpoint_bindings', 'image-metadata': 'image_metadata', 'jobs': 'jobs', 'placement': 'placement', 'root-disk': 'root_disk', 'series': 'series', 'tags': 'tags', 'volume-attachments': 'volume_attachments', 'volumes': 'volumes'}
+    def __init__(self, charm_lxd_profiles=None, cloudinit_userdata=None, constraints=None, controller_config=None, endpoint_bindings=None, image_metadata=None, jobs=None, placement=None, root_disk=None, series=None, tags=None, volume_attachments=None, volumes=None, **unknown_fields):
         '''
         charm_lxd_profiles : typing.Sequence[str]
         cloudinit_userdata : typing.Mapping[str, typing.Any]
@@ -17885,6 +18671,7 @@ class ProvisioningInfoBase(Type):
         image_metadata : typing.Sequence[~CloudImageMetadata]
         jobs : typing.Sequence[str]
         placement : str
+        root_disk : VolumeParams
         series : str
         tags : typing.Mapping[str, str]
         volume_attachments : typing.Sequence[~VolumeAttachmentParams]
@@ -17898,6 +18685,7 @@ class ProvisioningInfoBase(Type):
         image_metadata_ = [CloudImageMetadata.from_json(o) for o in image_metadata or []]
         jobs_ = jobs
         placement_ = placement
+        root_disk_ = VolumeParams.from_json(root_disk) if root_disk else None
         series_ = series
         tags_ = tags
         volume_attachments_ = [VolumeAttachmentParams.from_json(o) for o in volume_attachments or []]
@@ -17928,6 +18716,9 @@ class ProvisioningInfoBase(Type):
         if placement_ is not None and not isinstance(placement_, (bytes, str)):
             raise Exception("Expected placement_ to be a str, received: {}".format(type(placement_)))
 
+        if root_disk_ is not None and not isinstance(root_disk_, (dict, VolumeParams)):
+            raise Exception("Expected root_disk_ to be a VolumeParams, received: {}".format(type(root_disk_)))
+
         if series_ is not None and not isinstance(series_, (bytes, str)):
             raise Exception("Expected series_ to be a str, received: {}".format(type(series_)))
 
@@ -17948,6 +18739,7 @@ class ProvisioningInfoBase(Type):
         self.image_metadata = image_metadata_
         self.jobs = jobs_
         self.placement = placement_
+        self.root_disk = root_disk_
         self.series = series_
         self.tags = tags_
         self.volume_attachments = volume_attachments_
@@ -18041,9 +18833,9 @@ class ProvisioningInfoResultsV10(Type):
 
 
 class ProvisioningInfoV10(Type):
-    _toSchema = {'charm_lxd_profiles': 'charm-lxd-profiles', 'cloudinit_userdata': 'cloudinit-userdata', 'constraints': 'constraints', 'controller_config': 'controller-config', 'endpoint_bindings': 'endpoint-bindings', 'image_metadata': 'image-metadata', 'jobs': 'jobs', 'placement': 'placement', 'provisioninginfobase': 'ProvisioningInfoBase', 'provisioningnetworktopology': 'ProvisioningNetworkTopology', 'series': 'series', 'space_subnets': 'space-subnets', 'subnet_zones': 'subnet-zones', 'tags': 'tags', 'volume_attachments': 'volume-attachments', 'volumes': 'volumes'}
-    _toPy = {'ProvisioningInfoBase': 'provisioninginfobase', 'ProvisioningNetworkTopology': 'provisioningnetworktopology', 'charm-lxd-profiles': 'charm_lxd_profiles', 'cloudinit-userdata': 'cloudinit_userdata', 'constraints': 'constraints', 'controller-config': 'controller_config', 'endpoint-bindings': 'endpoint_bindings', 'image-metadata': 'image_metadata', 'jobs': 'jobs', 'placement': 'placement', 'series': 'series', 'space-subnets': 'space_subnets', 'subnet-zones': 'subnet_zones', 'tags': 'tags', 'volume-attachments': 'volume_attachments', 'volumes': 'volumes'}
-    def __init__(self, provisioninginfobase=None, provisioningnetworktopology=None, charm_lxd_profiles=None, cloudinit_userdata=None, constraints=None, controller_config=None, endpoint_bindings=None, image_metadata=None, jobs=None, placement=None, series=None, space_subnets=None, subnet_zones=None, tags=None, volume_attachments=None, volumes=None, **unknown_fields):
+    _toSchema = {'charm_lxd_profiles': 'charm-lxd-profiles', 'cloudinit_userdata': 'cloudinit-userdata', 'constraints': 'constraints', 'controller_config': 'controller-config', 'endpoint_bindings': 'endpoint-bindings', 'image_metadata': 'image-metadata', 'jobs': 'jobs', 'placement': 'placement', 'provisioninginfobase': 'ProvisioningInfoBase', 'provisioningnetworktopology': 'ProvisioningNetworkTopology', 'root_disk': 'root-disk', 'series': 'series', 'space_subnets': 'space-subnets', 'subnet_zones': 'subnet-zones', 'tags': 'tags', 'volume_attachments': 'volume-attachments', 'volumes': 'volumes'}
+    _toPy = {'ProvisioningInfoBase': 'provisioninginfobase', 'ProvisioningNetworkTopology': 'provisioningnetworktopology', 'charm-lxd-profiles': 'charm_lxd_profiles', 'cloudinit-userdata': 'cloudinit_userdata', 'constraints': 'constraints', 'controller-config': 'controller_config', 'endpoint-bindings': 'endpoint_bindings', 'image-metadata': 'image_metadata', 'jobs': 'jobs', 'placement': 'placement', 'root-disk': 'root_disk', 'series': 'series', 'space-subnets': 'space_subnets', 'subnet-zones': 'subnet_zones', 'tags': 'tags', 'volume-attachments': 'volume_attachments', 'volumes': 'volumes'}
+    def __init__(self, provisioninginfobase=None, provisioningnetworktopology=None, charm_lxd_profiles=None, cloudinit_userdata=None, constraints=None, controller_config=None, endpoint_bindings=None, image_metadata=None, jobs=None, placement=None, root_disk=None, series=None, space_subnets=None, subnet_zones=None, tags=None, volume_attachments=None, volumes=None, **unknown_fields):
         '''
         provisioninginfobase : ProvisioningInfoBase
         provisioningnetworktopology : ProvisioningNetworkTopology
@@ -18055,6 +18847,7 @@ class ProvisioningInfoV10(Type):
         image_metadata : typing.Sequence[~CloudImageMetadata]
         jobs : typing.Sequence[str]
         placement : str
+        root_disk : VolumeParams
         series : str
         space_subnets : typing.Mapping[str, typing.Sequence[str]]
         subnet_zones : typing.Mapping[str, typing.Sequence[str]]
@@ -18072,6 +18865,7 @@ class ProvisioningInfoV10(Type):
         image_metadata_ = [CloudImageMetadata.from_json(o) for o in image_metadata or []]
         jobs_ = jobs
         placement_ = placement
+        root_disk_ = VolumeParams.from_json(root_disk) if root_disk else None
         series_ = series
         space_subnets_ = space_subnets
         subnet_zones_ = subnet_zones
@@ -18110,6 +18904,9 @@ class ProvisioningInfoV10(Type):
         if placement_ is not None and not isinstance(placement_, (bytes, str)):
             raise Exception("Expected placement_ to be a str, received: {}".format(type(placement_)))
 
+        if root_disk_ is not None and not isinstance(root_disk_, (dict, VolumeParams)):
+            raise Exception("Expected root_disk_ to be a VolumeParams, received: {}".format(type(root_disk_)))
+
         if series_ is not None and not isinstance(series_, (bytes, str)):
             raise Exception("Expected series_ to be a str, received: {}".format(type(series_)))
 
@@ -18138,6 +18935,7 @@ class ProvisioningInfoV10(Type):
         self.image_metadata = image_metadata_
         self.jobs = jobs_
         self.placement = placement_
+        self.root_disk = root_disk_
         self.series = series_
         self.space_subnets = space_subnets_
         self.subnet_zones = subnet_zones_
