@@ -23,6 +23,7 @@ import websockets
 from . import provisioner, tag, utils
 from .annotationhelper import _get_annotations, _set_annotations
 from .bundle import BundleHandler, get_charm_series
+from .charmhub import CharmHub
 from .client import client, connector
 from .client.client import ConfigValue, Value
 from .client.overrides import Caveat, Macaroon
@@ -775,6 +776,14 @@ class Model:
 
         """
         return list(self.state.relations.values())
+
+    @property
+    def charmhub(self):
+        """Return a charmhub store for requesting charm information using
+        the charm-hub-url model config.
+
+        """
+        return CharmHub(self)
 
     async def get_info(self):
         """Return a client.ModelInfo object for this Model.
