@@ -15,15 +15,13 @@ from functools import partial
 from pathlib import Path
 
 import yaml
-
-import theblues.charmstore
-import theblues.errors
 import websockets
 
 from . import provisioner, tag, utils
 from .annotationhelper import _get_annotations, _set_annotations
 from .bundle import BundleHandler, get_charm_series
 from .charmhub import CharmHub
+from .charmstore import CharmStore
 from .client import client, connector
 from .client.client import ConfigValue, Value
 from .client.overrides import Caveat, Macaroon
@@ -461,6 +459,8 @@ class Model:
         self._watch_stopped = asyncio.Event(loop=self._connector.loop)
         self._watch_received = asyncio.Event(loop=self._connector.loop)
         self._watch_stopped.set()
+
+        self._charmhub = CharmHub(self)
         self._charmstore = CharmStore(self._connector.loop)
 
     def is_connected(self):
@@ -783,7 +783,11 @@ class Model:
         the charm-hub-url model config.
 
         """
-        return CharmHub(self)
+        return self._charmhub
+
+    @property
+    def charmstore(self):
+        return self._charmstore
 
     async def get_info(self):
         """Return a client.ModelInfo object for this Model.
@@ -1968,10 +1972,6 @@ class Model:
         """
         raise NotImplementedError()
 
-    @property
-    def charmstore(self):
-        return self._charmstore
-
     async def get_metrics(self, *tags):
         """Retrieve metrics.
 
@@ -2184,38 +2184,6 @@ def _create_consume_args(offer, macaroon, controller_info):
     arg.macaroon = macaroon
 
     return arg
-
-
-class CharmStore:
-    """
-    Async wrapper around theblues.charmstore.CharmStore
-    """
-    def __init__(self, loop, cs_timeout=20):
-        self.loop = loop
-        self._cs = theblues.charmstore.CharmStore(timeout=cs_timeout)
-
-    def __getattr__(self, name):
-        """
-        Wrap method calls in coroutines that use run_in_executor to make them
-        async.
-        """
-        attr = getattr(self._cs, name)
-        if not callable(attr):
-            wrapper = partial(getattr, self._cs, name)
-            setattr(self, name, wrapper)
-        else:
-            async def coro(*args, **kwargs):
-                method = partial(attr, *args, **kwargs)
-                for attempt in range(1, 4):
-                    try:
-                        return await self.loop.run_in_executor(None, method)
-                    except theblues.errors.ServerError:
-                        if attempt == 3:
-                            raise
-                        await asyncio.sleep(1, loop=self.loop)
-            setattr(self, name, coro)
-            wrapper = coro
-        return wrapper
 
 
 class CharmArchiveGenerator:
