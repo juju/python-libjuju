@@ -1,6 +1,6 @@
 """
 Example to show how to connect to the current model and query the charm-hub
-store for information about a given charm.
+repository for information about a given charm.
 """
 import logging
 

@@ -779,7 +779,7 @@ class Model:
 
     @property
     def charmhub(self):
-        """Return a charmhub store for requesting charm information using
+        """Return a charmhub repository for requesting charm information using
         the charm-hub-url model config.
 
         """
