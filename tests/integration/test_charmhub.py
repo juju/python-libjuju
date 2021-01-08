@@ -33,3 +33,27 @@ async def test_info_not_found(event_loop):
             assert e.message == "No charm or bundle with name 'badnameforapp'."
         else:
             raise
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_find(event_loop):
+    async with base.CleanModel() as model:
+        result = await model.charmhub.find("kube")
+
+        assert len(result.result) > 0
+        for resp in result.result:
+            assert resp.name != ""
+            assert resp.type_ in ["charm", "bundle"]
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_find_all(event_loop):
+    async with base.CleanModel() as model:
+        result = await model.charmhub.find("")
+
+        assert len(result.result) > 0
+        for resp in result.result:
+            assert resp.name != ""
+            assert resp.type_ in ["charm", "bundle"]

@@ -24,5 +24,12 @@ class CharmHub:
         facade = self._facade()
         return await facade.Info(tag="application-{}".format(name), channel=channel)
 
+    async def find(self, query):
+        """find queries the CharmHub store for available charms or bundles.
+
+        """
+        facade = self._facade()
+        return await facade.Find(query=query)
+
     def _facade(self):
         return client.CharmHubFacade.from_connection(self.model.connection())
