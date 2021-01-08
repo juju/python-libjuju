@@ -61,9 +61,7 @@ class Channel:
         if not Risk.valid(risk):
             raise JujuError("unexpected risk {}".format(risk))
 
-        if track is None:
-            track = ""
-        self.track = track
+        self.track = track or ""
         self.risk = risk
 
     @staticmethod
@@ -76,8 +74,6 @@ class Channel:
             raise JujuError("channel cannot be empty")
 
         p = s.split("/")
-
-        print(len(p))
 
         risk = None
         track = None
@@ -163,7 +159,7 @@ class Platform:
         else:
             raise JujuError("platform is malformed and has too many components {}".format(s))
 
-        if arch is None or arch == "":
+        if not arch:
             raise JujuError("architecture in platform {} is not valid".format(s))
         if os is not None and os == "":
             raise JujuError("os in platform {} is not valid".format(s))
