@@ -1222,17 +1222,22 @@ class Model:
         await self.block_until(lambda: _find_relation(*specs) is not None)
         return _find_relation(*specs)
 
-    def add_space(self, name, *cidrs):
+    async def add_space(self, name, cidrs=None, public=True):
         """Add a new network space.
 
         Adds a new space with the given name and associates the given
         (optional) list of existing subnet CIDRs with it.
 
         :param str name: Name of the space
-        :param *cidrs: Optional list of existing subnet CIDRs
-
+        :param List[str] cidrs: Optional list of existing subnet CIDRs
         """
-        raise NotImplementedError()
+        space_facade = client.SpacesFacade.from_connection(self.connection())
+        spaces = [
+            {
+                "cidrs": cidrs,
+                "space-tag": tag.space(name),
+                "public": public}]
+        return await space_facade.CreateSpaces(spaces=spaces)
 
     async def add_ssh_key(self, user, key):
         """Add a public SSH key to this model.
@@ -1668,11 +1673,14 @@ class Model:
         """
         raise NotImplementedError()
 
-    def get_spaces(self):
+    async def get_spaces(self):
         """Return list of all known spaces, including associated subnets.
 
+        Returns a List of :class:`~juju._definitions.Space` instances.
         """
-        raise NotImplementedError()
+        space_facade = client.SpacesFacade.from_connection(self.connection())
+        response = await space_facade.ListSpaces()
+        return response.results
 
     async def get_ssh_key(self, raw_ssh=False):
         """Return known SSH keys for this model.

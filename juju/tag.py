@@ -50,3 +50,6 @@ def unit(unit_name):
 
 def action(action_uuid):
     return _prefix('action-', action_uuid)
+
+def space(space_name):
+    return _prefix('space-', space_name)
