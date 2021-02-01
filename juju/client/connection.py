@@ -99,7 +99,7 @@ client_facades = {
     'RetryStrategy': {'versions': [1]},
     'Singular': {'versions': [2]},
     'SSHClient': {'versions': [1, 2]},
-    'Spaces': {'versions': [2, 3]},
+    'Spaces': {'versions': [2, 3, 4, 5, 6]},
     'StatusHistory': {'versions': [2]},
     'Storage': {'versions': [3, 4]},
     'StorageProvisioner': {'versions': [3, 4]},
