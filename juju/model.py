@@ -637,11 +637,14 @@ class Model:
         :param series: Charm series
 
         """
-        fh = tempfile.NamedTemporaryFile()
-        CharmArchiveGenerator(charm_dir).make_archive(fh.name)
-        with fh:
+        if charm_dir.endswith('.charm'):
+            fn = charm_dir
+        else:
+            fn = tempfile.NamedTemporaryFile().name
+            CharmArchiveGenerator(charm_dir).make_archive(fn)
+        with open(fn, 'rb') as fh:
             func = partial(
-                self.add_local_charm, fh, series, os.stat(fh.name).st_size)
+                self.add_local_charm, fh, series, os.stat(fn).st_size)
             charm_url = await self._connector.loop.run_in_executor(None, func)
 
         log.debug('Uploaded local charm: %s -> %s', charm_dir, charm_url)
@@ -1398,6 +1401,7 @@ class Model:
         if trust and (self.info.agent_version < client.Number.from_json('2.4.0')):
             raise NotImplementedError("trusted is not supported on model version {}".format(self.info.agent_version))
 
+        entity_url = str(entity_url)  # allow for pathlib.Path objects
         entity_path = Path(entity_url.replace('local:', ''))
         bundle_path = entity_path / 'bundle.yaml'
         metadata_path = entity_path / 'metadata.yaml'
@@ -1452,7 +1456,11 @@ class Model:
                                                             entity=entity)
             else:
                 if not application_name:
-                    metadata = yaml.load(metadata_path.read_text(), Loader=yaml.FullLoader)
+                    if str(entity_path).endswith('.charm'):
+                        with zipfile.ZipFile(entity_path, 'r') as charm_file:
+                            metadata = yaml.load(charm_file.read('metadata.yaml'), Loader=yaml.FullLoader)
+                    else:
+                        metadata = yaml.load(metadata_path.read_text(), Loader=yaml.FullLoader)
                     application_name = metadata['name']
                 # We have a local charm dir that needs to be uploaded
                 charm_dir = os.path.abspath(
