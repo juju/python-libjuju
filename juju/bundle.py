@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import os
+import zipfile
 from pathlib import Path
 
 import yaml
@@ -179,11 +180,16 @@ def get_charm_series(path):
 
     Returns None if no series can be determined.
     """
-    md = Path(path) / "metadata.yaml"
-    if not md.exists():
-        return None
     try:
-        data = yaml.safe_load(md.open())
+        if path.endswith('.charm'):
+            md = "metadata.yaml in %s" % path
+            with zipfile.ZipFile(path, 'r') as charm_file:
+                data = yaml.safe_load(charm_file.read('metadata.yaml'))
+        else:
+            md = Path(path) / "metadata.yaml"
+            if not md.exists():
+                return None
+            data = yaml.safe_load(md.open())
     except yaml.YAMLError as exc:
         if hasattr(exc, "problem_mark"):
             mark = exc.problem_mark
