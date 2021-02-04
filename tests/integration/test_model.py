@@ -62,6 +62,22 @@ async def test_deploy_local_bundle_file(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_deploy_bundle_local_charms(event_loop):
+    tests_dir = Path(__file__).absolute().parent
+    bundle_path = tests_dir / 'bundle' / 'local.yaml'
+
+    async with base.CleanModel() as model:
+        await model.deploy(bundle_path)
+        await model.wait_for_bundle(bundle_path)
+        assert list(model.units.keys()) == ['test1/0', 'test2/0']
+        assert model.units['test1/0'].agent_status == 'idle'
+        assert model.units['test1/0'].workload_status == 'active'
+        assert model.units['test2/0'].agent_status == 'idle'
+        assert model.units['test2/0'].workload_status == 'active'
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_deploy_invalid_bundle(event_loop):
     pytest.skip('test_deploy_invalid_bundle intermittent test failure')
     tests_dir = Path(__file__).absolute().parent.parent

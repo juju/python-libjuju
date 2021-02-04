@@ -11,6 +11,7 @@ import tempfile
 import weakref
 import zipfile
 from concurrent.futures import CancelledError
+from datetime import datetime, timedelta
 from functools import partial
 from pathlib import Path
 
@@ -30,6 +31,7 @@ from .constraints import parse as parse_constraints
 from .controller import Controller
 from .delta import get_entity_class, get_entity_delta
 from .errors import JujuAPIError, JujuError
+from .errors import JujuAppError, JujuUnitError, JujuAgentError, JujuMachineError
 from .exceptions import DeadEntityException
 from .names import is_valid_application
 from .offerendpoints import ParseError as OfferParseError
@@ -2143,6 +2145,91 @@ class Model:
                 controller_name = current.controller_name
         await controller.connect(controller_name=controller_name)
         return controller
+
+    async def wait_for_bundle(self, bundle_path, raise_on_error=True,
+                              timeout=10 * 60, idle_period=15,
+                              check_freq=0.5):
+        """Wait for the applications and units in the given bundle to settle.
+
+        The bundle is considered "settled" when all units are simultaneously "idle"
+        for at least `idle_period` seconds.
+
+        :param bundle_path (str or Path): Path to bundle to read.
+
+        :param raise_on_error (bool): If True, then any unit or app going into
+            "error" status immediately raises either a JujuAppError or a JujuUnitError.
+            Note that machine or agent failures will always raise an exception (either
+            JujuMachineError or JujuAgentError), regardless of this param.
+
+        :param timeout (float): How long to wait, in seconds, for the bundle settles
+            before raising an asyncio.TimeoutError. If None, will wait forever.
+
+        :param idle_period (float): How long, in seconds, between agent status updates a
+            unit needs to be idle for, to allow for queued hooks to start.
+
+        :param check_freq (float): How frequently, in seconds, to check the model.
+        """
+        timeout = timedelta(seconds=timeout) if timeout is not None else None
+        idle_period = timedelta(seconds=idle_period)
+        bundle = yaml.safe_load(Path(bundle_path).read_text())
+        start_time = datetime.now()
+        bundle_apps = bundle.get("applications", bundle.get("services"))
+        idle_times = {}
+
+        def _raise_for_errors(errors):
+            if not errors:
+                return
+            for entity_name, error_type in (("Machine", JujuMachineError),
+                                            ("Agent", JujuAgentError),
+                                            ("Unit", JujuUnitError),
+                                            ("App", JujuAppError)):
+                errored = errors.get(entity_name, [])
+                if not errored:
+                    continue
+                raise error_type("{}{} in error: {}".format(
+                    entity_name,
+                    "s" if len(errored) > 1 else "",
+                    ", ".join(errored),
+                ))
+
+        while True:
+            all_ready = True
+            errors = {}
+            for app in bundle_apps.keys():
+                if app not in self.applications:
+                    continue
+                app = self.applications[app]
+                if raise_on_error and app.status == "error":
+                    errors.setdefault("App", []).append(app.name)
+                for unit in app.units:
+                    if unit.machine.status == "error":
+                        errors.setdefault("Machine", []).append(unit.machine.id)
+                        continue
+                    if unit.agent_status == "error":
+                        errors.setdefault("Agent", []).append(unit.name)
+                        continue
+                    if raise_on_error and unit.workload_status == "error":
+                        errors.setdefault("Unit", []).append(unit.name)
+                        continue
+                    if unit.agent_status == "idle":
+                        now = datetime.now()
+                        idle_start = idle_times.setdefault(unit.name, now)
+                        print(f"Unit {unit.name} is idle for {now - idle_start}")
+                        if now - idle_start < idle_period:
+                            all_ready = False
+                    else:
+                        idle_times.pop(unit.name, None)
+                        all_ready = False
+                actual_num_units = len(app.units)
+                expected_num_units = bundle_apps[app.name].get("num_units", 0)
+                if actual_num_units < expected_num_units:
+                    all_ready = False
+            _raise_for_errors(errors)
+            if all_ready:
+                break
+            if timeout is not None and datetime.now() - start_time > timeout:
+                raise asyncio.TimeoutError("Timed out waiting for {}".format(bundle_path))
+            await asyncio.sleep(check_freq)
 
 
 def _create_consume_args(offer, macaroon, controller_info):
