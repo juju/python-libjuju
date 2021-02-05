@@ -2146,15 +2146,14 @@ class Model:
         await controller.connect(controller_name=controller_name)
         return controller
 
-    async def wait_for_bundle(self, bundle_path, raise_on_error=True,
-                              timeout=10 * 60, idle_period=15,
-                              check_freq=0.5):
-        """Wait for the applications and units in the given bundle to settle.
+    async def wait_for_idle(self, apps=None, raise_on_error=True, timeout=10 * 60,
+                            idle_period=15, check_freq=0.5):
+        """Wait for applications in the model to settle into an idle state.
 
-        The bundle is considered "settled" when all units are simultaneously "idle"
-        for at least `idle_period` seconds.
-
-        :param bundle_path (str or Path): Path to bundle to read.
+        :param apps (list[str]): Optional list of specific app names to wait on.
+            If given, all apps must be present in the model and idle, while other
+            apps in the model can still be busy. If not given, all apps currently
+            in the model must be idle.
 
         :param raise_on_error (bool): If True, then any unit or app going into
             "error" status immediately raises either a JujuAppError or a JujuUnitError.
@@ -2164,16 +2163,16 @@ class Model:
         :param timeout (float): How long to wait, in seconds, for the bundle settles
             before raising an asyncio.TimeoutError. If None, will wait forever.
 
-        :param idle_period (float): How long, in seconds, between agent status updates a
-            unit needs to be idle for, to allow for queued hooks to start.
+        :param idle_period (float): How long, in seconds, the agent statuses of all
+            units of all apps need to be `idle`. This delay is used to ensure that
+            any pending hooks have a chance to start to avoid false positives.
 
         :param check_freq (float): How frequently, in seconds, to check the model.
         """
         timeout = timedelta(seconds=timeout) if timeout is not None else None
         idle_period = timedelta(seconds=idle_period)
-        bundle = yaml.safe_load(Path(bundle_path).read_text())
         start_time = datetime.now()
-        bundle_apps = bundle.get("applications", bundle.get("services"))
+        apps = apps or self.applications
         idle_times = {}
 
         def _raise_for_errors(errors):
@@ -2193,16 +2192,17 @@ class Model:
                 ))
 
         while True:
-            all_ready = True
+            busy_apps = []
             errors = {}
-            for app in bundle_apps.keys():
+            for app in apps:
                 if app not in self.applications:
+                    busy_apps.append(app)
                     continue
                 app = self.applications[app]
                 if raise_on_error and app.status == "error":
                     errors.setdefault("App", []).append(app.name)
                 for unit in app.units:
-                    if unit.machine.status == "error":
+                    if unit.machine is not None and unit.machine.status == "error":
                         errors.setdefault("Machine", []).append(unit.machine.id)
                         continue
                     if unit.agent_status == "error":
@@ -2214,21 +2214,19 @@ class Model:
                     if unit.agent_status == "idle":
                         now = datetime.now()
                         idle_start = idle_times.setdefault(unit.name, now)
-                        print(f"Unit {unit.name} is idle for {now - idle_start}")
                         if now - idle_start < idle_period:
-                            all_ready = False
+                            busy_apps.append(app.name)
                     else:
                         idle_times.pop(unit.name, None)
-                        all_ready = False
-                actual_num_units = len(app.units)
-                expected_num_units = bundle_apps[app.name].get("num_units", 0)
-                if actual_num_units < expected_num_units:
-                    all_ready = False
+                        busy_apps.append(app.name)
             _raise_for_errors(errors)
-            if all_ready:
+            if not busy_apps:
                 break
             if timeout is not None and datetime.now() - start_time > timeout:
-                raise asyncio.TimeoutError("Timed out waiting for {}".format(bundle_path))
+                s = "s" if len(busy_apps) > 1 else ""
+                busy_apps = ", ".join(busy_apps)
+                raise asyncio.TimeoutError("Timed out waiting for model; "
+                                           "busy app{}: {}".format(s, busy_apps))
             await asyncio.sleep(check_freq)
 
 

@@ -1,5 +1,5 @@
 name: charm
-series: ["xenial"]
+series: ["focal"]
 summary: "test"
 description: "test"
 maintainers: ["test"]
