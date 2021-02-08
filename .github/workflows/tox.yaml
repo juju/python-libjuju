@@ -3,15 +3,36 @@ name: Unit Tests
 on: [push, pull_request]
 
 jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: [3.5, 3.6, 3.7, 3.8, 3.9]
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Install dependencies
+      run: |
+        pip install tox
+    - name: Run lint
+      run: tox -e lint
   unit-tests:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: [3.5, 3.6, 3.7, 3.8, 3.9]
     steps:
       - uses: actions/checkout@v2
       - name: Setup Python
         uses: actions/setup-python@v1
         with:
-          python-version: 3.8
-      - name: Install Tox and any other packages
+          python-version: ${{ matrix.python }}
+      - name: Install dependencies
         run: pip install tox
-      - name: Run Lint and Unit Tests
-        run: tox -e lint,py3
+      - name: Run unit tests
+        run: tox -e py3

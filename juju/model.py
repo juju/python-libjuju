@@ -11,6 +11,7 @@ import tempfile
 import weakref
 import zipfile
 from concurrent.futures import CancelledError
+from datetime import datetime, timedelta
 from functools import partial
 from pathlib import Path
 
@@ -30,6 +31,7 @@ from .constraints import parse as parse_constraints
 from .controller import Controller
 from .delta import get_entity_class, get_entity_delta
 from .errors import JujuAPIError, JujuError
+from .errors import JujuAppError, JujuUnitError, JujuAgentError, JujuMachineError
 from .exceptions import DeadEntityException
 from .names import is_valid_application
 from .offerendpoints import ParseError as OfferParseError
@@ -2143,6 +2145,89 @@ class Model:
                 controller_name = current.controller_name
         await controller.connect(controller_name=controller_name)
         return controller
+
+    async def wait_for_idle(self, apps=None, raise_on_error=True, timeout=10 * 60,
+                            idle_period=15, check_freq=0.5):
+        """Wait for applications in the model to settle into an idle state.
+
+        :param apps (list[str]): Optional list of specific app names to wait on.
+            If given, all apps must be present in the model and idle, while other
+            apps in the model can still be busy. If not given, all apps currently
+            in the model must be idle.
+
+        :param raise_on_error (bool): If True, then any unit or app going into
+            "error" status immediately raises either a JujuAppError or a JujuUnitError.
+            Note that machine or agent failures will always raise an exception (either
+            JujuMachineError or JujuAgentError), regardless of this param.
+
+        :param timeout (float): How long to wait, in seconds, for the bundle settles
+            before raising an asyncio.TimeoutError. If None, will wait forever.
+
+        :param idle_period (float): How long, in seconds, the agent statuses of all
+            units of all apps need to be `idle`. This delay is used to ensure that
+            any pending hooks have a chance to start to avoid false positives.
+
+        :param check_freq (float): How frequently, in seconds, to check the model.
+        """
+        timeout = timedelta(seconds=timeout) if timeout is not None else None
+        idle_period = timedelta(seconds=idle_period)
+        start_time = datetime.now()
+        apps = apps or self.applications
+        idle_times = {}
+
+        def _raise_for_errors(errors):
+            if not errors:
+                return
+            for entity_name, error_type in (("Machine", JujuMachineError),
+                                            ("Agent", JujuAgentError),
+                                            ("Unit", JujuUnitError),
+                                            ("App", JujuAppError)):
+                errored = errors.get(entity_name, [])
+                if not errored:
+                    continue
+                raise error_type("{}{} in error: {}".format(
+                    entity_name,
+                    "s" if len(errored) > 1 else "",
+                    ", ".join(errored),
+                ))
+
+        while True:
+            busy_apps = []
+            errors = {}
+            for app in apps:
+                if app not in self.applications:
+                    busy_apps.append(app)
+                    continue
+                app = self.applications[app]
+                if raise_on_error and app.status == "error":
+                    errors.setdefault("App", []).append(app.name)
+                for unit in app.units:
+                    if unit.machine is not None and unit.machine.status == "error":
+                        errors.setdefault("Machine", []).append(unit.machine.id)
+                        continue
+                    if unit.agent_status == "error":
+                        errors.setdefault("Agent", []).append(unit.name)
+                        continue
+                    if raise_on_error and unit.workload_status == "error":
+                        errors.setdefault("Unit", []).append(unit.name)
+                        continue
+                    if unit.agent_status == "idle":
+                        now = datetime.now()
+                        idle_start = idle_times.setdefault(unit.name, now)
+                        if now - idle_start < idle_period:
+                            busy_apps.append(app.name)
+                    else:
+                        idle_times.pop(unit.name, None)
+                        busy_apps.append(app.name)
+            _raise_for_errors(errors)
+            if not busy_apps:
+                break
+            if timeout is not None and datetime.now() - start_time > timeout:
+                s = "s" if len(busy_apps) > 1 else ""
+                busy_apps = ", ".join(busy_apps)
+                raise asyncio.TimeoutError("Timed out waiting for model; "
+                                           "busy app{}: {}".format(s, busy_apps))
+            await asyncio.sleep(check_freq)
 
 
 def _create_consume_args(offer, macaroon, controller_info):
