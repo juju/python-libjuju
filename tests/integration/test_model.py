@@ -14,7 +14,7 @@ import paramiko
 import pylxd
 import pytest
 from juju.client.client import ApplicationFacade, ConfigValue
-from juju.errors import JujuError
+from juju.errors import JujuError, JujuUnitError
 from juju.model import Model, ModelObserver
 from juju.utils import block_until, run_with_interrupt, wait_for_bundle
 
@@ -97,8 +97,40 @@ async def test_deploy_local_charm(event_loop):
     async with base.CleanModel() as model:
         await model.deploy(str(charm_path))
         assert 'charm' in model.applications
-        await model.wait_for_idle()
+        await model.wait_for_idle(wait_for_active=True)
         assert model.units['charm/0'].workload_status == 'active'
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_wait_local_charm_blocked(event_loop):
+    from pathlib import Path
+    tests_dir = Path(__file__).absolute().parent.parent
+    charm_path = tests_dir / 'charm'
+
+    async with base.CleanModel() as model:
+        await model.deploy(str(charm_path), config={'status': 'blocked'})
+        assert 'charm' in model.applications
+        await model.wait_for_idle()
+        with pytest.raises(JujuUnitError):
+            await model.wait_for_idle(wait_for_active=True,
+                                      raise_on_blocked=True,
+                                      timeout=30)
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_wait_local_charm_waiting_timeout(event_loop):
+    from pathlib import Path
+    tests_dir = Path(__file__).absolute().parent.parent
+    charm_path = tests_dir / 'charm'
+
+    async with base.CleanModel() as model:
+        await model.deploy(str(charm_path), config={'status': 'waiting'})
+        assert 'charm' in model.applications
+        await model.wait_for_idle()
+        with pytest.raises(asyncio.TimeoutError):
+            await model.wait_for_idle(wait_for_active=True, timeout=30)
 
 
 @base.bootstrapped
