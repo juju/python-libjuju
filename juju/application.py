@@ -162,9 +162,9 @@ class Application(model.ModelEntity):
             self.name, 'to' if scale else 'by', scale or scale_change)
 
         await app_facade.ScaleApplications(applications=[
-            client.ScaleApplicationParam(application_tag=self.tag,
-                                         scale=scale,
-                                         scale_change=scale_change)
+            client.ScaleApplicationParams(application_tag=self.tag,
+                                          scale=scale,
+                                          scale_change=scale_change)
         ])
 
     def allocate(self, budget, value):
