@@ -138,6 +138,7 @@ class UniterFacade(Type):
                                                   'identity-endpoint': {'type': 'string'},
                                                   'name': {'type': 'string'},
                                                   'region': {'type': 'string'},
+                                                  'skip-tls-verify': {'type': 'boolean'},
                                                   'storage-endpoint': {'type': 'string'},
                                                   'type': {'type': 'string'}},
                                    'required': ['type', 'name'],
