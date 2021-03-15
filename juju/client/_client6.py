@@ -129,6 +129,8 @@ class ActionFacade(Type):
                                                            'applications': {'items': {'type': 'string'},
                                                                             'type': 'array'},
                                                            'limit': {'type': 'integer'},
+                                                           'machines': {'items': {'type': 'string'},
+                                                                        'type': 'array'},
                                                            'offset': {'type': 'integer'},
                                                            'status': {'items': {'type': 'string'},
                                                                       'type': 'array'},
@@ -541,13 +543,14 @@ class ActionFacade(Type):
 
 
     @ReturnMapping(OperationResults)
-    async def ListOperations(self, actions=None, applications=None, limit=None, offset=None, status=None, units=None):
+    async def ListOperations(self, actions=None, applications=None, limit=None, machines=None, offset=None, status=None, units=None):
         '''
         ListOperations fetches the called actions for specified apps/units.
 
         actions : typing.Sequence[str]
         applications : typing.Sequence[str]
         limit : int
+        machines : typing.Sequence[str]
         offset : int
         status : typing.Sequence[str]
         units : typing.Sequence[str]
@@ -561,6 +564,9 @@ class ActionFacade(Type):
 
         if limit is not None and not isinstance(limit, int):
             raise Exception("Expected limit to be a int, received: {}".format(type(limit)))
+
+        if machines is not None and not isinstance(machines, (bytes, str, list)):
+            raise Exception("Expected machines to be a Sequence, received: {}".format(type(machines)))
 
         if offset is not None and not isinstance(offset, int):
             raise Exception("Expected offset to be a int, received: {}".format(type(offset)))
@@ -580,6 +586,7 @@ class ActionFacade(Type):
         _params['actions'] = actions
         _params['applications'] = applications
         _params['limit'] = limit
+        _params['machines'] = machines
         _params['offset'] = offset
         _params['status'] = status
         _params['units'] = units

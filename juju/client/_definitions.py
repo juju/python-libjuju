@@ -4909,9 +4909,9 @@ class ClaimLeadershipParams(Type):
 
 
 class Cloud(Type):
-    _toSchema = {'auth_types': 'auth-types', 'ca_certificates': 'ca-certificates', 'config': 'config', 'endpoint': 'endpoint', 'host_cloud_region': 'host-cloud-region', 'identity_endpoint': 'identity-endpoint', 'region_config': 'region-config', 'regions': 'regions', 'storage_endpoint': 'storage-endpoint', 'type_': 'type'}
-    _toPy = {'auth-types': 'auth_types', 'ca-certificates': 'ca_certificates', 'config': 'config', 'endpoint': 'endpoint', 'host-cloud-region': 'host_cloud_region', 'identity-endpoint': 'identity_endpoint', 'region-config': 'region_config', 'regions': 'regions', 'storage-endpoint': 'storage_endpoint', 'type': 'type_'}
-    def __init__(self, auth_types=None, ca_certificates=None, config=None, endpoint=None, host_cloud_region=None, identity_endpoint=None, region_config=None, regions=None, storage_endpoint=None, type_=None, **unknown_fields):
+    _toSchema = {'auth_types': 'auth-types', 'ca_certificates': 'ca-certificates', 'config': 'config', 'endpoint': 'endpoint', 'host_cloud_region': 'host-cloud-region', 'identity_endpoint': 'identity-endpoint', 'region_config': 'region-config', 'regions': 'regions', 'skip_tls_verify': 'skip-tls-verify', 'storage_endpoint': 'storage-endpoint', 'type_': 'type'}
+    _toPy = {'auth-types': 'auth_types', 'ca-certificates': 'ca_certificates', 'config': 'config', 'endpoint': 'endpoint', 'host-cloud-region': 'host_cloud_region', 'identity-endpoint': 'identity_endpoint', 'region-config': 'region_config', 'regions': 'regions', 'skip-tls-verify': 'skip_tls_verify', 'storage-endpoint': 'storage_endpoint', 'type': 'type_'}
+    def __init__(self, auth_types=None, ca_certificates=None, config=None, endpoint=None, host_cloud_region=None, identity_endpoint=None, region_config=None, regions=None, skip_tls_verify=None, storage_endpoint=None, type_=None, **unknown_fields):
         '''
         auth_types : typing.Sequence[str]
         ca_certificates : typing.Sequence[str]
@@ -4921,6 +4921,7 @@ class Cloud(Type):
         identity_endpoint : str
         region_config : typing.Mapping[str, typing.Any]
         regions : typing.Sequence[~CloudRegion]
+        skip_tls_verify : bool
         storage_endpoint : str
         type_ : str
         '''
@@ -4932,6 +4933,7 @@ class Cloud(Type):
         identity_endpoint_ = identity_endpoint
         region_config_ = region_config
         regions_ = [CloudRegion.from_json(o) for o in regions or []]
+        skip_tls_verify_ = skip_tls_verify
         storage_endpoint_ = storage_endpoint
         type__ = type_
 
@@ -4960,6 +4962,9 @@ class Cloud(Type):
         if regions_ is not None and not isinstance(regions_, (bytes, str, list)):
             raise Exception("Expected regions_ to be a Sequence, received: {}".format(type(regions_)))
 
+        if skip_tls_verify_ is not None and not isinstance(skip_tls_verify_, bool):
+            raise Exception("Expected skip_tls_verify_ to be a bool, received: {}".format(type(skip_tls_verify_)))
+
         if storage_endpoint_ is not None and not isinstance(storage_endpoint_, (bytes, str)):
             raise Exception("Expected storage_endpoint_ to be a str, received: {}".format(type(storage_endpoint_)))
 
@@ -4974,6 +4979,7 @@ class Cloud(Type):
         self.identity_endpoint = identity_endpoint_
         self.region_config = region_config_
         self.regions = regions_
+        self.skip_tls_verify = skip_tls_verify_
         self.storage_endpoint = storage_endpoint_
         self.type_ = type__
         self.unknown_fields = unknown_fields
@@ -5437,9 +5443,9 @@ class CloudResults(Type):
 
 
 class CloudSpec(Type):
-    _toSchema = {'cacertificates': 'cacertificates', 'credential': 'credential', 'endpoint': 'endpoint', 'identity_endpoint': 'identity-endpoint', 'name': 'name', 'region': 'region', 'storage_endpoint': 'storage-endpoint', 'type_': 'type'}
-    _toPy = {'cacertificates': 'cacertificates', 'credential': 'credential', 'endpoint': 'endpoint', 'identity-endpoint': 'identity_endpoint', 'name': 'name', 'region': 'region', 'storage-endpoint': 'storage_endpoint', 'type': 'type_'}
-    def __init__(self, cacertificates=None, credential=None, endpoint=None, identity_endpoint=None, name=None, region=None, storage_endpoint=None, type_=None, **unknown_fields):
+    _toSchema = {'cacertificates': 'cacertificates', 'credential': 'credential', 'endpoint': 'endpoint', 'identity_endpoint': 'identity-endpoint', 'name': 'name', 'region': 'region', 'skip_tls_verify': 'skip-tls-verify', 'storage_endpoint': 'storage-endpoint', 'type_': 'type'}
+    _toPy = {'cacertificates': 'cacertificates', 'credential': 'credential', 'endpoint': 'endpoint', 'identity-endpoint': 'identity_endpoint', 'name': 'name', 'region': 'region', 'skip-tls-verify': 'skip_tls_verify', 'storage-endpoint': 'storage_endpoint', 'type': 'type_'}
+    def __init__(self, cacertificates=None, credential=None, endpoint=None, identity_endpoint=None, name=None, region=None, skip_tls_verify=None, storage_endpoint=None, type_=None, **unknown_fields):
         '''
         cacertificates : typing.Sequence[str]
         credential : CloudCredential
@@ -5447,6 +5453,7 @@ class CloudSpec(Type):
         identity_endpoint : str
         name : str
         region : str
+        skip_tls_verify : bool
         storage_endpoint : str
         type_ : str
         '''
@@ -5456,6 +5463,7 @@ class CloudSpec(Type):
         identity_endpoint_ = identity_endpoint
         name_ = name
         region_ = region
+        skip_tls_verify_ = skip_tls_verify
         storage_endpoint_ = storage_endpoint
         type__ = type_
 
@@ -5478,6 +5486,9 @@ class CloudSpec(Type):
         if region_ is not None and not isinstance(region_, (bytes, str)):
             raise Exception("Expected region_ to be a str, received: {}".format(type(region_)))
 
+        if skip_tls_verify_ is not None and not isinstance(skip_tls_verify_, bool):
+            raise Exception("Expected skip_tls_verify_ to be a bool, received: {}".format(type(skip_tls_verify_)))
+
         if storage_endpoint_ is not None and not isinstance(storage_endpoint_, (bytes, str)):
             raise Exception("Expected storage_endpoint_ to be a str, received: {}".format(type(storage_endpoint_)))
 
@@ -5490,6 +5501,7 @@ class CloudSpec(Type):
         self.identity_endpoint = identity_endpoint_
         self.name = name_
         self.region = region_
+        self.skip_tls_verify = skip_tls_verify_
         self.storage_endpoint = storage_endpoint_
         self.type_ = type__
         self.unknown_fields = unknown_fields
@@ -11689,13 +11701,14 @@ class LogForwardingSetLastSentParams(Type):
 
 
 class LoginRequest(Type):
-    _toSchema = {'auth_tag': 'auth-tag', 'bakery_version': 'bakery-version', 'cli_args': 'cli-args', 'credentials': 'credentials', 'macaroons': 'macaroons', 'nonce': 'nonce', 'user_data': 'user-data'}
-    _toPy = {'auth-tag': 'auth_tag', 'bakery-version': 'bakery_version', 'cli-args': 'cli_args', 'credentials': 'credentials', 'macaroons': 'macaroons', 'nonce': 'nonce', 'user-data': 'user_data'}
-    def __init__(self, auth_tag=None, bakery_version=None, cli_args=None, credentials=None, macaroons=None, nonce=None, user_data=None, **unknown_fields):
+    _toSchema = {'auth_tag': 'auth-tag', 'bakery_version': 'bakery-version', 'cli_args': 'cli-args', 'client_version': 'client-version', 'credentials': 'credentials', 'macaroons': 'macaroons', 'nonce': 'nonce', 'user_data': 'user-data'}
+    _toPy = {'auth-tag': 'auth_tag', 'bakery-version': 'bakery_version', 'cli-args': 'cli_args', 'client-version': 'client_version', 'credentials': 'credentials', 'macaroons': 'macaroons', 'nonce': 'nonce', 'user-data': 'user_data'}
+    def __init__(self, auth_tag=None, bakery_version=None, cli_args=None, client_version=None, credentials=None, macaroons=None, nonce=None, user_data=None, **unknown_fields):
         '''
         auth_tag : str
         bakery_version : int
         cli_args : str
+        client_version : str
         credentials : str
         macaroons : typing.Sequence[~Macaroon]
         nonce : str
@@ -11704,6 +11717,7 @@ class LoginRequest(Type):
         auth_tag_ = auth_tag
         bakery_version_ = bakery_version
         cli_args_ = cli_args
+        client_version_ = client_version
         credentials_ = credentials
         macaroons_ = [Macaroon.from_json(o) for o in macaroons or []]
         nonce_ = nonce
@@ -11718,6 +11732,9 @@ class LoginRequest(Type):
 
         if cli_args_ is not None and not isinstance(cli_args_, (bytes, str)):
             raise Exception("Expected cli_args_ to be a str, received: {}".format(type(cli_args_)))
+
+        if client_version_ is not None and not isinstance(client_version_, (bytes, str)):
+            raise Exception("Expected client_version_ to be a str, received: {}".format(type(client_version_)))
 
         if credentials_ is not None and not isinstance(credentials_, (bytes, str)):
             raise Exception("Expected credentials_ to be a str, received: {}".format(type(credentials_)))
@@ -11734,6 +11751,7 @@ class LoginRequest(Type):
         self.auth_tag = auth_tag_
         self.bakery_version = bakery_version_
         self.cli_args = cli_args_
+        self.client_version = client_version_
         self.credentials = credentials_
         self.macaroons = macaroons_
         self.nonce = nonce_
@@ -12342,9 +12360,9 @@ class MachinePortsResults(Type):
 
 
 class MachineStatus(Type):
-    _toSchema = {'agent_status': 'agent-status', 'constraints': 'constraints', 'containers': 'containers', 'display_name': 'display-name', 'dns_name': 'dns-name', 'hardware': 'hardware', 'has_vote': 'has-vote', 'id_': 'id', 'instance_id': 'instance-id', 'instance_status': 'instance-status', 'ip_addresses': 'ip-addresses', 'jobs': 'jobs', 'lxd_profiles': 'lxd-profiles', 'modification_status': 'modification-status', 'network_interfaces': 'network-interfaces', 'primary_controller_machine': 'primary-controller-machine', 'series': 'series', 'wants_vote': 'wants-vote'}
-    _toPy = {'agent-status': 'agent_status', 'constraints': 'constraints', 'containers': 'containers', 'display-name': 'display_name', 'dns-name': 'dns_name', 'hardware': 'hardware', 'has-vote': 'has_vote', 'id': 'id_', 'instance-id': 'instance_id', 'instance-status': 'instance_status', 'ip-addresses': 'ip_addresses', 'jobs': 'jobs', 'lxd-profiles': 'lxd_profiles', 'modification-status': 'modification_status', 'network-interfaces': 'network_interfaces', 'primary-controller-machine': 'primary_controller_machine', 'series': 'series', 'wants-vote': 'wants_vote'}
-    def __init__(self, agent_status=None, constraints=None, containers=None, display_name=None, dns_name=None, hardware=None, has_vote=None, id_=None, instance_id=None, instance_status=None, ip_addresses=None, jobs=None, lxd_profiles=None, modification_status=None, network_interfaces=None, primary_controller_machine=None, series=None, wants_vote=None, **unknown_fields):
+    _toSchema = {'agent_status': 'agent-status', 'constraints': 'constraints', 'containers': 'containers', 'display_name': 'display-name', 'dns_name': 'dns-name', 'hardware': 'hardware', 'has_vote': 'has-vote', 'hostname': 'hostname', 'id_': 'id', 'instance_id': 'instance-id', 'instance_status': 'instance-status', 'ip_addresses': 'ip-addresses', 'jobs': 'jobs', 'lxd_profiles': 'lxd-profiles', 'modification_status': 'modification-status', 'network_interfaces': 'network-interfaces', 'primary_controller_machine': 'primary-controller-machine', 'series': 'series', 'wants_vote': 'wants-vote'}
+    _toPy = {'agent-status': 'agent_status', 'constraints': 'constraints', 'containers': 'containers', 'display-name': 'display_name', 'dns-name': 'dns_name', 'hardware': 'hardware', 'has-vote': 'has_vote', 'hostname': 'hostname', 'id': 'id_', 'instance-id': 'instance_id', 'instance-status': 'instance_status', 'ip-addresses': 'ip_addresses', 'jobs': 'jobs', 'lxd-profiles': 'lxd_profiles', 'modification-status': 'modification_status', 'network-interfaces': 'network_interfaces', 'primary-controller-machine': 'primary_controller_machine', 'series': 'series', 'wants-vote': 'wants_vote'}
+    def __init__(self, agent_status=None, constraints=None, containers=None, display_name=None, dns_name=None, hardware=None, has_vote=None, hostname=None, id_=None, instance_id=None, instance_status=None, ip_addresses=None, jobs=None, lxd_profiles=None, modification_status=None, network_interfaces=None, primary_controller_machine=None, series=None, wants_vote=None, **unknown_fields):
         '''
         agent_status : DetailedStatus
         constraints : str
@@ -12353,6 +12371,7 @@ class MachineStatus(Type):
         dns_name : str
         hardware : str
         has_vote : bool
+        hostname : str
         id_ : str
         instance_id : str
         instance_status : DetailedStatus
@@ -12372,6 +12391,7 @@ class MachineStatus(Type):
         dns_name_ = dns_name
         hardware_ = hardware
         has_vote_ = has_vote
+        hostname_ = hostname
         id__ = id_
         instance_id_ = instance_id
         instance_status_ = DetailedStatus.from_json(instance_status) if instance_status else None
@@ -12405,6 +12425,9 @@ class MachineStatus(Type):
 
         if has_vote_ is not None and not isinstance(has_vote_, bool):
             raise Exception("Expected has_vote_ to be a bool, received: {}".format(type(has_vote_)))
+
+        if hostname_ is not None and not isinstance(hostname_, (bytes, str)):
+            raise Exception("Expected hostname_ to be a str, received: {}".format(type(hostname_)))
 
         if id__ is not None and not isinstance(id__, (bytes, str)):
             raise Exception("Expected id__ to be a str, received: {}".format(type(id__)))
@@ -12446,6 +12469,7 @@ class MachineStatus(Type):
         self.dns_name = dns_name_
         self.hardware = hardware_
         self.has_vote = has_vote_
+        self.hostname = hostname_
         self.id_ = id__
         self.instance_id = instance_id_
         self.instance_status = instance_status_
@@ -16043,13 +16067,14 @@ class OfferUserDetails(Type):
 
 
 class OperationQueryArgs(Type):
-    _toSchema = {'actions': 'actions', 'applications': 'applications', 'limit': 'limit', 'offset': 'offset', 'status': 'status', 'units': 'units'}
-    _toPy = {'actions': 'actions', 'applications': 'applications', 'limit': 'limit', 'offset': 'offset', 'status': 'status', 'units': 'units'}
-    def __init__(self, actions=None, applications=None, limit=None, offset=None, status=None, units=None, **unknown_fields):
+    _toSchema = {'actions': 'actions', 'applications': 'applications', 'limit': 'limit', 'machines': 'machines', 'offset': 'offset', 'status': 'status', 'units': 'units'}
+    _toPy = {'actions': 'actions', 'applications': 'applications', 'limit': 'limit', 'machines': 'machines', 'offset': 'offset', 'status': 'status', 'units': 'units'}
+    def __init__(self, actions=None, applications=None, limit=None, machines=None, offset=None, status=None, units=None, **unknown_fields):
         '''
         actions : typing.Sequence[str]
         applications : typing.Sequence[str]
         limit : int
+        machines : typing.Sequence[str]
         offset : int
         status : typing.Sequence[str]
         units : typing.Sequence[str]
@@ -16057,6 +16082,7 @@ class OperationQueryArgs(Type):
         actions_ = actions
         applications_ = applications
         limit_ = limit
+        machines_ = machines
         offset_ = offset
         status_ = status
         units_ = units
@@ -16071,6 +16097,9 @@ class OperationQueryArgs(Type):
         if limit_ is not None and not isinstance(limit_, int):
             raise Exception("Expected limit_ to be a int, received: {}".format(type(limit_)))
 
+        if machines_ is not None and not isinstance(machines_, (bytes, str, list)):
+            raise Exception("Expected machines_ to be a Sequence, received: {}".format(type(machines_)))
+
         if offset_ is not None and not isinstance(offset_, int):
             raise Exception("Expected offset_ to be a int, received: {}".format(type(offset_)))
 
@@ -16083,6 +16112,7 @@ class OperationQueryArgs(Type):
         self.actions = actions_
         self.applications = applications_
         self.limit = limit_
+        self.machines = machines_
         self.offset = offset_
         self.status = status_
         self.units = units_
@@ -17508,6 +17538,48 @@ class RebootActionResults(Type):
             raise Exception("Expected results_ to be a Sequence, received: {}".format(type(results_)))
 
         self.results = results_
+        self.unknown_fields = unknown_fields
+
+
+
+class RecordAgentStartInformationArg(Type):
+    _toSchema = {'hostname': 'hostname', 'tag': 'tag'}
+    _toPy = {'hostname': 'hostname', 'tag': 'tag'}
+    def __init__(self, hostname=None, tag=None, **unknown_fields):
+        '''
+        hostname : str
+        tag : str
+        '''
+        hostname_ = hostname
+        tag_ = tag
+
+        # Validate arguments against known Juju API types.
+        if hostname_ is not None and not isinstance(hostname_, (bytes, str)):
+            raise Exception("Expected hostname_ to be a str, received: {}".format(type(hostname_)))
+
+        if tag_ is not None and not isinstance(tag_, (bytes, str)):
+            raise Exception("Expected tag_ to be a str, received: {}".format(type(tag_)))
+
+        self.hostname = hostname_
+        self.tag = tag_
+        self.unknown_fields = unknown_fields
+
+
+
+class RecordAgentStartInformationArgs(Type):
+    _toSchema = {'args': 'args'}
+    _toPy = {'args': 'args'}
+    def __init__(self, args=None, **unknown_fields):
+        '''
+        args : typing.Sequence[~RecordAgentStartInformationArg]
+        '''
+        args_ = [RecordAgentStartInformationArg.from_json(o) for o in args or []]
+
+        # Validate arguments against known Juju API types.
+        if args_ is not None and not isinstance(args_, (bytes, str, list)):
+            raise Exception("Expected args_ to be a Sequence, received: {}".format(type(args_)))
+
+        self.args = args_
         self.unknown_fields = unknown_fields
 
 
@@ -24710,6 +24782,48 @@ class UserModelList(Type):
             raise Exception("Expected user_models_ to be a Sequence, received: {}".format(type(user_models_)))
 
         self.user_models = user_models_
+        self.unknown_fields = unknown_fields
+
+
+
+class ValidateModelUpgradeParam(Type):
+    _toSchema = {'model_tag': 'model-tag'}
+    _toPy = {'model-tag': 'model_tag'}
+    def __init__(self, model_tag=None, **unknown_fields):
+        '''
+        model_tag : str
+        '''
+        model_tag_ = model_tag
+
+        # Validate arguments against known Juju API types.
+        if model_tag_ is not None and not isinstance(model_tag_, (bytes, str)):
+            raise Exception("Expected model_tag_ to be a str, received: {}".format(type(model_tag_)))
+
+        self.model_tag = model_tag_
+        self.unknown_fields = unknown_fields
+
+
+
+class ValidateModelUpgradeParams(Type):
+    _toSchema = {'force': 'force', 'model': 'model'}
+    _toPy = {'force': 'force', 'model': 'model'}
+    def __init__(self, force=None, model=None, **unknown_fields):
+        '''
+        force : bool
+        model : typing.Sequence[~ValidateModelUpgradeParam]
+        '''
+        force_ = force
+        model_ = [ValidateModelUpgradeParam.from_json(o) for o in model or []]
+
+        # Validate arguments against known Juju API types.
+        if force_ is not None and not isinstance(force_, bool):
+            raise Exception("Expected force_ to be a bool, received: {}".format(type(force_)))
+
+        if model_ is not None and not isinstance(model_, (bytes, str, list)):
+            raise Exception("Expected model_ to be a Sequence, received: {}".format(type(model_)))
+
+        self.force = force_
+        self.model = model_
         self.unknown_fields = unknown_fields
 
 
