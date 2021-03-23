@@ -1,6 +1,15 @@
 Changelog
 ---------
 
+2.8.6
+^^^^^
+
+Tuesday March 23 2021
+
+* Update facade methods for Juju 2.8.10
+* Bug fix - Fix typo in param name for ScaleApplications
+* Introduction of hostname property for Machines
+
 2.8.5
 ^^^^^
 
