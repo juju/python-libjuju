@@ -30,9 +30,9 @@ async def test_info_not_found(event_loop):
         try:
             await model.charmhub.info("badnameforapp")
         except JujuAPIError as e:
-            assert e.message == "No charm or bundle with name 'badnameforapp'."
+            assert e.message == "badnameforapp not found"
         else:
-            raise
+            assert False
 
 
 @base.bootstrapped
@@ -45,6 +45,18 @@ async def test_find(event_loop):
         for resp in result.result:
             assert resp.name != ""
             assert resp.type_ in ["charm", "bundle"]
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_find_bundles(event_loop):
+    async with base.CleanModel() as model:
+        result = await model.charmhub.find("kube", charm_type="bundle")
+
+        assert len(result.result) > 0
+        for resp in result.result:
+            assert resp.name != ""
+            assert resp.type_ in ["bundle"]
 
 
 @base.bootstrapped
