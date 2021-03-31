@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import os
+import zipfile
 from pathlib import Path
 
 import yaml
@@ -72,7 +73,7 @@ class BundleHandler:
                 )
         return bundle
 
-    async def _handle_local_charms(self, bundle):
+    async def _handle_local_charms(self, bundle, bundle_dir):
         """Search for references to local charms (i.e. filesystem paths)
         in the bundle. Upload the local charms to the model, and replace
         the filesystem paths with appropriate 'local:' paths in the bundle.
@@ -89,9 +90,16 @@ class BundleHandler:
         apps_dict = bundle.get('applications', bundle.get('services', {}))
         for app_name in self.applications:
             app_dict = apps_dict[app_name]
-            charm_dir = os.path.abspath(os.path.expanduser(app_dict['charm']))
-            if not os.path.isdir(charm_dir):
-                continue
+            charm_dir = app_dict['charm']
+            try:
+                charm_path = (bundle_dir / charm_dir).resolve()
+                if not (charm_path.is_dir() or
+                        (charm_path.is_file() and
+                         charm_path.suffix in ('.charm', '.zip'))):
+                    continue
+                charm_dir = str(charm_path)
+            except ValueError:
+                pass
             series = (
                 app_dict.get('series') or
                 default_series or
@@ -122,18 +130,24 @@ class BundleHandler:
 
     async def fetch_plan(self, entity_id):
         is_store_url = entity_id.startswith('cs:')
+        is_local = False
+        bundle_dir = None
 
         if not is_store_url and os.path.isfile(entity_id):
             bundle_yaml = Path(entity_id).read_text()
+            is_local = True
+            bundle_dir = Path(entity_id).parent
         elif not is_store_url and os.path.isdir(entity_id):
             bundle_yaml = (Path(entity_id) / "bundle.yaml").read_text()
+            bundle_dir = Path(entity_id)
         else:
             bundle_yaml = await self.charmstore.files(entity_id,
                                                       filename='bundle.yaml',
                                                       read_file=True)
         self.bundle = yaml.safe_load(bundle_yaml)
         self.bundle = await self._validate_bundle(self.bundle)
-        self.bundle = await self._handle_local_charms(self.bundle)
+        if is_local:
+            self.bundle = await self._handle_local_charms(self.bundle, bundle_dir)
 
         self.plan = await self.bundle_facade.GetChanges(
             bundleurl=entity_id,
@@ -179,11 +193,16 @@ def get_charm_series(path):
 
     Returns None if no series can be determined.
     """
-    md = Path(path) / "metadata.yaml"
-    if not md.exists():
-        return None
     try:
-        data = yaml.safe_load(md.open())
+        if path.endswith('.charm'):
+            md = "metadata.yaml in %s" % path
+            with zipfile.ZipFile(path, 'r') as charm_file:
+                data = yaml.safe_load(charm_file.read('metadata.yaml'))
+        else:
+            md = Path(path) / "metadata.yaml"
+            if not md.exists():
+                return None
+            data = yaml.safe_load(md.open())
     except yaml.YAMLError as exc:
         if hasattr(exc, "problem_mark"):
             mark = exc.problem_mark

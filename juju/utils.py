@@ -1,11 +1,13 @@
 import asyncio
 import os
+import textwrap
 from collections import defaultdict
 from functools import partial
 from pathlib import Path
 import base64
 from pyasn1.type import univ, char
 from pyasn1.codec.der.encoder import encode
+import yaml
 
 
 async def execute_process(*cmd, log=None, loop=None):
@@ -83,6 +85,26 @@ async def block_until(*conditions, timeout=None, wait_period=0.5, loop=None):
         while not all(c() for c in conditions):
             await asyncio.sleep(wait_period, loop=loop)
     await asyncio.wait_for(_block(), timeout, loop=loop)
+
+
+async def wait_for_bundle(model, bundle, **kwargs):
+    """Helper to wait for just the apps in a specific bundle.
+
+    Equivalent to loading the bundle, pulling out the app names, and calling::
+
+        await model.wait_for_idle(app_names, **kwargs)
+    """
+    try:
+        bundle_path = Path(bundle)
+        if bundle_path.is_file():
+            bundle = bundle_path.read_text()
+        elif (bundle_path / "bundle.yaml").is_file():
+            bundle = (bundle_path / "bundle.yaml")
+    except OSError:
+        pass
+    bundle = yaml.safe_load(textwrap.dedent(bundle).strip())
+    apps = list(bundle.get("applications", bundle.get("services")).keys())
+    await model.wait_for_idle(apps, **kwargs)
 
 
 async def run_with_interrupt(task, *events, loop=None):

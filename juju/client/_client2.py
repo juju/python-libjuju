@@ -486,6 +486,7 @@ class AgentFacade(Type):
                                                   'credential': {'$ref': '#/definitions/CloudCredential'},
                                                   'endpoint': {'type': 'string'},
                                                   'identity-endpoint': {'type': 'string'},
+                                                  'is-controller-cloud': {'type': 'boolean'},
                                                   'name': {'type': 'string'},
                                                   'region': {'type': 'string'},
                                                   'skip-tls-verify': {'type': 'boolean'},

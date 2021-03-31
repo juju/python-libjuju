@@ -323,6 +323,17 @@ class Machine(model.ModelEntity):
         return None
 
     @property
+    def hostname(self):
+        """Get the hostname for this machine as reported by the machine agent
+        running on it. This is only supported on 2.8.10+ controllers.
+
+        May return None if no hostname information is available.
+        """
+        if 'hostname' in self.safe_data and self.safe_data['hostname'] != '':
+            return self.safe_data['hostname']
+        return None
+
+    @property
     def series(self):
         """Returns the series of the current machine
 

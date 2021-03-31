@@ -1213,11 +1213,14 @@ class CharmsFacade(Type):
                                       'properties': {'specs': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmActionSpec'}},
                                                                'type': 'object'}},
                                       'type': 'object'},
+                     'CharmBase': {'additionalProperties': False,
+                                   'properties': {'channel': {'type': 'string'},
+                                                  'name': {'type': 'string'}},
+                                   'type': 'object'},
                      'CharmContainer': {'additionalProperties': False,
                                         'properties': {'mounts': {'items': {'$ref': '#/definitions/CharmMount'},
                                                                   'type': 'array'},
-                                                       'systems': {'items': {'$ref': '#/definitions/CharmSystem'},
-                                                                   'type': 'array'}},
+                                                       'resource': {'type': 'string'}},
                                         'type': 'object'},
                      'CharmDeployment': {'additionalProperties': False,
                                          'properties': {'min-version': {'type': 'string'},
@@ -1253,8 +1256,10 @@ class CharmsFacade(Type):
                                                       'devices'],
                                          'type': 'object'},
                      'CharmMeta': {'additionalProperties': False,
-                                   'properties': {'architectures': {'items': {'type': 'string'},
-                                                                    'type': 'array'},
+                                   'properties': {'assumes': {'items': {'type': 'string'},
+                                                              'type': 'array'},
+                                                  'bases': {'items': {'$ref': '#/definitions/CharmBase'},
+                                                            'type': 'array'},
                                                   'categories': {'items': {'type': 'string'},
                                                                  'type': 'array'},
                                                   'containers': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmContainer'}},
@@ -1271,8 +1276,6 @@ class CharmsFacade(Type):
                                                                       'type': 'object'},
                                                   'peers': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmRelation'}},
                                                             'type': 'object'},
-                                                  'platforms': {'items': {'type': 'string'},
-                                                                'type': 'array'},
                                                   'provides': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmRelation'}},
                                                                'type': 'object'},
                                                   'requires': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmRelation'}},
@@ -1285,8 +1288,6 @@ class CharmsFacade(Type):
                                                               'type': 'object'},
                                                   'subordinate': {'type': 'boolean'},
                                                   'summary': {'type': 'string'},
-                                                  'systems': {'items': {'$ref': '#/definitions/CharmSystem'},
-                                                              'type': 'array'},
                                                   'tags': {'items': {'type': 'string'},
                                                            'type': 'array'},
                                                   'terms': {'items': {'type': 'string'},
@@ -1359,6 +1360,24 @@ class CharmsFacade(Type):
                                                     'limit',
                                                     'scope'],
                                        'type': 'object'},
+                     'CharmResource': {'additionalProperties': False,
+                                       'properties': {'description': {'type': 'string'},
+                                                      'fingerprint': {'items': {'type': 'integer'},
+                                                                      'type': 'array'},
+                                                      'name': {'type': 'string'},
+                                                      'origin': {'type': 'string'},
+                                                      'path': {'type': 'string'},
+                                                      'revision': {'type': 'integer'},
+                                                      'size': {'type': 'integer'},
+                                                      'type': {'type': 'string'}},
+                                       'required': ['name',
+                                                    'type',
+                                                    'path',
+                                                    'origin',
+                                                    'revision',
+                                                    'fingerprint',
+                                                    'size'],
+                                       'type': 'object'},
                      'CharmResourceMeta': {'additionalProperties': False,
                                            'properties': {'description': {'type': 'string'},
                                                           'name': {'type': 'string'},
@@ -1369,6 +1388,35 @@ class CharmsFacade(Type):
                                                         'path',
                                                         'description'],
                                            'type': 'object'},
+                     'CharmResourceResult': {'additionalProperties': False,
+                                             'properties': {'CharmResource': {'$ref': '#/definitions/CharmResource'},
+                                                            'ErrorResult': {'$ref': '#/definitions/ErrorResult'},
+                                                            'description': {'type': 'string'},
+                                                            'error': {'$ref': '#/definitions/Error'},
+                                                            'fingerprint': {'items': {'type': 'integer'},
+                                                                            'type': 'array'},
+                                                            'name': {'type': 'string'},
+                                                            'origin': {'type': 'string'},
+                                                            'path': {'type': 'string'},
+                                                            'revision': {'type': 'integer'},
+                                                            'size': {'type': 'integer'},
+                                                            'type': {'type': 'string'}},
+                                             'required': ['ErrorResult',
+                                                          'name',
+                                                          'type',
+                                                          'path',
+                                                          'origin',
+                                                          'revision',
+                                                          'fingerprint',
+                                                          'size',
+                                                          'CharmResource'],
+                                             'type': 'object'},
+                     'CharmResourcesResults': {'additionalProperties': False,
+                                               'properties': {'results': {'items': {'items': {'$ref': '#/definitions/CharmResourceResult'},
+                                                                                    'type': 'array'},
+                                                                          'type': 'array'}},
+                                               'required': ['results'],
+                                               'type': 'object'},
                      'CharmStorage': {'additionalProperties': False,
                                       'properties': {'count-max': {'type': 'integer'},
                                                      'count-min': {'type': 'integer'},
@@ -1390,11 +1438,6 @@ class CharmsFacade(Type):
                                                    'count-max',
                                                    'minimum-size'],
                                       'type': 'object'},
-                     'CharmSystem': {'additionalProperties': False,
-                                     'properties': {'channel': {'type': 'string'},
-                                                    'os': {'type': 'string'},
-                                                    'resource': {'type': 'string'}},
-                                     'type': 'object'},
                      'CharmURL': {'additionalProperties': False,
                                   'properties': {'url': {'type': 'string'}},
                                   'required': ['url'],
@@ -1556,6 +1599,13 @@ class CharmsFacade(Type):
                              'properties': {'Params': {'$ref': '#/definitions/CharmsList'},
                                             'Result': {'$ref': '#/definitions/CharmsListResult'}},
                              'type': 'object'},
+                    'ListCharmResources': {'description': 'ListCharmResources '
+                                                          'returns a series of '
+                                                          'resources for a given '
+                                                          'charm.',
+                                           'properties': {'Params': {'$ref': '#/definitions/CharmURLAndOrigins'},
+                                                          'Result': {'$ref': '#/definitions/CharmResourcesResults'}},
+                                           'type': 'object'},
                     'ResolveCharms': {'description': 'ResolveCharms resolves the '
                                                      'given charm URLs with an '
                                                      'optionally specified\n'
@@ -1775,6 +1825,29 @@ class CharmsFacade(Type):
 
 
 
+    @ReturnMapping(CharmResourcesResults)
+    async def ListCharmResources(self, entities=None):
+        '''
+        ListCharmResources returns a series of resources for a given charm.
+
+        entities : typing.Sequence[~CharmURLAndOrigin]
+        Returns -> CharmResourcesResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Charms',
+                   request='ListCharmResources',
+                   version=4,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
     @ReturnMapping(ResolveCharmWithChannelResults)
     async def ResolveCharms(self, macaroon=None, resolve=None):
         '''
@@ -1808,7 +1881,9 @@ class InstancePollerFacade(Type):
     name = 'InstancePoller'
     version = 4
     schema =     {'definitions': {'Address': {'additionalProperties': False,
-                                 'properties': {'scope': {'type': 'string'},
+                                 'properties': {'cidr': {'type': 'string'},
+                                                'is-secondary': {'type': 'boolean'},
+                                                'scope': {'type': 'string'},
                                                 'space-id': {'type': 'string'},
                                                 'space-name': {'type': 'string'},
                                                 'type': {'type': 'string'},

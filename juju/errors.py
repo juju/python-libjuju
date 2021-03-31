@@ -61,3 +61,19 @@ class JujuEntityNotFoundError(JujuError):
         self.entity_name = entity_name
         self.entity_types = entity_types
         super().__init__("Entity not found: {}".format(entity_name))
+
+
+class JujuMachineError(JujuError):
+    pass
+
+
+class JujuAgentError(JujuError):
+    pass
+
+
+class JujuAppError(JujuError):
+    pass
+
+
+class JujuUnitError(JujuError):
+    pass

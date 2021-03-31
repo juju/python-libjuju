@@ -1542,6 +1542,7 @@ class FirewallerFacade(Type):
                                                   'credential': {'$ref': '#/definitions/CloudCredential'},
                                                   'endpoint': {'type': 'string'},
                                                   'identity-endpoint': {'type': 'string'},
+                                                  'is-controller-cloud': {'type': 'boolean'},
                                                   'name': {'type': 'string'},
                                                   'region': {'type': 'string'},
                                                   'skip-tls-verify': {'type': 'boolean'},
@@ -2706,7 +2707,9 @@ class MachineManagerFacade(Type):
                                             'required': ['machines'],
                                             'type': 'object'},
                      'Address': {'additionalProperties': False,
-                                 'properties': {'scope': {'type': 'string'},
+                                 'properties': {'cidr': {'type': 'string'},
+                                                'is-secondary': {'type': 'boolean'},
+                                                'scope': {'type': 'string'},
                                                 'space-id': {'type': 'string'},
                                                 'space-name': {'type': 'string'},
                                                 'type': {'type': 'string'},
@@ -2944,7 +2947,7 @@ class MachineManagerFacade(Type):
                     'UpgradeSeriesComplete': {'description': 'UpgradeSeriesComplete '
                                                              'marks a machine as '
                                                              'having completed a '
-                                                             'managed series '
+                                                             'managed series\n'
                                                              'upgrade.',
                                               'properties': {'Params': {'$ref': '#/definitions/UpdateSeriesArg'},
                                                              'Result': {'$ref': '#/definitions/ErrorResult'}},
@@ -2977,7 +2980,8 @@ class MachineManagerFacade(Type):
                                                                        'returns a '
                                                                        'watcher '
                                                                        'that fires '
-                                                                       'on upgrade '
+                                                                       'on '
+                                                                       'upgrade\n'
                                                                        'series '
                                                                        'events.',
                                                         'properties': {'Params': {'$ref': '#/definitions/Entities'},
@@ -3147,7 +3151,8 @@ class MachineManagerFacade(Type):
     @ReturnMapping(ErrorResult)
     async def UpgradeSeriesComplete(self, force=None, series=None, tag=None):
         '''
-        UpgradeSeriesComplete marks a machine as having completed a managed series upgrade.
+        UpgradeSeriesComplete marks a machine as having completed a managed series
+        upgrade.
 
         force : bool
         series : str
@@ -3239,7 +3244,8 @@ class MachineManagerFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def WatchUpgradeSeriesNotifications(self, entities=None):
         '''
-        WatchUpgradeSeriesNotifications returns a watcher that fires on upgrade series events.
+        WatchUpgradeSeriesNotifications returns a watcher that fires on upgrade
+        series events.
 
         entities : typing.Sequence[~Entity]
         Returns -> NotifyWatchResults

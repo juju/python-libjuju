@@ -822,6 +822,7 @@ class CAASAgentFacade(Type):
                                                   'credential': {'$ref': '#/definitions/CloudCredential'},
                                                   'endpoint': {'type': 'string'},
                                                   'identity-endpoint': {'type': 'string'},
+                                                  'is-controller-cloud': {'type': 'boolean'},
                                                   'name': {'type': 'string'},
                                                   'region': {'type': 'string'},
                                                   'skip-tls-verify': {'type': 'boolean'},
@@ -1289,11 +1290,14 @@ class CAASApplicationProvisionerFacade(Type):
                                       'properties': {'specs': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmActionSpec'}},
                                                                'type': 'object'}},
                                       'type': 'object'},
+                     'CharmBase': {'additionalProperties': False,
+                                   'properties': {'channel': {'type': 'string'},
+                                                  'name': {'type': 'string'}},
+                                   'type': 'object'},
                      'CharmContainer': {'additionalProperties': False,
                                         'properties': {'mounts': {'items': {'$ref': '#/definitions/CharmMount'},
                                                                   'type': 'array'},
-                                                       'systems': {'items': {'$ref': '#/definitions/CharmSystem'},
-                                                                   'type': 'array'}},
+                                                       'resource': {'type': 'string'}},
                                         'type': 'object'},
                      'CharmDeployment': {'additionalProperties': False,
                                          'properties': {'min-version': {'type': 'string'},
@@ -1329,8 +1333,10 @@ class CAASApplicationProvisionerFacade(Type):
                                                       'devices'],
                                          'type': 'object'},
                      'CharmMeta': {'additionalProperties': False,
-                                   'properties': {'architectures': {'items': {'type': 'string'},
-                                                                    'type': 'array'},
+                                   'properties': {'assumes': {'items': {'type': 'string'},
+                                                              'type': 'array'},
+                                                  'bases': {'items': {'$ref': '#/definitions/CharmBase'},
+                                                            'type': 'array'},
                                                   'categories': {'items': {'type': 'string'},
                                                                  'type': 'array'},
                                                   'containers': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmContainer'}},
@@ -1347,8 +1353,6 @@ class CAASApplicationProvisionerFacade(Type):
                                                                       'type': 'object'},
                                                   'peers': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmRelation'}},
                                                             'type': 'object'},
-                                                  'platforms': {'items': {'type': 'string'},
-                                                                'type': 'array'},
                                                   'provides': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmRelation'}},
                                                                'type': 'object'},
                                                   'requires': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmRelation'}},
@@ -1361,8 +1365,6 @@ class CAASApplicationProvisionerFacade(Type):
                                                               'type': 'object'},
                                                   'subordinate': {'type': 'boolean'},
                                                   'summary': {'type': 'string'},
-                                                  'systems': {'items': {'$ref': '#/definitions/CharmSystem'},
-                                                              'type': 'array'},
                                                   'tags': {'items': {'type': 'string'},
                                                            'type': 'array'},
                                                   'terms': {'items': {'type': 'string'},
@@ -1448,11 +1450,6 @@ class CAASApplicationProvisionerFacade(Type):
                                                    'count-max',
                                                    'minimum-size'],
                                       'type': 'object'},
-                     'CharmSystem': {'additionalProperties': False,
-                                     'properties': {'channel': {'type': 'string'},
-                                                    'os': {'type': 'string'},
-                                                    'resource': {'type': 'string'}},
-                                     'type': 'object'},
                      'CharmURL': {'additionalProperties': False,
                                   'properties': {'url': {'type': 'string'}},
                                   'required': ['url'],
@@ -2134,11 +2131,14 @@ class CAASFirewallerEmbeddedFacade(Type):
                                       'properties': {'specs': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmActionSpec'}},
                                                                'type': 'object'}},
                                       'type': 'object'},
+                     'CharmBase': {'additionalProperties': False,
+                                   'properties': {'channel': {'type': 'string'},
+                                                  'name': {'type': 'string'}},
+                                   'type': 'object'},
                      'CharmContainer': {'additionalProperties': False,
                                         'properties': {'mounts': {'items': {'$ref': '#/definitions/CharmMount'},
                                                                   'type': 'array'},
-                                                       'systems': {'items': {'$ref': '#/definitions/CharmSystem'},
-                                                                   'type': 'array'}},
+                                                       'resource': {'type': 'string'}},
                                         'type': 'object'},
                      'CharmDeployment': {'additionalProperties': False,
                                          'properties': {'min-version': {'type': 'string'},
@@ -2174,8 +2174,10 @@ class CAASFirewallerEmbeddedFacade(Type):
                                                       'devices'],
                                          'type': 'object'},
                      'CharmMeta': {'additionalProperties': False,
-                                   'properties': {'architectures': {'items': {'type': 'string'},
-                                                                    'type': 'array'},
+                                   'properties': {'assumes': {'items': {'type': 'string'},
+                                                              'type': 'array'},
+                                                  'bases': {'items': {'$ref': '#/definitions/CharmBase'},
+                                                            'type': 'array'},
                                                   'categories': {'items': {'type': 'string'},
                                                                  'type': 'array'},
                                                   'containers': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmContainer'}},
@@ -2192,8 +2194,6 @@ class CAASFirewallerEmbeddedFacade(Type):
                                                                       'type': 'object'},
                                                   'peers': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmRelation'}},
                                                             'type': 'object'},
-                                                  'platforms': {'items': {'type': 'string'},
-                                                                'type': 'array'},
                                                   'provides': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmRelation'}},
                                                                'type': 'object'},
                                                   'requires': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmRelation'}},
@@ -2206,8 +2206,6 @@ class CAASFirewallerEmbeddedFacade(Type):
                                                               'type': 'object'},
                                                   'subordinate': {'type': 'boolean'},
                                                   'summary': {'type': 'string'},
-                                                  'systems': {'items': {'$ref': '#/definitions/CharmSystem'},
-                                                              'type': 'array'},
                                                   'tags': {'items': {'type': 'string'},
                                                            'type': 'array'},
                                                   'terms': {'items': {'type': 'string'},
@@ -2293,11 +2291,6 @@ class CAASFirewallerEmbeddedFacade(Type):
                                                    'count-max',
                                                    'minimum-size'],
                                       'type': 'object'},
-                     'CharmSystem': {'additionalProperties': False,
-                                     'properties': {'channel': {'type': 'string'},
-                                                    'os': {'type': 'string'},
-                                                    'resource': {'type': 'string'}},
-                                     'type': 'object'},
                      'CharmURL': {'additionalProperties': False,
                                   'properties': {'url': {'type': 'string'}},
                                   'required': ['url'],
@@ -2829,7 +2822,9 @@ class CAASModelOperatorFacade(Type):
                                             'required': ['servers'],
                                             'type': 'object'},
                      'Address': {'additionalProperties': False,
-                                 'properties': {'scope': {'type': 'string'},
+                                 'properties': {'cidr': {'type': 'string'},
+                                                'is-secondary': {'type': 'boolean'},
+                                                'scope': {'type': 'string'},
                                                 'space-id': {'type': 'string'},
                                                 'space-name': {'type': 'string'},
                                                 'type': {'type': 'string'},
@@ -2864,6 +2859,8 @@ class CAASModelOperatorFacade(Type):
                                       'type': 'object'},
                      'HostPort': {'additionalProperties': False,
                                   'properties': {'Address': {'$ref': '#/definitions/Address'},
+                                                 'cidr': {'type': 'string'},
+                                                 'is-secondary': {'type': 'boolean'},
                                                  'port': {'type': 'integer'},
                                                  'scope': {'type': 'string'},
                                                  'space-id': {'type': 'string'},
@@ -3100,7 +3097,9 @@ class CAASOperatorFacade(Type):
                                             'required': ['servers'],
                                             'type': 'object'},
                      'Address': {'additionalProperties': False,
-                                 'properties': {'scope': {'type': 'string'},
+                                 'properties': {'cidr': {'type': 'string'},
+                                                'is-secondary': {'type': 'boolean'},
+                                                'scope': {'type': 'string'},
                                                 'space-id': {'type': 'string'},
                                                 'space-name': {'type': 'string'},
                                                 'type': {'type': 'string'},
@@ -3133,7 +3132,7 @@ class CAASOperatorFacade(Type):
                                                'Minor': {'type': 'integer'},
                                                'Number': {'$ref': '#/definitions/Number'},
                                                'Patch': {'type': 'integer'},
-                                               'Series': {'type': 'string'},
+                                               'Release': {'type': 'string'},
                                                'Tag': {'type': 'string'}},
                                 'required': ['Major',
                                              'Minor',
@@ -3141,7 +3140,7 @@ class CAASOperatorFacade(Type):
                                              'Patch',
                                              'Build',
                                              'Number',
-                                             'Series',
+                                             'Release',
                                              'Arch'],
                                 'type': 'object'},
                      'Entities': {'additionalProperties': False,
@@ -3198,6 +3197,8 @@ class CAASOperatorFacade(Type):
                                       'type': 'object'},
                      'HostPort': {'additionalProperties': False,
                                   'properties': {'Address': {'$ref': '#/definitions/Address'},
+                                                 'cidr': {'type': 'string'},
+                                                 'is-secondary': {'type': 'boolean'},
                                                  'port': {'type': 'integer'},
                                                  'scope': {'type': 'string'},
                                                  'space-id': {'type': 'string'},
@@ -3717,7 +3718,9 @@ class CAASOperatorProvisionerFacade(Type):
                                             'required': ['servers'],
                                             'type': 'object'},
                      'Address': {'additionalProperties': False,
-                                 'properties': {'scope': {'type': 'string'},
+                                 'properties': {'cidr': {'type': 'string'},
+                                                'is-secondary': {'type': 'boolean'},
+                                                'scope': {'type': 'string'},
                                                 'space-id': {'type': 'string'},
                                                 'space-name': {'type': 'string'},
                                                 'type': {'type': 'string'},
@@ -3761,6 +3764,8 @@ class CAASOperatorProvisionerFacade(Type):
                                       'type': 'object'},
                      'HostPort': {'additionalProperties': False,
                                   'properties': {'Address': {'$ref': '#/definitions/Address'},
+                                                 'cidr': {'type': 'string'},
+                                                 'is-secondary': {'type': 'boolean'},
                                                  'port': {'type': 'integer'},
                                                  'scope': {'type': 'string'},
                                                  'space-id': {'type': 'string'},
@@ -4205,7 +4210,9 @@ class CAASUnitProvisionerFacade(Type):
     name = 'CAASUnitProvisioner'
     version = 1
     schema =     {'definitions': {'Address': {'additionalProperties': False,
-                                 'properties': {'scope': {'type': 'string'},
+                                 'properties': {'cidr': {'type': 'string'},
+                                                'is-secondary': {'type': 'boolean'},
+                                                'scope': {'type': 'string'},
                                                 'space-id': {'type': 'string'},
                                                 'space-name': {'type': 'string'},
                                                 'type': {'type': 'string'},
@@ -4922,8 +4929,6 @@ class CharmHubFacade(Type):
                                  'properties': {'platforms': {'items': {'$ref': '#/definitions/Platform'},
                                                               'type': 'array'},
                                                 'released-at': {'type': 'string'},
-                                                'resources': {'items': {'$ref': '#/definitions/CharmHubInfoResource'},
-                                                              'type': 'array'},
                                                 'revision': {'type': 'integer'},
                                                 'risk': {'type': 'string'},
                                                 'size': {'type': 'integer'},
@@ -4935,8 +4940,7 @@ class CharmHubFacade(Type):
                                               'revision',
                                               'size',
                                               'version',
-                                              'platforms',
-                                              'resources'],
+                                              'platforms'],
                                  'type': 'object'},
                      'CharmHubBundle': {'additionalProperties': False,
                                         'properties': {'charms': {'items': {'$ref': '#/definitions/BundleCharm'},
@@ -4973,18 +4977,6 @@ class CharmHubFacade(Type):
                                                       'message': {'type': 'string'}},
                                        'required': ['code', 'message'],
                                        'type': 'object'},
-                     'CharmHubInfoResource': {'additionalProperties': False,
-                                              'properties': {'name': {'type': 'string'},
-                                                             'revision': {'type': 'integer'},
-                                                             'size': {'type': 'integer'},
-                                                             'type': {'type': 'string'},
-                                                             'url': {'type': 'string'}},
-                                              'required': ['name',
-                                                           'revision',
-                                                           'type',
-                                                           'size',
-                                                           'url'],
-                                              'type': 'object'},
                      'CharmOption': {'additionalProperties': False,
                                      'properties': {'default': {'additionalProperties': True,
                                                                 'type': 'object'},
@@ -5060,7 +5052,14 @@ class CharmHubFacade(Type):
                                   'required': ['architecture', 'os', 'series'],
                                   'type': 'object'},
                      'Query': {'additionalProperties': False,
-                               'properties': {'query': {'type': 'string'}},
+                               'properties': {'category': {'type': 'string'},
+                                              'channel': {'type': 'string'},
+                                              'platforms': {'type': 'string'},
+                                              'publisher': {'type': 'string'},
+                                              'query': {'type': 'string'},
+                                              'relation-provides': {'type': 'string'},
+                                              'relation-requires': {'type': 'string'},
+                                              'type': {'type': 'string'}},
                                'required': ['query'],
                                'type': 'object'}},
      'properties': {'Find': {'description': 'Find queries the CharmHub API with a '
@@ -5077,15 +5076,43 @@ class CharmHubFacade(Type):
     
 
     @ReturnMapping(CharmHubEntityFindResult)
-    async def Find(self, query=None):
+    async def Find(self, category=None, channel=None, platforms=None, publisher=None, query=None, relation_provides=None, relation_requires=None, type_=None):
         '''
         Find queries the CharmHub API with a given entity ID.
 
+        category : str
+        channel : str
+        platforms : str
+        publisher : str
         query : str
+        relation_provides : str
+        relation_requires : str
+        type_ : str
         Returns -> CharmHubEntityFindResult
         '''
+        if category is not None and not isinstance(category, (bytes, str)):
+            raise Exception("Expected category to be a str, received: {}".format(type(category)))
+
+        if channel is not None and not isinstance(channel, (bytes, str)):
+            raise Exception("Expected channel to be a str, received: {}".format(type(channel)))
+
+        if platforms is not None and not isinstance(platforms, (bytes, str)):
+            raise Exception("Expected platforms to be a str, received: {}".format(type(platforms)))
+
+        if publisher is not None and not isinstance(publisher, (bytes, str)):
+            raise Exception("Expected publisher to be a str, received: {}".format(type(publisher)))
+
         if query is not None and not isinstance(query, (bytes, str)):
             raise Exception("Expected query to be a str, received: {}".format(type(query)))
+
+        if relation_provides is not None and not isinstance(relation_provides, (bytes, str)):
+            raise Exception("Expected relation_provides to be a str, received: {}".format(type(relation_provides)))
+
+        if relation_requires is not None and not isinstance(relation_requires, (bytes, str)):
+            raise Exception("Expected relation_requires to be a str, received: {}".format(type(relation_requires)))
+
+        if type_ is not None and not isinstance(type_, (bytes, str)):
+            raise Exception("Expected type_ to be a str, received: {}".format(type(type_)))
 
         # map input types to rpc msg
         _params = dict()
@@ -5093,7 +5120,14 @@ class CharmHubFacade(Type):
                    request='Find',
                    version=1,
                    params=_params)
+        _params['category'] = category
+        _params['channel'] = channel
+        _params['platforms'] = platforms
+        _params['publisher'] = publisher
         _params['query'] = query
+        _params['relation-provides'] = relation_provides
+        _params['relation-requires'] = relation_requires
+        _params['type'] = type_
         reply = await self.rpc(msg)
         return reply
 
@@ -7545,7 +7579,9 @@ class DeployerFacade(Type):
                                             'required': ['servers'],
                                             'type': 'object'},
                      'Address': {'additionalProperties': False,
-                                 'properties': {'scope': {'type': 'string'},
+                                 'properties': {'cidr': {'type': 'string'},
+                                                'is-secondary': {'type': 'boolean'},
+                                                'scope': {'type': 'string'},
                                                 'space-id': {'type': 'string'},
                                                 'space-name': {'type': 'string'},
                                                 'type': {'type': 'string'},
@@ -7606,6 +7642,8 @@ class DeployerFacade(Type):
                                       'type': 'object'},
                      'HostPort': {'additionalProperties': False,
                                   'properties': {'Address': {'$ref': '#/definitions/Address'},
+                                                 'cidr': {'type': 'string'},
+                                                 'is-secondary': {'type': 'boolean'},
                                                  'port': {'type': 'integer'},
                                                  'scope': {'type': 'string'},
                                                  'space-id': {'type': 'string'},
@@ -15664,7 +15702,7 @@ class UpgraderFacade(Type):
                                                'Minor': {'type': 'integer'},
                                                'Number': {'$ref': '#/definitions/Number'},
                                                'Patch': {'type': 'integer'},
-                                               'Series': {'type': 'string'},
+                                               'Release': {'type': 'string'},
                                                'Tag': {'type': 'string'}},
                                 'required': ['Major',
                                              'Minor',
@@ -15672,7 +15710,7 @@ class UpgraderFacade(Type):
                                              'Patch',
                                              'Build',
                                              'Number',
-                                             'Series',
+                                             'Release',
                                              'Arch'],
                                 'type': 'object'},
                      'Entities': {'additionalProperties': False,

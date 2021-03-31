@@ -1,6 +1,27 @@
 Changelog
 ---------
 
+2.8.6
+^^^^^
+
+Tuesday March 23 2021
+
+* Update facade methods for Juju 2.8.10
+* Bug fix - Fix typo in param name for ScaleApplications
+* Introduction of hostname property for Machines
+
+2.8.5
+^^^^^
+
+Monday February 8 2021
+
+ * Implement add_space and get_spaces.
+ * Update facade controllers.
+ * Support already archived (.charm or .zip) local charms.
+ * Introduction of wait_for_bundle method.
+ * Bug fix - Handle None in list_offers results
+ * Bug fix - Update libraries to support Python 3.9+
+
 2.8.4
 ^^^^^
 
