@@ -9,10 +9,10 @@ class Schema(Enum):
     CHARM_HUB = "ch"
 
     def matches(self, potential):
-        return self.value == potential
+        return str(self.value) == str(potential)
 
     def __str__(self):
-        return self.value
+        return str(self.value)
 
 
 class URL:
@@ -63,7 +63,7 @@ class URL:
         if self.series:
             parts.append(self.series)
         if self.revision is not None and self.revision >= 0:
-            parts.append("{}-{}", self.name, self.revision)
+            parts.append("{}-{}".format(self.name, self.revision))
         else:
             parts.append(self.name)
         return "/".join(parts)
