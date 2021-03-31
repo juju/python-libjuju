@@ -1433,8 +1433,6 @@ class Model:
                                                   include_stats=False)
             entity_id = entity['Id']
 
-        client_facade = client.ClientFacade.from_connection(self.connection())
-
         is_bundle = ((is_local and
                       (entity_id.endswith('.yaml') and entity_path.exists()) or
                       bundle_path.exists()) or
@@ -1463,7 +1461,8 @@ class Model:
                     application_name = entity['Meta']['charm-metadata']['Name']
                 if not series:
                     series = self._get_series(entity_url, entity)
-                await client_facade.AddCharm(channel=channel, url=entity_id, force=False)
+
+                self._add_charm(channel, entity_id)
                 # XXX: we're dropping local resources here, but we don't
                 # actually support them yet anyway
                 resources = await self._add_store_resources(application_name,
@@ -1505,6 +1504,17 @@ class Model:
                 placement=parse_placement(to),
                 devices=devices,
             )
+
+    async def _add_charm(self, channel, entity_id):
+        # client facade is deprecated with in Juju, and smaller, more focused
+        # facades have been created and we'll use that if it's available.
+        charms_cls = client.CharmsFacade
+        if charms_cls.best_facade_version(self.connection()) > 2:
+            charms_facade = charms_cls.from_connection(self.connection())
+            return await charms_facade.AddCharm(channel=channel, url=entity_id, force=False)
+
+        client_facade = client.ClientFacade.from_connection(self.connection())
+        await client_facade.AddCharm(channel=channel, url=entity_id, force=False)
 
     async def _add_store_resources(self, application, entity_url,
                                    overrides=None, entity=None):
