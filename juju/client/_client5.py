@@ -4397,6 +4397,648 @@ class MachineManagerFacade(Type):
 
 
 
+class MachinerFacade(Type):
+    name = 'Machiner'
+    version = 5
+    schema =     {'definitions': {'APIHostPortsResult': {'additionalProperties': False,
+                                            'properties': {'servers': {'items': {'items': {'$ref': '#/definitions/HostPort'},
+                                                                                 'type': 'array'},
+                                                                       'type': 'array'}},
+                                            'required': ['servers'],
+                                            'type': 'object'},
+                     'Address': {'additionalProperties': False,
+                                 'properties': {'cidr': {'type': 'string'},
+                                                'is-secondary': {'type': 'boolean'},
+                                                'scope': {'type': 'string'},
+                                                'space-id': {'type': 'string'},
+                                                'space-name': {'type': 'string'},
+                                                'type': {'type': 'string'},
+                                                'value': {'type': 'string'}},
+                                 'required': ['value', 'type', 'scope'],
+                                 'type': 'object'},
+                     'Entities': {'additionalProperties': False,
+                                  'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
+                                                              'type': 'array'}},
+                                  'required': ['entities'],
+                                  'type': 'object'},
+                     'Entity': {'additionalProperties': False,
+                                'properties': {'tag': {'type': 'string'}},
+                                'required': ['tag'],
+                                'type': 'object'},
+                     'EntityStatusArgs': {'additionalProperties': False,
+                                          'properties': {'data': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                               'type': 'object'}},
+                                                                  'type': 'object'},
+                                                         'info': {'type': 'string'},
+                                                         'status': {'type': 'string'},
+                                                         'tag': {'type': 'string'}},
+                                          'required': ['tag',
+                                                       'status',
+                                                       'info',
+                                                       'data'],
+                                          'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ErrorResult': {'additionalProperties': False,
+                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
+                                     'type': 'object'},
+                     'ErrorResults': {'additionalProperties': False,
+                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
+                                                                 'type': 'array'}},
+                                      'required': ['results'],
+                                      'type': 'object'},
+                     'HostPort': {'additionalProperties': False,
+                                  'properties': {'Address': {'$ref': '#/definitions/Address'},
+                                                 'cidr': {'type': 'string'},
+                                                 'is-secondary': {'type': 'boolean'},
+                                                 'port': {'type': 'integer'},
+                                                 'scope': {'type': 'string'},
+                                                 'space-id': {'type': 'string'},
+                                                 'space-name': {'type': 'string'},
+                                                 'type': {'type': 'string'},
+                                                 'value': {'type': 'string'}},
+                                  'required': ['value',
+                                               'type',
+                                               'scope',
+                                               'Address',
+                                               'port'],
+                                  'type': 'object'},
+                     'JobsResult': {'additionalProperties': False,
+                                    'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                   'jobs': {'items': {'type': 'string'},
+                                                            'type': 'array'}},
+                                    'required': ['jobs'],
+                                    'type': 'object'},
+                     'JobsResults': {'additionalProperties': False,
+                                     'properties': {'results': {'items': {'$ref': '#/definitions/JobsResult'},
+                                                                'type': 'array'}},
+                                     'required': ['results'],
+                                     'type': 'object'},
+                     'LifeResult': {'additionalProperties': False,
+                                    'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                   'life': {'type': 'string'}},
+                                    'required': ['life'],
+                                    'type': 'object'},
+                     'LifeResults': {'additionalProperties': False,
+                                     'properties': {'results': {'items': {'$ref': '#/definitions/LifeResult'},
+                                                                'type': 'array'}},
+                                     'required': ['results'],
+                                     'type': 'object'},
+                     'MachineAddresses': {'additionalProperties': False,
+                                          'properties': {'addresses': {'items': {'$ref': '#/definitions/Address'},
+                                                                       'type': 'array'},
+                                                         'tag': {'type': 'string'}},
+                                          'required': ['tag', 'addresses'],
+                                          'type': 'object'},
+                     'NetworkConfig': {'additionalProperties': False,
+                                       'properties': {'address': {'type': 'string'},
+                                                      'addresses': {'items': {'$ref': '#/definitions/Address'},
+                                                                    'type': 'array'},
+                                                      'cidr': {'type': 'string'},
+                                                      'config-type': {'type': 'string'},
+                                                      'device-index': {'type': 'integer'},
+                                                      'disabled': {'type': 'boolean'},
+                                                      'dns-search-domains': {'items': {'type': 'string'},
+                                                                             'type': 'array'},
+                                                      'dns-servers': {'items': {'type': 'string'},
+                                                                      'type': 'array'},
+                                                      'gateway-address': {'type': 'string'},
+                                                      'interface-name': {'type': 'string'},
+                                                      'interface-type': {'type': 'string'},
+                                                      'is-default-gateway': {'type': 'boolean'},
+                                                      'mac-address': {'type': 'string'},
+                                                      'mtu': {'type': 'integer'},
+                                                      'no-auto-start': {'type': 'boolean'},
+                                                      'origin': {'type': 'string'},
+                                                      'parent-interface-name': {'type': 'string'},
+                                                      'provider-address-id': {'type': 'string'},
+                                                      'provider-id': {'type': 'string'},
+                                                      'provider-network-id': {'type': 'string'},
+                                                      'provider-space-id': {'type': 'string'},
+                                                      'provider-subnet-id': {'type': 'string'},
+                                                      'provider-vlan-id': {'type': 'string'},
+                                                      'routes': {'items': {'$ref': '#/definitions/NetworkRoute'},
+                                                                 'type': 'array'},
+                                                      'shadow-addresses': {'items': {'$ref': '#/definitions/Address'},
+                                                                           'type': 'array'},
+                                                      'virtual-port-type': {'type': 'string'},
+                                                      'vlan-tag': {'type': 'integer'}},
+                                       'required': ['device-index',
+                                                    'mac-address',
+                                                    'cidr',
+                                                    'mtu',
+                                                    'provider-id',
+                                                    'provider-network-id',
+                                                    'provider-subnet-id',
+                                                    'provider-space-id',
+                                                    'provider-address-id',
+                                                    'provider-vlan-id',
+                                                    'vlan-tag',
+                                                    'interface-name',
+                                                    'parent-interface-name',
+                                                    'interface-type',
+                                                    'disabled'],
+                                       'type': 'object'},
+                     'NetworkRoute': {'additionalProperties': False,
+                                      'properties': {'destination-cidr': {'type': 'string'},
+                                                     'gateway-ip': {'type': 'string'},
+                                                     'metric': {'type': 'integer'}},
+                                      'required': ['destination-cidr',
+                                                   'gateway-ip',
+                                                   'metric'],
+                                      'type': 'object'},
+                     'NotifyWatchResult': {'additionalProperties': False,
+                                           'properties': {'NotifyWatcherId': {'type': 'string'},
+                                                          'error': {'$ref': '#/definitions/Error'}},
+                                           'required': ['NotifyWatcherId'],
+                                           'type': 'object'},
+                     'NotifyWatchResults': {'additionalProperties': False,
+                                            'properties': {'results': {'items': {'$ref': '#/definitions/NotifyWatchResult'},
+                                                                       'type': 'array'}},
+                                            'required': ['results'],
+                                            'type': 'object'},
+                     'RecordAgentStartInformationArg': {'additionalProperties': False,
+                                                        'properties': {'hostname': {'type': 'string'},
+                                                                       'tag': {'type': 'string'}},
+                                                        'required': ['tag'],
+                                                        'type': 'object'},
+                     'RecordAgentStartInformationArgs': {'additionalProperties': False,
+                                                         'properties': {'args': {'items': {'$ref': '#/definitions/RecordAgentStartInformationArg'},
+                                                                                 'type': 'array'}},
+                                                         'required': ['args'],
+                                                         'type': 'object'},
+                     'SetMachineNetworkConfig': {'additionalProperties': False,
+                                                 'properties': {'config': {'items': {'$ref': '#/definitions/NetworkConfig'},
+                                                                           'type': 'array'},
+                                                                'tag': {'type': 'string'}},
+                                                 'required': ['tag', 'config'],
+                                                 'type': 'object'},
+                     'SetMachinesAddresses': {'additionalProperties': False,
+                                              'properties': {'machine-addresses': {'items': {'$ref': '#/definitions/MachineAddresses'},
+                                                                                   'type': 'array'}},
+                                              'required': ['machine-addresses'],
+                                              'type': 'object'},
+                     'SetStatus': {'additionalProperties': False,
+                                   'properties': {'entities': {'items': {'$ref': '#/definitions/EntityStatusArgs'},
+                                                               'type': 'array'}},
+                                   'required': ['entities'],
+                                   'type': 'object'},
+                     'StringResult': {'additionalProperties': False,
+                                      'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                     'result': {'type': 'string'}},
+                                      'required': ['result'],
+                                      'type': 'object'},
+                     'StringsResult': {'additionalProperties': False,
+                                       'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                      'result': {'items': {'type': 'string'},
+                                                                 'type': 'array'}},
+                                       'type': 'object'}},
+     'properties': {'APIAddresses': {'description': 'APIAddresses returns the list '
+                                                    'of addresses used to connect '
+                                                    'to the API.',
+                                     'properties': {'Result': {'$ref': '#/definitions/StringsResult'}},
+                                     'type': 'object'},
+                    'APIHostPorts': {'description': 'APIHostPorts returns the API '
+                                                    'server addresses.',
+                                     'properties': {'Result': {'$ref': '#/definitions/APIHostPortsResult'}},
+                                     'type': 'object'},
+                    'EnsureDead': {'description': 'EnsureDead calls EnsureDead on '
+                                                  'each given entity from state. '
+                                                  'It\n'
+                                                  'will fail if the entity is not '
+                                                  "present. If it's Alive, nothing "
+                                                  'will\n'
+                                                  'happen (see state/EnsureDead() '
+                                                  'for units or machines).',
+                                   'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                  'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                   'type': 'object'},
+                    'Jobs': {'description': 'Jobs returns the jobs assigned to the '
+                                            'given entities.',
+                             'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                            'Result': {'$ref': '#/definitions/JobsResults'}},
+                             'type': 'object'},
+                    'Life': {'description': 'Life returns the life status of every '
+                                            'supplied entity, where available.',
+                             'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                            'Result': {'$ref': '#/definitions/LifeResults'}},
+                             'type': 'object'},
+                    'ModelUUID': {'description': 'ModelUUID returns the model UUID '
+                                                 'that this machine resides in.\n'
+                                                 'It is implemented here directly '
+                                                 'as a result of removing it from\n'
+                                                 'embedded APIAddresser *without* '
+                                                 'bumping the facade version.\n'
+                                                 'It should be blanked when this '
+                                                 'facade version is next '
+                                                 'incremented.',
+                                  'properties': {'Result': {'$ref': '#/definitions/StringResult'}},
+                                  'type': 'object'},
+                    'RecordAgentStartInformation': {'description': 'RecordAgentStartInformation '
+                                                                   'syncs the '
+                                                                   'machine model '
+                                                                   'with '
+                                                                   'information\n'
+                                                                   'reported by a '
+                                                                   'machine agent '
+                                                                   'when it '
+                                                                   'starts.',
+                                                    'properties': {'Params': {'$ref': '#/definitions/RecordAgentStartInformationArgs'},
+                                                                   'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                                    'type': 'object'},
+                    'RecordAgentStartTime': {'description': 'RecordAgentStartTime '
+                                                            'updates the agent '
+                                                            'start time field in '
+                                                            'the machine doc.',
+                                             'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                            'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                             'type': 'object'},
+                    'SetMachineAddresses': {'properties': {'Params': {'$ref': '#/definitions/SetMachinesAddresses'},
+                                                           'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                            'type': 'object'},
+                    'SetObservedNetworkConfig': {'description': 'SetObservedNetworkConfig '
+                                                                'reads the network '
+                                                                'config for the '
+                                                                'machine\n'
+                                                                'identified by the '
+                                                                'input args.\n'
+                                                                'This config is '
+                                                                'merged with the '
+                                                                'new network '
+                                                                'config supplied '
+                                                                'in the\n'
+                                                                'same args and '
+                                                                'updated if it has '
+                                                                'changed.',
+                                                 'properties': {'Params': {'$ref': '#/definitions/SetMachineNetworkConfig'}},
+                                                 'type': 'object'},
+                    'SetStatus': {'description': 'SetStatus sets the status of '
+                                                 'each given entity.',
+                                  'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
+                                                 'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                  'type': 'object'},
+                    'UpdateStatus': {'description': 'UpdateStatus updates the '
+                                                    'status data of each given '
+                                                    'entity.\n'
+                                                    'TODO(fwereade): WTF. This '
+                                                    'method exists *only* for the '
+                                                    'convenience of the\n'
+                                                    '*client* API -- and is itself '
+                                                    'completely broken -- but we '
+                                                    'still expose it\n'
+                                                    'in every facade with a '
+                                                    'StatusSetter? FFS.',
+                                     'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
+                                                    'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                     'type': 'object'},
+                    'Watch': {'description': 'Watch starts an NotifyWatcher for '
+                                             'each given entity.',
+                              'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                             'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
+                              'type': 'object'},
+                    'WatchAPIHostPorts': {'description': 'WatchAPIHostPorts '
+                                                         'watches the API server '
+                                                         'addresses.',
+                                          'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
+                                          'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(StringsResult)
+    async def APIAddresses(self):
+        '''
+        APIAddresses returns the list of addresses used to connect to the API.
+
+
+        Returns -> StringsResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Machiner',
+                   request='APIAddresses',
+                   version=5,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(APIHostPortsResult)
+    async def APIHostPorts(self):
+        '''
+        APIHostPorts returns the API server addresses.
+
+
+        Returns -> APIHostPortsResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Machiner',
+                   request='APIHostPorts',
+                   version=5,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def EnsureDead(self, entities=None):
+        '''
+        EnsureDead calls EnsureDead on each given entity from state. It
+        will fail if the entity is not present. If it's Alive, nothing will
+        happen (see state/EnsureDead() for units or machines).
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Machiner',
+                   request='EnsureDead',
+                   version=5,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(JobsResults)
+    async def Jobs(self, entities=None):
+        '''
+        Jobs returns the jobs assigned to the given entities.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> JobsResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Machiner',
+                   request='Jobs',
+                   version=5,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(LifeResults)
+    async def Life(self, entities=None):
+        '''
+        Life returns the life status of every supplied entity, where available.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> LifeResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Machiner',
+                   request='Life',
+                   version=5,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResult)
+    async def ModelUUID(self):
+        '''
+        ModelUUID returns the model UUID that this machine resides in.
+        It is implemented here directly as a result of removing it from
+        embedded APIAddresser *without* bumping the facade version.
+        It should be blanked when this facade version is next incremented.
+
+
+        Returns -> StringResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Machiner',
+                   request='ModelUUID',
+                   version=5,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def RecordAgentStartInformation(self, args=None):
+        '''
+        RecordAgentStartInformation syncs the machine model with information
+        reported by a machine agent when it starts.
+
+        args : typing.Sequence[~RecordAgentStartInformationArg]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Machiner',
+                   request='RecordAgentStartInformation',
+                   version=5,
+                   params=_params)
+        _params['args'] = args
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def RecordAgentStartTime(self, entities=None):
+        '''
+        RecordAgentStartTime updates the agent start time field in the machine doc.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Machiner',
+                   request='RecordAgentStartTime',
+                   version=5,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def SetMachineAddresses(self, machine_addresses=None):
+        '''
+        machine_addresses : typing.Sequence[~MachineAddresses]
+        Returns -> ErrorResults
+        '''
+        if machine_addresses is not None and not isinstance(machine_addresses, (bytes, str, list)):
+            raise Exception("Expected machine_addresses to be a Sequence, received: {}".format(type(machine_addresses)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Machiner',
+                   request='SetMachineAddresses',
+                   version=5,
+                   params=_params)
+        _params['machine-addresses'] = machine_addresses
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def SetObservedNetworkConfig(self, config=None, tag=None):
+        '''
+        SetObservedNetworkConfig reads the network config for the machine
+        identified by the input args.
+        This config is merged with the new network config supplied in the
+        same args and updated if it has changed.
+
+        config : typing.Sequence[~NetworkConfig]
+        tag : str
+        Returns -> None
+        '''
+        if config is not None and not isinstance(config, (bytes, str, list)):
+            raise Exception("Expected config to be a Sequence, received: {}".format(type(config)))
+
+        if tag is not None and not isinstance(tag, (bytes, str)):
+            raise Exception("Expected tag to be a str, received: {}".format(type(tag)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Machiner',
+                   request='SetObservedNetworkConfig',
+                   version=5,
+                   params=_params)
+        _params['config'] = config
+        _params['tag'] = tag
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def SetStatus(self, entities=None):
+        '''
+        SetStatus sets the status of each given entity.
+
+        entities : typing.Sequence[~EntityStatusArgs]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Machiner',
+                   request='SetStatus',
+                   version=5,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def UpdateStatus(self, entities=None):
+        '''
+        UpdateStatus updates the status data of each given entity.
+        TODO(fwereade): WTF. This method exists *only* for the convenience of the
+        *client* API -- and is itself completely broken -- but we still expose it
+        in every facade with a StatusSetter? FFS.
+
+        entities : typing.Sequence[~EntityStatusArgs]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Machiner',
+                   request='UpdateStatus',
+                   version=5,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResults)
+    async def Watch(self, entities=None):
+        '''
+        Watch starts an NotifyWatcher for each given entity.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> NotifyWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Machiner',
+                   request='Watch',
+                   version=5,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResult)
+    async def WatchAPIHostPorts(self):
+        '''
+        WatchAPIHostPorts watches the API server addresses.
+
+
+        Returns -> NotifyWatchResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Machiner',
+                   request='WatchAPIHostPorts',
+                   version=5,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
 class ModelManagerFacade(Type):
     name = 'ModelManager'
     version = 5

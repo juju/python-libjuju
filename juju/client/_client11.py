@@ -1563,7 +1563,9 @@ class ProvisionerFacade(Type):
                                             'required': ['servers'],
                                             'type': 'object'},
                      'Address': {'additionalProperties': False,
-                                 'properties': {'scope': {'type': 'string'},
+                                 'properties': {'cidr': {'type': 'string'},
+                                                'is-secondary': {'type': 'boolean'},
+                                                'scope': {'type': 'string'},
                                                 'space-id': {'type': 'string'},
                                                 'space-name': {'type': 'string'},
                                                 'type': {'type': 'string'},
@@ -1577,7 +1579,7 @@ class ProvisionerFacade(Type):
                                                'Minor': {'type': 'integer'},
                                                'Number': {'$ref': '#/definitions/Number'},
                                                'Patch': {'type': 'integer'},
-                                               'Series': {'type': 'string'},
+                                               'Release': {'type': 'string'},
                                                'Tag': {'type': 'string'}},
                                 'required': ['Major',
                                              'Minor',
@@ -1585,7 +1587,7 @@ class ProvisionerFacade(Type):
                                              'Patch',
                                              'Build',
                                              'Number',
-                                             'Series',
+                                             'Release',
                                              'Arch'],
                                 'type': 'object'},
                      'BoolResult': {'additionalProperties': False,
@@ -1789,12 +1791,14 @@ class ProvisionerFacade(Type):
                                                         'major': {'type': 'integer'},
                                                         'minor': {'type': 'integer'},
                                                         'number': {'$ref': '#/definitions/Number'},
+                                                        'os-type': {'type': 'string'},
                                                         'series': {'type': 'string'}},
                                          'required': ['number',
                                                       'major',
                                                       'minor',
                                                       'arch',
                                                       'series',
+                                                      'os-type',
                                                       'agentstream'],
                                          'type': 'object'},
                      'FindToolsResult': {'additionalProperties': False,
@@ -1829,6 +1833,8 @@ class ProvisionerFacade(Type):
                                                   'type': 'object'},
                      'HostPort': {'additionalProperties': False,
                                   'properties': {'Address': {'$ref': '#/definitions/Address'},
+                                                 'cidr': {'type': 'string'},
+                                                 'is-secondary': {'type': 'boolean'},
                                                  'port': {'type': 'integer'},
                                                  'scope': {'type': 'string'},
                                                  'space-id': {'type': 'string'},
@@ -3040,7 +3046,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(FindToolsResult)
-    async def FindTools(self, agentstream=None, arch=None, major=None, minor=None, number=None, series=None):
+    async def FindTools(self, agentstream=None, arch=None, major=None, minor=None, number=None, os_type=None, series=None):
         '''
         FindTools returns a List containing all tools matching the given parameters.
 
@@ -3049,6 +3055,7 @@ class ProvisionerFacade(Type):
         major : int
         minor : int
         number : Number
+        os_type : str
         series : str
         Returns -> FindToolsResult
         '''
@@ -3067,6 +3074,9 @@ class ProvisionerFacade(Type):
         if number is not None and not isinstance(number, (dict, Number)):
             raise Exception("Expected number to be a Number, received: {}".format(type(number)))
 
+        if os_type is not None and not isinstance(os_type, (bytes, str)):
+            raise Exception("Expected os_type to be a str, received: {}".format(type(os_type)))
+
         if series is not None and not isinstance(series, (bytes, str)):
             raise Exception("Expected series to be a str, received: {}".format(type(series)))
 
@@ -3081,6 +3091,7 @@ class ProvisionerFacade(Type):
         _params['major'] = major
         _params['minor'] = minor
         _params['number'] = number
+        _params['os-type'] = os_type
         _params['series'] = series
         reply = await self.rpc(msg)
         return reply

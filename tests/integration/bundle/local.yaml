@@ -1,0 +1,7 @@
+applications:
+  test1:
+    charm: "../charm"
+    num_units: 1
+  test2:
+    charm: "../charm.charm"
+    num_units: 1

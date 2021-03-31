@@ -11,6 +11,7 @@ import tempfile
 import weakref
 import zipfile
 from concurrent.futures import CancelledError
+from datetime import datetime, timedelta
 from functools import partial
 from pathlib import Path
 
@@ -29,6 +30,7 @@ from .constraints import parse as parse_constraints
 from .controller import Controller
 from .delta import get_entity_class, get_entity_delta
 from .errors import JujuAPIError, JujuError
+from .errors import JujuAppError, JujuUnitError, JujuAgentError, JujuMachineError
 from .exceptions import DeadEntityException
 from .names import is_valid_application
 from .offerendpoints import ParseError as OfferParseError
@@ -638,11 +640,14 @@ class Model:
         :param series: Charm series
 
         """
-        fh = tempfile.NamedTemporaryFile()
-        CharmArchiveGenerator(charm_dir).make_archive(fh.name)
-        with fh:
+        if charm_dir.endswith('.charm'):
+            fn = charm_dir
+        else:
+            fn = tempfile.NamedTemporaryFile().name
+            CharmArchiveGenerator(charm_dir).make_archive(fn)
+        with open(fn, 'rb') as fh:
             func = partial(
-                self.add_local_charm, fh, series, os.stat(fh.name).st_size)
+                self.add_local_charm, fh, series, os.stat(fn).st_size)
             charm_url = await self._connector.loop.run_in_executor(None, func)
 
         log.debug('Uploaded local charm: %s -> %s', charm_dir, charm_url)
@@ -1235,17 +1240,22 @@ class Model:
         await self.block_until(lambda: _find_relation(*specs) is not None)
         return _find_relation(*specs)
 
-    def add_space(self, name, *cidrs):
+    async def add_space(self, name, cidrs=None, public=True):
         """Add a new network space.
 
         Adds a new space with the given name and associates the given
         (optional) list of existing subnet CIDRs with it.
 
         :param str name: Name of the space
-        :param *cidrs: Optional list of existing subnet CIDRs
-
+        :param List[str] cidrs: Optional list of existing subnet CIDRs
         """
-        raise NotImplementedError()
+        space_facade = client.SpacesFacade.from_connection(self.connection())
+        spaces = [
+            {
+                "cidrs": cidrs,
+                "space-tag": tag.space(name),
+                "public": public}]
+        return await space_facade.CreateSpaces(spaces=spaces)
 
     async def add_ssh_key(self, user, key):
         """Add a public SSH key to this model.
@@ -1406,6 +1416,7 @@ class Model:
         if trust and (self.info.agent_version < client.Number.from_json('2.4.0')):
             raise NotImplementedError("trusted is not supported on model version {}".format(self.info.agent_version))
 
+        entity_url = str(entity_url)  # allow for pathlib.Path objects
         entity_path = Path(entity_url.replace('local:', ''))
         bundle_path = entity_path / 'bundle.yaml'
         metadata_path = entity_path / 'metadata.yaml'
@@ -1460,7 +1471,11 @@ class Model:
                                                             entity=entity)
             else:
                 if not application_name:
-                    metadata = yaml.load(metadata_path.read_text(), Loader=yaml.FullLoader)
+                    if str(entity_path).endswith('.charm'):
+                        with zipfile.ZipFile(entity_path, 'r') as charm_file:
+                            metadata = yaml.load(charm_file.read('metadata.yaml'), Loader=yaml.FullLoader)
+                    else:
+                        metadata = yaml.load(metadata_path.read_text(), Loader=yaml.FullLoader)
                     application_name = metadata['name']
                 # We have a local charm dir that needs to be uploaded
                 charm_dir = os.path.abspath(
@@ -1681,11 +1696,14 @@ class Model:
         """
         raise NotImplementedError()
 
-    def get_spaces(self):
+    async def get_spaces(self):
         """Return list of all known spaces, including associated subnets.
 
+        Returns a List of :class:`~juju._definitions.Space` instances.
         """
-        raise NotImplementedError()
+        space_facade = client.SpacesFacade.from_connection(self.connection())
+        response = await space_facade.ListSpaces()
+        return response.results
 
     async def get_ssh_key(self, raw_ssh=False):
         """Return known SSH keys for this model.
@@ -2136,6 +2154,118 @@ class Model:
                 controller_name = current.controller_name
         await controller.connect(controller_name=controller_name)
         return controller
+
+    async def wait_for_idle(self, apps=None, raise_on_error=True, raise_on_blocked=False,
+                            wait_for_active=False, timeout=10 * 60, idle_period=15, check_freq=0.5):
+        """Wait for applications in the model to settle into an idle state.
+
+        :param apps (list[str]): Optional list of specific app names to wait on.
+            If given, all apps must be present in the model and idle, while other
+            apps in the model can still be busy. If not given, all apps currently
+            in the model must be idle.
+
+        :param raise_on_error (bool): If True, then any unit or app going into
+            "error" status immediately raises either a JujuAppError or a JujuUnitError.
+            Note that machine or agent failures will always raise an exception (either
+            JujuMachineError or JujuAgentError), regardless of this param. The default
+            is True.
+
+        :param raise_on_blocked (bool): If True, then any unit or app going into
+            "blocked" status immediately raises either a JujuAppError or a JujuUnitError.
+            The defaul tis False.
+
+        :param wait_for_active (bool): If True, then also wait for all unit workload
+            statuses to be "active" as well. The default is False.
+
+        :param timeout (float): How long to wait, in seconds, for the bundle settles
+            before raising an asyncio.TimeoutError. If None, will wait forever.
+            The default is 10 minutes.
+
+        :param idle_period (float): How long, in seconds, the agent statuses of all
+            units of all apps need to be `idle`. This delay is used to ensure that
+            any pending hooks have a chance to start to avoid false positives.
+            The default is 15 seconds.
+
+        :param check_freq (float): How frequently, in seconds, to check the model.
+            The default is every half-second.
+        """
+        timeout = timedelta(seconds=timeout) if timeout is not None else None
+        idle_period = timedelta(seconds=idle_period)
+        start_time = datetime.now()
+        apps = apps or self.applications
+        idle_times = {}
+        last_log_time = None
+        log_interval = timedelta(seconds=30)
+
+        def _raise_for_status(entities, status):
+            if not entities:
+                return
+            for entity_name, error_type in (("Machine", JujuMachineError),
+                                            ("Agent", JujuAgentError),
+                                            ("Unit", JujuUnitError),
+                                            ("App", JujuAppError)):
+                errored = entities.get(entity_name, [])
+                if not errored:
+                    continue
+                raise error_type("{}{} in {}: {}".format(
+                    entity_name,
+                    "s" if len(errored) > 1 else "",
+                    status,
+                    ", ".join(errored),
+                ))
+
+        while True:
+            busy = []
+            errors = {}
+            blocks = {}
+            for app in apps:
+                if app not in self.applications:
+                    busy.append(app + " (missing)")
+                    continue
+                app = self.applications[app]
+                if raise_on_error and app.status == "error":
+                    errors.setdefault("App", []).append(app.name)
+                if raise_on_blocked and app.status == "blocked":
+                    blocks.setdefault("App", []).append(app.name)
+                for unit in app.units:
+                    if unit.machine is not None and unit.machine.status == "error":
+                        errors.setdefault("Machine", []).append(unit.machine.id)
+                        continue
+                    if unit.agent_status == "error":
+                        errors.setdefault("Agent", []).append(unit.name)
+                        continue
+                    if raise_on_error and unit.workload_status == "error":
+                        errors.setdefault("Unit", []).append(unit.name)
+                        continue
+                    if raise_on_blocked and unit.workload_status == "blocked":
+                        blocks.setdefault("Unit", []).append(unit.name)
+                        continue
+                    waiting_for_active = wait_for_active and unit.workload_status != "active"
+                    if not waiting_for_active and unit.agent_status == "idle":
+                        now = datetime.now()
+                        idle_start = idle_times.setdefault(unit.name, now)
+                        if now - idle_start < idle_period:
+                            busy.append("{} [{}] {}: {}".format(unit.name,
+                                                                unit.agent_status,
+                                                                unit.workload_status,
+                                                                unit.workload_status_message))
+                    else:
+                        idle_times.pop(unit.name, None)
+                        busy.append("{} [{}] {}: {}".format(unit.name,
+                                                            unit.agent_status,
+                                                            unit.workload_status,
+                                                            unit.workload_status_message))
+            _raise_for_status(errors, "error")
+            _raise_for_status(blocks, "blocked")
+            if not busy:
+                break
+            busy = "\n  ".join(busy)
+            if timeout is not None and datetime.now() - start_time > timeout:
+                raise asyncio.TimeoutError("Timed out waiting for model:\n" + busy)
+            if last_log_time is None or datetime.now() - last_log_time > log_interval:
+                log.info("Waiting for model:\n  " + busy)
+                last_log_time = datetime.now()
+            await asyncio.sleep(check_freq)
 
 
 def _create_consume_args(offer, macaroon, controller_info):
