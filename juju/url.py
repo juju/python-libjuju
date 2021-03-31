@@ -16,7 +16,7 @@ class Schema(Enum):
 
 
 class URL:
-    def __init__(self, schema, user=None, name=None, revision=None, series=None):
+    def __init__(self, schema, user=None, name=None, revision=None, series=None, architecture=None):
         self.schema = schema
         self.user = user
         self.name = name
@@ -26,6 +26,7 @@ class URL:
         if revision is None:
             revision = -1
         self.revision = revision
+        self.architecture = architecture
 
     @staticmethod
     def parse(s):
@@ -57,6 +58,8 @@ class URL:
         parts = []
         if self.user:
             parts.append("~{}".format(self.user))
+        if self.architecture:
+            parts.append(self.architecture)
         if self.series:
             parts.append(self.series)
         if self.revision is not None and self.revision >= 0:
@@ -114,10 +117,19 @@ def parse_v2_url(u, s):
     c = URL(Schema.CHARM_HUB)
 
     parts = u.path.split("/")
-    if len(parts) != 1:
-        raise JujuError("charm or bundle URL {} malformed, expected <name>".format(s))
+    num = len(parts)
+    if num == 0 or num > 3:
+        raise JujuError("charm or bundle URL {} malformed".format(s))
 
-    (c.name, c.revision) = extract_revision(parts[0])
+    name = ""
+    if num == 3:
+        c.architecture, c.series, name = parts[0], parts[1], parts[2]
+    elif num == 2:
+        c.architecture, name = parts[0], parts[1]
+    else:
+        name = parts[0]
+
+    (c.name, c.revision) = extract_revision(name)
     # TODO (stickupkid) - validate the name.
 
     return c
