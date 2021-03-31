@@ -37,6 +37,7 @@ from .offerendpoints import ParseError as OfferParseError
 from .offerendpoints import parse_local_endpoint, parse_offer_url
 from .placement import parse as parse_placement
 from .tag import application as application_tag
+from .url import URL, Schema
 
 log = logging.getLogger(__name__)
 
@@ -1416,27 +1417,37 @@ class Model:
         if trust and (self.info.agent_version < client.Number.from_json('2.4.0')):
             raise NotImplementedError("trusted is not supported on model version {}".format(self.info.agent_version))
 
-        entity_url = str(entity_url)  # allow for pathlib.Path objects
-        entity_path = Path(entity_url.replace('local:', ''))
-        bundle_path = entity_path / 'bundle.yaml'
-        metadata_path = entity_path / 'metadata.yaml'
 
-        is_local = (
-            entity_url.startswith('local:') or
-            entity_path.is_dir() or
-            entity_path.is_file()
-        )
-        if is_local:
-            entity_id = entity_url.replace('local:', '')
-        else:
-            entity = await self.charmstore.entity(entity_url, channel=channel,
+        # Attempt to resolve a charm or bundle based on the URL.
+        # In an ideal world this should be moved to the controller, and we
+        # wouldn't have to deal with this at all.
+        is_local = False
+        is_bundle = False
+        identifier = None
+        url = URL.parse(str(entity_url))
+        if url.schema.matches(Schema.Local):
+            entity_url = url.path()
+            entity_path = Path(entity_url)
+            bundle_path = entity_path / 'bundle.yaml'
+
+            identifier = entity_url
+            is_local = (
+                entity_path.is_dir() or
+                entity_path.is_file()
+            )
+            is_bundle = (
+                (entity_url.endswith(".yaml") and entity_path.exists()) or 
+                bundle_path.exists()
+            )
+        elif url.schema.matches(Schema.CHARM_STORE):
+            charm = await self.charmstore.entity(str(url), channel=channel,
                                                   include_stats=False)
-            entity_id = entity['Id']
+            identifier = charm['Id']
+            is_bundle = url.series == "bundle"
+        elif url.schema.matches(Schema.CHARM_HUB):
+            # TODO (stickupkid): request to get the charm id.
 
-        is_bundle = ((is_local and
-                      (entity_id.endswith('.yaml') and entity_path.exists()) or
-                      bundle_path.exists()) or
-                     (not is_local and 'bundle/' in entity_id))
+
 
         if is_bundle:
             handler = BundleHandler(self, trusted=trust, forced=force)
