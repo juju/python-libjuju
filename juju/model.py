@@ -1573,11 +1573,17 @@ class Model:
 
         charms_facade = charms_cls.from_connection(self.connection())
 
+        if Schema.CHARM_STORE.matches(url.schema):
+            source = "charm-store"
+        else:
+            source = "charm-hub"
         resp = await charms_facade.ResolveCharms(resolve=[{
             'reference': str(url),
             'charm-origin': {
-                'source': 'charm-hub',
+                'source': source,
                 'architecture': origin.architecture,
+                'track': origin.track,
+                'risk': origin.risk,
             }
         }])
         if len(resp.results) != 1:

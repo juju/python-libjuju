@@ -411,7 +411,7 @@ class TestAddRelationChangeRun:
         model.add_relation = base.AsyncMock(return_value="relation1")
 
         context = mock.Mock()
-        context.resolveRelation = mock.Mock(side_effect=['endpoint_1', 'endpoint_2'])
+        context.resolve_relation = mock.Mock(side_effect=['endpoint_1', 'endpoint_2'])
         context.model = model
 
         result = await change.run(context)
