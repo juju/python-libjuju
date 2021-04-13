@@ -35,7 +35,7 @@ from .exceptions import DeadEntityException
 from .names import is_valid_application
 from .offerendpoints import ParseError as OfferParseError
 from .offerendpoints import parse_local_endpoint, parse_offer_url
-from .origin import Channel, Risk
+from .origin import Channel
 from .placement import parse as parse_placement
 from .tag import application as application_tag
 from .url import URL, Schema
@@ -1418,7 +1418,6 @@ class Model:
         if trust and (self.info.agent_version < client.Number.from_json('2.4.0')):
             raise NotImplementedError("trusted is not supported on model version {}".format(self.info.agent_version))
 
-
         # Attempt to resolve a charm or bundle based on the URL.
         # In an ideal world this should be moved to the controller, and we
         # wouldn't have to deal with this at all.
@@ -1440,18 +1439,18 @@ class Model:
             origin = client.CharmOrigin(source="local", architecture=architecture)
             if not (entity_path.is_dir() or entity_path.is_file()):
                 raise JujuError('{} path not found'.format(entity_url))
-            
+
             is_bundle = (
-                (entity_url.endswith(".yaml") and entity_path.exists()) or 
+                (entity_url.endswith(".yaml") and entity_path.exists()) or
                 bundle_path.exists()
             )
 
         elif Schema.CHARM_STORE.matches(url.schema):
-            result = await self.charmstore.entity(str(url), 
+            result = await self.charmstore.entity(str(url),
                                                   channel=channel,
                                                   include_stats=False)
             identifier = result['Id']
-            origin = client.CharmOrigin(source="charm-store", 
+            origin = client.CharmOrigin(source="charm-store",
                                         architecture=architecture,
                                         risk=channel)
             is_bundle = url.series == "bundle"
@@ -1462,7 +1461,7 @@ class Model:
             ch = Channel('latest', 'stable')
             if channel:
                 ch = Channel.parse(channel).normalize()
-            origin = client.CharmOrigin(source="charm-hub", 
+            origin = client.CharmOrigin(source="charm-hub",
                                         architecture=architecture,
                                         risk=ch.risk,
                                         track=ch.track)
@@ -1598,11 +1597,11 @@ class Model:
     async def _resolve_architecture(self, url):
         if url.architecture:
             return url.architecture
-        
+
         constraints = await self.get_constraints()
         if 'arch' in constraints:
             return constraints['arch']
-        
+
         return "amd64"
 
     async def _add_store_resources(self, application, entity_url,

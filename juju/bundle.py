@@ -196,7 +196,7 @@ class BundleHandler:
             }])
             if len(resp.results) != 1:
                 raise JujuError("expected one result, received {}".format(resp.results))
-            
+
             result = resp.results[0]
             if not result.url:
                 raise JujuError("no url found for bundle {}".format(charm_url.name))
@@ -208,13 +208,13 @@ class BundleHandler:
                 return self._get_bundle_yaml(archive)
 
         raise JujuError('charm facade not supported')
-    
+
     def _get_bundle_yaml(self, archive):
         for member in archive.infolist():
             if member.filename == "bundle.yaml":
                 return archive.read(member)
         raise JujuError("bundle.yaml not found")
-    
+
     async def _resolve_charms(self):
         deployed = dict()
 
@@ -243,7 +243,7 @@ class BundleHandler:
                 charm_url = URL.parse(spec['charm'])
                 channel = None
                 track, risk = '', ''
-                if 'channel' in spec: 
+                if 'channel' in spec:
                     channel = Channel.parse(spec['channel'])
                     track, risk = channel.track, channel.risk
 
@@ -252,10 +252,10 @@ class BundleHandler:
                 else:
                     architecture = await self.model._resolve_architecture(charm_url)
 
-                origin = client.CharmOrigin(source="charm-hub", 
-                                        architecture=architecture,
-                                        risk=risk,
-                                        track=track)
+                origin = client.CharmOrigin(source="charm-hub",
+                                            architecture=architecture,
+                                            risk=risk,
+                                            track=track)
                 charm_url, charm_origin = await self.model._resolve_charm(charm_url, origin)
 
                 spec['charm'] = str(charm_url)
@@ -264,9 +264,8 @@ class BundleHandler:
                     self.origins[str(charm_url)] = {}
                 self.origins[str(charm_url)][str(channel)] = charm_origin
             else:
-                results = await self.client_facade.ResolveCharms(references=[spec['charm']])
+                await self.client_facade.ResolveCharms(references=[spec['charm']])
                 # TODO (stickupkid): Ensure that this works as expected.
-
 
     async def execute_plan(self):
         await self._resolve_charms()
@@ -285,11 +284,11 @@ class BundleHandler:
         apps_dict = self.bundle.get('applications',
                                     self.bundle.get('services', {}))
         return list(apps_dict.keys())
-    
+
     @property
     def applications_specs(self):
         return self.bundle.get('applications',
-                                self.bundle.get('services', {}))
+                               self.bundle.get('services', {}))
 
     def resolve_relation(self, reference):
         parts = reference.split(":", maxsplit=1)
@@ -307,7 +306,7 @@ class BundleHandler:
 
 
 def is_local_charm(charm_url):
-    return charm_url.startswith('.') or charm_url.startswith('local:') 
+    return charm_url.startswith('.') or charm_url.startswith('local:')
 
 
 def get_charm_series(path):
@@ -584,7 +583,7 @@ class AddCharmChange(ChangeInfo):
             arch = self.architecture
             if not arch:
                 arch = await context.model._resolve_architecture(url)
-            origin = client.CharmOrigin(source="charm-hub", 
+            origin = client.CharmOrigin(source="charm-hub",
                                         architecture=arch,
                                         risk=ch.risk,
                                         track=ch.track)
