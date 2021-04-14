@@ -20,8 +20,11 @@ client:
 	$(PY) -m juju.client.facade -s "juju/client/schemas*" -o juju/client/
 
 .PHONY: test
-test:
-	tox
+test: lint
+	tox -e py3
+	@for f in $(shell find tests/integration -maxdepth 1 -mindepth 1 -name "*.py" | grep -v "__init__.py"); do \
+		tox -e integration -- "$${f}"; \
+	done
 
 .PHONY: lint
 lint: 
