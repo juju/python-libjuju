@@ -307,7 +307,7 @@ class BundleHandler:
 
 
 def is_local_charm(charm_url):
-    return charm_url.startswith('.') or charm_url.startswith('local:')
+    return charm_url.startswith('.') or charm_url.startswith('local:') or os.path.isabs(charm_url)
 
 
 def get_charm_series(path):
@@ -476,7 +476,7 @@ class AddApplicationChange(ChangeInfo):
         if self.channel is not None and self.channel != "":
             channel = Channel.parse(self.channel).normalize()
 
-        origin = context.origins[str(url)][str(channel)]
+        origin = context.origins.get(str(url), {}).get(str(channel), None)
         if origin is None:
             raise JujuError("expected origin to be valid for application {} and charm {}".format(self.application, self.charm))
 
@@ -570,6 +570,8 @@ class AddCharmChange(ChangeInfo):
         ch = None
         identifier = None
         if Schema.LOCAL.matches(url.schema):
+            origin = client.CharmOrigin(source="local", risk="stable")
+            context.origins[self.charm] = {str(None): origin}
             return self.charm
 
         elif Schema.CHARM_STORE.matches(url.schema):

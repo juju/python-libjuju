@@ -137,7 +137,7 @@ async def test_wait_local_charm_waiting_timeout(event_loop):
 @pytest.mark.asyncio
 async def test_deploy_bundle(event_loop):
     async with base.CleanModel() as model:
-        await model.deploy('bundle/wiki-simple')
+        await model.deploy('cs:bundle/wiki-simple')
 
         for app in ('wiki', 'mysql'):
             assert app in model.applications

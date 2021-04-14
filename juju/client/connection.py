@@ -314,14 +314,21 @@ class Connection:
             self.proxy.connect()
 
         _endpoints = [(endpoint, cacert)] if isinstance(endpoint, str) else [(e, cacert) for e in endpoint]
+        lastError = None
         for _ep in _endpoints:
             try:
                 await self._connect_with_redirect([_ep])
                 return self
+            except ssl.SSLError as e:
+                lastError = e
+                continue
             except OSError as e:
                 logging.debug(
                     "Cannot access endpoint {}: {}".format(_ep, e.strerror))
+                lastError = e
                 continue
+        if lastError is not None:
+            raise lastError
         raise Exception("Unable to connect to websocket")
 
     @property

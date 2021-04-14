@@ -41,7 +41,7 @@ class URL:
             raise JujuError("charm or bundle URL {} has unrecognized parts".format(u))
 
         if Schema.LOCAL.matches(u.scheme):
-            c = parse_v1_url(Schema.LOCAL, u, s)
+            c = URL(Schema.LOCAL, name=u.path)
         elif Schema.CHARM_STORE.matches(u.scheme):
             c = parse_v1_url(Schema.CHARM_STORE, u, s)
         else:

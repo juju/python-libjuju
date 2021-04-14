@@ -20,7 +20,7 @@ import websockets
 
 from . import provisioner, tag, utils
 from .annotationhelper import _get_annotations, _set_annotations
-from .bundle import BundleHandler, get_charm_series
+from .bundle import BundleHandler, get_charm_series, is_local_charm
 from .charmhub import CharmHub
 from .charmstore import CharmStore
 from .client import client, connector
@@ -1428,6 +1428,11 @@ class Model:
         origin = None
         result = None
 
+        # Ensure what we pass in, is a string.
+        entity_url = str(entity_url)
+        if is_local_charm(entity_url) and not entity_url.startswith("local:"):
+            entity_url = "local:{}".format(entity_url)
+        print("!!!", entity_url)
         url = URL.parse(str(entity_url))
         architecture = await self._resolve_architecture(url)
 
@@ -1441,6 +1446,7 @@ class Model:
             if not (entity_path.is_dir() or entity_path.is_file()):
                 raise JujuError('{} path not found'.format(entity_url))
 
+            is_local = True
             is_bundle = (
                 (entity_url.endswith(".yaml") and entity_path.exists()) or
                 bundle_path.exists()
@@ -1475,13 +1481,13 @@ class Model:
             raise JujuError('unknown charm or bundle {}'.format(entity_url))
 
         if not application_name:
-            if Schema.LOCAL.matches(url.schema) and Schema.CHARM_STORE.matches(url.schema):
-                application_name = result['Meta']['charm-metadata']['Name']
-            else:
+            if Schema.CHARM_HUB.matches(url.schema):
                 # For charmhub charms, we don't have the metadata and we're not
                 # going to get it, so fallback to the url and use that one if a
                 # user didn't specify it.
                 application_name = url.name
+            elif result is not None and not is_bundle:
+                application_name = result['Meta']['charm-metadata']['Name']
 
         if is_bundle:
             handler = BundleHandler(self, trusted=trust, forced=force)
