@@ -15,7 +15,7 @@ async def main():
     # connect to current controller with current user, per Juju CLI
     await controller.connect()
 
-    bundles = [('juju-qa-bundle-test', None), ('cs:~juju-qa/bundle/basic-0', 'beta')]
+    bundles = [('cs:~juju-qa/bundle/basic-0', 'beta'), ('juju-qa-bundle-test', None)]
     for i in range(len(bundles)): 
         deployment = bundles[i]
         model = await controller.add_model('model{}'.format(i))

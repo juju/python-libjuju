@@ -420,13 +420,13 @@ class AddApplicationChange(ChangeInfo):
             self.options = params[3]
             self.constraints = params[4]
             self.storage = {k: parse_storage_constraint(v) for k, v in params[5].items()}
+            self.channel = None
             if len(params) == 8:
                 # Juju 2.4 and below only sends the endpoint bindings and resources
                 self.endpoint_bindings = params[6]
                 self.resources = params[7]
                 self.devices = None
                 self.num_units = None
-                self.channel = None
             else:
                 # Juju 2.5+ sends devices before endpoint bindings, as well as num_units
                 # There might be placement but we need to ignore that.
@@ -434,7 +434,8 @@ class AddApplicationChange(ChangeInfo):
                 self.endpoint_bindings = params[7]
                 self.resources = params[8]
                 self.num_units = params[9]
-                self.channel = params[10]
+                if len(params) > 10:
+                    self.channel = params[10]
 
         elif isinstance(params, dict):
             AddApplicationChange.from_dict(self, params)
