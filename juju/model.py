@@ -39,6 +39,7 @@ from .origin import Channel
 from .placement import parse as parse_placement
 from .tag import application as application_tag
 from .url import URL, Schema
+from .version import DEFAULT_ARCHITECTURE
 
 log = logging.getLogger(__name__)
 
@@ -1602,7 +1603,7 @@ class Model:
         if 'arch' in constraints:
             return constraints['arch']
 
-        return "amd64"
+        return DEFAULT_ARCHITECTURE
 
     async def _add_store_resources(self, application, entity_url,
                                    overrides=None, entity=None):

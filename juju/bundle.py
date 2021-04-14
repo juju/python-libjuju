@@ -16,6 +16,7 @@ from .constraints import parse as parse_constraints, parse_storage_constraint, p
 from .errors import JujuError
 from .origin import Channel
 from .url import Schema, URL
+from .version import LTS_RELEASES
 
 log = logging.getLogger(__name__)
 
@@ -230,7 +231,6 @@ class BundleHandler:
                 if is_local_charm(spec['charm']):
                     spec.charm = self.model.applications[name]
                     continue
-
                 if spec['charm'] == app.charm_url:
                     continue
 
@@ -239,14 +239,13 @@ class BundleHandler:
             if is_local_charm(spec['charm']):
                 continue
 
+            charm_url = URL.parse(spec['charm'])
+            channel = None
+            track, risk = '', ''
+            if 'channel' in spec:
+                channel = Channel.parse(spec['channel'])
+                track, risk = channel.track, channel.risk
             if self.charms_facade is not None:
-                charm_url = URL.parse(spec['charm'])
-                channel = None
-                track, risk = '', ''
-                if 'channel' in spec:
-                    channel = Channel.parse(spec['channel'])
-                    track, risk = channel.track, channel.risk
-
                 if cons is not None and cons['arch'] != '':
                     architecture = cons['arch']
                 else:
@@ -259,13 +258,15 @@ class BundleHandler:
                 charm_url, charm_origin = await self.model._resolve_charm(charm_url, origin)
 
                 spec['charm'] = str(charm_url)
-
-                if str(channel) not in self.origins:
-                    self.origins[str(charm_url)] = {}
-                self.origins[str(charm_url)][str(channel)] = charm_origin
             else:
-                await self.client_facade.ResolveCharms(references=[spec['charm']])
-                # TODO (stickupkid): Ensure that this works as expected.
+                results = await self.model.charmstore.entity(str(charm_url))
+                charm_origin = client.CharmOrigin(source="charm-store",
+                                                  risk=risk,
+                                                  track=track)
+
+            if str(channel) not in self.origins:
+                self.origins[str(charm_url)] = {}
+            self.origins[str(charm_url)][str(channel)] = charm_origin
 
     async def execute_plan(self):
         await self._resolve_charms()
@@ -471,7 +472,7 @@ class AddApplicationChange(ChangeInfo):
             resources = {}
 
         channel = None
-        if self.channel is not None:
+        if self.channel is not None and self.channel != "":
             channel = Channel.parse(self.channel).normalize()
 
         origin = context.origins[str(url)][str(channel)]
@@ -575,6 +576,7 @@ class AddCharmChange(ChangeInfo):
             log.debug('Adding %s', entity_id)
             await context.client_facade.AddCharm(channel=None, url=entity_id, force=False)
             identifier = entity_id
+            origin = client.CharmOrigin(source="charm-store", risk="stable")
 
         elif Schema.CHARM_HUB.matches(url.schema):
             ch = Channel('latest', 'stable')

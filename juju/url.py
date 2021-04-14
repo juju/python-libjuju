@@ -52,15 +52,18 @@ class URL:
         return c
 
     def with_revision(self, rev):
-        return URL(self.schema, self.user, self.name, rev, self.series)
+        return URL(self.schema, self.user, self.name, rev, self.series, self.architecture)
+
+    def with_series(self, series):
+        return URL(self.schema, self.user, self.name, self.revision, series, self.architecture)
 
     def path(self):
         parts = []
-        if self.user:
+        if self.user is not None:
             parts.append("~{}".format(self.user))
-        if self.architecture:
+        if self.architecture is not None:
             parts.append(self.architecture)
-        if self.series:
+        if self.series is not None:
             parts.append(self.series)
         if self.revision is not None and self.revision >= 0:
             parts.append("{}-{}".format(self.name, self.revision))
@@ -74,7 +77,8 @@ class URL:
                 self.user == other.user and \
                 self.name == other.name and \
                 self.revision == other.revision and \
-                self.series == other.series
+                self.series == other.series and \
+                self.architecture == other.architecture
         return False
 
     def __str__(self):

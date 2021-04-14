@@ -6,35 +6,41 @@ This example:
 3. Destroys the units and applications
 
 """
+from juju.controller import Controller
 from juju import loop
-from juju.model import Model
 
 
 async def main():
-    model = Model()
-    print('Connecting to model')
-    # Connect to current model with current user, per Juju CLI
-    await model.connect()
+    controller = Controller()
+    # connect to current controller with current user, per Juju CLI
+    await controller.connect()
 
-    try:
-        print('Deploying bundle')
-        applications = await model.deploy(
-            'cs:~juju-qa/bundle/basic-0',
-            channel='beta',
-        )
+    bundles = [('juju-qa-bundle-test', None), ('cs:~juju-qa/bundle/basic-0', 'beta')]
+    for i in range(len(bundles)): 
+        deployment = bundles[i]
+        model = await controller.add_model('model{}'.format(i))
 
-        print('Waiting for active')
-        await model.block_until(
-            lambda: all(unit.workload_status == 'active'
-                        for application in applications for unit in application.units))
-        print("Successfully deployed!")
-        print('Removing bundle')
-        for application in applications:
-            await application.remove()
-    finally:
-        print('Disconnecting from model')
-        await model.disconnect()
-        print("Success")
+        try:
+            print('Deploying bundle')
+            applications = await model.deploy(
+                deployment[0],
+                channel=deployment[1],
+            )
+
+            print('Waiting for active')
+            await model.block_until(
+                lambda: all(unit.workload_status == 'active'
+                            for application in applications for unit in application.units))
+            print("Successfully deployed!")
+            print('Removing bundle')
+            for application in applications:
+                await application.remove()
+        finally:
+            print('Disconnecting from model')
+            await model.disconnect()
+            print("Success")
+
+    await controller.disconnect()
 
 
 if __name__ == '__main__':
