@@ -77,7 +77,8 @@ class TestAddApplicationChange(unittest.TestCase):
                           "endpoint_bindings": "endpoint_bindings",
                           "resources": "resources",
                           "devices": None,
-                          "num_units": None}, change.__dict__)
+                          "num_units": None,
+                          "channel": None}, change.__dict__)
 
     def test_list_params_juju_2_5(self):
         change = AddApplicationChange(1, [], params=["charm",
@@ -101,7 +102,8 @@ class TestAddApplicationChange(unittest.TestCase):
                           "endpoint_bindings": "endpoint_bindings",
                           "resources": "resources",
                           "devices": {"gpu": {"type": "gpu", "count": 1, "attributes": {"attr1": "a", "attr2": "b"}}},
-                          "num_units": "num_units"}, change.__dict__)
+                          "num_units": "num_units",
+                          "channel": None}, change.__dict__)
 
     def test_dict_params(self):
         change = AddApplicationChange(1, [], params={"charm": "charm",
@@ -113,7 +115,8 @@ class TestAddApplicationChange(unittest.TestCase):
                                                      "endpoint-bindings": "endpoint_bindings",
                                                      "resources": "resources",
                                                      "devices": "devices",
-                                                     "num-units": "num_units"})
+                                                     "num-units": "num_units",
+                                                     "channel": "channel"})
         self.assertEqual({"change_id": 1,
                           "requires": [],
                           "charm": "charm",
@@ -125,7 +128,8 @@ class TestAddApplicationChange(unittest.TestCase):
                           "endpoint_bindings": "endpoint_bindings",
                           "resources": "resources",
                           "devices": "devices",
-                          "num_units": "num_units"}, change.__dict__)
+                          "num_units": "num_units",
+                          "channel": "channel"}, change.__dict__)
 
     def test_dict_params_missing_data(self):
         change = AddApplicationChange(1, [], params={"charm": "charm",
@@ -145,13 +149,59 @@ class TestAddApplicationChange(unittest.TestCase):
                           "endpoint_bindings": None,
                           "resources": None,
                           "devices": None,
-                          "num_units": None}, change.__dict__)
+                          "num_units": None,
+                          "channel": None}, change.__dict__)
 
 
 class TestAddApplicationChangeRun:
 
     @pytest.mark.asyncio
-    async def test_run(self, event_loop):
+    async def test_run_with_charmstore_charm(self, event_loop):
+        change = AddApplicationChange(1, [], params={"charm": "cs:charm",
+                                                     "series": "series",
+                                                     "application": "application",
+                                                     "options": "options",
+                                                     "constraints": "constraints",
+                                                     "storage": "storage",
+                                                     "endpoint-bindings": "endpoint_bindings",
+                                                     "resources": "resources",
+                                                     "devices": "devices",
+                                                     "num-units": "num_units",
+                                                     "channel": "channel"})
+
+        model = mock.Mock()
+        model._deploy = base.AsyncMock(return_value=None)
+        model._add_store_resources = base.AsyncMock(return_value=["resource1"])
+
+        context = mock.Mock()
+        context.resolve.return_value = "cs:charm1"
+        context.origins = {"cs:charm1": {"channel/stable": {}}}
+        context.trusted = False
+        context.model = model
+
+        result = await change.run(context)
+        assert result == "application"
+
+        model._add_store_resources.assert_called_once()
+        model._add_store_resources.assert_called_with("application",
+                                                      "cs:charm1",
+                                                      overrides="resources")
+
+        model._deploy.assert_called_once()
+        model._deploy.assert_called_with(charm_url="cs:charm1",
+                                         application="application",
+                                         series="series",
+                                         config="options",
+                                         constraints="constraints",
+                                         endpoint_bindings="endpoint_bindings",
+                                         resources=["resource1"],
+                                         storage="storage",
+                                         devices="devices",
+                                         num_units="num_units")
+
+
+    @pytest.mark.asyncio
+    async def test_run_with_charmhub_charm(self, event_loop):
         change = AddApplicationChange(1, [], params={"charm": "charm",
                                                      "series": "series",
                                                      "application": "application",
@@ -161,33 +211,30 @@ class TestAddApplicationChangeRun:
                                                      "endpoint-bindings": "endpoint_bindings",
                                                      "resources": "resources",
                                                      "devices": "devices",
-                                                     "num-units": "num_units"})
+                                                     "num-units": "num_units",
+                                                     "channel": "channel"})
 
         model = mock.Mock()
         model._deploy = base.AsyncMock(return_value=None)
         model._add_store_resources = base.AsyncMock(return_value=["resource1"])
 
         context = mock.Mock()
-        context.resolve.return_value = "charm1"
+        context.resolve.return_value = "ch:charm1"
+        context.origins = {"ch:charm1": {"channel/stable": {}}}
         context.trusted = False
         context.model = model
 
         result = await change.run(context)
         assert result == "application"
 
-        model._add_store_resources.assert_called_once()
-        model._add_store_resources.assert_called_with("application",
-                                                      "charm1",
-                                                      overrides="resources")
-
         model._deploy.assert_called_once()
-        model._deploy.assert_called_with(charm_url="charm1",
+        model._deploy.assert_called_with(charm_url="ch:charm1",
                                          application="application",
                                          series="series",
                                          config="options",
                                          constraints="constraints",
                                          endpoint_bindings="endpoint_bindings",
-                                         resources=["resource1"],
+                                         resources={},
                                          storage="storage",
                                          devices="devices",
                                          num_units="num_units")
@@ -240,7 +287,8 @@ class TestAddCharmChange(unittest.TestCase):
                           "requires": [],
                           "charm": "charm",
                           "series": "series",
-                          "channel": None}, change.__dict__)
+                          "channel": None,
+                          "architecture": None}, change.__dict__)
 
     def test_list_params_juju_2_7(self):
         change = AddCharmChange(1, [], params=["charm",
@@ -250,17 +298,20 @@ class TestAddCharmChange(unittest.TestCase):
                           "requires": [],
                           "charm": "charm",
                           "series": "series",
-                          "channel": "channel"}, change.__dict__)
+                          "channel": "channel",
+                          "architecture": None}, change.__dict__)
 
     def test_dict_params(self):
         change = AddCharmChange(1, [], params={"charm": "charm",
                                                "series": "series",
-                                               "channel": "channel"})
+                                               "channel": "channel",
+                                               "architecture": "architecture"})
         self.assertEqual({"change_id": 1,
                           "requires": [],
                           "charm": "charm",
                           "series": "series",
-                          "channel": "channel"}, change.__dict__)
+                          "channel": "channel",
+                          "architecture": "architecture"}, change.__dict__)
 
     def test_dict_params_missing_data(self):
         change = AddCharmChange(1, [], params={"charm": "charm",
@@ -269,14 +320,15 @@ class TestAddCharmChange(unittest.TestCase):
                           "requires": [],
                           "charm": "charm",
                           "series": "series",
-                          "channel": None}, change.__dict__)
+                          "channel": None,
+                          "architecture": None}, change.__dict__)
 
 
 class TestAddCharmChangeRun:
 
     @pytest.mark.asyncio
     async def test_run(self, event_loop):
-        change = AddCharmChange(1, [], params={"charm": "charm",
+        change = AddCharmChange(1, [], params={"charm": "cs:charm",
                                                "series": "series",
                                                "channel": "channel"})
 
@@ -286,15 +338,20 @@ class TestAddCharmChangeRun:
         client_facade = mock.Mock()
         client_facade.AddCharm = base.AsyncMock(return_value=None)
 
+        model = mock.Mock()
+        model._add_charm = base.AsyncMock(return_value=None)
+
         context = mock.Mock()
         context.charmstore = charmstore
         context.client_facade = client_facade
+        context.origins = {}
+        context.model = model
 
         result = await change.run(context)
         assert result == "entity_id"
 
         charmstore.entityId.assert_called_once()
-        charmstore.entityId.assert_called_with("charm")
+        charmstore.entityId.assert_called_with("cs:charm")
 
         client_facade.AddCharm.assert_called_once()
         client_facade.AddCharm.assert_called_with(channel=None,

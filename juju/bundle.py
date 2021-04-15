@@ -389,7 +389,8 @@ class AddApplicationChange(ChangeInfo):
              'devices': 'devices',
              'endpoint-bindings': 'endpoint_bindings',
              'resources': 'resources',
-             'num-units': 'num_units'}
+             'num-units': 'num_units',
+             'channel': 'channel'}
 
     """AddApplicationChange holds a change for deploying a Juju application.
 
@@ -478,7 +479,7 @@ class AddApplicationChange(ChangeInfo):
 
         origin = context.origins.get(str(url), {}).get(str(channel), None)
         if origin is None:
-            raise JujuError("expected origin to be valid for application {} and charm {}".format(self.application, self.charm))
+            raise JujuError("expected origin to be valid for application {} and charm {} with channel {}".format(self.application, str(url), str(channel)))
 
         await context.model._deploy(
             charm_url=charm,
@@ -514,7 +515,8 @@ class AddApplicationChange(ChangeInfo):
 class AddCharmChange(ChangeInfo):
     _toPy = {'charm': 'charm',
              'series': 'series',
-             'channel': 'channel'}
+             'channel': 'channel',
+             'architecture': 'architecture'}
 
     """AddCharmChange holds a change for adding a charm to the environment.
 
