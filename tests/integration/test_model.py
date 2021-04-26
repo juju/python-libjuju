@@ -571,9 +571,7 @@ async def test_store_resources_charm(event_loop):
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_local_oci_image_resource_charm(event_loop):
-    pytest.skip('test_local_resources_charm intermittent test failure')
-
-    tests_dir = Path(__file__).absolute().parent.parent
+    tests_dir = Path(__file__).absolute().parent
     charm_path = tests_dir / 'oci-image-charm'
     async with base.CleanModel() as model:
         resources = {"oci-image": "ubuntu/latest"}
