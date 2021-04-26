@@ -329,6 +329,10 @@ class AddApplicationChange(ChangeInfo):
         :param context: is used for any methods or properties required to
             perform a change.
         """
+        if self.application in context.model.applications:
+            log.debug('Skipping %s; already in model', self.application)
+            return self.application
+
         # resolve indirect references
         charm = context.resolve(self.charm)
         options = {}

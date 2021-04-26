@@ -166,6 +166,7 @@ class TestAddApplicationChangeRun:
         model = mock.Mock()
         model._deploy = base.AsyncMock(return_value=None)
         model._add_store_resources = base.AsyncMock(return_value=["resource1"])
+        model.applications = {}
 
         context = mock.Mock()
         context.resolve.return_value = "charm1"
@@ -192,6 +193,13 @@ class TestAddApplicationChangeRun:
                                          devices="devices",
                                          num_units="num_units")
 
+        # confirm that it's idempotent
+        model.applications = {"application": None}
+        result = await change.run(context)
+        assert result == "application"
+        model._add_store_resources.assert_called_once()
+        model._deploy.assert_called_once()
+
     @pytest.mark.asyncio
     async def test_run_local(self, event_loop):
         change = AddApplicationChange(1, [], params={"charm": "local:charm",
@@ -206,6 +214,7 @@ class TestAddApplicationChangeRun:
 
         model = mock.Mock()
         model._deploy = base.AsyncMock(return_value=None)
+        model.applications = {}
 
         context = mock.Mock()
         context.resolve.return_value = "local:charm1"
