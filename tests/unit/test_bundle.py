@@ -416,18 +416,31 @@ class TestAddRelationChangeRun:
         change = AddRelationChange(1, [], params={"endpoint1": "endpoint1",
                                                   "endpoint2": "endpoint2"})
 
+        rel1 = mock.Mock(name="rel1", **{"matches.return_value": False})
+        rel2 = mock.Mock(name="rel2", **{"matches.return_value": True})
+
         model = mock.Mock()
-        model.add_relation = base.AsyncMock(return_value="relation1")
+        model.add_relation = base.AsyncMock(return_value=rel2)
 
         context = mock.Mock()
         context.resolveRelation = mock.Mock(side_effect=['endpoint_1', 'endpoint_2'])
         context.model = model
+        model.relations = [rel1]
 
         result = await change.run(context)
-        assert result == "relation1"
+        assert result is rel2
 
         model.add_relation.assert_called_once()
         model.add_relation.assert_called_with("endpoint_1", "endpoint_2")
+
+        # confirm that it's idempotent
+        context.resolveRelation.side_effect = ['endpoint_1', 'endpoint_2']
+        model.add_relation.reset_mock()
+        model.add_relation.return_value = None
+        model.relations = [rel1, rel2]
+        result = await change.run(context)
+        assert result is rel2
+        assert not model.add_relation.called
 
 
 class TestAddUnitChange(unittest.TestCase):

@@ -583,6 +583,11 @@ class AddRelationChange(ChangeInfo):
         ep1 = context.resolveRelation(self.endpoint1)
         ep2 = context.resolveRelation(self.endpoint2)
 
+        existing = [rel for rel in context.model.relations if rel.matches(ep1, ep2)]
+        if existing:
+            log.info('Skipping %s <-> %s; already related', ep1, ep2)
+            return existing[0]
+
         log.info('Relating %s <-> %s', ep1, ep2)
         return await context.model.add_relation(ep1, ep2)
 
