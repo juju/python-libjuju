@@ -570,6 +570,25 @@ async def test_store_resources_charm(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_local_oci_image_resource_charm(event_loop):
+    tests_dir = Path(__file__).absolute().parent
+    charm_path = tests_dir / 'oci-image-charm'
+    async with base.CleanModel() as model:
+        resources = {"oci-image": "ubuntu/latest"}
+        charm = await model.deploy(str(charm_path), resources=resources)
+        assert 'oci-image-charm' in model.applications
+        terminal_statuses = ('active', 'error', 'blocked')
+        await model.block_until(
+            lambda: (
+                len(charm.units) > 0 and
+                charm.units[0].workload_status in terminal_statuses),
+            timeout=120,
+        )
+        assert charm.units[0].workload_status == 'active'
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_store_resources_bundle(event_loop):
     pytest.skip('test_store_resources_bundle intermittent test failure')
     async with base.CleanModel() as model:
