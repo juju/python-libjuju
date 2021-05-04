@@ -3015,6 +3015,798 @@ class BundleFacade(Type):
 
 
 
+class CAASUnitProvisionerFacade(Type):
+    name = 'CAASUnitProvisioner'
+    version = 2
+    schema =     {'definitions': {'Address': {'additionalProperties': False,
+                                 'properties': {'cidr': {'type': 'string'},
+                                                'is-secondary': {'type': 'boolean'},
+                                                'scope': {'type': 'string'},
+                                                'space-id': {'type': 'string'},
+                                                'space-name': {'type': 'string'},
+                                                'type': {'type': 'string'},
+                                                'value': {'type': 'string'}},
+                                 'required': ['value', 'type', 'scope'],
+                                 'type': 'object'},
+                     'ApplicationGetConfigResults': {'additionalProperties': False,
+                                                     'properties': {'Results': {'items': {'$ref': '#/definitions/ConfigResult'},
+                                                                                'type': 'array'}},
+                                                     'required': ['Results'],
+                                                     'type': 'object'},
+                     'ApplicationUnitInfo': {'additionalProperties': False,
+                                             'properties': {'provider-id': {'type': 'string'},
+                                                            'unit-tag': {'type': 'string'}},
+                                             'required': ['provider-id',
+                                                          'unit-tag'],
+                                             'type': 'object'},
+                     'ApplicationUnitParams': {'additionalProperties': False,
+                                               'properties': {'address': {'type': 'string'},
+                                                              'data': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                    'type': 'object'}},
+                                                                       'type': 'object'},
+                                                              'filesystem-info': {'items': {'$ref': '#/definitions/KubernetesFilesystemInfo'},
+                                                                                  'type': 'array'},
+                                                              'info': {'type': 'string'},
+                                                              'ports': {'items': {'type': 'string'},
+                                                                        'type': 'array'},
+                                                              'provider-id': {'type': 'string'},
+                                                              'stateful': {'type': 'boolean'},
+                                                              'status': {'type': 'string'},
+                                                              'unit-tag': {'type': 'string'}},
+                                               'required': ['provider-id',
+                                                            'unit-tag',
+                                                            'address',
+                                                            'ports',
+                                                            'status',
+                                                            'info'],
+                                               'type': 'object'},
+                     'BoolResult': {'additionalProperties': False,
+                                    'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                   'result': {'type': 'boolean'}},
+                                    'required': ['result'],
+                                    'type': 'object'},
+                     'BoolResults': {'additionalProperties': False,
+                                     'properties': {'results': {'items': {'$ref': '#/definitions/BoolResult'},
+                                                                'type': 'array'}},
+                                     'required': ['results'],
+                                     'type': 'object'},
+                     'ConfigResult': {'additionalProperties': False,
+                                      'properties': {'config': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                             'type': 'object'}},
+                                                                'type': 'object'},
+                                                     'error': {'$ref': '#/definitions/Error'}},
+                                      'required': ['config'],
+                                      'type': 'object'},
+                     'Entities': {'additionalProperties': False,
+                                  'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
+                                                              'type': 'array'}},
+                                  'required': ['entities'],
+                                  'type': 'object'},
+                     'Entity': {'additionalProperties': False,
+                                'properties': {'tag': {'type': 'string'}},
+                                'required': ['tag'],
+                                'type': 'object'},
+                     'EntityStatus': {'additionalProperties': False,
+                                      'properties': {'data': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                           'type': 'object'}},
+                                                              'type': 'object'},
+                                                     'info': {'type': 'string'},
+                                                     'since': {'format': 'date-time',
+                                                               'type': 'string'},
+                                                     'status': {'type': 'string'}},
+                                      'required': ['status', 'info', 'since'],
+                                      'type': 'object'},
+                     'EntityStatusArgs': {'additionalProperties': False,
+                                          'properties': {'data': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                               'type': 'object'}},
+                                                                  'type': 'object'},
+                                                         'info': {'type': 'string'},
+                                                         'status': {'type': 'string'},
+                                                         'tag': {'type': 'string'}},
+                                          'required': ['tag',
+                                                       'status',
+                                                       'info',
+                                                       'data'],
+                                          'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ErrorResult': {'additionalProperties': False,
+                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
+                                     'type': 'object'},
+                     'ErrorResults': {'additionalProperties': False,
+                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
+                                                                 'type': 'array'}},
+                                      'required': ['results'],
+                                      'type': 'object'},
+                     'IntResult': {'additionalProperties': False,
+                                   'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                  'result': {'type': 'integer'}},
+                                   'required': ['result'],
+                                   'type': 'object'},
+                     'IntResults': {'additionalProperties': False,
+                                    'properties': {'results': {'items': {'$ref': '#/definitions/IntResult'},
+                                                               'type': 'array'}},
+                                    'required': ['results'],
+                                    'type': 'object'},
+                     'KubernetesDeploymentInfo': {'additionalProperties': False,
+                                                  'properties': {'deployment-type': {'type': 'string'},
+                                                                 'service-type': {'type': 'string'}},
+                                                  'required': ['deployment-type',
+                                                               'service-type'],
+                                                  'type': 'object'},
+                     'KubernetesDeviceParams': {'additionalProperties': False,
+                                                'properties': {'Attributes': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                              'type': 'object'},
+                                                               'Count': {'type': 'integer'},
+                                                               'Type': {'type': 'string'}},
+                                                'required': ['Type',
+                                                             'Count',
+                                                             'Attributes'],
+                                                'type': 'object'},
+                     'KubernetesFilesystemAttachmentParams': {'additionalProperties': False,
+                                                              'properties': {'mount-point': {'type': 'string'},
+                                                                             'provider': {'type': 'string'},
+                                                                             'read-only': {'type': 'boolean'}},
+                                                              'required': ['provider'],
+                                                              'type': 'object'},
+                     'KubernetesFilesystemInfo': {'additionalProperties': False,
+                                                  'properties': {'data': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                       'type': 'object'}},
+                                                                          'type': 'object'},
+                                                                 'filesystem-id': {'type': 'string'},
+                                                                 'info': {'type': 'string'},
+                                                                 'mount-point': {'type': 'string'},
+                                                                 'pool': {'type': 'string'},
+                                                                 'read-only': {'type': 'boolean'},
+                                                                 'size': {'type': 'integer'},
+                                                                 'status': {'type': 'string'},
+                                                                 'storagename': {'type': 'string'},
+                                                                 'volume': {'$ref': '#/definitions/KubernetesVolumeInfo'}},
+                                                  'required': ['storagename',
+                                                               'pool',
+                                                               'size',
+                                                               'filesystem-id',
+                                                               'status',
+                                                               'info',
+                                                               'volume'],
+                                                  'type': 'object'},
+                     'KubernetesFilesystemParams': {'additionalProperties': False,
+                                                    'properties': {'attachment': {'$ref': '#/definitions/KubernetesFilesystemAttachmentParams'},
+                                                                   'attributes': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                               'type': 'object'}},
+                                                                                  'type': 'object'},
+                                                                   'provider': {'type': 'string'},
+                                                                   'size': {'type': 'integer'},
+                                                                   'storagename': {'type': 'string'},
+                                                                   'tags': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                            'type': 'object'}},
+                                                    'required': ['storagename',
+                                                                 'size',
+                                                                 'provider'],
+                                                    'type': 'object'},
+                     'KubernetesProvisioningInfo': {'additionalProperties': False,
+                                                    'properties': {'charm-modified-version': {'type': 'integer'},
+                                                                   'constraints': {'$ref': '#/definitions/Value'},
+                                                                   'deployment-info': {'$ref': '#/definitions/KubernetesDeploymentInfo'},
+                                                                   'devices': {'items': {'$ref': '#/definitions/KubernetesDeviceParams'},
+                                                                               'type': 'array'},
+                                                                   'filesystems': {'items': {'$ref': '#/definitions/KubernetesFilesystemParams'},
+                                                                                   'type': 'array'},
+                                                                   'operator-image-path': {'type': 'string'},
+                                                                   'pod-spec': {'type': 'string'},
+                                                                   'raw-k8s-spec': {'type': 'string'},
+                                                                   'tags': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                            'type': 'object'},
+                                                                   'volumes': {'items': {'$ref': '#/definitions/KubernetesVolumeParams'},
+                                                                               'type': 'array'}},
+                                                    'required': ['pod-spec',
+                                                                 'constraints'],
+                                                    'type': 'object'},
+                     'KubernetesProvisioningInfoResult': {'additionalProperties': False,
+                                                          'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                                         'result': {'$ref': '#/definitions/KubernetesProvisioningInfo'}},
+                                                          'required': ['result'],
+                                                          'type': 'object'},
+                     'KubernetesProvisioningInfoResults': {'additionalProperties': False,
+                                                           'properties': {'results': {'items': {'$ref': '#/definitions/KubernetesProvisioningInfoResult'},
+                                                                                      'type': 'array'}},
+                                                           'required': ['results'],
+                                                           'type': 'object'},
+                     'KubernetesVolumeAttachmentParams': {'additionalProperties': False,
+                                                          'properties': {'provider': {'type': 'string'},
+                                                                         'read-only': {'type': 'boolean'}},
+                                                          'required': ['provider'],
+                                                          'type': 'object'},
+                     'KubernetesVolumeInfo': {'additionalProperties': False,
+                                              'properties': {'data': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                   'type': 'object'}},
+                                                                      'type': 'object'},
+                                                             'info': {'type': 'string'},
+                                                             'persistent': {'type': 'boolean'},
+                                                             'pool': {'type': 'string'},
+                                                             'size': {'type': 'integer'},
+                                                             'status': {'type': 'string'},
+                                                             'volume-id': {'type': 'string'}},
+                                              'required': ['volume-id',
+                                                           'size',
+                                                           'persistent',
+                                                           'status',
+                                                           'info'],
+                                              'type': 'object'},
+                     'KubernetesVolumeParams': {'additionalProperties': False,
+                                                'properties': {'attachment': {'$ref': '#/definitions/KubernetesVolumeAttachmentParams'},
+                                                               'attributes': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                           'type': 'object'}},
+                                                                              'type': 'object'},
+                                                               'provider': {'type': 'string'},
+                                                               'size': {'type': 'integer'},
+                                                               'storagename': {'type': 'string'},
+                                                               'tags': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                        'type': 'object'}},
+                                                'required': ['storagename',
+                                                             'size',
+                                                             'provider'],
+                                                'type': 'object'},
+                     'LifeResult': {'additionalProperties': False,
+                                    'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                   'life': {'type': 'string'}},
+                                    'required': ['life'],
+                                    'type': 'object'},
+                     'LifeResults': {'additionalProperties': False,
+                                     'properties': {'results': {'items': {'$ref': '#/definitions/LifeResult'},
+                                                                'type': 'array'}},
+                                     'required': ['results'],
+                                     'type': 'object'},
+                     'NotifyWatchResult': {'additionalProperties': False,
+                                           'properties': {'NotifyWatcherId': {'type': 'string'},
+                                                          'error': {'$ref': '#/definitions/Error'}},
+                                           'required': ['NotifyWatcherId'],
+                                           'type': 'object'},
+                     'NotifyWatchResults': {'additionalProperties': False,
+                                            'properties': {'results': {'items': {'$ref': '#/definitions/NotifyWatchResult'},
+                                                                       'type': 'array'}},
+                                            'required': ['results'],
+                                            'type': 'object'},
+                     'SetStatus': {'additionalProperties': False,
+                                   'properties': {'entities': {'items': {'$ref': '#/definitions/EntityStatusArgs'},
+                                                               'type': 'array'}},
+                                   'required': ['entities'],
+                                   'type': 'object'},
+                     'StringResult': {'additionalProperties': False,
+                                      'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                     'result': {'type': 'string'}},
+                                      'required': ['result'],
+                                      'type': 'object'},
+                     'StringResults': {'additionalProperties': False,
+                                       'properties': {'results': {'items': {'$ref': '#/definitions/StringResult'},
+                                                                  'type': 'array'}},
+                                       'required': ['results'],
+                                       'type': 'object'},
+                     'StringsWatchResult': {'additionalProperties': False,
+                                            'properties': {'changes': {'items': {'type': 'string'},
+                                                                       'type': 'array'},
+                                                           'error': {'$ref': '#/definitions/Error'},
+                                                           'watcher-id': {'type': 'string'}},
+                                            'required': ['watcher-id'],
+                                            'type': 'object'},
+                     'StringsWatchResults': {'additionalProperties': False,
+                                             'properties': {'results': {'items': {'$ref': '#/definitions/StringsWatchResult'},
+                                                                        'type': 'array'}},
+                                             'required': ['results'],
+                                             'type': 'object'},
+                     'UpdateApplicationServiceArg': {'additionalProperties': False,
+                                                     'properties': {'addresses': {'items': {'$ref': '#/definitions/Address'},
+                                                                                  'type': 'array'},
+                                                                    'application-tag': {'type': 'string'},
+                                                                    'generation': {'type': 'integer'},
+                                                                    'provider-id': {'type': 'string'},
+                                                                    'scale': {'type': 'integer'}},
+                                                     'required': ['application-tag',
+                                                                  'provider-id',
+                                                                  'addresses'],
+                                                     'type': 'object'},
+                     'UpdateApplicationServiceArgs': {'additionalProperties': False,
+                                                      'properties': {'args': {'items': {'$ref': '#/definitions/UpdateApplicationServiceArg'},
+                                                                              'type': 'array'}},
+                                                      'required': ['args'],
+                                                      'type': 'object'},
+                     'UpdateApplicationUnitArgs': {'additionalProperties': False,
+                                                   'properties': {'args': {'items': {'$ref': '#/definitions/UpdateApplicationUnits'},
+                                                                           'type': 'array'}},
+                                                   'required': ['args'],
+                                                   'type': 'object'},
+                     'UpdateApplicationUnitResult': {'additionalProperties': False,
+                                                     'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                                    'info': {'$ref': '#/definitions/UpdateApplicationUnitsInfo'}},
+                                                     'type': 'object'},
+                     'UpdateApplicationUnitResults': {'additionalProperties': False,
+                                                      'properties': {'results': {'items': {'$ref': '#/definitions/UpdateApplicationUnitResult'},
+                                                                                 'type': 'array'}},
+                                                      'required': ['results'],
+                                                      'type': 'object'},
+                     'UpdateApplicationUnits': {'additionalProperties': False,
+                                                'properties': {'application-tag': {'type': 'string'},
+                                                               'generation': {'type': 'integer'},
+                                                               'scale': {'type': 'integer'},
+                                                               'status': {'$ref': '#/definitions/EntityStatus'},
+                                                               'units': {'items': {'$ref': '#/definitions/ApplicationUnitParams'},
+                                                                         'type': 'array'}},
+                                                'required': ['application-tag',
+                                                             'units'],
+                                                'type': 'object'},
+                     'UpdateApplicationUnitsInfo': {'additionalProperties': False,
+                                                    'properties': {'units': {'items': {'$ref': '#/definitions/ApplicationUnitInfo'},
+                                                                             'type': 'array'}},
+                                                    'required': ['units'],
+                                                    'type': 'object'},
+                     'Value': {'additionalProperties': False,
+                               'properties': {'allocate-public-ip': {'type': 'boolean'},
+                                              'arch': {'type': 'string'},
+                                              'container': {'type': 'string'},
+                                              'cores': {'type': 'integer'},
+                                              'cpu-power': {'type': 'integer'},
+                                              'instance-type': {'type': 'string'},
+                                              'mem': {'type': 'integer'},
+                                              'root-disk': {'type': 'integer'},
+                                              'root-disk-source': {'type': 'string'},
+                                              'spaces': {'items': {'type': 'string'},
+                                                         'type': 'array'},
+                                              'tags': {'items': {'type': 'string'},
+                                                       'type': 'array'},
+                                              'virt-type': {'type': 'string'},
+                                              'zones': {'items': {'type': 'string'},
+                                                        'type': 'array'}},
+                               'type': 'object'}},
+     'properties': {'ApplicationsConfig': {'description': 'ApplicationsConfig '
+                                                          'returns the config for '
+                                                          'the specified '
+                                                          'applications.',
+                                           'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                          'Result': {'$ref': '#/definitions/ApplicationGetConfigResults'}},
+                                           'type': 'object'},
+                    'ApplicationsScale': {'description': 'ApplicationsScale '
+                                                         'returns the scaling info '
+                                                         'for specified '
+                                                         'applications in this '
+                                                         'model.',
+                                          'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                         'Result': {'$ref': '#/definitions/IntResults'}},
+                                          'type': 'object'},
+                    'ApplicationsTrust': {'description': 'ApplicationsTrust '
+                                                         'returns the trust status '
+                                                         'for specified '
+                                                         'applications in this '
+                                                         'model.',
+                                          'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                         'Result': {'$ref': '#/definitions/BoolResults'}},
+                                          'type': 'object'},
+                    'ClearApplicationsResources': {'description': 'ClearApplicationsResources '
+                                                                  'clears the '
+                                                                  'flags which '
+                                                                  'indicate\n'
+                                                                  'applications '
+                                                                  'still have '
+                                                                  'resources in '
+                                                                  'the cluster.',
+                                                   'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                                  'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                                   'type': 'object'},
+                    'DeploymentMode': {'description': 'DeploymentMode returns the '
+                                                      'deployment mode of the '
+                                                      "given applications' charms.",
+                                       'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                      'Result': {'$ref': '#/definitions/StringResults'}},
+                                       'type': 'object'},
+                    'Life': {'description': 'Life returns the life status of every '
+                                            'supplied entity, where available.',
+                             'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                            'Result': {'$ref': '#/definitions/LifeResults'}},
+                             'type': 'object'},
+                    'ProvisioningInfo': {'description': 'ProvisioningInfo returns '
+                                                        'the provisioning info for '
+                                                        'specified applications in '
+                                                        'this model.',
+                                         'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                        'Result': {'$ref': '#/definitions/KubernetesProvisioningInfoResults'}},
+                                         'type': 'object'},
+                    'SetOperatorStatus': {'description': 'SetOperatorStatus '
+                                                         'updates the operator '
+                                                         'status for each given '
+                                                         'application.',
+                                          'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
+                                                         'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                          'type': 'object'},
+                    'UpdateApplicationsService': {'description': 'UpdateApplicationsService '
+                                                                 'updates the Juju '
+                                                                 'data model to '
+                                                                 'reflect the '
+                                                                 'given\n'
+                                                                 'service details '
+                                                                 'of the specified '
+                                                                 'application.',
+                                                  'properties': {'Params': {'$ref': '#/definitions/UpdateApplicationServiceArgs'},
+                                                                 'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                                  'type': 'object'},
+                    'UpdateApplicationsUnits': {'description': 'UpdateApplicationsUnits '
+                                                               'updates the Juju '
+                                                               'data model to '
+                                                               'reflect the given\n'
+                                                               'units of the '
+                                                               'specified '
+                                                               'application.',
+                                                'properties': {'Params': {'$ref': '#/definitions/UpdateApplicationUnitArgs'},
+                                                               'Result': {'$ref': '#/definitions/UpdateApplicationUnitResults'}},
+                                                'type': 'object'},
+                    'WatchApplications': {'description': 'WatchApplications starts '
+                                                         'a StringsWatcher to '
+                                                         'watch applications '
+                                                         'deployed to this model.',
+                                          'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
+                                          'type': 'object'},
+                    'WatchApplicationsScale': {'description': 'WatchApplicationsScale '
+                                                              'starts a '
+                                                              'NotifyWatcher to '
+                                                              'watch changes\n'
+                                                              'to the '
+                                                              "applications' "
+                                                              'scale.',
+                                               'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                              'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
+                                               'type': 'object'},
+                    'WatchApplicationsTrustHash': {'description': 'WatchApplicationsTrustHash '
+                                                                  'starts a '
+                                                                  'StringsWatcher '
+                                                                  'to watch '
+                                                                  'changes\n'
+                                                                  'to the '
+                                                                  "applications' "
+                                                                  'trust status.',
+                                                   'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                                  'Result': {'$ref': '#/definitions/StringsWatchResults'}},
+                                                   'type': 'object'},
+                    'WatchPodSpec': {'description': 'WatchPodSpec starts a '
+                                                    'NotifyWatcher to watch '
+                                                    'changes to the\n'
+                                                    'pod spec for specified units '
+                                                    'in this model.',
+                                     'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                    'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
+                                     'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(ApplicationGetConfigResults)
+    async def ApplicationsConfig(self, entities=None):
+        '''
+        ApplicationsConfig returns the config for the specified applications.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ApplicationGetConfigResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASUnitProvisioner',
+                   request='ApplicationsConfig',
+                   version=2,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(IntResults)
+    async def ApplicationsScale(self, entities=None):
+        '''
+        ApplicationsScale returns the scaling info for specified applications in this model.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> IntResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASUnitProvisioner',
+                   request='ApplicationsScale',
+                   version=2,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(BoolResults)
+    async def ApplicationsTrust(self, entities=None):
+        '''
+        ApplicationsTrust returns the trust status for specified applications in this model.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> BoolResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASUnitProvisioner',
+                   request='ApplicationsTrust',
+                   version=2,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def ClearApplicationsResources(self, entities=None):
+        '''
+        ClearApplicationsResources clears the flags which indicate
+        applications still have resources in the cluster.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASUnitProvisioner',
+                   request='ClearApplicationsResources',
+                   version=2,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResults)
+    async def DeploymentMode(self, entities=None):
+        '''
+        DeploymentMode returns the deployment mode of the given applications' charms.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASUnitProvisioner',
+                   request='DeploymentMode',
+                   version=2,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(LifeResults)
+    async def Life(self, entities=None):
+        '''
+        Life returns the life status of every supplied entity, where available.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> LifeResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASUnitProvisioner',
+                   request='Life',
+                   version=2,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(KubernetesProvisioningInfoResults)
+    async def ProvisioningInfo(self, entities=None):
+        '''
+        ProvisioningInfo returns the provisioning info for specified applications in this model.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> KubernetesProvisioningInfoResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASUnitProvisioner',
+                   request='ProvisioningInfo',
+                   version=2,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def SetOperatorStatus(self, entities=None):
+        '''
+        SetOperatorStatus updates the operator status for each given application.
+
+        entities : typing.Sequence[~EntityStatusArgs]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASUnitProvisioner',
+                   request='SetOperatorStatus',
+                   version=2,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def UpdateApplicationsService(self, args=None):
+        '''
+        UpdateApplicationsService updates the Juju data model to reflect the given
+        service details of the specified application.
+
+        args : typing.Sequence[~UpdateApplicationServiceArg]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASUnitProvisioner',
+                   request='UpdateApplicationsService',
+                   version=2,
+                   params=_params)
+        _params['args'] = args
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(UpdateApplicationUnitResults)
+    async def UpdateApplicationsUnits(self, args=None):
+        '''
+        UpdateApplicationsUnits updates the Juju data model to reflect the given
+        units of the specified application.
+
+        args : typing.Sequence[~UpdateApplicationUnits]
+        Returns -> UpdateApplicationUnitResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASUnitProvisioner',
+                   request='UpdateApplicationsUnits',
+                   version=2,
+                   params=_params)
+        _params['args'] = args
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResult)
+    async def WatchApplications(self):
+        '''
+        WatchApplications starts a StringsWatcher to watch applications deployed to this model.
+
+
+        Returns -> StringsWatchResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASUnitProvisioner',
+                   request='WatchApplications',
+                   version=2,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResults)
+    async def WatchApplicationsScale(self, entities=None):
+        '''
+        WatchApplicationsScale starts a NotifyWatcher to watch changes
+        to the applications' scale.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> NotifyWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASUnitProvisioner',
+                   request='WatchApplicationsScale',
+                   version=2,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResults)
+    async def WatchApplicationsTrustHash(self, entities=None):
+        '''
+        WatchApplicationsTrustHash starts a StringsWatcher to watch changes
+        to the applications' trust status.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringsWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASUnitProvisioner',
+                   request='WatchApplicationsTrustHash',
+                   version=2,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResults)
+    async def WatchPodSpec(self, entities=None):
+        '''
+        WatchPodSpec starts a NotifyWatcher to watch changes to the
+        pod spec for specified units in this model.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> NotifyWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASUnitProvisioner',
+                   request='WatchPodSpec',
+                   version=2,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
 class CharmRevisionUpdaterFacade(Type):
     name = 'CharmRevisionUpdater'
     version = 2

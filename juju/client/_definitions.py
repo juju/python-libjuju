@@ -4666,13 +4666,14 @@ class Channel(Type):
 
 
 class Charm(Type):
-    _toSchema = {'actions': 'actions', 'config': 'config', 'lxd_profile': 'lxd-profile', 'meta': 'meta', 'metrics': 'metrics', 'revision': 'revision', 'url': 'url'}
-    _toPy = {'actions': 'actions', 'config': 'config', 'lxd-profile': 'lxd_profile', 'meta': 'meta', 'metrics': 'metrics', 'revision': 'revision', 'url': 'url'}
-    def __init__(self, actions=None, config=None, lxd_profile=None, meta=None, metrics=None, revision=None, url=None, **unknown_fields):
+    _toSchema = {'actions': 'actions', 'config': 'config', 'lxd_profile': 'lxd-profile', 'manifest': 'manifest', 'meta': 'meta', 'metrics': 'metrics', 'revision': 'revision', 'url': 'url'}
+    _toPy = {'actions': 'actions', 'config': 'config', 'lxd-profile': 'lxd_profile', 'manifest': 'manifest', 'meta': 'meta', 'metrics': 'metrics', 'revision': 'revision', 'url': 'url'}
+    def __init__(self, actions=None, config=None, lxd_profile=None, manifest=None, meta=None, metrics=None, revision=None, url=None, **unknown_fields):
         '''
         actions : CharmActions
         config : typing.Mapping[str, ~CharmOption]
         lxd_profile : CharmLXDProfile
+        manifest : CharmManifest
         meta : CharmMeta
         metrics : CharmMetrics
         revision : int
@@ -4681,6 +4682,7 @@ class Charm(Type):
         actions_ = CharmActions.from_json(actions) if actions else None
         config_ = {k: CharmOption.from_json(v) for k, v in (config or dict()).items()}
         lxd_profile_ = CharmLXDProfile.from_json(lxd_profile) if lxd_profile else None
+        manifest_ = CharmManifest.from_json(manifest) if manifest else None
         meta_ = CharmMeta.from_json(meta) if meta else None
         metrics_ = CharmMetrics.from_json(metrics) if metrics else None
         revision_ = revision
@@ -4695,6 +4697,9 @@ class Charm(Type):
 
         if lxd_profile_ is not None and not isinstance(lxd_profile_, (dict, CharmLXDProfile)):
             raise Exception("Expected lxd_profile_ to be a CharmLXDProfile, received: {}".format(type(lxd_profile_)))
+
+        if manifest_ is not None and not isinstance(manifest_, (dict, CharmManifest)):
+            raise Exception("Expected manifest_ to be a CharmManifest, received: {}".format(type(manifest_)))
 
         if meta_ is not None and not isinstance(meta_, (dict, CharmMeta)):
             raise Exception("Expected meta_ to be a CharmMeta, received: {}".format(type(meta_)))
@@ -4711,6 +4716,7 @@ class Charm(Type):
         self.actions = actions_
         self.config = config_
         self.lxd_profile = lxd_profile_
+        self.manifest = manifest_
         self.meta = meta_
         self.metrics = metrics_
         self.revision = revision_
@@ -4762,23 +4768,29 @@ class CharmActions(Type):
 
 
 class CharmBase(Type):
-    _toSchema = {'channel': 'channel', 'name': 'name'}
-    _toPy = {'channel': 'channel', 'name': 'name'}
-    def __init__(self, channel=None, name=None, **unknown_fields):
+    _toSchema = {'architectures': 'architectures', 'channel': 'channel', 'name': 'name'}
+    _toPy = {'architectures': 'architectures', 'channel': 'channel', 'name': 'name'}
+    def __init__(self, architectures=None, channel=None, name=None, **unknown_fields):
         '''
+        architectures : typing.Sequence[str]
         channel : str
         name : str
         '''
+        architectures_ = architectures
         channel_ = channel
         name_ = name
 
         # Validate arguments against known Juju API types.
+        if architectures_ is not None and not isinstance(architectures_, (bytes, str, list)):
+            raise Exception("Expected architectures_ to be a Sequence, received: {}".format(type(architectures_)))
+
         if channel_ is not None and not isinstance(channel_, (bytes, str)):
             raise Exception("Expected channel_ to be a str, received: {}".format(type(channel_)))
 
         if name_ is not None and not isinstance(name_, (bytes, str)):
             raise Exception("Expected name_ to be a str, received: {}".format(type(name_)))
 
+        self.architectures = architectures_
         self.channel = channel_
         self.name = name_
         self.unknown_fields = unknown_fields
@@ -5139,13 +5151,30 @@ class CharmLXDProfile(Type):
 
 
 
+class CharmManifest(Type):
+    _toSchema = {'bases': 'bases'}
+    _toPy = {'bases': 'bases'}
+    def __init__(self, bases=None, **unknown_fields):
+        '''
+        bases : typing.Sequence[~CharmBase]
+        '''
+        bases_ = [CharmBase.from_json(o) for o in bases or []]
+
+        # Validate arguments against known Juju API types.
+        if bases_ is not None and not isinstance(bases_, (bytes, str, list)):
+            raise Exception("Expected bases_ to be a Sequence, received: {}".format(type(bases_)))
+
+        self.bases = bases_
+        self.unknown_fields = unknown_fields
+
+
+
 class CharmMeta(Type):
-    _toSchema = {'assumes': 'assumes', 'bases': 'bases', 'categories': 'categories', 'containers': 'containers', 'deployment': 'deployment', 'description': 'description', 'devices': 'devices', 'extra_bindings': 'extra-bindings', 'min_juju_version': 'min-juju-version', 'name': 'name', 'payload_classes': 'payload-classes', 'peers': 'peers', 'provides': 'provides', 'requires': 'requires', 'resources': 'resources', 'series': 'series', 'storage': 'storage', 'subordinate': 'subordinate', 'summary': 'summary', 'tags': 'tags', 'terms': 'terms'}
-    _toPy = {'assumes': 'assumes', 'bases': 'bases', 'categories': 'categories', 'containers': 'containers', 'deployment': 'deployment', 'description': 'description', 'devices': 'devices', 'extra-bindings': 'extra_bindings', 'min-juju-version': 'min_juju_version', 'name': 'name', 'payload-classes': 'payload_classes', 'peers': 'peers', 'provides': 'provides', 'requires': 'requires', 'resources': 'resources', 'series': 'series', 'storage': 'storage', 'subordinate': 'subordinate', 'summary': 'summary', 'tags': 'tags', 'terms': 'terms'}
-    def __init__(self, assumes=None, bases=None, categories=None, containers=None, deployment=None, description=None, devices=None, extra_bindings=None, min_juju_version=None, name=None, payload_classes=None, peers=None, provides=None, requires=None, resources=None, series=None, storage=None, subordinate=None, summary=None, tags=None, terms=None, **unknown_fields):
+    _toSchema = {'assumes': 'assumes', 'categories': 'categories', 'containers': 'containers', 'deployment': 'deployment', 'description': 'description', 'devices': 'devices', 'extra_bindings': 'extra-bindings', 'min_juju_version': 'min-juju-version', 'name': 'name', 'payload_classes': 'payload-classes', 'peers': 'peers', 'provides': 'provides', 'requires': 'requires', 'resources': 'resources', 'series': 'series', 'storage': 'storage', 'subordinate': 'subordinate', 'summary': 'summary', 'tags': 'tags', 'terms': 'terms'}
+    _toPy = {'assumes': 'assumes', 'categories': 'categories', 'containers': 'containers', 'deployment': 'deployment', 'description': 'description', 'devices': 'devices', 'extra-bindings': 'extra_bindings', 'min-juju-version': 'min_juju_version', 'name': 'name', 'payload-classes': 'payload_classes', 'peers': 'peers', 'provides': 'provides', 'requires': 'requires', 'resources': 'resources', 'series': 'series', 'storage': 'storage', 'subordinate': 'subordinate', 'summary': 'summary', 'tags': 'tags', 'terms': 'terms'}
+    def __init__(self, assumes=None, categories=None, containers=None, deployment=None, description=None, devices=None, extra_bindings=None, min_juju_version=None, name=None, payload_classes=None, peers=None, provides=None, requires=None, resources=None, series=None, storage=None, subordinate=None, summary=None, tags=None, terms=None, **unknown_fields):
         '''
         assumes : typing.Sequence[str]
-        bases : typing.Sequence[~CharmBase]
         categories : typing.Sequence[str]
         containers : typing.Mapping[str, ~CharmContainer]
         deployment : CharmDeployment
@@ -5167,7 +5196,6 @@ class CharmMeta(Type):
         terms : typing.Sequence[str]
         '''
         assumes_ = assumes
-        bases_ = [CharmBase.from_json(o) for o in bases or []]
         categories_ = categories
         containers_ = {k: CharmContainer.from_json(v) for k, v in (containers or dict()).items()}
         deployment_ = CharmDeployment.from_json(deployment) if deployment else None
@@ -5191,9 +5219,6 @@ class CharmMeta(Type):
         # Validate arguments against known Juju API types.
         if assumes_ is not None and not isinstance(assumes_, (bytes, str, list)):
             raise Exception("Expected assumes_ to be a Sequence, received: {}".format(type(assumes_)))
-
-        if bases_ is not None and not isinstance(bases_, (bytes, str, list)):
-            raise Exception("Expected bases_ to be a Sequence, received: {}".format(type(bases_)))
 
         if categories_ is not None and not isinstance(categories_, (bytes, str, list)):
             raise Exception("Expected categories_ to be a Sequence, received: {}".format(type(categories_)))
@@ -5253,7 +5278,6 @@ class CharmMeta(Type):
             raise Exception("Expected terms_ to be a Sequence, received: {}".format(type(terms_)))
 
         self.assumes = assumes_
-        self.bases = bases_
         self.categories = categories_
         self.containers = containers_
         self.deployment = deployment_

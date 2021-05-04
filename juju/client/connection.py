@@ -43,7 +43,7 @@ client_facades = {
     'CAASOperator': {'versions': [1]},
     'CAASAgent': {'versions': [1]},
     'CAASOperatorProvisioner': {'versions': [1]},
-    'CAASUnitProvisioner': {'versions': [1]},
+    'CAASUnitProvisioner': {'versions': [1, 2]},
     'CAASOperatorUpgrader': {'versions': [1]},
     'CAASModelOperator': {'versions': [1]},
     'Controller': {'versions': [3, 4, 5, 6, 7, 8, 9]},
