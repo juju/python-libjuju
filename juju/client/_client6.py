@@ -1515,6 +1515,1154 @@ class CloudFacade(Type):
 
 
 
+class FirewallerFacade(Type):
+    name = 'Firewaller'
+    version = 6
+    schema =     {'definitions': {'BoolResult': {'additionalProperties': False,
+                                    'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                   'result': {'type': 'boolean'}},
+                                    'required': ['result'],
+                                    'type': 'object'},
+                     'BoolResults': {'additionalProperties': False,
+                                     'properties': {'results': {'items': {'$ref': '#/definitions/BoolResult'},
+                                                                'type': 'array'}},
+                                     'required': ['results'],
+                                     'type': 'object'},
+                     'CloudCredential': {'additionalProperties': False,
+                                         'properties': {'attrs': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                  'type': 'object'},
+                                                        'auth-type': {'type': 'string'},
+                                                        'redacted': {'items': {'type': 'string'},
+                                                                     'type': 'array'}},
+                                         'required': ['auth-type'],
+                                         'type': 'object'},
+                     'CloudSpec': {'additionalProperties': False,
+                                   'properties': {'cacertificates': {'items': {'type': 'string'},
+                                                                     'type': 'array'},
+                                                  'credential': {'$ref': '#/definitions/CloudCredential'},
+                                                  'endpoint': {'type': 'string'},
+                                                  'identity-endpoint': {'type': 'string'},
+                                                  'is-controller-cloud': {'type': 'boolean'},
+                                                  'name': {'type': 'string'},
+                                                  'region': {'type': 'string'},
+                                                  'skip-tls-verify': {'type': 'boolean'},
+                                                  'storage-endpoint': {'type': 'string'},
+                                                  'type': {'type': 'string'}},
+                                   'required': ['type', 'name'],
+                                   'type': 'object'},
+                     'CloudSpecResult': {'additionalProperties': False,
+                                         'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                        'result': {'$ref': '#/definitions/CloudSpec'}},
+                                         'type': 'object'},
+                     'CloudSpecResults': {'additionalProperties': False,
+                                          'properties': {'results': {'items': {'$ref': '#/definitions/CloudSpecResult'},
+                                                                     'type': 'array'}},
+                                          'type': 'object'},
+                     'ControllerAPIInfoResult': {'additionalProperties': False,
+                                                 'properties': {'addresses': {'items': {'type': 'string'},
+                                                                              'type': 'array'},
+                                                                'cacert': {'type': 'string'},
+                                                                'error': {'$ref': '#/definitions/Error'}},
+                                                 'required': ['addresses',
+                                                              'cacert'],
+                                                 'type': 'object'},
+                     'ControllerAPIInfoResults': {'additionalProperties': False,
+                                                  'properties': {'results': {'items': {'$ref': '#/definitions/ControllerAPIInfoResult'},
+                                                                             'type': 'array'}},
+                                                  'required': ['results'],
+                                                  'type': 'object'},
+                     'ControllerConfigResult': {'additionalProperties': False,
+                                                'properties': {'config': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                       'type': 'object'}},
+                                                                          'type': 'object'}},
+                                                'required': ['config'],
+                                                'type': 'object'},
+                     'Entities': {'additionalProperties': False,
+                                  'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
+                                                              'type': 'array'}},
+                                  'required': ['entities'],
+                                  'type': 'object'},
+                     'Entity': {'additionalProperties': False,
+                                'properties': {'tag': {'type': 'string'}},
+                                'required': ['tag'],
+                                'type': 'object'},
+                     'EntityStatusArgs': {'additionalProperties': False,
+                                          'properties': {'data': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                               'type': 'object'}},
+                                                                  'type': 'object'},
+                                                         'info': {'type': 'string'},
+                                                         'status': {'type': 'string'},
+                                                         'tag': {'type': 'string'}},
+                                          'required': ['tag',
+                                                       'status',
+                                                       'info',
+                                                       'data'],
+                                          'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ErrorResult': {'additionalProperties': False,
+                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
+                                     'type': 'object'},
+                     'ErrorResults': {'additionalProperties': False,
+                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
+                                                                 'type': 'array'}},
+                                      'required': ['results'],
+                                      'type': 'object'},
+                     'ExposeInfoResult': {'additionalProperties': False,
+                                          'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                         'exposed': {'type': 'boolean'},
+                                                         'exposed-endpoints': {'patternProperties': {'.*': {'$ref': '#/definitions/ExposedEndpoint'}},
+                                                                               'type': 'object'}},
+                                          'type': 'object'},
+                     'ExposeInfoResults': {'additionalProperties': False,
+                                           'properties': {'results': {'items': {'$ref': '#/definitions/ExposeInfoResult'},
+                                                                      'type': 'array'}},
+                                           'required': ['results'],
+                                           'type': 'object'},
+                     'ExposedEndpoint': {'additionalProperties': False,
+                                         'properties': {'expose-to-cidrs': {'items': {'type': 'string'},
+                                                                            'type': 'array'},
+                                                        'expose-to-spaces': {'items': {'type': 'string'},
+                                                                             'type': 'array'}},
+                                         'type': 'object'},
+                     'FanConfigEntry': {'additionalProperties': False,
+                                        'properties': {'overlay': {'type': 'string'},
+                                                       'underlay': {'type': 'string'}},
+                                        'required': ['underlay', 'overlay'],
+                                        'type': 'object'},
+                     'FirewallRule': {'additionalProperties': False,
+                                      'properties': {'known-service': {'type': 'string'},
+                                                     'whitelist-cidrs': {'items': {'type': 'string'},
+                                                                         'type': 'array'}},
+                                      'required': ['known-service'],
+                                      'type': 'object'},
+                     'KnownServiceArgs': {'additionalProperties': False,
+                                          'properties': {'known-services': {'items': {'type': 'string'},
+                                                                            'type': 'array'}},
+                                          'required': ['known-services'],
+                                          'type': 'object'},
+                     'LifeResult': {'additionalProperties': False,
+                                    'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                   'life': {'type': 'string'}},
+                                    'required': ['life'],
+                                    'type': 'object'},
+                     'LifeResults': {'additionalProperties': False,
+                                     'properties': {'results': {'items': {'$ref': '#/definitions/LifeResult'},
+                                                                'type': 'array'}},
+                                     'required': ['results'],
+                                     'type': 'object'},
+                     'ListFirewallRulesResults': {'additionalProperties': False,
+                                                  'properties': {'Rules': {'items': {'$ref': '#/definitions/FirewallRule'},
+                                                                           'type': 'array'}},
+                                                  'required': ['Rules'],
+                                                  'type': 'object'},
+                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
+                     'MacaroonResult': {'additionalProperties': False,
+                                        'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                       'result': {'$ref': '#/definitions/Macaroon'}},
+                                        'type': 'object'},
+                     'MacaroonResults': {'additionalProperties': False,
+                                         'properties': {'results': {'items': {'$ref': '#/definitions/MacaroonResult'},
+                                                                    'type': 'array'}},
+                                         'required': ['results'],
+                                         'type': 'object'},
+                     'ModelConfigResult': {'additionalProperties': False,
+                                           'properties': {'config': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                  'type': 'object'}},
+                                                                     'type': 'object'}},
+                                           'required': ['config'],
+                                           'type': 'object'},
+                     'ModelTag': {'additionalProperties': False, 'type': 'object'},
+                     'NotifyWatchResult': {'additionalProperties': False,
+                                           'properties': {'NotifyWatcherId': {'type': 'string'},
+                                                          'error': {'$ref': '#/definitions/Error'}},
+                                           'required': ['NotifyWatcherId'],
+                                           'type': 'object'},
+                     'NotifyWatchResults': {'additionalProperties': False,
+                                            'properties': {'results': {'items': {'$ref': '#/definitions/NotifyWatchResult'},
+                                                                       'type': 'array'}},
+                                            'required': ['results'],
+                                            'type': 'object'},
+                     'OpenMachinePortRangesResult': {'additionalProperties': False,
+                                                     'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                                    'unit-port-ranges': {'patternProperties': {'.*': {'items': {'$ref': '#/definitions/OpenUnitPortRanges'},
+                                                                                                                      'type': 'array'}},
+                                                                                         'type': 'object'}},
+                                                     'required': ['unit-port-ranges'],
+                                                     'type': 'object'},
+                     'OpenMachinePortRangesResults': {'additionalProperties': False,
+                                                      'properties': {'results': {'items': {'$ref': '#/definitions/OpenMachinePortRangesResult'},
+                                                                                 'type': 'array'}},
+                                                      'required': ['results'],
+                                                      'type': 'object'},
+                     'OpenUnitPortRanges': {'additionalProperties': False,
+                                            'properties': {'endpoint': {'type': 'string'},
+                                                           'port-ranges': {'items': {'$ref': '#/definitions/PortRange'},
+                                                                           'type': 'array'},
+                                                           'subnet-cidrs': {'items': {'type': 'string'},
+                                                                            'type': 'array'}},
+                                            'required': ['endpoint',
+                                                         'port-ranges',
+                                                         'subnet-cidrs'],
+                                            'type': 'object'},
+                     'PortRange': {'additionalProperties': False,
+                                   'properties': {'from-port': {'type': 'integer'},
+                                                  'protocol': {'type': 'string'},
+                                                  'to-port': {'type': 'integer'}},
+                                   'required': ['from-port', 'to-port', 'protocol'],
+                                   'type': 'object'},
+                     'SetStatus': {'additionalProperties': False,
+                                   'properties': {'entities': {'items': {'$ref': '#/definitions/EntityStatusArgs'},
+                                                               'type': 'array'}},
+                                   'required': ['entities'],
+                                   'type': 'object'},
+                     'SpaceInfo': {'additionalProperties': False,
+                                   'properties': {'id': {'type': 'string'},
+                                                  'name': {'type': 'string'},
+                                                  'provider-id': {'type': 'string'},
+                                                  'subnets': {'items': {'$ref': '#/definitions/SubnetV3'},
+                                                              'type': 'array'}},
+                                   'required': ['id', 'name'],
+                                   'type': 'object'},
+                     'SpaceInfos': {'additionalProperties': False,
+                                    'properties': {'space-infos': {'items': {'$ref': '#/definitions/SpaceInfo'},
+                                                                   'type': 'array'}},
+                                    'type': 'object'},
+                     'SpaceInfosParams': {'additionalProperties': False,
+                                          'properties': {'space-ids': {'items': {'type': 'string'},
+                                                                       'type': 'array'}},
+                                          'type': 'object'},
+                     'StringResult': {'additionalProperties': False,
+                                      'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                     'result': {'type': 'string'}},
+                                      'required': ['result'],
+                                      'type': 'object'},
+                     'StringResults': {'additionalProperties': False,
+                                       'properties': {'results': {'items': {'$ref': '#/definitions/StringResult'},
+                                                                  'type': 'array'}},
+                                       'required': ['results'],
+                                       'type': 'object'},
+                     'StringsWatchResult': {'additionalProperties': False,
+                                            'properties': {'changes': {'items': {'type': 'string'},
+                                                                       'type': 'array'},
+                                                           'error': {'$ref': '#/definitions/Error'},
+                                                           'watcher-id': {'type': 'string'}},
+                                            'required': ['watcher-id'],
+                                            'type': 'object'},
+                     'StringsWatchResults': {'additionalProperties': False,
+                                             'properties': {'results': {'items': {'$ref': '#/definitions/StringsWatchResult'},
+                                                                        'type': 'array'}},
+                                             'required': ['results'],
+                                             'type': 'object'},
+                     'Subnet': {'additionalProperties': False,
+                                'properties': {'cidr': {'type': 'string'},
+                                               'life': {'type': 'string'},
+                                               'provider-id': {'type': 'string'},
+                                               'provider-network-id': {'type': 'string'},
+                                               'provider-space-id': {'type': 'string'},
+                                               'space-tag': {'type': 'string'},
+                                               'status': {'type': 'string'},
+                                               'vlan-tag': {'type': 'integer'},
+                                               'zones': {'items': {'type': 'string'},
+                                                         'type': 'array'}},
+                                'required': ['cidr',
+                                             'vlan-tag',
+                                             'life',
+                                             'space-tag',
+                                             'zones'],
+                                'type': 'object'},
+                     'SubnetV2': {'additionalProperties': False,
+                                  'properties': {'Subnet': {'$ref': '#/definitions/Subnet'},
+                                                 'cidr': {'type': 'string'},
+                                                 'id': {'type': 'string'},
+                                                 'life': {'type': 'string'},
+                                                 'provider-id': {'type': 'string'},
+                                                 'provider-network-id': {'type': 'string'},
+                                                 'provider-space-id': {'type': 'string'},
+                                                 'space-tag': {'type': 'string'},
+                                                 'status': {'type': 'string'},
+                                                 'vlan-tag': {'type': 'integer'},
+                                                 'zones': {'items': {'type': 'string'},
+                                                           'type': 'array'}},
+                                  'required': ['cidr',
+                                               'vlan-tag',
+                                               'life',
+                                               'space-tag',
+                                               'zones',
+                                               'Subnet'],
+                                  'type': 'object'},
+                     'SubnetV3': {'additionalProperties': False,
+                                  'properties': {'Subnet': {'$ref': '#/definitions/Subnet'},
+                                                 'SubnetV2': {'$ref': '#/definitions/SubnetV2'},
+                                                 'cidr': {'type': 'string'},
+                                                 'fan-info': {'$ref': '#/definitions/FanConfigEntry'},
+                                                 'id': {'type': 'string'},
+                                                 'is-public': {'type': 'boolean'},
+                                                 'life': {'type': 'string'},
+                                                 'provider-id': {'type': 'string'},
+                                                 'provider-network-id': {'type': 'string'},
+                                                 'provider-space-id': {'type': 'string'},
+                                                 'space-id': {'type': 'string'},
+                                                 'space-tag': {'type': 'string'},
+                                                 'status': {'type': 'string'},
+                                                 'vlan-tag': {'type': 'integer'},
+                                                 'zones': {'items': {'type': 'string'},
+                                                           'type': 'array'}},
+                                  'required': ['cidr',
+                                               'vlan-tag',
+                                               'life',
+                                               'space-tag',
+                                               'zones',
+                                               'Subnet',
+                                               'SubnetV2',
+                                               'space-id'],
+                                  'type': 'object'}},
+     'properties': {'AreManuallyProvisioned': {'description': 'AreManuallyProvisioned '
+                                                              'returns whether '
+                                                              'each given entity '
+                                                              'is\n'
+                                                              'manually '
+                                                              'provisioned or not. '
+                                                              'Only machine tags '
+                                                              'are accepted.',
+                                               'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                              'Result': {'$ref': '#/definitions/BoolResults'}},
+                                               'type': 'object'},
+                    'CloudSpec': {'description': "CloudSpec returns the model's "
+                                                 'cloud spec.',
+                                  'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                 'Result': {'$ref': '#/definitions/CloudSpecResults'}},
+                                  'type': 'object'},
+                    'ControllerAPIInfoForModels': {'description': 'ControllerAPIInfoForModels '
+                                                                  'returns the '
+                                                                  'controller api '
+                                                                  'connection '
+                                                                  'details for the '
+                                                                  'specified '
+                                                                  'models.',
+                                                   'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                                  'Result': {'$ref': '#/definitions/ControllerAPIInfoResults'}},
+                                                   'type': 'object'},
+                    'ControllerConfig': {'description': 'ControllerConfig returns '
+                                                        "the controller's "
+                                                        'configuration.',
+                                         'properties': {'Result': {'$ref': '#/definitions/ControllerConfigResult'}},
+                                         'type': 'object'},
+                    'FirewallRules': {'description': 'FirewallRules returns the '
+                                                     'firewall rules for the '
+                                                     'specified well known service '
+                                                     'types.',
+                                      'properties': {'Params': {'$ref': '#/definitions/KnownServiceArgs'},
+                                                     'Result': {'$ref': '#/definitions/ListFirewallRulesResults'}},
+                                      'type': 'object'},
+                    'GetAssignedMachine': {'description': 'GetAssignedMachine '
+                                                          'returns the assigned '
+                                                          'machine tag (if any) '
+                                                          'for\n'
+                                                          'each given unit.',
+                                           'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                          'Result': {'$ref': '#/definitions/StringResults'}},
+                                           'type': 'object'},
+                    'GetCloudSpec': {'description': 'GetCloudSpec constructs the '
+                                                    'CloudSpec for a validated and '
+                                                    'authorized model.',
+                                     'properties': {'Params': {'$ref': '#/definitions/ModelTag'},
+                                                    'Result': {'$ref': '#/definitions/CloudSpecResult'}},
+                                     'type': 'object'},
+                    'GetExposeInfo': {'description': 'GetExposeInfo returns the '
+                                                     'expose flag and per-endpoint '
+                                                     'expose settings\n'
+                                                     'for the specified '
+                                                     'applications.',
+                                      'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                     'Result': {'$ref': '#/definitions/ExposeInfoResults'}},
+                                      'type': 'object'},
+                    'InstanceId': {'description': 'InstanceId returns the provider '
+                                                  'specific instance id for each '
+                                                  'given\n'
+                                                  'machine or an '
+                                                  'CodeNotProvisioned error, if '
+                                                  'not set.',
+                                   'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                  'Result': {'$ref': '#/definitions/StringResults'}},
+                                   'type': 'object'},
+                    'Life': {'description': 'Life returns the life status of every '
+                                            'supplied entity, where available.',
+                             'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                            'Result': {'$ref': '#/definitions/LifeResults'}},
+                             'type': 'object'},
+                    'MacaroonForRelations': {'description': 'MacaroonForRelations '
+                                                            'returns the macaroon '
+                                                            'for the specified '
+                                                            'relations.',
+                                             'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                            'Result': {'$ref': '#/definitions/MacaroonResults'}},
+                                             'type': 'object'},
+                    'ModelConfig': {'description': 'ModelConfig returns the '
+                                                   "current model's configuration.",
+                                    'properties': {'Result': {'$ref': '#/definitions/ModelConfigResult'}},
+                                    'type': 'object'},
+                    'OpenedMachinePortRanges': {'description': 'OpenedMachinePortRanges '
+                                                               'returns a list of '
+                                                               'the opened port '
+                                                               'ranges for the\n'
+                                                               'specified machines '
+                                                               'where each result '
+                                                               'is broken down by '
+                                                               'unit. The list of\n'
+                                                               'opened ports for '
+                                                               'each unit is '
+                                                               'further grouped by '
+                                                               'endpoint name and '
+                                                               'includes\n'
+                                                               'the subnet CIDRs '
+                                                               'that belong to the '
+                                                               'space that each '
+                                                               'endpoint is bound '
+                                                               'to.',
+                                                'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                               'Result': {'$ref': '#/definitions/OpenMachinePortRangesResults'}},
+                                                'type': 'object'},
+                    'SetRelationsStatus': {'description': 'SetRelationsStatus sets '
+                                                          'the status for the '
+                                                          'specified relations.',
+                                           'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
+                                                          'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                           'type': 'object'},
+                    'SpaceInfos': {'description': 'SpaceInfos returns a '
+                                                  'comprehensive representation of '
+                                                  'either all spaces or\n'
+                                                  'a filtered subset of the known '
+                                                  'spaces and their associated '
+                                                  'subnet details.',
+                                   'properties': {'Params': {'$ref': '#/definitions/SpaceInfosParams'},
+                                                  'Result': {'$ref': '#/definitions/SpaceInfos'}},
+                                   'type': 'object'},
+                    'Watch': {'description': 'Watch starts an NotifyWatcher for '
+                                             'each given entity.',
+                              'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                             'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
+                              'type': 'object'},
+                    'WatchCloudSpecsChanges': {'description': 'WatchCloudSpecsChanges '
+                                                              'returns a watcher '
+                                                              'for cloud spec '
+                                                              'changes.',
+                                               'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                              'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
+                                               'type': 'object'},
+                    'WatchEgressAddressesForRelations': {'description': 'WatchEgressAddressesForRelations '
+                                                                        'creates a '
+                                                                        'watcher '
+                                                                        'that '
+                                                                        'notifies '
+                                                                        'when '
+                                                                        'addresses, '
+                                                                        'from '
+                                                                        'which\n'
+                                                                        'connections '
+                                                                        'will '
+                                                                        'originate '
+                                                                        'for the '
+                                                                        'relation, '
+                                                                        'change.\n'
+                                                                        'Each '
+                                                                        'event '
+                                                                        'contains '
+                                                                        'the '
+                                                                        'entire '
+                                                                        'set of '
+                                                                        'addresses '
+                                                                        'which are '
+                                                                        'required '
+                                                                        'for '
+                                                                        'ingress '
+                                                                        'for the '
+                                                                        'relation.',
+                                                         'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                                        'Result': {'$ref': '#/definitions/StringsWatchResults'}},
+                                                         'type': 'object'},
+                    'WatchForModelConfigChanges': {'description': 'WatchForModelConfigChanges '
+                                                                  'returns a '
+                                                                  'NotifyWatcher '
+                                                                  'that observes\n'
+                                                                  'changes to the '
+                                                                  'model '
+                                                                  'configuration.\n'
+                                                                  'Note that '
+                                                                  'although the '
+                                                                  'NotifyWatchResult '
+                                                                  'contains an '
+                                                                  'Error field,\n'
+                                                                  "it's not used "
+                                                                  'because we are '
+                                                                  'only returning '
+                                                                  'a single '
+                                                                  'watcher,\n'
+                                                                  'so we use the '
+                                                                  'regular error '
+                                                                  'return.',
+                                                   'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
+                                                   'type': 'object'},
+                    'WatchIngressAddressesForRelations': {'description': 'WatchIngressAddressesForRelations '
+                                                                         'creates '
+                                                                         'a '
+                                                                         'watcher '
+                                                                         'that '
+                                                                         'returns '
+                                                                         'the '
+                                                                         'ingress '
+                                                                         'networks\n'
+                                                                         'that '
+                                                                         'have '
+                                                                         'been '
+                                                                         'recorded '
+                                                                         'against '
+                                                                         'the '
+                                                                         'specified '
+                                                                         'relations.',
+                                                          'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                                         'Result': {'$ref': '#/definitions/StringsWatchResults'}},
+                                                          'type': 'object'},
+                    'WatchModelMachineStartTimes': {'description': 'WatchModelMachineStartTimes '
+                                                                   'watches the '
+                                                                   'non-container '
+                                                                   'machines in '
+                                                                   'the model\n'
+                                                                   'for changes to '
+                                                                   'the Life or '
+                                                                   'AgentStartTime '
+                                                                   'fields and '
+                                                                   'reports them '
+                                                                   'as a batch.',
+                                                    'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
+                                                    'type': 'object'},
+                    'WatchModelMachines': {'description': 'WatchModelMachines '
+                                                          'returns a '
+                                                          'StringsWatcher that '
+                                                          'notifies of\n'
+                                                          'changes to the life '
+                                                          'cycles of the top level '
+                                                          'machines in the '
+                                                          'current\n'
+                                                          'model.',
+                                           'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
+                                           'type': 'object'},
+                    'WatchOpenedPorts': {'description': 'WatchOpenedPorts returns '
+                                                        'a new StringsWatcher for '
+                                                        'each given\n'
+                                                        'model tag.',
+                                         'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                        'Result': {'$ref': '#/definitions/StringsWatchResults'}},
+                                         'type': 'object'},
+                    'WatchSubnets': {'description': 'WatchSubnets returns a new '
+                                                    'StringsWatcher that watches '
+                                                    'the specified\n'
+                                                    'subnet tags or all tags if no '
+                                                    'entities are specified.',
+                                     'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                    'Result': {'$ref': '#/definitions/StringsWatchResult'}},
+                                     'type': 'object'},
+                    'WatchUnits': {'description': 'WatchUnits starts a '
+                                                  'StringsWatcher to watch all '
+                                                  'units belonging to\n'
+                                                  'to any entity (machine or '
+                                                  'service) passed in args.',
+                                   'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                  'Result': {'$ref': '#/definitions/StringsWatchResults'}},
+                                   'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(BoolResults)
+    async def AreManuallyProvisioned(self, entities=None):
+        '''
+        AreManuallyProvisioned returns whether each given entity is
+        manually provisioned or not. Only machine tags are accepted.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> BoolResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='AreManuallyProvisioned',
+                   version=6,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CloudSpecResults)
+    async def CloudSpec(self, entities=None):
+        '''
+        CloudSpec returns the model's cloud spec.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> CloudSpecResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='CloudSpec',
+                   version=6,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ControllerAPIInfoResults)
+    async def ControllerAPIInfoForModels(self, entities=None):
+        '''
+        ControllerAPIInfoForModels returns the controller api connection details for the specified models.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ControllerAPIInfoResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='ControllerAPIInfoForModels',
+                   version=6,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ControllerConfigResult)
+    async def ControllerConfig(self):
+        '''
+        ControllerConfig returns the controller's configuration.
+
+
+        Returns -> ControllerConfigResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='ControllerConfig',
+                   version=6,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ListFirewallRulesResults)
+    async def FirewallRules(self, known_services=None):
+        '''
+        FirewallRules returns the firewall rules for the specified well known service types.
+
+        known_services : typing.Sequence[str]
+        Returns -> ListFirewallRulesResults
+        '''
+        if known_services is not None and not isinstance(known_services, (bytes, str, list)):
+            raise Exception("Expected known_services to be a Sequence, received: {}".format(type(known_services)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='FirewallRules',
+                   version=6,
+                   params=_params)
+        _params['known-services'] = known_services
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResults)
+    async def GetAssignedMachine(self, entities=None):
+        '''
+        GetAssignedMachine returns the assigned machine tag (if any) for
+        each given unit.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='GetAssignedMachine',
+                   version=6,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CloudSpecResult)
+    async def GetCloudSpec(self):
+        '''
+        GetCloudSpec constructs the CloudSpec for a validated and authorized model.
+
+
+        Returns -> CloudSpecResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='GetCloudSpec',
+                   version=6,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ExposeInfoResults)
+    async def GetExposeInfo(self, entities=None):
+        '''
+        GetExposeInfo returns the expose flag and per-endpoint expose settings
+        for the specified applications.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ExposeInfoResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='GetExposeInfo',
+                   version=6,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResults)
+    async def InstanceId(self, entities=None):
+        '''
+        InstanceId returns the provider specific instance id for each given
+        machine or an CodeNotProvisioned error, if not set.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='InstanceId',
+                   version=6,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(LifeResults)
+    async def Life(self, entities=None):
+        '''
+        Life returns the life status of every supplied entity, where available.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> LifeResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='Life',
+                   version=6,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(MacaroonResults)
+    async def MacaroonForRelations(self, entities=None):
+        '''
+        MacaroonForRelations returns the macaroon for the specified relations.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> MacaroonResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='MacaroonForRelations',
+                   version=6,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ModelConfigResult)
+    async def ModelConfig(self):
+        '''
+        ModelConfig returns the current model's configuration.
+
+
+        Returns -> ModelConfigResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='ModelConfig',
+                   version=6,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(OpenMachinePortRangesResults)
+    async def OpenedMachinePortRanges(self, entities=None):
+        '''
+        OpenedMachinePortRanges returns a list of the opened port ranges for the
+        specified machines where each result is broken down by unit. The list of
+        opened ports for each unit is further grouped by endpoint name and includes
+        the subnet CIDRs that belong to the space that each endpoint is bound to.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> OpenMachinePortRangesResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='OpenedMachinePortRanges',
+                   version=6,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def SetRelationsStatus(self, entities=None):
+        '''
+        SetRelationsStatus sets the status for the specified relations.
+
+        entities : typing.Sequence[~EntityStatusArgs]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='SetRelationsStatus',
+                   version=6,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SpaceInfos)
+    async def SpaceInfos(self, space_ids=None):
+        '''
+        SpaceInfos returns a comprehensive representation of either all spaces or
+        a filtered subset of the known spaces and their associated subnet details.
+
+        space_ids : typing.Sequence[str]
+        Returns -> SpaceInfos
+        '''
+        if space_ids is not None and not isinstance(space_ids, (bytes, str, list)):
+            raise Exception("Expected space_ids to be a Sequence, received: {}".format(type(space_ids)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='SpaceInfos',
+                   version=6,
+                   params=_params)
+        _params['space-ids'] = space_ids
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResults)
+    async def Watch(self, entities=None):
+        '''
+        Watch starts an NotifyWatcher for each given entity.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> NotifyWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='Watch',
+                   version=6,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResults)
+    async def WatchCloudSpecsChanges(self, entities=None):
+        '''
+        WatchCloudSpecsChanges returns a watcher for cloud spec changes.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> NotifyWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='WatchCloudSpecsChanges',
+                   version=6,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResults)
+    async def WatchEgressAddressesForRelations(self, entities=None):
+        '''
+        WatchEgressAddressesForRelations creates a watcher that notifies when addresses, from which
+        connections will originate for the relation, change.
+        Each event contains the entire set of addresses which are required for ingress for the relation.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringsWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='WatchEgressAddressesForRelations',
+                   version=6,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResult)
+    async def WatchForModelConfigChanges(self):
+        '''
+        WatchForModelConfigChanges returns a NotifyWatcher that observes
+        changes to the model configuration.
+        Note that although the NotifyWatchResult contains an Error field,
+        it's not used because we are only returning a single watcher,
+        so we use the regular error return.
+
+
+        Returns -> NotifyWatchResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='WatchForModelConfigChanges',
+                   version=6,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResults)
+    async def WatchIngressAddressesForRelations(self, entities=None):
+        '''
+        WatchIngressAddressesForRelations creates a watcher that returns the ingress networks
+        that have been recorded against the specified relations.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringsWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='WatchIngressAddressesForRelations',
+                   version=6,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResult)
+    async def WatchModelMachineStartTimes(self):
+        '''
+        WatchModelMachineStartTimes watches the non-container machines in the model
+        for changes to the Life or AgentStartTime fields and reports them as a batch.
+
+
+        Returns -> StringsWatchResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='WatchModelMachineStartTimes',
+                   version=6,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResult)
+    async def WatchModelMachines(self):
+        '''
+        WatchModelMachines returns a StringsWatcher that notifies of
+        changes to the life cycles of the top level machines in the current
+        model.
+
+
+        Returns -> StringsWatchResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='WatchModelMachines',
+                   version=6,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResults)
+    async def WatchOpenedPorts(self, entities=None):
+        '''
+        WatchOpenedPorts returns a new StringsWatcher for each given
+        model tag.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringsWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='WatchOpenedPorts',
+                   version=6,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResult)
+    async def WatchSubnets(self, entities=None):
+        '''
+        WatchSubnets returns a new StringsWatcher that watches the specified
+        subnet tags or all tags if no entities are specified.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringsWatchResult
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='WatchSubnets',
+                   version=6,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResults)
+    async def WatchUnits(self, entities=None):
+        '''
+        WatchUnits starts a StringsWatcher to watch all units belonging to
+        to any entity (machine or service) passed in args.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringsWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='WatchUnits',
+                   version=6,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
 class MachineManagerFacade(Type):
     name = 'MachineManager'
     version = 6
@@ -1559,7 +2707,9 @@ class MachineManagerFacade(Type):
                                             'required': ['machines'],
                                             'type': 'object'},
                      'Address': {'additionalProperties': False,
-                                 'properties': {'scope': {'type': 'string'},
+                                 'properties': {'cidr': {'type': 'string'},
+                                                'is-secondary': {'type': 'boolean'},
+                                                'scope': {'type': 'string'},
                                                 'space-id': {'type': 'string'},
                                                 'space-name': {'type': 'string'},
                                                 'type': {'type': 'string'},
@@ -1719,7 +2869,8 @@ class MachineManagerFacade(Type):
                                                    'required': ['Results'],
                                                    'type': 'object'},
                      'Value': {'additionalProperties': False,
-                               'properties': {'arch': {'type': 'string'},
+                               'properties': {'allocate-public-ip': {'type': 'boolean'},
+                                              'arch': {'type': 'string'},
                                               'container': {'type': 'string'},
                                               'cores': {'type': 'integer'},
                                               'cpu-power': {'type': 'integer'},
@@ -1796,7 +2947,7 @@ class MachineManagerFacade(Type):
                     'UpgradeSeriesComplete': {'description': 'UpgradeSeriesComplete '
                                                              'marks a machine as '
                                                              'having completed a '
-                                                             'managed series '
+                                                             'managed series\n'
                                                              'upgrade.',
                                               'properties': {'Params': {'$ref': '#/definitions/UpdateSeriesArg'},
                                                              'Result': {'$ref': '#/definitions/ErrorResult'}},
@@ -1829,7 +2980,8 @@ class MachineManagerFacade(Type):
                                                                        'returns a '
                                                                        'watcher '
                                                                        'that fires '
-                                                                       'on upgrade '
+                                                                       'on '
+                                                                       'upgrade\n'
                                                                        'series '
                                                                        'events.',
                                                         'properties': {'Params': {'$ref': '#/definitions/Entities'},
@@ -1999,7 +3151,8 @@ class MachineManagerFacade(Type):
     @ReturnMapping(ErrorResult)
     async def UpgradeSeriesComplete(self, force=None, series=None, tag=None):
         '''
-        UpgradeSeriesComplete marks a machine as having completed a managed series upgrade.
+        UpgradeSeriesComplete marks a machine as having completed a managed series
+        upgrade.
 
         force : bool
         series : str
@@ -2091,7 +3244,8 @@ class MachineManagerFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def WatchUpgradeSeriesNotifications(self, entities=None):
         '''
-        WatchUpgradeSeriesNotifications returns a watcher that fires on upgrade series events.
+        WatchUpgradeSeriesNotifications returns a watcher that fires on upgrade
+        series events.
 
         entities : typing.Sequence[~Entity]
         Returns -> NotifyWatchResults

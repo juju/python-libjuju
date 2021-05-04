@@ -7,7 +7,7 @@ from juju.client._definitions import *
 
 class UniterFacade(Type):
     name = 'Uniter'
-    version = 16
+    version = 17
     schema =     {'definitions': {'APIHostPortsResult': {'additionalProperties': False,
                                             'properties': {'servers': {'items': {'items': {'$ref': '#/definitions/HostPort'},
                                                                                  'type': 'array'},
@@ -69,7 +69,9 @@ class UniterFacade(Type):
                                                                   'type': 'array'}},
                                        'type': 'object'},
                      'Address': {'additionalProperties': False,
-                                 'properties': {'scope': {'type': 'string'},
+                                 'properties': {'cidr': {'type': 'string'},
+                                                'is-secondary': {'type': 'boolean'},
+                                                'scope': {'type': 'string'},
                                                 'space-id': {'type': 'string'},
                                                 'space-name': {'type': 'string'},
                                                 'type': {'type': 'string'},
@@ -136,8 +138,10 @@ class UniterFacade(Type):
                                                   'credential': {'$ref': '#/definitions/CloudCredential'},
                                                   'endpoint': {'type': 'string'},
                                                   'identity-endpoint': {'type': 'string'},
+                                                  'is-controller-cloud': {'type': 'boolean'},
                                                   'name': {'type': 'string'},
                                                   'region': {'type': 'string'},
+                                                  'skip-tls-verify': {'type': 'boolean'},
                                                   'storage-endpoint': {'type': 'string'},
                                                   'type': {'type': 'string'}},
                                    'required': ['type', 'name'],
@@ -210,14 +214,16 @@ class UniterFacade(Type):
                                         'required': ['tag', 'charm-url'],
                                         'type': 'object'},
                      'EntityPortRange': {'additionalProperties': False,
-                                         'properties': {'from-port': {'type': 'integer'},
+                                         'properties': {'endpoint': {'type': 'string'},
+                                                        'from-port': {'type': 'integer'},
                                                         'protocol': {'type': 'string'},
                                                         'tag': {'type': 'string'},
                                                         'to-port': {'type': 'integer'}},
                                          'required': ['tag',
                                                       'protocol',
                                                       'from-port',
-                                                      'to-port'],
+                                                      'to-port',
+                                                      'endpoint'],
                                          'type': 'object'},
                      'EntityStatusArgs': {'additionalProperties': False,
                                           'properties': {'data': {'patternProperties': {'.*': {'additionalProperties': True,
@@ -300,6 +306,8 @@ class UniterFacade(Type):
                                          'type': 'object'},
                      'HostPort': {'additionalProperties': False,
                                   'properties': {'Address': {'$ref': '#/definitions/Address'},
+                                                 'cidr': {'type': 'string'},
+                                                 'is-secondary': {'type': 'boolean'},
                                                  'port': {'type': 'integer'},
                                                  'scope': {'type': 'string'},
                                                  'space-id': {'type': 'string'},
@@ -464,6 +472,25 @@ class UniterFacade(Type):
                                                                        'type': 'array'}},
                                             'required': ['results'],
                                             'type': 'object'},
+                     'OpenMachinePortRangesByEndpointResult': {'additionalProperties': False,
+                                                               'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                                              'unit-port-ranges': {'patternProperties': {'.*': {'items': {'$ref': '#/definitions/OpenUnitPortRangesByEndpoint'},
+                                                                                                                                'type': 'array'}},
+                                                                                                   'type': 'object'}},
+                                                               'required': ['unit-port-ranges'],
+                                                               'type': 'object'},
+                     'OpenMachinePortRangesByEndpointResults': {'additionalProperties': False,
+                                                                'properties': {'results': {'items': {'$ref': '#/definitions/OpenMachinePortRangesByEndpointResult'},
+                                                                                           'type': 'array'}},
+                                                                'required': ['results'],
+                                                                'type': 'object'},
+                     'OpenUnitPortRangesByEndpoint': {'additionalProperties': False,
+                                                      'properties': {'endpoint': {'type': 'string'},
+                                                                     'port-ranges': {'items': {'$ref': '#/definitions/PortRange'},
+                                                                                     'type': 'array'}},
+                                                      'required': ['endpoint',
+                                                                   'port-ranges'],
+                                                      'type': 'object'},
                      'PodSpec': {'additionalProperties': False,
                                  'properties': {'spec': {'type': 'string'},
                                                 'tag': {'type': 'string'}},
@@ -853,7 +880,20 @@ class UniterFacade(Type):
                     'AllMachinePorts': {'description': 'AllMachinePorts returns '
                                                        'all opened port ranges for '
                                                        'each given\n'
-                                                       'machine (on all networks).',
+                                                       'machine (on all '
+                                                       'networks).\n'
+                                                       '\n'
+                                                       'DEPRECATED: clients should '
+                                                       'switch to the '
+                                                       'OpenedMachinePortRanges '
+                                                       'API call\n'
+                                                       'when using the V17+ API.\n'
+                                                       '\n'
+                                                       'TODO(achilleasa): remove '
+                                                       'from V17 once all client '
+                                                       'references to this API\n'
+                                                       'have been changed to use '
+                                                       'the new API.',
                                         'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                        'Result': {'$ref': '#/definitions/MachinePortsResults'}},
                                         'type': 'object'},
@@ -1105,9 +1145,14 @@ class UniterFacade(Type):
                                     'properties': {'Result': {'$ref': '#/definitions/ModelConfigResult'}},
                                     'type': 'object'},
                     'ModelUUID': {'description': 'ModelUUID returns the model UUID '
-                                                 'to connect to the model\n'
-                                                 'that the current connection is '
-                                                 'for.',
+                                                 'that this unit resides in.\n'
+                                                 'It is implemented here directly '
+                                                 'as a result of removing it from\n'
+                                                 'embedded APIAddresser *without* '
+                                                 'bumping the facade version.\n'
+                                                 'It should be blanked when this '
+                                                 'facade version is next '
+                                                 'incremented.',
                                   'properties': {'Result': {'$ref': '#/definitions/StringResult'}},
                                   'type': 'object'},
                     'NetworkInfo': {'description': 'NetworkInfo returns network '
@@ -1116,12 +1161,26 @@ class UniterFacade(Type):
                                     'properties': {'Params': {'$ref': '#/definitions/NetworkInfoParams'},
                                                    'Result': {'$ref': '#/definitions/NetworkInfoResults'}},
                                     'type': 'object'},
-                    'OpenPorts': {'description': 'OpenPorts sets the policy of the '
-                                                 'port range with protocol to be\n'
-                                                 'opened, for all given units.',
-                                  'properties': {'Params': {'$ref': '#/definitions/EntitiesPortRanges'},
+                    'OpenPorts': {'properties': {'Params': {'$ref': '#/definitions/EntitiesPortRanges'},
                                                  'Result': {'$ref': '#/definitions/ErrorResults'}},
                                   'type': 'object'},
+                    'OpenedMachinePortRangesByEndpoint': {'description': 'OpenedMachinePortRangesByEndpoint '
+                                                                         'returns '
+                                                                         'the port '
+                                                                         'ranges '
+                                                                         'opened '
+                                                                         'by each\n'
+                                                                         'unit on '
+                                                                         'the '
+                                                                         'provided '
+                                                                         'machines '
+                                                                         'grouped '
+                                                                         'by '
+                                                                         'application '
+                                                                         'endpoint.',
+                                                          'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                                         'Result': {'$ref': '#/definitions/OpenMachinePortRangesByEndpointResults'}},
+                                                          'type': 'object'},
                     'PrivateAddress': {'description': 'PrivateAddress returns the '
                                                       'private address for each '
                                                       'given unit, if set.',
@@ -1638,7 +1697,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='APIAddresses',
-                   version=16,
+                   version=17,
                    params=_params)
 
         reply = await self.rpc(msg)
@@ -1659,7 +1718,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='APIHostPorts',
-                   version=16,
+                   version=17,
                    params=_params)
 
         reply = await self.rpc(msg)
@@ -1682,7 +1741,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='ActionStatus',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -1706,7 +1765,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='Actions',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -1729,7 +1788,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='AddMetricBatches',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['batches'] = batches
         reply = await self.rpc(msg)
@@ -1754,7 +1813,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='AddUnitStorage',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['storages'] = storages
         reply = await self.rpc(msg)
@@ -1768,6 +1827,12 @@ class UniterFacade(Type):
         AllMachinePorts returns all opened port ranges for each given
         machine (on all networks).
 
+        DEPRECATED: clients should switch to the OpenedMachinePortRanges API call
+        when using the V17+ API.
+
+        TODO(achilleasa): remove from V17 once all client references to this API
+        have been changed to use the new API.
+
         entities : typing.Sequence[~Entity]
         Returns -> MachinePortsResults
         '''
@@ -1778,7 +1843,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='AllMachinePorts',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -1802,7 +1867,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='ApplicationStatus',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -1827,7 +1892,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='AssignedMachine',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -1850,7 +1915,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='AvailabilityZone',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -1873,7 +1938,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='BeginActions',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -1896,7 +1961,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='CanApplyLXDProfile',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -1920,7 +1985,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='CharmArchiveSha256',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['urls'] = urls
         reply = await self.rpc(msg)
@@ -1944,7 +2009,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='CharmModifiedVersion',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -1967,7 +2032,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='CharmURL',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -1990,7 +2055,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='ClearResolved',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -2014,7 +2079,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='ClosePorts',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -2035,7 +2100,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='CloudAPIVersion',
-                   version=16,
+                   version=17,
                    params=_params)
 
         reply = await self.rpc(msg)
@@ -2059,7 +2124,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='CloudSpec',
-                   version=16,
+                   version=17,
                    params=_params)
 
         reply = await self.rpc(msg)
@@ -2084,7 +2149,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='CommitHookChanges',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['args'] = args
         reply = await self.rpc(msg)
@@ -2108,7 +2173,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='ConfigSettings',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -2129,7 +2194,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='CurrentModel',
-                   version=16,
+                   version=17,
                    params=_params)
 
         reply = await self.rpc(msg)
@@ -2153,7 +2218,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='Destroy',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -2176,7 +2241,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='DestroyAllSubordinates',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -2200,7 +2265,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='DestroyUnitStorageAttachments',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -2225,7 +2290,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='EnsureDead',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -2250,7 +2315,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='EnterScope',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['relation-units'] = relation_units
         reply = await self.rpc(msg)
@@ -2273,7 +2338,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='FinishActions',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['results'] = results
         reply = await self.rpc(msg)
@@ -2294,7 +2359,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='GetMeterStatus',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -2317,7 +2382,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='GetPodSpec',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -2341,7 +2406,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='GetPrincipal',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -2364,7 +2429,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='GetRawK8sSpec',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -2387,7 +2452,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='GoalStates',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -2410,7 +2475,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='HasSubordinates',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -2433,7 +2498,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='LXDProfileName',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -2456,7 +2521,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='LXDProfileRequired',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['urls'] = urls
         reply = await self.rpc(msg)
@@ -2481,7 +2546,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='LeaveScope',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['relation-units'] = relation_units
         reply = await self.rpc(msg)
@@ -2504,7 +2569,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='Life',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -2527,7 +2592,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='LogActionsMessages',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['messages'] = messages
         reply = await self.rpc(msg)
@@ -2551,7 +2616,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='Merge',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['params'] = params
         reply = await self.rpc(msg)
@@ -2572,7 +2637,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='ModelConfig',
-                   version=16,
+                   version=17,
                    params=_params)
 
         reply = await self.rpc(msg)
@@ -2583,8 +2648,10 @@ class UniterFacade(Type):
     @ReturnMapping(StringResult)
     async def ModelUUID(self):
         '''
-        ModelUUID returns the model UUID to connect to the model
-        that the current connection is for.
+        ModelUUID returns the model UUID that this unit resides in.
+        It is implemented here directly as a result of removing it from
+        embedded APIAddresser *without* bumping the facade version.
+        It should be blanked when this facade version is next incremented.
 
 
         Returns -> StringResult
@@ -2594,7 +2661,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='ModelUUID',
-                   version=16,
+                   version=17,
                    params=_params)
 
         reply = await self.rpc(msg)
@@ -2625,7 +2692,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='NetworkInfo',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['bindings'] = bindings
         _params['relation-id'] = relation_id
@@ -2638,9 +2705,6 @@ class UniterFacade(Type):
     @ReturnMapping(ErrorResults)
     async def OpenPorts(self, entities=None):
         '''
-        OpenPorts sets the policy of the port range with protocol to be
-        opened, for all given units.
-
         entities : typing.Sequence[~EntityPortRange]
         Returns -> ErrorResults
         '''
@@ -2651,7 +2715,31 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='OpenPorts',
-                   version=16,
+                   version=17,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(OpenMachinePortRangesByEndpointResults)
+    async def OpenedMachinePortRangesByEndpoint(self, entities=None):
+        '''
+        OpenedMachinePortRangesByEndpoint returns the port ranges opened by each
+        unit on the provided machines grouped by application endpoint.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> OpenMachinePortRangesByEndpointResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='OpenedMachinePortRangesByEndpoint',
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -2674,7 +2762,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='PrivateAddress',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -2700,7 +2788,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='ProviderType',
-                   version=16,
+                   version=17,
                    params=_params)
 
         reply = await self.rpc(msg)
@@ -2723,7 +2811,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='PublicAddress',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -2747,7 +2835,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='Read',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -2775,7 +2863,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='ReadLocalApplicationSettings',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['relation'] = relation
         _params['unit'] = unit
@@ -2800,7 +2888,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='ReadRemoteSettings',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['relation-unit-pairs'] = relation_unit_pairs
         reply = await self.rpc(msg)
@@ -2828,7 +2916,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='ReadSettings',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['relation-units'] = relation_units
         reply = await self.rpc(msg)
@@ -2851,7 +2939,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='Refresh',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -2875,7 +2963,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='Relation',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['relation-units'] = relation_units
         reply = await self.rpc(msg)
@@ -2900,7 +2988,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='RelationById',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['relation-ids'] = relation_ids
         reply = await self.rpc(msg)
@@ -2923,7 +3011,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='RelationsStatus',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -2947,7 +3035,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='RemoveStorageAttachments',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['ids'] = ids
         reply = await self.rpc(msg)
@@ -2970,7 +3058,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='RequestReboot',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -2993,7 +3081,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='Resolved',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -3014,7 +3102,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='SLALevel',
-                   version=16,
+                   version=17,
                    params=_params)
 
         reply = await self.rpc(msg)
@@ -3038,7 +3126,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='SetAgentStatus',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -3062,7 +3150,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='SetApplicationStatus',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -3086,7 +3174,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='SetCharmURL',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -3109,7 +3197,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='SetRelationStatus',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['args'] = args
         reply = await self.rpc(msg)
@@ -3133,7 +3221,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='SetState',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['args'] = args
         reply = await self.rpc(msg)
@@ -3158,7 +3246,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='SetStatus',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -3183,7 +3271,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='SetUnitStatus',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -3207,7 +3295,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='SetUpgradeSeriesUnitStatus',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['params'] = params
         reply = await self.rpc(msg)
@@ -3231,7 +3319,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='SetWorkloadVersion',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -3255,7 +3343,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='State',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -3279,7 +3367,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='StorageAttachmentLife',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['ids'] = ids
         reply = await self.rpc(msg)
@@ -3302,7 +3390,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='StorageAttachments',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['ids'] = ids
         reply = await self.rpc(msg)
@@ -3325,7 +3413,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='UnitStatus',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -3348,7 +3436,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='UnitStorageAttachments',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -3372,7 +3460,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='UpdateNetworkInfo',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -3397,7 +3485,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='UpdateSettings',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['relation-units'] = relation_units
         reply = await self.rpc(msg)
@@ -3422,7 +3510,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='UpgradeSeriesUnitStatus',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -3445,7 +3533,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='Watch',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -3466,7 +3554,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='WatchAPIHostPorts',
-                   version=16,
+                   version=17,
                    params=_params)
 
         reply = await self.rpc(msg)
@@ -3492,7 +3580,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='WatchActionNotifications',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -3519,7 +3607,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='WatchConfigSettingsHash',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -3544,7 +3632,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='WatchForModelConfigChanges',
-                   version=16,
+                   version=17,
                    params=_params)
 
         reply = await self.rpc(msg)
@@ -3567,7 +3655,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='WatchInstanceData',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -3591,7 +3679,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='WatchLeadershipSettings',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -3612,7 +3700,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='WatchMeterStatus',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -3637,7 +3725,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='WatchRelationUnits',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['relation-units'] = relation_units
         reply = await self.rpc(msg)
@@ -3662,7 +3750,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='WatchStorageAttachments',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['ids'] = ids
         reply = await self.rpc(msg)
@@ -3688,7 +3776,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='WatchTrustConfigSettingsHash',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -3714,7 +3802,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='WatchUnitAddressesHash',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -3741,7 +3829,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='WatchUnitRelations',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -3766,7 +3854,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='WatchUnitStorageAttachments',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -3789,7 +3877,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='WatchUpgradeSeriesNotifications',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
@@ -3812,7 +3900,7 @@ class UniterFacade(Type):
         _params = dict()
         msg = dict(type='Uniter',
                    request='WorkloadVersion',
-                   version=16,
+                   version=17,
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
