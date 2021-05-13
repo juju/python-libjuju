@@ -199,7 +199,6 @@ class TestAddApplicationChangeRun:
                                          devices="devices",
                                          num_units="num_units")
 
-
     @pytest.mark.asyncio
     async def test_run_with_charmhub_charm(self, event_loop):
         change = AddApplicationChange(1, [], params={"charm": "charm",

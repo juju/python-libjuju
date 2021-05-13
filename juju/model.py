@@ -1432,7 +1432,6 @@ class Model:
         entity_url = str(entity_url)
         if is_local_charm(entity_url) and not entity_url.startswith("local:"):
             entity_url = "local:{}".format(entity_url)
-        print("!!!", entity_url)
         url = URL.parse(str(entity_url))
         architecture = await self._resolve_architecture(url)
 

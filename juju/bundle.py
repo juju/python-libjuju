@@ -16,7 +16,6 @@ from .constraints import parse as parse_constraints, parse_storage_constraint, p
 from .errors import JujuError
 from .origin import Channel
 from .url import Schema, URL
-from .version import LTS_RELEASES
 
 log = logging.getLogger(__name__)
 
@@ -260,6 +259,7 @@ class BundleHandler:
                 spec['charm'] = str(charm_url)
             else:
                 results = await self.model.charmstore.entity(str(charm_url))
+                charm_url = results.get('Id', charm_url)
                 charm_origin = client.CharmOrigin(source="charm-store",
                                                   risk=risk,
                                                   track=track)

@@ -110,7 +110,7 @@ async def test_deploy_charmhub_charm(event_loop):
         app = await model.deploy('hello-juju')
         await model.block_until(lambda: (len(app.units) > 0 and
                                          app.units[0].machine))
-        assert 'hello-juju' in app.data['charm-url'] 
+        assert 'hello-juju' in app.data['charm-url']
 
 
 @base.bootstrapped

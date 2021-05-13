@@ -16,7 +16,7 @@ async def main():
     await controller.connect()
 
     bundles = [('cs:~juju-qa/bundle/basic-0', 'beta'), ('juju-qa-bundle-test', None)]
-    for i in range(len(bundles)): 
+    for i in range(len(bundles)):
         deployment = bundles[i]
         model = await controller.add_model('model{}'.format(i))
 
