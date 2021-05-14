@@ -3020,6 +3020,7 @@ class CAASUnitProvisionerFacade(Type):
     version = 2
     schema =     {'definitions': {'Address': {'additionalProperties': False,
                                  'properties': {'cidr': {'type': 'string'},
+                                                'config-type': {'type': 'string'},
                                                 'is-secondary': {'type': 'boolean'},
                                                 'scope': {'type': 'string'},
                                                 'space-id': {'type': 'string'},

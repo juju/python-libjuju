@@ -2833,6 +2833,7 @@ class CAASModelOperatorFacade(Type):
                                             'type': 'object'},
                      'Address': {'additionalProperties': False,
                                  'properties': {'cidr': {'type': 'string'},
+                                                'config-type': {'type': 'string'},
                                                 'is-secondary': {'type': 'boolean'},
                                                 'scope': {'type': 'string'},
                                                 'space-id': {'type': 'string'},
@@ -2870,6 +2871,7 @@ class CAASModelOperatorFacade(Type):
                      'HostPort': {'additionalProperties': False,
                                   'properties': {'Address': {'$ref': '#/definitions/Address'},
                                                  'cidr': {'type': 'string'},
+                                                 'config-type': {'type': 'string'},
                                                  'is-secondary': {'type': 'boolean'},
                                                  'port': {'type': 'integer'},
                                                  'scope': {'type': 'string'},
@@ -3108,6 +3110,7 @@ class CAASOperatorFacade(Type):
                                             'type': 'object'},
                      'Address': {'additionalProperties': False,
                                  'properties': {'cidr': {'type': 'string'},
+                                                'config-type': {'type': 'string'},
                                                 'is-secondary': {'type': 'boolean'},
                                                 'scope': {'type': 'string'},
                                                 'space-id': {'type': 'string'},
@@ -3208,6 +3211,7 @@ class CAASOperatorFacade(Type):
                      'HostPort': {'additionalProperties': False,
                                   'properties': {'Address': {'$ref': '#/definitions/Address'},
                                                  'cidr': {'type': 'string'},
+                                                 'config-type': {'type': 'string'},
                                                  'is-secondary': {'type': 'boolean'},
                                                  'port': {'type': 'integer'},
                                                  'scope': {'type': 'string'},
@@ -3729,6 +3733,7 @@ class CAASOperatorProvisionerFacade(Type):
                                             'type': 'object'},
                      'Address': {'additionalProperties': False,
                                  'properties': {'cidr': {'type': 'string'},
+                                                'config-type': {'type': 'string'},
                                                 'is-secondary': {'type': 'boolean'},
                                                 'scope': {'type': 'string'},
                                                 'space-id': {'type': 'string'},
@@ -3775,6 +3780,7 @@ class CAASOperatorProvisionerFacade(Type):
                      'HostPort': {'additionalProperties': False,
                                   'properties': {'Address': {'$ref': '#/definitions/Address'},
                                                  'cidr': {'type': 'string'},
+                                                 'config-type': {'type': 'string'},
                                                  'is-secondary': {'type': 'boolean'},
                                                  'port': {'type': 'integer'},
                                                  'scope': {'type': 'string'},
@@ -7590,6 +7596,7 @@ class DeployerFacade(Type):
                                             'type': 'object'},
                      'Address': {'additionalProperties': False,
                                  'properties': {'cidr': {'type': 'string'},
+                                                'config-type': {'type': 'string'},
                                                 'is-secondary': {'type': 'boolean'},
                                                 'scope': {'type': 'string'},
                                                 'space-id': {'type': 'string'},
@@ -7653,6 +7660,7 @@ class DeployerFacade(Type):
                      'HostPort': {'additionalProperties': False,
                                   'properties': {'Address': {'$ref': '#/definitions/Address'},
                                                  'cidr': {'type': 'string'},
+                                                 'config-type': {'type': 'string'},
                                                  'is-secondary': {'type': 'boolean'},
                                                  'port': {'type': 'integer'},
                                                  'scope': {'type': 'string'},
@@ -14857,7 +14865,8 @@ class UndertakerFacade(Type):
                                    'required': ['entities'],
                                    'type': 'object'},
                      'UndertakerModelInfo': {'additionalProperties': False,
-                                             'properties': {'force-destroyed': {'type': 'boolean'},
+                                             'properties': {'destroy-timeout': {'type': 'integer'},
+                                                            'force-destroyed': {'type': 'boolean'},
                                                             'global-name': {'type': 'string'},
                                                             'is-system': {'type': 'boolean'},
                                                             'life': {'type': 'string'},
@@ -14867,8 +14876,7 @@ class UndertakerFacade(Type):
                                                           'name',
                                                           'global-name',
                                                           'is-system',
-                                                          'life',
-                                                          'force-destroyed'],
+                                                          'life'],
                                              'type': 'object'},
                      'UndertakerModelInfoResult': {'additionalProperties': False,
                                                    'properties': {'error': {'$ref': '#/definitions/Error'},
@@ -14920,7 +14928,8 @@ class UndertakerFacade(Type):
                                                            'changes to the '
                                                            'lifecycle of an\n'
                                                            "model's machines and "
-                                                           'services.',
+                                                           'applications and '
+                                                           'storage.',
                                             'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
                                             'type': 'object'}},
      'type': 'object'}
@@ -15064,7 +15073,7 @@ class UndertakerFacade(Type):
     async def WatchModelResources(self):
         '''
         WatchModelResources creates watchers for changes to the lifecycle of an
-        model's machines and services.
+        model's machines and applications and storage.
 
 
         Returns -> NotifyWatchResults
@@ -15788,12 +15797,10 @@ class UpgraderFacade(Type):
                                'required': ['version', 'url', 'size'],
                                'type': 'object'},
                      'ToolsResult': {'additionalProperties': False,
-                                     'properties': {'disable-ssl-hostname-verification': {'type': 'boolean'},
-                                                    'error': {'$ref': '#/definitions/Error'},
+                                     'properties': {'error': {'$ref': '#/definitions/Error'},
                                                     'tools': {'items': {'$ref': '#/definitions/Tools'},
                                                               'type': 'array'}},
-                                     'required': ['tools',
-                                                  'disable-ssl-hostname-verification'],
+                                     'required': ['tools'],
                                      'type': 'object'},
                      'ToolsResults': {'additionalProperties': False,
                                       'properties': {'results': {'items': {'$ref': '#/definitions/ToolsResult'},

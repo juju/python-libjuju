@@ -1502,7 +1502,8 @@ class CharmsFacade(Type):
                      'Macaroon': {'additionalProperties': False, 'type': 'object'},
                      'ResolveCharmWithChannel': {'additionalProperties': False,
                                                  'properties': {'charm-origin': {'$ref': '#/definitions/CharmOrigin'},
-                                                                'reference': {'type': 'string'}},
+                                                                'reference': {'type': 'string'},
+                                                                'switch-charm': {'type': 'boolean'}},
                                                  'required': ['reference',
                                                               'charm-origin'],
                                                  'type': 'object'},
@@ -1887,6 +1888,7 @@ class InstancePollerFacade(Type):
     version = 4
     schema =     {'definitions': {'Address': {'additionalProperties': False,
                                  'properties': {'cidr': {'type': 'string'},
+                                                'config-type': {'type': 'string'},
                                                 'is-secondary': {'type': 'boolean'},
                                                 'scope': {'type': 'string'},
                                                 'space-id': {'type': 'string'},

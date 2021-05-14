@@ -1235,11 +1235,12 @@ class AddUsers(Type):
 
 
 class Address(Type):
-    _toSchema = {'cidr': 'cidr', 'is_secondary': 'is-secondary', 'scope': 'scope', 'space_id': 'space-id', 'space_name': 'space-name', 'type_': 'type', 'value': 'value'}
-    _toPy = {'cidr': 'cidr', 'is-secondary': 'is_secondary', 'scope': 'scope', 'space-id': 'space_id', 'space-name': 'space_name', 'type': 'type_', 'value': 'value'}
-    def __init__(self, cidr=None, is_secondary=None, scope=None, space_id=None, space_name=None, type_=None, value=None, **unknown_fields):
+    _toSchema = {'cidr': 'cidr', 'config_type': 'config-type', 'is_secondary': 'is-secondary', 'scope': 'scope', 'space_id': 'space-id', 'space_name': 'space-name', 'type_': 'type', 'value': 'value'}
+    _toPy = {'cidr': 'cidr', 'config-type': 'config_type', 'is-secondary': 'is_secondary', 'scope': 'scope', 'space-id': 'space_id', 'space-name': 'space_name', 'type': 'type_', 'value': 'value'}
+    def __init__(self, cidr=None, config_type=None, is_secondary=None, scope=None, space_id=None, space_name=None, type_=None, value=None, **unknown_fields):
         '''
         cidr : str
+        config_type : str
         is_secondary : bool
         scope : str
         space_id : str
@@ -1248,6 +1249,7 @@ class Address(Type):
         value : str
         '''
         cidr_ = cidr
+        config_type_ = config_type
         is_secondary_ = is_secondary
         scope_ = scope
         space_id_ = space_id
@@ -1258,6 +1260,9 @@ class Address(Type):
         # Validate arguments against known Juju API types.
         if cidr_ is not None and not isinstance(cidr_, (bytes, str)):
             raise Exception("Expected cidr_ to be a str, received: {}".format(type(cidr_)))
+
+        if config_type_ is not None and not isinstance(config_type_, (bytes, str)):
+            raise Exception("Expected config_type_ to be a str, received: {}".format(type(config_type_)))
 
         if is_secondary_ is not None and not isinstance(is_secondary_, bool):
             raise Exception("Expected is_secondary_ to be a bool, received: {}".format(type(is_secondary_)))
@@ -1278,6 +1283,7 @@ class Address(Type):
             raise Exception("Expected value_ to be a str, received: {}".format(type(value_)))
 
         self.cidr = cidr_
+        self.config_type = config_type_
         self.is_secondary = is_secondary_
         self.scope = scope_
         self.space_id = space_id_
@@ -8437,19 +8443,21 @@ class DestroyMachinesParams(Type):
 
 
 class DestroyModelParams(Type):
-    _toSchema = {'destroy_storage': 'destroy-storage', 'force': 'force', 'max_wait': 'max-wait', 'model_tag': 'model-tag'}
-    _toPy = {'destroy-storage': 'destroy_storage', 'force': 'force', 'max-wait': 'max_wait', 'model-tag': 'model_tag'}
-    def __init__(self, destroy_storage=None, force=None, max_wait=None, model_tag=None, **unknown_fields):
+    _toSchema = {'destroy_storage': 'destroy-storage', 'force': 'force', 'max_wait': 'max-wait', 'model_tag': 'model-tag', 'timeout': 'timeout'}
+    _toPy = {'destroy-storage': 'destroy_storage', 'force': 'force', 'max-wait': 'max_wait', 'model-tag': 'model_tag', 'timeout': 'timeout'}
+    def __init__(self, destroy_storage=None, force=None, max_wait=None, model_tag=None, timeout=None, **unknown_fields):
         '''
         destroy_storage : bool
         force : bool
         max_wait : int
         model_tag : str
+        timeout : int
         '''
         destroy_storage_ = destroy_storage
         force_ = force
         max_wait_ = max_wait
         model_tag_ = model_tag
+        timeout_ = timeout
 
         # Validate arguments against known Juju API types.
         if destroy_storage_ is not None and not isinstance(destroy_storage_, bool):
@@ -8464,10 +8472,14 @@ class DestroyModelParams(Type):
         if model_tag_ is not None and not isinstance(model_tag_, (bytes, str)):
             raise Exception("Expected model_tag_ to be a str, received: {}".format(type(model_tag_)))
 
+        if timeout_ is not None and not isinstance(timeout_, int):
+            raise Exception("Expected timeout_ to be a int, received: {}".format(type(timeout_)))
+
         self.destroy_storage = destroy_storage_
         self.force = force_
         self.max_wait = max_wait_
         self.model_tag = model_tag_
+        self.timeout = timeout_
         self.unknown_fields = unknown_fields
 
 
@@ -11341,12 +11353,13 @@ class HostNetworkChangeResults(Type):
 
 
 class HostPort(Type):
-    _toSchema = {'address': 'Address', 'cidr': 'cidr', 'is_secondary': 'is-secondary', 'port': 'port', 'scope': 'scope', 'space_id': 'space-id', 'space_name': 'space-name', 'type_': 'type', 'value': 'value'}
-    _toPy = {'Address': 'address', 'cidr': 'cidr', 'is-secondary': 'is_secondary', 'port': 'port', 'scope': 'scope', 'space-id': 'space_id', 'space-name': 'space_name', 'type': 'type_', 'value': 'value'}
-    def __init__(self, address=None, cidr=None, is_secondary=None, port=None, scope=None, space_id=None, space_name=None, type_=None, value=None, **unknown_fields):
+    _toSchema = {'address': 'Address', 'cidr': 'cidr', 'config_type': 'config-type', 'is_secondary': 'is-secondary', 'port': 'port', 'scope': 'scope', 'space_id': 'space-id', 'space_name': 'space-name', 'type_': 'type', 'value': 'value'}
+    _toPy = {'Address': 'address', 'cidr': 'cidr', 'config-type': 'config_type', 'is-secondary': 'is_secondary', 'port': 'port', 'scope': 'scope', 'space-id': 'space_id', 'space-name': 'space_name', 'type': 'type_', 'value': 'value'}
+    def __init__(self, address=None, cidr=None, config_type=None, is_secondary=None, port=None, scope=None, space_id=None, space_name=None, type_=None, value=None, **unknown_fields):
         '''
         address : Address
         cidr : str
+        config_type : str
         is_secondary : bool
         port : int
         scope : str
@@ -11357,6 +11370,7 @@ class HostPort(Type):
         '''
         address_ = Address.from_json(address) if address else None
         cidr_ = cidr
+        config_type_ = config_type
         is_secondary_ = is_secondary
         port_ = port
         scope_ = scope
@@ -11371,6 +11385,9 @@ class HostPort(Type):
 
         if cidr_ is not None and not isinstance(cidr_, (bytes, str)):
             raise Exception("Expected cidr_ to be a str, received: {}".format(type(cidr_)))
+
+        if config_type_ is not None and not isinstance(config_type_, (bytes, str)):
+            raise Exception("Expected config_type_ to be a str, received: {}".format(type(config_type_)))
 
         if is_secondary_ is not None and not isinstance(is_secondary_, bool):
             raise Exception("Expected is_secondary_ to be a bool, received: {}".format(type(is_secondary_)))
@@ -11395,6 +11412,7 @@ class HostPort(Type):
 
         self.address = address_
         self.cidr = cidr_
+        self.config_type = config_type_
         self.is_secondary = is_secondary_
         self.port = port_
         self.scope = scope_
@@ -17957,14 +17975,15 @@ class OperationQueryArgs(Type):
 
 
 class OperationResult(Type):
-    _toSchema = {'actions': 'actions', 'completed': 'completed', 'enqueued': 'enqueued', 'error': 'error', 'operation': 'operation', 'started': 'started', 'status': 'status', 'summary': 'summary'}
-    _toPy = {'actions': 'actions', 'completed': 'completed', 'enqueued': 'enqueued', 'error': 'error', 'operation': 'operation', 'started': 'started', 'status': 'status', 'summary': 'summary'}
-    def __init__(self, actions=None, completed=None, enqueued=None, error=None, operation=None, started=None, status=None, summary=None, **unknown_fields):
+    _toSchema = {'actions': 'actions', 'completed': 'completed', 'enqueued': 'enqueued', 'error': 'error', 'fail': 'fail', 'operation': 'operation', 'started': 'started', 'status': 'status', 'summary': 'summary'}
+    _toPy = {'actions': 'actions', 'completed': 'completed', 'enqueued': 'enqueued', 'error': 'error', 'fail': 'fail', 'operation': 'operation', 'started': 'started', 'status': 'status', 'summary': 'summary'}
+    def __init__(self, actions=None, completed=None, enqueued=None, error=None, fail=None, operation=None, started=None, status=None, summary=None, **unknown_fields):
         '''
         actions : typing.Sequence[~ActionResult]
         completed : str
         enqueued : str
         error : Error
+        fail : str
         operation : str
         started : str
         status : str
@@ -17974,6 +17993,7 @@ class OperationResult(Type):
         completed_ = completed
         enqueued_ = enqueued
         error_ = Error.from_json(error) if error else None
+        fail_ = fail
         operation_ = operation
         started_ = started
         status_ = status
@@ -17992,6 +18012,9 @@ class OperationResult(Type):
         if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
+        if fail_ is not None and not isinstance(fail_, (bytes, str)):
+            raise Exception("Expected fail_ to be a str, received: {}".format(type(fail_)))
+
         if operation_ is not None and not isinstance(operation_, (bytes, str)):
             raise Exception("Expected operation_ to be a str, received: {}".format(type(operation_)))
 
@@ -18008,6 +18031,7 @@ class OperationResult(Type):
         self.completed = completed_
         self.enqueued = enqueued_
         self.error = error_
+        self.fail = fail_
         self.operation = operation_
         self.started = started_
         self.status = status_
@@ -21752,15 +21776,17 @@ class ResolveCharmResults(Type):
 
 
 class ResolveCharmWithChannel(Type):
-    _toSchema = {'charm_origin': 'charm-origin', 'reference': 'reference'}
-    _toPy = {'charm-origin': 'charm_origin', 'reference': 'reference'}
-    def __init__(self, charm_origin=None, reference=None, **unknown_fields):
+    _toSchema = {'charm_origin': 'charm-origin', 'reference': 'reference', 'switch_charm': 'switch-charm'}
+    _toPy = {'charm-origin': 'charm_origin', 'reference': 'reference', 'switch-charm': 'switch_charm'}
+    def __init__(self, charm_origin=None, reference=None, switch_charm=None, **unknown_fields):
         '''
         charm_origin : CharmOrigin
         reference : str
+        switch_charm : bool
         '''
         charm_origin_ = CharmOrigin.from_json(charm_origin) if charm_origin else None
         reference_ = reference
+        switch_charm_ = switch_charm
 
         # Validate arguments against known Juju API types.
         if charm_origin_ is not None and not isinstance(charm_origin_, (dict, CharmOrigin)):
@@ -21769,8 +21795,12 @@ class ResolveCharmWithChannel(Type):
         if reference_ is not None and not isinstance(reference_, (bytes, str)):
             raise Exception("Expected reference_ to be a str, received: {}".format(type(reference_)))
 
+        if switch_charm_ is not None and not isinstance(switch_charm_, bool):
+            raise Exception("Expected switch_charm_ to be a bool, received: {}".format(type(switch_charm_)))
+
         self.charm_origin = charm_origin_
         self.reference = reference_
+        self.switch_charm = switch_charm_
         self.unknown_fields = unknown_fields
 
 
@@ -25345,29 +25375,23 @@ class Tools(Type):
 
 
 class ToolsResult(Type):
-    _toSchema = {'disable_ssl_hostname_verification': 'disable-ssl-hostname-verification', 'error': 'error', 'tools': 'tools'}
-    _toPy = {'disable-ssl-hostname-verification': 'disable_ssl_hostname_verification', 'error': 'error', 'tools': 'tools'}
-    def __init__(self, disable_ssl_hostname_verification=None, error=None, tools=None, **unknown_fields):
+    _toSchema = {'error': 'error', 'tools': 'tools'}
+    _toPy = {'error': 'error', 'tools': 'tools'}
+    def __init__(self, error=None, tools=None, **unknown_fields):
         '''
-        disable_ssl_hostname_verification : bool
         error : Error
         tools : typing.Sequence[~Tools]
         '''
-        disable_ssl_hostname_verification_ = disable_ssl_hostname_verification
         error_ = Error.from_json(error) if error else None
         tools_ = [Tools.from_json(o) for o in tools or []]
 
         # Validate arguments against known Juju API types.
-        if disable_ssl_hostname_verification_ is not None and not isinstance(disable_ssl_hostname_verification_, bool):
-            raise Exception("Expected disable_ssl_hostname_verification_ to be a bool, received: {}".format(type(disable_ssl_hostname_verification_)))
-
         if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
         if tools_ is not None and not isinstance(tools_, (bytes, str, list)):
             raise Exception("Expected tools_ to be a Sequence, received: {}".format(type(tools_)))
 
-        self.disable_ssl_hostname_verification = disable_ssl_hostname_verification_
         self.error = error_
         self.tools = tools_
         self.unknown_fields = unknown_fields
@@ -25429,10 +25453,11 @@ class TrackPayloadArgs(Type):
 
 
 class UndertakerModelInfo(Type):
-    _toSchema = {'force_destroyed': 'force-destroyed', 'global_name': 'global-name', 'is_system': 'is-system', 'life': 'life', 'name': 'name', 'uuid': 'uuid'}
-    _toPy = {'force-destroyed': 'force_destroyed', 'global-name': 'global_name', 'is-system': 'is_system', 'life': 'life', 'name': 'name', 'uuid': 'uuid'}
-    def __init__(self, force_destroyed=None, global_name=None, is_system=None, life=None, name=None, uuid=None, **unknown_fields):
+    _toSchema = {'destroy_timeout': 'destroy-timeout', 'force_destroyed': 'force-destroyed', 'global_name': 'global-name', 'is_system': 'is-system', 'life': 'life', 'name': 'name', 'uuid': 'uuid'}
+    _toPy = {'destroy-timeout': 'destroy_timeout', 'force-destroyed': 'force_destroyed', 'global-name': 'global_name', 'is-system': 'is_system', 'life': 'life', 'name': 'name', 'uuid': 'uuid'}
+    def __init__(self, destroy_timeout=None, force_destroyed=None, global_name=None, is_system=None, life=None, name=None, uuid=None, **unknown_fields):
         '''
+        destroy_timeout : int
         force_destroyed : bool
         global_name : str
         is_system : bool
@@ -25440,6 +25465,7 @@ class UndertakerModelInfo(Type):
         name : str
         uuid : str
         '''
+        destroy_timeout_ = destroy_timeout
         force_destroyed_ = force_destroyed
         global_name_ = global_name
         is_system_ = is_system
@@ -25448,6 +25474,9 @@ class UndertakerModelInfo(Type):
         uuid_ = uuid
 
         # Validate arguments against known Juju API types.
+        if destroy_timeout_ is not None and not isinstance(destroy_timeout_, int):
+            raise Exception("Expected destroy_timeout_ to be a int, received: {}".format(type(destroy_timeout_)))
+
         if force_destroyed_ is not None and not isinstance(force_destroyed_, bool):
             raise Exception("Expected force_destroyed_ to be a bool, received: {}".format(type(force_destroyed_)))
 
@@ -25466,6 +25495,7 @@ class UndertakerModelInfo(Type):
         if uuid_ is not None and not isinstance(uuid_, (bytes, str)):
             raise Exception("Expected uuid_ to be a str, received: {}".format(type(uuid_)))
 
+        self.destroy_timeout = destroy_timeout_
         self.force_destroyed = force_destroyed_
         self.global_name = global_name_
         self.is_system = is_system_
