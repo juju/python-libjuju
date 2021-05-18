@@ -1568,7 +1568,7 @@ class Model:
         if str(url.schema) not in self.deploy_types:
             raise JujuError("unknown deploy type {}, expected charmhub, charmstore or local".format(url.schema))
         res = await self.deploy_types[str(url.schema)].resolve(url, architecture, application_name, channel, series, entity_url)
-        
+
         if res.identifier is None:
             raise JujuError('unknown charm or bundle {}'.format(entity_url))
         identifier = res.identifier

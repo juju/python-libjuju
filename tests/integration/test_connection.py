@@ -270,8 +270,6 @@ Yq2KJhGKIZiGjJ/tekeLkJKR5NLiRZ5AhxYyZKYqK85wPPreMKxWbnDoLWY27FfB
 -----END CERTIFICATE-----
 """
 
-    print(endpoint)
-
     try:
         connection = await Connection.connect(
             endpoint=endpoint,
