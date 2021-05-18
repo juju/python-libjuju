@@ -576,14 +576,14 @@ class AddCharmChange(ChangeInfo):
             context.origins[self.charm] = {str(None): origin}
             return self.charm
 
-        elif Schema.CHARM_STORE.matches(url.schema):
+        if Schema.CHARM_STORE.matches(url.schema):
             entity_id = await context.charmstore.entityId(self.charm)
             log.debug('Adding %s', entity_id)
             await context.client_facade.AddCharm(channel=None, url=entity_id, force=False)
             identifier = entity_id
             origin = client.CharmOrigin(source="charm-store", risk="stable")
 
-        elif Schema.CHARM_HUB.matches(url.schema):
+        if Schema.CHARM_HUB.matches(url.schema):
             ch = Channel('latest', 'stable')
             if self.channel:
                 ch = Channel.parse(self.channel).normalize()
