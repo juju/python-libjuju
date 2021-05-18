@@ -178,36 +178,36 @@ class BundleHandler:
             raise JujuError(self.plan.errors)
 
     async def _download_bundle(self, charm_url, origin):
-        if self.charms_facade is not None:
-            resp = await self.charms_facade.GetDownloadInfos(entities=[{
-                'charm-url': str(charm_url),
-                'charm-origin': {
-                    'source': origin.source,
-                    'type': origin.type_,
-                    'id': origin.id_,
-                    'hash': origin.hash_,
-                    'revision': origin.revision,
-                    'risk': origin.risk,
-                    'track': origin.track,
-                    'architecture': origin.architecture,
-                    'os': origin.os,
-                    'series': origin.series,
-                }
-            }])
-            if len(resp.results) != 1:
-                raise JujuError("expected one result, received {}".format(resp.results))
+        if self.charms_facade is None:
+            raise JujuError('unable to download bundle for {} using the new charms facade. Upgrade controller to proceed.'.format(charm_url))
 
-            result = resp.results[0]
-            if not result.url:
-                raise JujuError("no url found for bundle {}".format(charm_url.name))
+        resp = await self.charms_facade.GetDownloadInfos(entities=[{
+            'charm-url': str(charm_url),
+            'charm-origin': {
+                'source': origin.source,
+                'type': origin.type_,
+                'id': origin.id_,
+                'hash': origin.hash_,
+                'revision': origin.revision,
+                'risk': origin.risk,
+                'track': origin.track,
+                'architecture': origin.architecture,
+                'os': origin.os,
+                'series': origin.series,
+            }
+        }])
+        if len(resp.results) != 1:
+            raise JujuError("expected one result, received {}".format(resp.results))
 
-            bundle_resp = requests.get(result.url)
-            bundle_resp.raise_for_status()
+        result = resp.results[0]
+        if not result.url:
+            raise JujuError("no url found for bundle {}".format(charm_url.name))
 
-            with closing(bundle_resp), zipfile.ZipFile(io.BytesIO(bundle_resp.content)) as archive:
-                return self._get_bundle_yaml(archive)
+        bundle_resp = requests.get(result.url)
+        bundle_resp.raise_for_status()
 
-        raise JujuError('charm facade not supported')
+        with closing(bundle_resp), zipfile.ZipFile(io.BytesIO(bundle_resp.content)) as archive:
+            return self._get_bundle_yaml(archive)
 
     def _get_bundle_yaml(self, archive):
         for member in archive.infolist():
