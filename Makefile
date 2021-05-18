@@ -22,9 +22,8 @@ client:
 .PHONY: test
 test: lint
 	tox -e py3
-	@for f in $(shell find tests/integration -maxdepth 1 -mindepth 1 -name "*.py" | grep -v "__init__.py"); do \
-		tox -e integration -- "$${f}"; \
-	done
+	tox -e integration
+
 
 .PHONY: lint
 lint: 
