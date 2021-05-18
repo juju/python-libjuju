@@ -425,6 +425,139 @@ class ModelEntity:
         return self.model.state.get_entity(self.entity_type, self.entity_id)
 
 
+class DeployTypeResult:
+    """DeployTypeResult represents the result of a deployment type after a
+    resolution.
+    """
+
+    def __init__(self, identifier, origin, app_name, is_local=False, is_bundle=False):
+        self.identifier = identifier
+        self.origin = origin
+        self.app_name = app_name
+        self.is_local = is_local
+        self.is_bundle = is_bundle
+
+
+class LocalDeployType:
+    """LocalDeployType deals with local only deployments.
+    """
+
+    async def resolve(self, url, architecture, app_name=None, channel=None, series=None, entity_url=None):
+        """resolve attempts to resolve a local charm or bundle using the url
+        and architecture. If information is missing, it will attempt to backfill
+        that information, before sending the result back.
+        """
+
+        entity_url = url.path()
+        entity_path = Path(entity_url)
+        bundle_path = entity_path / 'bundle.yaml'
+
+        identifier = entity_url
+        origin = client.CharmOrigin(source="local", architecture=architecture)
+        if not (entity_path.is_dir() or entity_path.is_file()):
+            raise JujuError('{} path not found'.format(entity_url))
+
+        is_bundle = (
+            (entity_url.endswith(".yaml") and entity_path.exists()) or
+            bundle_path.exists()
+        )
+
+        if app_name is None:
+            app_name = url.name
+
+            if not is_bundle:
+                entity_url = url.path()
+                entity_path = Path(entity_url)
+                if str(entity_path).endswith('.charm'):
+                    with zipfile.ZipFile(entity_path, 'r') as charm_file:
+                        metadata = yaml.load(charm_file.read('metadata.yaml'), Loader=yaml.FullLoader)
+                else:
+                    metadata_path = entity_path / 'metadata.yaml'
+                    metadata = yaml.load(metadata_path.read_text(), Loader=yaml.FullLoader)
+                app_name = metadata['name']
+
+        return DeployTypeResult(
+            identifier=identifier,
+            origin=origin,
+            app_name=app_name,
+            is_local=True,
+            is_bundle=is_bundle,
+        )
+
+
+class CharmStoreDeployType:
+    """CharmStoreDeployType defines a class for resolving and deploying charm
+    store charms and bundle.
+    """
+
+    def __init__(self, charmstore, get_series):
+        self.charmstore = charmstore
+        self.get_series = get_series
+
+    async def resolve(self, url, architecture, app_name=None, channel=None, series=None, entity_url=None):
+        """resolve attempts to resolve charmstore charms or bundles. A request
+        to the charmstore is required to get more information about the
+        underlying identifier.
+        """
+
+        result = await self.charmstore.entity(str(url),
+                                              channel=channel,
+                                              include_stats=False)
+        identifier = result['Id']
+        is_bundle = url.series == "bundle"
+        if not series:
+            series = self.get_series(entity_url, result)
+
+        if app_name is None and not is_bundle:
+            app_name = result['Meta']['charm-metadata']['Name']
+
+        origin = client.CharmOrigin(source="charm-store",
+                                    architecture=architecture,
+                                    risk=channel,
+                                    series=series)
+
+        return DeployTypeResult(
+            identifier=identifier,
+            app_name=app_name,
+            origin=origin,
+            is_bundle=is_bundle,
+        )
+
+
+class CharmhubDeployType:
+    """CharmhubDeployType defines a class for resolving and deploying charmhub
+    charms and bundles.
+    """
+
+    def __init__(self, charm_resolver):
+        self.charm_resolver = charm_resolver
+
+    async def resolve(self, url, architecture, app_name=None, channel=None, series=None, entity_url=None):
+        """resolve attempts to resolve charmhub charms or bundles. A request to
+        the charmhub API is required to correctly determine the charm url and
+        underlying origin.
+        """
+
+        ch = Channel('latest', 'stable')
+        if channel is not None:
+            ch = Channel.parse(channel).normalize()
+        origin = client.CharmOrigin(source="charm-hub",
+                                    architecture=architecture,
+                                    risk=ch.risk,
+                                    track=ch.track)
+        charm_url, origin = await self.charm_resolver(url, origin)
+
+        if app_name is None:
+            app_name = url.name
+
+        return DeployTypeResult(
+            identifier=charm_url,
+            app_name=app_name,
+            origin=origin,
+            is_bundle=origin.type_ == "bundle",
+        )
+
+
 class Model:
     """
     The main API for interacting with a Juju model.
@@ -467,6 +600,12 @@ class Model:
 
         self._charmhub = CharmHub(self)
         self._charmstore = CharmStore(self._connector.loop)
+
+        self.deploy_types = {
+            "local": LocalDeployType(),
+            "cs": CharmStoreDeployType(self._charmstore, self._get_series),
+            "ch": CharmhubDeployType(self._resolve_charm),
+        }
 
     def is_connected(self):
         """Reports whether the Model is currently connected."""
@@ -1419,15 +1558,6 @@ class Model:
         if trust and (self.info.agent_version < client.Number.from_json('2.4.0')):
             raise NotImplementedError("trusted is not supported on model version {}".format(self.info.agent_version))
 
-        # Attempt to resolve a charm or bundle based on the URL.
-        # In an ideal world this should be moved to the controller, and we
-        # wouldn't have to deal with this at all.
-        is_local = False
-        is_bundle = False
-        identifier = None
-        origin = None
-        result = None
-
         # Ensure what we pass in, is a string.
         entity_url = str(entity_url)
         if is_local_charm(entity_url) and not entity_url.startswith("local:"):
@@ -1435,62 +1565,18 @@ class Model:
         url = URL.parse(str(entity_url))
         architecture = await self._resolve_architecture(url)
 
-        if Schema.LOCAL.matches(url.schema):
-            entity_url = url.path()
-            entity_path = Path(entity_url)
-            bundle_path = entity_path / 'bundle.yaml'
-
-            identifier = entity_url
-            origin = client.CharmOrigin(source="local", architecture=architecture)
-            if not (entity_path.is_dir() or entity_path.is_file()):
-                raise JujuError('{} path not found'.format(entity_url))
-
-            is_local = True
-            is_bundle = (
-                (entity_url.endswith(".yaml") and entity_path.exists()) or
-                bundle_path.exists()
-            )
-
-        elif Schema.CHARM_STORE.matches(url.schema):
-            result = await self.charmstore.entity(str(url),
-                                                  channel=channel,
-                                                  include_stats=False)
-            identifier = result['Id']
-            origin = client.CharmOrigin(source="charm-store",
-                                        architecture=architecture,
-                                        risk=channel)
-            is_bundle = url.series == "bundle"
-            if not series:
-                series = self._get_series(entity_url, result)
-
-        elif Schema.CHARM_HUB.matches(url.schema):
-            ch = Channel('latest', 'stable')
-            if channel:
-                ch = Channel.parse(channel).normalize()
-            origin = client.CharmOrigin(source="charm-hub",
-                                        architecture=architecture,
-                                        risk=ch.risk,
-                                        track=ch.track)
-            charm_url, origin = await self._resolve_charm(url, origin)
-
-            identifier = charm_url
-            is_bundle = origin.type_ == "bundle"
-
-        if identifier is None:
+        if str(url.schema) not in self.deploy_types:
+            raise JujuError("unknown deploy type {}, expected charmhub, charmstore or local".format(url.schema))
+        res = await self.deploy_types[str(url.schema)].resolve(url, architecture, application_name, channel, series, entity_url)
+        
+        if res.identifier is None:
             raise JujuError('unknown charm or bundle {}'.format(entity_url))
+        identifier = res.identifier
 
-        if not application_name:
-            if Schema.CHARM_HUB.matches(url.schema):
-                # For charmhub charms, we don't have the metadata and we're not
-                # going to get it, so fallback to the url and use that one if a
-                # user didn't specify it.
-                application_name = url.name
-            elif result is not None and not is_bundle:
-                application_name = result['Meta']['charm-metadata']['Name']
-
-        if is_bundle:
+        series = res.origin.series or series
+        if res.is_bundle:
             handler = BundleHandler(self, trusted=trust, forced=force)
-            await handler.fetch_plan(url, origin)
+            await handler.fetch_plan(url, res.origin)
             await handler.execute_plan()
             extant_apps = {app for app in self.applications}
             pending_apps = set(handler.applications) - extant_apps
@@ -1508,27 +1594,15 @@ class Model:
         else:
             # XXX: we're dropping local resources here, but we don't
             # actually support them yet anyway
-            if not is_local:
-                await self._add_charm(identifier, origin)
+            if not res.is_local:
+                await self._add_charm(identifier, res.origin)
 
                 # TODO (stickupkid): Handle charmhub charms, for now we'll only
                 # handle charmstore charms.
                 if Schema.CHARM_STORE.matches(url.schema):
-                    resources = await self._add_store_resources(application_name,
-                                                                identifier,
-                                                                entity=result)
+                    resources = await self._add_store_resources(res.app_name,
+                                                                identifier)
             else:
-                if not application_name:
-                    entity_url = url.path()
-                    entity_path = Path(entity_url)
-                    if str(entity_path).endswith('.charm'):
-                        with zipfile.ZipFile(entity_path, 'r') as charm_file:
-                            metadata = yaml.load(charm_file.read('metadata.yaml'), Loader=yaml.FullLoader)
-                    else:
-                        metadata_path = entity_path / 'metadata.yaml'
-                        metadata = yaml.load(metadata_path.read_text(), Loader=yaml.FullLoader)
-                    application_name = metadata['name']
-
                 # We have a local charm dir that needs to be uploaded
                 charm_dir = os.path.abspath(
                     os.path.expanduser(identifier))
@@ -1547,7 +1621,7 @@ class Model:
 
             return await self._deploy(
                 charm_url=identifier,
-                application=application_name,
+                application=res.app_name,
                 series=series,
                 config=config,
                 constraints=constraints,
@@ -1611,11 +1685,9 @@ class Model:
         return DEFAULT_ARCHITECTURE
 
     async def _add_store_resources(self, application, entity_url,
-                                   overrides=None, entity=None):
-        if not entity:
-            # avoid extra charm store call if one was already made
-            entity = await self.charmstore.entity(entity_url,
-                                                  include_stats=False)
+                                   overrides=None):
+        entity = await self.charmstore.entity(entity_url,
+                                              include_stats=False)
         resources = [
             {
                 'description': resource['Description'],
