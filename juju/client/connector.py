@@ -6,6 +6,7 @@ import macaroonbakery.httpbakery as httpbakery
 from juju.client.connection import Connection
 from juju.client.gocookies import GoCookieJar, go_to_py_cookie
 from juju.client.jujudata import FileJujuData
+from juju.client.proxy.factory import proxy_from_config
 from juju.errors import JujuConnectionError, JujuError
 
 log = logging.getLogger('connector')
@@ -55,6 +56,7 @@ class Connector:
 
         kwargs are passed through to Connection.connect()
         """
+
         kwargs.setdefault('loop', self.loop)
         kwargs.setdefault('max_frame_size', self.max_frame_size)
         kwargs.setdefault('bakery_client', self.bakery_client)
@@ -89,6 +91,8 @@ class Connector:
         endpoints = controller['api-endpoints']
         accounts = self.jujudata.accounts().get(controller_name, {})
 
+        proxy = proxy_from_config(controller.get('proxy-config', None))
+
         await self.connect(
             endpoint=endpoints,
             uuid=None,
@@ -97,6 +101,7 @@ class Connector:
             cacert=controller.get('ca-cert'),
             bakery_client=self.bakery_client_for_controller(controller_name),
             specified_facades=specified_facades,
+            proxy=proxy,
         )
         self.controller_name = controller_name
         self.controller_uuid = controller["uuid"]
@@ -121,8 +126,11 @@ class Connector:
         account = self.jujudata.accounts().get(controller_name, {})
         models = self.jujudata.models().get(controller_name, {}).get('models',
                                                                      {})
+
         if model_name not in models:
             raise JujuConnectionError('Model not found: {}'.format(model_name))
+
+        proxy = proxy_from_config(controller.get('proxy-config', None))
 
         # TODO if there's no record for the required model name, connect
         # to the controller to find out the model's uuid, then connect
@@ -137,6 +145,7 @@ class Connector:
             password=account.get('password'),
             cacert=controller.get('ca-cert'),
             bakery_client=self.bakery_client_for_controller(controller_name),
+            proxy=proxy,
         )
         self.controller_name = controller_name
         self.model_name = controller_name + ':' + model_name

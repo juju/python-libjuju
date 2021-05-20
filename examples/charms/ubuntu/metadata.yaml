@@ -1,0 +1,16 @@
+name: ubuntu-lite
+summary: The smallest charm I could come up with that still looks nice.
+maintainer: John Arbash Meinel <john@arbash-meinel.com>
+description: |
+  Run an Ubuntu system, but don't do a whole lot else.
+series: ["xenial", "bionic", "trusty"]
+provides:
+  ubuntu:
+    interface: ubuntu
+extra-bindings:
+  another:
+tags:
+  # https://jujucharms.com/docs/stable/authors-charm-metadata
+  - misc
+  - application_development
+subordinate: false

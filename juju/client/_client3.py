@@ -455,7 +455,10 @@ class AdminFacade(Type):
     name = 'Admin'
     version = 3
     schema =     {'definitions': {'Address': {'additionalProperties': False,
-                                 'properties': {'scope': {'type': 'string'},
+                                 'properties': {'cidr': {'type': 'string'},
+                                                'config-type': {'type': 'string'},
+                                                'is-secondary': {'type': 'boolean'},
+                                                'scope': {'type': 'string'},
                                                 'space-id': {'type': 'string'},
                                                 'space-name': {'type': 'string'},
                                                 'type': {'type': 'string'},
@@ -483,6 +486,9 @@ class AdminFacade(Type):
                                         'type': 'object'},
                      'HostPort': {'additionalProperties': False,
                                   'properties': {'Address': {'$ref': '#/definitions/Address'},
+                                                 'cidr': {'type': 'string'},
+                                                 'config-type': {'type': 'string'},
+                                                 'is-secondary': {'type': 'boolean'},
                                                  'port': {'type': 'integer'},
                                                  'scope': {'type': 'string'},
                                                  'space-id': {'type': 'string'},
@@ -1410,6 +1416,582 @@ class ApplicationFacade(Type):
 
 
 
+class ApplicationOffersFacade(Type):
+    name = 'ApplicationOffers'
+    version = 3
+    schema =     {'definitions': {'AddApplicationOffer': {'additionalProperties': False,
+                                             'properties': {'application-description': {'type': 'string'},
+                                                            'application-name': {'type': 'string'},
+                                                            'endpoints': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                          'type': 'object'},
+                                                            'model-tag': {'type': 'string'},
+                                                            'offer-name': {'type': 'string'}},
+                                             'required': ['model-tag',
+                                                          'offer-name',
+                                                          'application-name',
+                                                          'application-description',
+                                                          'endpoints'],
+                                             'type': 'object'},
+                     'AddApplicationOffers': {'additionalProperties': False,
+                                              'properties': {'Offers': {'items': {'$ref': '#/definitions/AddApplicationOffer'},
+                                                                        'type': 'array'}},
+                                              'required': ['Offers'],
+                                              'type': 'object'},
+                     'ApplicationOfferAdminDetails': {'additionalProperties': False,
+                                                      'properties': {'ApplicationOfferDetails': {'$ref': '#/definitions/ApplicationOfferDetails'},
+                                                                     'application-description': {'type': 'string'},
+                                                                     'application-name': {'type': 'string'},
+                                                                     'bindings': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                                  'type': 'object'},
+                                                                     'charm-url': {'type': 'string'},
+                                                                     'connections': {'items': {'$ref': '#/definitions/OfferConnection'},
+                                                                                     'type': 'array'},
+                                                                     'endpoints': {'items': {'$ref': '#/definitions/RemoteEndpoint'},
+                                                                                   'type': 'array'},
+                                                                     'offer-name': {'type': 'string'},
+                                                                     'offer-url': {'type': 'string'},
+                                                                     'offer-uuid': {'type': 'string'},
+                                                                     'source-model-tag': {'type': 'string'},
+                                                                     'spaces': {'items': {'$ref': '#/definitions/RemoteSpace'},
+                                                                                'type': 'array'},
+                                                                     'users': {'items': {'$ref': '#/definitions/OfferUserDetails'},
+                                                                               'type': 'array'}},
+                                                      'required': ['source-model-tag',
+                                                                   'offer-uuid',
+                                                                   'offer-url',
+                                                                   'offer-name',
+                                                                   'application-description',
+                                                                   'ApplicationOfferDetails',
+                                                                   'application-name',
+                                                                   'charm-url'],
+                                                      'type': 'object'},
+                     'ApplicationOfferDetails': {'additionalProperties': False,
+                                                 'properties': {'application-description': {'type': 'string'},
+                                                                'bindings': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                             'type': 'object'},
+                                                                'endpoints': {'items': {'$ref': '#/definitions/RemoteEndpoint'},
+                                                                              'type': 'array'},
+                                                                'offer-name': {'type': 'string'},
+                                                                'offer-url': {'type': 'string'},
+                                                                'offer-uuid': {'type': 'string'},
+                                                                'source-model-tag': {'type': 'string'},
+                                                                'spaces': {'items': {'$ref': '#/definitions/RemoteSpace'},
+                                                                           'type': 'array'},
+                                                                'users': {'items': {'$ref': '#/definitions/OfferUserDetails'},
+                                                                          'type': 'array'}},
+                                                 'required': ['source-model-tag',
+                                                              'offer-uuid',
+                                                              'offer-url',
+                                                              'offer-name',
+                                                              'application-description'],
+                                                 'type': 'object'},
+                     'ApplicationOfferResult': {'additionalProperties': False,
+                                                'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                               'result': {'$ref': '#/definitions/ApplicationOfferAdminDetails'}},
+                                                'type': 'object'},
+                     'ApplicationOffersResults': {'additionalProperties': False,
+                                                  'properties': {'results': {'items': {'$ref': '#/definitions/ApplicationOfferResult'},
+                                                                             'type': 'array'}},
+                                                  'type': 'object'},
+                     'ConsumeOfferDetails': {'additionalProperties': False,
+                                             'properties': {'external-controller': {'$ref': '#/definitions/ExternalControllerInfo'},
+                                                            'macaroon': {'$ref': '#/definitions/Macaroon'},
+                                                            'offer': {'$ref': '#/definitions/ApplicationOfferDetails'}},
+                                             'type': 'object'},
+                     'ConsumeOfferDetailsArg': {'additionalProperties': False,
+                                                'properties': {'offer-urls': {'$ref': '#/definitions/OfferURLs'},
+                                                               'user-tag': {'type': 'string'}},
+                                                'required': ['offer-urls'],
+                                                'type': 'object'},
+                     'ConsumeOfferDetailsResult': {'additionalProperties': False,
+                                                   'properties': {'ConsumeOfferDetails': {'$ref': '#/definitions/ConsumeOfferDetails'},
+                                                                  'error': {'$ref': '#/definitions/Error'},
+                                                                  'external-controller': {'$ref': '#/definitions/ExternalControllerInfo'},
+                                                                  'macaroon': {'$ref': '#/definitions/Macaroon'},
+                                                                  'offer': {'$ref': '#/definitions/ApplicationOfferDetails'}},
+                                                   'required': ['ConsumeOfferDetails'],
+                                                   'type': 'object'},
+                     'ConsumeOfferDetailsResults': {'additionalProperties': False,
+                                                    'properties': {'results': {'items': {'$ref': '#/definitions/ConsumeOfferDetailsResult'},
+                                                                               'type': 'array'}},
+                                                    'type': 'object'},
+                     'DestroyApplicationOffers': {'additionalProperties': False,
+                                                  'properties': {'force': {'type': 'boolean'},
+                                                                 'offer-urls': {'items': {'type': 'string'},
+                                                                                'type': 'array'}},
+                                                  'required': ['offer-urls'],
+                                                  'type': 'object'},
+                     'EndpointFilterAttributes': {'additionalProperties': False,
+                                                  'properties': {'interface': {'type': 'string'},
+                                                                 'name': {'type': 'string'},
+                                                                 'role': {'type': 'string'}},
+                                                  'required': ['role',
+                                                               'interface',
+                                                               'name'],
+                                                  'type': 'object'},
+                     'EntityStatus': {'additionalProperties': False,
+                                      'properties': {'data': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                           'type': 'object'}},
+                                                              'type': 'object'},
+                                                     'info': {'type': 'string'},
+                                                     'since': {'format': 'date-time',
+                                                               'type': 'string'},
+                                                     'status': {'type': 'string'}},
+                                      'required': ['status', 'info', 'since'],
+                                      'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ErrorResult': {'additionalProperties': False,
+                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
+                                     'type': 'object'},
+                     'ErrorResults': {'additionalProperties': False,
+                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
+                                                                 'type': 'array'}},
+                                      'required': ['results'],
+                                      'type': 'object'},
+                     'ExternalControllerInfo': {'additionalProperties': False,
+                                                'properties': {'addrs': {'items': {'type': 'string'},
+                                                                         'type': 'array'},
+                                                               'ca-cert': {'type': 'string'},
+                                                               'controller-alias': {'type': 'string'},
+                                                               'controller-tag': {'type': 'string'}},
+                                                'required': ['controller-tag',
+                                                             'controller-alias',
+                                                             'addrs',
+                                                             'ca-cert'],
+                                                'type': 'object'},
+                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
+                     'ModifyOfferAccess': {'additionalProperties': False,
+                                           'properties': {'access': {'type': 'string'},
+                                                          'action': {'type': 'string'},
+                                                          'offer-url': {'type': 'string'},
+                                                          'user-tag': {'type': 'string'}},
+                                           'required': ['user-tag',
+                                                        'action',
+                                                        'access',
+                                                        'offer-url'],
+                                           'type': 'object'},
+                     'ModifyOfferAccessRequest': {'additionalProperties': False,
+                                                  'properties': {'changes': {'items': {'$ref': '#/definitions/ModifyOfferAccess'},
+                                                                             'type': 'array'}},
+                                                  'required': ['changes'],
+                                                  'type': 'object'},
+                     'OfferConnection': {'additionalProperties': False,
+                                         'properties': {'endpoint': {'type': 'string'},
+                                                        'ingress-subnets': {'items': {'type': 'string'},
+                                                                            'type': 'array'},
+                                                        'relation-id': {'type': 'integer'},
+                                                        'source-model-tag': {'type': 'string'},
+                                                        'status': {'$ref': '#/definitions/EntityStatus'},
+                                                        'username': {'type': 'string'}},
+                                         'required': ['source-model-tag',
+                                                      'relation-id',
+                                                      'username',
+                                                      'endpoint',
+                                                      'status',
+                                                      'ingress-subnets'],
+                                         'type': 'object'},
+                     'OfferFilter': {'additionalProperties': False,
+                                     'properties': {'allowed-users': {'items': {'type': 'string'},
+                                                                      'type': 'array'},
+                                                    'application-description': {'type': 'string'},
+                                                    'application-name': {'type': 'string'},
+                                                    'application-user': {'type': 'string'},
+                                                    'connected-users': {'items': {'type': 'string'},
+                                                                        'type': 'array'},
+                                                    'endpoints': {'items': {'$ref': '#/definitions/EndpointFilterAttributes'},
+                                                                  'type': 'array'},
+                                                    'model-name': {'type': 'string'},
+                                                    'offer-name': {'type': 'string'},
+                                                    'owner-name': {'type': 'string'}},
+                                     'required': ['owner-name',
+                                                  'model-name',
+                                                  'offer-name',
+                                                  'application-name',
+                                                  'application-description',
+                                                  'application-user',
+                                                  'endpoints',
+                                                  'connected-users',
+                                                  'allowed-users'],
+                                     'type': 'object'},
+                     'OfferFilters': {'additionalProperties': False,
+                                      'properties': {'Filters': {'items': {'$ref': '#/definitions/OfferFilter'},
+                                                                 'type': 'array'}},
+                                      'required': ['Filters'],
+                                      'type': 'object'},
+                     'OfferURLs': {'additionalProperties': False,
+                                   'properties': {'bakery-version': {'type': 'integer'},
+                                                  'offer-urls': {'items': {'type': 'string'},
+                                                                 'type': 'array'}},
+                                   'type': 'object'},
+                     'OfferUserDetails': {'additionalProperties': False,
+                                          'properties': {'access': {'type': 'string'},
+                                                         'display-name': {'type': 'string'},
+                                                         'user': {'type': 'string'}},
+                                          'required': ['user',
+                                                       'display-name',
+                                                       'access'],
+                                          'type': 'object'},
+                     'QueryApplicationOffersResults': {'additionalProperties': False,
+                                                       'properties': {'results': {'items': {'$ref': '#/definitions/ApplicationOfferAdminDetails'},
+                                                                                  'type': 'array'}},
+                                                       'required': ['results'],
+                                                       'type': 'object'},
+                     'RemoteApplicationInfo': {'additionalProperties': False,
+                                               'properties': {'description': {'type': 'string'},
+                                                              'endpoints': {'items': {'$ref': '#/definitions/RemoteEndpoint'},
+                                                                            'type': 'array'},
+                                                              'icon-url-path': {'type': 'string'},
+                                                              'model-tag': {'type': 'string'},
+                                                              'name': {'type': 'string'},
+                                                              'offer-url': {'type': 'string'},
+                                                              'source-model-label': {'type': 'string'}},
+                                               'required': ['model-tag',
+                                                            'name',
+                                                            'description',
+                                                            'offer-url',
+                                                            'endpoints',
+                                                            'icon-url-path'],
+                                               'type': 'object'},
+                     'RemoteApplicationInfoResult': {'additionalProperties': False,
+                                                     'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                                    'result': {'$ref': '#/definitions/RemoteApplicationInfo'}},
+                                                     'type': 'object'},
+                     'RemoteApplicationInfoResults': {'additionalProperties': False,
+                                                      'properties': {'results': {'items': {'$ref': '#/definitions/RemoteApplicationInfoResult'},
+                                                                                 'type': 'array'}},
+                                                      'required': ['results'],
+                                                      'type': 'object'},
+                     'RemoteEndpoint': {'additionalProperties': False,
+                                        'properties': {'interface': {'type': 'string'},
+                                                       'limit': {'type': 'integer'},
+                                                       'name': {'type': 'string'},
+                                                       'role': {'type': 'string'}},
+                                        'required': ['name',
+                                                     'role',
+                                                     'interface',
+                                                     'limit'],
+                                        'type': 'object'},
+                     'RemoteSpace': {'additionalProperties': False,
+                                     'properties': {'cloud-type': {'type': 'string'},
+                                                    'name': {'type': 'string'},
+                                                    'provider-attributes': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                         'type': 'object'}},
+                                                                            'type': 'object'},
+                                                    'provider-id': {'type': 'string'},
+                                                    'subnets': {'items': {'$ref': '#/definitions/Subnet'},
+                                                                'type': 'array'}},
+                                     'required': ['cloud-type',
+                                                  'name',
+                                                  'provider-id',
+                                                  'provider-attributes',
+                                                  'subnets'],
+                                     'type': 'object'},
+                     'Subnet': {'additionalProperties': False,
+                                'properties': {'cidr': {'type': 'string'},
+                                               'life': {'type': 'string'},
+                                               'provider-id': {'type': 'string'},
+                                               'provider-network-id': {'type': 'string'},
+                                               'provider-space-id': {'type': 'string'},
+                                               'space-tag': {'type': 'string'},
+                                               'status': {'type': 'string'},
+                                               'vlan-tag': {'type': 'integer'},
+                                               'zones': {'items': {'type': 'string'},
+                                                         'type': 'array'}},
+                                'required': ['cidr',
+                                             'vlan-tag',
+                                             'life',
+                                             'space-tag',
+                                             'zones'],
+                                'type': 'object'}},
+     'properties': {'ApplicationOffers': {'description': 'ApplicationOffers gets '
+                                                         'details about remote '
+                                                         'applications that match '
+                                                         'given URLs.',
+                                          'properties': {'Params': {'$ref': '#/definitions/OfferURLs'},
+                                                         'Result': {'$ref': '#/definitions/ApplicationOffersResults'}},
+                                          'type': 'object'},
+                    'DestroyOffers': {'description': 'DestroyOffers removes the '
+                                                     'offers specified by the '
+                                                     'given URLs, forcing if '
+                                                     'necessary.',
+                                      'properties': {'Params': {'$ref': '#/definitions/DestroyApplicationOffers'},
+                                                     'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                      'type': 'object'},
+                    'FindApplicationOffers': {'description': 'FindApplicationOffers '
+                                                             'gets details about '
+                                                             'remote applications '
+                                                             'that match given '
+                                                             'filter.',
+                                              'properties': {'Params': {'$ref': '#/definitions/OfferFilters'},
+                                                             'Result': {'$ref': '#/definitions/QueryApplicationOffersResults'}},
+                                              'type': 'object'},
+                    'GetConsumeDetails': {'description': 'GetConsumeDetails '
+                                                         'returns the details '
+                                                         'necessary to pass to '
+                                                         'another model\n'
+                                                         'to allow the specified '
+                                                         'args user to consume the '
+                                                         'offers represented by '
+                                                         'the args URLs.',
+                                          'properties': {'Params': {'$ref': '#/definitions/ConsumeOfferDetailsArg'},
+                                                         'Result': {'$ref': '#/definitions/ConsumeOfferDetailsResults'}},
+                                          'type': 'object'},
+                    'ListApplicationOffers': {'description': 'ListApplicationOffers '
+                                                             'gets deployed '
+                                                             'details about '
+                                                             'application offers '
+                                                             'that match given '
+                                                             'filter.\n'
+                                                             'The results contain '
+                                                             'details about the '
+                                                             'deployed '
+                                                             'applications such as '
+                                                             'connection count.',
+                                              'properties': {'Params': {'$ref': '#/definitions/OfferFilters'},
+                                                             'Result': {'$ref': '#/definitions/QueryApplicationOffersResults'}},
+                                              'type': 'object'},
+                    'ModifyOfferAccess': {'description': 'ModifyOfferAccess '
+                                                         'changes the application '
+                                                         'offer access granted to '
+                                                         'users.',
+                                          'properties': {'Params': {'$ref': '#/definitions/ModifyOfferAccessRequest'},
+                                                         'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                          'type': 'object'},
+                    'Offer': {'description': 'Offer makes application endpoints '
+                                             'available for consumption at a '
+                                             'specified URL.',
+                              'properties': {'Params': {'$ref': '#/definitions/AddApplicationOffers'},
+                                             'Result': {'$ref': '#/definitions/ErrorResults'}},
+                              'type': 'object'},
+                    'RemoteApplicationInfo': {'description': 'RemoteApplicationInfo '
+                                                             'returns information '
+                                                             'about the requested '
+                                                             'remote application.\n'
+                                                             'This call currently '
+                                                             'has no client side '
+                                                             'API, only there for '
+                                                             'the GUI at this '
+                                                             'stage.',
+                                              'properties': {'Params': {'$ref': '#/definitions/OfferURLs'},
+                                                             'Result': {'$ref': '#/definitions/RemoteApplicationInfoResults'}},
+                                              'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(ApplicationOffersResults)
+    async def ApplicationOffers(self, bakery_version=None, offer_urls=None):
+        '''
+        ApplicationOffers gets details about remote applications that match given URLs.
+
+        bakery_version : int
+        offer_urls : typing.Sequence[str]
+        Returns -> ApplicationOffersResults
+        '''
+        if bakery_version is not None and not isinstance(bakery_version, int):
+            raise Exception("Expected bakery_version to be a int, received: {}".format(type(bakery_version)))
+
+        if offer_urls is not None and not isinstance(offer_urls, (bytes, str, list)):
+            raise Exception("Expected offer_urls to be a Sequence, received: {}".format(type(offer_urls)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ApplicationOffers',
+                   request='ApplicationOffers',
+                   version=3,
+                   params=_params)
+        _params['bakery-version'] = bakery_version
+        _params['offer-urls'] = offer_urls
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def DestroyOffers(self, force=None, offer_urls=None):
+        '''
+        DestroyOffers removes the offers specified by the given URLs, forcing if necessary.
+
+        force : bool
+        offer_urls : typing.Sequence[str]
+        Returns -> ErrorResults
+        '''
+        if force is not None and not isinstance(force, bool):
+            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
+
+        if offer_urls is not None and not isinstance(offer_urls, (bytes, str, list)):
+            raise Exception("Expected offer_urls to be a Sequence, received: {}".format(type(offer_urls)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ApplicationOffers',
+                   request='DestroyOffers',
+                   version=3,
+                   params=_params)
+        _params['force'] = force
+        _params['offer-urls'] = offer_urls
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(QueryApplicationOffersResults)
+    async def FindApplicationOffers(self, filters=None):
+        '''
+        FindApplicationOffers gets details about remote applications that match given filter.
+
+        filters : typing.Sequence[~OfferFilter]
+        Returns -> QueryApplicationOffersResults
+        '''
+        if filters is not None and not isinstance(filters, (bytes, str, list)):
+            raise Exception("Expected filters to be a Sequence, received: {}".format(type(filters)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ApplicationOffers',
+                   request='FindApplicationOffers',
+                   version=3,
+                   params=_params)
+        _params['Filters'] = filters
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ConsumeOfferDetailsResults)
+    async def GetConsumeDetails(self, offer_urls=None, user_tag=None):
+        '''
+        GetConsumeDetails returns the details necessary to pass to another model
+        to allow the specified args user to consume the offers represented by the args URLs.
+
+        offer_urls : OfferURLs
+        user_tag : str
+        Returns -> ConsumeOfferDetailsResults
+        '''
+        if offer_urls is not None and not isinstance(offer_urls, (dict, OfferURLs)):
+            raise Exception("Expected offer_urls to be a OfferURLs, received: {}".format(type(offer_urls)))
+
+        if user_tag is not None and not isinstance(user_tag, (bytes, str)):
+            raise Exception("Expected user_tag to be a str, received: {}".format(type(user_tag)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ApplicationOffers',
+                   request='GetConsumeDetails',
+                   version=3,
+                   params=_params)
+        _params['offer-urls'] = offer_urls
+        _params['user-tag'] = user_tag
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(QueryApplicationOffersResults)
+    async def ListApplicationOffers(self, filters=None):
+        '''
+        ListApplicationOffers gets deployed details about application offers that match given filter.
+        The results contain details about the deployed applications such as connection count.
+
+        filters : typing.Sequence[~OfferFilter]
+        Returns -> QueryApplicationOffersResults
+        '''
+        if filters is not None and not isinstance(filters, (bytes, str, list)):
+            raise Exception("Expected filters to be a Sequence, received: {}".format(type(filters)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ApplicationOffers',
+                   request='ListApplicationOffers',
+                   version=3,
+                   params=_params)
+        _params['Filters'] = filters
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def ModifyOfferAccess(self, changes=None):
+        '''
+        ModifyOfferAccess changes the application offer access granted to users.
+
+        changes : typing.Sequence[~ModifyOfferAccess]
+        Returns -> ErrorResults
+        '''
+        if changes is not None and not isinstance(changes, (bytes, str, list)):
+            raise Exception("Expected changes to be a Sequence, received: {}".format(type(changes)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ApplicationOffers',
+                   request='ModifyOfferAccess',
+                   version=3,
+                   params=_params)
+        _params['changes'] = changes
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def Offer(self, offers=None):
+        '''
+        Offer makes application endpoints available for consumption at a specified URL.
+
+        offers : typing.Sequence[~AddApplicationOffer]
+        Returns -> ErrorResults
+        '''
+        if offers is not None and not isinstance(offers, (bytes, str, list)):
+            raise Exception("Expected offers to be a Sequence, received: {}".format(type(offers)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ApplicationOffers',
+                   request='Offer',
+                   version=3,
+                   params=_params)
+        _params['Offers'] = offers
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(RemoteApplicationInfoResults)
+    async def RemoteApplicationInfo(self, bakery_version=None, offer_urls=None):
+        '''
+        RemoteApplicationInfo returns information about the requested remote application.
+        This call currently has no client side API, only there for the GUI at this stage.
+
+        bakery_version : int
+        offer_urls : typing.Sequence[str]
+        Returns -> RemoteApplicationInfoResults
+        '''
+        if bakery_version is not None and not isinstance(bakery_version, int):
+            raise Exception("Expected bakery_version to be a int, received: {}".format(type(bakery_version)))
+
+        if offer_urls is not None and not isinstance(offer_urls, (bytes, str, list)):
+            raise Exception("Expected offer_urls to be a Sequence, received: {}".format(type(offer_urls)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ApplicationOffers',
+                   request='RemoteApplicationInfo',
+                   version=3,
+                   params=_params)
+        _params['bakery-version'] = bakery_version
+        _params['offer-urls'] = offer_urls
+        reply = await self.rpc(msg)
+        return reply
+
+
+
 class BundleFacade(Type):
     name = 'Bundle'
     version = 3
@@ -1503,6 +2085,512 @@ class BundleFacade(Type):
 
 
 
+class CharmsFacade(Type):
+    name = 'Charms'
+    version = 3
+    schema =     {'definitions': {'AddCharmWithAuth': {'additionalProperties': False,
+                                          'properties': {'charm-origin': {'$ref': '#/definitions/CharmOrigin'},
+                                                         'force': {'type': 'boolean'},
+                                                         'macaroon': {'$ref': '#/definitions/Macaroon'},
+                                                         'series': {'type': 'string'},
+                                                         'url': {'type': 'string'}},
+                                          'required': ['url',
+                                                       'charm-origin',
+                                                       'macaroon',
+                                                       'force',
+                                                       'series'],
+                                          'type': 'object'},
+                     'AddCharmWithOrigin': {'additionalProperties': False,
+                                            'properties': {'charm-origin': {'$ref': '#/definitions/CharmOrigin'},
+                                                           'force': {'type': 'boolean'},
+                                                           'series': {'type': 'string'},
+                                                           'url': {'type': 'string'}},
+                                            'required': ['url',
+                                                         'charm-origin',
+                                                         'force',
+                                                         'series'],
+                                            'type': 'object'},
+                     'Charm': {'additionalProperties': False,
+                               'properties': {'actions': {'$ref': '#/definitions/CharmActions'},
+                                              'config': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmOption'}},
+                                                         'type': 'object'},
+                                              'lxd-profile': {'$ref': '#/definitions/CharmLXDProfile'},
+                                              'meta': {'$ref': '#/definitions/CharmMeta'},
+                                              'metrics': {'$ref': '#/definitions/CharmMetrics'},
+                                              'revision': {'type': 'integer'},
+                                              'url': {'type': 'string'}},
+                               'required': ['revision', 'url', 'config'],
+                               'type': 'object'},
+                     'CharmActionSpec': {'additionalProperties': False,
+                                         'properties': {'description': {'type': 'string'},
+                                                        'params': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                'type': 'object'}},
+                                                                   'type': 'object'}},
+                                         'required': ['description', 'params'],
+                                         'type': 'object'},
+                     'CharmActions': {'additionalProperties': False,
+                                      'properties': {'specs': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmActionSpec'}},
+                                                               'type': 'object'}},
+                                      'type': 'object'},
+                     'CharmDevice': {'additionalProperties': False,
+                                     'properties': {'CountMax': {'type': 'integer'},
+                                                    'CountMin': {'type': 'integer'},
+                                                    'Description': {'type': 'string'},
+                                                    'Name': {'type': 'string'},
+                                                    'Type': {'type': 'string'}},
+                                     'required': ['Name',
+                                                  'Description',
+                                                  'Type',
+                                                  'CountMin',
+                                                  'CountMax'],
+                                     'type': 'object'},
+                     'CharmLXDProfile': {'additionalProperties': False,
+                                         'properties': {'config': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                   'type': 'object'},
+                                                        'description': {'type': 'string'},
+                                                        'devices': {'patternProperties': {'.*': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                                                 'type': 'object'}},
+                                                                    'type': 'object'}},
+                                         'required': ['config',
+                                                      'description',
+                                                      'devices'],
+                                         'type': 'object'},
+                     'CharmMeta': {'additionalProperties': False,
+                                   'properties': {'categories': {'items': {'type': 'string'},
+                                                                 'type': 'array'},
+                                                  'description': {'type': 'string'},
+                                                  'devices': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmDevice'}},
+                                                              'type': 'object'},
+                                                  'extra-bindings': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                     'type': 'object'},
+                                                  'min-juju-version': {'type': 'string'},
+                                                  'name': {'type': 'string'},
+                                                  'payload-classes': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmPayloadClass'}},
+                                                                      'type': 'object'},
+                                                  'peers': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmRelation'}},
+                                                            'type': 'object'},
+                                                  'provides': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmRelation'}},
+                                                               'type': 'object'},
+                                                  'requires': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmRelation'}},
+                                                               'type': 'object'},
+                                                  'resources': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmResourceMeta'}},
+                                                                'type': 'object'},
+                                                  'series': {'items': {'type': 'string'},
+                                                             'type': 'array'},
+                                                  'storage': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmStorage'}},
+                                                              'type': 'object'},
+                                                  'subordinate': {'type': 'boolean'},
+                                                  'summary': {'type': 'string'},
+                                                  'tags': {'items': {'type': 'string'},
+                                                           'type': 'array'},
+                                                  'terms': {'items': {'type': 'string'},
+                                                            'type': 'array'}},
+                                   'required': ['name',
+                                                'summary',
+                                                'description',
+                                                'subordinate'],
+                                   'type': 'object'},
+                     'CharmMetric': {'additionalProperties': False,
+                                     'properties': {'description': {'type': 'string'},
+                                                    'type': {'type': 'string'}},
+                                     'required': ['type', 'description'],
+                                     'type': 'object'},
+                     'CharmMetrics': {'additionalProperties': False,
+                                      'properties': {'metrics': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmMetric'}},
+                                                                 'type': 'object'},
+                                                     'plan': {'$ref': '#/definitions/CharmPlan'}},
+                                      'required': ['metrics', 'plan'],
+                                      'type': 'object'},
+                     'CharmOption': {'additionalProperties': False,
+                                     'properties': {'default': {'additionalProperties': True,
+                                                                'type': 'object'},
+                                                    'description': {'type': 'string'},
+                                                    'type': {'type': 'string'}},
+                                     'required': ['type'],
+                                     'type': 'object'},
+                     'CharmOrigin': {'additionalProperties': False,
+                                     'properties': {'hash': {'type': 'string'},
+                                                    'id': {'type': 'string'},
+                                                    'revision': {'type': 'integer'},
+                                                    'risk': {'type': 'string'},
+                                                    'source': {'type': 'string'},
+                                                    'track': {'type': 'string'}},
+                                     'required': ['source', 'id'],
+                                     'type': 'object'},
+                     'CharmOriginResult': {'additionalProperties': False,
+                                           'properties': {'charm-origin': {'$ref': '#/definitions/CharmOrigin'},
+                                                          'error': {'$ref': '#/definitions/Error'}},
+                                           'required': ['charm-origin'],
+                                           'type': 'object'},
+                     'CharmPayloadClass': {'additionalProperties': False,
+                                           'properties': {'name': {'type': 'string'},
+                                                          'type': {'type': 'string'}},
+                                           'required': ['name', 'type'],
+                                           'type': 'object'},
+                     'CharmPlan': {'additionalProperties': False,
+                                   'properties': {'required': {'type': 'boolean'}},
+                                   'required': ['required'],
+                                   'type': 'object'},
+                     'CharmRelation': {'additionalProperties': False,
+                                       'properties': {'interface': {'type': 'string'},
+                                                      'limit': {'type': 'integer'},
+                                                      'name': {'type': 'string'},
+                                                      'optional': {'type': 'boolean'},
+                                                      'role': {'type': 'string'},
+                                                      'scope': {'type': 'string'}},
+                                       'required': ['name',
+                                                    'role',
+                                                    'interface',
+                                                    'optional',
+                                                    'limit',
+                                                    'scope'],
+                                       'type': 'object'},
+                     'CharmResourceMeta': {'additionalProperties': False,
+                                           'properties': {'description': {'type': 'string'},
+                                                          'name': {'type': 'string'},
+                                                          'path': {'type': 'string'},
+                                                          'type': {'type': 'string'}},
+                                           'required': ['name',
+                                                        'type',
+                                                        'path',
+                                                        'description'],
+                                           'type': 'object'},
+                     'CharmStorage': {'additionalProperties': False,
+                                      'properties': {'count-max': {'type': 'integer'},
+                                                     'count-min': {'type': 'integer'},
+                                                     'description': {'type': 'string'},
+                                                     'location': {'type': 'string'},
+                                                     'minimum-size': {'type': 'integer'},
+                                                     'name': {'type': 'string'},
+                                                     'properties': {'items': {'type': 'string'},
+                                                                    'type': 'array'},
+                                                     'read-only': {'type': 'boolean'},
+                                                     'shared': {'type': 'boolean'},
+                                                     'type': {'type': 'string'}},
+                                      'required': ['name',
+                                                   'description',
+                                                   'type',
+                                                   'shared',
+                                                   'read-only',
+                                                   'count-min',
+                                                   'count-max',
+                                                   'minimum-size'],
+                                      'type': 'object'},
+                     'CharmURL': {'additionalProperties': False,
+                                  'properties': {'url': {'type': 'string'}},
+                                  'required': ['url'],
+                                  'type': 'object'},
+                     'CharmsList': {'additionalProperties': False,
+                                    'properties': {'names': {'items': {'type': 'string'},
+                                                             'type': 'array'}},
+                                    'required': ['names'],
+                                    'type': 'object'},
+                     'CharmsListResult': {'additionalProperties': False,
+                                          'properties': {'charm-urls': {'items': {'type': 'string'},
+                                                                        'type': 'array'}},
+                                          'required': ['charm-urls'],
+                                          'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'IsMeteredResult': {'additionalProperties': False,
+                                         'properties': {'metered': {'type': 'boolean'}},
+                                         'required': ['metered'],
+                                         'type': 'object'},
+                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
+                     'ResolveCharmWithChannel': {'additionalProperties': False,
+                                                 'properties': {'charm-origin': {'$ref': '#/definitions/CharmOrigin'},
+                                                                'reference': {'type': 'string'}},
+                                                 'required': ['reference',
+                                                              'charm-origin'],
+                                                 'type': 'object'},
+                     'ResolveCharmWithChannelResult': {'additionalProperties': False,
+                                                       'properties': {'charm-origin': {'$ref': '#/definitions/CharmOrigin'},
+                                                                      'error': {'$ref': '#/definitions/Error'},
+                                                                      'supported-series': {'items': {'type': 'string'},
+                                                                                           'type': 'array'},
+                                                                      'url': {'type': 'string'}},
+                                                       'required': ['url',
+                                                                    'charm-origin',
+                                                                    'supported-series'],
+                                                       'type': 'object'},
+                     'ResolveCharmWithChannelResults': {'additionalProperties': False,
+                                                        'properties': {'Results': {'items': {'$ref': '#/definitions/ResolveCharmWithChannelResult'},
+                                                                                   'type': 'array'}},
+                                                        'required': ['Results'],
+                                                        'type': 'object'},
+                     'ResolveCharmsWithChannel': {'additionalProperties': False,
+                                                  'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
+                                                                 'resolve': {'items': {'$ref': '#/definitions/ResolveCharmWithChannel'},
+                                                                             'type': 'array'}},
+                                                  'required': ['resolve'],
+                                                  'type': 'object'}},
+     'properties': {'AddCharm': {'description': 'AddCharm adds the given charm URL '
+                                                '(which must include revision) to '
+                                                'the\n'
+                                                'environment, if it does not exist '
+                                                'yet. Local charms are not '
+                                                'supported,\n'
+                                                'only charm store and charm hub '
+                                                'URLs. See also AddLocalCharm().',
+                                 'properties': {'Params': {'$ref': '#/definitions/AddCharmWithOrigin'},
+                                                'Result': {'$ref': '#/definitions/CharmOriginResult'}},
+                                 'type': 'object'},
+                    'AddCharmWithAuthorization': {'description': 'AddCharmWithAuthorization '
+                                                                 'adds the given '
+                                                                 'charm URL (which '
+                                                                 'must include\n'
+                                                                 'revision) to the '
+                                                                 'environment, if '
+                                                                 'it does not '
+                                                                 'exist yet. Local '
+                                                                 'charms are\n'
+                                                                 'not supported, '
+                                                                 'only charm store '
+                                                                 'and charm hub '
+                                                                 'URLs. See also '
+                                                                 'AddLocalCharm().\n'
+                                                                 '\n'
+                                                                 'The '
+                                                                 'authorization '
+                                                                 'macaroon, '
+                                                                 'args.CharmStoreMacaroon, '
+                                                                 'may be\n'
+                                                                 'omitted, in '
+                                                                 'which case this '
+                                                                 'call is '
+                                                                 'equivalent to '
+                                                                 'AddCharm.',
+                                                  'properties': {'Params': {'$ref': '#/definitions/AddCharmWithAuth'},
+                                                                 'Result': {'$ref': '#/definitions/CharmOriginResult'}},
+                                                  'type': 'object'},
+                    'CharmInfo': {'description': 'CharmInfo returns information '
+                                                 'about the requested charm.\n'
+                                                 'NOTE: thumper 2016-06-29, this '
+                                                 'is not a bulk call and probably '
+                                                 'should be.',
+                                  'properties': {'Params': {'$ref': '#/definitions/CharmURL'},
+                                                 'Result': {'$ref': '#/definitions/Charm'}},
+                                  'type': 'object'},
+                    'IsMetered': {'description': 'IsMetered returns whether or not '
+                                                 'the charm is metered.',
+                                  'properties': {'Params': {'$ref': '#/definitions/CharmURL'},
+                                                 'Result': {'$ref': '#/definitions/IsMeteredResult'}},
+                                  'type': 'object'},
+                    'List': {'description': 'List returns a list of charm URLs '
+                                            'currently in the state.\n'
+                                            'If supplied parameter contains any '
+                                            'names, the result will\n'
+                                            'be filtered to return only the charms '
+                                            'with supplied names.',
+                             'properties': {'Params': {'$ref': '#/definitions/CharmsList'},
+                                            'Result': {'$ref': '#/definitions/CharmsListResult'}},
+                             'type': 'object'},
+                    'ResolveCharms': {'description': 'ResolveCharms resolves the '
+                                                     'given charm URLs with an '
+                                                     'optionally specified\n'
+                                                     'preferred channel.  Channel '
+                                                     'provided via CharmOrigin.',
+                                      'properties': {'Params': {'$ref': '#/definitions/ResolveCharmsWithChannel'},
+                                                     'Result': {'$ref': '#/definitions/ResolveCharmWithChannelResults'}},
+                                      'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(CharmOriginResult)
+    async def AddCharm(self, charm_origin=None, force=None, series=None, url=None):
+        '''
+        AddCharm adds the given charm URL (which must include revision) to the
+        environment, if it does not exist yet. Local charms are not supported,
+        only charm store and charm hub URLs. See also AddLocalCharm().
+
+        charm_origin : CharmOrigin
+        force : bool
+        series : str
+        url : str
+        Returns -> CharmOriginResult
+        '''
+        if charm_origin is not None and not isinstance(charm_origin, (dict, CharmOrigin)):
+            raise Exception("Expected charm_origin to be a CharmOrigin, received: {}".format(type(charm_origin)))
+
+        if force is not None and not isinstance(force, bool):
+            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
+
+        if series is not None and not isinstance(series, (bytes, str)):
+            raise Exception("Expected series to be a str, received: {}".format(type(series)))
+
+        if url is not None and not isinstance(url, (bytes, str)):
+            raise Exception("Expected url to be a str, received: {}".format(type(url)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Charms',
+                   request='AddCharm',
+                   version=3,
+                   params=_params)
+        _params['charm-origin'] = charm_origin
+        _params['force'] = force
+        _params['series'] = series
+        _params['url'] = url
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CharmOriginResult)
+    async def AddCharmWithAuthorization(self, charm_origin=None, force=None, macaroon=None, series=None, url=None):
+        '''
+        AddCharmWithAuthorization adds the given charm URL (which must include
+        revision) to the environment, if it does not exist yet. Local charms are
+        not supported, only charm store and charm hub URLs. See also AddLocalCharm().
+
+        The authorization macaroon, args.CharmStoreMacaroon, may be
+        omitted, in which case this call is equivalent to AddCharm.
+
+        charm_origin : CharmOrigin
+        force : bool
+        macaroon : Macaroon
+        series : str
+        url : str
+        Returns -> CharmOriginResult
+        '''
+        if charm_origin is not None and not isinstance(charm_origin, (dict, CharmOrigin)):
+            raise Exception("Expected charm_origin to be a CharmOrigin, received: {}".format(type(charm_origin)))
+
+        if force is not None and not isinstance(force, bool):
+            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
+
+        if macaroon is not None and not isinstance(macaroon, (dict, Macaroon)):
+            raise Exception("Expected macaroon to be a Macaroon, received: {}".format(type(macaroon)))
+
+        if series is not None and not isinstance(series, (bytes, str)):
+            raise Exception("Expected series to be a str, received: {}".format(type(series)))
+
+        if url is not None and not isinstance(url, (bytes, str)):
+            raise Exception("Expected url to be a str, received: {}".format(type(url)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Charms',
+                   request='AddCharmWithAuthorization',
+                   version=3,
+                   params=_params)
+        _params['charm-origin'] = charm_origin
+        _params['force'] = force
+        _params['macaroon'] = macaroon
+        _params['series'] = series
+        _params['url'] = url
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(Charm)
+    async def CharmInfo(self, url=None):
+        '''
+        CharmInfo returns information about the requested charm.
+        NOTE: thumper 2016-06-29, this is not a bulk call and probably should be.
+
+        url : str
+        Returns -> Charm
+        '''
+        if url is not None and not isinstance(url, (bytes, str)):
+            raise Exception("Expected url to be a str, received: {}".format(type(url)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Charms',
+                   request='CharmInfo',
+                   version=3,
+                   params=_params)
+        _params['url'] = url
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(IsMeteredResult)
+    async def IsMetered(self, url=None):
+        '''
+        IsMetered returns whether or not the charm is metered.
+
+        url : str
+        Returns -> IsMeteredResult
+        '''
+        if url is not None and not isinstance(url, (bytes, str)):
+            raise Exception("Expected url to be a str, received: {}".format(type(url)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Charms',
+                   request='IsMetered',
+                   version=3,
+                   params=_params)
+        _params['url'] = url
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CharmsListResult)
+    async def List(self, names=None):
+        '''
+        List returns a list of charm URLs currently in the state.
+        If supplied parameter contains any names, the result will
+        be filtered to return only the charms with supplied names.
+
+        names : typing.Sequence[str]
+        Returns -> CharmsListResult
+        '''
+        if names is not None and not isinstance(names, (bytes, str, list)):
+            raise Exception("Expected names to be a Sequence, received: {}".format(type(names)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Charms',
+                   request='List',
+                   version=3,
+                   params=_params)
+        _params['names'] = names
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ResolveCharmWithChannelResults)
+    async def ResolveCharms(self, macaroon=None, resolve=None):
+        '''
+        ResolveCharms resolves the given charm URLs with an optionally specified
+        preferred channel.  Channel provided via CharmOrigin.
+
+        macaroon : Macaroon
+        resolve : typing.Sequence[~ResolveCharmWithChannel]
+        Returns -> ResolveCharmWithChannelResults
+        '''
+        if macaroon is not None and not isinstance(macaroon, (dict, Macaroon)):
+            raise Exception("Expected macaroon to be a Macaroon, received: {}".format(type(macaroon)))
+
+        if resolve is not None and not isinstance(resolve, (bytes, str, list)):
+            raise Exception("Expected resolve to be a Sequence, received: {}".format(type(resolve)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Charms',
+                   request='ResolveCharms',
+                   version=3,
+                   params=_params)
+        _params['macaroon'] = macaroon
+        _params['resolve'] = resolve
+        reply = await self.rpc(msg)
+        return reply
+
+
+
 class ClientFacade(Type):
     name = 'Client'
     version = 3
@@ -1569,7 +2657,10 @@ class ClientFacade(Type):
                                             'required': ['machines'],
                                             'type': 'object'},
                      'Address': {'additionalProperties': False,
-                                 'properties': {'scope': {'type': 'string'},
+                                 'properties': {'cidr': {'type': 'string'},
+                                                'config-type': {'type': 'string'},
+                                                'is-secondary': {'type': 'boolean'},
+                                                'scope': {'type': 'string'},
                                                 'space-id': {'type': 'string'},
                                                 'space-name': {'type': 'string'},
                                                 'type': {'type': 'string'},
@@ -1603,12 +2694,15 @@ class ClientFacade(Type):
                      'ApplicationStatus': {'additionalProperties': False,
                                            'properties': {'can-upgrade-to': {'type': 'string'},
                                                           'charm': {'type': 'string'},
+                                                          'charm-channel': {'type': 'string'},
                                                           'charm-profile': {'type': 'string'},
                                                           'charm-version': {'type': 'string'},
                                                           'endpoint-bindings': {'patternProperties': {'.*': {'type': 'string'}},
                                                                                 'type': 'object'},
                                                           'err': {'$ref': '#/definitions/Error'},
                                                           'exposed': {'type': 'boolean'},
+                                                          'exposed-endpoints': {'patternProperties': {'.*': {'$ref': '#/definitions/ExposedEndpoint'}},
+                                                                                'type': 'object'},
                                                           'int': {'type': 'integer'},
                                                           'life': {'type': 'string'},
                                                           'meter-statuses': {'patternProperties': {'.*': {'$ref': '#/definitions/MeterStatus'}},
@@ -1626,6 +2720,8 @@ class ClientFacade(Type):
                                                                     'type': 'object'},
                                                           'workload-version': {'type': 'string'}},
                                            'required': ['charm',
+                                                        'charm-version',
+                                                        'charm-profile',
                                                         'series',
                                                         'exposed',
                                                         'life',
@@ -1636,8 +2732,6 @@ class ClientFacade(Type):
                                                         'meter-statuses',
                                                         'status',
                                                         'workload-version',
-                                                        'charm-version',
-                                                        'charm-profile',
                                                         'endpoint-bindings',
                                                         'public-address'],
                                            'type': 'object'},
@@ -1648,7 +2742,7 @@ class ClientFacade(Type):
                                                'Minor': {'type': 'integer'},
                                                'Number': {'$ref': '#/definitions/Number'},
                                                'Patch': {'type': 'integer'},
-                                               'Series': {'type': 'string'},
+                                               'Release': {'type': 'string'},
                                                'Tag': {'type': 'string'}},
                                 'required': ['Major',
                                              'Minor',
@@ -1656,7 +2750,7 @@ class ClientFacade(Type):
                                              'Patch',
                                              'Build',
                                              'Number',
-                                             'Series',
+                                             'Release',
                                              'Arch'],
                                 'type': 'object'},
                      'BranchStatus': {'additionalProperties': False,
@@ -1781,18 +2875,26 @@ class ClientFacade(Type):
                                                                  'type': 'array'}},
                                       'required': ['results'],
                                       'type': 'object'},
+                     'ExposedEndpoint': {'additionalProperties': False,
+                                         'properties': {'expose-to-cidrs': {'items': {'type': 'string'},
+                                                                            'type': 'array'},
+                                                        'expose-to-spaces': {'items': {'type': 'string'},
+                                                                             'type': 'array'}},
+                                         'type': 'object'},
                      'FindToolsParams': {'additionalProperties': False,
                                          'properties': {'agentstream': {'type': 'string'},
                                                         'arch': {'type': 'string'},
                                                         'major': {'type': 'integer'},
                                                         'minor': {'type': 'integer'},
                                                         'number': {'$ref': '#/definitions/Number'},
+                                                        'os-type': {'type': 'string'},
                                                         'series': {'type': 'string'}},
                                          'required': ['number',
                                                       'major',
                                                       'minor',
                                                       'arch',
                                                       'series',
+                                                      'os-type',
                                                       'agentstream'],
                                          'type': 'object'},
                      'FindToolsResult': {'additionalProperties': False,
@@ -1849,6 +2951,9 @@ class ClientFacade(Type):
                                  'type': 'object'},
                      'HostPort': {'additionalProperties': False,
                                   'properties': {'Address': {'$ref': '#/definitions/Address'},
+                                                 'cidr': {'type': 'string'},
+                                                 'config-type': {'type': 'string'},
+                                                 'is-secondary': {'type': 'boolean'},
                                                  'port': {'type': 'integer'},
                                                  'scope': {'type': 'string'},
                                                  'space-id': {'type': 'string'},
@@ -2264,7 +3369,8 @@ class ClientFacade(Type):
                                                  'subordinates'],
                                     'type': 'object'},
                      'Value': {'additionalProperties': False,
-                               'properties': {'arch': {'type': 'string'},
+                               'properties': {'allocate-public-ip': {'type': 'boolean'},
+                                              'arch': {'type': 'string'},
                                               'container': {'type': 'string'},
                                               'cores': {'type': 'integer'},
                                               'cpu-power': {'type': 'integer'},
@@ -2291,14 +3397,21 @@ class ClientFacade(Type):
                                                            'synchronisation '
                                                            'record, if any.',
                                             'type': 'object'},
-                    'AddCharm': {'properties': {'Params': {'$ref': '#/definitions/AddCharm'}},
+                    'AddCharm': {'description': 'NOTE: AddCharm is deprecated as '
+                                                'of juju 2.9 and charms facade '
+                                                'version 3.\n'
+                                                'Please discontinue use and move '
+                                                'to the charms facade version.\n'
+                                                '\n'
+                                                'TODO: remove in juju 3.0',
+                                 'properties': {'Params': {'$ref': '#/definitions/AddCharm'}},
                                  'type': 'object'},
                     'AddCharmWithAuthorization': {'description': 'AddCharmWithAuthorization '
                                                                  'adds the given '
                                                                  'charm URL (which '
-                                                                 'must include '
-                                                                 'revision) to\n'
-                                                                 'the model, if it '
+                                                                 'must include\n'
+                                                                 'revision) to the '
+                                                                 'model, if it '
                                                                  'does not exist '
                                                                  'yet. Local '
                                                                  'charms are not\n'
@@ -2311,12 +3424,27 @@ class ClientFacade(Type):
                                                                  'authorization '
                                                                  'macaroon, '
                                                                  'args.CharmStoreMacaroon, '
-                                                                 'may be\n'
-                                                                 'omitted, in '
+                                                                 'may be omitted, '
+                                                                 'in\n'
                                                                  'which case this '
                                                                  'call is '
                                                                  'equivalent to '
-                                                                 'AddCharm.',
+                                                                 'AddCharm.\n'
+                                                                 '\n'
+                                                                 'NOTE: '
+                                                                 'AddCharmWithAuthorization '
+                                                                 'is deprecated as '
+                                                                 'of juju 2.9 and '
+                                                                 'charms\n'
+                                                                 'facade version '
+                                                                 '3. Please '
+                                                                 'discontinue use '
+                                                                 'and move to the '
+                                                                 'charms facade\n'
+                                                                 'version.\n'
+                                                                 '\n'
+                                                                 'TODO: remove in '
+                                                                 'juju 3.0',
                                                   'properties': {'Params': {'$ref': '#/definitions/AddCharmWithAuthorization'}},
                                                   'type': 'object'},
                     'AddMachines': {'description': 'AddMachines adds new machines '
@@ -2437,7 +3565,17 @@ class ClientFacade(Type):
                                                      'best available charm URLs '
                                                      'with series, for charm\n'
                                                      'locations without a series '
-                                                     'specified.',
+                                                     'specified.\n'
+                                                     '\n'
+                                                     'NOTE: ResolveCharms is '
+                                                     'deprecated as of juju 2.9 '
+                                                     'and charms facade version '
+                                                     '3.\n'
+                                                     'Please discontinue use and '
+                                                     'move to the charms facade '
+                                                     'version.\n'
+                                                     '\n'
+                                                     'TODO: remove in juju 3.0',
                                       'properties': {'Params': {'$ref': '#/definitions/ResolveCharms'},
                                                      'Result': {'$ref': '#/definitions/ResolveCharmResults'}},
                                       'type': 'object'},
@@ -2529,6 +3667,11 @@ class ClientFacade(Type):
     @ReturnMapping(None)
     async def AddCharm(self, channel=None, force=None, url=None):
         '''
+        NOTE: AddCharm is deprecated as of juju 2.9 and charms facade version 3.
+        Please discontinue use and move to the charms facade version.
+
+        TODO: remove in juju 3.0
+
         channel : str
         force : bool
         url : str
@@ -2560,12 +3703,18 @@ class ClientFacade(Type):
     @ReturnMapping(None)
     async def AddCharmWithAuthorization(self, channel=None, force=None, macaroon=None, url=None):
         '''
-        AddCharmWithAuthorization adds the given charm URL (which must include revision) to
-        the model, if it does not exist yet. Local charms are not
+        AddCharmWithAuthorization adds the given charm URL (which must include
+        revision) to the model, if it does not exist yet. Local charms are not
         supported, only charm store URLs. See also AddLocalCharm().
 
-        The authorization macaroon, args.CharmStoreMacaroon, may be
-        omitted, in which case this call is equivalent to AddCharm.
+        The authorization macaroon, args.CharmStoreMacaroon, may be omitted, in
+        which case this call is equivalent to AddCharm.
+
+        NOTE: AddCharmWithAuthorization is deprecated as of juju 2.9 and charms
+        facade version 3. Please discontinue use and move to the charms facade
+        version.
+
+        TODO: remove in juju 3.0
 
         channel : str
         force : bool
@@ -2717,7 +3866,7 @@ class ClientFacade(Type):
 
 
     @ReturnMapping(FindToolsResult)
-    async def FindTools(self, agentstream=None, arch=None, major=None, minor=None, number=None, series=None):
+    async def FindTools(self, agentstream=None, arch=None, major=None, minor=None, number=None, os_type=None, series=None):
         '''
         FindTools returns a List containing all tools matching the given parameters.
 
@@ -2726,6 +3875,7 @@ class ClientFacade(Type):
         major : int
         minor : int
         number : Number
+        os_type : str
         series : str
         Returns -> FindToolsResult
         '''
@@ -2744,6 +3894,9 @@ class ClientFacade(Type):
         if number is not None and not isinstance(number, (dict, Number)):
             raise Exception("Expected number to be a Number, received: {}".format(type(number)))
 
+        if os_type is not None and not isinstance(os_type, (bytes, str)):
+            raise Exception("Expected os_type to be a str, received: {}".format(type(os_type)))
+
         if series is not None and not isinstance(series, (bytes, str)):
             raise Exception("Expected series to be a str, received: {}".format(type(series)))
 
@@ -2758,6 +3911,7 @@ class ClientFacade(Type):
         _params['major'] = major
         _params['minor'] = minor
         _params['number'] = number
+        _params['os-type'] = os_type
         _params['series'] = series
         reply = await self.rpc(msg)
         return reply
@@ -3066,6 +4220,11 @@ class ClientFacade(Type):
         '''
         ResolveCharm resolves the best available charm URLs with series, for charm
         locations without a series specified.
+
+        NOTE: ResolveCharms is deprecated as of juju 2.9 and charms facade version 3.
+        Please discontinue use and move to the charms facade version.
+
+        TODO: remove in juju 3.0
 
         references : typing.Sequence[str]
         Returns -> ResolveCharmResults
@@ -5723,6 +6882,525 @@ class MachineManagerFacade(Type):
                    version=3,
                    params=_params)
         _params['constraints'] = constraints
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+class MigrationMasterFacade(Type):
+    name = 'MigrationMaster'
+    version = 3
+    schema =     {'definitions': {'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'MasterMigrationStatus': {'additionalProperties': False,
+                                               'properties': {'migration-id': {'type': 'string'},
+                                                              'phase': {'type': 'string'},
+                                                              'phase-changed-time': {'format': 'date-time',
+                                                                                     'type': 'string'},
+                                                              'spec': {'$ref': '#/definitions/MigrationSpec'}},
+                                               'required': ['spec',
+                                                            'migration-id',
+                                                            'phase',
+                                                            'phase-changed-time'],
+                                               'type': 'object'},
+                     'MigrationModelInfo': {'additionalProperties': False,
+                                            'properties': {'agent-version': {'$ref': '#/definitions/Number'},
+                                                           'controller-agent-version': {'$ref': '#/definitions/Number'},
+                                                           'name': {'type': 'string'},
+                                                           'owner-tag': {'type': 'string'},
+                                                           'uuid': {'type': 'string'}},
+                                            'required': ['uuid',
+                                                         'name',
+                                                         'owner-tag',
+                                                         'agent-version',
+                                                         'controller-agent-version'],
+                                            'type': 'object'},
+                     'MigrationSpec': {'additionalProperties': False,
+                                       'properties': {'model-tag': {'type': 'string'},
+                                                      'target-info': {'$ref': '#/definitions/MigrationTargetInfo'}},
+                                       'required': ['model-tag', 'target-info'],
+                                       'type': 'object'},
+                     'MigrationTargetInfo': {'additionalProperties': False,
+                                             'properties': {'addrs': {'items': {'type': 'string'},
+                                                                      'type': 'array'},
+                                                            'auth-tag': {'type': 'string'},
+                                                            'ca-cert': {'type': 'string'},
+                                                            'controller-alias': {'type': 'string'},
+                                                            'controller-tag': {'type': 'string'},
+                                                            'macaroons': {'type': 'string'},
+                                                            'password': {'type': 'string'}},
+                                             'required': ['controller-tag',
+                                                          'addrs',
+                                                          'ca-cert',
+                                                          'auth-tag'],
+                                             'type': 'object'},
+                     'MinionReports': {'additionalProperties': False,
+                                       'properties': {'failed': {'items': {'type': 'string'},
+                                                                 'type': 'array'},
+                                                      'migration-id': {'type': 'string'},
+                                                      'phase': {'type': 'string'},
+                                                      'success-count': {'type': 'integer'},
+                                                      'unknown-count': {'type': 'integer'},
+                                                      'unknown-sample': {'items': {'type': 'string'},
+                                                                         'type': 'array'}},
+                                       'required': ['migration-id',
+                                                    'phase',
+                                                    'success-count',
+                                                    'unknown-count',
+                                                    'unknown-sample',
+                                                    'failed'],
+                                       'type': 'object'},
+                     'NotifyWatchResult': {'additionalProperties': False,
+                                           'properties': {'NotifyWatcherId': {'type': 'string'},
+                                                          'error': {'$ref': '#/definitions/Error'}},
+                                           'required': ['NotifyWatcherId'],
+                                           'type': 'object'},
+                     'Number': {'additionalProperties': False,
+                                'properties': {'Build': {'type': 'integer'},
+                                               'Major': {'type': 'integer'},
+                                               'Minor': {'type': 'integer'},
+                                               'Patch': {'type': 'integer'},
+                                               'Tag': {'type': 'string'}},
+                                'required': ['Major',
+                                             'Minor',
+                                             'Tag',
+                                             'Patch',
+                                             'Build'],
+                                'type': 'object'},
+                     'ProcessRelations': {'additionalProperties': False,
+                                          'properties': {'controller-alias': {'type': 'string'}},
+                                          'required': ['controller-alias'],
+                                          'type': 'object'},
+                     'SerializedModel': {'additionalProperties': False,
+                                         'properties': {'bytes': {'items': {'type': 'integer'},
+                                                                  'type': 'array'},
+                                                        'charms': {'items': {'type': 'string'},
+                                                                   'type': 'array'},
+                                                        'resources': {'items': {'$ref': '#/definitions/SerializedModelResource'},
+                                                                      'type': 'array'},
+                                                        'tools': {'items': {'$ref': '#/definitions/SerializedModelTools'},
+                                                                  'type': 'array'}},
+                                         'required': ['bytes',
+                                                      'charms',
+                                                      'tools',
+                                                      'resources'],
+                                         'type': 'object'},
+                     'SerializedModelResource': {'additionalProperties': False,
+                                                 'properties': {'application': {'type': 'string'},
+                                                                'application-revision': {'$ref': '#/definitions/SerializedModelResourceRevision'},
+                                                                'charmstore-revision': {'$ref': '#/definitions/SerializedModelResourceRevision'},
+                                                                'name': {'type': 'string'},
+                                                                'unit-revisions': {'patternProperties': {'.*': {'$ref': '#/definitions/SerializedModelResourceRevision'}},
+                                                                                   'type': 'object'}},
+                                                 'required': ['application',
+                                                              'name',
+                                                              'application-revision',
+                                                              'charmstore-revision',
+                                                              'unit-revisions'],
+                                                 'type': 'object'},
+                     'SerializedModelResourceRevision': {'additionalProperties': False,
+                                                         'properties': {'description': {'type': 'string'},
+                                                                        'fingerprint': {'type': 'string'},
+                                                                        'origin': {'type': 'string'},
+                                                                        'path': {'type': 'string'},
+                                                                        'revision': {'type': 'integer'},
+                                                                        'size': {'type': 'integer'},
+                                                                        'timestamp': {'format': 'date-time',
+                                                                                      'type': 'string'},
+                                                                        'type': {'type': 'string'},
+                                                                        'username': {'type': 'string'}},
+                                                         'required': ['revision',
+                                                                      'type',
+                                                                      'path',
+                                                                      'description',
+                                                                      'origin',
+                                                                      'fingerprint',
+                                                                      'size',
+                                                                      'timestamp'],
+                                                         'type': 'object'},
+                     'SerializedModelTools': {'additionalProperties': False,
+                                              'properties': {'uri': {'type': 'string'},
+                                                             'version': {'type': 'string'}},
+                                              'required': ['version', 'uri'],
+                                              'type': 'object'},
+                     'SetMigrationPhaseArgs': {'additionalProperties': False,
+                                               'properties': {'phase': {'type': 'string'}},
+                                               'required': ['phase'],
+                                               'type': 'object'},
+                     'SetMigrationStatusMessageArgs': {'additionalProperties': False,
+                                                       'properties': {'message': {'type': 'string'}},
+                                                       'required': ['message'],
+                                                       'type': 'object'},
+                     'StringResult': {'additionalProperties': False,
+                                      'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                     'result': {'type': 'string'}},
+                                      'required': ['result'],
+                                      'type': 'object'}},
+     'properties': {'Export': {'description': 'Export serializes the model '
+                                              'associated with the API connection.',
+                               'properties': {'Result': {'$ref': '#/definitions/SerializedModel'}},
+                               'type': 'object'},
+                    'MigrationStatus': {'description': 'MigrationStatus returns '
+                                                       'the details and progress '
+                                                       'of the latest\n'
+                                                       'model migration.',
+                                        'properties': {'Result': {'$ref': '#/definitions/MasterMigrationStatus'}},
+                                        'type': 'object'},
+                    'MinionReportTimeout': {'description': 'MinionReportTimeout '
+                                                           'returns the '
+                                                           'configuration value '
+                                                           'for this controller '
+                                                           'that\n'
+                                                           'indicates how long the '
+                                                           'migration master '
+                                                           'worker should wait for '
+                                                           'minions to\n'
+                                                           'reported on phases of '
+                                                           'a migration.',
+                                            'properties': {'Result': {'$ref': '#/definitions/StringResult'}},
+                                            'type': 'object'},
+                    'MinionReports': {'description': 'MinionReports returns '
+                                                     'details of the reports made '
+                                                     'by migration\n'
+                                                     'minions to the controller '
+                                                     'for the current migration '
+                                                     'phase.',
+                                      'properties': {'Result': {'$ref': '#/definitions/MinionReports'}},
+                                      'type': 'object'},
+                    'ModelInfo': {'description': 'ModelInfo returns essential '
+                                                 'information about the model to '
+                                                 'be\n'
+                                                 'migrated.',
+                                  'properties': {'Result': {'$ref': '#/definitions/MigrationModelInfo'}},
+                                  'type': 'object'},
+                    'Prechecks': {'description': 'Prechecks performs pre-migration '
+                                                 'checks on the model and\n'
+                                                 '(source) controller.',
+                                  'type': 'object'},
+                    'ProcessRelations': {'description': 'ProcessRelations '
+                                                        'processes any relations '
+                                                        'that need updating after '
+                                                        'an export.\n'
+                                                        'This should help fix any '
+                                                        'remoteApplications that '
+                                                        'have been migrated.',
+                                         'properties': {'Params': {'$ref': '#/definitions/ProcessRelations'}},
+                                         'type': 'object'},
+                    'Reap': {'description': 'Reap removes all documents for the '
+                                            'model associated with the API\n'
+                                            'connection.',
+                             'type': 'object'},
+                    'SetPhase': {'description': 'SetPhase sets the phase of the '
+                                                'active model migration. The '
+                                                'provided\n'
+                                                'phase must be a valid phase '
+                                                'value, for example QUIESCE" or\n'
+                                                '"ABORT". See the core/migration '
+                                                'package for the complete list.',
+                                 'properties': {'Params': {'$ref': '#/definitions/SetMigrationPhaseArgs'}},
+                                 'type': 'object'},
+                    'SetStatusMessage': {'description': 'SetStatusMessage sets a '
+                                                        'human readable status '
+                                                        'message containing\n'
+                                                        'information about the '
+                                                        "migration's progress. "
+                                                        'This will be shown in\n'
+                                                        'status output shown to '
+                                                        'the end user.',
+                                         'properties': {'Params': {'$ref': '#/definitions/SetMigrationStatusMessageArgs'}},
+                                         'type': 'object'},
+                    'Watch': {'description': 'Watch starts watching for an active '
+                                             'migration for the model\n'
+                                             'associated with the API connection. '
+                                             'The returned id should be used\n'
+                                             'with the NotifyWatcher facade to '
+                                             'receive events.',
+                              'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
+                              'type': 'object'},
+                    'WatchMinionReports': {'description': 'WatchMinionReports sets '
+                                                          'up a watcher which '
+                                                          'reports when a report\n'
+                                                          'for a migration minion '
+                                                          'has arrived.',
+                                           'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
+                                           'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(SerializedModel)
+    async def Export(self):
+        '''
+        Export serializes the model associated with the API connection.
+
+
+        Returns -> SerializedModel
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='MigrationMaster',
+                   request='Export',
+                   version=3,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(MasterMigrationStatus)
+    async def MigrationStatus(self):
+        '''
+        MigrationStatus returns the details and progress of the latest
+        model migration.
+
+
+        Returns -> MasterMigrationStatus
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='MigrationMaster',
+                   request='MigrationStatus',
+                   version=3,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResult)
+    async def MinionReportTimeout(self):
+        '''
+        MinionReportTimeout returns the configuration value for this controller that
+        indicates how long the migration master worker should wait for minions to
+        reported on phases of a migration.
+
+
+        Returns -> StringResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='MigrationMaster',
+                   request='MinionReportTimeout',
+                   version=3,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(MinionReports)
+    async def MinionReports(self):
+        '''
+        MinionReports returns details of the reports made by migration
+        minions to the controller for the current migration phase.
+
+
+        Returns -> MinionReports
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='MigrationMaster',
+                   request='MinionReports',
+                   version=3,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(MigrationModelInfo)
+    async def ModelInfo(self):
+        '''
+        ModelInfo returns essential information about the model to be
+        migrated.
+
+
+        Returns -> MigrationModelInfo
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='MigrationMaster',
+                   request='ModelInfo',
+                   version=3,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def Prechecks(self):
+        '''
+        Prechecks performs pre-migration checks on the model and
+        (source) controller.
+
+
+        Returns -> None
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='MigrationMaster',
+                   request='Prechecks',
+                   version=3,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def ProcessRelations(self, controller_alias=None):
+        '''
+        ProcessRelations processes any relations that need updating after an export.
+        This should help fix any remoteApplications that have been migrated.
+
+        controller_alias : str
+        Returns -> None
+        '''
+        if controller_alias is not None and not isinstance(controller_alias, (bytes, str)):
+            raise Exception("Expected controller_alias to be a str, received: {}".format(type(controller_alias)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='MigrationMaster',
+                   request='ProcessRelations',
+                   version=3,
+                   params=_params)
+        _params['controller-alias'] = controller_alias
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def Reap(self):
+        '''
+        Reap removes all documents for the model associated with the API
+        connection.
+
+
+        Returns -> None
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='MigrationMaster',
+                   request='Reap',
+                   version=3,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def SetPhase(self, phase=None):
+        '''
+        SetPhase sets the phase of the active model migration. The provided
+        phase must be a valid phase value, for example QUIESCE" or
+        "ABORT". See the core/migration package for the complete list.
+
+        phase : str
+        Returns -> None
+        '''
+        if phase is not None and not isinstance(phase, (bytes, str)):
+            raise Exception("Expected phase to be a str, received: {}".format(type(phase)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='MigrationMaster',
+                   request='SetPhase',
+                   version=3,
+                   params=_params)
+        _params['phase'] = phase
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def SetStatusMessage(self, message=None):
+        '''
+        SetStatusMessage sets a human readable status message containing
+        information about the migration's progress. This will be shown in
+        status output shown to the end user.
+
+        message : str
+        Returns -> None
+        '''
+        if message is not None and not isinstance(message, (bytes, str)):
+            raise Exception("Expected message to be a str, received: {}".format(type(message)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='MigrationMaster',
+                   request='SetStatusMessage',
+                   version=3,
+                   params=_params)
+        _params['message'] = message
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResult)
+    async def Watch(self):
+        '''
+        Watch starts watching for an active migration for the model
+        associated with the API connection. The returned id should be used
+        with the NotifyWatcher facade to receive events.
+
+
+        Returns -> NotifyWatchResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='MigrationMaster',
+                   request='Watch',
+                   version=3,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResult)
+    async def WatchMinionReports(self):
+        '''
+        WatchMinionReports sets up a watcher which reports when a report
+        for a migration minion has arrived.
+
+
+        Returns -> NotifyWatchResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='MigrationMaster',
+                   request='WatchMinionReports',
+                   version=3,
+                   params=_params)
+
         reply = await self.rpc(msg)
         return reply
 

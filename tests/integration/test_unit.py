@@ -50,7 +50,7 @@ async def test_run_action(event_loop):
 
     async with base.CleanModel() as model:
         app = await model.deploy(
-            'git',
+            'cs:git',
             application_name='git',
             series='trusty',
             channel='stable',
@@ -90,7 +90,7 @@ async def test_scp(event_loop):
     except RuntimeError:
         pytest.skip('test_scp will always fail outside of MainThread')
     async with base.CleanModel() as model:
-        app = await model.deploy('ubuntu')
+        app = await model.deploy('cs:ubuntu')
 
         await asyncio.wait_for(
             model.block_until(lambda: app.units),
@@ -124,7 +124,7 @@ async def test_ssh(event_loop):
     except RuntimeError:
         pytest.skip('test_ssh will always fail outside of MainThread')
     async with base.CleanModel() as model:
-        app = await model.deploy('ubuntu')
+        app = await model.deploy('cs:ubuntu')
 
         await asyncio.wait_for(
             model.block_until(lambda: app.units),
@@ -144,7 +144,7 @@ async def test_ssh(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_resolve(event_loop):
+async def test_resolve_local(event_loop):
     charm_file = Path(__file__).absolute().parent / 'charm.charm'
 
     async with base.CleanModel() as model:
