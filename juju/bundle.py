@@ -434,9 +434,9 @@ class AddCharmChange(ChangeInfo):
         if self.charm.startswith('local:'):
             return self.charm
 
-        entity_id = await context.charmstore.entityId(self.charm)
+        entity_id = await context.charmstore.entityId(self.charm, channel=self.channel)
         log.debug('Adding %s', entity_id)
-        await context.client_facade.AddCharm(channel=None, url=entity_id, force=False)
+        await context.client_facade.AddCharm(channel=self.channel, url=entity_id, force=False)
         return entity_id
 
     def __str__(self):

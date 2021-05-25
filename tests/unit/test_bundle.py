@@ -303,10 +303,10 @@ class TestAddCharmChangeRun:
         assert result == "entity_id"
 
         charmstore.entityId.assert_called_once()
-        charmstore.entityId.assert_called_with("charm")
+        charmstore.entityId.assert_called_with("charm", channel="channel")
 
         client_facade.AddCharm.assert_called_once()
-        client_facade.AddCharm.assert_called_with(channel=None,
+        client_facade.AddCharm.assert_called_with(channel="channel",
                                                   url="entity_id",
                                                   force=False)
 
