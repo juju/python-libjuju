@@ -2918,7 +2918,6 @@ class FirewallerFacade(Type):
                                                   'identity-endpoint': {'type': 'string'},
                                                   'name': {'type': 'string'},
                                                   'region': {'type': 'string'},
-                                                  'skip-tls-verify': {'type': 'boolean'},
                                                   'storage-endpoint': {'type': 'string'},
                                                   'type': {'type': 'string'}},
                                    'required': ['type', 'name'],
@@ -4408,7 +4407,10 @@ class MachinerFacade(Type):
                                             'required': ['servers'],
                                             'type': 'object'},
                      'Address': {'additionalProperties': False,
-                                 'properties': {'scope': {'type': 'string'},
+                                 'properties': {'cidr': {'type': 'string'},
+                                                'config-type': {'type': 'string'},
+                                                'is-secondary': {'type': 'boolean'},
+                                                'scope': {'type': 'string'},
                                                 'space-id': {'type': 'string'},
                                                 'space-name': {'type': 'string'},
                                                 'type': {'type': 'string'},
@@ -4454,6 +4456,9 @@ class MachinerFacade(Type):
                                       'type': 'object'},
                      'HostPort': {'additionalProperties': False,
                                   'properties': {'Address': {'$ref': '#/definitions/Address'},
+                                                 'cidr': {'type': 'string'},
+                                                 'config-type': {'type': 'string'},
+                                                 'is-secondary': {'type': 'boolean'},
                                                  'port': {'type': 'integer'},
                                                  'scope': {'type': 'string'},
                                                  'space-id': {'type': 'string'},
@@ -4524,6 +4529,7 @@ class MachinerFacade(Type):
                                                                  'type': 'array'},
                                                       'shadow-addresses': {'items': {'$ref': '#/definitions/Address'},
                                                                            'type': 'array'},
+                                                      'virtual-port-type': {'type': 'string'},
                                                       'vlan-tag': {'type': 'integer'}},
                                        'required': ['device-index',
                                                     'mac-address',
@@ -4626,9 +4632,14 @@ class MachinerFacade(Type):
                                             'Result': {'$ref': '#/definitions/LifeResults'}},
                              'type': 'object'},
                     'ModelUUID': {'description': 'ModelUUID returns the model UUID '
-                                                 'to connect to the model\n'
-                                                 'that the current connection is '
-                                                 'for.',
+                                                 'that this machine resides in.\n'
+                                                 'It is implemented here directly '
+                                                 'as a result of removing it from\n'
+                                                 'embedded APIAddresser *without* '
+                                                 'bumping the facade version.\n'
+                                                 'It should be blanked when this '
+                                                 'facade version is next '
+                                                 'incremented.',
                                   'properties': {'Result': {'$ref': '#/definitions/StringResult'}},
                                   'type': 'object'},
                     'RecordAgentStartInformation': {'description': 'RecordAgentStartInformation '
@@ -4817,8 +4828,10 @@ class MachinerFacade(Type):
     @ReturnMapping(StringResult)
     async def ModelUUID(self):
         '''
-        ModelUUID returns the model UUID to connect to the model
-        that the current connection is for.
+        ModelUUID returns the model UUID that this machine resides in.
+        It is implemented here directly as a result of removing it from
+        embedded APIAddresser *without* bumping the facade version.
+        It should be blanked when this facade version is next incremented.
 
 
         Returns -> StringResult

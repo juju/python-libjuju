@@ -1563,7 +1563,10 @@ class ProvisionerFacade(Type):
                                             'required': ['servers'],
                                             'type': 'object'},
                      'Address': {'additionalProperties': False,
-                                 'properties': {'scope': {'type': 'string'},
+                                 'properties': {'cidr': {'type': 'string'},
+                                                'config-type': {'type': 'string'},
+                                                'is-secondary': {'type': 'boolean'},
+                                                'scope': {'type': 'string'},
                                                 'space-id': {'type': 'string'},
                                                 'space-name': {'type': 'string'},
                                                 'type': {'type': 'string'},
@@ -1577,7 +1580,7 @@ class ProvisionerFacade(Type):
                                                'Minor': {'type': 'integer'},
                                                'Number': {'$ref': '#/definitions/Number'},
                                                'Patch': {'type': 'integer'},
-                                               'Series': {'type': 'string'},
+                                               'Release': {'type': 'string'},
                                                'Tag': {'type': 'string'}},
                                 'required': ['Major',
                                              'Minor',
@@ -1585,7 +1588,7 @@ class ProvisionerFacade(Type):
                                              'Patch',
                                              'Build',
                                              'Number',
-                                             'Series',
+                                             'Release',
                                              'Arch'],
                                 'type': 'object'},
                      'BoolResult': {'additionalProperties': False,
@@ -1789,12 +1792,14 @@ class ProvisionerFacade(Type):
                                                         'major': {'type': 'integer'},
                                                         'minor': {'type': 'integer'},
                                                         'number': {'$ref': '#/definitions/Number'},
+                                                        'os-type': {'type': 'string'},
                                                         'series': {'type': 'string'}},
                                          'required': ['number',
                                                       'major',
                                                       'minor',
                                                       'arch',
                                                       'series',
+                                                      'os-type',
                                                       'agentstream'],
                                          'type': 'object'},
                      'FindToolsResult': {'additionalProperties': False,
@@ -1829,6 +1834,9 @@ class ProvisionerFacade(Type):
                                                   'type': 'object'},
                      'HostPort': {'additionalProperties': False,
                                   'properties': {'Address': {'$ref': '#/definitions/Address'},
+                                                 'cidr': {'type': 'string'},
+                                                 'config-type': {'type': 'string'},
+                                                 'is-secondary': {'type': 'boolean'},
                                                  'port': {'type': 'integer'},
                                                  'scope': {'type': 'string'},
                                                  'space-id': {'type': 'string'},
@@ -1953,6 +1961,7 @@ class ProvisionerFacade(Type):
                                                                  'type': 'array'},
                                                       'shadow-addresses': {'items': {'$ref': '#/definitions/Address'},
                                                                            'type': 'array'},
+                                                      'virtual-port-type': {'type': 'string'},
                                                       'vlan-tag': {'type': 'integer'}},
                                        'required': ['device-index',
                                                     'mac-address',
@@ -2012,6 +2021,7 @@ class ProvisionerFacade(Type):
                                                              'jobs': {'items': {'type': 'string'},
                                                                       'type': 'array'},
                                                              'placement': {'type': 'string'},
+                                                             'root-disk': {'$ref': '#/definitions/VolumeParams'},
                                                              'series': {'type': 'string'},
                                                              'tags': {'patternProperties': {'.*': {'type': 'string'}},
                                                                       'type': 'object'},
@@ -2053,6 +2063,7 @@ class ProvisionerFacade(Type):
                                                             'jobs': {'items': {'type': 'string'},
                                                                      'type': 'array'},
                                                             'placement': {'type': 'string'},
+                                                            'root-disk': {'$ref': '#/definitions/VolumeParams'},
                                                             'series': {'type': 'string'},
                                                             'space-subnets': {'patternProperties': {'.*': {'items': {'type': 'string'},
                                                                                                            'type': 'array'}},
@@ -2182,12 +2193,10 @@ class ProvisionerFacade(Type):
                                'required': ['version', 'url', 'size'],
                                'type': 'object'},
                      'ToolsResult': {'additionalProperties': False,
-                                     'properties': {'disable-ssl-hostname-verification': {'type': 'boolean'},
-                                                    'error': {'$ref': '#/definitions/Error'},
+                                     'properties': {'error': {'$ref': '#/definitions/Error'},
                                                     'tools': {'items': {'$ref': '#/definitions/Tools'},
                                                               'type': 'array'}},
-                                     'required': ['tools',
-                                                  'disable-ssl-hostname-verification'],
+                                     'required': ['tools'],
                                      'type': 'object'},
                      'ToolsResults': {'additionalProperties': False,
                                       'properties': {'results': {'items': {'$ref': '#/definitions/ToolsResult'},
@@ -2201,7 +2210,8 @@ class ProvisionerFacade(Type):
                                                      'enable-os-upgrade'],
                                         'type': 'object'},
                      'Value': {'additionalProperties': False,
-                               'properties': {'arch': {'type': 'string'},
+                               'properties': {'allocate-public-ip': {'type': 'boolean'},
+                                              'arch': {'type': 'string'},
                                               'container': {'type': 'string'},
                                               'cores': {'type': 'integer'},
                                               'cpu-power': {'type': 'integer'},
@@ -2496,7 +2506,6 @@ class ProvisionerFacade(Type):
                                     'properties': {'Result': {'$ref': '#/definitions/ModelConfigResult'}},
                                     'type': 'object'},
                     'ModelUUID': {'description': 'ModelUUID returns the model UUID '
-                                                 'to connect to the model\n'
                                                  'that the current connection is '
                                                  'for.',
                                   'properties': {'Result': {'$ref': '#/definitions/StringResult'}},
@@ -2646,11 +2655,6 @@ class ProvisionerFacade(Type):
                                                'properties': {'Params': {'$ref': '#/definitions/MachineContainersParams'},
                                                               'Result': {'$ref': '#/definitions/ErrorResults'}},
                                                'type': 'object'},
-                    'StateAddresses': {'description': 'StateAddresses returns the '
-                                                      'list of addresses used to '
-                                                      'connect to the state.',
-                                       'properties': {'Result': {'$ref': '#/definitions/StringsResult'}},
-                                       'type': 'object'},
                     'Status': {'description': 'Status returns the status of each '
                                               'given entity.',
                                'properties': {'Params': {'$ref': '#/definitions/Entities'},
@@ -3042,7 +3046,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(FindToolsResult)
-    async def FindTools(self, agentstream=None, arch=None, major=None, minor=None, number=None, series=None):
+    async def FindTools(self, agentstream=None, arch=None, major=None, minor=None, number=None, os_type=None, series=None):
         '''
         FindTools returns a List containing all tools matching the given parameters.
 
@@ -3051,6 +3055,7 @@ class ProvisionerFacade(Type):
         major : int
         minor : int
         number : Number
+        os_type : str
         series : str
         Returns -> FindToolsResult
         '''
@@ -3069,6 +3074,9 @@ class ProvisionerFacade(Type):
         if number is not None and not isinstance(number, (dict, Number)):
             raise Exception("Expected number to be a Number, received: {}".format(type(number)))
 
+        if os_type is not None and not isinstance(os_type, (bytes, str)):
+            raise Exception("Expected os_type to be a str, received: {}".format(type(os_type)))
+
         if series is not None and not isinstance(series, (bytes, str)):
             raise Exception("Expected series to be a str, received: {}".format(type(series)))
 
@@ -3083,6 +3091,7 @@ class ProvisionerFacade(Type):
         _params['major'] = major
         _params['minor'] = minor
         _params['number'] = number
+        _params['os-type'] = os_type
         _params['series'] = series
         reply = await self.rpc(msg)
         return reply
@@ -3329,8 +3338,7 @@ class ProvisionerFacade(Type):
     @ReturnMapping(StringResult)
     async def ModelUUID(self):
         '''
-        ModelUUID returns the model UUID to connect to the model
-        that the current connection is for.
+        ModelUUID returns the model UUID that the current connection is for.
 
 
         Returns -> StringResult
@@ -3690,27 +3698,6 @@ class ProvisionerFacade(Type):
                    version=11,
                    params=_params)
         _params['params'] = params
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(StringsResult)
-    async def StateAddresses(self):
-        '''
-        StateAddresses returns the list of addresses used to connect to the state.
-
-
-        Returns -> StringsResult
-        '''
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Provisioner',
-                   request='StateAddresses',
-                   version=11,
-                   params=_params)
-
         reply = await self.rpc(msg)
         return reply
 

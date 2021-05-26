@@ -18,7 +18,7 @@ async def main():
 
     # Deploy a local charm using a path to the charm directory
     await model.deploy(
-        '/home/tvansteenburgh/src/charms/ubuntu',
+        './charms/ubuntu',
         application_name='ubuntu',
         series='trusty',
     )

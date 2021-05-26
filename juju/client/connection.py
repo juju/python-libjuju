@@ -23,7 +23,7 @@ client_facades = {
     'Agent': {'versions': [2]},
     'AgentTools': {'versions': [1]},
     'Annotations': {'versions': [2]},
-    'Application': {'versions': [1, 2, 3, 4, 5, 6, 7, 8]},
+    'Application': {'versions': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]},
     'ApplicationOffers': {'versions': [1, 2]},
     'ApplicationScaler': {'versions': [1]},
     'Backups': {'versions': [1, 2]},
@@ -43,7 +43,7 @@ client_facades = {
     'CAASOperator': {'versions': [1]},
     'CAASAgent': {'versions': [1]},
     'CAASOperatorProvisioner': {'versions': [1]},
-    'CAASUnitProvisioner': {'versions': [1]},
+    'CAASUnitProvisioner': {'versions': [1, 2]},
     'CAASOperatorUpgrader': {'versions': [1]},
     'CAASModelOperator': {'versions': [1]},
     'Controller': {'versions': [3, 4, 5, 6, 7, 8, 9]},
@@ -231,6 +231,7 @@ class Connection:
             retries=3,
             retry_backoff=10,
             specified_facades=None,
+            proxy=None,
     ):
         """Connect to the websocket.
 
@@ -308,6 +309,10 @@ class Connection:
             max_frame_size = self.MAX_FRAME_SIZE
         self.max_frame_size = max_frame_size
 
+        self.proxy = proxy
+        if self.proxy is not None:
+            self.proxy.connect()
+
         _endpoints = [(endpoint, cacert)] if isinstance(endpoint, str) else [(e, cacert) for e in endpoint]
         for _ep in _endpoints:
             try:
@@ -348,12 +353,23 @@ class Connection:
         else:
             url = "wss://{}/api".format(endpoint)
 
+        # We need to establish a server_hostname here for TLS sni if we are
+        # connecting through a proxy as the Juju controller certificates will
+        # not be covering the proxy
+        sock = None
+        server_hostname = None
+        if self.proxy is not None:
+            sock = self.proxy.socket()
+            server_hostname = "juju-app"
+
         return (await websockets.connect(
             url,
             ssl=self._get_ssl(cacert),
             loop=self.loop,
             max_size=self.max_frame_size,
-        ), url, endpoint, cacert)
+            server_hostname=server_hostname,
+            sock=sock,
+        )), url, endpoint, cacert
 
     async def close(self):
         if not self.ws:
@@ -363,6 +379,9 @@ class Connection:
         await self._receiver_task.stopped.wait()
         await self.ws.close()
         self.ws = None
+
+        if self.proxy is not None:
+            self.proxy.close()
 
     async def _recv(self, request_id):
         if not self.is_open:
@@ -551,11 +570,9 @@ class Connection:
         return await Connection.connect(**self.connect_params())
 
     def connect_params(self):
-        """Return a tuple of parameters suitable for passing to
+        """Return a dict of parameters suitable for passing to
         Connection.connect that can be used to make a new connection
-        to the same controller (and model if specified. The first
-        element in the returned tuple holds the endpoint argument;
-        the other holds a dict of the keyword args.
+        to the same controller (and model if specified).
         """
         return {
             'endpoint': self.endpoint,
@@ -566,6 +583,7 @@ class Connection:
             'bakery_client': self.bakery_client,
             'loop': self.loop,
             'max_frame_size': self.max_frame_size,
+            'proxy': self.proxy,
         }
 
     async def controller(self):
