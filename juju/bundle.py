@@ -329,6 +329,13 @@ class AddApplicationChange(ChangeInfo):
         :param context: is used for any methods or properties required to
             perform a change.
         """
+        # NB: this should really be handled by the controller when generating the
+        # bundle change plan, and this short-term workaround may be missing some
+        # aspects of the logic which the CLI client contains to handle edge cases.
+        if self.application in context.model.applications:
+            log.debug('Skipping %s; already in model', self.application)
+            return self.application
+
         # resolve indirect references
         charm = context.resolve(self.charm)
         options = {}
@@ -427,9 +434,9 @@ class AddCharmChange(ChangeInfo):
         if self.charm.startswith('local:'):
             return self.charm
 
-        entity_id = await context.charmstore.entityId(self.charm)
+        entity_id = await context.charmstore.entityId(self.charm, channel=self.channel)
         log.debug('Adding %s', entity_id)
-        await context.client_facade.AddCharm(channel=None, url=entity_id, force=False)
+        await context.client_facade.AddCharm(channel=self.channel, url=entity_id, force=False)
         return entity_id
 
     def __str__(self):
@@ -578,6 +585,14 @@ class AddRelationChange(ChangeInfo):
         """
         ep1 = context.resolveRelation(self.endpoint1)
         ep2 = context.resolveRelation(self.endpoint2)
+
+        # NB: this should really be handled by the controller when generating the
+        # bundle change plan, and this short-term workaround may be missing some
+        # aspects of the logic which the CLI client contains to handle edge cases.
+        existing = [rel for rel in context.model.relations if rel.matches(ep1, ep2)]
+        if existing:
+            log.info('Skipping %s <-> %s; already related', ep1, ep2)
+            return existing[0]
 
         log.info('Relating %s <-> %s', ep1, ep2)
         return await context.model.add_relation(ep1, ep2)

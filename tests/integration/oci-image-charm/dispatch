@@ -1,0 +1,10 @@
+#!/bin/bash
+
+resource_file="$(resource-get oci-image)"
+if [[ -z "$resource_file" ]]; then
+  status-set waiting
+elif grep -q "ubuntu/latest" "$resource_file"; then
+  status-set active
+else
+  status-set error
+fi

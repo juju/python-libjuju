@@ -151,9 +151,18 @@ async def test_resolve(event_loop):
             application_name='ubuntu',
             series='trusty',
             channel='stable',
+            config={'status': 'error'},
         )
 
-        # Resolving a hook not in an error state is not a great test but at
-        # least it exercises the code.
-        for unit in app.units:
-            await unit.resolved()
+        try:
+            await model.wait_for_idle(raise_on_error=False)
+            assert app.units[0].workload_status == 'error'
+
+            await app.units[0].resolved()
+
+            await model.wait_for_idle(raise_on_error=False)
+            assert app.units[0].workload_status == 'active'
+        finally:
+            # Errored units won't get cleaned up unless we force them.
+            await asyncio.gather(*(machine.destroy(force=True)
+                                   for machine in model.machines.values()))

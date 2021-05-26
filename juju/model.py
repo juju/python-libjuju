@@ -1405,7 +1405,7 @@ class Model:
 
         TODO::
 
-            - support local resources
+            - support local file resources
 
         """
         if storage:
@@ -1487,10 +1487,16 @@ class Model:
                         "Pass a 'series' kwarg to Model.deploy().".format(
                             charm_dir))
                 entity_id = await self.add_local_charm_dir(charm_dir, series)
+                resources = await self._add_local_resources(application_name,
+                                                            entity_id,
+                                                            metadata,
+                                                            resources=resources)
+
             if config is None:
                 config = {}
             if trust:
                 config["trust"] = "true"
+
             return await self._deploy(
                 charm_url=entity_id,
                 application=application_name,
@@ -1548,6 +1554,71 @@ class Model:
         resource_map = {resource['name']: pid
                         for resource, pid
                         in zip(resources, response.pending_ids)}
+        return resource_map
+
+    async def _add_local_resources(self, application, entity_url, metadata, resources):
+        if not resources:
+            return None
+
+        resource_map = dict()
+
+        for name, path in resources.items():
+            resource_type = metadata["resources"][name]["type"]
+            if resource_type != "oci-image":
+                # For  now only oci-images are supported
+                log.info("Resource {} of type {} is not supported".format(name, resource_type))
+                continue
+
+            charmresource = {
+                'description': '',
+                'fingerprint': '',
+                'name': name,
+                'path': path,
+                'revision': 0,
+                'size': 0,
+                'type_': 'oci-image',
+                'origin': 'upload',
+            }
+
+            resources_facade = client.ResourcesFacade.from_connection(
+                self.connection())
+            response = await resources_facade.AddPendingResources(
+                application_tag=tag.application(application),
+                charm_url=entity_url,
+                resources=[client.CharmResource(**charmresource)])
+            pending_id = response.pending_ids[0]
+            resource_map[name] = pending_id
+
+            # TODO Docker Image validation and support for local images.
+            docker_image_details = {
+                'registrypath': path,
+                'username': '',
+                'password': '',
+            }
+
+            data = yaml.dump(docker_image_details)
+
+            charmresource['fingerprint'] = hashlib.sha3_384(bytes(data, 'utf-8')).digest()
+
+            conn, headers, path_prefix = self.connection().https_connection()
+
+            query = "?pendingid={}".format(pending_id)
+            url = "{}/applications/{}/resources/{}{}".format(
+                path_prefix, application, name, query)
+            disp = "multipart/form-data; filename=\"{}\"".format(path)
+
+            headers['Content-Type'] = 'application/octet-stream'
+            headers['Content-Length'] = len(data)
+            headers['Content-Sha384'] = charmresource['fingerprint'].hex()
+            headers['Content-Disposition'] = disp
+
+            conn.request('PUT', url, data, headers)
+
+            response = conn.getresponse()
+            result = response.read().decode()
+            if not response.status == 200:
+                raise JujuError(result)
+
         return resource_map
 
     async def _deploy(self, charm_url, application, series, config,
