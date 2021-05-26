@@ -1,7 +1,10 @@
 import asyncio
 import logging
+import io
 import os
 import zipfile
+import requests
+from contextlib import closing
 from pathlib import Path
 
 import yaml
@@ -11,6 +14,8 @@ from toposort import toposort_flatten
 from .client import client
 from .constraints import parse as parse_constraints, parse_storage_constraint, parse_device_constraint
 from .errors import JujuError
+from .origin import Channel
+from .url import Schema, URL
 
 log = logging.getLogger(__name__)
 
@@ -29,10 +34,12 @@ class BundleHandler:
         self.plan = []
         self.references = {}
         self._units_by_app = {}
+        self.origins = {}
 
         for unit_name, unit in model.units.items():
             app_units = self._units_by_app.setdefault(unit.application, [])
             app_units.append(unit_name)
+
         self.bundle_facade = client.BundleFacade.from_connection(
             model.connection())
         self.client_facade = client.ClientFacade.from_connection(
@@ -41,6 +48,14 @@ class BundleHandler:
             model.connection())
         self.ann_facade = client.AnnotationsFacade.from_connection(
             model.connection())
+
+        # Feature detect if we have the new charms facade, otherwise fallback
+        # to the client facade, when making calls.
+        if client.CharmsFacade.best_facade_version(model.connection()) > 2:
+            self.charms_facade = client.CharmsFacade.from_connection(
+                model.connection())
+        else:
+            self.charms_facade = None
 
         # This describes all the change types that the BundleHandler supports.
         change_type_cls = [AddApplicationChange,
@@ -128,22 +143,28 @@ class BundleHandler:
 
         return bundle
 
-    async def fetch_plan(self, entity_id):
-        is_store_url = entity_id.startswith('cs:')
-        is_local = False
+    async def fetch_plan(self, charm_url, origin):
+        entity_id = charm_url.path()
+        is_local = Schema.LOCAL.matches(charm_url.schema)
         bundle_dir = None
 
-        if not is_store_url and os.path.isfile(entity_id):
+        if is_local and os.path.isfile(entity_id):
             bundle_yaml = Path(entity_id).read_text()
-            is_local = True
             bundle_dir = Path(entity_id).parent
-        elif not is_store_url and os.path.isdir(entity_id):
+        elif is_local and os.path.isdir(entity_id):
             bundle_yaml = (Path(entity_id) / "bundle.yaml").read_text()
             bundle_dir = Path(entity_id)
-        else:
+
+        if Schema.CHARM_STORE.matches(charm_url.schema):
             bundle_yaml = await self.charmstore.files(entity_id,
                                                       filename='bundle.yaml',
                                                       read_file=True)
+        elif Schema.CHARM_HUB.matches(charm_url.schema):
+            bundle_yaml = await self._download_bundle(charm_url, origin)
+
+        if not bundle_yaml:
+            raise JujuError('empty bundle, nothing to deploy')
+
         self.bundle = yaml.safe_load(bundle_yaml)
         self.bundle = await self._validate_bundle(self.bundle)
         if is_local:
@@ -156,7 +177,100 @@ class BundleHandler:
         if self.plan.errors:
             raise JujuError(self.plan.errors)
 
+    async def _download_bundle(self, charm_url, origin):
+        if self.charms_facade is None:
+            raise JujuError('unable to download bundle for {} using the new charms facade. Upgrade controller to proceed.'.format(charm_url))
+
+        resp = await self.charms_facade.GetDownloadInfos(entities=[{
+            'charm-url': str(charm_url),
+            'charm-origin': {
+                'source': origin.source,
+                'type': origin.type_,
+                'id': origin.id_,
+                'hash': origin.hash_,
+                'revision': origin.revision,
+                'risk': origin.risk,
+                'track': origin.track,
+                'architecture': origin.architecture,
+                'os': origin.os,
+                'series': origin.series,
+            }
+        }])
+        if len(resp.results) != 1:
+            raise JujuError("expected one result, received {}".format(resp.results))
+
+        result = resp.results[0]
+        if not result.url:
+            raise JujuError("no url found for bundle {}".format(charm_url.name))
+
+        bundle_resp = requests.get(result.url)
+        bundle_resp.raise_for_status()
+
+        with closing(bundle_resp), zipfile.ZipFile(io.BytesIO(bundle_resp.content)) as archive:
+            return self._get_bundle_yaml(archive)
+
+    def _get_bundle_yaml(self, archive):
+        for member in archive.infolist():
+            if member.filename == "bundle.yaml":
+                return archive.read(member)
+        raise JujuError("bundle.yaml not found")
+
+    async def _resolve_charms(self):
+        deployed = dict()
+
+        specs = self.applications_specs
+        for name in self.applications:
+            spec = specs[name]
+            app = self.model.applications.get(name, None)
+
+            cons = None
+            if app is not None:
+                deployed[name] = name
+
+                if is_local_charm(spec['charm']):
+                    spec.charm = self.model.applications[name]
+                    continue
+                if spec['charm'] == app.charm_url:
+                    continue
+
+                cons = await app.get_constraints()
+
+            if is_local_charm(spec['charm']):
+                continue
+
+            charm_url = URL.parse(spec['charm'])
+            channel = None
+            track, risk = '', ''
+            if 'channel' in spec:
+                channel = Channel.parse(spec['channel'])
+                track, risk = channel.track, channel.risk
+            if self.charms_facade is not None:
+                if cons is not None and cons['arch'] != '':
+                    architecture = cons['arch']
+                else:
+                    architecture = await self.model._resolve_architecture(charm_url)
+
+                origin = client.CharmOrigin(source="charm-hub",
+                                            architecture=architecture,
+                                            risk=risk,
+                                            track=track)
+                charm_url, charm_origin = await self.model._resolve_charm(charm_url, origin)
+
+                spec['charm'] = str(charm_url)
+            else:
+                results = await self.model.charmstore.entity(str(charm_url))
+                charm_url = results.get('Id', charm_url)
+                charm_origin = client.CharmOrigin(source="charm-store",
+                                                  risk=risk,
+                                                  track=track)
+
+            if str(channel) not in self.origins:
+                self.origins[str(charm_url)] = {}
+            self.origins[str(charm_url)][str(channel)] = charm_origin
+
     async def execute_plan(self):
+        await self._resolve_charms()
+
         changes = ChangeSet(self.plan.changes)
         for step in changes.sorted():
             change_cls = self.change_types.get(step.method)
@@ -172,7 +286,12 @@ class BundleHandler:
                                     self.bundle.get('services', {}))
         return list(apps_dict.keys())
 
-    def resolveRelation(self, reference):
+    @property
+    def applications_specs(self):
+        return self.bundle.get('applications',
+                               self.bundle.get('services', {}))
+
+    def resolve_relation(self, reference):
         parts = reference.split(":", maxsplit=1)
         application = self.resolve(parts[0])
         if len(parts) == 1:
@@ -185,6 +304,10 @@ class BundleHandler:
             if ref is not None:
                 reference = ref
         return reference
+
+
+def is_local_charm(charm_url):
+    return charm_url.startswith('.') or charm_url.startswith('local:') or os.path.isabs(charm_url)
 
 
 def get_charm_series(path):
@@ -266,7 +389,8 @@ class AddApplicationChange(ChangeInfo):
              'devices': 'devices',
              'endpoint-bindings': 'endpoint_bindings',
              'resources': 'resources',
-             'num-units': 'num_units'}
+             'num-units': 'num_units',
+             'channel': 'channel'}
 
     """AddApplicationChange holds a change for deploying a Juju application.
 
@@ -297,6 +421,7 @@ class AddApplicationChange(ChangeInfo):
             self.options = params[3]
             self.constraints = params[4]
             self.storage = {k: parse_storage_constraint(v) for k, v in params[5].items()}
+            self.channel = None
             if len(params) == 8:
                 # Juju 2.4 and below only sends the endpoint bindings and resources
                 self.endpoint_bindings = params[6]
@@ -310,6 +435,8 @@ class AddApplicationChange(ChangeInfo):
                 self.endpoint_bindings = params[7]
                 self.resources = params[8]
                 self.num_units = params[9]
+                if len(params) > 10:
+                    self.channel = params[10]
 
         elif isinstance(params, dict):
             AddApplicationChange.from_dict(self, params)
@@ -338,11 +465,22 @@ class AddApplicationChange(ChangeInfo):
             if context.model.info.agent_version < client.Number.from_json('2.4.0'):
                 raise NotImplementedError("trusted is not supported on model version {}".format(context.model.info.agent_version))
             options["trust"] = "true"
-        if not charm.startswith('local:'):
+
+        url = URL.parse(str(charm))
+        if Schema.CHARM_STORE.matches(url.schema):
             resources = await context.model._add_store_resources(
                 self.application, charm, overrides=self.resources)
         else:
             resources = {}
+
+        channel = None
+        if self.channel is not None and self.channel != "":
+            channel = Channel.parse(self.channel).normalize()
+
+        origin = context.origins.get(str(url), {}).get(str(channel), None)
+        if origin is None:
+            raise JujuError("expected origin to be valid for application {} and charm {} with channel {}".format(self.application, str(url), str(channel)))
+
         await context.model._deploy(
             charm_url=charm,
             application=self.application,
@@ -377,7 +515,8 @@ class AddApplicationChange(ChangeInfo):
 class AddCharmChange(ChangeInfo):
     _toPy = {'charm': 'charm',
              'series': 'series',
-             'channel': 'channel'}
+             'channel': 'channel',
+             'architecture': 'architecture'}
 
     """AddCharmChange holds a change for adding a charm to the environment.
 
@@ -404,6 +543,10 @@ class AddCharmChange(ChangeInfo):
                 self.channel = params[2]
             else:
                 self.channel = None
+            if len(params) > 3 and params[3] != "":
+                self.architecture = params[3]
+            else:
+                self.architecture = None
         elif isinstance(params, dict):
             AddCharmChange.from_dict(self, params)
         else:
@@ -422,15 +565,47 @@ class AddCharmChange(ChangeInfo):
         :param context: is used for any methods or properties required to
             perform a change.
         """
+
         # We don't add local charms because they've already been added
         # by self._handle_local_charms
-        if self.charm.startswith('local:'):
+        url = URL.parse(str(self.charm))
+        ch = None
+        identifier = None
+        if Schema.LOCAL.matches(url.schema):
+            origin = client.CharmOrigin(source="local", risk="stable")
+            context.origins[self.charm] = {str(None): origin}
             return self.charm
 
-        entity_id = await context.charmstore.entityId(self.charm)
-        log.debug('Adding %s', entity_id)
-        await context.client_facade.AddCharm(channel=None, url=entity_id, force=False)
-        return entity_id
+        if Schema.CHARM_STORE.matches(url.schema):
+            entity_id = await context.charmstore.entityId(self.charm)
+            log.debug('Adding %s', entity_id)
+            await context.client_facade.AddCharm(channel=None, url=entity_id, force=False)
+            identifier = entity_id
+            origin = client.CharmOrigin(source="charm-store", risk="stable")
+
+        if Schema.CHARM_HUB.matches(url.schema):
+            ch = Channel('latest', 'stable')
+            if self.channel:
+                ch = Channel.parse(self.channel).normalize()
+            arch = self.architecture
+            if not arch:
+                arch = await context.model._resolve_architecture(url)
+            origin = client.CharmOrigin(source="charm-hub",
+                                        architecture=arch,
+                                        risk=ch.risk,
+                                        track=ch.track)
+            identifier, origin = await context.model._resolve_charm(url, origin)
+
+        if identifier is None:
+            raise JujuError('unknown charm {}'.format(self.charm))
+
+        await context.model._add_charm(identifier, origin)
+
+        if str(ch) not in context.origins:
+            context.origins[str(identifier)] = {}
+        context.origins[str(identifier)][str(ch)] = origin
+
+        return str(identifier) if identifier is not None else url.path()
 
     def __str__(self):
         series = ""
@@ -576,8 +751,8 @@ class AddRelationChange(ChangeInfo):
         :param context: is used for any methods or properties required to
             perform a change.
         """
-        ep1 = context.resolveRelation(self.endpoint1)
-        ep2 = context.resolveRelation(self.endpoint2)
+        ep1 = context.resolve_relation(self.endpoint1)
+        ep2 = context.resolve_relation(self.endpoint2)
 
         log.info('Relating %s <-> %s', ep1, ep2)
         return await context.model.add_relation(ep1, ep2)

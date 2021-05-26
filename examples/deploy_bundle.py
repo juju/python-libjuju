@@ -6,27 +6,33 @@ This example:
 3. Destroys the units and applications
 
 """
+from juju.controller import Controller
 from juju import loop
-from juju.model import Model
 
 
 async def main():
-    model = Model()
-    print('Connecting to model')
-    # Connect to current model with current user, per Juju CLI
-    await model.connect()
+    controller = Controller()
+    # connect to current controller with current user, per Juju CLI
+    await controller.connect()
+
+    # Deploy charmhub bundle
+    await deploy_bundle(controller, 'juju-qa-bundle-test')
+
+    # Deploy legacy bundle
+    await deploy_bundle(controller, 'cs:~juju-qa/bundle/basic-0', 'beta')
+
+    await controller.disconnect()
+
+
+async def deploy_bundle(controller, url, channel=None):
+    models = await controller.list_models()
+    model = await controller.add_model('model{}'.format(len(models) + 1))
 
     try:
         print('Deploying bundle')
-        applications = await model.deploy(
-            'cs:~juju-qa/bundle/basic-0',
-            channel='beta',
-        )
 
-        print('Waiting for active')
-        await model.block_until(
-            lambda: all(unit.workload_status == 'active'
-                        for application in applications for unit in application.units))
+        applications = await deploy_and_wait_for_bundle(model, url, channel)
+
         print("Successfully deployed!")
         print('Removing bundle')
         for application in applications:
@@ -36,6 +42,16 @@ async def main():
         await model.disconnect()
         print("Success")
 
+
+async def deploy_and_wait_for_bundle(model, url, channel=None):
+    applications = await model.deploy(url, channel=channel)
+
+    print('Waiting for active')
+    await model.block_until(
+        lambda: all(unit.workload_status == 'active'
+                    for application in applications for unit in application.units))
+
+    return applications
 
 if __name__ == '__main__':
     loop.run(main())

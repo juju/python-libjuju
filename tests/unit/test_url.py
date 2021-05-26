@@ -31,6 +31,14 @@ class TestURLV1(unittest.TestCase):
 
 class TestURLV2(unittest.TestCase):
     def test_parse_charmhub(self):
+        u = URL.parse("ch:arm64/bionic/mysql-1")
+        self.assertEqual(u, URL(Schema.CHARM_HUB, name="mysql", architecture="arm64", series="bionic", revision=1))
+
+    def test_parse_charmhub_with_no_series(self):
+        u = URL.parse("ch:arm64/mysql")
+        self.assertEqual(u, URL(Schema.CHARM_HUB, name="mysql", architecture="arm64"))
+
+    def test_parse_charmhub_with_no_series_arch(self):
         u = URL.parse("ch:mysql")
         self.assertEqual(u, URL(Schema.CHARM_HUB, name="mysql"))
 

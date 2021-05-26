@@ -9,14 +9,14 @@ class Schema(Enum):
     CHARM_HUB = "ch"
 
     def matches(self, potential):
-        return self.value == potential
+        return str(self.value) == str(potential)
 
     def __str__(self):
-        return self.value
+        return str(self.value)
 
 
 class URL:
-    def __init__(self, schema, user=None, name=None, revision=None, series=None):
+    def __init__(self, schema, user=None, name=None, revision=None, series=None, architecture=None):
         self.schema = schema
         self.user = user
         self.name = name
@@ -26,6 +26,7 @@ class URL:
         if revision is None:
             revision = -1
         self.revision = revision
+        self.architecture = architecture
 
     @staticmethod
     def parse(s):
@@ -40,7 +41,7 @@ class URL:
             raise JujuError("charm or bundle URL {} has unrecognized parts".format(u))
 
         if Schema.LOCAL.matches(u.scheme):
-            c = parse_v1_url(Schema.LOCAL, u, s)
+            c = URL(Schema.LOCAL, name=u.path)
         elif Schema.CHARM_STORE.matches(u.scheme):
             c = parse_v1_url(Schema.CHARM_STORE, u, s)
         else:
@@ -51,16 +52,21 @@ class URL:
         return c
 
     def with_revision(self, rev):
-        return URL(self.schema, self.user, self.name, rev, self.series)
+        return URL(self.schema, self.user, self.name, rev, self.series, self.architecture)
+
+    def with_series(self, series):
+        return URL(self.schema, self.user, self.name, self.revision, series, self.architecture)
 
     def path(self):
         parts = []
-        if self.user:
+        if self.user is not None:
             parts.append("~{}".format(self.user))
-        if self.series:
+        if self.architecture is not None:
+            parts.append(self.architecture)
+        if self.series is not None:
             parts.append(self.series)
         if self.revision is not None and self.revision >= 0:
-            parts.append("{}-{}", self.name, self.revision)
+            parts.append("{}-{}".format(self.name, self.revision))
         else:
             parts.append(self.name)
         return "/".join(parts)
@@ -71,7 +77,8 @@ class URL:
                 self.user == other.user and \
                 self.name == other.name and \
                 self.revision == other.revision and \
-                self.series == other.series
+                self.series == other.series and \
+                self.architecture == other.architecture
         return False
 
     def __str__(self):
@@ -114,10 +121,19 @@ def parse_v2_url(u, s):
     c = URL(Schema.CHARM_HUB)
 
     parts = u.path.split("/")
-    if len(parts) != 1:
-        raise JujuError("charm or bundle URL {} malformed, expected <name>".format(s))
+    num = len(parts)
+    if num == 0 or num > 3:
+        raise JujuError("charm or bundle URL {} malformed".format(s))
 
-    (c.name, c.revision) = extract_revision(parts[0])
+    name = ""
+    if num == 3:
+        c.architecture, c.series, name = parts[0], parts[1], parts[2]
+    elif num == 2:
+        c.architecture, name = parts[0], parts[1]
+    else:
+        name = parts[0]
+
+    (c.name, c.revision) = extract_revision(name)
     # TODO (stickupkid) - validate the name.
 
     return c
