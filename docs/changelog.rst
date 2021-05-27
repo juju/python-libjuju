@@ -1,6 +1,17 @@
 Changelog
 ---------
 
+2.9.0
+^^^^^
+
+Thursday May 27 2021
+
+* Update facade methods for Juju 2.9.0
+* Update facade methods for Juju 2.9.1
+* Bug fix - Support for Juju client proxies (LP#1926595)
+* Bug fix - Honor charm channel in bundles #496
+* Remove machine workaround for Juju 2.2.3
+
 2.8.6
 ^^^^^
 
