@@ -1483,7 +1483,9 @@ class Model:
                 series = series or get_charm_series(charm_dir)
                 if not series:
                     config = await self.get_config()
-                    series = config.get("default-series")
+                    default_series = config.get("default-series")
+                    if default_series:
+                        series = default_series.value
                 if not series:
                     raise JujuError(
                         "Couldn't determine series for charm at {}. "
