@@ -800,6 +800,7 @@ class ExposeChange(ChangeInfo):
     def __init__(self, change_id, requires, params=None):
         super(ExposeChange, self).__init__(change_id, requires)
 
+        self.exposed_endpoints = None
         if isinstance(params, list):
             self.application = params[0]
         elif isinstance(params, dict):

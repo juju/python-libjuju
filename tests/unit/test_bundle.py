@@ -621,7 +621,8 @@ class TestExposeChange(unittest.TestCase):
         change = ExposeChange(1, [], params=["application"])
         self.assertEqual({"change_id": 1,
                           "requires": [],
-                          "application": "application"}, change.__dict__)
+                          "application": "application",
+                          "exposed_endpoints": None}, change.__dict__)
 
     def test_dict_params(self):
         change = ExposeChange(1, [], params={"application": "application"})
