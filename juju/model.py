@@ -1482,6 +1482,11 @@ class Model:
                     os.path.expanduser(entity_id))
                 series = series or get_charm_series(charm_dir)
                 if not series:
+                    model_config = await self.get_config()
+                    default_series = model_config.get("default-series")
+                    if default_series:
+                        series = default_series.value
+                if not series:
                     raise JujuError(
                         "Couldn't determine series for charm at {}. "
                         "Pass a 'series' kwarg to Model.deploy().".format(
