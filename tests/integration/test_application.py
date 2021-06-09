@@ -1,4 +1,5 @@
 import asyncio
+from pathlib import Path
 
 import pytest
 
@@ -141,6 +142,20 @@ async def test_upgrade_charm_switch(event_loop):
         assert app.data['charm-url'] == 'cs:ubuntu-0'
         await app.upgrade_charm(switch='ubuntu-8')
         assert app.data['charm-url'] == 'cs:ubuntu-8'
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_upgrade_local_charm(event_loop):
+    async with base.CleanModel() as model:
+        tests_dir = Path(__file__).absolute().parent
+        charm_path = tests_dir / 'upgrade-charm'
+        app = await model.deploy('ubuntu-0')
+        await model.block_until(lambda: (len(app.units) > 0 and
+                                         app.units[0].machine))
+        assert app.data['charm-url'] == 'cs:ubuntu-0'
+        await app.upgrade_charm(path=charm_path)
+        assert app.data['charm-url'] == 'local:ubuntu'
 
 
 @base.bootstrapped

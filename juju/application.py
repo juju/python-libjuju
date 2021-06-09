@@ -15,12 +15,17 @@
 import asyncio
 import json
 import logging
+import zipfile
+import os
+import yaml
+from pathlib import Path
 
 from . import model, tag
 from .status import derive_status
 from .annotationhelper import _get_annotations, _set_annotations
 from .client import client
 from .errors import JujuError
+from .bundle import get_charm_series
 from .placement import parse as parse_placement
 
 log = logging.getLogger(__name__)
@@ -578,9 +583,10 @@ class Application(model.ModelEntity):
         :param str switch: Crossgrade charm url
 
         """
-        # TODO: Support local upgrades
         if path is not None:
-            raise NotImplementedError("path option is not implemented")
+            await self.local_refresh(channel, force, force_series, force_units,
+                                     path, resources)
+            return
         if resources is not None:
             raise NotImplementedError("resources option is not implemented")
 
@@ -683,6 +689,68 @@ class Application(model.ModelEntity):
         )
 
     upgrade_charm = refresh
+
+    async def local_refresh(
+            self, channel=None, force=False, force_series=False, force_units=False,
+            path=None, resources=None):
+        """Refresh the charm for this application with a local charm.
+
+        :param str channel: Channel to use when getting the charm from the
+            charm store, e.g. 'development'
+        :param bool force_series: Refresh even if series of deployed
+            application is not supported by the new charm
+        :param bool force_units: Refresh all units immediately, even if in
+            error state
+        :param str path: Refresh to a charm located at path
+        :param dict resources: Dictionary of resource name/filepath pairs
+        :param int revision: Explicit refresh revision
+        :param str switch: Crossgrade charm url
+
+        """
+        app_facade = self._facade()
+
+        charm_dir = os.path.abspath(
+            os.path.expanduser(path))
+        model_config = await self.get_config()
+
+        series = get_charm_series(charm_dir)
+        if not series:
+            model_config = await self.get_config()
+            default_series = model_config.get("default-series")
+            if default_series:
+                series = default_series.value
+
+        charm_url = await self.model.add_local_charm_dir(charm_dir, series)
+        if resources is not None:
+            if str(path).endswith('.charm'):
+                with zipfile.ZipFile(path, 'r') as charm_file:
+                    metadata = yaml.load(charm_file.read('metadata.yaml'), Loader=yaml.FullLoader)
+            else:
+                entity_path = Path(path)
+                metadata_path = entity_path / 'metadata.yaml'
+                metadata = yaml.load(metadata_path.read_text(), Loader=yaml.FullLoader)
+            resources = await self.model.add_local_resources(self.entity_id,
+                                                             charm_url,
+                                                             metadata,
+                                                             resources=resources)
+
+        # Update application
+        await app_facade.SetCharm(
+            application=self.entity_id,
+            channel=channel,
+            charm_url=charm_url,
+            config_settings=None,
+            config_settings_yaml=None,
+            force=force,
+            force_series=force_series,
+            force_units=force_units,
+            resource_ids=resources,
+            storage_constraints=None,
+        )
+
+        await self.model.block_until(
+            lambda: self.data['charm-url'] == charm_url
+        )
 
     async def get_metrics(self):
         """Get metrics for this application's units.
