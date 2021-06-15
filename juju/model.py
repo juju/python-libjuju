@@ -1492,10 +1492,10 @@ class Model:
                         "Pass a 'series' kwarg to Model.deploy().".format(
                             charm_dir))
                 entity_id = await self.add_local_charm_dir(charm_dir, series)
-                resources = await self._add_local_resources(application_name,
-                                                            entity_id,
-                                                            metadata,
-                                                            resources=resources)
+                resources = await self.add_local_resources(application_name,
+                                                           entity_id,
+                                                           metadata,
+                                                           resources=resources)
 
             if config is None:
                 config = {}
@@ -1561,7 +1561,7 @@ class Model:
                         in zip(resources, response.pending_ids)}
         return resource_map
 
-    async def _add_local_resources(self, application, entity_url, metadata, resources):
+    async def add_local_resources(self, application, entity_url, metadata, resources):
         if not resources:
             return None
 
