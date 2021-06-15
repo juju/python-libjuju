@@ -15,10 +15,7 @@
 import asyncio
 import json
 import logging
-import zipfile
 import os
-import yaml
-from pathlib import Path
 
 from . import model, tag
 from .status import derive_status
@@ -27,6 +24,7 @@ from .client import client
 from .errors import JujuError
 from .bundle import get_charm_series
 from .placement import parse as parse_placement
+from .charm import get_local_charm_metadata
 
 log = logging.getLogger(__name__)
 
@@ -719,16 +717,9 @@ class Application(model.ModelEntity):
             default_series = model_config.get("default-series")
             if default_series:
                 series = default_series.value
-
         charm_url = await self.model.add_local_charm_dir(charm_dir, series)
+        metadata = get_local_charm_metadata(path)
         if resources is not None:
-            if str(path).endswith('.charm'):
-                with zipfile.ZipFile(path, 'r') as charm_file:
-                    metadata = yaml.load(charm_file.read('metadata.yaml'), Loader=yaml.FullLoader)
-            else:
-                entity_path = Path(path)
-                metadata_path = entity_path / 'metadata.yaml'
-                metadata = yaml.load(metadata_path.read_text(), Loader=yaml.FullLoader)
             resources = await self.model.add_local_resources(self.entity_id,
                                                              charm_url,
                                                              metadata,
