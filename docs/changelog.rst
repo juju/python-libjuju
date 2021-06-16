@@ -1,6 +1,15 @@
 Changelog
 ---------
 
+2.9.1
+^^^^^
+
+Wednesday June 16 2021
+
+* Bug fix - Bundle Exposed endpoints missing #502
+* Bug fix - Fix series requirement for local charms #504
+* Add local charm update support #507
+
 2.9.0
 ^^^^^
 
