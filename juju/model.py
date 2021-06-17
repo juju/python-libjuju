@@ -21,7 +21,6 @@ import websockets
 from . import provisioner, tag, utils
 from .annotationhelper import _get_annotations, _set_annotations
 from .bundle import BundleHandler, get_charm_series
-from .charm import get_local_charm_metadata
 from .charmhub import CharmHub
 from .charmstore import CharmStore
 from .client import client, connector
@@ -1470,7 +1469,7 @@ class Model:
                                                             entity_id,
                                                             entity=entity)
             else:
-                metadata = get_local_charm_metadata(entity_path)
+                metadata = utils.get_local_charm_metadata(entity_path)
                 if not application_name:
                     application_name = metadata['name']
                 # We have a local charm dir that needs to be uploaded
