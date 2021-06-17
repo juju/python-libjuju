@@ -21,6 +21,7 @@ import websockets
 from . import provisioner, tag, utils
 from .annotationhelper import _get_annotations, _set_annotations
 from .bundle import BundleHandler, get_charm_series
+from .charm import get_local_charm_metadata
 from .charmhub import CharmHub
 from .charmstore import CharmStore
 from .client import client, connector
@@ -1419,7 +1420,6 @@ class Model:
         entity_url = str(entity_url)  # allow for pathlib.Path objects
         entity_path = Path(entity_url.replace('local:', ''))
         bundle_path = entity_path / 'bundle.yaml'
-        metadata_path = entity_path / 'metadata.yaml'
 
         is_local = (
             entity_url.startswith('local:') or
@@ -1470,12 +1470,8 @@ class Model:
                                                             entity_id,
                                                             entity=entity)
             else:
+                metadata = get_local_charm_metadata(entity_path)
                 if not application_name:
-                    if str(entity_path).endswith('.charm'):
-                        with zipfile.ZipFile(entity_path, 'r') as charm_file:
-                            metadata = yaml.load(charm_file.read('metadata.yaml'), Loader=yaml.FullLoader)
-                    else:
-                        metadata = yaml.load(metadata_path.read_text(), Loader=yaml.FullLoader)
                     application_name = metadata['name']
                 # We have a local charm dir that needs to be uploaded
                 charm_dir = os.path.abspath(
