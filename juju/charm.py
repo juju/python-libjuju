@@ -13,30 +13,9 @@
 #     limitations under the License.
 
 import logging
-import zipfile
-import yaml
-from pathlib import Path
 from . import model
 
 log = logging.getLogger(__name__)
-
-
-def get_local_charm_metadata(path):
-    """Retrieve Metadata of a Charm from its path
-
-    :patam str path: Path of charm directory or .charm file
-
-    :return: Object of charm metadata
-    """
-    if str(path).endswith('.charm'):
-        with zipfile.ZipFile(path, 'r') as charm_file:
-            metadata = yaml.load(charm_file.read('metadata.yaml'), Loader=yaml.FullLoader)
-    else:
-        entity_path = Path(path)
-        metadata_path = entity_path / 'metadata.yaml'
-        metadata = yaml.load(metadata_path.read_text(), Loader=yaml.FullLoader)
-
-    return metadata
 
 
 class Charm(model.ModelEntity):

@@ -17,14 +17,13 @@ import json
 import logging
 import os
 
-from . import model, tag
+from . import model, tag, utils
 from .status import derive_status
 from .annotationhelper import _get_annotations, _set_annotations
 from .client import client
 from .errors import JujuError
 from .bundle import get_charm_series
 from .placement import parse as parse_placement
-from .charm import get_local_charm_metadata
 
 log = logging.getLogger(__name__)
 
@@ -718,7 +717,7 @@ class Application(model.ModelEntity):
             if default_series:
                 series = default_series.value
         charm_url = await self.model.add_local_charm_dir(charm_dir, series)
-        metadata = get_local_charm_metadata(path)
+        metadata = utils.get_local_charm_metadata(path)
         if resources is not None:
             resources = await self.model.add_local_resources(self.entity_id,
                                                              charm_url,
