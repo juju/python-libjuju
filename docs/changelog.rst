@@ -1,6 +1,13 @@
 Changelog
 ---------
 
+2.9.2
+^^^^^
+
+Monday June 28 2021
+
+* Bug fix - Fix 'metadata referenced before assignment' error #509
+
 2.9.1
 ^^^^^
 
