@@ -350,6 +350,10 @@ class AddApplicationChange(ChangeInfo):
                 self.application, charm, overrides=self.resources)
         else:
             resources = {}
+        if self.series is None or self.series == "":
+            self.series = context.bundle.get("bundle",
+                                             context.bundle.get("series", None))
+
         await context.model._deploy(
             charm_url=charm,
             application=self.application,

@@ -236,6 +236,57 @@ class TestAddApplicationChangeRun:
                                          devices="devices",
                                          num_units="num_units")
 
+    @pytest.mark.asyncio
+    async def test_run_no_series(self, event_loop):
+        change = AddApplicationChange(1, [], params={"charm": "charm",
+                                                     "series": "",
+                                                     "application": "application",
+                                                     "options": "options",
+                                                     "constraints": "constraints",
+                                                     "storage": "storage",
+                                                     "endpoint-bindings": "endpoint_bindings",
+                                                     "resources": "resources",
+                                                     "devices": "devices",
+                                                     "num-units": "num_units"})
+
+        model = mock.Mock()
+        model._deploy = base.AsyncMock(return_value=None)
+        model._add_store_resources = base.AsyncMock(return_value=["resource1"])
+        model.applications = {}
+
+        context = mock.Mock()
+        context.resolve.return_value = "charm1"
+        context.trusted = False
+        context.model = model
+        context.bundle = {"bundle": "kubernetes"}
+
+        result = await change.run(context)
+        assert result == "application"
+
+        model._add_store_resources.assert_called_once()
+        model._add_store_resources.assert_called_with("application",
+                                                      "charm1",
+                                                      overrides="resources")
+
+        model._deploy.assert_called_once()
+        model._deploy.assert_called_with(charm_url="charm1",
+                                         application="application",
+                                         series="kubernetes",
+                                         config="options",
+                                         constraints="constraints",
+                                         endpoint_bindings="endpoint_bindings",
+                                         resources=["resource1"],
+                                         storage="storage",
+                                         devices="devices",
+                                         num_units="num_units")
+
+        # confirm that it's idempotent
+        model.applications = {"application": None}
+        result = await change.run(context)
+        assert result == "application"
+        model._add_store_resources.assert_called_once()
+        model._deploy.assert_called_once()
+
 
 class TestAddCharmChange(unittest.TestCase):
 
