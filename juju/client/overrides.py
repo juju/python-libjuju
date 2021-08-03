@@ -63,7 +63,11 @@ class ResourcesFacade(Type):
     """
 
     @ReturnMapping(_client.AddPendingResourcesResult)
-    async def AddPendingResources(self, application_tag="", charm_url="", resources=None):
+    async def AddPendingResources(self,
+                                  application_tag="",
+                                  charm_url="",
+                                  charm_origin=None,
+                                  resources=None):
         """Fix the calling signature of AddPendingResources.
 
         The ResourcesFacade doesn't conform to the standard facade pattern in
@@ -81,11 +85,12 @@ class ResourcesFacade(Type):
         _params = dict()
         msg = dict(type='Resources',
                    request='AddPendingResources',
-                   version=1,
+                   version=2,
                    params=_params)
         _params['tag'] = application_tag
         _params['url'] = charm_url
         _params['resources'] = resources
+        _params['charm-origin'] = charm_origin
         reply = await self.rpc(msg)
         return reply
 

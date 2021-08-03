@@ -1595,10 +1595,13 @@ class Model:
             # XXX: we're dropping local resources here, but we don't
             # actually support them yet anyway
             if not res.is_local:
-                await self._add_charm(identifier, res.origin)
+                add_charm_res = await self._add_charm(identifier, res.origin)
 
-                # TODO (stickupkid): Handle charmhub charms, for now we'll only
-                # handle charmstore charms.
+                if Schema.CHARM_HUB.matches(url.schema):
+                    resources = await self._add_charmhub_resources(res.app_name,
+                                                                   identifier,
+                                                                   add_charm_res.charm_origin)
+
                 if Schema.CHARM_STORE.matches(url.schema):
                     resources = await self._add_store_resources(res.app_name,
                                                                 identifier)
@@ -1632,6 +1635,7 @@ class Model:
                 num_units=num_units,
                 placement=parse_placement(to),
                 devices=devices,
+                charm_origin=add_charm_res.charm_origin,
             )
 
     async def _add_charm(self, charm_url, origin):
@@ -1684,6 +1688,50 @@ class Model:
 
         return DEFAULT_ARCHITECTURE
 
+    async def _add_charmhub_resources(self, application,
+                                      entity_url,
+                                      origin,
+                                      overrides=None):
+        charm_facade = client.CharmsFacade.from_connection(self.connection())
+        res = await charm_facade.CharmInfo(entity_url)
+
+        resources = []
+        for resource in res.meta.resources.values():
+            resources.append({
+                'description': resource.description,
+                'name': resource.name,
+                'path': resource.path,
+                'type_': resource.type_,
+                'origin': 'store',
+                'revision': -1,
+            })
+
+        if overrides:
+            names = {r['name'] for r in resources}
+            unknown = overrides.keys() - names
+            if unknown:
+                raise JujuError('Unrecognized resource{}: {}'.format(
+                    's' if len(unknown) > 1 else '',
+                    ', '.join(unknown)))
+            for resource in resources:
+                if resource['name'] in overrides:
+                    resource['revision'] = overrides[resource['name']]
+
+
+        resources_facade = client.ResourcesFacade.from_connection(
+            self.connection())
+        response = await resources_facade.AddPendingResources(
+            application_tag=tag.application(application),
+            charm_url=entity_url,
+            charm_origin=origin,
+            resources=[client.CharmResource(**resource) for resource in resources],
+        )
+
+        resource_map = {resource['name']: pid
+                        for resource, pid
+                        in zip(resources, response.pending_ids)}
+        return resource_map
+
     async def _add_store_resources(self, application, entity_url,
                                    overrides=None):
         entity = await self.charmstore.entity(entity_url,
@@ -1729,7 +1777,7 @@ class Model:
     async def _deploy(self, charm_url, application, series, config,
                       constraints, endpoint_bindings, resources, storage,
                       channel=None, num_units=None, placement=None,
-                      devices=None):
+                      devices=None, charm_origin=None):
         """Logic shared between `Model.deploy` and `BundleHandler.deploy`.
         """
         log.info('Deploying %s', charm_url)
@@ -1747,6 +1795,7 @@ class Model:
             application=application,
             series=series,
             channel=channel,
+            charm_origin=charm_origin,
             config_yaml=config,
             constraints=parse_constraints(constraints),
             endpoint_bindings=endpoint_bindings,

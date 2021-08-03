@@ -107,7 +107,7 @@ async def test_deploy_charmstore_charm(event_loop):
 @pytest.mark.asyncio
 async def test_deploy_charmhub_charm(event_loop):
     async with base.CleanModel() as model:
-        app = await model.deploy('hello-juju')
+        app = await model.deploy('ch:hello-juju')
         await model.block_until(lambda: (len(app.units) > 0 and
                                          app.units[0].machine))
         assert 'hello-juju' in app.data['charm-url']
