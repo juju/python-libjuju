@@ -97,7 +97,7 @@ async def test_deploy_local_charm(event_loop):
     async with base.CleanModel() as model:
         await model.deploy(str(charm_path))
         assert 'charm' in model.applications
-        await model.wait_for_idle(wait_for_active=True)
+        await model.wait_for_idle(wait_for_status="active")
         assert model.units['charm/0'].workload_status == 'active'
 
 
@@ -113,7 +113,7 @@ async def test_wait_local_charm_blocked(event_loop):
         assert 'charm' in model.applications
         await model.wait_for_idle()
         with pytest.raises(JujuUnitError):
-            await model.wait_for_idle(wait_for_active=True,
+            await model.wait_for_idle(wait_for_status="active",
                                       raise_on_blocked=True,
                                       timeout=30)
 
@@ -130,7 +130,7 @@ async def test_wait_local_charm_waiting_timeout(event_loop):
         assert 'charm' in model.applications
         await model.wait_for_idle()
         with pytest.raises(asyncio.TimeoutError):
-            await model.wait_for_idle(wait_for_active=True, timeout=30)
+            await model.wait_for_idle(wait_for_status="active", timeout=30)
 
 
 @base.bootstrapped

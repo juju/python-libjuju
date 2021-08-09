@@ -151,10 +151,10 @@ async def test_upgrade_local_charm(event_loop):
         tests_dir = Path(__file__).absolute().parent
         charm_path = tests_dir / 'upgrade-charm'
         app = await model.deploy('ubuntu', series='focal')
-        await model.wait_for_idle(wait_for_active=True)
+        await model.wait_for_idle(wait_for_status="active")
         assert app.data['charm-url'].startswith('cs:ubuntu')
         await app.upgrade_charm(path=charm_path)
-        await model.wait_for_idle()  # nb: can't use wait_for_active because test charm goes to "waiting"
+        await model.wait_for_idle(wait_for_status="waiting")
         assert app.data['charm-url'] == 'local:focal/ubuntu-0'
 
 
