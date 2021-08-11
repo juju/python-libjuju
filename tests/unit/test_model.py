@@ -298,14 +298,14 @@ class TestModelWaitForIdle(asynctest.TestCase):
             mock_apps.return_value = apps
             m = Model()
 
-            # pass "active" via `wait_for_status` (str)
-            await m.wait_for_idle(apps=["dummy_app"], wait_for_status="active", timeout=5, idle_period=0)
+            # pass "active" via `status` (str)
+            await m.wait_for_idle(apps=["dummy_app"], status="active", timeout=5, idle_period=0)
 
             # pass "active" via `wait_for_active` (bool; deprecated)
             await m.wait_for_idle(apps=["dummy_app"], wait_for_active=True, timeout=5, idle_period=0)
 
-            # use both `wait_for_status` and `wait_for_active` - `wait_for_active` takes precedence
-            await m.wait_for_idle(apps=["dummy_app"], wait_for_active=True, wait_for_status="doesn't matter", timeout=5,
+            # use both `status` and `wait_for_active` - `wait_for_active` takes precedence
+            await m.wait_for_idle(apps=["dummy_app"], wait_for_active=True, status="doesn't matter", timeout=5,
                                   idle_period=0)
 
         mock_apps.assert_called()
