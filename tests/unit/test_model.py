@@ -267,6 +267,8 @@ class TestModelConnect(asynctest.TestCase):
                                         max_frame_size='max_frame_size')
 
 
+# Patch timedelta to immediately force a timeout to avoid introducing an unnecessary delay in the test failing.
+# It should be safe to always set it up to lead to a timeout.
 @patch('juju.model.timedelta', new=lambda *a, **kw: datetime.timedelta(0))
 class TestModelWaitForIdle(asynctest.TestCase):
     async def test_no_args(self):
