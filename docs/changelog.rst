@@ -1,6 +1,13 @@
 Changelog
 ---------
 
+2.9.3
+^^^^^
+
+Monday August 12 2021
+
+* Bug fix - Fix 'Default to bundle series if the charm has no series field' #514
+
 2.9.2
 ^^^^^
 
