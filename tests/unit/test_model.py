@@ -311,4 +311,4 @@ class TestModelWaitForIdle(asynctest.TestCase):
             # use both `status` and `wait_for_active` - `wait_for_active` takes precedence
             await m.wait_for_idle(apps=["dummy_app"], wait_for_active=True, status="doesn't matter")
 
-        mock_apps.assert_called()
+        mock_apps.assert_called_with()
