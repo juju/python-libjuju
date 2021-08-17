@@ -1,8 +1,11 @@
 import unittest
+from unittest.mock import patch, PropertyMock
 
 import mock
 
+import asyncio
 import asynctest
+import datetime
 
 from juju.client.jujudata import FileJujuData
 from juju.model import Model
@@ -262,3 +265,50 @@ class TestModelConnect(asynctest.TestCase):
                                         macaroons='macaroons',
                                         loop='loop',
                                         max_frame_size='max_frame_size')
+
+
+# Patch timedelta to immediately force a timeout to avoid introducing an unnecessary delay in the test failing.
+# It should be safe to always set it up to lead to a timeout.
+@patch('juju.model.timedelta', new=lambda *a, **kw: datetime.timedelta(0))
+class TestModelWaitForIdle(asynctest.TestCase):
+    async def test_no_args(self):
+        m = Model()
+        with self.assertWarns(DeprecationWarning):
+            # no apps so should return right away
+            await m.wait_for_idle(wait_for_active=True)
+
+    async def test_timeout(self):
+        m = Model()
+        with self.assertRaises(asyncio.TimeoutError) as cm:
+            # no apps so should timeout after timeout period
+            await m.wait_for_idle(apps=["nonexisting_app"])
+        self.assertEqual(str(cm.exception), "Timed out waiting for model:\nnonexisting_app (missing)")
+
+    async def test_wait_for_active_status(self):
+        # create a custom apps mock
+        from types import SimpleNamespace
+        apps = {"dummy_app": SimpleNamespace(
+            status="active",
+            units=[SimpleNamespace(
+                name="mockunit/0",
+                workload_status="active",
+                workload_status_message="workload_status_message",
+                machine=None,
+                agent_status="idle",
+            )],
+        )}
+
+        with patch.object(Model, 'applications', new_callable=PropertyMock) as mock_apps:
+            mock_apps.return_value = apps
+            m = Model()
+
+            # pass "active" via `status` (str)
+            await m.wait_for_idle(apps=["dummy_app"], status="active")
+
+            # pass "active" via `wait_for_active` (bool; deprecated)
+            await m.wait_for_idle(apps=["dummy_app"], wait_for_active=True)
+
+            # use both `status` and `wait_for_active` - `wait_for_active` takes precedence
+            await m.wait_for_idle(apps=["dummy_app"], wait_for_active=True, status="doesn't matter")
+
+        mock_apps.assert_called_with()
