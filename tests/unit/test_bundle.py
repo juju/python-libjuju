@@ -1,11 +1,24 @@
+from pathlib import Path
 import unittest
 from unittest import mock
 
+import yaml
+
 import pytest
-from juju.bundle import (AddApplicationChange, AddCharmChange,
-                         AddMachineChange, AddRelationChange, AddUnitChange,
-                         ChangeSet, ConsumeOfferChange, CreateOfferChange,
-                         ExposeChange, ScaleChange, SetAnnotationsChange)
+from juju.bundle import (
+    AddApplicationChange,
+    AddCharmChange,
+    AddMachineChange,
+    AddRelationChange,
+    AddUnitChange,
+    BundleHandler,
+    ChangeSet,
+    ConsumeOfferChange,
+    CreateOfferChange,
+    ExposeChange,
+    ScaleChange,
+    SetAnnotationsChange,
+)
 from juju.client import client
 from toposort import CircularDependencyError
 
@@ -220,6 +233,7 @@ class TestAddApplicationChangeRun:
         context.resolve.return_value = "local:charm1"
         context.trusted = False
         context.model = model
+        context.bundle = {"applications": {}}
 
         result = await change.run(context)
         assert result == "application"
@@ -873,3 +887,52 @@ class TestSetAnnotationsChangeRun:
 
         entity.set_annotations.assert_called_once()
         entity.set_annotations.assert_called_with("annotations")
+
+
+class TestBundleHandler:
+    @pytest.mark.asyncio
+    async def test_fetch_plan_local_k8s_bundle(self, event_loop):
+        class AsyncMock(mock.MagicMock):
+            async def __call__(self, *args, **kwargs):
+                return super(AsyncMock, self).__call__(*args, **kwargs)
+
+        bundle_dir = Path("tests/bundle")
+        bundle = {
+            "bundle": "kubernetes",
+            "applications": {
+                "oci-image-charm": {
+                    "charm": "../integration/oci-image-charm",
+                    "resources": {"oci-image": "ubuntu:latest"}
+                }
+            }
+        }
+
+        connection_mock = mock.Mock()
+        connection_mock.facades = {
+            "Bundle": 17,
+            "Client": 17,
+            "Application": 17,
+            "Annotations": 17,
+        }
+        model = mock.Mock()
+        model.units = {}
+        model.loop = event_loop
+        model.add_local_charm_dir = AsyncMock()
+        model.add_local_charm_dir.side_effect = ["charm_uri"]
+        model.connection.return_value = connection_mock
+        model.get_config = AsyncMock()
+        model.get_config.return_value = mock.Mock()
+        model.add_local_resources = AsyncMock()
+        model.add_local_resources.side_effect = [{"oci-image": "id"}]
+        handler = BundleHandler(model)
+        handler.bundle = bundle
+
+        bundle = await handler._handle_local_charms(bundle, bundle_dir)
+
+        model.add_local_resources.assert_called_once_with(
+            "oci-image-charm",
+            "charm_uri",
+            yaml.load(Path("tests/integration/oci-image-charm/metadata.yaml").read_text(), Loader=yaml.FullLoader),
+            resources={"oci-image": "ubuntu:latest"},
+        )
+        assert bundle["applications"]["oci-image-charm"]["resources"]["oci-image"] == "id"

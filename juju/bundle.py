@@ -11,6 +11,7 @@ from toposort import toposort_flatten
 from .client import client
 from .constraints import parse as parse_constraints, parse_storage_constraint, parse_device_constraint
 from .errors import JujuError
+from . import utils
 
 log = logging.getLogger(__name__)
 
@@ -106,6 +107,11 @@ class BundleHandler:
                 get_charm_series(charm_dir)
             )
             if not series:
+                model_config = await self.model.get_config()
+                default_series = model_config.get("default-series")
+                if default_series:
+                    series = default_series.value
+            if not series:
                 raise JujuError(
                     "Couldn't determine series for charm at {}. "
                     "Add a 'series' key to the bundle.".format(charm_dir))
@@ -122,9 +128,17 @@ class BundleHandler:
                 self.model.add_local_charm_dir(*params)
                 for params in args
             ], loop=self.model.loop)
+
             # Update the 'charm:' entry for each app with the new 'local:' url.
-            for app_name, charm_url in zip(apps, charm_urls):
+            for app_name, charm_url, (charm_dir, _) in zip(apps, charm_urls, args):
+                resources = await self.model.add_local_resources(
+                    app_name,
+                    charm_url,
+                    utils.get_local_charm_metadata(charm_dir),
+                    resources=bundle["applications"][app_name].get("resources", {}),
+                )
                 apps_dict[app_name]['charm'] = charm_url
+                apps_dict[app_name]["resources"] = resources
 
         return bundle
 
@@ -349,7 +363,7 @@ class AddApplicationChange(ChangeInfo):
             resources = await context.model._add_store_resources(
                 self.application, charm, overrides=self.resources)
         else:
-            resources = {}
+            resources = context.bundle.get("applications", {}).get(self.application, {}).get("resources", {})
         if self.series is None or self.series == "":
             self.series = context.bundle.get("bundle",
                                              context.bundle.get("series", None))
