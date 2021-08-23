@@ -1717,7 +1717,6 @@ class Model:
                 if resource['name'] in overrides:
                     resource['revision'] = overrides[resource['name']]
 
-
         resources_facade = client.ResourcesFacade.from_connection(
             self.connection())
         response = await resources_facade.AddPendingResources(

@@ -18,8 +18,9 @@ async def main():
     try:
         print('Deploying ')
         application = await model.deploy(
-            'ch:snappass-test',
-            application_name='snappass'
+            'ch:juju-qa-test',
+            application_name='juju-qa-test2',
+            channel='2.0/edge',
         )
 
         print('Waiting for active')
