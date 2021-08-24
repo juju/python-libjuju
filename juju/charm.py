@@ -13,7 +13,6 @@
 #     limitations under the License.
 
 import logging
-
 from . import model
 
 log = logging.getLogger(__name__)

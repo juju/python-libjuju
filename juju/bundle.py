@@ -456,6 +456,13 @@ class AddApplicationChange(ChangeInfo):
         :param context: is used for any methods or properties required to
             perform a change.
         """
+        # NB: this should really be handled by the controller when generating the
+        # bundle change plan, and this short-term workaround may be missing some
+        # aspects of the logic which the CLI client contains to handle edge cases.
+        if self.application in context.model.applications:
+            log.debug('Skipping %s; already in model', self.application)
+            return self.application
+
         # resolve indirect references
         charm = context.resolve(self.charm)
         options = {}
@@ -480,6 +487,9 @@ class AddApplicationChange(ChangeInfo):
         origin = context.origins.get(str(url), {}).get(str(channel), None)
         if origin is None:
             raise JujuError("expected origin to be valid for application {} and charm {} with channel {}".format(self.application, str(url), str(channel)))
+        if self.series is None or self.series == "":
+            self.series = context.bundle.get("bundle",
+                                             context.bundle.get("series", None))
 
         await context.model._deploy(
             charm_url=charm,
@@ -577,9 +587,9 @@ class AddCharmChange(ChangeInfo):
             return self.charm
 
         if Schema.CHARM_STORE.matches(url.schema):
-            entity_id = await context.charmstore.entityId(self.charm)
+            entity_id = await context.charmstore.entityId(self.charm, channel=self.channel)
             log.debug('Adding %s', entity_id)
-            await context.client_facade.AddCharm(channel=None, url=entity_id, force=False)
+            await context.client_facade.AddCharm(channel=self.channel, url=entity_id, force=False)
             identifier = entity_id
             origin = client.CharmOrigin(source="charm-store", risk="stable")
 
@@ -753,6 +763,14 @@ class AddRelationChange(ChangeInfo):
         """
         ep1 = context.resolve_relation(self.endpoint1)
         ep2 = context.resolve_relation(self.endpoint2)
+
+        # NB: this should really be handled by the controller when generating the
+        # bundle change plan, and this short-term workaround may be missing some
+        # aspects of the logic which the CLI client contains to handle edge cases.
+        existing = [rel for rel in context.model.relations if rel.matches(ep1, ep2)]
+        if existing:
+            log.info('Skipping %s <-> %s; already related', ep1, ep2)
+            return existing[0]
 
         log.info('Relating %s <-> %s', ep1, ep2)
         return await context.model.add_relation(ep1, ep2)
@@ -960,6 +978,7 @@ class ExposeChange(ChangeInfo):
     def __init__(self, change_id, requires, params=None):
         super(ExposeChange, self).__init__(change_id, requires)
 
+        self.exposed_endpoints = None
         if isinstance(params, list):
             self.application = params[0]
         elif isinstance(params, dict):

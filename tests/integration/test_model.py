@@ -97,7 +97,7 @@ async def test_deploy_local_charm(event_loop):
     async with base.CleanModel() as model:
         await model.deploy(str(charm_path))
         assert 'charm' in model.applications
-        await model.wait_for_idle(wait_for_active=True)
+        await model.wait_for_idle(status="active")
         assert model.units['charm/0'].workload_status == 'active'
 
 
@@ -113,7 +113,7 @@ async def test_wait_local_charm_blocked(event_loop):
         assert 'charm' in model.applications
         await model.wait_for_idle()
         with pytest.raises(JujuUnitError):
-            await model.wait_for_idle(wait_for_active=True,
+            await model.wait_for_idle(status="active",
                                       raise_on_blocked=True,
                                       timeout=30)
 
@@ -130,7 +130,7 @@ async def test_wait_local_charm_waiting_timeout(event_loop):
         assert 'charm' in model.applications
         await model.wait_for_idle()
         with pytest.raises(asyncio.TimeoutError):
-            await model.wait_for_idle(wait_for_active=True, timeout=30)
+            await model.wait_for_idle(status="active", timeout=30)
 
 
 @base.bootstrapped
@@ -566,6 +566,25 @@ async def test_store_resources_charm(event_loop):
         # ghost will go in to blocked (or error, for older
         # charm revs) if the resource is missing
         assert ghost.units[0].workload_status == 'active'
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_local_oci_image_resource_charm(event_loop):
+    tests_dir = Path(__file__).absolute().parent
+    charm_path = tests_dir / 'oci-image-charm'
+    async with base.CleanModel() as model:
+        resources = {"oci-image": "ubuntu/latest"}
+        charm = await model.deploy(str(charm_path), resources=resources)
+        assert 'oci-image-charm' in model.applications
+        terminal_statuses = ('active', 'error', 'blocked')
+        await model.block_until(
+            lambda: (
+                len(charm.units) > 0 and
+                charm.units[0].workload_status in terminal_statuses),
+            timeout=120,
+        )
+        assert charm.units[0].workload_status == 'active'
 
 
 @base.bootstrapped

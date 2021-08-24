@@ -125,7 +125,7 @@ class Unit(model.ModelEntity):
         return await app_facade.ResolveUnitErrors(
             all_=False,
             retry=retry,
-            tags={'tag': [self.tag]})
+            tags={'entities': [{'tag': self.tag}]})
 
     async def run(self, command, timeout=None):
         """Run command on this unit.
