@@ -1,0 +1,9 @@
+bundle: kubernetes
+applications:
+  onos2:
+    charm: "../charms/onos.charm"
+    scale: 1
+    options:
+      admin-password: admin
+    resources:
+      onos-image: onosproject/onos:2.6.0
