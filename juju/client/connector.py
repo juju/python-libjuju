@@ -56,7 +56,6 @@ class Connector:
 
         kwargs are passed through to Connection.connect()
         """
-
         kwargs.setdefault('loop', self.loop)
         kwargs.setdefault('max_frame_size', self.max_frame_size)
         kwargs.setdefault('bakery_client', self.bakery_client)
@@ -106,7 +105,7 @@ class Connector:
         self.controller_name = controller_name
         self.controller_uuid = controller["uuid"]
 
-    async def connect_model(self, model_name=None):
+    async def connect_model(self, model_name=None, **kwargs):
         """Connect to a model by name. If either controller or model
         parts of the name are empty, the current controller and/or model
         will be used.
@@ -138,15 +137,14 @@ class Connector:
         # haven't necessarily synced with the local juju data,
         # and also remove the need for base.CleanModel to
         # subclass JujuData.
-        await self.connect(
-            endpoint=endpoints,
-            uuid=models[model_name]['uuid'],
-            username=account.get('user'),
-            password=account.get('password'),
-            cacert=controller.get('ca-cert'),
-            bakery_client=self.bakery_client_for_controller(controller_name),
-            proxy=proxy,
-        )
+        kwargs.update(endpoint=endpoints,
+                      uuid=models[model_name]['uuid'],
+                      username=account.get('user'),
+                      password=account.get('password'),
+                      cacert=controller.get('ca-cert'),
+                      bakery_client=self.bakery_client_for_controller(controller_name),
+                      proxy=proxy)
+        await self.connect(**kwargs)
         self.controller_name = controller_name
         self.model_name = controller_name + ':' + model_name
 

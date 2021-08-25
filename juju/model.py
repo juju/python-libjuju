@@ -583,12 +583,12 @@ class Model:
             await self._connector.connect(**kwargs)
         await self._after_connect()
 
-    async def connect_model(self, model_name):
+    async def connect_model(self, model_name, **kwargs):
         """
         .. deprecated:: 0.6.2
            Use ``connect(model_name=model_name)`` instead.
         """
-        return await self.connect(model_name=model_name)
+        return await self.connect(model_name=model_name, **kwargs)
 
     async def connect_current(self):
         """
