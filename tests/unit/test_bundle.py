@@ -224,6 +224,7 @@ class TestAddApplicationChangeRun:
         model = mock.Mock()
         model._deploy = base.AsyncMock(return_value=None)
         model._add_store_resources = base.AsyncMock(return_value=["resource1"])
+        model.applications = {}
 
         context = mock.Mock()
         context.resolve.return_value = "ch:charm1"
@@ -284,7 +285,7 @@ class TestAddApplicationChangeRun:
 
     @pytest.mark.asyncio
     async def test_run_no_series(self, event_loop):
-        change = AddApplicationChange(1, [], params={"charm": "charm",
+        change = AddApplicationChange(1, [], params={"charm": "cs:charm1",
                                                      "series": "",
                                                      "application": "application",
                                                      "options": "options",
@@ -301,7 +302,7 @@ class TestAddApplicationChangeRun:
         model.applications = {}
 
         context = mock.Mock()
-        context.resolve.return_value = "charm1"
+        context.resolve.return_value = "cs:charm1"
         context.trusted = False
         context.model = model
         context.bundle = {"bundle": "kubernetes"}
@@ -311,11 +312,11 @@ class TestAddApplicationChangeRun:
 
         model._add_store_resources.assert_called_once()
         model._add_store_resources.assert_called_with("application",
-                                                      "charm1",
+                                                      "cs:charm1",
                                                       overrides="resources")
 
         model._deploy.assert_called_once()
-        model._deploy.assert_called_with(charm_url="charm1",
+        model._deploy.assert_called_with(charm_url="cs:charm1",
                                          application="application",
                                          series="kubernetes",
                                          config="options",
@@ -541,7 +542,7 @@ class TestAddRelationChangeRun:
         model.add_relation.assert_called_with("endpoint_1", "endpoint_2")
 
         # confirm that it's idempotent
-        context.resolveRelation.side_effect = ['endpoint_1', 'endpoint_2']
+        context.resolve_relation = mock.Mock(side_effect=['endpoint_1', 'endpoint_2'])
         model.add_relation.reset_mock()
         model.add_relation.return_value = None
         model.relations = [rel1, rel2]
