@@ -1597,6 +1597,7 @@ class Model:
             # actually support them yet anyway
             if not res.is_local:
                 add_charm_res = await self._add_charm(identifier, res.origin)
+                charm_origin = add_charm_res.charm_origin
 
                 if Schema.CHARM_HUB.matches(url.schema):
                     resources = await self._add_charmhub_resources(res.app_name,
@@ -1610,6 +1611,7 @@ class Model:
                 # We have a local charm dir that needs to be uploaded
                 charm_dir = os.path.abspath(
                     os.path.expanduser(identifier))
+                charm_origin = res.origin
                 metadata = utils.get_local_charm_metadata(charm_dir)
                 if not application_name:
                     application_name = metadata['name']
@@ -1648,7 +1650,7 @@ class Model:
                 num_units=num_units,
                 placement=parse_placement(to),
                 devices=devices,
-                charm_origin=add_charm_res.charm_origin,
+                charm_origin=charm_origin
             )
 
     async def _add_charm(self, charm_url, origin):
