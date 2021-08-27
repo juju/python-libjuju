@@ -1739,9 +1739,8 @@ class Model:
             resources=[client.CharmResource(**resource) for resource in resources],
         )
 
-        resource_map = {resource['name']: pid
-                        for resource, pid
-                        in zip(resources, response.pending_ids)}
+        resource_map = {resource['name']: resource['pending_id']
+                        for resource in resources}
         return resource_map
 
     async def _add_store_resources(self, application, entity_url,
