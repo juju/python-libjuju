@@ -1741,8 +1741,12 @@ class Model:
             resources=[client.CharmResource(**resource) for resource in resources],
         )
 
-        resource_map = {resource['name']: resource['pending_id']
-                        for resource in resources}
+        # response.pending_ids always exists but it can itself be None
+        # see juju/client/_definitions.py for AddPendingResourcesResult
+        resource_map = {resource['name']: pid
+                        for resource, pid
+                        in zip(resources, response.pending_ids or {})}
+
         return resource_map
 
     async def _add_store_resources(self, application, entity_url,
