@@ -164,10 +164,13 @@ class Machine(model.ModelEntity):
             cmd.extend(ssh_opts.split() if isinstance(ssh_opts, str) else ssh_opts)
         cmd.extend([command])
         loop = self.model.loop
-        process = await asyncio.create_subprocess_exec(*cmd, loop=loop)
-        await process.wait()
+        process = await asyncio.create_subprocess_exec(
+            *cmd, loop=loop, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
+        stdout, stderr = await process.communicate()
         if process.returncode != 0:
-            raise JujuError("command failed: %s" % cmd)
+            raise JujuError("command failed: %s with %s" % (cmd, stderr.decode()))
+        # stdout is a bytes-like object, returning a string might be more useful
+        return stdout.decode()
 
     def status_history(self, num=20, utc=False):
         """Get status history for this machine.
