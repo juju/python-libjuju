@@ -154,7 +154,7 @@ async def test_resolve_local(event_loop):
         )
 
         try:
-            await model.wait_for_idle(raise_on_error=False)
+            await model.wait_for_idle(raise_on_error=False, idle_period=3)
             assert app.units[0].workload_status == 'error'
 
             await app.units[0].resolved()
