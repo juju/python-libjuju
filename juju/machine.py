@@ -232,12 +232,11 @@ class Machine(model.ModelEntity):
 
         May return None if no suitable address is found.
         """
-        for scope in ['public', 'local-cloud']:
-            addresses = self.safe_data['addresses'] or []
-            addresses = [address for address in addresses
-                         if address['scope'] == scope]
-            if addresses:
-                return addresses[0]['value']
+        addresses = self.safe_data['addresses'] or []
+        for address in addresses:
+            scope = address['scope']
+            if scope == 'public' or scope == 'local-cloud':
+                return address['value']
         return None
 
     @property
