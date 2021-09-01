@@ -138,8 +138,9 @@ async def test_ssh(event_loop):
             model.block_until(lambda: (machine.status == 'running' and
                                        machine.agent_status == 'started')),
             timeout=480)
+
         output = await unit.ssh("echo test")
-        assert(output == "test")
+        assert 'test' in output
 
 
 @base.bootstrapped
