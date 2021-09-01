@@ -341,13 +341,17 @@ async def test_add_manual_machine_ssh(event_loop):
                 time.sleep(attempt * 5)
             else:
                 break
+        else:
+            # this else will only run when for finishes without a
+            # break (meaning it kept erroring)
+            raise Exception('Unable to add_machine')
 
-            assert len(model.machines) == 1
+        assert len(model.machines) == 1
 
-            res = await machine1.destroy(force=True)
+        res = await machine1.destroy(force=True)
 
-            assert res is None
-            assert len(model.machines) == 0
+        assert res is None
+        assert len(model.machines) == 0
 
         container.stop(wait=True)
         container.delete(wait=True)
@@ -451,9 +455,15 @@ async def test_add_manual_machine_ssh_root(event_loop):
                     private_key_path,
                 ))
             except (paramiko.ssh_exception.NoValidConnectionsError, paramiko.ssh_exception.AuthenticationException):
+                # if we get an exception, try again
                 time.sleep(attempt * 5)
             else:
+                # try part finished without exception
                 break
+        else:
+            # this else will only run when for finishes without a
+            # break (meaning it kept erroring)
+            raise Exception('Unable to add_machine')
 
         assert len(model.machines) == 1
 
