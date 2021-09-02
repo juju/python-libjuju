@@ -123,10 +123,9 @@ async def run_with_interrupt(task, *events, loop=None):
     :param loop: Optional event loop to use other than the default.
     """
     loop = loop or asyncio.get_event_loop()
-    task = asyncio.ensure_future(task, loop=loop)
+    task = asyncio.ensure_future(task)
     event_tasks = [loop.create_task(event.wait()) for event in events]
     done, pending = await asyncio.wait([task] + event_tasks,
-                                       loop=loop,
                                        return_when=asyncio.FIRST_COMPLETED)
     for f in pending:
         f.cancel()  # cancel unfinished tasks

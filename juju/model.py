@@ -594,9 +594,9 @@ class Model:
         self.state = ModelState(self)
         self._info = None
         self._mode = None
-        self._watch_stopping = asyncio.Event(loop=self._connector.loop)
-        self._watch_stopped = asyncio.Event(loop=self._connector.loop)
-        self._watch_received = asyncio.Event(loop=self._connector.loop)
+        self._watch_stopping = asyncio.Event()
+        self._watch_stopped = asyncio.Event()
+        self._watch_received = asyncio.Event()
         self._watch_stopped.set()
 
         self._charmhub = CharmHub(self)
@@ -1145,7 +1145,7 @@ class Model:
             has a 'completed' status. See the _Observer class for details.
 
         """
-        q = asyncio.Queue(loop=self._connector.loop)
+        q = asyncio.Queue()
 
         async def callback(delta, old, new, model):
             await q.put(delta.get_id())
