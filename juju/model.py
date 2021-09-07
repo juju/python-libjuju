@@ -1279,11 +1279,17 @@ class Model:
         """
         raise NotImplementedError()
 
-    def get_backups(self):
+    async def get_backups(self):
         """Retrieve metadata for backups in this model.
 
+        :return [dict]: List of metadata for the stored backups
         """
-        raise NotImplementedError()
+        backups_facade = client.BackupsFacade.from_connection(self.connection())
+        _backups_metadata = await backups_facade.List()
+        backups_metadata = _backups_metadata.serialize()
+        if 'list' not in backups_metadata:
+            raise JujuAPIError("Unexpected response metadata : %s" % backups_metadata)
+        return backups_metadata['list']
 
     def block(self, *commands):
         """Add a new block to this model.
@@ -1310,15 +1316,20 @@ class Model:
         """
         raise NotImplementedError()
 
-    def create_backup(self, note=None, no_download=False):
+    async def create_backup(self, notes=None, keep_copy=False, no_download=False):
         """Create a backup of this model.
 
         :param str note: A note to store with the backup
+        :param bool keep_copy: Keep a copy of the archive on the controller
         :param bool no_download: Do not download the backup archive
-        :return str: Path to downloaded archive
+        :return dict: Metadata for the created backup (id, checksum, notes, filename, etc.)
 
         """
-        raise NotImplementedError()
+        backups_facade = client.BackupsFacade.from_connection(self.connection())
+        results = await backups_facade.Create(notes=notes, keep_copy=keep_copy, no_download=no_download)
+        if results is None:
+            raise JujuAPIError("Couldn't create a backup")
+        return results.serialize()
 
     def create_storage_pool(self, name, provider_type, **pool_config):
         """Create or define a storage pool.
@@ -1679,7 +1690,7 @@ class Model:
         return await app_facade.DestroyUnits(unit_names=list(unit_names))
     destroy_units = destroy_unit
 
-    def get_backup(self, archive_id):
+    def download_backup(self, archive_id):
         """Download a backup archive file.
 
         :param str archive_id: The id of the archive to download
@@ -1822,13 +1833,23 @@ class Model:
         """
         raise NotImplementedError()
 
-    def remove_backup(self, backup_id):
+    async def remove_backup(self, backup_id):
         """Delete a backup.
 
         :param str backup_id: The id of the backup to remove
 
         """
-        raise NotImplementedError()
+        backups_facade = client.BackupsFacade.from_connection(self.connection())
+        return await backups_facade.Remove([backup_id])
+
+    async def remove_backups(self, backup_ids):
+        """Delete the given backups.
+
+        :param [str] backup_ids: The list of ids of the backups to remove
+
+        """
+        backups_facade = client.BackupsFacade.from_connection(self.connection())
+        return await backups_facade.Remove(backup_ids)
 
     def remove_cached_images(self, arch=None, kind=None, series=None):
         """Remove cached OS images.
