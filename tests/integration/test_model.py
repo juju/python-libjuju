@@ -784,3 +784,26 @@ async def test_unit_annotations(event_loop):
 
         annotations = await unit.get_annotations()
         assert annotations == expected
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_backups(event_loop):
+    m = Model()
+    await m.connect(model_name='controller')
+    backups = await m.get_backups()
+    assert backups == []  # no backup yet
+
+    created_backup = await m.create_backup(notes="hi", keep_copy=True)
+    assert 'id' in created_backup
+    created_id = created_backup['id']
+
+    assert 'checksum' in created_backup
+    assert created_backup['notes'] == "hi"
+
+    after_create_backups = await m.get_backups()
+    assert len(after_create_backups) == 1
+
+    await m.remove_backup(created_id)
+    after_remove_backup = await m.get_backups()
+    assert len(after_remove_backup) == 0
