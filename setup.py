@@ -35,8 +35,8 @@ setup(
         'pyRFC3339>=1.0,<2.0',
         'pyyaml>=5.1.2,<=6.0',
         'theblues>=0.5.1,<1.0',
-        'websockets>="9.1" ; python_version<"3.9"',
-        'websockets>="9.1" ; python_version>="3.9"',
+        # websockets only works with python>= 3.6.1
+        'websockets>="9.1" ; python_version>="3.6.1"',
         'paramiko>=2.4.0,<3.0.0',
         'pyasn1>=0.4.4',
         'toposort>=1.5,<2',
