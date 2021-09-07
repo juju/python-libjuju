@@ -954,11 +954,23 @@ class TestBundleHandler:
                 return super(AsyncMock, self).__call__(*args, **kwargs)
 
         bundle_dir = Path("tests/bundle")
+        charm_dir_1 = "../integration/oci-image-charm"
+        charm_dir_2 = "../integration/oci-image-charm-no-series"
+        charm_path_1 = str((bundle_dir / charm_dir_1).resolve())
+        charm_path_2 = str((bundle_dir / charm_dir_2).resolve())
         bundle = {
             "bundle": "kubernetes",
             "applications": {
                 "oci-image-charm": {
-                    "charm": "../integration/oci-image-charm",
+                    "charm": charm_dir_1,
+                    "resources": {"oci-image": "ubuntu:latest"}
+                },
+                "oci-image-charm-2": {
+                    "charm": charm_dir_2,
+                    "resources": {"oci-image": "ubuntu:latest"}
+                },
+                "oci-image-charm-3": {
+                    "charm": charm_dir_2,
                     "resources": {"oci-image": "ubuntu:latest"}
                 }
             }
@@ -975,21 +987,43 @@ class TestBundleHandler:
         model.units = {}
         model.loop = event_loop
         model.add_local_charm_dir = AsyncMock()
-        model.add_local_charm_dir.side_effect = ["charm_uri"]
+        model.add_local_charm_dir.return_value = "charm_uri"
         model.connection.return_value = connection_mock
         model.get_config = AsyncMock()
-        model.get_config.return_value = mock.Mock()
+        default_series = mock.Mock()
+        default_series.value = "focal"
+        model_config = {"default-series": default_series}
+        model.get_config.return_value = model_config
         model.add_local_resources = AsyncMock()
-        model.add_local_resources.side_effect = [{"oci-image": "id"}]
+        model.add_local_resources.return_value = {"oci-image": "id"}
         handler = BundleHandler(model)
         handler.bundle = bundle
 
         bundle = await handler._handle_local_charms(bundle, bundle_dir)
 
-        model.add_local_resources.assert_called_once_with(
-            "oci-image-charm",
-            "charm_uri",
-            yaml.load(Path("tests/integration/oci-image-charm/metadata.yaml").read_text(), Loader=yaml.FullLoader),
-            resources={"oci-image": "ubuntu:latest"},
+        model.add_local_resources.assert_has_calls([
+            mock.call(
+                "oci-image-charm",
+                "charm_uri",
+                yaml.load(Path("tests/integration/oci-image-charm/metadata.yaml").read_text(), Loader=yaml.FullLoader),
+                resources={"oci-image": "ubuntu:latest"},
+            ),
+            mock.call(
+                "oci-image-charm-2",
+                "charm_uri",
+                yaml.load(Path("tests/integration/oci-image-charm-no-series/metadata.yaml").read_text(), Loader=yaml.FullLoader),
+                resources={"oci-image": "ubuntu:latest"},
+            ),
+            mock.call(
+                "oci-image-charm-3",
+                "charm_uri",
+                yaml.load(Path("tests/integration/oci-image-charm-no-series/metadata.yaml").read_text(), Loader=yaml.FullLoader),
+                resources={"oci-image": "ubuntu:latest"},
+            )]
         )
+        model.add_local_charm_dir.assert_has_calls([
+            mock.call(charm_path_1, "focal"),
+            mock.call(charm_path_2, "focal"),
+            mock.call(charm_path_2, "focal")
+        ])
         assert bundle["applications"]["oci-image-charm"]["resources"]["oci-image"] == "id"
