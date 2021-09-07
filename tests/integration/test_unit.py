@@ -1,4 +1,5 @@
 import asyncio
+from pathlib import Path
 from tempfile import NamedTemporaryFile
 
 import pytest
@@ -137,23 +138,31 @@ async def test_ssh(event_loop):
             model.block_until(lambda: (machine.status == 'running' and
                                        machine.agent_status == 'started')),
             timeout=480)
+
         output = await unit.ssh("echo test")
-        assert(output == "test")
+        assert 'test' in output
 
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_resolve(event_loop):
+async def test_resolve_local(event_loop):
+    charm_file = Path(__file__).absolute().parent / 'charm.charm'
 
     async with base.CleanModel() as model:
         app = await model.deploy(
-            'cs:ubuntu-0',
-            application_name='ubuntu',
-            series='trusty',
-            channel='stable',
+            str(charm_file),
+            config={'status': 'error'},
         )
 
-        # Resolving a hook not in an error state is not a great test but at
-        # least it exercises the code.
-        for unit in app.units:
-            await unit.resolved()
+        try:
+            await model.wait_for_idle(raise_on_error=False, idle_period=3)
+            assert app.units[0].workload_status == 'error'
+
+            await app.units[0].resolved()
+
+            await model.wait_for_idle(raise_on_error=False)
+            assert app.units[0].workload_status == 'active'
+        finally:
+            # Errored units won't get cleaned up unless we force them.
+            await asyncio.gather(*(machine.destroy(force=True)
+                                   for machine in model.machines.values()))

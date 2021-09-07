@@ -8,6 +8,7 @@ import os
 import re
 import stat
 import tempfile
+import warnings
 import weakref
 import zipfile
 from concurrent.futures import CancelledError
@@ -593,9 +594,9 @@ class Model:
         self.state = ModelState(self)
         self._info = None
         self._mode = None
-        self._watch_stopping = asyncio.Event(loop=self._connector.loop)
-        self._watch_stopped = asyncio.Event(loop=self._connector.loop)
-        self._watch_received = asyncio.Event(loop=self._connector.loop)
+        self._watch_stopping = asyncio.Event()
+        self._watch_stopped = asyncio.Event()
+        self._watch_received = asyncio.Event()
         self._watch_stopped.set()
 
         self._charmhub = CharmHub(self)
@@ -1144,7 +1145,7 @@ class Model:
             has a 'completed' status. See the _Observer class for details.
 
         """
-        q = asyncio.Queue(loop=self._connector.loop)
+        q = asyncio.Queue()
 
         async def callback(delta, old, new, model):
             await q.put(delta.get_id())
@@ -1547,7 +1548,7 @@ class Model:
 
         TODO::
 
-            - support local resources
+            - support local file resources
 
         """
         if storage:
@@ -1596,6 +1597,7 @@ class Model:
             # actually support them yet anyway
             if not res.is_local:
                 add_charm_res = await self._add_charm(identifier, res.origin)
+                charm_origin = add_charm_res.charm_origin
 
                 if Schema.CHARM_HUB.matches(url.schema):
                     resources = await self._add_charmhub_resources(res.app_name,
@@ -1609,13 +1611,26 @@ class Model:
                 # We have a local charm dir that needs to be uploaded
                 charm_dir = os.path.abspath(
                     os.path.expanduser(identifier))
+                charm_origin = res.origin
+                metadata = utils.get_local_charm_metadata(charm_dir)
+                if not application_name:
+                    application_name = metadata['name']
                 series = series or get_charm_series(charm_dir)
+                if not series:
+                    model_config = await self.get_config()
+                    default_series = model_config.get("default-series")
+                    if default_series:
+                        series = default_series.value
                 if not series:
                     raise JujuError(
                         "Couldn't determine series for charm at {}. "
                         "Pass a 'series' kwarg to Model.deploy().".format(
                             charm_dir))
                 identifier = await self.add_local_charm_dir(charm_dir, series)
+                resources = await self.add_local_resources(application_name,
+                                                           identifier,
+                                                           metadata,
+                                                           resources=resources)
 
             if config is None:
                 config = {}
@@ -1635,7 +1650,7 @@ class Model:
                 num_units=num_units,
                 placement=parse_placement(to),
                 devices=devices,
-                charm_origin=add_charm_res.charm_origin,
+                charm_origin=charm_origin
             )
 
     async def _add_charm(self, charm_url, origin):
@@ -1726,9 +1741,12 @@ class Model:
             resources=[client.CharmResource(**resource) for resource in resources],
         )
 
+        # response.pending_ids always exists but it can itself be None
+        # see juju/client/_definitions.py for AddPendingResourcesResult
         resource_map = {resource['name']: pid
                         for resource, pid
-                        in zip(resources, response.pending_ids)}
+                        in zip(resources, response.pending_ids or {})}
+
         return resource_map
 
     async def _add_store_resources(self, application, entity_url,
@@ -1771,6 +1789,71 @@ class Model:
         resource_map = {resource['name']: pid
                         for resource, pid
                         in zip(resources, response.pending_ids)}
+        return resource_map
+
+    async def add_local_resources(self, application, entity_url, metadata, resources):
+        if not resources:
+            return None
+
+        resource_map = dict()
+
+        for name, path in resources.items():
+            resource_type = metadata["resources"][name]["type"]
+            if resource_type != "oci-image":
+                # For  now only oci-images are supported
+                log.info("Resource {} of type {} is not supported".format(name, resource_type))
+                continue
+
+            charmresource = {
+                'description': '',
+                'fingerprint': '',
+                'name': name,
+                'path': path,
+                'revision': 0,
+                'size': 0,
+                'type_': 'oci-image',
+                'origin': 'upload',
+            }
+
+            resources_facade = client.ResourcesFacade.from_connection(
+                self.connection())
+            response = await resources_facade.AddPendingResources(
+                application_tag=tag.application(application),
+                charm_url=entity_url,
+                resources=[client.CharmResource(**charmresource)])
+            pending_id = response.pending_ids[0]
+            resource_map[name] = pending_id
+
+            # TODO Docker Image validation and support for local images.
+            docker_image_details = {
+                'registrypath': path,
+                'username': '',
+                'password': '',
+            }
+
+            data = yaml.dump(docker_image_details)
+
+            charmresource['fingerprint'] = hashlib.sha3_384(bytes(data, 'utf-8')).digest()
+
+            conn, headers, path_prefix = self.connection().https_connection()
+
+            query = "?pendingid={}".format(pending_id)
+            url = "{}/applications/{}/resources/{}{}".format(
+                path_prefix, application, name, query)
+            disp = "multipart/form-data; filename=\"{}\"".format(path)
+
+            headers['Content-Type'] = 'application/octet-stream'
+            headers['Content-Length'] = len(data)
+            headers['Content-Sha384'] = charmresource['fingerprint'].hex()
+            headers['Content-Disposition'] = disp
+
+            conn.request('PUT', url, data, headers)
+
+            response = conn.getresponse()
+            result = response.read().decode()
+            if not response.status == 200:
+                raise JujuError(result)
+
         return resource_map
 
     async def _deploy(self, charm_url, application, series, config,
@@ -2380,7 +2463,8 @@ class Model:
         return controller
 
     async def wait_for_idle(self, apps=None, raise_on_error=True, raise_on_blocked=False,
-                            wait_for_active=False, timeout=10 * 60, idle_period=15, check_freq=0.5):
+                            wait_for_active=False, timeout=10 * 60, idle_period=15, check_freq=0.5,
+                            status=None):
         """Wait for applications in the model to settle into an idle state.
 
         :param apps (list[str]): Optional list of specific app names to wait on.
@@ -2412,7 +2496,14 @@ class Model:
 
         :param check_freq (float): How frequently, in seconds, to check the model.
             The default is every half-second.
+
+        :param status (str): The status to wait for. If None, not waiting.
+            The default is None (not waiting for any status).
         """
+        if wait_for_active:
+            warnings.warn("wait_for_active is deprecated; use status", DeprecationWarning)
+            status = "active"
+
         timeout = timedelta(seconds=timeout) if timeout is not None else None
         idle_period = timedelta(seconds=idle_period)
         start_time = datetime.now()
@@ -2464,8 +2555,8 @@ class Model:
                     if raise_on_blocked and unit.workload_status == "blocked":
                         blocks.setdefault("Unit", []).append(unit.name)
                         continue
-                    waiting_for_active = wait_for_active and unit.workload_status != "active"
-                    if not waiting_for_active and unit.agent_status == "idle":
+                    waiting_for_status = status and unit.workload_status != status
+                    if not waiting_for_status and unit.agent_status == "idle":
                         now = datetime.now()
                         idle_start = idle_times.setdefault(unit.name, now)
                         if now - idle_start < idle_period:

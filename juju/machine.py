@@ -140,7 +140,7 @@ class Machine(model.ModelEntity):
             raise JujuError("command failed: %s" % cmd)
 
     async def ssh(
-            self, command, user=None, proxy=False, ssh_opts=None):
+            self, command, user='ubuntu', proxy=False, ssh_opts=None):
         """Execute a command over SSH on this machine.
 
         :param str command: Command to execute
@@ -164,10 +164,13 @@ class Machine(model.ModelEntity):
             cmd.extend(ssh_opts.split() if isinstance(ssh_opts, str) else ssh_opts)
         cmd.extend([command])
         loop = self.model.loop
-        process = await asyncio.create_subprocess_exec(*cmd, loop=loop)
-        await process.wait()
+        process = await asyncio.create_subprocess_exec(
+            *cmd, loop=loop, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
+        stdout, stderr = await process.communicate()
         if process.returncode != 0:
-            raise JujuError("command failed: %s" % cmd)
+            raise JujuError("command failed: %s with %s" % (cmd, stderr.decode()))
+        # stdout is a bytes-like object, returning a string might be more useful
+        return stdout.decode()
 
     def status_history(self, num=20, utc=False):
         """Get status history for this machine.
@@ -232,12 +235,11 @@ class Machine(model.ModelEntity):
 
         May return None if no suitable address is found.
         """
-        for scope in ['public', 'local-cloud']:
-            addresses = self.safe_data['addresses'] or []
-            addresses = [address for address in addresses
-                         if address['scope'] == scope]
-            if addresses:
-                return addresses[0]['value']
+        addresses = self.safe_data['addresses'] or []
+        for address in addresses:
+            scope = address['scope']
+            if scope == 'public' or scope == 'local-cloud':
+                return address['value']
         return None
 
     @property

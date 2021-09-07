@@ -1,0 +1,9 @@
+name: oci-image-charm
+series: ["focal"]
+summary: "test"
+description: "test"
+maintainers: ["test"]
+resources:
+  oci-image:
+    type: oci-image
+    description: 'Backing OCI image'

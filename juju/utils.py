@@ -8,6 +8,7 @@ import base64
 from pyasn1.type import univ, char
 from pyasn1.codec.der.encoder import encode
 import yaml
+import zipfile
 
 
 async def execute_process(*cmd, log=None, loop=None):
@@ -122,10 +123,9 @@ async def run_with_interrupt(task, *events, loop=None):
     :param loop: Optional event loop to use other than the default.
     """
     loop = loop or asyncio.get_event_loop()
-    task = asyncio.ensure_future(task, loop=loop)
+    task = asyncio.ensure_future(task)
     event_tasks = [loop.create_task(event.wait()) for event in events]
     done, pending = await asyncio.wait([task] + event_tasks,
-                                       loop=loop,
                                        return_when=asyncio.FIRST_COMPLETED)
     for f in pending:
         f.cancel()  # cancel unfinished tasks
@@ -185,3 +185,21 @@ def generate_user_controller_access_token(username, controller_endpoints, secret
     remainder = len(registration_string) % 3
     registration_string += b"\0" * (3 - remainder)
     return base64.urlsafe_b64encode(registration_string)
+
+
+def get_local_charm_metadata(path):
+    """Retrieve Metadata of a Charm from its path
+
+    :patam str path: Path of charm directory or .charm file
+
+    :return: Object of charm metadata
+    """
+    if str(path).endswith('.charm'):
+        with zipfile.ZipFile(path, 'r') as charm_file:
+            metadata = yaml.load(charm_file.read('metadata.yaml'), Loader=yaml.FullLoader)
+    else:
+        entity_path = Path(path)
+        metadata_path = entity_path / 'metadata.yaml'
+        metadata = yaml.load(metadata_path.read_text(), Loader=yaml.FullLoader)
+
+    return metadata

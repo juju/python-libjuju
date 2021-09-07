@@ -125,7 +125,7 @@ class Unit(model.ModelEntity):
         return await app_facade.ResolveUnitErrors(
             all_=False,
             retry=retry,
-            tags={'tag': [self.tag]})
+            tags={'entities': [{'tag': self.tag}]})
 
     async def run(self, command, timeout=None):
         """Run command on this unit.
@@ -223,7 +223,7 @@ class Unit(model.ModelEntity):
         raise NotImplementedError()
 
     async def ssh(
-            self, command, user=None, proxy=False, ssh_opts=None):
+            self, command, user='ubuntu', proxy=False, ssh_opts=None):
         """Execute a command over SSH on this unit.
 
         :param str command: Command to execute

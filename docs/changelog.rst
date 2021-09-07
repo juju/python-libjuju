@@ -1,6 +1,40 @@
 Changelog
 ---------
 
+2.9.3
+^^^^^
+
+Monday August 12 2021
+
+* Bug fix - Fix 'Default to bundle series if the charm has no series field' #514
+
+2.9.2
+^^^^^
+
+Monday June 28 2021
+
+* Bug fix - Fix 'metadata referenced before assignment' error #509
+
+2.9.1
+^^^^^
+
+Wednesday June 16 2021
+
+* Bug fix - Bundle Exposed endpoints missing #502
+* Bug fix - Fix series requirement for local charms #504
+* Add local charm update support #507
+
+2.9.0
+^^^^^
+
+Thursday May 27 2021
+
+* Update facade methods for Juju 2.9.0
+* Update facade methods for Juju 2.9.1
+* Bug fix - Support for Juju client proxies (LP#1926595)
+* Bug fix - Honor charm channel in bundles #496
+* Remove machine workaround for Juju 2.2.3
+
 2.8.6
 ^^^^^
 
