@@ -14,7 +14,7 @@ import paramiko
 import pylxd
 import pytest
 from juju.client.client import ApplicationFacade, ConfigValue
-from juju.errors import JujuError, JujuUnitError
+from juju.errors import JujuError, JujuUnitError, JujuConnectionError
 from juju.model import Model, ModelObserver
 from juju.utils import block_until, run_with_interrupt, wait_for_bundle
 
@@ -814,3 +814,31 @@ async def test_backups(event_loop):
     await m.remove_backup(created_id)
     after_remove_backup = await m.get_backups()
     assert len(after_remove_backup) == 0
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_model_cache_update(event_loop):
+    """Connecting to a new model shouldn't fail because the cache is not
+    updated yet
+
+    """
+    async with base.CleanController() as controller:
+        await controller.connect_current()
+
+        model_name = "new-test-model"
+        await controller.add_model(model_name)
+
+        model_uuids = await controller.model_uuids()
+        assert model_name in model_uuids
+
+        model = Model()
+        try:
+            await model.connect(model_name=model_name)
+        except JujuConnectionError:
+            # avoid leaking the model if the test fails
+            await controller.destroy_models(model_name)
+            raise
+
+        # cleanup
+        await controller.destroy_models(model_name)
