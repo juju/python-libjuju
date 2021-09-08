@@ -52,7 +52,8 @@ class BundleHandler:
 
         # Feature detect if we have the new charms facade, otherwise fallback
         # to the client facade, when making calls.
-        if client.CharmsFacade.best_facade_version(model.connection()) > 2:
+        best_facade_version = client.CharmsFacade.best_facade_version(model.connection())
+        if best_facade_version is not None and best_facade_version > 2:
             self.charms_facade = client.CharmsFacade.from_connection(
                 model.connection())
         else:
