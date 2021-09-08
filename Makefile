@@ -20,8 +20,10 @@ client:
 	$(PY) -m juju.client.facade -s "juju/client/schemas*" -o juju/client/
 
 .PHONY: test
-test:
-	tox
+test: lint
+	tox -e py3
+	tox -e integration
+
 
 .PHONY: lint
 lint: 

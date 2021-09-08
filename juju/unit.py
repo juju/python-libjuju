@@ -223,7 +223,7 @@ class Unit(model.ModelEntity):
         raise NotImplementedError()
 
     async def ssh(
-            self, command, user=None, proxy=False, ssh_opts=None):
+            self, command, user='ubuntu', proxy=False, ssh_opts=None):
         """Execute a command over SSH on this unit.
 
         :param str command: Command to execute

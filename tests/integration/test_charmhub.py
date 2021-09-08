@@ -8,18 +8,18 @@ from juju.errors import JujuAPIError
 @pytest.mark.asyncio
 async def test_info(event_loop):
     async with base.CleanModel() as model:
-        result = await model.charmhub.info("mattermost")
+        result = await model.charmhub.info("hello-juju")
 
-        assert result.result.name == "mattermost"
+        assert result.result.name == "hello-juju"
 
 
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_info_with_channel(event_loop):
     async with base.CleanModel() as model:
-        result = await model.charmhub.info("mattermost", "latest/stable")
+        result = await model.charmhub.info("hello-juju", "latest/stable")
 
-        assert result.result.name == "mattermost"
+        assert result.result.name == "hello-juju"
         assert "latest/stable" in result.result.channel_map
 
 

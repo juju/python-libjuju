@@ -96,6 +96,26 @@ async def test_add_units(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_deploy_charmstore_charm(event_loop):
+    async with base.CleanModel() as model:
+        app = await model.deploy('cs:ubuntu-0')
+        await model.block_until(lambda: (len(app.units) > 0 and
+                                         app.units[0].machine))
+        assert app.data['charm-url'] == 'cs:ubuntu-0'
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_deploy_charmhub_charm(event_loop):
+    async with base.CleanModel() as model:
+        app = await model.deploy('ch:hello-juju')
+        await model.block_until(lambda: (len(app.units) > 0 and
+                                         app.units[0].machine))
+        assert 'hello-juju' in app.data['charm-url']
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_upgrade_charm(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy('cs:ubuntu-0')
@@ -136,7 +156,7 @@ async def test_upgrade_charm_revision(event_loop):
 @pytest.mark.asyncio
 async def test_upgrade_charm_switch(event_loop):
     async with base.CleanModel() as model:
-        app = await model.deploy('ubuntu-0')
+        app = await model.deploy('cs:ubuntu-0')
         await model.block_until(lambda: (len(app.units) > 0 and
                                          app.units[0].machine))
         assert app.data['charm-url'] == 'cs:ubuntu-0'
@@ -150,7 +170,7 @@ async def test_upgrade_local_charm(event_loop):
     async with base.CleanModel() as model:
         tests_dir = Path(__file__).absolute().parent
         charm_path = tests_dir / 'upgrade-charm'
-        app = await model.deploy('ubuntu', series='focal')
+        app = await model.deploy('cs:ubuntu', series='focal')
         await model.wait_for_idle(status="active")
         assert app.data['charm-url'].startswith('cs:ubuntu')
         await app.upgrade_charm(path=charm_path)

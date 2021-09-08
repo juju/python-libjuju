@@ -483,6 +483,14 @@ class Application(model.ModelEntity):
             units=[],
         )
 
+    @property
+    def charm_url(self):
+        """Get the charm url for a given application
+
+        :return string: The charm url for an application
+        """
+        return self.safe_data['charm-url']
+
     async def get_annotations(self):
         """Get annotations on this application.
 
