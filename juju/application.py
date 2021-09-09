@@ -517,7 +517,12 @@ class Application(model.ModelEntity):
         log.debug(
             'Setting config for %s: %s', self.name, config)
 
-        return await app_facade.Set(application=self.name, options=config)
+        str_config = {}
+        for k, v in config.items():
+            if v.get('value') is not None:
+                str_config[k] = str(v.get('value'))
+
+        await app_facade.Set(application=self.name, options=str_config)
 
     async def reset_config(self, to_default):
         """
