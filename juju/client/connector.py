@@ -131,7 +131,7 @@ class Connector:
             model_uuid = models[model_name]['uuid']
         else:
             # let's try to find it through the actual controller
-            await self.connect_controllerc(controller_name=controller_name)
+            await self.connect_controller(controller_name=controller_name)
             # get the facade
             controller_facade = client.ControllerFacade.from_connection(
                 self.connection())
@@ -160,6 +160,8 @@ class Connector:
                       bakery_client=self.bakery_client_for_controller(controller_name),
                       proxy=proxy)
         await self.connect(**kwargs)
+        # TODO this might be a good spot to trigger refreshing the
+        # local cache (the connection to the model might help)
         self.controller_name = controller_name
         self.model_name = controller_name + ':' + model_name
 
