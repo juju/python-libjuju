@@ -14,7 +14,7 @@ async def test_run(event_loop):
 
     async with base.CleanModel() as model:
         app = await model.deploy(
-            'ubuntu-0',
+            'cs:ubuntu-0',
             application_name='ubuntu',
             series='trusty',
             channel='stable',
@@ -138,8 +138,9 @@ async def test_ssh(event_loop):
             model.block_until(lambda: (machine.status == 'running' and
                                        machine.agent_status == 'started')),
             timeout=480)
+
         output = await unit.ssh("echo test")
-        assert(output == "test")
+        assert 'test' in output
 
 
 @base.bootstrapped
@@ -154,7 +155,7 @@ async def test_resolve_local(event_loop):
         )
 
         try:
-            await model.wait_for_idle(raise_on_error=False)
+            await model.wait_for_idle(raise_on_error=False, idle_period=3)
             assert app.units[0].workload_status == 'error'
 
             await app.units[0].resolved()

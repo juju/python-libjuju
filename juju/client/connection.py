@@ -31,7 +31,7 @@ client_facades = {
     'Bundle': {'versions': [1, 2, 3]},
     'CharmHub': {'versions': [1]},
     'CharmRevisionUpdater': {'versions': [2]},
-    'Charms': {'versions': [2]},
+    'Charms': {'versions': [2, 3, 4]},
     'Cleaner': {'versions': [2]},
     'Client': {'versions': [1, 2]},
     'Cloud': {'versions': [1, 2, 3, 4, 5]},
@@ -163,8 +163,8 @@ class Monitor:
 
     def __init__(self, connection):
         self.connection = weakref.ref(connection)
-        self.reconnecting = asyncio.Lock(loop=connection.loop)
-        self.close_called = asyncio.Event(loop=connection.loop)
+        self.reconnecting = asyncio.Lock()
+        self.close_called = asyncio.Event()
 
     @property
     def status(self):
@@ -314,14 +314,21 @@ class Connection:
             self.proxy.connect()
 
         _endpoints = [(endpoint, cacert)] if isinstance(endpoint, str) else [(e, cacert) for e in endpoint]
+        lastError = None
         for _ep in _endpoints:
             try:
                 await self._connect_with_redirect([_ep])
                 return self
+            except ssl.SSLError as e:
+                lastError = e
+                continue
             except OSError as e:
                 logging.debug(
                     "Cannot access endpoint {}: {}".format(_ep, e.strerror))
+                lastError = e
                 continue
+        if lastError is not None:
+            raise lastError
         raise Exception("Unable to connect to websocket")
 
     @property
@@ -427,7 +434,7 @@ class Connection:
         async def _do_ping():
             try:
                 await pinger_facade.Ping()
-                await asyncio.sleep(10, loop=self.loop)
+                await asyncio.sleep(10)
             except CancelledError:
                 pass
 
@@ -629,7 +636,7 @@ class Connection:
                                                      0.1 * i))
                  for i, (endpoint, cacert) in enumerate(endpoints)]
         for attempt in range(self._retries + 1):
-            for task in asyncio.as_completed(tasks, loop=self.loop):
+            for task in asyncio.as_completed(tasks):
                 try:
                     result = await task
                     break
@@ -798,7 +805,7 @@ class Connection:
 
 class _Task:
     def __init__(self, task, loop):
-        self.stopped = asyncio.Event(loop=loop)
+        self.stopped = asyncio.Event()
         self.stopped.set()
         self.task = task
         self.loop = loop

@@ -65,6 +65,7 @@ async def test_macaroon_auth_with_bad_key(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.xfail
 async def test_macaroon_auth_with_unauthorized_user(event_loop):
     auth_info, username = agent_auth_info()
     # Create a bakery client can do agent authentication.

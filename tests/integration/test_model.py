@@ -137,7 +137,7 @@ async def test_wait_local_charm_waiting_timeout(event_loop):
 @pytest.mark.asyncio
 async def test_deploy_bundle(event_loop):
     async with base.CleanModel() as model:
-        await model.deploy('bundle/wiki-simple')
+        await model.deploy('cs:bundle/wiki-simple')
 
         for app in ('wiki', 'mysql'):
             assert app in model.applications
@@ -327,27 +327,30 @@ async def test_add_manual_machine_ssh(event_loop):
         # and pylxd's container.execute seems to be broken and fails and/or
         # hangs trying to properly check if the service is up.
         time.sleep(5)
-
+        spec = 'ssh:{}@{}:{}'.format(
+            test_user,
+            host['address'],
+            private_key_path,
+        )
+        err = None
         for attempt in range(1, 4):
             try:
                 # add a new manual machine
-                machine1 = await model.add_machine(spec='ssh:{}@{}:{}'.format(
-                    test_user,
-                    host['address'],
-                    private_key_path,
-                ))
-            except paramiko.ssh_exception.NoValidConnectionsError:
+                machine1 = await model.add_machine(spec=spec)
+            except (paramiko.ssh_exception.NoValidConnectionsError, paramiko.ssh_exception.AuthenticationException) as e:
                 # retry the ssh connection a few times if it fails
+                err = e
                 time.sleep(attempt * 5)
             else:
+                # try part finished without exception, breaking
                 break
 
-            assert len(model.machines) == 1
+        assert len(model.machines) == 1, 'Unable to add_machine in %s attempts with spec : %s -- exception was %s' % (attempt, spec, err)
 
-            res = await machine1.destroy(force=True)
+        res = await machine1.destroy(force=True)
 
-            assert res is None
-            assert len(model.machines) == 0
+        assert res is None, 'Bad teardown, res is : %s' % res
+        assert len(model.machines) == 0
 
         container.stop(wait=True)
         container.delete(wait=True)
@@ -441,25 +444,29 @@ async def test_add_manual_machine_ssh_root(event_loop):
         # and pylxd's container.execute seems to be broken and fails and/or
         # hangs trying to properly check if the service is up.
         time.sleep(5)
-
+        spec = 'ssh:{}@{}:{}'.format(
+            "root",
+            host['address'],
+            private_key_path,
+        )
+        err = None
         for attempt in range(1, 4):
             try:
                 # add a new manual machine
-                machine1 = await model.add_machine(spec='ssh:{}@{}:{}'.format(
-                    "root",
-                    host['address'],
-                    private_key_path,
-                ))
-            except (paramiko.ssh_exception.NoValidConnectionsError, paramiko.ssh_exception.AuthenticationException):
+                machine1 = await model.add_machine(spec=spec)
+            except (paramiko.ssh_exception.NoValidConnectionsError, paramiko.ssh_exception.AuthenticationException) as e:
+                # if we get an exception, try again
+                err = e
                 time.sleep(attempt * 5)
             else:
+                # try part finished without exception
                 break
 
-        assert len(model.machines) == 1
+        assert len(model.machines) == 1, 'Unable to add_machine in %s attempts with spec : %s -- exception was %s' % (attempt, spec, err)
 
         res = await machine1.destroy(force=True)
 
-        assert res is None
+        assert res is None, 'Bad teardown, res is : %s' % res
         assert len(model.machines) == 0
 
         container.stop(wait=True)
@@ -784,3 +791,26 @@ async def test_unit_annotations(event_loop):
 
         annotations = await unit.get_annotations()
         assert annotations == expected
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_backups(event_loop):
+    m = Model()
+    await m.connect(model_name='controller')
+    backups = await m.get_backups()
+    assert backups == []  # no backup yet
+
+    created_backup = await m.create_backup(notes="hi", keep_copy=True)
+    assert 'id' in created_backup
+    created_id = created_backup['id']
+
+    assert 'checksum' in created_backup
+    assert created_backup['notes'] == "hi"
+
+    after_create_backups = await m.get_backups()
+    assert len(after_create_backups) == 1
+
+    await m.remove_backup(created_id)
+    after_remove_backup = await m.get_backups()
+    assert len(after_remove_backup) == 0
