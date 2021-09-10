@@ -2158,10 +2158,12 @@ class Model:
         config_facade = client.ModelConfigFacade.from_connection(
             self.connection()
         )
+
+        new_conf = {}
         for key, value in config.items():
             if isinstance(value, ConfigValue):
-                config[key] = value.value
-        await config_facade.ModelSet(config=config)
+                new_conf[key] = value.value
+        await config_facade.ModelSet(config=new_conf)
 
     async def set_constraints(self, constraints):
         """Set machine constraints on this model.
