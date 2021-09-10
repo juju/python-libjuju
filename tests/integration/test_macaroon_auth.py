@@ -16,7 +16,7 @@ log = logging.getLogger(__name__)
 
 @base.bootstrapped
 @pytest.mark.asyncio
-#@pytest.mark.xfail
+# @pytest.mark.xfail
 @pytest.mark.skip('one of old macaroon_auth tests, needs to be revised')
 async def test_macaroon_auth(event_loop):
     auth_info, username = agent_auth_info()
@@ -38,7 +38,7 @@ async def test_macaroon_auth(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-#@pytest.mark.xfail
+# @pytest.mark.xfail
 @pytest.mark.skip('one of old macaroon_auth tests, needs to be revised')
 async def test_macaroon_auth_with_bad_key(event_loop):
     auth_info, username = agent_auth_info()
@@ -67,7 +67,7 @@ async def test_macaroon_auth_with_bad_key(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-#@pytest.mark.xfail
+# @pytest.mark.xfail
 @pytest.mark.skip('one of old macaroon_auth tests, needs to be revised')
 async def test_macaroon_auth_with_unauthorized_user(event_loop):
     auth_info, username = agent_auth_info()
