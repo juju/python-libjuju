@@ -126,7 +126,7 @@ class BundleHandler:
                 model_config = await self.model.get_config()
                 default_series = model_config.get("default-series")
                 if default_series:
-                    series = default_series.value
+                    default_series = series = default_series.value
             if not series:
                 raise JujuError(
                     "Couldn't determine series for charm at {}. "
