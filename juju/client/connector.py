@@ -141,9 +141,6 @@ class Connector:
             for user_model in response.user_models:
                 if 'admin/' + user_model.model.name == model_name:
                     model_uuid = user_model.model.uuid
-            # TODO refresh the local cache
-            # then self.jujudata.refresh()
-            # then self.jujudata.models()
 
         if model_uuid is None:
             raise JujuConnectionError('Model not found: {}'.format(model_name))
