@@ -48,6 +48,31 @@ async def test_action(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_get_set_config(event_loop):
+    async with base.CleanModel() as model:
+        ubuntu_app = await model.deploy(
+            'percona-cluster',
+            application_name='mysql',
+            series='xenial',
+            channel='stable',
+            config={
+                'tuning-level': 'safest',
+            },
+            constraints={
+                'arch': 'amd64',
+                'mem': 256 * MB,
+            },
+        )
+
+        config = await ubuntu_app.get_config()
+        await ubuntu_app.set_config(config)
+
+        config2 = await ubuntu_app.get_config()
+        assert config == config2
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_status_is_not_unset(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy(
