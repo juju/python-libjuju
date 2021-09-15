@@ -8,6 +8,7 @@ from juju.client.gocookies import GoCookieJar, go_to_py_cookie
 from juju.client.jujudata import FileJujuData
 from juju.client.proxy.factory import proxy_from_config
 from juju.errors import JujuConnectionError, JujuError
+from juju.client import client
 
 log = logging.getLogger('connector')
 
@@ -125,26 +126,39 @@ class Connector:
         account = self.jujudata.accounts().get(controller_name, {})
         models = self.jujudata.models().get(controller_name, {}).get('models',
                                                                      {})
+        model_uuid = None
+        if model_name in models:
+            model_uuid = models[model_name]['uuid']
+        else:
+            # let's try to find it through the actual controller
+            await self.connect_controller(controller_name=controller_name)
+            # get the facade
+            controller_facade = client.ControllerFacade.from_connection(
+                self.connection())
+            # get all the user models from the api
+            response = await controller_facade.AllModels()
+            # search the one that contains admin/model_name
+            for user_model in response.user_models:
+                if 'admin/' + user_model.model.name == model_name:
+                    model_uuid = user_model.model.uuid
 
-        if model_name not in models:
+        if model_uuid is None:
             raise JujuConnectionError('Model not found: {}'.format(model_name))
 
         proxy = proxy_from_config(controller.get('proxy-config', None))
 
-        # TODO if there's no record for the required model name, connect
-        # to the controller to find out the model's uuid, then connect
-        # to that. This will let connect_model work with models that
-        # haven't necessarily synced with the local juju data,
-        # and also remove the need for base.CleanModel to
-        # subclass JujuData.
+        # TODO remove the need for base.CleanModel to subclass
+        # JujuData.
         kwargs.update(endpoint=endpoints,
-                      uuid=models[model_name]['uuid'],
+                      uuid=model_uuid,
                       username=account.get('user'),
                       password=account.get('password'),
                       cacert=controller.get('ca-cert'),
                       bakery_client=self.bakery_client_for_controller(controller_name),
                       proxy=proxy)
         await self.connect(**kwargs)
+        # TODO this might be a good spot to trigger refreshing the
+        # local cache (the connection to the model might help)
         self.controller_name = controller_name
         self.model_name = controller_name + ':' + model_name
 
