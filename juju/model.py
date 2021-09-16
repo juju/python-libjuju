@@ -30,7 +30,7 @@ from .client.overrides import Caveat, Macaroon
 from .constraints import parse as parse_constraints
 from .controller import Controller
 from .delta import get_entity_class, get_entity_delta
-from .errors import JujuAPIError, JujuError
+from .errors import JujuAPIError, JujuError, JujuModelConfigError
 from .errors import JujuAppError, JujuUnitError, JujuAgentError, JujuMachineError
 from .exceptions import DeadEntityException
 from .names import is_valid_application
@@ -2163,6 +2163,10 @@ class Model:
         for key, value in config.items():
             if isinstance(value, ConfigValue):
                 new_conf[key] = value.value
+            elif isinstance(value, str):
+                new_conf[key] = value
+            else:
+                raise JujuModelConfigError("Expected either a string or a ConfigValue as a config value, found : %s of type %s" % (value, type(value)))
         await config_facade.ModelSet(config=new_conf)
 
     async def set_constraints(self, constraints):
