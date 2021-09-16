@@ -79,11 +79,23 @@ class JujuUnitError(JujuError):
     pass
 
 
-class JujuApplicationConfigError(JujuError):
+class JujuConfigError(JujuError):
     """Exception raised during processing a configuration key-value pair
     in a config set for an application.
     """
-    def __init__(self, config, config_pair):
+    def __init__(self, config, config_pair, message=None):
         self.config = config
         self.config_pair = config_pair
-        super().__init__("Couldn't process the value of a config pair : %s, value of type %s" % (self.config_pair, type(self.config_pair[1])))
+        if message is None:
+            self.message = "Couldn't process the value of a config pair : %s, value of type %s" % (self.config_pair, type(self.config_pair[1]))
+        else:
+            self.message = message
+        super().__init__(self.message)
+
+
+class JujuApplicationConfigError(JujuConfigError):
+    pass
+
+
+class JujuModelConfigError(JujuConfigError):
+    pass
