@@ -21,7 +21,7 @@ from . import model, tag, utils
 from .status import derive_status
 from .annotationhelper import _get_annotations, _set_annotations
 from .client import client
-from .errors import JujuError
+from .errors import JujuError, JujuApplicationConfigError
 from .bundle import get_charm_series
 from .placement import parse as parse_placement
 
@@ -519,8 +519,14 @@ class Application(model.ModelEntity):
 
         str_config = {}
         for k, v in config.items():
-            if v.get('value') is not None:
-                str_config[k] = str(v.get('value'))
+            if isinstance(v, str):
+                str_config[k] = v
+            elif isinstance(v, dict):
+                # pairs with a value of None are ignored
+                if v.get('value', False):
+                    str_config[k] = str(v.get('value'))
+            else:
+                raise JujuApplicationConfigError(config, [k, v])
 
         await app_facade.Set(application=self.name, options=str_config)
 
