@@ -16,7 +16,7 @@ import pytest
 from juju.client.client import ApplicationFacade, ConfigValue
 from juju.errors import JujuError, JujuUnitError, JujuConnectionError
 from juju.model import Model, ModelObserver
-from juju.utils import block_until, run_with_interrupt, wait_for_bundle
+from juju.utils import run_with_interrupt, wait_for_bundle
 
 from .. import base
 
@@ -37,9 +37,9 @@ async def test_deploy_local_bundle_dir(event_loop):
         wordpress = model.applications.get('wordpress')
         mysql = model.applications.get('mysql')
         assert wordpress and mysql
-        await block_until(lambda: (len(wordpress.units) == 1 and
-                                   len(mysql.units) == 1),
-                          timeout=60 * 4)
+        await model.block_until(lambda: (len(wordpress.units) == 1 and
+                                len(mysql.units) == 1),
+                                timeout=60 * 4)
 
 
 @base.bootstrapped
@@ -55,9 +55,9 @@ async def test_deploy_local_bundle_file(event_loop):
         dummy_sink = model.applications.get('dummy-sink')
         dummy_subordinate = model.applications.get('dummy-subordinate')
         assert dummy_sink and dummy_subordinate
-        await block_until(lambda: (len(dummy_sink.units) == 1 and
-                                   len(dummy_subordinate.units) == 1),
-                          timeout=60 * 4)
+        await model.block_until(lambda: (len(dummy_sink.units) == 1 and
+                                len(dummy_subordinate.units) == 1),
+                                timeout=60 * 4)
 
 
 @base.bootstrapped
@@ -665,7 +665,7 @@ async def test_get_machines(event_loop):
 async def test_watcher_reconnect(event_loop):
     async with base.CleanModel() as model:
         await model.connection().ws.close()
-        await block_until(model.is_connected, timeout=3)
+        await model.block_until(model.is_connected, timeout=3)
 
 
 @base.bootstrapped
