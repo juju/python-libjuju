@@ -1,4 +1,11 @@
+from juju.client.jujudata import FileJujuData
+
+
 class Juju(object):
+
+    def __init__(self, jujudata=None):
+        self.jujudata = jujudata or FileJujuData()
+
     def add_cloud(self, name, definition, replace=False):
         """Add a user-defined cloud to Juju from among known cloud types.
 
@@ -58,9 +65,8 @@ class Juju(object):
     def get_controllers(self):
         """Return list of all available controllers.
 
-        (maybe move this to Cloud?)
         """
-        raise NotImplementedError()
+        return self.jujudata.controllers()
 
     def get_plans(self, charm_url):
         """Return list of plans available for the specified charm.
