@@ -589,7 +589,7 @@ async def test_local_oci_image_resource_charm(event_loop):
             lambda: (
                 len(charm.units) > 0 and
                 charm.units[0].workload_status in terminal_statuses),
-            timeout=60*4,
+            timeout=60 * 4,
         )
         assert charm.units[0].workload_status == 'active'
 
