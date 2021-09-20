@@ -40,12 +40,6 @@ class Juju(object):
         """
         raise NotImplementedError()
 
-    def get_agreements(self):
-        """Return list of terms to which the current user has agreed.
-
-        """
-        raise NotImplementedError()
-
     def get_clouds(self):
         """Return list of all available clouds.
 
