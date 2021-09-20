@@ -1,4 +1,6 @@
+from juju.controller import Controller
 from juju.client.jujudata import FileJujuData
+from juju.errors import JujuError
 
 
 class Juju(object):
@@ -101,7 +103,7 @@ class Juju(object):
         """
         raise NotImplementedError()
 
-    def get_controller(self, name, include_passwords=False):
+    async def get_controller(self, name, include_passwords=False):
         """Get a controller by name.
 
         :param str name: Name of controller
@@ -109,7 +111,18 @@ class Juju(object):
 
         (maybe move this to Cloud?)
         """
-        raise NotImplementedError()
+
+        # check if name is in the controllers.yaml
+        controllers = self.jujudata.controllers()
+        assert isinstance(controllers, dict)
+        if name not in controllers:
+            raise JujuError('%s is not among the controllers: %s' % (name, controllers.keys()))
+
+        # make a new Controller object that's connected to the
+        # controller with the given name
+        controller = Controller()
+        await controller.connect(name)
+        return controller
 
     def update_clouds(self):
         """Update public cloud info available to Juju.
