@@ -40,20 +40,8 @@ class Juju(object):
         """
         raise NotImplementedError()
 
-    def create_budget(self):
-        """Create a new budget.
-
-        """
-        raise NotImplementedError()
-
     def get_agreements(self):
         """Return list of terms to which the current user has agreed.
-
-        """
-        raise NotImplementedError()
-
-    def get_budgets(self):
-        """Return list of available budgets.
 
         """
         raise NotImplementedError()
@@ -82,15 +70,6 @@ class Juju(object):
         """Register a user to a controller.
 
         :param str registration_string: The registration string
-
-        """
-        raise NotImplementedError()
-
-    def set_budget(self, name, limit):
-        """Set a monthly budget limit.
-
-        :param str name: Name of budget
-        :param int limit: Monthly limit
 
         """
         raise NotImplementedError()
