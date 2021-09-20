@@ -82,7 +82,7 @@ class Juju(object):
         :param str name: Name of controller
         :param bool include_passwords: Include passwords for accounts
 
-        (maybe move this to Cloud?)
+        The returned controller will try and connect to be ready to use.
         """
 
         # check if name is in the controllers.yaml
