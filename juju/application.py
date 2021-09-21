@@ -175,15 +175,6 @@ class Application(model.ModelEntity):
                                           scale_change=scale_change)
         ])
 
-    def allocate(self, budget, value):
-        """Allocate budget to this application.
-
-        :param str budget: Name of budget
-        :param int value: Budget limit
-
-        """
-        raise NotImplementedError()
-
     def attach(self, resource_name, file_path):
         """Upload a file as a resource for this application.
 

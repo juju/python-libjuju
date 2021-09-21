@@ -2243,14 +2243,6 @@ class Model:
             results[tag.untag('action-', a.action.tag)] = a.status
         return results
 
-    def get_budget(self, budget_name):
-        """Get budget usage info.
-
-        :param str budget_name: Name of budget
-
-        """
-        raise NotImplementedError()
-
     async def get_status(self, filters=None, utc=False):
         """Return the status of the model.
 
