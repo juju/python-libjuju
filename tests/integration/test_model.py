@@ -16,7 +16,7 @@ import pytest
 from juju.client.client import ApplicationFacade, ConfigValue
 from juju.errors import JujuError, JujuUnitError, JujuConnectionError
 from juju.model import Model, ModelObserver
-from juju.utils import run_with_interrupt, wait_for_bundle
+from juju.utils import block_until, run_with_interrupt, wait_for_bundle
 
 from .. import base
 
@@ -665,7 +665,7 @@ async def test_get_machines(event_loop):
 async def test_watcher_reconnect(event_loop):
     async with base.CleanModel() as model:
         await model.connection().ws.close()
-        await model.block_until(model.is_connected, timeout=3)
+        await block_until(model.is_connected, timeout=3)
 
 
 @base.bootstrapped
