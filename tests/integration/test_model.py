@@ -231,14 +231,8 @@ async def test_add_machine(event_loop):
         assert res is None
         assert len(model.machines) == 0
 
+async def add_manual_machine_ssh(event_loop, is_root=False):
 
-@base.bootstrapped
-@pytest.mark.asyncio
-async def test_add_manual_machine_ssh(event_loop):
-    """Test manual machine provisioning with a non-root user
-
-    Tests manual machine provisioning using a randomized username with sudo access.
-    """
 
     # Verify controller is localhost
     async with base.CleanController() as controller:
@@ -261,8 +255,11 @@ async def test_add_manual_machine_ssh(event_loop):
             uuid.uuid4().hex[-4:]
         )
 
-        # Create a randomized user name
-        test_user = ''.join(random.choice(string.ascii_lowercase) for i in range(10))
+        if is_root:
+            test_user = "root"
+        else:
+            # Create a randomized user name
+            test_user = ''.join(random.choice(string.ascii_lowercase) for i in range(10))
 
         # create profile w/cloud-init and juju ssh key
         public_key = ""
@@ -279,6 +276,15 @@ async def test_add_manual_machine_ssh(event_loop):
           sudo: ["ALL=(ALL) NOPASSWD:ALL"]
           groups: adm, sudoers
         """.format(test_user, public_key)
+
+        if is_root:
+            cloud_init = """
+            #cloud-config
+            users:
+            - name: {}
+              ssh_authorized_keys:
+                - {}
+            """.format(test_user, public_key)
 
         profile = client.profiles.create(
             test_name,
@@ -359,120 +365,20 @@ async def test_add_manual_machine_ssh(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_add_manual_machine_ssh(event_loop):
+    """Test manual machine provisioning with a non-root user
+
+    Tests manual machine provisioning using a randomized username with sudo access.
+    """
+    await add_manual_machine_ssh(event_loop, is_root=False)
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_add_manual_machine_ssh_root(event_loop):
     """Test manual machine provisioning with the root user"""
 
-    # Verify controller is localhost
-    async with base.CleanController() as controller:
-        cloud = await controller.get_cloud()
-        if cloud != "localhost":
-            pytest.skip('Skipping because test requires lxd.')
-
-    async with base.CleanModel() as model:
-        private_key_path = os.path.expanduser(
-            "~/.local/share/juju/ssh/juju_id_rsa"
-        )
-        public_key_path = os.path.expanduser(
-            "~/.local/share/juju/ssh/juju_id_rsa.pub"
-        )
-
-        # connect using the local unix socket
-        client = pylxd.Client()
-
-        test_name = "test-{}-add-manual-machine-ssh".format(
-            uuid.uuid4().hex[-4:]
-        )
-
-        # create profile w/cloud-init and juju ssh key
-        public_key = ""
-        with open(public_key_path, "r") as f:
-            public_key = f.readline()
-
-        cloud_init = """
-        #cloud-config
-        users:
-        - name: root
-          ssh_authorized_keys:
-            - {}
-        """.format(public_key)
-
-        profile = client.profiles.create(
-            test_name,
-            config={'user.user-data': cloud_init},
-            devices={
-                'root': {'path': '/', 'pool': 'default', 'type': 'disk'},
-                'eth0': {
-                    'nictype': 'bridged',
-                    'parent': 'lxdbr0',
-                    'type': 'nic'
-                }
-            }
-        )
-
-        # create lxc machine
-        config = {
-            'name': test_name,
-            'source': {
-                'type': 'image',
-                'alias': 'bionic',
-                'mode': 'pull',
-                'protocol': 'simplestreams',
-                'server': 'https://cloud-images.ubuntu.com/releases',
-            },
-            'profiles': [test_name],
-        }
-        container = client.containers.create(config, wait=True)
-        container.start(wait=True)
-
-        def wait_for_network(container, timeout=30):
-            """Wait for eth0 to have an ipv4 address."""
-            starttime = time.time()
-            while(time.time() < starttime + timeout):
-                time.sleep(1)
-                if 'eth0' in container.state().network:
-                    addresses = container.state().network['eth0']['addresses']
-                    if len(addresses) > 0:
-                        if addresses[0]['family'] == 'inet':
-                            return addresses[0]
-            return None
-
-        host = wait_for_network(container)
-        assert host, 'Failed to get address for machine'
-
-        # HACK: We need to give sshd a chance to bind to the interface,
-        # and pylxd's container.execute seems to be broken and fails and/or
-        # hangs trying to properly check if the service is up.
-        time.sleep(5)
-        spec = 'ssh:{}@{}:{}'.format(
-            "root",
-            host['address'],
-            private_key_path,
-        )
-        err = None
-        for attempt in range(1, 4):
-            try:
-                # add a new manual machine
-                machine1 = await model.add_machine(spec=spec)
-            except (paramiko.ssh_exception.NoValidConnectionsError, paramiko.ssh_exception.AuthenticationException) as e:
-                # if we get an exception, try again
-                err = e
-                time.sleep(attempt * 5)
-            else:
-                # try part finished without exception
-                break
-
-        assert len(model.machines) == 1, 'Unable to add_machine in %s attempts with spec : %s -- exception was %s' % (attempt, spec, err)
-
-        res = await machine1.destroy(force=True)
-
-        assert res is None, 'Bad teardown, res is : %s' % res
-        assert len(model.machines) == 0
-
-        container.stop(wait=True)
-        container.delete(wait=True)
-
-        profile.delete()
-
+    await add_manual_machine_ssh(event_loop, is_root=True)
 
 @base.bootstrapped
 @pytest.mark.asyncio
