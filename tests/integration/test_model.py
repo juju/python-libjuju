@@ -298,7 +298,7 @@ async def test_add_manual_machine_ssh(event_loop):
             'name': test_name,
             'source': {
                 'type': 'image',
-                'alias': 'xenial',
+                'alias': 'bionic',
                 'mode': 'pull',
                 'protocol': 'simplestreams',
                 'server': 'https://cloud-images.ubuntu.com/releases',
@@ -354,7 +354,6 @@ async def test_add_manual_machine_ssh(event_loop):
 
         container.stop(wait=True)
         container.delete(wait=True)
-
         profile.delete()
 
 
@@ -415,7 +414,7 @@ async def test_add_manual_machine_ssh_root(event_loop):
             'name': test_name,
             'source': {
                 'type': 'image',
-                'alias': 'xenial',
+                'alias': 'bionic',
                 'mode': 'pull',
                 'protocol': 'simplestreams',
                 'server': 'https://cloud-images.ubuntu.com/releases',
