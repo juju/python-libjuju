@@ -351,12 +351,25 @@ async def add_manual_machine_ssh(event_loop, is_root=False):
                 # try part finished without exception, breaking
                 break
 
-        assert len(model.machines) == 1, 'Unable to add_machine in %s attempts with spec : %s -- exception was %s' % (attempt, spec, err)
+        if len(model.machines) != 1:
+            container.stop(wait=True)
+            container.delete(wait=True)
+            profile.delete()
+            raise AssertionError('Unable to add_machine in %s attempts with spec : %s -- exception was %s' % (attempt, spec, err))
 
         res = await machine1.destroy(force=True)
 
-        assert res is None, 'Bad teardown, res is : %s' % res
-        assert len(model.machines) == 0
+        if res is not None:
+            container.stop(wait=True)
+            container.delete(wait=True)
+            profile.delete()
+            raise AssertionError('Bad teardown, res is : %s' % res)
+
+        if len(model.machines) != 0:
+            container.stop(wait=True)
+            container.delete(wait=True)
+            profile.delete()
+            raise AssertionError('Unable to destroy the added machine during cleanup -- model has : %s machines' % len(model.machines))
 
         container.stop(wait=True)
         container.delete(wait=True)
