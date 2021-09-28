@@ -231,8 +231,8 @@ async def test_add_machine(event_loop):
         assert res is None
         assert len(model.machines) == 0
 
-async def add_manual_machine_ssh(event_loop, is_root=False):
 
+async def add_manual_machine_ssh(event_loop, is_root=False):
 
     # Verify controller is localhost
     async with base.CleanController() as controller:
@@ -392,6 +392,7 @@ async def test_add_manual_machine_ssh_root(event_loop):
     """Test manual machine provisioning with the root user"""
 
     await add_manual_machine_ssh(event_loop, is_root=True)
+
 
 @base.bootstrapped
 @pytest.mark.asyncio
