@@ -19,7 +19,7 @@ async def main():
     try:
         print('Deploying bundle')
         applications = await model.deploy(
-            'examples/k8s-local-bundle/bundle.yaml',
+            './examples/k8s-local-bundle/bundle.yaml',
         )
 
         print('Waiting for active')
