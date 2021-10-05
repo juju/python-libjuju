@@ -2127,20 +2127,20 @@ class Model:
         await key_facade.DeleteKeys(ssh_keys=[key], user=user)
     remove_ssh_keys = remove_ssh_key
 
-    def restore_backup(
-            self, bootstrap=False, constraints=None, archive=None,
-            backup_id=None, upload_tools=False):
+    async def restore_backup(
+            self, backup_id, bootstrap=False,
+            constraints=None, archive=None, upload_tools=False):
         """Restore a backup archive to a new controller.
 
+        :param str backup_id: Id of backup to restore
         :param bool bootstrap: Bootstrap a new state machine
         :param constraints: Model constraints
         :type constraints: :class:`juju.Constraints`
         :param str archive: Path to backup archive to restore
-        :param str backup_id: Id of backup to restore
         :param bool upload_tools: Upload tools if bootstrapping a new machine
 
         """
-        raise NotImplementedError()
+        raise DeprecationWarning("juju restore-backup is deprecated in favor of the stand-alone 'juju-restore' tool: https://github.com/juju/juju-restore")
 
     def retry_provisioning(self):
         """Retry provisioning for failed machines.
