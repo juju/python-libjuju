@@ -1,7 +1,6 @@
 import asyncio
 import ipaddress
 import logging
-import os
 
 import pyrfc3339
 
@@ -9,6 +8,7 @@ from . import model, tag
 from .annotationhelper import _get_annotations, _set_annotations
 from .client import client
 from .errors import JujuError
+from juju.utils import juju_ssh_key_paths
 
 log = logging.getLogger(__name__)
 
@@ -124,9 +124,10 @@ class Machine(model.ModelEntity):
         """ Execute an scp command. Requires a fully qualified source and
         destination.
         """
+        _, id_path = juju_ssh_key_paths()
         cmd = [
             'scp',
-            '-i', os.path.expanduser('~/.local/share/juju/ssh/juju_id_rsa'),
+            '-i', id_path,
             '-o', 'StrictHostKeyChecking=no',
             '-q',
             '-B'
@@ -153,9 +154,10 @@ class Machine(model.ModelEntity):
             raise NotImplementedError('proxy option is not implemented')
         address = self.dns_name
         destination = "{}@{}".format(user, address)
+        _, id_path = juju_ssh_key_paths()
         cmd = [
             'ssh',
-            '-i', os.path.expanduser('~/.local/share/juju/ssh/juju_id_rsa'),
+            '-i', id_path,
             '-o', 'StrictHostKeyChecking=no',
             '-q',
             destination

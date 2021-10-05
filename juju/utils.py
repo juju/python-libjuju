@@ -32,15 +32,50 @@ async def execute_process(*cmd, log=None, loop=None):
     return p.returncode == 0
 
 
+def juju_config_dir():
+    """Resolves and returns the path string to the juju configuration
+    folder for the juju CLI tool. Of the following items, returns the
+    first option that works (top to bottom):
+
+    * $JUJU_DATA
+    * $XDG_DATA_HOME/juju
+    * ~/.local/share/juju
+
+    """
+    # Check $JUJU_DATA first
+    config_dir = os.environ.get('JUJU_DATA', None)
+
+    # Second option: $XDG_DATA_HOME for ~/.local/share
+    if not config_dir:
+        config_dir = os.environ.get('XDG_DATA_HOME', None)
+
+    # Third option: just set it to ~/.local/share/juju
+    if not config_dir:
+        config_dir = '~/.local/share/juju'
+
+    return os.path.abspath(os.path.expanduser(config_dir))
+
+
+def juju_ssh_key_paths():
+    """Resolves and returns the path strings for public and private ssh
+    keys for juju CLI.
+
+    """
+    config_dir = juju_config_dir()
+    public_key_path = os.path.join(config_dir, 'ssh', 'juju_id_rsa.pub')
+    private_key_path = os.path.join(config_dir, 'ssh', 'juju_id_rsa')
+
+    return public_key_path, private_key_path
+
+
 def _read_ssh_key():
     '''
     Inner function for read_ssh_key, suitable for passing to our
     Executor.
 
     '''
-    default_data_dir = Path(Path.home(), ".local", "share", "juju")
-    juju_data = os.environ.get("JUJU_DATA", default_data_dir)
-    ssh_key_path = Path(juju_data, 'ssh', 'juju_id_rsa.pub')
+    public_key_path_str, _ = juju_ssh_key_paths()
+    ssh_key_path = Path(public_key_path_str)
     with ssh_key_path.open('r') as ssh_key_file:
         ssh_key = ssh_key_file.readlines()[0].strip()
     return ssh_key
