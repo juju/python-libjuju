@@ -1925,14 +1925,22 @@ class Model:
         return await app_facade.DestroyUnits(unit_names=list(unit_names))
     destroy_units = destroy_unit
 
-    def download_backup(self, archive_id):
+    async def download_backup(self, archive_id):
         """Download a backup archive file.
 
         :param str archive_id: The id of the archive to download
         :return str: Path to the archive file
 
         """
-        raise NotImplementedError()
+
+        external_cmd = ['juju', 'download-backup', archive_id]
+        loop = asyncio.get_running_loop()
+        process = await asyncio.create_subprocess_exec(
+            *external_cmd, loop=loop, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
+        stdout, stderr = await process.communicate()
+        if process.returncode != 0:
+            raise JujuError("command failed: %s with %s" % (" ".join(external_cmd), stderr.decode()))
+        return stdout.decode('utf-8').strip()
 
     def enable_ha(
             self, num_controllers=0, constraints=None, series=None, to=None):
@@ -2308,13 +2316,22 @@ class Model:
         """
         raise NotImplementedError()
 
-    def upload_backup(self, archive_path):
+    async def upload_backup(self, archive_path):
         """Store a backup archive remotely in Juju.
 
         :param str archive_path: Path to local archive
+        :return str created backup ID
 
         """
-        raise NotImplementedError()
+
+        external_cmd = ['juju', 'upload-backup', archive_path]
+        loop = asyncio.get_running_loop()
+        process = await asyncio.create_subprocess_exec(
+            *external_cmd, loop=loop, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
+        stdout, stderr = await process.communicate()
+        if process.returncode != 0:
+            raise JujuError("command failed: %s with %s" % (" ".join(external_cmd), stderr.decode()))
+        return stdout.decode('utf-8').split()[-1]
 
     async def get_metrics(self, *tags):
         """Retrieve metrics.
