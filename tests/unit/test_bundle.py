@@ -236,7 +236,7 @@ class TestAddApplicationChangeRun:
 
         model = mock.Mock()
         model._deploy = base.AsyncMock(return_value=None)
-        model._add_store_resources = base.AsyncMock(return_value=["resource1"])
+        model._add_charmhub_resources = base.AsyncMock(return_value=["resource1"])
         model.applications = {}
 
         context = mock.Mock()
@@ -255,7 +255,7 @@ class TestAddApplicationChangeRun:
                                          config="options",
                                          constraints="constraints",
                                          endpoint_bindings="endpoint_bindings",
-                                         resources={},
+                                         resources=["resource1"],
                                          storage="storage",
                                          devices="devices",
                                          num_units="num_units")

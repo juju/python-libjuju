@@ -492,8 +492,11 @@ class AddApplicationChange(ChangeInfo):
         if Schema.CHARM_STORE.matches(url.schema):
             resources = await context.model._add_store_resources(
                 self.application, charm, overrides=self.resources)
+        elif Schema.CHARM_HUB.matches(url.schema):
+            resources = await context.model._add_charmhub_resources(
+                self.application, charm, 'store', overrides=self.resources)
         else:
-            resources = {}
+            resources = context.bundle.get("applications", {}).get(self.application, {}).get("resources", {})
 
         channel = None
         if self.channel is not None and self.channel != "":
