@@ -243,7 +243,7 @@ class BundleHandler:
                 deployed[name] = name
 
                 if is_local_charm(spec['charm']):
-                    spec.charm = self.model.applications[name]
+                    spec['charm'] = self.model.applications[name]
                     continue
                 if spec['charm'] == app.charm_url:
                     continue
