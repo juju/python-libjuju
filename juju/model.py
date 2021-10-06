@@ -1469,9 +1469,21 @@ class Model:
         """
         backups_facade = client.BackupsFacade.from_connection(self.connection())
         results = await backups_facade.Create(notes=notes, keep_copy=keep_copy, no_download=no_download)
+
         if results is None:
-            raise JujuAPIError("Couldn't create a backup")
-        return results.serialize()
+            raise JujuAPIError("unable to create a backup")
+
+        backup_metadata = results.serialize()
+
+        if 'error' in backup_metadata:
+            raise JujuBackupError("unable to create a backup, got %s from Juju API" % backup_metadata)
+
+        backup_id = backup_metadata['id']
+
+        if not no_download:
+            await self.download_backup(backup_id)
+
+        return backup_metadata
 
     def create_storage_pool(self, name, provider_type, **pool_config):
         """Create or define a storage pool.
