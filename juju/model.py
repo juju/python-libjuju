@@ -30,7 +30,7 @@ from .client.overrides import Caveat, Macaroon
 from .constraints import parse as parse_constraints
 from .controller import Controller
 from .delta import get_entity_class, get_entity_delta
-from .errors import JujuAPIError, JujuError, JujuModelConfigError
+from .errors import JujuAPIError, JujuError, JujuModelConfigError, JujuBackupError
 from .errors import JujuAppError, JujuUnitError, JujuAgentError, JujuMachineError
 from .exceptions import DeadEntityException
 from .names import is_valid_application
@@ -1933,14 +1933,24 @@ class Model:
 
         """
 
-        external_cmd = ['juju', 'download-backup', archive_id]
-        loop = asyncio.get_running_loop()
-        process = await asyncio.create_subprocess_exec(
-            *external_cmd, loop=loop, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
-        stdout, stderr = await process.communicate()
-        if process.returncode != 0:
-            raise JujuError("command failed: %s with %s" % (" ".join(external_cmd), stderr.decode()))
-        return stdout.decode('utf-8').strip()
+        conn, headers, path_prefix = self.connection().https_connection()
+        path = "%s/backups" % path_prefix
+        headers['Content-Type'] = 'application/json'
+        args = {'id': archive_id}
+        conn.request("GET", path, json.dumps(args, indent=2), headers=headers)
+        response = conn.getresponse()
+        result = response.read()
+        if not response.status == 200:
+            raise JujuBackupError("unable to download the backup ID : %s -- got : %s from the JujuAPI with a HTTP response code : %s" % (archive_id, result, response.status))
+
+        file_name = "juju-backup-%s.tar.gz" % archive_id
+        with open(file_name, 'wb') as f:
+            try:
+                f.write(result)
+            except (OSError, IOError) as e:
+                raise JujuBackupError("backup ID : %s was fetched, but : %s" % (archive_id, e))
+
+        return file_name
 
     def enable_ha(
             self, num_controllers=0, constraints=None, series=None, to=None):
@@ -2323,15 +2333,7 @@ class Model:
         :return str created backup ID
 
         """
-
-        external_cmd = ['juju', 'upload-backup', archive_path]
-        loop = asyncio.get_running_loop()
-        process = await asyncio.create_subprocess_exec(
-            *external_cmd, loop=loop, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
-        stdout, stderr = await process.communicate()
-        if process.returncode != 0:
-            raise JujuError("command failed: %s with %s" % (" ".join(external_cmd), stderr.decode()))
-        return stdout.decode('utf-8').split()[-1]
+        raise NotImplementedError()
 
     async def get_metrics(self, *tags):
         """Retrieve metrics.
