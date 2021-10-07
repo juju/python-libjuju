@@ -1481,7 +1481,7 @@ class Model:
         backup_id = backup_metadata['id']
 
         if not no_download:
-            await self.download_backup(backup_id)
+            self.download_backup(backup_id)
 
         return backup_metadata
 
@@ -1937,7 +1937,7 @@ class Model:
         return await app_facade.DestroyUnits(unit_names=list(unit_names))
     destroy_units = destroy_unit
 
-    async def download_backup(self, archive_id):
+    def download_backup(self, archive_id):
         """Download a backup archive file.
 
         :param str archive_id: The id of the archive to download
@@ -2149,7 +2149,7 @@ class Model:
         await key_facade.DeleteKeys(ssh_keys=[key], user=user)
     remove_ssh_keys = remove_ssh_key
 
-    async def restore_backup(
+    def restore_backup(
             self, backup_id, bootstrap=False,
             constraints=None, archive=None, upload_tools=False):
         """Restore a backup archive to a new controller.
@@ -2338,7 +2338,7 @@ class Model:
         """
         raise NotImplementedError()
 
-    async def upload_backup(self, archive_path):
+    def upload_backup(self, archive_path):
         """Store a backup archive remotely in Juju.
 
         :param str archive_path: Path to local archive
