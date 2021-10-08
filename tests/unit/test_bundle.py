@@ -985,7 +985,6 @@ class TestBundleHandler:
         }
         model = mock.Mock()
         model.units = {}
-        model.loop = event_loop
         model.add_local_charm_dir = AsyncMock()
         model.add_local_charm_dir.return_value = "charm_uri"
         model.connection.return_value = connection_mock

@@ -565,7 +565,6 @@ class Model:
     """
     def __init__(
         self,
-        loop=None,
         max_frame_size=None,
         bakery_client=None,
         jujudata=None,
@@ -577,7 +576,6 @@ class Model:
 
         If jujudata is None, jujudata.FileJujuData will be used.
 
-        :param loop: an asyncio event loop
         :param max_frame_size: See
             `juju.client.connection.Connection.MAX_FRAME_SIZE`
         :param bakery_client httpbakery.Client: The bakery client to use
@@ -585,7 +583,6 @@ class Model:
         :param jujudata JujuData: The source for current controller information
         """
         self._connector = connector.Connector(
-            loop=loop,
             max_frame_size=max_frame_size,
             bakery_client=bakery_client,
             jujudata=jujudata,
@@ -600,7 +597,7 @@ class Model:
         self._watch_stopped.set()
 
         self._charmhub = CharmHub(self)
-        self._charmstore = CharmStore(self._connector.loop)
+        self._charmstore = CharmStore()
 
         self.deploy_types = {
             "local": LocalDeployType(),
@@ -611,10 +608,6 @@ class Model:
     def is_connected(self):
         """Reports whether the Model is currently connected."""
         return self._connector.is_connected()
-
-    @property
-    def loop(self):
-        return self._connector.loop
 
     def connection(self):
         """Return the current Connection object. It raises an exception
@@ -673,8 +666,6 @@ class Model:
             If this is None, a default bakery_client will be used.
         :param list macaroons: List of macaroons to load into the
             ``bakery_client``.
-        :param asyncio.BaseEventLoop loop: The event loop to use for async
-            operations.
         :param int max_frame_size: The maximum websocket frame size to allow.
         :param specified_facades: Overwrite the facades with a series of
             specified facades.
@@ -710,7 +701,6 @@ class Model:
                 'cacert',
                 'bakery_client',
                 'macaroons',
-                'loop',
                 'max_frame_size',
             ]
             for i, arg in enumerate(args):
@@ -791,7 +781,8 @@ class Model:
         with open(fn, 'rb') as fh:
             func = partial(
                 self.add_local_charm, fh, series, os.stat(fn).st_size)
-            charm_url = await self._connector.loop.run_in_executor(None, func)
+            loop = asyncio.get_running_loop()
+            charm_url = await loop.run_in_executor(None, func)
 
         log.debug('Uploaded local charm: %s -> %s', charm_dir, charm_url)
         return charm_url
@@ -870,8 +861,7 @@ class Model:
 
         await utils.block_until(done,
                                 timeout=timeout,
-                                wait_period=wait_period,
-                                loop=self.loop)
+                                wait_period=wait_period)
         if _disconnected():
             raise websockets.ConnectionClosed(1006, 'no reason')
 
@@ -1037,8 +1027,7 @@ class Model:
                     try:
                         results = await utils.run_with_interrupt(
                             allwatcher.Next(),
-                            self._watch_stopping,
-                            loop=self._connector.loop)
+                            self._watch_stopping)
                     except JujuAPIError as e:
                         if 'watcher was stopped' not in str(e):
                             raise
@@ -1105,7 +1094,7 @@ class Model:
         self._watch_received.clear()
         self._watch_stopping.clear()
         self._watch_stopped.clear()
-        self._connector.loop.create_task(_all_watcher())
+        asyncio.ensure_future(_all_watcher())
 
     async def _notify_observers(self, delta, old_obj, new_obj):
         """Call observing callbacks, notifying them of a change in model state
@@ -1127,8 +1116,7 @@ class Model:
 
         for o in self._observers:
             if o.cares_about(delta):
-                asyncio.ensure_future(o(delta, old_obj, new_obj, self),
-                                      loop=self._connector.loop)
+                asyncio.ensure_future(o(delta, old_obj, new_obj, self))
 
     async def _wait(self, entity_type, entity_id, action, predicate=None):
         """
@@ -1608,10 +1596,9 @@ class Model:
                 # haven't made it yet we'll need to wait on them to be added
                 await asyncio.gather(*[
                     asyncio.ensure_future(
-                        self._wait_for_new('application', app_name),
-                        loop=self._connector.loop)
+                        self._wait_for_new('application', app_name))
                     for app_name in pending_apps
-                ], loop=self._connector.loop)
+                ])
             return [app for name, app in self.applications.items()
                     if name in handler.applications]
         else:

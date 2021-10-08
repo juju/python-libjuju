@@ -210,8 +210,6 @@ class Connection:
         client = await Connection.connect(
             api_endpoint, model_uuid, username, password, cacert)
 
-    Note: Any connection method or constructor can accept an optional `loop`
-    argument to override the default event loop from `asyncio.get_event_loop`.
     """
 
     MAX_FRAME_SIZE = 2**22
@@ -226,7 +224,6 @@ class Connection:
             password=None,
             cacert=None,
             bakery_client=None,
-            loop=None,
             max_frame_size=None,
             retries=3,
             retry_backoff=10,
@@ -250,8 +247,6 @@ class Connection:
             to use when performing macaroon-based login. Macaroon tokens
             acquired when logging will be saved to bakery_client.cookies.
             If this is None, a default bakery_client will be used.
-        :param asyncio.BaseEventLoop loop: The event loop to use for async
-            operations.
         :param int max_frame_size: The maximum websocket frame size to allow.
         :param int retries: When connecting or reconnecting, and all endpoints
             fail, how many times to retry the connection before giving up.
@@ -279,7 +274,6 @@ class Connection:
             username = None
         self.usertag = tag.user(username)
         self.password = password
-        self.loop = loop or asyncio.get_event_loop()
 
         self.__request_id__ = 0
 
@@ -294,8 +288,8 @@ class Connection:
         self.info = None
 
         # Create that _Task objects but don't start the tasks yet.
-        self._pinger_task = _Task(self._pinger, self.loop)
-        self._receiver_task = _Task(self._receiver, self.loop)
+        self._pinger_task = _Task(self._pinger)
+        self._receiver_task = _Task(self._receiver)
 
         self._retries = retries
         self._retry_backoff = retry_backoff
@@ -303,7 +297,7 @@ class Connection:
         self.facades = {}
         self.specified_facades = specified_facades or {}
 
-        self.messages = IdQueue(loop=self.loop)
+        self.messages = IdQueue()
         self.monitor = Monitor(connection=self)
         if max_frame_size is None:
             max_frame_size = self.MAX_FRAME_SIZE
@@ -372,7 +366,6 @@ class Connection:
         return (await websockets.connect(
             url,
             ssl=self._get_ssl(cacert),
-            loop=self.loop,
             max_size=self.max_frame_size,
             server_hostname=server_hostname,
             sock=sock,
@@ -400,8 +393,7 @@ class Connection:
             while self.is_open:
                 result = await utils.run_with_interrupt(
                     self.ws.recv(),
-                    self.monitor.close_called,
-                    loop=self.loop)
+                    self.monitor.close_called)
                 if self.monitor.close_called.is_set():
                     break
                 if result is not None:
@@ -415,7 +407,7 @@ class Connection:
             # the reconnect has to be done as a task because the receiver will
             # be cancelled by the reconnect and we don't want the reconnect
             # to be aborted half-way through
-            self.loop.create_task(self.reconnect())
+            asyncio.ensure_future(self.reconnect())
             return
         except Exception as e:
             log.exception("Error in receiver")
@@ -443,8 +435,7 @@ class Connection:
             while True:
                 await utils.run_with_interrupt(
                     _do_ping(),
-                    self.monitor.close_called,
-                    loop=self.loop)
+                    self.monitor.close_called)
                 if self.monitor.close_called.is_set():
                     break
         except websockets.exceptions.ConnectionClosed:
@@ -486,7 +477,7 @@ class Connection:
                 # if it is triggered by the pinger, then this RPC call will
                 # be cancelled when the pinger is cancelled by the reconnect,
                 # and we don't want the reconnect to be aborted halfway through
-                await asyncio.wait([self.reconnect()], loop=self.loop)
+                await asyncio.wait([self.reconnect()])
                 if self.monitor.status != Monitor.CONNECTED:
                     # reconnect failed; abort and shutdown
                     log.error('RPC: Automatic reconnect failed')
@@ -588,7 +579,6 @@ class Connection:
             'password': self.password,
             'cacert': self.cacert,
             'bakery_client': self.bakery_client,
-            'loop': self.loop,
             'max_frame_size': self.max_frame_size,
             'proxy': self.proxy,
         }
@@ -602,7 +592,6 @@ class Connection:
             password=self.password,
             cacert=self.cacert,
             bakery_client=self.bakery_client,
-            loop=self.loop,
             max_frame_size=self.max_frame_size,
         )
 
@@ -632,7 +621,7 @@ class Connection:
         # Try all endpoints in parallel, with slight increasing delay (+100ms
         # for each subsequent endpoint); the delay allows us to prefer the
         # earlier endpoints over the latter. Use first successful connection.
-        tasks = [self.loop.create_task(_try_endpoint(endpoint, cacert,
+        tasks = [asyncio.ensure_future(_try_endpoint(endpoint, cacert,
                                                      0.1 * i))
                  for i, (endpoint, cacert) in enumerate(endpoints)]
         for attempt in range(self._retries + 1):
@@ -804,11 +793,10 @@ class Connection:
 
 
 class _Task:
-    def __init__(self, task, loop):
+    def __init__(self, task):
         self.stopped = asyncio.Event()
         self.stopped.set()
         self.task = task
-        self.loop = loop
 
     def start(self):
         async def run():
@@ -817,7 +805,7 @@ class _Task:
             finally:
                 self.stopped.set()
         self.stopped.clear()
-        self.loop.create_task(run())
+        asyncio.ensure_future(run())
 
 
 def _macaroons_for_domain(cookies, domain):

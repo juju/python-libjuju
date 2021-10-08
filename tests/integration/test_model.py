@@ -444,13 +444,13 @@ async def test_relate(event_loop):
             my_relation = await run_with_interrupt(model.add_relation(
                 'ubuntu',
                 'nrpe',
-            ), timeout, loop=event_loop)
+            ), timeout)
 
         assert isinstance(my_relation, Relation)
 
 
 async def _deploy_in_loop(new_loop, model_name, jujudata):
-    new_model = Model(new_loop, jujudata=jujudata)
+    new_model = Model(jujudata=jujudata)
     await new_model.connect(model_name)
     try:
         await new_model.deploy('cs:xenial/ubuntu')

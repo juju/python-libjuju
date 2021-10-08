@@ -31,7 +31,7 @@ def run(*steps):
     try:
         for step in steps:
             task = loop.create_task(step)
-            loop.run_until_complete(asyncio.wait([task], loop=loop))
+            loop.run_until_complete(asyncio.wait([task]))
             if run._sigint:
                 raise KeyboardInterrupt()
             if task.exception():

@@ -255,7 +255,7 @@ class TestModelConnect(asynctest.TestCase):
                                              username='user',
                                              password='pass')
         await m.connect('endpoint', 'uuid', 'user', 'pass', 'cacert', 'bakery',
-                        'macaroons', 'loop', 'max_frame_size')
+                        'macaroons', 'max_frame_size')
         mock_connect.assert_called_with(endpoint='endpoint',
                                         uuid='uuid',
                                         username='user',
@@ -263,7 +263,6 @@ class TestModelConnect(asynctest.TestCase):
                                         cacert='cacert',
                                         bakery_client='bakery',
                                         macaroons='macaroons',
-                                        loop='loop',
                                         max_frame_size='max_frame_size')
 
 
