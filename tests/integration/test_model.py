@@ -721,26 +721,20 @@ async def test_backups(event_loop):
     num_of_backups_before_test = len(test_start)
 
     # Create a backup
-    created_backup = await m.create_backup(notes="hi", keep_copy=True)
-    assert 'id' in created_backup
-    created_id = created_backup['id']
+    local_file_name, extra_info = await m.create_backup(notes="hi")
+    assert 'id' in extra_info
+    assert 'checksum' in extra_info
 
-    assert 'checksum' in created_backup
-    assert created_backup['notes'] == "hi"
+    assert extra_info['notes'] == "hi"
 
     # Check if the file is downloaded on disk
-    file_path = 'juju-backup-%s.tar.gz' % created_id
-    assert os.path.exists(file_path)
+    assert os.path.exists(local_file_name)
 
-    # See if the backup is actually kept in the controller (keep_copy=True)
-    after_create_backups = await m.get_backups()
-    assert len(after_create_backups) == num_of_backups_before_test + 1
-
-    # Cleanup
-    os.remove(file_path)
-    await m.remove_backup(created_id)
     test_over = await m.get_backups()
     assert len(test_over) == num_of_backups_before_test
+
+    # Cleanup
+    os.remove(local_file_name)
 
 
 @base.bootstrapped
