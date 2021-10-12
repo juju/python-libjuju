@@ -8,6 +8,7 @@ import yaml
 from juju import tag
 from juju.client.gocookies import GoCookieJar
 from juju.errors import JujuError
+from juju.utils import juju_config_dir
 
 
 class NoModelException(Exception):
@@ -121,8 +122,7 @@ class FileJujuData(JujuData):
     '''Provide access to the Juju client configuration files.
     Any configuration file is read once and then cached.'''
     def __init__(self):
-        self.path = os.environ.get('JUJU_DATA') or '~/.local/share/juju'
-        self.path = os.path.abspath(os.path.expanduser(self.path))
+        self.path = juju_config_dir()
         # _loaded keeps track of the loaded YAML from
         # the Juju data files so we don't need to load the same
         # file many times.
