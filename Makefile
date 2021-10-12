@@ -27,7 +27,7 @@ test: lint
 
 .PHONY: lint
 lint: 
-	tox -e lint --notest
+	tox -e lint
 
 .PHONY: docs
 docs: .tox

@@ -180,19 +180,22 @@ async def test_add_bundle(event_loop):
             assert 'mysql' in model_1.applications
             await model_1.block_until(
                 lambda: all(unit.workload_status == 'active'
-                            for unit in application.units))
+                            for unit in application.units),
+                timeout=60 * 4)
             await model_1.create_offer("mysql:db")
 
             offers = await model_1.list_offers()
             await model_1.block_until(
                 lambda: all(offer.application_name == 'mysql'
-                            for offer in offers.results))
+                            for offer in offers.results),
+                timeout=60 * 4)
 
             # farm off a new model to test the consumption
             async with base.CleanModel() as model_2:
                 await model_2.deploy('local:{}'.format(tmp_path))
                 await model_2.block_until(
                     lambda: all(unit.agent_status == 'executing'
-                                for unit in application.units))
+                                for unit in application.units),
+                    timeout=60 * 4)
 
             await model_1.remove_offer("admin/{}.mysql".format(model_1.info.name), force=True)
