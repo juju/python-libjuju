@@ -1,6 +1,33 @@
 Changelog
 ---------
 
+2.9.4
+^^^^^
+
+Tuesday October 12 2021
+
+## What's Changed
+
+* Charmhub deploy charm by @SimonRichardson in https://github.com/juju/python-libjuju/pull/483
+* add wait_for_status instead of wait_for_active by @sed-i in https://github.com/juju/python-libjuju/pull/517
+* Adds resource support for charmhub deployments by @tlm in https://github.com/juju/python-libjuju/pull/516
+* Fix bug #519 and #522: Add local resources for bundles by @davigar15 in https://github.com/juju/python-libjuju/pull/520
+* Patching some missing kwargs by @cderici in https://github.com/juju/python-libjuju/pull/527
+* Implementing `backup` functionality by @cderici in https://github.com/juju/python-libjuju/pull/536
+* Fix issue 532: Set the default_series properly by @davigar15 in https://github.com/juju/python-libjuju/pull/533
+* A random small bug fix by @cderici in https://github.com/juju/python-libjuju/pull/541
+* Allow ApplicationFacade set_config with non-string values by @cderici in https://github.com/juju/python-libjuju/pull/540
+* Skip macaroon tests issue 534 by @cderici in https://github.com/juju/python-libjuju/pull/542
+* Fix issue 530: Check the controller for unsynched models by @cderici in https://github.com/juju/python-libjuju/pull/539
+* Upgrade setup-python action. by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/543
+* Fix integration tests by @cderici in https://github.com/juju/python-libjuju/pull/544
+* Bring juju/juju.py into life by @cderici in https://github.com/juju/python-libjuju/pull/546
+* Extract resources info from apps in locally deployed bundle by @cderici in https://github.com/juju/python-libjuju/pull/552
+* Fix for simple bug in bundle deployment code self.charm -> self['charm'] by @jnsgruk in https://github.com/juju/python-libjuju/pull/558
+* Fix integration tests continued by @cderici in https://github.com/juju/python-libjuju/pull/547
+* Get the config dir resolve logic into one place by @cderici in https://github.com/juju/python-libjuju/pull/555
+* Complete the backups functionality by @cderici in https://github.com/juju/python-libjuju/pull/556
+
 2.9.3
 ^^^^^
 
