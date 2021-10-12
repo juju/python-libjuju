@@ -79,6 +79,10 @@ class JujuUnitError(JujuError):
     pass
 
 
+class JujuBackupError(JujuError):
+    pass
+
+
 class JujuConfigError(JujuError):
     """Exception raised during processing a configuration key-value pair
     in a config set for an application.

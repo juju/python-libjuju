@@ -30,7 +30,7 @@ from .client.overrides import Caveat, Macaroon
 from .constraints import parse as parse_constraints
 from .controller import Controller
 from .delta import get_entity_class, get_entity_delta
-from .errors import JujuAPIError, JujuError, JujuModelConfigError
+from .errors import JujuAPIError, JujuError, JujuModelConfigError, JujuBackupError
 from .errors import JujuAppError, JujuUnitError, JujuAgentError, JujuMachineError
 from .exceptions import DeadEntityException
 from .names import is_valid_application
@@ -1458,20 +1458,31 @@ class Model:
         """
         raise NotImplementedError()
 
-    async def create_backup(self, notes=None, keep_copy=False, no_download=False):
+    async def create_backup(self, notes=None):
         """Create a backup of this model.
 
         :param str note: A note to store with the backup
         :param bool keep_copy: Keep a copy of the archive on the controller
         :param bool no_download: Do not download the backup archive
-        :return dict: Metadata for the created backup (id, checksum, notes, filename, etc.)
+        :return str, dict: Filename for the downloaded archive file, Extra metadata for the created backup
 
         """
         backups_facade = client.BackupsFacade.from_connection(self.connection())
-        results = await backups_facade.Create(notes=notes, keep_copy=keep_copy, no_download=no_download)
+        results = await backups_facade.Create(notes=notes)
+
         if results is None:
-            raise JujuAPIError("Couldn't create a backup")
-        return results.serialize()
+            raise JujuAPIError("unable to create a backup")
+
+        backup_metadata = results.serialize()
+
+        if 'error' in backup_metadata:
+            raise JujuBackupError("unable to create a backup, got %s from Juju API" % backup_metadata)
+
+        backup_id = backup_metadata['filename']
+
+        file_name = self.download_backup(backup_id)
+
+        return file_name, backup_metadata
 
     def create_storage_pool(self, name, provider_type, **pool_config):
         """Create or define a storage pool.
@@ -1925,14 +1936,43 @@ class Model:
         return await app_facade.DestroyUnits(unit_names=list(unit_names))
     destroy_units = destroy_unit
 
-    def download_backup(self, archive_id):
+    def download_backup(self, archive_id, target_filename=None):
         """Download a backup archive file.
 
         :param str archive_id: The id of the archive to download
+        :param str (optional) target_filename: A custom name for the target file
         :return str: Path to the archive file
 
         """
-        raise NotImplementedError()
+
+        conn, headers, path_prefix = self.connection().https_connection()
+        path = "%s/backups" % path_prefix
+        headers['Content-Type'] = 'application/json'
+        args = {'id': archive_id}
+        conn.request("GET", path, json.dumps(args, indent=2), headers=headers)
+        response = conn.getresponse()
+        result = response.read()
+        if not response.status == 200:
+            raise JujuBackupError("unable to download the backup ID : %s -- got : %s from the JujuAPI with a HTTP response code : %s" % (archive_id, result, response.status))
+
+        if target_filename:
+            file_name = target_filename
+        else:
+            # check if archive_id is a filename
+            if re.match(r'.*\.tar\.gz', archive_id):
+                # if so, use the same ID generated & sent by the Juju API
+                archive_id = re.compile('[0-9]+').findall(archive_id)[0]
+
+            file_name = "juju-backup-%s.tar.gz" % archive_id
+
+        with open(file_name, 'wb') as f:
+            try:
+                f.write(result)
+            except (OSError, IOError) as e:
+                raise JujuBackupError("backup ID : %s was fetched, but : %s" % (archive_id, e))
+
+        log.info("Backup archive downloaded in : %s" % file_name)
+        return file_name
 
     def enable_ha(
             self, num_controllers=0, constraints=None, series=None, to=None):
@@ -2120,19 +2160,19 @@ class Model:
     remove_ssh_keys = remove_ssh_key
 
     def restore_backup(
-            self, bootstrap=False, constraints=None, archive=None,
-            backup_id=None, upload_tools=False):
+            self, backup_id, bootstrap=False,
+            constraints=None, archive=None, upload_tools=False):
         """Restore a backup archive to a new controller.
 
+        :param str backup_id: Id of backup to restore
         :param bool bootstrap: Bootstrap a new state machine
         :param constraints: Model constraints
         :type constraints: :class:`juju.Constraints`
         :param str archive: Path to backup archive to restore
-        :param str backup_id: Id of backup to restore
         :param bool upload_tools: Upload tools if bootstrapping a new machine
 
         """
-        raise NotImplementedError()
+        raise DeprecationWarning("juju restore-backup is deprecated in favor of the stand-alone 'juju-restore' tool: https://github.com/juju/juju-restore")
 
     def retry_provisioning(self):
         """Retry provisioning for failed machines.
@@ -2312,6 +2352,7 @@ class Model:
         """Store a backup archive remotely in Juju.
 
         :param str archive_path: Path to local archive
+        :return str created backup ID
 
         """
         raise NotImplementedError()

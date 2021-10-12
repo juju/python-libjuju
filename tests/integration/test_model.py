@@ -717,22 +717,24 @@ async def test_unit_annotations(event_loop):
 async def test_backups(event_loop):
     m = Model()
     await m.connect(model_name='controller')
-    backups = await m.get_backups()
-    assert backups == []  # no backup yet
+    test_start = await m.get_backups()
+    num_of_backups_before_test = len(test_start)
 
-    created_backup = await m.create_backup(notes="hi", keep_copy=True)
-    assert 'id' in created_backup
-    created_id = created_backup['id']
+    # Create a backup
+    local_file_name, extra_info = await m.create_backup(notes="hi")
+    assert 'id' in extra_info
+    assert 'checksum' in extra_info
 
-    assert 'checksum' in created_backup
-    assert created_backup['notes'] == "hi"
+    assert extra_info['notes'] == "hi"
 
-    after_create_backups = await m.get_backups()
-    assert len(after_create_backups) == 1
+    # Check if the file is downloaded on disk
+    assert os.path.exists(local_file_name)
 
-    await m.remove_backup(created_id)
-    after_remove_backup = await m.get_backups()
-    assert len(after_remove_backup) == 0
+    test_over = await m.get_backups()
+    assert len(test_over) == num_of_backups_before_test
+
+    # Cleanup
+    os.remove(local_file_name)
 
 
 @base.bootstrapped
