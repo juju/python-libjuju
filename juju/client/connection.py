@@ -1,3 +1,4 @@
+import sys
 import base64
 import json
 import logging
@@ -5,6 +6,7 @@ import ssl
 import urllib.request
 import weakref
 from http.client import HTTPSConnection
+from dateutil.parser import parse
 
 import macaroonbakery.bakery as bakery
 import macaroonbakery.httpbakery as httpbakery
@@ -192,7 +194,11 @@ class Monitor:
             return self.DISCONNECTING
 
         # connection closed uncleanly (we didn't call connection.close)
-        stopped = connection._receiver_task.cancelled()
+        if connection.is_debug_log_connection:
+            stopped = connection._debug_log_task.cancelled()
+        else:
+            stopped = connection._receiver_task.cancelled()
+
         if stopped or not connection.ws.open:
             return self.ERROR
 
@@ -227,6 +233,7 @@ class Connection:
             retry_backoff=10,
             specified_facades=None,
             proxy=None,
+            debug_log_conn=None
     ):
         """Connect to the websocket.
 
@@ -253,6 +260,7 @@ class Connection:
             would wait 10s, 20s, and 30s).
         :param specified_facades: Define a series of facade versions you wish to override
             to prevent using the conservative client pinning with in the client.
+        :param TextIOWrapper debug_log_conn: target if this is a debug log connection
         """
         self = cls()
         if endpoint is None:
@@ -285,8 +293,13 @@ class Connection:
         self.cacert = None
         self.info = None
 
+        self.debug_log_target = debug_log_conn
+        self.is_debug_log_connection = debug_log_conn is not None
+
+        # Create that _Task objects but don't start the tasks yet.
         self._pinger_task = None
         self._receiver_task = None
+        self._debug_log_task = None
 
         self._retries = retries
         self._retry_backoff = retry_backoff
@@ -308,7 +321,12 @@ class Connection:
         lastError = None
         for _ep in _endpoints:
             try:
-                await self._connect_with_redirect([_ep])
+                if debug_log_conn:
+                    # make a direct connection with basic auth if
+                    # debug-log (i.e. no redirection or login)
+                    await self._connect([_ep])
+                else:
+                    await self._connect_with_redirect([_ep])
                 return self
             except ssl.SSLError as e:
                 lastError = e
@@ -346,7 +364,12 @@ class Connection:
         return context
 
     async def _open(self, endpoint, cacert):
-        if self.uuid:
+
+        if self.is_debug_log_connection:
+            assert self.uuid
+            url = "wss://user-{}:{}@{}/model/{}/log".format(
+                self.username, self.password, endpoint, self.uuid)
+        elif self.uuid:
             url = "wss://{}/model/{}/api".format(endpoint, self.uuid)
         else:
             url = "wss://{}/api".format(endpoint)
@@ -376,6 +399,9 @@ class Connection:
             self._pinger_task.cancel()
         if self._receiver_task:
             self._receiver_task.cancel()
+        if self._debug_log_task:
+            self._close_debug_log_target()
+            self._debug_log_task.cance()
 
         if self.ws is not None:
             await self.ws.close()
@@ -390,6 +416,48 @@ class Connection:
         if not self.is_open:
             raise websockets.exceptions.ConnectionClosed(0, 'websocket closed')
         return await self.messages.get(request_id)
+
+    def _close_debug_log_target(self):
+        if self.debug_log_target is not sys.stdout:
+            self.debug_log_target.close()
+
+    async def _debug_logger(self):
+        try:
+            while self.is_open:
+                result = await utils.run_with_interrupt(
+                    self.ws.recv(),
+                    self.monitor.close_called)
+                if self.monitor.close_called.is_set():
+                    break
+                if result is not None and result != '{}\n':
+                    result = json.loads(result)
+
+                    tag = result['tag']
+                    ts = parse(result['ts'])
+                    sev = result['sev']
+                    mod = result['mod']
+                    msg = result['msg']
+
+                    self.debug_log_target.write("%s %s:%s:%s %s %s %s\n" % (tag, ts.hour, ts.minute, ts.second, sev, mod, msg))
+                    log.debug("debug log line is : %s" % result)
+        except KeyError as e:
+            log.exception('Unexpected debug line -- %s' % e)
+            await self.close()
+            raise
+        except CancelledError:
+            await self.close()
+            pass
+        except websockets.ConnectionClosed:
+            log.warning('Debug Logger: Connection closed, reconnecting')
+            # the reconnect has to be done as a task because the receiver will
+            # be cancelled by the reconnect and we don't want the reconnect
+            # to be aborted half-way through
+            jasyncio.create_task(self.reconnect())
+            raise
+        except Exception as e:
+            log.exception("Error in debug logger : %s" % e)
+            await self.close()
+            raise
 
     async def _receiver(self):
         try:
@@ -608,7 +676,8 @@ class Connection:
             return
         async with monitor.reconnecting:
             await self.close()
-            await self._connect_with_login(
+            connector = self._connect if self.is_debug_log_connection else self._connect_with_login
+            await connector(
                 [(self.endpoint, self.cacert)]
                 if not self.endpoints else
                 self.endpoints
@@ -659,7 +728,10 @@ class Connection:
         self.addr = result[1]
         self.endpoint = result[2]
         self.cacert = result[3]
-        self._receiver_task = jasyncio.create_task(self._receiver())
+        if self.is_debug_log_connection:
+            self._debug_log_task = jasyncio.create_task(self._debug_logger())
+        else:
+            self._receiver_task = jasyncio.create_task(self._receiver())
         log.debug("Driver connected to juju %s", self.addr)
         self.monitor.close_called.clear()
 
