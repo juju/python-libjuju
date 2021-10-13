@@ -36,6 +36,7 @@ class Connector:
         self.loop = loop or asyncio.get_event_loop()
         self.bakery_client = bakery_client
         self._connection = None
+        self._log_connection = None
         self.controller_name = None
         self.controller_uuid = None
         self.model_name = None
@@ -68,7 +69,11 @@ class Connector:
             jar = kwargs['bakery_client'].cookies
             for macaroon in kwargs.pop('macaroons'):
                 jar.set_cookie(go_to_py_cookie(macaroon))
-        self._connection = await Connection.connect(**kwargs)
+        if 'debug_log_conn' in kwargs:
+            assert self._connection
+            self._log_connection = await Connection.connect(**kwargs)
+        else:
+            self._connection = await Connection.connect(**kwargs)
 
     async def disconnect(self):
         """Shut down the watcher task and close websockets.
@@ -77,6 +82,10 @@ class Connector:
             log.debug('Closing model connection')
             await self._connection.close()
             self._connection = None
+        if self._log_connection:
+            log.debug('Also closing debug-log connection')
+            await self._log_connection.close()
+            self._log_connection = None
 
     async def connect_controller(self, controller_name=None, specified_facades=None):
         """Connect to a controller by name. If the name is empty, it

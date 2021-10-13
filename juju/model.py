@@ -5,6 +5,7 @@ import hashlib
 import json
 import logging
 import os
+import sys
 import re
 import stat
 import tempfile
@@ -679,7 +680,9 @@ class Model:
         :param specified_facades: Overwrite the facades with a series of
             specified facades.
         """
-        await self.disconnect()
+        is_debug_log_conn = 'debug_log_conn' in kwargs
+        if not is_debug_log_conn:
+            await self.disconnect()
         if 'endpoint' not in kwargs and len(args) < 2:
             if args and 'model_name' in kwargs:
                 raise TypeError('connect() got multiple values for model_name')
@@ -723,7 +726,8 @@ class Model:
                 raise ValueError('Authentication parameters are required '
                                  'if model_name not given')
             await self._connector.connect(**kwargs)
-        await self._after_connect()
+        if not is_debug_log_conn:
+            await self._after_connect()
 
     async def connect_model(self, model_name, **kwargs):
         """
@@ -1494,10 +1498,10 @@ class Model:
         """
         raise NotImplementedError()
 
-    def debug_log(
-            self, no_tail=False, exclude_module=None, include_module=None,
-            include=None, level=None, limit=0, lines=10, replay=False,
-            exclude=None):
+    async def debug_log(
+            self, target=sys.stdout, no_tail=False, exclude_module=None,
+            include_module=None, include=None, level=None, limit=0, lines=10,
+            replay=False, exclude=None):
         """Get log messages for this model.
 
         :param bool no_tail: Stop after returning existing log messages
@@ -1516,7 +1520,10 @@ class Model:
         :param list exclude: Do not show log messages for these entities
 
         """
-        raise NotImplementedError()
+        if not self.is_connected():
+            await self.connect()
+
+        await self.connect(debug_log_conn=target)
 
     def _get_series(self, entity_url, entity):
         # try to get the series from the provided charm URL
