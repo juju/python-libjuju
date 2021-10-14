@@ -1,8 +1,9 @@
 from functools import partial
 
-import asyncio
 import theblues.charmstore
 import theblues.errors
+
+from . import jasyncio
 
 
 class CharmStore:
@@ -26,12 +27,12 @@ class CharmStore:
                 method = partial(attr, *args, **kwargs)
                 for attempt in range(1, 4):
                     try:
-                        loop = asyncio.get_running_loop()
+                        loop = jasyncio.get_running_loop()
                         return await loop.run_in_executor(None, method)
                     except theblues.errors.ServerError:
                         if attempt == 3:
                             raise
-                        await asyncio.sleep(1)
+                        await jasyncio.sleep(1)
             setattr(self, name, coro)
             wrapper = coro
         return wrapper

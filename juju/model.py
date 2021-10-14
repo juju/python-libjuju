@@ -1,4 +1,3 @@
-import asyncio
 import base64
 import collections
 import hashlib
@@ -19,7 +18,7 @@ from pathlib import Path
 import yaml
 import websockets
 
-from . import provisioner, tag, utils
+from . import provisioner, tag, utils, jasyncio
 from .annotationhelper import _get_annotations, _set_annotations
 from .bundle import BundleHandler, get_charm_series, is_local_charm
 from .charmhub import CharmHub
@@ -591,9 +590,9 @@ class Model:
         self.state = ModelState(self)
         self._info = None
         self._mode = None
-        self._watch_stopping = asyncio.Event()
-        self._watch_stopped = asyncio.Event()
-        self._watch_received = asyncio.Event()
+        self._watch_stopping = jasyncio.Event()
+        self._watch_stopped = jasyncio.Event()
+        self._watch_received = jasyncio.Event()
         self._watch_stopped.set()
 
         self._charmhub = CharmHub(self)
@@ -781,7 +780,7 @@ class Model:
         with open(fn, 'rb') as fh:
             func = partial(
                 self.add_local_charm, fh, series, os.stat(fn).st_size)
-            loop = asyncio.get_running_loop()
+            loop = jasyncio.get_running_loop()
             charm_url = await loop.run_in_executor(None, func)
 
         log.debug('Uploaded local charm: %s -> %s', charm_dir, charm_url)
@@ -1094,7 +1093,7 @@ class Model:
         self._watch_received.clear()
         self._watch_stopping.clear()
         self._watch_stopped.clear()
-        asyncio.ensure_future(_all_watcher())
+        jasyncio.ensure_future(_all_watcher())
 
     async def _notify_observers(self, delta, old_obj, new_obj):
         """Call observing callbacks, notifying them of a change in model state
@@ -1116,7 +1115,7 @@ class Model:
 
         for o in self._observers:
             if o.cares_about(delta):
-                asyncio.ensure_future(o(delta, old_obj, new_obj, self))
+                jasyncio.ensure_future(o(delta, old_obj, new_obj, self))
 
     async def _wait(self, entity_type, entity_id, action, predicate=None):
         """
@@ -1133,7 +1132,7 @@ class Model:
             has a 'completed' status. See the _Observer class for details.
 
         """
-        q = asyncio.Queue()
+        q = jasyncio.Queue()
 
         async def callback(delta, old, new, model):
             await q.put(delta.get_id())
@@ -1594,8 +1593,8 @@ class Model:
             if pending_apps:
                 # new apps will usually be in the model by now, but if some
                 # haven't made it yet we'll need to wait on them to be added
-                await asyncio.gather(*[
-                    asyncio.ensure_future(
+                await jasyncio.gather(*[
+                    jasyncio.ensure_future(
                         self._wait_for_new('application', app_name))
                     for app_name in pending_apps
                 ])
@@ -2229,8 +2228,8 @@ class Model:
                 if action_output.results[0].status in ('completed', 'failed'):
                     return
                 else:
-                    await asyncio.sleep(1)
-        await asyncio.wait_for(
+                    await jasyncio.sleep(1)
+        await jasyncio.wait_for(
             _wait_for_action_status(),
             timeout=wait)
         action_output = await action_facade.Actions(entities=entity)
@@ -2623,11 +2622,11 @@ class Model:
                 break
             busy = "\n  ".join(busy)
             if timeout is not None and datetime.now() - start_time > timeout:
-                raise asyncio.TimeoutError("Timed out waiting for model:\n" + busy)
+                raise jasyncio.TimeoutError("Timed out waiting for model:\n" + busy)
             if last_log_time is None or datetime.now() - last_log_time > log_interval:
                 log.info("Waiting for model:\n  " + busy)
                 last_log_time = datetime.now()
-            await asyncio.sleep(check_freq)
+            await jasyncio.sleep(check_freq)
 
 
 def _create_consume_args(offer, macaroon, controller_info):

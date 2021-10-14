@@ -1,4 +1,3 @@
-import asyncio
 import json
 import logging
 from concurrent.futures import CancelledError
@@ -6,7 +5,7 @@ from pathlib import Path
 
 import websockets
 
-from . import errors, tag, utils
+from . import errors, tag, utils, jasyncio
 from .client import client, connector
 from .errors import JujuAPIError
 from .offerendpoints import ParseError as OfferParseError
@@ -556,7 +555,7 @@ class Controller:
                 # see: https://bugs.launchpad.net/juju/+bug/1721786
                 if 'has been removed' not in e.message or attempt == 3:
                     raise
-                await asyncio.sleep(attempt)
+                await jasyncio.sleep(attempt)
 
     async def list_models(self):
         """Return list of names of the available models on this controller.
@@ -813,7 +812,7 @@ class Controller:
         all models in the controller. If the user isn't a superuser they
         will get a permission error.
         """
-        stop_event = asyncio.Event()
+        stop_event = jasyncio.Event()
 
         async def _watcher(stop_event):
             try:
@@ -854,5 +853,5 @@ class Controller:
                 raise
 
         log.debug('Starting watcher task for model summaries')
-        asyncio.ensure_future(_watcher(stop_event))
+        jasyncio.ensure_future(_watcher(stop_event))
         return stop_event

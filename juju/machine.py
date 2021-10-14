@@ -1,10 +1,9 @@
-import asyncio
 import ipaddress
 import logging
 
 import pyrfc3339
 
-from . import model, tag
+from . import model, tag, jasyncio
 from .annotationhelper import _get_annotations, _set_annotations
 from .client import client
 from .errors import JujuError
@@ -134,7 +133,7 @@ class Machine(model.ModelEntity):
         ]
         cmd.extend(scp_opts.split() if isinstance(scp_opts, str) else scp_opts)
         cmd.extend([source, destination])
-        process = await asyncio.create_subprocess_exec(*cmd)
+        process = await jasyncio.create_subprocess_exec(*cmd)
         await process.wait()
         if process.returncode != 0:
             raise JujuError("command failed: %s" % cmd)
@@ -164,8 +163,8 @@ class Machine(model.ModelEntity):
         if ssh_opts:
             cmd.extend(ssh_opts.split() if isinstance(ssh_opts, str) else ssh_opts)
         cmd.extend([command])
-        process = await asyncio.create_subprocess_exec(
-            *cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
+        process = await jasyncio.create_subprocess_exec(
+            *cmd, stdout=jasyncio.subprocess.PIPE, stderr=jasyncio.subprocess.PIPE)
         stdout, stderr = await process.communicate()
         if process.returncode != 0:
             raise JujuError("command failed: %s with %s" % (cmd, stderr.decode()))

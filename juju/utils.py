@@ -1,4 +1,3 @@
-import asyncio
 import os
 import textwrap
 from collections import defaultdict
@@ -10,17 +9,19 @@ from pyasn1.codec.der.encoder import encode
 import yaml
 import zipfile
 
+from . import jasyncio
+
 
 async def execute_process(*cmd, log=None):
     '''
     Wrapper around asyncio.create_subprocess_exec.
 
     '''
-    p = await asyncio.create_subprocess_exec(
+    p = await jasyncio.create_subprocess_exec(
         *cmd,
-        stdin=asyncio.subprocess.PIPE,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE)
+        stdin=jasyncio.subprocess.PIPE,
+        stdout=jasyncio.subprocess.PIPE,
+        stderr=jasyncio.subprocess.PIPE)
     stdout, stderr = await p.communicate()
     if log:
         log.debug("Exec %s -> %d", cmd, p.returncode)
@@ -86,7 +87,7 @@ async def read_ssh_key():
     can be passed on to a model.
 
     '''
-    loop = asyncio.get_running_loop()
+    loop = jasyncio.get_running_loop()
     return await loop.run_in_executor(None, _read_ssh_key)
 
 
@@ -95,7 +96,7 @@ class IdQueue:
     Wrapper around asyncio.Queue that maintains a separate queue for each ID.
     """
     def __init__(self, maxsize=0):
-        self._queues = defaultdict(partial(asyncio.Queue, maxsize))
+        self._queues = defaultdict(partial(jasyncio.Queue, maxsize))
 
     async def get(self, id):
         value = await self._queues[id].get()
@@ -118,8 +119,8 @@ async def block_until(*conditions, timeout=None, wait_period=0.5):
     """
     async def _block():
         while not all(c() for c in conditions):
-            await asyncio.sleep(wait_period)
-    await asyncio.wait_for(_block(), timeout)
+            await jasyncio.sleep(wait_period)
+    await jasyncio.wait_for(_block(), timeout)
 
 
 async def wait_for_bundle(model, bundle, **kwargs):
@@ -155,10 +156,10 @@ async def run_with_interrupt(task, *events):
     :param events: One or more `asyncio.Event`s which, if set, will interrupt
         `task` and cause it to be cancelled.
     """
-    task = asyncio.ensure_future(task)
-    event_tasks = [asyncio.ensure_future(event.wait()) for event in events]
-    done, pending = await asyncio.wait([task] + event_tasks,
-                                       return_when=asyncio.FIRST_COMPLETED)
+    task = jasyncio.ensure_future(task)
+    event_tasks = [jasyncio.ensure_future(event.wait()) for event in events]
+    done, pending = await jasyncio.wait([task] + event_tasks,
+                                        return_when=jasyncio.FIRST_COMPLETED)
     for f in pending:
         f.cancel()  # cancel unfinished tasks
     for f in done:

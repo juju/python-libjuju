@@ -1,4 +1,3 @@
-import asyncio
 import base64
 import json
 import logging
@@ -11,7 +10,7 @@ from http.client import HTTPSConnection
 import macaroonbakery.bakery as bakery
 import macaroonbakery.httpbakery as httpbakery
 import websockets
-from juju import errors, tag, utils
+from juju import errors, tag, utils, jasyncio
 from juju.client import client
 from juju.utils import IdQueue
 
@@ -163,8 +162,8 @@ class Monitor:
 
     def __init__(self, connection):
         self.connection = weakref.ref(connection)
-        self.reconnecting = asyncio.Lock()
-        self.close_called = asyncio.Event()
+        self.reconnecting = jasyncio.Lock()
+        self.close_called = jasyncio.Event()
 
     @property
     def status(self):
@@ -407,7 +406,7 @@ class Connection:
             # the reconnect has to be done as a task because the receiver will
             # be cancelled by the reconnect and we don't want the reconnect
             # to be aborted half-way through
-            asyncio.ensure_future(self.reconnect())
+            jasyncio.ensure_future(self.reconnect())
             return
         except Exception as e:
             log.exception("Error in receiver")
@@ -426,7 +425,7 @@ class Connection:
         async def _do_ping():
             try:
                 await pinger_facade.Ping()
-                await asyncio.sleep(10)
+                await jasyncio.sleep(10)
             except CancelledError:
                 pass
 
@@ -477,7 +476,7 @@ class Connection:
                 # if it is triggered by the pinger, then this RPC call will
                 # be cancelled when the pinger is cancelled by the reconnect,
                 # and we don't want the reconnect to be aborted halfway through
-                await asyncio.wait([self.reconnect()])
+                await jasyncio.wait([self.reconnect()])
                 if self.monitor.status != Monitor.CONNECTED:
                     # reconnect failed; abort and shutdown
                     log.error('RPC: Automatic reconnect failed')
@@ -615,17 +614,17 @@ class Connection:
 
         async def _try_endpoint(endpoint, cacert, delay):
             if delay:
-                await asyncio.sleep(delay)
+                await jasyncio.sleep(delay)
             return await self._open(endpoint, cacert)
 
         # Try all endpoints in parallel, with slight increasing delay (+100ms
         # for each subsequent endpoint); the delay allows us to prefer the
         # earlier endpoints over the latter. Use first successful connection.
-        tasks = [asyncio.ensure_future(_try_endpoint(endpoint, cacert,
-                                                     0.1 * i))
+        tasks = [jasyncio.ensure_future(_try_endpoint(endpoint, cacert,
+                                                      0.1 * i))
                  for i, (endpoint, cacert) in enumerate(endpoints)]
         for attempt in range(self._retries + 1):
-            for task in asyncio.as_completed(tasks):
+            for task in jasyncio.as_completed(tasks):
                 try:
                     result = await task
                     break
@@ -639,7 +638,7 @@ class Connection:
                               'attempt {} of {}'.format(_endpoints_str,
                                                         attempt + 1,
                                                         self._retries + 1))
-                    await asyncio.sleep((attempt + 1) * self._retry_backoff)
+                    await jasyncio.sleep((attempt + 1) * self._retry_backoff)
                     continue
                 else:
                     raise errors.JujuConnectionError(
@@ -794,7 +793,7 @@ class Connection:
 
 class _Task:
     def __init__(self, task):
-        self.stopped = asyncio.Event()
+        self.stopped = jasyncio.Event()
         self.stopped.set()
         self.task = task
 
@@ -805,7 +804,7 @@ class _Task:
             finally:
                 self.stopped.set()
         self.stopped.clear()
-        asyncio.ensure_future(run())
+        jasyncio.ensure_future(run())
 
 
 def _macaroons_for_domain(cookies, domain):

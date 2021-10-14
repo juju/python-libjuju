@@ -1,4 +1,3 @@
-import asyncio
 import logging
 import io
 import os
@@ -14,7 +13,7 @@ from toposort import toposort_flatten
 from .client import client
 from .constraints import parse as parse_constraints, parse_storage_constraint, parse_device_constraint
 from .errors import JujuError
-from . import utils
+from . import utils, jasyncio
 from .origin import Channel
 from .url import Schema, URL
 
@@ -140,7 +139,7 @@ class BundleHandler:
         if apps:
             # If we have apps to update, spawn all the coroutines concurrently
             # and wait for them to finish.
-            charm_urls = await asyncio.gather(*[
+            charm_urls = await jasyncio.gather(*[
                 self.model.add_local_charm_dir(*params)
                 for params in args
             ])
