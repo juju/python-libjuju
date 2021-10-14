@@ -20,6 +20,7 @@
 # Any module that needs to use the asyncio should get the binding from
 # this layer.
 
+import asyncio
 import signal
 
 from asyncio import Event, TimeoutError, Queue, ensure_future, \
@@ -29,13 +30,17 @@ from asyncio import Event, TimeoutError, Queue, ensure_future, \
 try:
     from asyncio import get_running_loop
 except ImportError:
-    from asyncio import get_event_loop
-
     def get_running_loop():
-        loop = get_event_loop()
+        loop = asyncio.get_event_loop()
         if not loop.is_running():
             raise RuntimeError("no running event loop")
         return loop
+
+try:
+    from asyncio import create_task
+except ImportError:
+    def create_task(coro):
+        return asyncio.ensure_future(coro)
 
 
 def run(*steps):
@@ -50,7 +55,7 @@ def run(*steps):
 
     task = None
     run._sigint = False  # function attr to allow setting from closure
-    loop = get_running_loop()
+    loop = asyncio.new_event_loop()
 
     def abort():
         task.cancel()
