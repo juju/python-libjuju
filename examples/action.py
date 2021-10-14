@@ -9,7 +9,7 @@ This example:
 """
 import logging
 
-from juju import loop
+from juju import jasyncio
 from juju.model import Model
 
 
@@ -39,6 +39,7 @@ async def main():
     for unit in app.units:
         await run_action(unit)
 
+    await app.remove()
     await model.disconnect()
 
 
@@ -46,4 +47,4 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     ws_logger = logging.getLogger('websockets.protocol')
     ws_logger.setLevel(logging.INFO)
-    loop.run(main())
+    jasyncio.run(main())

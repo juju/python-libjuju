@@ -12,7 +12,7 @@ import os
 import yaml
 import base64
 
-from juju import loop
+from juju import jasyncio
 from juju.client import client
 from juju.controller import Controller
 
@@ -48,6 +48,7 @@ async def main():
     )
     await controller.add_credential("test", credential=cred, cloud="test")
 
+    await controller.remove_cloud('test')
     await controller.disconnect()
 
 
@@ -55,4 +56,4 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     ws_logger = logging.getLogger('websockets.protocol')
     ws_logger.setLevel(logging.INFO)
-    loop.run(main())
+    jasyncio.run(main())

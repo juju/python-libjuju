@@ -1,4 +1,4 @@
-from juju import loop
+from juju import jasyncio
 from juju.model import Model
 
 
@@ -17,4 +17,4 @@ async def status():
 
 
 if __name__ == '__main__':
-    loop.run(status())
+    jasyncio.run(status())

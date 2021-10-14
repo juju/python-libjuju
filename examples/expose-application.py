@@ -8,7 +8,7 @@ This example:
 
 NOTE: this test must be run against a 2.9 controller.
 """
-from juju import loop
+from juju import jasyncio
 from juju.model import Model
 from juju.application import ExposedEndpoint
 
@@ -71,4 +71,4 @@ async def main():
 
 
 if __name__ == '__main__':
-    loop.run(main())
+    jasyncio.run(main())

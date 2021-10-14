@@ -6,7 +6,7 @@ This example:
 3. Destroys the units and applications
 
 """
-from juju import loop
+from juju import jasyncio
 from juju.model import Model
 
 
@@ -37,4 +37,4 @@ async def main():
 
 
 if __name__ == '__main__':
-    loop.run(main())
+    jasyncio.run(main())
