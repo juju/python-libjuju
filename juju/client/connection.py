@@ -4,7 +4,6 @@ import logging
 import ssl
 import urllib.request
 import weakref
-from concurrent.futures import CancelledError
 from http.client import HTTPSConnection
 
 import macaroonbakery.bakery as bakery
@@ -193,7 +192,7 @@ class Monitor:
             return self.DISCONNECTING
 
         # connection closed uncleanly (we didn't call connection.close)
-        stopped = connection._receiver_task.stopped.is_set()
+        stopped = connection._receiver_task.cancelled()
         if stopped or not connection.ws.open:
             return self.ERROR
 
@@ -286,9 +285,8 @@ class Connection:
         self.cacert = None
         self.info = None
 
-        # Create that _Task objects but don't start the tasks yet.
-        self._pinger_task = _Task(self._pinger)
-        self._receiver_task = _Task(self._receiver)
+        self._pinger_task = None
+        self._receiver_task = None
 
         self._retries = retries
         self._retry_backoff = retry_backoff
@@ -374,8 +372,11 @@ class Connection:
         if not self.ws:
             return
         self.monitor.close_called.set()
-        await self._pinger_task.stopped.wait()
-        await self._receiver_task.stopped.wait()
+        if self._pinger_task:
+            self._pinger_task.cancel()
+        if self._receiver_task:
+            self._receiver_task.cancel()
+        await jasyncio.sleep(1)
         await self.ws.close()
         self.ws = None
 
@@ -398,8 +399,8 @@ class Connection:
                 if result is not None:
                     result = json.loads(result)
                     await self.messages.put(result['request-id'], result)
-        except CancelledError:
-            pass
+        except jasyncio.CancelledError:
+            raise
         except websockets.ConnectionClosed as e:
             log.warning('Receiver: Connection closed, reconnecting')
             await self.messages.put_all(e)
@@ -425,9 +426,8 @@ class Connection:
         async def _do_ping():
             try:
                 await pinger_facade.Ping()
-                await jasyncio.sleep(10)
-            except CancelledError:
-                pass
+            except jasyncio.CancelledError:
+                raise
 
         pinger_facade = client.PingerFacade.from_connection(self)
         try:
@@ -437,6 +437,9 @@ class Connection:
                     self.monitor.close_called)
                 if self.monitor.close_called.is_set():
                     break
+                await jasyncio.sleep(10)
+        except jasyncio.CancelledError:
+            raise
         except websockets.exceptions.ConnectionClosed:
             # The connection has closed - we can't do anything
             # more until the connection is restarted.
@@ -653,7 +656,7 @@ class Connection:
         self.addr = result[1]
         self.endpoint = result[2]
         self.cacert = result[3]
-        self._receiver_task.start()
+        self._receiver_task = jasyncio.create_task(self._receiver(), name='receiver')
         log.debug("Driver connected to juju %s", self.addr)
         self.monitor.close_called.clear()
 
@@ -697,7 +700,7 @@ class Connection:
             if not success:
                 await self.close()
             else:
-                self._pinger_task.start()
+                self._pinger_task = jasyncio.create_task(self._pinger(), name='pinger')
 
     async def _connect_with_redirect(self, endpoints):
         try:
@@ -708,7 +711,6 @@ class Connection:
                 raise
             login_result = await self._connect_with_login(e.endpoints)
         self._build_facades(login_result.get('facades', {}))
-        self._pinger_task.start()
 
     def _build_facades(self, facades):
         self.facades.clear()
@@ -789,22 +791,6 @@ class Connection:
                 "version": 3,
             }))['response']
             raise errors.JujuRedirectException(redirect_info, True) from e
-
-
-class _Task:
-    def __init__(self, task):
-        self.stopped = jasyncio.Event()
-        self.stopped.set()
-        self.task = task
-
-    def start(self):
-        async def run():
-            try:
-                return await self.task()
-            finally:
-                self.stopped.set()
-        self.stopped.clear()
-        jasyncio.ensure_future(run())
 
 
 def _macaroons_for_domain(cookies, domain):
