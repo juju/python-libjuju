@@ -192,8 +192,7 @@ class RedirectServer:
         try:
             while not self._terminate.is_set():
                 await run_with_interrupt(self._start.wait(),
-                                         self._terminate,
-                                         loop=self.loop)
+                                         self._terminate)
                 if self._terminate.is_set():
                     break
                 self._start.clear()
@@ -211,8 +210,7 @@ class RedirectServer:
                         while not self._stop.is_set():
                             await run_with_interrupt(
                                 asyncio.sleep(1, loop=self.loop),
-                                self._stop,
-                                loop=self.loop)
+                                self._stop)
                             logger.debug('server: tick')
                         logger.debug('server: stopping')
                 except asyncio.CancelledError:
