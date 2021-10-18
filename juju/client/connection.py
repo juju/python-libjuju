@@ -377,8 +377,9 @@ class Connection:
         if self._receiver_task:
             self._receiver_task.cancel()
 
-        await self.ws.close()
-        self.ws = None
+        if self.ws is not None:
+            await self.ws.close()
+            self.ws = None
 
         if self.proxy is not None:
             self.proxy.close()
