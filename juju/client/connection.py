@@ -376,12 +376,14 @@ class Connection:
             self._pinger_task.cancel()
         if self._receiver_task:
             self._receiver_task.cancel()
-        await jasyncio.sleep(1)
+
         await self.ws.close()
         self.ws = None
 
         if self.proxy is not None:
             self.proxy.close()
+
+        await jasyncio.sleep(1)
 
     async def _recv(self, request_id):
         if not self.is_open:
