@@ -656,7 +656,7 @@ class Connection:
         self.addr = result[1]
         self.endpoint = result[2]
         self.cacert = result[3]
-        self._receiver_task = jasyncio.create_task(self._receiver(), name='receiver')
+        self._receiver_task = jasyncio.create_task(self._receiver())
         log.debug("Driver connected to juju %s", self.addr)
         self.monitor.close_called.clear()
 
@@ -700,7 +700,7 @@ class Connection:
             if not success:
                 await self.close()
             else:
-                self._pinger_task = jasyncio.create_task(self._pinger(), name='pinger')
+                self._pinger_task = jasyncio.create_task(self._pinger())
 
     async def _connect_with_redirect(self, endpoints):
         try:

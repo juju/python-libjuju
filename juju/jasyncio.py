@@ -40,7 +40,7 @@ except ImportError:
 try:
     from asyncio import create_task
 except ImportError:
-    def create_task(coro, name=None):
+    def create_task(coro):
         return asyncio.ensure_future(coro)
 
 
