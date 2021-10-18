@@ -163,6 +163,8 @@ async def test_add_bundle(event_loop):
 
     async with base.CleanModel() as model_1:
         tmp_path = None
+        wait_for_min = 5
+
         with tempfile.TemporaryDirectory() as dirpath:
             try:
                 tmp_path = str(Path(dirpath) / 'bundle.yaml')
@@ -181,14 +183,14 @@ async def test_add_bundle(event_loop):
             await model_1.block_until(
                 lambda: all(unit.workload_status == 'active'
                             for unit in application.units),
-                timeout=60 * 4)
+                timeout=60 * wait_for_min)
             await model_1.create_offer("mysql:db")
 
             offers = await model_1.list_offers()
             await model_1.block_until(
                 lambda: all(offer.application_name == 'mysql'
                             for offer in offers.results),
-                timeout=60 * 4)
+                timeout=60 * wait_for_min)
 
             # farm off a new model to test the consumption
             async with base.CleanModel() as model_2:
@@ -196,6 +198,6 @@ async def test_add_bundle(event_loop):
                 await model_2.block_until(
                     lambda: all(unit.agent_status == 'executing'
                                 for unit in application.units),
-                    timeout=60 * 4)
+                    timeout=60 * wait_for_min)
 
             await model_1.remove_offer("admin/{}.mysql".format(model_1.info.name), force=True)
