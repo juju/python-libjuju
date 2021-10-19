@@ -23,13 +23,13 @@ from .. import base
 MB = 1
 GB = 1024
 SSH_KEY = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCsYMJGNGG74HAJha3n2CFmWYsOOaORnJK6VqNy86pj0MIpvRXBzFzVy09uPQ66GOQhTEoJHEqE77VMui7+62AcMXT+GG7cFHcnU8XVQsGM6UirCcNyWNysfiEMoAdZScJf/GvoY87tMEszhZIUV37z8PUBx6twIqMdr31W1J0IaPa+sV6FEDadeLaNTvancDcHK1zuKsL39jzAg7+LYjKJfEfrsQP+lj/EQcjtKqlhVS5kzsJVfx8ZEd0xhW5G7N6bCdKNalS8mKCMaBXJpijNQ82AiyqCIDCRrre2To0/i7pTjRiL0U9f9mV3S4NJaQaokR050w/ZLySFf6F7joJT mathijs@Qrama-Mathijs'  # noqa
+TESTS_DIR = Path(__file__).absolute().parent.parent
 
 
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_deploy_local_bundle_dir(event_loop):
-    tests_dir = Path(__file__).absolute().parent.parent
-    bundle_path = tests_dir / 'bundle'
+    bundle_path = TESTS_DIR / 'bundle'
 
     async with base.CleanModel() as model:
         await model.deploy(str(bundle_path))
@@ -45,8 +45,7 @@ async def test_deploy_local_bundle_dir(event_loop):
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_deploy_local_bundle_file(event_loop):
-    tests_dir = Path(__file__).absolute().parent.parent
-    bundle_path = tests_dir / 'bundle'
+    bundle_path = TESTS_DIR / 'bundle'
     mini_bundle_file_path = bundle_path / 'mini-bundle.yaml'
 
     async with base.CleanModel() as model:
@@ -63,8 +62,7 @@ async def test_deploy_local_bundle_file(event_loop):
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_deploy_bundle_local_charms(event_loop):
-    tests_dir = Path(__file__).absolute().parent
-    bundle_path = tests_dir / 'bundle' / 'local.yaml'
+    bundle_path = TESTS_DIR / 'integration' / 'bundle' / 'local.yaml'
 
     async with base.CleanModel() as model:
         await model.deploy(bundle_path)
@@ -80,8 +78,7 @@ async def test_deploy_bundle_local_charms(event_loop):
 @pytest.mark.asyncio
 async def test_deploy_invalid_bundle(event_loop):
     pytest.skip('test_deploy_invalid_bundle intermittent test failure')
-    tests_dir = Path(__file__).absolute().parent.parent
-    bundle_path = tests_dir / 'bundle' / 'invalid.yaml'
+    bundle_path = TESTS_DIR / 'bundle' / 'invalid.yaml'
     async with base.CleanModel() as model:
         with pytest.raises(JujuError):
             await model.deploy(str(bundle_path))
@@ -90,9 +87,7 @@ async def test_deploy_invalid_bundle(event_loop):
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_deploy_local_charm(event_loop):
-    from pathlib import Path
-    tests_dir = Path(__file__).absolute().parent.parent
-    charm_path = tests_dir / 'charm'
+    charm_path = TESTS_DIR / 'charm'
 
     async with base.CleanModel() as model:
         await model.deploy(str(charm_path))
@@ -104,9 +99,7 @@ async def test_deploy_local_charm(event_loop):
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_wait_local_charm_blocked(event_loop):
-    from pathlib import Path
-    tests_dir = Path(__file__).absolute().parent.parent
-    charm_path = tests_dir / 'charm'
+    charm_path = TESTS_DIR / 'charm'
 
     async with base.CleanModel() as model:
         await model.deploy(str(charm_path), config={'status': 'blocked'})
@@ -121,9 +114,7 @@ async def test_wait_local_charm_blocked(event_loop):
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_wait_local_charm_waiting_timeout(event_loop):
-    from pathlib import Path
-    tests_dir = Path(__file__).absolute().parent.parent
-    charm_path = tests_dir / 'charm'
+    charm_path = TESTS_DIR / 'charm'
 
     async with base.CleanModel() as model:
         await model.deploy(str(charm_path), config={'status': 'waiting'})
@@ -146,9 +137,7 @@ async def test_deploy_bundle(event_loop):
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_deploy_local_charm_folder_symlink(event_loop):
-    from pathlib import Path
-    tests_dir = Path(__file__).absolute().parent.parent
-    charm_path = tests_dir / 'charm-folder-symlink'
+    charm_path = TESTS_DIR / 'charm-folder-symlink'
 
     async with base.CleanModel() as model:
         simple = await model.deploy(str(charm_path))
@@ -497,8 +486,7 @@ async def test_store_resources_charm(event_loop):
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_local_oci_image_resource_charm(event_loop):
-    tests_dir = Path(__file__).absolute().parent
-    charm_path = tests_dir / 'oci-image-charm'
+    charm_path = TESTS_DIR / 'integration' / 'oci-image-charm'
     async with base.CleanModel() as model:
         resources = {"oci-image": "ubuntu/latest"}
         charm = await model.deploy(str(charm_path), resources=resources)
