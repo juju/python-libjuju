@@ -321,7 +321,7 @@ class Connection:
         lastError = None
         for _ep in _endpoints:
             try:
-                if debug_log_conn:
+                if self.is_debug_log_connection:
                     # make a direct connection with basic auth if
                     # debug-log (i.e. no redirection or login)
                     await self._connect([_ep])
@@ -389,28 +389,43 @@ class Connection:
             max_size=self.max_frame_size,
             server_hostname=server_hostname,
             sock=sock,
+            ping_interval=None
         )), url, endpoint, cacert
 
-    async def close(self):
+    async def close(self, to_reconnect=False):
         if not self.ws:
             return
         self.monitor.close_called.set()
+
         if self._pinger_task:
             self._pinger_task.cancel()
+            self._pinger_task = None
         if self._receiver_task:
             self._receiver_task.cancel()
-        if self._debug_log_task:
+            self._receiver_task = None
+        if self._debug_log_task and not to_reconnect:
+            #  Don't need to cancel the _debug_log_task for reconnects
+            self._debug_log_task.cancel()
+            self._debug_log_task = None
             self._close_debug_log_target()
-            self._debug_log_task.cance()
+        #  Allow a second for tasks to be cancelled
+        await jasyncio.sleep(1)
 
-        if self.ws is not None:
-            await self.ws.close()
-            self.ws = None
+        if not self.ws.closed:
+            ws_close_task = jasyncio.create_task(self.ws.close())
+            done, pending = await jasyncio.wait([ws_close_task])
+
+            assert ws_close_task in done
+
+            #  close_task.exception() is None means that close_task
+            #  (ws.close()) actually completed without any errors
+            assert ws_close_task.exception() is None
+            #  proof that the errors we see in the output dont belong
+            #  to us, but belongs to websockets library
+        self.ws = None
 
         if self.proxy is not None:
             self.proxy.close()
-
-        await jasyncio.sleep(1)
 
     async def _recv(self, request_id):
         if not self.is_open:
@@ -444,16 +459,15 @@ class Connection:
             log.exception('Unexpected debug line -- %s' % e)
             await self.close()
             raise
-        except CancelledError:
-            await self.close()
-            pass
-        except websockets.ConnectionClosed:
+        except jasyncio.CancelledError:
+            raise
+        except websockets.exceptions.ConnectionClosed:
             log.warning('Debug Logger: Connection closed, reconnecting')
             # the reconnect has to be done as a task because the receiver will
             # be cancelled by the reconnect and we don't want the reconnect
             # to be aborted half-way through
-            jasyncio.create_task(self.reconnect())
-            raise
+            jasyncio.ensure_future(self.reconnect())
+            return
         except Exception as e:
             log.exception("Error in debug logger : %s" % e)
             await self.close()
@@ -472,7 +486,7 @@ class Connection:
                     await self.messages.put(result['request-id'], result)
         except jasyncio.CancelledError:
             raise
-        except websockets.ConnectionClosed as e:
+        except websockets.exceptions.ConnectionClosed as e:
             log.warning('Receiver: Connection closed, reconnecting')
             await self.messages.put_all(e)
             # the reconnect has to be done as a task because the receiver will
@@ -675,7 +689,7 @@ class Connection:
         if monitor.reconnecting.locked() or monitor.close_called.is_set():
             return
         async with monitor.reconnecting:
-            await self.close()
+            await self.close(to_reconnect=True)
             connector = self._connect if self.is_debug_log_connection else self._connect_with_login
             await connector(
                 [(self.endpoint, self.cacert)]
@@ -728,10 +742,22 @@ class Connection:
         self.addr = result[1]
         self.endpoint = result[2]
         self.cacert = result[3]
-        if self.is_debug_log_connection:
+
+        #  If this is a debug-log connection, and the _debug_log_task
+        #  is not created yet, then go ahead and schedule it
+        if self.is_debug_log_connection and not self._debug_log_task:
             self._debug_log_task = jasyncio.create_task(self._debug_logger())
-        else:
+
+        #  If this is regular connection, and we dont have a
+        #  receiver_task yet, then schedule a _receiver_task
+        elif not self.is_debug_log_connection and not self._receiver_task:
             self._receiver_task = jasyncio.create_task(self._receiver())
+
+        #  In any type of connection, if we don't have a _pinger_task
+        #  yet, then schedule a new one
+        if not self._pinger_task:
+            self._pinger_task = jasyncio.create_task(self._pinger())
+
         log.debug("Driver connected to juju %s", self.addr)
         self.monitor.close_called.clear()
 
