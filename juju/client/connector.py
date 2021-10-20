@@ -1,4 +1,3 @@
-import asyncio
 import copy
 import logging
 
@@ -25,7 +24,6 @@ class Connector:
     '''
     def __init__(
         self,
-        loop=None,
         max_frame_size=None,
         bakery_client=None,
         jujudata=None,
@@ -33,7 +31,6 @@ class Connector:
         '''Initialize a connector that will use the given parameters
         by default when making a new connection'''
         self.max_frame_size = max_frame_size
-        self.loop = loop or asyncio.get_event_loop()
         self.bakery_client = bakery_client
         self._connection = None
         self.controller_name = None
@@ -57,7 +54,6 @@ class Connector:
 
         kwargs are passed through to Connection.connect()
         """
-        kwargs.setdefault('loop', self.loop)
         kwargs.setdefault('max_frame_size', self.max_frame_size)
         kwargs.setdefault('bakery_client', self.bakery_client)
         if 'macaroons' in kwargs:

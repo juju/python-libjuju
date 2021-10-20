@@ -8,7 +8,7 @@ This example shows how to deploy a local charm. It:
 """
 import logging
 
-from juju import loop
+from juju import jasyncio
 from juju.model import Model
 
 
@@ -30,4 +30,4 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     ws_logger = logging.getLogger('websockets.protocol')
     ws_logger.setLevel(logging.INFO)
-    loop.run(main())
+    jasyncio.run(main())

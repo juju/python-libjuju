@@ -1,17 +1,15 @@
-import asyncio
 import base64
 import json
 import logging
 import ssl
 import urllib.request
 import weakref
-from concurrent.futures import CancelledError
 from http.client import HTTPSConnection
 
 import macaroonbakery.bakery as bakery
 import macaroonbakery.httpbakery as httpbakery
 import websockets
-from juju import errors, tag, utils
+from juju import errors, tag, utils, jasyncio
 from juju.client import client
 from juju.utils import IdQueue
 
@@ -163,8 +161,8 @@ class Monitor:
 
     def __init__(self, connection):
         self.connection = weakref.ref(connection)
-        self.reconnecting = asyncio.Lock()
-        self.close_called = asyncio.Event()
+        self.reconnecting = jasyncio.Lock()
+        self.close_called = jasyncio.Event()
 
     @property
     def status(self):
@@ -194,7 +192,7 @@ class Monitor:
             return self.DISCONNECTING
 
         # connection closed uncleanly (we didn't call connection.close)
-        stopped = connection._receiver_task.stopped.is_set()
+        stopped = connection._receiver_task.cancelled()
         if stopped or not connection.ws.open:
             return self.ERROR
 
@@ -210,8 +208,6 @@ class Connection:
         client = await Connection.connect(
             api_endpoint, model_uuid, username, password, cacert)
 
-    Note: Any connection method or constructor can accept an optional `loop`
-    argument to override the default event loop from `asyncio.get_event_loop`.
     """
 
     MAX_FRAME_SIZE = 2**22
@@ -226,7 +222,6 @@ class Connection:
             password=None,
             cacert=None,
             bakery_client=None,
-            loop=None,
             max_frame_size=None,
             retries=3,
             retry_backoff=10,
@@ -250,8 +245,6 @@ class Connection:
             to use when performing macaroon-based login. Macaroon tokens
             acquired when logging will be saved to bakery_client.cookies.
             If this is None, a default bakery_client will be used.
-        :param asyncio.BaseEventLoop loop: The event loop to use for async
-            operations.
         :param int max_frame_size: The maximum websocket frame size to allow.
         :param int retries: When connecting or reconnecting, and all endpoints
             fail, how many times to retry the connection before giving up.
@@ -279,7 +272,6 @@ class Connection:
             username = None
         self.usertag = tag.user(username)
         self.password = password
-        self.loop = loop or asyncio.get_event_loop()
 
         self.__request_id__ = 0
 
@@ -293,9 +285,8 @@ class Connection:
         self.cacert = None
         self.info = None
 
-        # Create that _Task objects but don't start the tasks yet.
-        self._pinger_task = _Task(self._pinger, self.loop)
-        self._receiver_task = _Task(self._receiver, self.loop)
+        self._pinger_task = None
+        self._receiver_task = None
 
         self._retries = retries
         self._retry_backoff = retry_backoff
@@ -303,7 +294,7 @@ class Connection:
         self.facades = {}
         self.specified_facades = specified_facades or {}
 
-        self.messages = IdQueue(loop=self.loop)
+        self.messages = IdQueue()
         self.monitor = Monitor(connection=self)
         if max_frame_size is None:
             max_frame_size = self.MAX_FRAME_SIZE
@@ -372,7 +363,6 @@ class Connection:
         return (await websockets.connect(
             url,
             ssl=self._get_ssl(cacert),
-            loop=self.loop,
             max_size=self.max_frame_size,
             server_hostname=server_hostname,
             sock=sock,
@@ -382,13 +372,19 @@ class Connection:
         if not self.ws:
             return
         self.monitor.close_called.set()
-        await self._pinger_task.stopped.wait()
-        await self._receiver_task.stopped.wait()
-        await self.ws.close()
-        self.ws = None
+        if self._pinger_task:
+            self._pinger_task.cancel()
+        if self._receiver_task:
+            self._receiver_task.cancel()
+
+        if self.ws is not None:
+            await self.ws.close()
+            self.ws = None
 
         if self.proxy is not None:
             self.proxy.close()
+
+        await jasyncio.sleep(1)
 
     async def _recv(self, request_id):
         if not self.is_open:
@@ -400,22 +396,21 @@ class Connection:
             while self.is_open:
                 result = await utils.run_with_interrupt(
                     self.ws.recv(),
-                    self.monitor.close_called,
-                    loop=self.loop)
+                    self.monitor.close_called)
                 if self.monitor.close_called.is_set():
                     break
                 if result is not None:
                     result = json.loads(result)
                     await self.messages.put(result['request-id'], result)
-        except CancelledError:
-            pass
+        except jasyncio.CancelledError:
+            raise
         except websockets.ConnectionClosed as e:
             log.warning('Receiver: Connection closed, reconnecting')
             await self.messages.put_all(e)
             # the reconnect has to be done as a task because the receiver will
             # be cancelled by the reconnect and we don't want the reconnect
             # to be aborted half-way through
-            self.loop.create_task(self.reconnect())
+            jasyncio.ensure_future(self.reconnect())
             return
         except Exception as e:
             log.exception("Error in receiver")
@@ -434,19 +429,20 @@ class Connection:
         async def _do_ping():
             try:
                 await pinger_facade.Ping()
-                await asyncio.sleep(10)
-            except CancelledError:
-                pass
+            except jasyncio.CancelledError:
+                raise
 
         pinger_facade = client.PingerFacade.from_connection(self)
         try:
             while True:
                 await utils.run_with_interrupt(
                     _do_ping(),
-                    self.monitor.close_called,
-                    loop=self.loop)
+                    self.monitor.close_called)
                 if self.monitor.close_called.is_set():
                     break
+                await jasyncio.sleep(10)
+        except jasyncio.CancelledError:
+            raise
         except websockets.exceptions.ConnectionClosed:
             # The connection has closed - we can't do anything
             # more until the connection is restarted.
@@ -486,7 +482,7 @@ class Connection:
                 # if it is triggered by the pinger, then this RPC call will
                 # be cancelled when the pinger is cancelled by the reconnect,
                 # and we don't want the reconnect to be aborted halfway through
-                await asyncio.wait([self.reconnect()], loop=self.loop)
+                await jasyncio.wait([self.reconnect()])
                 if self.monitor.status != Monitor.CONNECTED:
                     # reconnect failed; abort and shutdown
                     log.error('RPC: Automatic reconnect failed')
@@ -588,7 +584,6 @@ class Connection:
             'password': self.password,
             'cacert': self.cacert,
             'bakery_client': self.bakery_client,
-            'loop': self.loop,
             'max_frame_size': self.max_frame_size,
             'proxy': self.proxy,
         }
@@ -602,7 +597,6 @@ class Connection:
             password=self.password,
             cacert=self.cacert,
             bakery_client=self.bakery_client,
-            loop=self.loop,
             max_frame_size=self.max_frame_size,
         )
 
@@ -626,17 +620,17 @@ class Connection:
 
         async def _try_endpoint(endpoint, cacert, delay):
             if delay:
-                await asyncio.sleep(delay)
+                await jasyncio.sleep(delay)
             return await self._open(endpoint, cacert)
 
         # Try all endpoints in parallel, with slight increasing delay (+100ms
         # for each subsequent endpoint); the delay allows us to prefer the
         # earlier endpoints over the latter. Use first successful connection.
-        tasks = [self.loop.create_task(_try_endpoint(endpoint, cacert,
-                                                     0.1 * i))
+        tasks = [jasyncio.ensure_future(_try_endpoint(endpoint, cacert,
+                                                      0.1 * i))
                  for i, (endpoint, cacert) in enumerate(endpoints)]
         for attempt in range(self._retries + 1):
-            for task in asyncio.as_completed(tasks):
+            for task in jasyncio.as_completed(tasks):
                 try:
                     result = await task
                     break
@@ -650,7 +644,7 @@ class Connection:
                               'attempt {} of {}'.format(_endpoints_str,
                                                         attempt + 1,
                                                         self._retries + 1))
-                    await asyncio.sleep((attempt + 1) * self._retry_backoff)
+                    await jasyncio.sleep((attempt + 1) * self._retry_backoff)
                     continue
                 else:
                     raise errors.JujuConnectionError(
@@ -665,7 +659,7 @@ class Connection:
         self.addr = result[1]
         self.endpoint = result[2]
         self.cacert = result[3]
-        self._receiver_task.start()
+        self._receiver_task = jasyncio.create_task(self._receiver())
         log.debug("Driver connected to juju %s", self.addr)
         self.monitor.close_called.clear()
 
@@ -709,7 +703,7 @@ class Connection:
             if not success:
                 await self.close()
             else:
-                self._pinger_task.start()
+                self._pinger_task = jasyncio.create_task(self._pinger())
 
     async def _connect_with_redirect(self, endpoints):
         try:
@@ -720,7 +714,6 @@ class Connection:
                 raise
             login_result = await self._connect_with_login(e.endpoints)
         self._build_facades(login_result.get('facades', {}))
-        self._pinger_task.start()
 
     def _build_facades(self, facades):
         self.facades.clear()
@@ -801,23 +794,6 @@ class Connection:
                 "version": 3,
             }))['response']
             raise errors.JujuRedirectException(redirect_info, True) from e
-
-
-class _Task:
-    def __init__(self, task, loop):
-        self.stopped = asyncio.Event()
-        self.stopped.set()
-        self.task = task
-        self.loop = loop
-
-    def start(self):
-        async def run():
-            try:
-                return await self.task()
-            finally:
-                self.stopped.set()
-        self.stopped.clear()
-        self.loop.create_task(run())
 
 
 def _macaroons_for_domain(cookies, domain):
