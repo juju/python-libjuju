@@ -453,7 +453,7 @@ class Connection:
                     mod = result['mod']
                     msg = result['msg']
 
-                    self.debug_log_target.write("%s %s:%s:%s %s %s %s\n" % (tag, ts.hour, ts.minute, ts.second, sev, mod, msg))
+                    self.debug_log_target.write("%s %02d:%02d:%02d %s %s %s\n" % (tag, ts.hour, ts.minute, ts.second, sev, mod, msg))
                     log.debug("debug log line is : %s" % result)
         except KeyError as e:
             log.exception('Unexpected debug line -- %s' % e)
