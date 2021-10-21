@@ -411,7 +411,7 @@ class Connection:
         #  Allow a second for tasks to be cancelled
         await jasyncio.sleep(1)
 
-        if not self.ws.closed:
+        if self.ws and not self.ws.closed:
             ws_close_task = jasyncio.create_task(self.ws.close())
             done, pending = await jasyncio.wait([ws_close_task])
 
