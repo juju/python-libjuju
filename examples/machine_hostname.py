@@ -12,7 +12,7 @@ NOTE: this example requires a 2.8.10+ controller.
 """
 import logging
 
-from juju import loop
+from juju import jasyncio
 from juju.model import Model
 
 MB = 1
@@ -43,4 +43,4 @@ if __name__ == '__main__':
     ws_logger = logging.getLogger('websockets.protocol')
     ws_logger.setLevel(logging.INFO)
 
-    loop.run(main())
+    jasyncio.run(main())

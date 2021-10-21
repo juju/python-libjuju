@@ -1,4 +1,3 @@
-import asyncio
 import json
 import logging
 from concurrent.futures import CancelledError
@@ -6,7 +5,7 @@ from pathlib import Path
 
 import websockets
 
-from . import errors, tag, utils
+from . import errors, tag, utils, jasyncio
 from .client import client, connector
 from .errors import JujuAPIError
 from .offerendpoints import ParseError as OfferParseError
@@ -24,7 +23,6 @@ class RemoveError(Exception):
 class Controller:
     def __init__(
         self,
-        loop=None,
         max_frame_size=None,
         bakery_client=None,
         jujudata=None,
@@ -36,7 +34,6 @@ class Controller:
 
         If jujudata is None, jujudata.FileJujuData will be used.
 
-        :param loop: an asyncio event loop
         :param max_frame_size: See
             `juju.client.connection.Connection.MAX_FRAME_SIZE`
         :param bakery_client httpbakery.Client: The bakery client to use
@@ -45,7 +42,6 @@ class Controller:
         information.
         """
         self._connector = connector.Connector(
-            loop=loop,
             max_frame_size=max_frame_size,
             bakery_client=bakery_client,
             jujudata=jujudata,
@@ -57,10 +53,6 @@ class Controller:
 
     async def __aexit__(self, exc_type, exc, tb):
         await self.disconnect()
-
-    @property
-    def loop(self):
-        return self._connector.loop
 
     async def connect(self, *args, **kwargs):
         """Connect to a Juju controller.
@@ -96,8 +88,6 @@ class Controller:
             If this is None, a default bakery_client will be used.
         :param list macaroons: List of macaroons to load into the
             ``bakery_client``.
-        :param asyncio.BaseEventLoop loop: The event loop to use for async
-            operations.
         :param int max_frame_size: The maximum websocket frame size to allow.
         :param specified_facades: Overwrite the facades with a series of
             specified facades.
@@ -131,7 +121,6 @@ class Controller:
                 'cacert',
                 'bakery_client',
                 'macaroons',
-                'loop',
                 'max_frame_size',
             ]
             for i, arg in enumerate(args):
@@ -348,8 +337,7 @@ class Controller:
 
         if not config or 'authorized-keys' not in config:
             config = config or {}
-            config['authorized-keys'] = await utils.read_ssh_key(
-                loop=self._connector.loop)
+            config['authorized-keys'] = await utils.read_ssh_key()
 
         model_info = await model_facade.CreateModel(
             cloud_tag=tag.cloud(cloud_name),
@@ -567,7 +555,7 @@ class Controller:
                 # see: https://bugs.launchpad.net/juju/+bug/1721786
                 if 'has been removed' not in e.message or attempt == 3:
                     raise
-                await asyncio.sleep(attempt, loop=self._connector.loop)
+                await jasyncio.sleep(attempt)
 
     async def list_models(self):
         """Return list of names of the available models on this controller.
@@ -824,7 +812,7 @@ class Controller:
         all models in the controller. If the user isn't a superuser they
         will get a permission error.
         """
-        stop_event = asyncio.Event(loop=self._connector.loop)
+        stop_event = jasyncio.Event()
 
         async def _watcher(stop_event):
             try:
@@ -844,8 +832,7 @@ class Controller:
                     try:
                         results = await utils.run_with_interrupt(
                             watcher.Next(),
-                            stop_event,
-                            loop=self._connector.loop)
+                            stop_event)
                     except JujuAPIError as e:
                         if 'watcher was stopped' not in str(e):
                             raise
@@ -866,5 +853,5 @@ class Controller:
                 raise
 
         log.debug('Starting watcher task for model summaries')
-        self._connector.loop.create_task(_watcher(stop_event))
+        jasyncio.ensure_future(_watcher(stop_event))
         return stop_event

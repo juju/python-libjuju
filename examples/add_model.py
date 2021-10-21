@@ -6,7 +6,7 @@ This example:
 3. Attempts to ssh into the charm
 
 """
-from juju import loop
+from juju import jasyncio
 from juju import utils
 from juju.controller import Controller
 import asyncio
@@ -64,4 +64,4 @@ async def main():
 
 
 if __name__ == '__main__':
-    loop.run(main())
+    jasyncio.run(main())

@@ -6,7 +6,7 @@ This example:
 3. Attempts to deploy a charm with constraints
 
 """
-from juju import loop
+from juju import jasyncio
 from juju.controller import Controller
 
 
@@ -32,4 +32,4 @@ async def main():
 
 
 if __name__ == '__main__':
-    loop.run(main())
+    jasyncio.run(main())

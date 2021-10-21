@@ -12,12 +12,11 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 
-import asyncio
 import json
 import logging
 import os
 
-from . import model, tag, utils
+from . import model, tag, utils, jasyncio
 from .status import derive_status
 from .annotationhelper import _get_annotations, _set_annotations
 from .client import client
@@ -143,8 +142,8 @@ class Application(model.ModelEntity):
             num_units=count,
         )
 
-        return await asyncio.gather(*[
-            asyncio.ensure_future(self.model._wait_for_new('unit', unit_id))
+        return await jasyncio.gather(*[
+            jasyncio.ensure_future(self.model._wait_for_new('unit', unit_id))
             for unit_id in result.units
         ])
 

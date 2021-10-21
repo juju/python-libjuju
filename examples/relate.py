@@ -11,7 +11,7 @@ import asyncio
 import logging
 
 from juju.model import Model, ModelObserver
-from juju import loop
+from juju import jasyncio
 
 
 class MyRemoveObserver(ModelObserver):
@@ -99,4 +99,4 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     ws_logger = logging.getLogger('websockets.protocol')
     ws_logger.setLevel(logging.INFO)
-    loop.run(main())
+    jasyncio.run(main())

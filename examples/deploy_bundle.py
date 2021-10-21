@@ -7,7 +7,7 @@ This example:
 
 """
 from juju.controller import Controller
-from juju import loop
+from juju import jasyncio
 
 
 async def main():
@@ -54,4 +54,4 @@ async def deploy_and_wait_for_bundle(model, url, channel=None):
     return applications
 
 if __name__ == '__main__':
-    loop.run(main())
+    jasyncio.run(main())

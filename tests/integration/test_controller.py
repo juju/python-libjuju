@@ -157,12 +157,12 @@ async def test_get_model(event_loop):
 
 async def _wait_for_model(controller, model_name):
     while model_name not in await controller.list_models():
-        await asyncio.sleep(0.5, loop=controller.loop)
+        await asyncio.sleep(0.5)
 
 
 async def _wait_for_model_gone(controller, model_name):
     while model_name in await controller.list_models():
-        await asyncio.sleep(0.5, loop=controller.loop)
+        await asyncio.sleep(0.5)
 
 
 @base.bootstrapped

@@ -6,7 +6,7 @@ This example:
 3. Cleanly disconnects.
 
 """
-from juju import loop
+from juju import jasyncio
 from juju.model import Model
 
 
@@ -24,4 +24,4 @@ async def report_leadership():
 
 
 if __name__ == '__main__':
-    loop.run(report_leadership())
+    jasyncio.run(report_leadership())

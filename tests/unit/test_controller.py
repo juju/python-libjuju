@@ -91,14 +91,13 @@ class TestControllerConnect(asynctest.TestCase):
                                              password='pass')
         mock_update_endpoints.assert_called_with()
         await c.connect('endpoint', 'user', 'pass', 'cacert', 'bakery',
-                        'macaroons', 'loop', 'max_frame_size')
+                        'macaroons', 'max_frame_size')
         mock_connect.assert_called_with(endpoint='endpoint',
                                         username='user',
                                         password='pass',
                                         cacert='cacert',
                                         bakery_client='bakery',
                                         macaroons='macaroons',
-                                        loop='loop',
                                         max_frame_size='max_frame_size')
         mock_update_endpoints.assert_called_with()
 
