@@ -29,6 +29,9 @@ class BundleHandler:
         self.model = model
         self.trusted = trusted
         self.forced = forced
+        self.bundle = None
+        self.overlays = []
+        self.overlay_removed_charms = set()
 
         self.charmstore = model.charmstore
         self.plan = []
@@ -159,7 +162,7 @@ class BundleHandler:
 
         return bundle
 
-    async def fetch_plan(self, charm_url, origin):
+    async def fetch_plan(self, charm_url, origin, overlay=None):
         entity_id = charm_url.path()
         is_local = Schema.LOCAL.matches(charm_url.schema)
         bundle_dir = None
@@ -181,14 +184,30 @@ class BundleHandler:
         if not bundle_yaml:
             raise JujuError('empty bundle, nothing to deploy')
 
-        self.bundle = yaml.safe_load(bundle_yaml)
+        _bundles = [b for b in yaml.safe_load_all(bundle_yaml)]
+        self.overlays = _bundles[1:]
+        self.bundle = _bundles[0]
+
+        # gather the names of the removed charms so model.deploy
+        # wouldn't wait for them to appear in the model
+        for overlay in self.overlays:
+            overlay_apps = overlay.get('applications', overlay.get('services', {}))
+            for charm_name, val in overlay_apps.items():
+                if val is None:
+                    self.overlay_removed_charms.add(charm_name)
+
         self.bundle = await self._validate_bundle(self.bundle)
         if is_local:
             self.bundle = await self._handle_local_charms(self.bundle, bundle_dir)
 
+        _yaml_data = [yaml.dump(self.bundle)]
+        for overlay in self.overlays:
+            _yaml_data.append(yaml.dump(overlay).replace('null', ''))
+        yaml_data = "---\n".join(_yaml_data)
+
         self.plan = await self.bundle_facade.GetChanges(
             bundleurl=entity_id,
-            yaml=yaml.dump(self.bundle))
+            yaml=yaml_data)
 
         if self.plan.errors:
             raise JujuError(self.plan.errors)
@@ -300,7 +319,7 @@ class BundleHandler:
     def applications(self):
         apps_dict = self.bundle.get('applications',
                                     self.bundle.get('services', {}))
-        return list(apps_dict.keys())
+        return set(apps_dict.keys()) - self.overlay_removed_charms
 
     @property
     def applications_specs(self):

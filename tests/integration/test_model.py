@@ -23,7 +23,9 @@ from .. import base
 MB = 1
 GB = 1024
 SSH_KEY = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCsYMJGNGG74HAJha3n2CFmWYsOOaORnJK6VqNy86pj0MIpvRXBzFzVy09uPQ66GOQhTEoJHEqE77VMui7+62AcMXT+GG7cFHcnU8XVQsGM6UirCcNyWNysfiEMoAdZScJf/GvoY87tMEszhZIUV37z8PUBx6twIqMdr31W1J0IaPa+sV6FEDadeLaNTvancDcHK1zuKsL39jzAg7+LYjKJfEfrsQP+lj/EQcjtKqlhVS5kzsJVfx8ZEd0xhW5G7N6bCdKNalS8mKCMaBXJpijNQ82AiyqCIDCRrre2To0/i7pTjRiL0U9f9mV3S4NJaQaokR050w/ZLySFf6F7joJT mathijs@Qrama-Mathijs'  # noqa
-TESTS_DIR = Path(__file__).absolute().parent.parent
+HERE_DIR = Path(__file__).absolute().parent
+TESTS_DIR = HERE_DIR.parent
+OVERLAYS_DIR = HERE_DIR / 'bundle' / 'test-overlays'
 
 
 @base.bootstrapped
@@ -130,8 +132,22 @@ async def test_deploy_bundle(event_loop):
     async with base.CleanModel() as model:
         await model.deploy('cs:bundle/wiki-simple')
 
+        # wiki-simple bundle deploys wiki and mysql and relates them
         for app in ('wiki', 'mysql'):
             assert app in model.applications
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_deploy_local_bundle_with_overlay_multi(event_loop):
+    async with base.CleanModel() as model:
+        bundle_with_overlay_path = OVERLAYS_DIR / 'bundle-with-overlay-multi.yaml'
+        await model.deploy(bundle_with_overlay_path)
+
+        # this bundle deploys mysql and ghost apps and relates them,
+        # but the overlay attached removes ghost, so
+        assert 'mysql' in model.applications
+        assert 'ghost' not in model.applications
 
 
 @base.bootstrapped
