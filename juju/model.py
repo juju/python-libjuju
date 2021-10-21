@@ -1525,6 +1525,129 @@ class Model:
 
         await self.connect(debug_log_conn=target)
 
+    async def status(self):      
+        client_facade = client.ClientFacade.from_connection(self.connection())
+        result_status = await client_facade.FullStatus()
+
+        
+        self._print_status_model(result_status)        
+        self._print_status_apps(result_status)
+        self._print_status_units(result_status)
+        self._print_status_machines(result_status)
+        print()
+        
+    def _print_status_model(self, result_status):
+        """Private function to print the status of a model"""
+        m = result_status.model
+        # print model
+        print('{:<25} {:<25} {:<15} {:<15} {:<30} {:<30}'\
+            .format('Model','Cloud/Region','Version','SLA','Timestamp','Notes'))
+        sla = m.unknown_fields['sla']
+        # TODO: find the appropriate date conversion expression
+        #timestamp = datetime.strptime(result_status.controller_timestamp,
+        #'%Y-%m-%dT%H:%M:%S.%f')
+        cloud = m.cloud_tag.split('-')[1]
+        timestamp = result_status.controller_timestamp
+        if m.available_version is not None and m.available_version != '':
+            available_version = f'upgrade available: {m.available_version}'
+        else:
+            available_version = ''
+        print('{:<25} {:<25} {:<15} {:<15} {:<30} {:<30}\n'\
+            .format(m.name, cloud+'/'+m.region, m.version, sla, 
+            timestamp, available_version))
+
+    def _print_status_apps(self, result_status):
+        """Auxiliar function to print the apps received
+        in a status result"""
+        apps = result_status.applications
+        if apps is None or len(apps) == 0:
+            return
+
+        limits = '{:<25} {:<10} {:<10} {:<5} {:<20} {:<8}'
+        #print header
+        print(limits.format(
+            'App','Version', 'Status', 'Scale', 'Charm', 'Channel'))
+        for name, app in apps.items():
+            print(limits.format(
+                name, app.charm_version, app.status.status, len(app.units), app.charm,
+                app.charm_channel))
+        print()
+
+    def _print_status_units(self, result_status):
+        """Auxiliar function to print the units received
+        in a status result"""
+
+        apps = result_status.applications
+        if apps is None or len(apps) == 0:
+            return
+
+        limits = '{:<15} {:<15} {:<20} {:<10} {:<15} {:<10} {:<30}'
+        summary = ''
+        for app_name, app in apps.items():
+            units = app.units
+            if units is None or len(units) == 0:
+                next
+
+            for name, unit in units.items():
+                addr = unit.public_address
+                if addr is None:
+                    addr = ''
+                opened_ports = unit.opened_ports
+                if opened_ports is None:
+                    opened_ports = ''
+                info = unit.workload_status.info
+                if info is None:
+                    info = ''
+
+                step = limits.format(
+                    name, unit.workload_status.status, 
+                    unit.agent_status.status, unit.machine,
+                    addr, opened_ports, info)
+                if summary == '':
+                    summary = step
+                else: 
+                    summary = summary + '\n' + step
+
+        if len(summary) == 0:
+            return
+        
+        print(limits.format(
+            'Unit', 'Workload', 'Agent', 'Machine',
+            'Public address',  'Ports', 'Message'))
+        print(summary)
+        print()
+    
+    def _print_status_machines(self, result_status):
+        machines = result_status.machines
+        if machines is None or len(machines) == 0:
+            return
+        
+        limits = '{:<15} {:<15} {:<15} {:<20} {:<15} {:<30}'
+        summary = ''
+        for name, machine in machines.items():
+            #dns = machine.dns
+            dns = 'here goes dns'
+            if dns is None:
+                dns = ''
+            step = limits.format(
+                name, 
+                machine.agent_status.status,
+                dns,
+                machine.instance_id,
+                machine.series,
+                machine.agent_status.info,
+            )
+            if summary == '':
+                summary = step
+            else:
+                summary = summary + '\n' + step
+
+        if summary == '':
+            return
+        print(limits.format('Machine','State','DNS', 'Inst id', 'Series', 'Message'))
+        print(summary)
+        print()
+
     def _get_series(self, entity_url, entity):
         # try to get the series from the provided charm URL
         if entity_url.startswith('cs:'):
