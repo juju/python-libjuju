@@ -1512,53 +1512,71 @@ class Model:
 
         await self.connect(debug_log_conn=target)
 
-    async def status(self):      
+    async def status(self, raw=False):
+        """Returns a string that mimics the content of the information
+        returned in the juju status command. If the raw parameter is
+        enabled, the function retursn a FullStatus object."""
         client_facade = client.ClientFacade.from_connection(self.connection())
         result_status = await client_facade.FullStatus()
 
+        if raw:
+            return result_status
         
-        self._print_status_model(result_status)        
-        self._print_status_apps(result_status)
-        self._print_status_units(result_status)
-        self._print_status_machines(result_status)
-        print()
-        
+        result_str = self._print_status_model(result_status)
+        result_str += '\n'
+        result_str += self._print_status_apps(result_status)
+        result_str += '\n'
+        result_str += self._print_status_units(result_status)
+        result_str += '\n'
+        result_str += self._print_status_machines(result_status)
+        result_str += '\n'
+        return result_str
+
     def _print_status_model(self, result_status):
         """Private function to print the status of a model"""
         m = result_status.model
         # print model
-        print('{:<25} {:<25} {:<15} {:<15} {:<30} {:<30}'\
-            .format('Model','Cloud/Region','Version','SLA','Timestamp','Notes'))
+        result_str = '{:<25} {:<25} {:<15} {:<15} {:<30} {:<30}'.format(
+            'Model', 'Cloud/Region', 'Version', 'SLA', 'Timestamp', 'Notes')
         sla = m.unknown_fields['sla']
         # TODO: find the appropriate date conversion expression
-        #timestamp = datetime.strptime(result_status.controller_timestamp,
-        #'%Y-%m-%dT%H:%M:%S.%f')
+        # timestamp = datetime.strptime(result_status.controller_timestamp,
+        # '%Y-%m-%dT%H:%M:%S.%f')
         cloud = m.cloud_tag.split('-')[1]
         timestamp = result_status.controller_timestamp
         if m.available_version is not None and m.available_version != '':
             available_version = f'upgrade available: {m.available_version}'
         else:
             available_version = ''
-        print('{:<25} {:<25} {:<15} {:<15} {:<30} {:<30}\n'\
-            .format(m.name, cloud+'/'+m.region, m.version, sla, 
-            timestamp, available_version))
+        result_str += '{:<25} {:<25} {:<15} {:<15} {:<30} {:<30}'.format(
+            m.name, cloud + '/' + m.region, m.version, sla,
+            timestamp, available_version)
+        result_str += '\n'
+        return result_str
 
     def _print_status_apps(self, result_status):
         """Auxiliar function to print the apps received
         in a status result"""
         apps = result_status.applications
         if apps is None or len(apps) == 0:
-            return
-
+            return ''
+        
         limits = '{:<25} {:<10} {:<10} {:<5} {:<20} {:<8}'
-        #print header
-        print(limits.format(
-            'App','Version', 'Status', 'Scale', 'Charm', 'Channel'))
+        # print header
+        result_str = limits.format(
+            'App', 'Version', 'Status', 'Scale', 'Charm', 'Channel')
+        result_str += '\n'
         for name, app in apps.items():
-            print(limits.format(
-                name, app.charm_version, app.status.status, len(app.units), app.charm,
-                app.charm_channel))
-        print()
+            # extract charm name from the path
+            # like in ch:amd64/trusty/mediawiki-28
+            charm_name = app.charm.split('/')[-1]
+            charm_name = charm_name.split('-')[0]
+            result_str += limits.format(
+                name, app.workload_version, app.status.status, len(app.units), charm_name,
+                app.charm_channel)
+            result_str += '\n'
+        result_str += '\n'
+        return result_str
 
     def _print_status_units(self, result_status):
         """Auxiliar function to print the units received
@@ -1579,50 +1597,53 @@ class Model:
                 addr = unit.public_address
                 if addr is None:
                     addr = ''
-                opened_ports = unit.opened_ports
-                if opened_ports is None:
+                
+                if unit.opened_ports is None:
                     opened_ports = ''
+                else:
+                    opened_ports = ','.join(unit.opened_ports)
+                
                 info = unit.workload_status.info
                 if info is None:
                     info = ''
 
                 step = limits.format(
-                    name, unit.workload_status.status, 
+                    name, unit.workload_status.status,
                     unit.agent_status.status, unit.machine,
                     addr, opened_ports, info)
                 if summary == '':
                     summary = step
-                else: 
+                else:
                     summary = summary + '\n' + step
 
         if len(summary) == 0:
-            return
-        
-        print(limits.format(
+            return ''
+        result_str = limits.format(
             'Unit', 'Workload', 'Agent', 'Machine',
-            'Public address',  'Ports', 'Message'))
-        print(summary)
-        print()
-    
+            'Public address', 'Ports', 'Message')
+        result_str += '\n'
+        result_str += summary
+        result_str += '\n'
+        return result_str
+
     def _print_status_machines(self, result_status):
         machines = result_status.machines
         if machines is None or len(machines) == 0:
             return
-        
+
         limits = '{:<15} {:<15} {:<15} {:<20} {:<15} {:<30}'
         summary = ''
         for name, machine in machines.items():
-            #dns = machine.dns
-            dns = 'here goes dns'
+            dns = machine.dns_name
             if dns is None:
                 dns = ''
             step = limits.format(
-                name, 
+                name,
                 machine.agent_status.status,
                 dns,
                 machine.instance_id,
                 machine.series,
-                machine.agent_status.info,
+                machine.agent_status.info
             )
             if summary == '':
                 summary = step
@@ -1631,9 +1652,11 @@ class Model:
 
         if summary == '':
             return
-        print(limits.format('Machine','State','DNS', 'Inst id', 'Series', 'Message'))
-        print(summary)
-        print()
+        result_str = limits.format('Machine', 'State', 'DNS', 'Inst id', 'Series', 'Message')
+        result_str += '\n'
+        result_str += summary
+        result_str += '\n'
+        return result_str
 
     def _get_series(self, entity_url, entity):
         # try to get the series from the provided charm URL
