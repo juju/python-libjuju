@@ -162,6 +162,43 @@ class BundleHandler:
 
         return bundle
 
+    def _resolve_include_file_config(self, bundle_dir):
+        """if any of the applications (including the ones in the overlays)
+        have "config: include-file:..." or "config:
+        include-base64:...", then we have to resolve and inline them
+        into the bundle here because they're all files with local
+        relative paths, so backend can't handle them.
+
+        """
+        bundle_apps = [self.bundle.get('applications', self.bundle.get('services', {}))]
+        overlay_apps = [overlay.get('applications', self.bundle.get('services', {})) for overlay in self.overlays]
+
+        for apps in bundle_apps + overlay_apps:
+            for app_name, app in apps.items():
+
+                if ('options' in app) and ('config' in app['options']) and \
+                   app['options']['config'].startswith('include-file'):
+
+                    # resolve the file
+                    if not bundle_dir:
+                        raise NotImplementedError('unable to resolve paths for config:include-file for non-local charms')
+                    config_path = (bundle_dir / Path(app['options']['config'].split('//')[1])).resolve()
+                    if not config_path.exists():
+                        raise JujuError('unable to locate config file : %s for : %s' % (config_path, app_name))
+
+                    # get the contents of the file
+                    config_contents = yaml.safe_load(config_path.read_text())
+
+                    # inline the configurations for the current app into
+                    # the app['options']
+                    for key, val in config_contents[app_name].items():
+                        app['options'][key] = val
+
+                    # remove the 'include-file' config
+                    app['options'].pop('config')
+
+        return self.bundle, self.overlays
+
     async def fetch_plan(self, charm_url, origin, overlays=[]):
         entity_id = charm_url.path()
         is_local = Schema.LOCAL.matches(charm_url.schema)
@@ -207,6 +244,8 @@ class BundleHandler:
         self.bundle = await self._validate_bundle(self.bundle)
         if is_local:
             self.bundle = await self._handle_local_charms(self.bundle, bundle_dir)
+
+        self.bundle, self.overlays = self._resolve_include_file_config(bundle_dir)
 
         _yaml_data = [yaml.dump(self.bundle)]
         for overlay in self.overlays:
