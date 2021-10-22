@@ -177,7 +177,7 @@ class BundleHandler:
         for apps in bundle_apps + overlay_apps:
             for app_name, app in apps.items():
 
-                if 'options' in app:
+                if app and 'options' in app:
                     if 'config' in app['options'] and app['options']['config'].startswith('include-file'):
                         # resolve the file
                         if not bundle_dir:
