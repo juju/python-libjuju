@@ -1,0 +1,6 @@
+description: Another overlay to remove memcached and add back the mysql and relate
+applications:
+  memcached:
+  ghost:
+    options:
+      config: include-file://config1.yaml

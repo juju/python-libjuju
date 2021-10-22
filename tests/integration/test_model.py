@@ -211,6 +211,27 @@ async def test_deploy_bundle_with_multi_overlay_as_argument(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_deploy_bundle_with_multiple_overlays_with_include_files(event_loop):
+    async with base.CleanModel() as model:
+        bundle_yaml_path = TESTS_DIR / 'integration' / 'bundle' / 'bundle.yaml'
+        overlay1_path = OVERLAYS_DIR / 'wiki-overlay1.yaml'
+        overlay2_path = OVERLAYS_DIR / 'wiki-overlay2.yaml'
+
+        await model.deploy(str(bundle_yaml_path), overlays=[overlay1_path, overlay2_path])
+        # the bundle : installs ghost, mysql and a local test charm
+        # overlay1   : removes test, mysql, installs memcached
+        # overlay2   : removes memcached, adds config to ghost with include-file
+        assert 'mysql' not in model.applications
+        assert 'test' not in model.applications
+        assert 'memcached' not in model.applications
+        assert 'ghost' in model.applications
+        ghost = model.applications.get('ghost', None)
+        assert ghost.config.get('port', None) == 2369
+        assert ghost.config.get('url', "") == 'http://my-ghost.blg'
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_deploy_local_charm_folder_symlink(event_loop):
     charm_path = TESTS_DIR / 'charm-folder-symlink'
 
