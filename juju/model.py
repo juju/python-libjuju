@@ -1521,7 +1521,7 @@ class Model:
 
         if raw:
             return result_status
-        
+
         result_str = self._print_status_model(result_status)
         result_str += '\n'
         result_str += self._print_status_apps(result_status)
@@ -1560,7 +1560,7 @@ class Model:
         apps = result_status.applications
         if apps is None or len(apps) == 0:
             return ''
-        
+
         limits = '{:<25} {:<10} {:<10} {:<5} {:<20} {:<8}'
         # print header
         result_str = limits.format(
@@ -1597,12 +1597,12 @@ class Model:
                 addr = unit.public_address
                 if addr is None:
                     addr = ''
-                
+
                 if unit.opened_ports is None:
                     opened_ports = ''
                 else:
                     opened_ports = ','.join(unit.opened_ports)
-                
+
                 info = unit.workload_status.info
                 if info is None:
                     info = ''
