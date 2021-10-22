@@ -3,6 +3,7 @@ import io
 import os
 import zipfile
 import requests
+import base64
 from contextlib import closing
 from pathlib import Path
 
@@ -176,26 +177,38 @@ class BundleHandler:
         for apps in bundle_apps + overlay_apps:
             for app_name, app in apps.items():
 
-                if ('options' in app) and ('config' in app['options']) and \
-                   app['options']['config'].startswith('include-file'):
+                if 'options' in app:
+                    if 'config' in app['options'] and app['options']['config'].startswith('include-file'):
+                        # resolve the file
+                        if not bundle_dir:
+                            raise NotImplementedError('unable to resolve paths for config:include-file for non-local charms')
+                        config_path = (bundle_dir / Path(app['options']['config'].split('//')[1])).resolve()
+                        if not config_path.exists():
+                            raise JujuError('unable to locate config file : %s for : %s' % (config_path, app_name))
 
-                    # resolve the file
-                    if not bundle_dir:
-                        raise NotImplementedError('unable to resolve paths for config:include-file for non-local charms')
-                    config_path = (bundle_dir / Path(app['options']['config'].split('//')[1])).resolve()
-                    if not config_path.exists():
-                        raise JujuError('unable to locate config file : %s for : %s' % (config_path, app_name))
+                        # get the contents of the file
+                        config_contents = yaml.safe_load(config_path.read_text())
 
-                    # get the contents of the file
-                    config_contents = yaml.safe_load(config_path.read_text())
+                        # inline the configurations for the current app into
+                        # the app['options']
+                        for key, val in config_contents[app_name].items():
+                            app['options'][key] = val
 
-                    # inline the configurations for the current app into
-                    # the app['options']
-                    for key, val in config_contents[app_name].items():
-                        app['options'][key] = val
+                        # remove the 'include-file' config
+                        app['options'].pop('config')
 
-                    # remove the 'include-file' config
-                    app['options'].pop('config')
+                    for option_key, option_val in app['options'].items():
+                        if isinstance(option_val, str) and option_val.startswith('include-base64'):
+                            # resolve the file
+                            if not bundle_dir:
+                                raise NotImplementedError('unable to resolve paths for config:include-base64 for non-local charms')
+                            base64_path = (bundle_dir / Path(option_val.split('//')[1])).resolve()
+                            if not base64_path.exists():
+                                raise JujuError('unable to locate the base64 file : %s for : %s' % (base64_path, app_name))
+
+                            # inline the base64 encoded config value
+                            base64_contents = base64.b64decode(base64_path.read_text())
+                            app['options'][option_key] = base64_contents
 
         return self.bundle, self.overlays
 
