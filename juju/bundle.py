@@ -155,14 +155,14 @@ class BundleHandler:
                     app_name,
                     charm_url,
                     utils.get_local_charm_metadata(charm_dir),
-                    resources=bundle["applications"][app_name].get("resources", {}),
+                    resources=bundle.get('applications', bundle.get('services', {}))[app_name].get("resources", {}),
                 )
                 apps_dict[app_name]['charm'] = charm_url
                 apps_dict[app_name]["resources"] = resources
 
         return bundle
 
-    async def fetch_plan(self, charm_url, origin, overlay=None):
+    async def fetch_plan(self, charm_url, origin, overlays=[]):
         entity_id = charm_url.path()
         is_local = Schema.LOCAL.matches(charm_url.schema)
         bundle_dir = None
@@ -187,6 +187,14 @@ class BundleHandler:
         _bundles = [b for b in yaml.safe_load_all(bundle_yaml)]
         self.overlays = _bundles[1:]
         self.bundle = _bundles[0]
+
+        if overlays != []:
+            for overlay_yaml_path in overlays:
+                try:
+                    overlay_contents = Path(overlay_yaml_path).read_text()
+                except (OSError, IOError) as e:
+                    raise JujuError('unable to open overlay %s \n %s' % (overlay_yaml_path, e))
+                self.overlays.extend(yaml.safe_load_all(overlay_contents))
 
         # gather the names of the removed charms so model.deploy
         # wouldn't wait for them to appear in the model

@@ -152,6 +152,19 @@ async def test_deploy_local_bundle_with_overlay_multi(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_deploy_bundle_with_overlay_as_argument(event_loop):
+    async with base.CleanModel() as model:
+        overlay_path = OVERLAYS_DIR / 'wiki-simple-overlay.yaml'
+
+        await model.deploy('cs:bundle/wiki-simple', overlays=[overlay_path])
+        # our overlay requests to remove mysql and add memcached and
+        # relate wiki with memcached, so
+        assert 'mysql' not in model.applications
+        assert 'memcached' in model.applications
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_deploy_local_charm_folder_symlink(event_loop):
     charm_path = TESTS_DIR / 'charm-folder-symlink'
 
