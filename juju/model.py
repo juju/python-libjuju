@@ -1518,7 +1518,7 @@ class Model:
         enabled, the function retursn a FullStatus object.
         :param Fileobject target: if set expects a file object such as
             sys.stdout or a file descriptor. The obtained status will
-            be sent to the file using the write function. If set to 
+            be sent to the file using the write function. If set to
             `None`, this function returns a string with the formatted
             status.
         :param bool raw: if `true` this functions returns the raw
@@ -1541,15 +1541,14 @@ class Model:
             result_str += '\n'
             result_str += self._print_status_machines(result_status)
             result_str += '\n'
-        
         if target is None:
             return result_str
-        
+
         try:
             target.write(result_str)
         except Exception as e:
             logging.error(e)
-        
+
         return None
 
     def _print_status_model(self, result_status):
@@ -1585,7 +1584,7 @@ class Model:
         # print header
         result_str = limits.format(
             'App', 'Version', 'Status', 'Scale', 'Charm', 'Channel')
-        
+
         for name, app in apps.items():
             # extract charm name from the path
             # like in ch:amd64/trusty/mediawiki-28

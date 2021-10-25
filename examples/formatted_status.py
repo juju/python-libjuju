@@ -1,7 +1,7 @@
 """
 This example demonstrates how to obtain a formatted full status
 description. For a similar solution using the FullStatus object
-check examples/fullstatus.py 
+check examples/fullstatus.py
 """
 import asyncio
 from juju import loop
@@ -34,7 +34,7 @@ async def main():
             # Uncomment this line to get the full status
             # using the standard output.
             # await model.formatted_status(target=sys.stdout)
-            await model.formatted_status(target = f)
+            await model.formatted_status(target=f)
             f.write('-----------\n')
     await application.remove()
     await model.disconnect()
