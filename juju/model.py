@@ -1512,31 +1512,51 @@ class Model:
 
         await self.connect(debug_log_conn=target)
 
-    async def status(self, raw=False):
+    async def formatted_status(self, target=None, raw=False, filters=None):
         """Returns a string that mimics the content of the information
         returned in the juju status command. If the raw parameter is
-        enabled, the function retursn a FullStatus object."""
+        enabled, the function retursn a FullStatus object.
+        :param Fileobject target: if set expects a file object such as
+            sys.stdout or a file descriptor. The obtained status will
+            be sent to the file using the write function. If set to 
+            `None`, this function returns a string with the formatted
+            status.
+        :param bool raw: if `true` this functions returns the raw
+            `FullStatus` object returned by Juju. This is similar to
+            invoking `get_status`.
+        :param str fileters: Optional list of applications, units, or machines
+            to include, which can use wildcards ('*').
+        """
         client_facade = client.ClientFacade.from_connection(self.connection())
-        result_status = await client_facade.FullStatus()
+        result_status = await client_facade.FullStatus(patterns=filters)
 
         if raw:
-            return result_status
-
-        result_str = self._print_status_model(result_status)
-        result_str += '\n'
-        result_str += self._print_status_apps(result_status)
-        result_str += '\n'
-        result_str += self._print_status_units(result_status)
-        result_str += '\n'
-        result_str += self._print_status_machines(result_status)
-        result_str += '\n'
-        return result_str
+            result_str = str(result_status)
+        else:
+            result_str = self._print_status_model(result_status)
+            result_str += '\n'
+            result_str += self._print_status_apps(result_status)
+            result_str += '\n'
+            result_str += self._print_status_units(result_status)
+            result_str += '\n'
+            result_str += self._print_status_machines(result_status)
+            result_str += '\n'
+        
+        if target is None:
+            return result_str
+        
+        try:
+            target.write(result_str)
+        except Exception as e:
+            logging.error(e)
+        
+        return None
 
     def _print_status_model(self, result_status):
         """Private function to print the status of a model"""
         m = result_status.model
         # print model
-        result_str = '{:<25} {:<25} {:<15} {:<15} {:<30} {:<30}'.format(
+        result_str = '{:<25} {:<25} {:<15} {:<15} {:<30} {:<30}\n'.format(
             'Model', 'Cloud/Region', 'Version', 'SLA', 'Timestamp', 'Notes')
         sla = m.unknown_fields['sla']
         # TODO: find the appropriate date conversion expression
@@ -1565,16 +1585,16 @@ class Model:
         # print header
         result_str = limits.format(
             'App', 'Version', 'Status', 'Scale', 'Charm', 'Channel')
-        result_str += '\n'
+        
         for name, app in apps.items():
             # extract charm name from the path
             # like in ch:amd64/trusty/mediawiki-28
             charm_name = app.charm.split('/')[-1]
             charm_name = charm_name.split('-')[0]
+            result_str += '\n'
             result_str += limits.format(
                 name, app.workload_version, app.status.status, len(app.units), charm_name,
                 app.charm_channel)
-            result_str += '\n'
         result_str += '\n'
         return result_str
 
