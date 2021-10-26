@@ -411,7 +411,7 @@ class Connection:
         #  Allow a second for tasks to be cancelled
         await jasyncio.sleep(1)
 
-        if not self.ws.closed:
+        if self.ws and not self.ws.closed:
             ws_close_task = jasyncio.create_task(self.ws.close())
             done, pending = await jasyncio.wait([ws_close_task])
 
@@ -419,7 +419,7 @@ class Connection:
 
             #  close_task.exception() is None means that close_task
             #  (ws.close()) actually completed without any errors
-            assert ws_close_task.exception() is None
+            assert ws_close_task.exception() is None, 'the websocket is unable to close properly, try making a new connection from scratch'
             #  proof that the errors we see in the output dont belong
             #  to us, but belongs to websockets library
         self.ws = None
@@ -454,7 +454,6 @@ class Connection:
                     msg = result['msg']
 
                     self.debug_log_target.write("%s %02d:%02d:%02d %s %s %s\n" % (tag, ts.hour, ts.minute, ts.second, sev, mod, msg))
-                    log.debug("debug log line is : %s" % result)
         except KeyError as e:
             log.exception('Unexpected debug line -- %s' % e)
             await self.close()

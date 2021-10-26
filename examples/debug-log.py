@@ -2,8 +2,7 @@
 This example demonstrate how debug-log works
 
 """
-import asyncio
-from juju import loop
+from juju import jasyncio
 import logging
 import sys
 from logging import getLogger
@@ -26,13 +25,11 @@ async def main():
         channel='stable',
     )
 
-    await asyncio.sleep(10)
-    await model.block_until(
-        lambda: all(unit.workload_status == 'active'
-                    for unit in application.units))
+    await model.wait_for_idle(status='active')
 
     await application.remove()
     await model.disconnect()
 
+
 if __name__ == '__main__':
-    loop.run(main())
+    jasyncio.run(main())
