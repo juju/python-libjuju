@@ -13,7 +13,7 @@ from toposort import toposort_flatten
 from .client import client
 from .constraints import parse as parse_constraints, parse_storage_constraint, parse_device_constraint
 from .errors import JujuError
-from . import utils, jasyncio
+from . import utils, jasyncio, charmhub
 from .origin import Channel
 from .url import Schema, URL
 
@@ -491,15 +491,6 @@ class AddApplicationChange(ChangeInfo):
             options["trust"] = "true"
 
         url = URL.parse(str(charm))
-        if Schema.CHARM_STORE.matches(url.schema):
-            resources = await context.model._add_store_resources(
-                self.application, charm, overrides=self.resources)
-        elif Schema.CHARM_HUB.matches(url.schema):
-            resources = await context.model._add_charmhub_resources(
-                self.application, charm, 'store', overrides=self.resources)
-        else:
-            resources = context.bundle.get("applications", {}).get(self.application, {}).get("resources", {})
-
         channel = None
         if self.channel is not None and self.channel != "":
             channel = Channel.parse(self.channel).normalize()
@@ -512,6 +503,20 @@ class AddApplicationChange(ChangeInfo):
             self.series = context.bundle.get("bundle",
                                              context.bundle.get("series", None))
 
+        if Schema.CHARM_STORE.matches(url.schema):
+            resources = await context.model._add_store_resources(
+                self.application, charm, overrides=self.resources)
+        elif Schema.CHARM_HUB.matches(url.schema):
+            c_hub = charmhub.CharmHub(context.model)
+            info = await c_hub.info(url.name, channel=self.channel)
+            if info.errors.error_list.code:
+                raise JujuError("unable to resolve the charm {} with channel {}".format(url.name, channel))
+            origin.id_ = info.result.id_
+            resources = await context.model._add_charmhub_resources(
+                self.application, charm, origin, overrides=self.resources)
+        else:
+            resources = context.bundle.get("applications", {}).get(self.application, {}).get("resources", {})
+
         await context.model._deploy(
             charm_url=charm,
             application=self.application,
@@ -521,8 +526,10 @@ class AddApplicationChange(ChangeInfo):
             endpoint_bindings=self.endpoint_bindings,
             resources=resources,
             storage=self.storage,
+            channel=self.channel,
             devices=self.devices,
             num_units=self.num_units,
+            charm_origin=origin,
         )
         return self.application
 
