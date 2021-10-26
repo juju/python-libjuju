@@ -17,6 +17,7 @@ class WebsocketMock:
         super().__init__()
         self.responses = deque(responses)
         self.open = True
+        self.closed = False
 
     async def send(self, message):
         pass
@@ -29,6 +30,7 @@ class WebsocketMock:
 
     async def close(self):
         self.open = False
+        self.closed = True
 
 
 @pytest.mark.asyncio
