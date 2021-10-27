@@ -1558,9 +1558,6 @@ class Model:
         result_str = '{:<25} {:<25} {:<15} {:<15} {:<30} {:<30}\n'.format(
             'Model', 'Cloud/Region', 'Version', 'SLA', 'Timestamp', 'Notes')
         sla = m.unknown_fields['sla']
-        # TODO: find the appropriate date conversion expression
-        # timestamp = datetime.strptime(result_status.controller_timestamp,
-        # '%Y-%m-%dT%H:%M:%S.%f')
         cloud = m.cloud_tag.split('-')[1]
         timestamp = result_status.controller_timestamp
         if m.available_version is not None and m.available_version != '':
