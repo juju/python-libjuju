@@ -10,6 +10,8 @@ from logging import getLogger
 from juju.model import Model
 import tempfile
 
+from juju.status import formatted_status
+
 LOG = getLogger(__name__)
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
@@ -32,8 +34,8 @@ async def main():
         for i in range(10):
             # Uncomment this line to get the full status
             # using the standard output.
-            # await model.formatted_status(target=sys.stdout)
-            await model.formatted_status(target=f)
+            # await formatted_status(model, target=sys.stdout)
+            await formatted_status(model, target=f)
             f.write('-----------\n')
             await jasyncio.sleep(1)
     await application.remove()
