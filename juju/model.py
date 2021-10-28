@@ -1851,7 +1851,12 @@ class Model:
 
             data = yaml.dump(docker_image_details)
 
-            charmresource['fingerprint'] = hashlib.sha3_384(bytes(data, 'utf-8')).digest()
+            if sys.version_info[0:2] == (3, 5):
+                hash_alg = hashlib.sha384
+            else:
+                hash_alg = hashlib.sha3_384
+
+            charmresource['fingerprint'] = hash_alg(bytes(data, 'utf-8')).digest()
 
             conn, headers, path_prefix = self.connection().https_connection()
 
