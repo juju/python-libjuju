@@ -14,7 +14,7 @@
 
 import json
 import logging
-import os
+import pathlib
 
 from . import model, tag, utils, jasyncio
 from .status import derive_status
@@ -715,8 +715,9 @@ class Application(model.ModelEntity):
         """
         app_facade = self._facade()
 
-        charm_dir = os.path.abspath(
-            os.path.expanduser(path))
+        if not isinstance(path, pathlib.Path):
+            path = pathlib.Path(path)
+        charm_dir = path.expanduser().resolve()
         model_config = await self.get_config()
 
         series = get_charm_series(charm_dir)
