@@ -845,6 +845,9 @@ class Model:
         log.debug('Resetting model')
         for app in self.applications.values():
             await app.destroy()
+        await self.block_until(
+            lambda: len(self.applications) == 0
+        )
         for machine in self.machines.values():
             await machine.destroy(force=force)
         await self.block_until(
