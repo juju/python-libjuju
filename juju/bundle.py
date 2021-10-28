@@ -330,13 +330,14 @@ def get_charm_series(path):
 
     Returns None if no series can be determined.
     """
+    path = Path(path)
     try:
-        if path.endswith('.charm'):
+        if path.suffix == '.charm':
             md = "metadata.yaml in %s" % path
-            with zipfile.ZipFile(path, 'r') as charm_file:
+            with zipfile.ZipFile(str(path), 'r') as charm_file:
                 data = yaml.safe_load(charm_file.read('metadata.yaml'))
         else:
-            md = Path(path) / "metadata.yaml"
+            md = path / "metadata.yaml"
             if not md.exists():
                 return None
             data = yaml.safe_load(md.open())
