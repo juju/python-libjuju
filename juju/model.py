@@ -459,7 +459,7 @@ class LocalDeployType:
             raise JujuError('{} path not found'.format(entity_url))
 
         is_bundle = (
-            (entity_url.endswith(".yaml") and entity_path.exists()) or
+            (entity_path.suffix == ".yaml" and entity_path.exists()) or
             bundle_path.exists()
         )
 
@@ -469,7 +469,7 @@ class LocalDeployType:
             if not is_bundle:
                 entity_url = url.path()
                 entity_path = Path(entity_url)
-                if str(entity_path).endswith('.charm'):
+                if entity_path.suffix == '.charm':
                     with zipfile.ZipFile(entity_path, 'r') as charm_file:
                         metadata = yaml.load(charm_file.read('metadata.yaml'), Loader=yaml.FullLoader)
                 else:
@@ -776,11 +776,12 @@ class Model:
         :param series: Charm series
 
         """
-        if charm_dir.endswith('.charm'):
+        charm_dir = Path(charm_dir)
+        if charm_dir.suffix == '.charm':
             fn = charm_dir
         else:
             fn = tempfile.NamedTemporaryFile().name
-            CharmArchiveGenerator(charm_dir).make_archive(fn)
+            CharmArchiveGenerator(str(charm_dir)).make_archive(fn)
         with open(fn, 'rb') as fh:
             func = partial(
                 self.add_local_charm, fh, series, os.stat(fn).st_size)
