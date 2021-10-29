@@ -228,7 +228,7 @@ def get_local_charm_metadata(path):
     :return: Object of charm metadata
     """
     if str(path).endswith('.charm'):
-        with zipfile.ZipFile(path, 'r') as charm_file:
+        with zipfile.ZipFile(str(path), 'r') as charm_file:
             metadata = yaml.load(charm_file.read('metadata.yaml'), Loader=yaml.FullLoader)
     else:
         entity_path = Path(path)

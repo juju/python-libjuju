@@ -470,7 +470,7 @@ class LocalDeployType:
                 entity_url = url.path()
                 entity_path = Path(entity_url)
                 if entity_path.suffix == '.charm':
-                    with zipfile.ZipFile(entity_path, 'r') as charm_file:
+                    with zipfile.ZipFile(str(entity_path), 'r') as charm_file:
                         metadata = yaml.load(charm_file.read('metadata.yaml'), Loader=yaml.FullLoader)
                 else:
                     metadata_path = entity_path / 'metadata.yaml'
@@ -2717,7 +2717,7 @@ class CharmArchiveGenerator:
                           (.bzr, etc)
 
         """
-        zf = zipfile.ZipFile(path, 'w', zipfile.ZIP_DEFLATED)
+        zf = zipfile.ZipFile(str(path), 'w', zipfile.ZIP_DEFLATED)
         for dirpath, dirnames, filenames in os.walk(self.path):
             relative_path = dirpath[len(self.path) + 1:]
             if relative_path and not self._ignore(relative_path):
