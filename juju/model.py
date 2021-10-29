@@ -784,7 +784,7 @@ class Model:
             CharmArchiveGenerator(str(charm_dir)).make_archive(fn)
         with open(str(fn), 'rb') as fh:
             func = partial(
-                self.add_local_charm, fh, series, os.stat(fn).st_size)
+                self.add_local_charm, fh, series, os.stat(str(fn)).st_size)
             loop = jasyncio.get_running_loop()
             charm_url = await loop.run_in_executor(None, func)
 
@@ -2745,7 +2745,7 @@ class CharmArchiveGenerator:
     def _check_type(self, path):
         """Check the path
         """
-        s = os.stat(path)
+        s = os.stat(str(path))
         if stat.S_ISDIR(s.st_mode) or stat.S_ISREG(s.st_mode):
             return path
         raise ValueError("Invalid Charm at %s %s" % (
