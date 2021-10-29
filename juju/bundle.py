@@ -116,6 +116,8 @@ class BundleHandler:
                 charm_dir = str(charm_path)
             except ValueError:
                 pass
+            except FileNotFoundError:
+                continue
             series = (
                 app_dict.get('series') or
                 default_series or
