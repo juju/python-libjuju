@@ -782,7 +782,7 @@ class Model:
         else:
             fn = tempfile.NamedTemporaryFile().name
             CharmArchiveGenerator(str(charm_dir)).make_archive(fn)
-        with open(fn, 'rb') as fh:
+        with open(str(fn), 'rb') as fh:
             func = partial(
                 self.add_local_charm, fh, series, os.stat(fn).st_size)
             loop = jasyncio.get_running_loop()
@@ -1967,7 +1967,7 @@ class Model:
 
             file_name = "juju-backup-%s.tar.gz" % archive_id
 
-        with open(file_name, 'wb') as f:
+        with open(str(file_name), 'wb') as f:
             try:
                 f.write(result)
             except (OSError, IOError) as e:
@@ -2510,7 +2510,7 @@ class Model:
             return result.result
 
         try:
-            with open(filename, "w") as file:
+            with open(str(filename), "w") as file:
                 file.write(result.result)
         except IOError:
             raise
