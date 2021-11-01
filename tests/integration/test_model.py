@@ -69,7 +69,7 @@ async def test_deploy_bundle_local_charms(event_loop):
     async with base.CleanModel() as model:
         await model.deploy(bundle_path)
         await wait_for_bundle(model, bundle_path)
-        assert list(model.units.keys()) == ['test1/0', 'test2/0']
+        assert set(model.units.keys()) == set(['test1/0', 'test2/0'])
         assert model.units['test1/0'].agent_status == 'idle'
         assert model.units['test1/0'].workload_status == 'active'
         assert model.units['test2/0'].agent_status == 'idle'

@@ -459,7 +459,7 @@ class LocalDeployType:
             raise JujuError('{} path not found'.format(entity_url))
 
         is_bundle = (
-            (entity_url.endswith(".yaml") and entity_path.exists()) or
+            (entity_path.suffix == ".yaml" and entity_path.exists()) or
             bundle_path.exists()
         )
 
@@ -469,8 +469,8 @@ class LocalDeployType:
             if not is_bundle:
                 entity_url = url.path()
                 entity_path = Path(entity_url)
-                if str(entity_path).endswith('.charm'):
-                    with zipfile.ZipFile(entity_path, 'r') as charm_file:
+                if entity_path.suffix == '.charm':
+                    with zipfile.ZipFile(str(entity_path), 'r') as charm_file:
                         metadata = yaml.load(charm_file.read('metadata.yaml'), Loader=yaml.FullLoader)
                 else:
                     metadata_path = entity_path / 'metadata.yaml'
@@ -776,14 +776,15 @@ class Model:
         :param series: Charm series
 
         """
-        if charm_dir.endswith('.charm'):
+        charm_dir = Path(charm_dir)
+        if charm_dir.suffix == '.charm':
             fn = charm_dir
         else:
             fn = tempfile.NamedTemporaryFile().name
-            CharmArchiveGenerator(charm_dir).make_archive(fn)
-        with open(fn, 'rb') as fh:
+            CharmArchiveGenerator(str(charm_dir)).make_archive(fn)
+        with open(str(fn), 'rb') as fh:
             func = partial(
-                self.add_local_charm, fh, series, os.stat(fn).st_size)
+                self.add_local_charm, fh, series, os.stat(str(fn)).st_size)
             loop = jasyncio.get_running_loop()
             charm_url = await loop.run_in_executor(None, func)
 
@@ -1851,7 +1852,12 @@ class Model:
 
             data = yaml.dump(docker_image_details)
 
-            charmresource['fingerprint'] = hashlib.sha3_384(bytes(data, 'utf-8')).digest()
+            if sys.version_info[0:2] == (3, 5):
+                hash_alg = hashlib.sha384
+            else:
+                hash_alg = hashlib.sha3_384
+
+            charmresource['fingerprint'] = hash_alg(bytes(data, 'utf-8')).digest()
 
             conn, headers, path_prefix = self.connection().https_connection()
 
@@ -1961,7 +1967,7 @@ class Model:
 
             file_name = "juju-backup-%s.tar.gz" % archive_id
 
-        with open(file_name, 'wb') as f:
+        with open(str(file_name), 'wb') as f:
             try:
                 f.write(result)
             except (OSError, IOError) as e:
@@ -2504,7 +2510,7 @@ class Model:
             return result.result
 
         try:
-            with open(filename, "w") as file:
+            with open(str(filename), "w") as file:
                 file.write(result.result)
         except IOError:
             raise
@@ -2711,7 +2717,7 @@ class CharmArchiveGenerator:
                           (.bzr, etc)
 
         """
-        zf = zipfile.ZipFile(path, 'w', zipfile.ZIP_DEFLATED)
+        zf = zipfile.ZipFile(str(path), 'w', zipfile.ZIP_DEFLATED)
         for dirpath, dirnames, filenames in os.walk(self.path):
             relative_path = dirpath[len(self.path) + 1:]
             if relative_path and not self._ignore(relative_path):
@@ -2739,7 +2745,7 @@ class CharmArchiveGenerator:
     def _check_type(self, path):
         """Check the path
         """
-        s = os.stat(path)
+        s = os.stat(str(path))
         if stat.S_ISDIR(s.st_mode) or stat.S_ISREG(s.st_mode):
             return path
         raise ValueError("Invalid Charm at %s %s" % (
