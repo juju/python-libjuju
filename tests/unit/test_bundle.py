@@ -1,6 +1,7 @@
 from pathlib import Path
 import unittest
 from unittest import mock
+from mock import patch, Mock, ANY
 
 import yaml
 
@@ -19,6 +20,7 @@ from juju.bundle import (
     ScaleChange,
     SetAnnotationsChange,
 )
+from juju import charmhub
 from juju.client import client
 from toposort import CircularDependencyError
 
@@ -211,6 +213,8 @@ class TestAddApplicationChangeRun:
                                          resources=["resource1"],
                                          storage="storage",
                                          devices="devices",
+                                         channel="channel",
+                                         charm_origin=ANY,
                                          num_units="num_units")
 
         # confirm that it's idempotent
@@ -234,18 +238,24 @@ class TestAddApplicationChangeRun:
                                                      "num-units": "num_units",
                                                      "channel": "channel"})
 
-        model = mock.Mock()
+        model = Mock()
         model._deploy = base.AsyncMock(return_value=None)
         model._add_charmhub_resources = base.AsyncMock(return_value=["resource1"])
         model.applications = {}
 
-        context = mock.Mock()
+        context = Mock()
         context.resolve.return_value = "ch:charm1"
-        context.origins = {"ch:charm1": {"channel/stable": {}}}
+        context.origins = {"ch:charm1": Mock()}
         context.trusted = False
         context.model = model
 
-        result = await change.run(context)
+        info = Mock()
+        info.result.id_ = "12345"
+        info.errors.error_list.code = ''
+        info_func = base.AsyncMock(return_value=info)
+
+        with patch.object(charmhub.CharmHub, 'info', info_func):
+            result = await change.run(context)
         assert result == "application"
 
         model._deploy.assert_called_once()
@@ -258,6 +268,8 @@ class TestAddApplicationChangeRun:
                                          resources=["resource1"],
                                          storage="storage",
                                          devices="devices",
+                                         channel="channel",
+                                         charm_origin=ANY,
                                          num_units="num_units")
 
     @pytest.mark.asyncio
@@ -295,7 +307,9 @@ class TestAddApplicationChangeRun:
                                          resources={},
                                          storage="storage",
                                          devices="devices",
-                                         num_units="num_units")
+                                         num_units="num_units",
+                                         channel=None,
+                                         charm_origin=ANY)
 
     @pytest.mark.asyncio
     async def test_run_no_series(self, event_loop):
@@ -308,7 +322,8 @@ class TestAddApplicationChangeRun:
                                                      "endpoint-bindings": "endpoint_bindings",
                                                      "resources": "resources",
                                                      "devices": "devices",
-                                                     "num-units": "num_units"})
+                                                     "num-units": "num_units",
+                                                     "channel": "channel"})
 
         model = mock.Mock()
         model._deploy = base.AsyncMock(return_value=None)
@@ -339,6 +354,8 @@ class TestAddApplicationChangeRun:
                                          resources=["resource1"],
                                          storage="storage",
                                          devices="devices",
+                                         channel="channel",
+                                         charm_origin=ANY,
                                          num_units="num_units")
 
         # confirm that it's idempotent
