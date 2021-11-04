@@ -16,7 +16,15 @@ async def test_unit_public_address(event_loop):
             application_name='ubuntu',
             series='trusty',
             channel='stable',
+            num_units=2,
         )
+
+        await model.block_until(
+            lambda: app.units,
+            timeout=480,
+        )
+
+        assert len(app.units) >= 1
 
         for unit in app.units:
             addr = await unit.get_public_address(timeout=60 * 4)
