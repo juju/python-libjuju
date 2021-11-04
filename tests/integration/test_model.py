@@ -1,4 +1,3 @@
-import asyncio
 import json
 import os
 import random
@@ -13,6 +12,7 @@ import paramiko
 
 import pylxd
 import pytest
+from juju import jasyncio
 from juju.client.client import ApplicationFacade, ConfigValue
 from juju.errors import JujuError, JujuUnitError, JujuConnectionError
 from juju.model import Model, ModelObserver
@@ -155,7 +155,7 @@ async def test_wait_local_charm_waiting_timeout(event_loop):
         await model.deploy(str(charm_path), config={'status': 'waiting'})
         assert 'charm' in model.applications
         await model.wait_for_idle()
-        with pytest.raises(asyncio.TimeoutError):
+        with pytest.raises(jasyncio.TimeoutError):
             await model.wait_for_idle(status="active", timeout=30)
 
 
@@ -530,8 +530,8 @@ async def test_relate(event_loop):
             num_units=0,
         )
 
-        relation_added = asyncio.Event()
-        timeout = asyncio.Event()
+        relation_added = jasyncio.Event()
+        timeout = jasyncio.Event()
 
         class TestObserver(ModelObserver):
             async def on_relation_add(self, delta, old, new, model):
@@ -579,7 +579,7 @@ async def _deploy_in_loop(new_loop, model_name, jujudata):
 async def test_explicit_loop_threaded(event_loop):
     async with base.CleanModel() as model:
         model_name = model.info.name
-        new_loop = asyncio.new_event_loop()
+        new_loop = jasyncio.new_event_loop()
         with ThreadPoolExecutor(1) as executor:
             f = executor.submit(
                 new_loop.run_until_complete,
