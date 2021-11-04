@@ -19,7 +19,7 @@ async def test_unit_public_address(event_loop):
         )
 
         for unit in app.units:
-            addr = await unit.get_public_address()
+            addr = await unit.get_public_address(timeout=60 * 4)
             assert addr, 'unit public address not set'
 
 
