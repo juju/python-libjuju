@@ -731,7 +731,7 @@ async def test_get_machines(event_loop):
 @pytest.mark.asyncio
 async def test_wait_for_idle_without_units(event_loop):
     async with base.CleanModel() as model:
-        app = await model.deploy(
+        await model.deploy(
             'cs:~jameinel/ubuntu-lite-7',
             application_name='ubuntu',
             series='bionic',
