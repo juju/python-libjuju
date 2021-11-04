@@ -729,6 +729,21 @@ async def test_get_machines(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_wait_for_idle_without_units(event_loop):
+    async with base.CleanModel() as model:
+        app = await model.deploy(
+            'cs:~jameinel/ubuntu-lite-7',
+            application_name='ubuntu',
+            series='bionic',
+            channel='stable',
+            num_units=0,
+        )
+        with pytest.raises(jasyncio.TimeoutError):
+            await model.wait_for_idle(timeout=10)
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_watcher_reconnect(event_loop):
     async with base.CleanModel() as model:
         await model.connection().close()

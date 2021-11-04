@@ -2619,15 +2619,18 @@ class Model:
             busy = []
             errors = {}
             blocks = {}
-            for app in apps:
-                if app not in self.applications:
-                    busy.append(app + " (missing)")
+            for app_name in apps:
+                if app_name not in self.applications:
+                    busy.append(app_name + " (missing)")
                     continue
-                app = self.applications[app]
+                app = self.applications[app_name]
                 if raise_on_error and app.status == "error":
                     errors.setdefault("App", []).append(app.name)
                 if raise_on_blocked and app.status == "blocked":
                     blocks.setdefault("App", []).append(app.name)
+                if not app.units:
+                    busy.append(app.name + " (no units yet)")
+                    continue
                 for unit in app.units:
                     if unit.machine is not None and unit.machine.status == "error":
                         errors.setdefault("Machine", []).append(unit.machine.id)
