@@ -1553,6 +1553,1062 @@ class ApplicationFacade(Type):
 
 
 
+class ControllerFacade(Type):
+    name = 'Controller'
+    version = 11
+    schema =     {'definitions': {'AllWatcherId': {'additionalProperties': False,
+                                      'properties': {'watcher-id': {'type': 'string'}},
+                                      'required': ['watcher-id'],
+                                      'type': 'object'},
+                     'CloudCredential': {'additionalProperties': False,
+                                         'properties': {'attrs': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                  'type': 'object'},
+                                                        'auth-type': {'type': 'string'},
+                                                        'redacted': {'items': {'type': 'string'},
+                                                                     'type': 'array'}},
+                                         'required': ['auth-type'],
+                                         'type': 'object'},
+                     'CloudSpec': {'additionalProperties': False,
+                                   'properties': {'cacertificates': {'items': {'type': 'string'},
+                                                                     'type': 'array'},
+                                                  'credential': {'$ref': '#/definitions/CloudCredential'},
+                                                  'endpoint': {'type': 'string'},
+                                                  'identity-endpoint': {'type': 'string'},
+                                                  'is-controller-cloud': {'type': 'boolean'},
+                                                  'name': {'type': 'string'},
+                                                  'region': {'type': 'string'},
+                                                  'skip-tls-verify': {'type': 'boolean'},
+                                                  'storage-endpoint': {'type': 'string'},
+                                                  'type': {'type': 'string'}},
+                                   'required': ['type', 'name'],
+                                   'type': 'object'},
+                     'CloudSpecResult': {'additionalProperties': False,
+                                         'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                        'result': {'$ref': '#/definitions/CloudSpec'}},
+                                         'type': 'object'},
+                     'CloudSpecResults': {'additionalProperties': False,
+                                          'properties': {'results': {'items': {'$ref': '#/definitions/CloudSpecResult'},
+                                                                     'type': 'array'}},
+                                          'type': 'object'},
+                     'ConfigValue': {'additionalProperties': False,
+                                     'properties': {'source': {'type': 'string'},
+                                                    'value': {'additionalProperties': True,
+                                                              'type': 'object'}},
+                                     'required': ['value', 'source'],
+                                     'type': 'object'},
+                     'ControllerAPIInfoResult': {'additionalProperties': False,
+                                                 'properties': {'addresses': {'items': {'type': 'string'},
+                                                                              'type': 'array'},
+                                                                'cacert': {'type': 'string'},
+                                                                'error': {'$ref': '#/definitions/Error'}},
+                                                 'required': ['addresses',
+                                                              'cacert'],
+                                                 'type': 'object'},
+                     'ControllerAPIInfoResults': {'additionalProperties': False,
+                                                  'properties': {'results': {'items': {'$ref': '#/definitions/ControllerAPIInfoResult'},
+                                                                             'type': 'array'}},
+                                                  'required': ['results'],
+                                                  'type': 'object'},
+                     'ControllerConfigResult': {'additionalProperties': False,
+                                                'properties': {'config': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                       'type': 'object'}},
+                                                                          'type': 'object'}},
+                                                'required': ['config'],
+                                                'type': 'object'},
+                     'ControllerConfigSet': {'additionalProperties': False,
+                                             'properties': {'config': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                    'type': 'object'}},
+                                                                       'type': 'object'}},
+                                             'required': ['config'],
+                                             'type': 'object'},
+                     'ControllerVersionResults': {'additionalProperties': False,
+                                                  'properties': {'git-commit': {'type': 'string'},
+                                                                 'version': {'type': 'string'}},
+                                                  'required': ['version',
+                                                               'git-commit'],
+                                                  'type': 'object'},
+                     'DestroyControllerArgs': {'additionalProperties': False,
+                                               'properties': {'destroy-models': {'type': 'boolean'},
+                                                              'destroy-storage': {'type': 'boolean'},
+                                                              'force': {'type': 'boolean'},
+                                                              'max-wait': {'type': 'integer'},
+                                                              'model-timeout': {'type': 'integer'}},
+                                               'required': ['destroy-models'],
+                                               'type': 'object'},
+                     'Entities': {'additionalProperties': False,
+                                  'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
+                                                              'type': 'array'}},
+                                  'required': ['entities'],
+                                  'type': 'object'},
+                     'Entity': {'additionalProperties': False,
+                                'properties': {'tag': {'type': 'string'}},
+                                'required': ['tag'],
+                                'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ErrorResult': {'additionalProperties': False,
+                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
+                                     'type': 'object'},
+                     'ErrorResults': {'additionalProperties': False,
+                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
+                                                                 'type': 'array'}},
+                                      'required': ['results'],
+                                      'type': 'object'},
+                     'HostedModelConfig': {'additionalProperties': False,
+                                           'properties': {'cloud-spec': {'$ref': '#/definitions/CloudSpec'},
+                                                          'config': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                  'type': 'object'}},
+                                                                     'type': 'object'},
+                                                          'error': {'$ref': '#/definitions/Error'},
+                                                          'name': {'type': 'string'},
+                                                          'owner': {'type': 'string'}},
+                                           'required': ['name', 'owner'],
+                                           'type': 'object'},
+                     'HostedModelConfigsResults': {'additionalProperties': False,
+                                                   'properties': {'models': {'items': {'$ref': '#/definitions/HostedModelConfig'},
+                                                                             'type': 'array'}},
+                                                   'required': ['models'],
+                                                   'type': 'object'},
+                     'InitiateMigrationArgs': {'additionalProperties': False,
+                                               'properties': {'specs': {'items': {'$ref': '#/definitions/MigrationSpec'},
+                                                                        'type': 'array'}},
+                                               'required': ['specs'],
+                                               'type': 'object'},
+                     'InitiateMigrationResult': {'additionalProperties': False,
+                                                 'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                                'migration-id': {'type': 'string'},
+                                                                'model-tag': {'type': 'string'}},
+                                                 'required': ['model-tag',
+                                                              'migration-id'],
+                                                 'type': 'object'},
+                     'InitiateMigrationResults': {'additionalProperties': False,
+                                                  'properties': {'results': {'items': {'$ref': '#/definitions/InitiateMigrationResult'},
+                                                                             'type': 'array'}},
+                                                  'required': ['results'],
+                                                  'type': 'object'},
+                     'MachineHardware': {'additionalProperties': False,
+                                         'properties': {'arch': {'type': 'string'},
+                                                        'availability-zone': {'type': 'string'},
+                                                        'cores': {'type': 'integer'},
+                                                        'cpu-power': {'type': 'integer'},
+                                                        'mem': {'type': 'integer'},
+                                                        'root-disk': {'type': 'integer'},
+                                                        'tags': {'items': {'type': 'string'},
+                                                                 'type': 'array'}},
+                                         'type': 'object'},
+                     'MigrationSpec': {'additionalProperties': False,
+                                       'properties': {'model-tag': {'type': 'string'},
+                                                      'target-info': {'$ref': '#/definitions/MigrationTargetInfo'}},
+                                       'required': ['model-tag', 'target-info'],
+                                       'type': 'object'},
+                     'MigrationTargetInfo': {'additionalProperties': False,
+                                             'properties': {'addrs': {'items': {'type': 'string'},
+                                                                      'type': 'array'},
+                                                            'auth-tag': {'type': 'string'},
+                                                            'ca-cert': {'type': 'string'},
+                                                            'controller-alias': {'type': 'string'},
+                                                            'controller-tag': {'type': 'string'},
+                                                            'macaroons': {'type': 'string'},
+                                                            'password': {'type': 'string'}},
+                                             'required': ['controller-tag',
+                                                          'addrs',
+                                                          'ca-cert',
+                                                          'auth-tag'],
+                                             'type': 'object'},
+                     'Model': {'additionalProperties': False,
+                               'properties': {'name': {'type': 'string'},
+                                              'owner-tag': {'type': 'string'},
+                                              'type': {'type': 'string'},
+                                              'uuid': {'type': 'string'}},
+                               'required': ['name', 'uuid', 'type', 'owner-tag'],
+                               'type': 'object'},
+                     'ModelBlockInfo': {'additionalProperties': False,
+                                        'properties': {'blocks': {'items': {'type': 'string'},
+                                                                  'type': 'array'},
+                                                       'model-uuid': {'type': 'string'},
+                                                       'name': {'type': 'string'},
+                                                       'owner-tag': {'type': 'string'}},
+                                        'required': ['name',
+                                                     'model-uuid',
+                                                     'owner-tag',
+                                                     'blocks'],
+                                        'type': 'object'},
+                     'ModelBlockInfoList': {'additionalProperties': False,
+                                            'properties': {'models': {'items': {'$ref': '#/definitions/ModelBlockInfo'},
+                                                                      'type': 'array'}},
+                                            'type': 'object'},
+                     'ModelConfigResults': {'additionalProperties': False,
+                                            'properties': {'config': {'patternProperties': {'.*': {'$ref': '#/definitions/ConfigValue'}},
+                                                                      'type': 'object'}},
+                                            'required': ['config'],
+                                            'type': 'object'},
+                     'ModelFilesystemInfo': {'additionalProperties': False,
+                                             'properties': {'detachable': {'type': 'boolean'},
+                                                            'id': {'type': 'string'},
+                                                            'message': {'type': 'string'},
+                                                            'provider-id': {'type': 'string'},
+                                                            'status': {'type': 'string'}},
+                                             'required': ['id'],
+                                             'type': 'object'},
+                     'ModelMachineInfo': {'additionalProperties': False,
+                                          'properties': {'display-name': {'type': 'string'},
+                                                         'ha-primary': {'type': 'boolean'},
+                                                         'hardware': {'$ref': '#/definitions/MachineHardware'},
+                                                         'has-vote': {'type': 'boolean'},
+                                                         'id': {'type': 'string'},
+                                                         'instance-id': {'type': 'string'},
+                                                         'message': {'type': 'string'},
+                                                         'status': {'type': 'string'},
+                                                         'wants-vote': {'type': 'boolean'}},
+                                          'required': ['id'],
+                                          'type': 'object'},
+                     'ModelStatus': {'additionalProperties': False,
+                                     'properties': {'application-count': {'type': 'integer'},
+                                                    'error': {'$ref': '#/definitions/Error'},
+                                                    'filesystems': {'items': {'$ref': '#/definitions/ModelFilesystemInfo'},
+                                                                    'type': 'array'},
+                                                    'hosted-machine-count': {'type': 'integer'},
+                                                    'life': {'type': 'string'},
+                                                    'machines': {'items': {'$ref': '#/definitions/ModelMachineInfo'},
+                                                                 'type': 'array'},
+                                                    'model-tag': {'type': 'string'},
+                                                    'owner-tag': {'type': 'string'},
+                                                    'type': {'type': 'string'},
+                                                    'unit-count': {'type': 'integer'},
+                                                    'volumes': {'items': {'$ref': '#/definitions/ModelVolumeInfo'},
+                                                                'type': 'array'}},
+                                     'required': ['model-tag',
+                                                  'life',
+                                                  'type',
+                                                  'hosted-machine-count',
+                                                  'application-count',
+                                                  'unit-count',
+                                                  'owner-tag'],
+                                     'type': 'object'},
+                     'ModelStatusResults': {'additionalProperties': False,
+                                            'properties': {'models': {'items': {'$ref': '#/definitions/ModelStatus'},
+                                                                      'type': 'array'}},
+                                            'required': ['models'],
+                                            'type': 'object'},
+                     'ModelTag': {'additionalProperties': False, 'type': 'object'},
+                     'ModelVolumeInfo': {'additionalProperties': False,
+                                         'properties': {'detachable': {'type': 'boolean'},
+                                                        'id': {'type': 'string'},
+                                                        'message': {'type': 'string'},
+                                                        'provider-id': {'type': 'string'},
+                                                        'status': {'type': 'string'}},
+                                         'required': ['id'],
+                                         'type': 'object'},
+                     'ModifyControllerAccess': {'additionalProperties': False,
+                                                'properties': {'access': {'type': 'string'},
+                                                               'action': {'type': 'string'},
+                                                               'user-tag': {'type': 'string'}},
+                                                'required': ['user-tag',
+                                                             'action',
+                                                             'access'],
+                                                'type': 'object'},
+                     'ModifyControllerAccessRequest': {'additionalProperties': False,
+                                                       'properties': {'changes': {'items': {'$ref': '#/definitions/ModifyControllerAccess'},
+                                                                                  'type': 'array'}},
+                                                       'required': ['changes'],
+                                                       'type': 'object'},
+                     'NotifyWatchResult': {'additionalProperties': False,
+                                           'properties': {'NotifyWatcherId': {'type': 'string'},
+                                                          'error': {'$ref': '#/definitions/Error'}},
+                                           'required': ['NotifyWatcherId'],
+                                           'type': 'object'},
+                     'NotifyWatchResults': {'additionalProperties': False,
+                                            'properties': {'results': {'items': {'$ref': '#/definitions/NotifyWatchResult'},
+                                                                       'type': 'array'}},
+                                            'required': ['results'],
+                                            'type': 'object'},
+                     'RemoveBlocksArgs': {'additionalProperties': False,
+                                          'properties': {'all': {'type': 'boolean'}},
+                                          'required': ['all'],
+                                          'type': 'object'},
+                     'StringResult': {'additionalProperties': False,
+                                      'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                     'result': {'type': 'string'}},
+                                      'required': ['result'],
+                                      'type': 'object'},
+                     'SummaryWatcherID': {'additionalProperties': False,
+                                          'properties': {'watcher-id': {'type': 'string'}},
+                                          'required': ['watcher-id'],
+                                          'type': 'object'},
+                     'UserAccess': {'additionalProperties': False,
+                                    'properties': {'access': {'type': 'string'},
+                                                   'user-tag': {'type': 'string'}},
+                                    'required': ['user-tag', 'access'],
+                                    'type': 'object'},
+                     'UserAccessResult': {'additionalProperties': False,
+                                          'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                         'result': {'$ref': '#/definitions/UserAccess'}},
+                                          'type': 'object'},
+                     'UserAccessResults': {'additionalProperties': False,
+                                           'properties': {'results': {'items': {'$ref': '#/definitions/UserAccessResult'},
+                                                                      'type': 'array'}},
+                                           'type': 'object'},
+                     'UserModel': {'additionalProperties': False,
+                                   'properties': {'last-connection': {'format': 'date-time',
+                                                                      'type': 'string'},
+                                                  'model': {'$ref': '#/definitions/Model'}},
+                                   'required': ['model', 'last-connection'],
+                                   'type': 'object'},
+                     'UserModelList': {'additionalProperties': False,
+                                       'properties': {'user-models': {'items': {'$ref': '#/definitions/UserModel'},
+                                                                      'type': 'array'}},
+                                       'required': ['user-models'],
+                                       'type': 'object'}},
+     'properties': {'AllModels': {'description': 'AllModels allows controller '
+                                                 'administrators to get the list '
+                                                 'of all the\n'
+                                                 'models in the controller.',
+                                  'properties': {'Result': {'$ref': '#/definitions/UserModelList'}},
+                                  'type': 'object'},
+                    'CloudSpec': {'description': "CloudSpec returns the model's "
+                                                 'cloud spec.',
+                                  'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                 'Result': {'$ref': '#/definitions/CloudSpecResults'}},
+                                  'type': 'object'},
+                    'ConfigSet': {'description': 'ConfigSet changes the value of '
+                                                 'specified controller '
+                                                 'configuration\n'
+                                                 'settings. Only some settings can '
+                                                 'be changed after bootstrap.\n'
+                                                 "Settings that aren't specified "
+                                                 'in the params are left '
+                                                 'unchanged.',
+                                  'properties': {'Params': {'$ref': '#/definitions/ControllerConfigSet'}},
+                                  'type': 'object'},
+                    'ControllerAPIInfoForModels': {'description': 'ControllerAPIInfoForModels '
+                                                                  'returns the '
+                                                                  'controller api '
+                                                                  'connection '
+                                                                  'details for the '
+                                                                  'specified '
+                                                                  'models.',
+                                                   'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                                  'Result': {'$ref': '#/definitions/ControllerAPIInfoResults'}},
+                                                   'type': 'object'},
+                    'ControllerConfig': {'description': 'ControllerConfig returns '
+                                                        "the controller's "
+                                                        'configuration.',
+                                         'properties': {'Result': {'$ref': '#/definitions/ControllerConfigResult'}},
+                                         'type': 'object'},
+                    'ControllerVersion': {'description': 'ControllerVersion '
+                                                         'returns the version '
+                                                         'information associated '
+                                                         'with this\n'
+                                                         'controller binary.\n'
+                                                         '\n'
+                                                         'NOTE: the implementation '
+                                                         'intentionally does not '
+                                                         'check for '
+                                                         'SuperuserAccess\n'
+                                                         'as the Version is known '
+                                                         'even to users with login '
+                                                         'access.',
+                                          'properties': {'Result': {'$ref': '#/definitions/ControllerVersionResults'}},
+                                          'type': 'object'},
+                    'DestroyController': {'description': 'DestroyController '
+                                                         'destroys the '
+                                                         'controller.\n'
+                                                         '\n'
+                                                         'If the args specify the '
+                                                         'destruction of the '
+                                                         'models, this method '
+                                                         'will\n'
+                                                         'attempt to do so. '
+                                                         'Otherwise, if the '
+                                                         'controller has any '
+                                                         'non-empty,\n'
+                                                         'non-Dead hosted models, '
+                                                         'then an error with the '
+                                                         'code\n'
+                                                         'params.CodeHasHostedModels '
+                                                         'will be transmitted.',
+                                          'properties': {'Params': {'$ref': '#/definitions/DestroyControllerArgs'}},
+                                          'type': 'object'},
+                    'GetCloudSpec': {'description': 'GetCloudSpec constructs the '
+                                                    'CloudSpec for a validated and '
+                                                    'authorized model.',
+                                     'properties': {'Params': {'$ref': '#/definitions/ModelTag'},
+                                                    'Result': {'$ref': '#/definitions/CloudSpecResult'}},
+                                     'type': 'object'},
+                    'GetControllerAccess': {'description': 'GetControllerAccess '
+                                                           'returns the level of '
+                                                           'access the specified '
+                                                           'users\n'
+                                                           'have on the '
+                                                           'controller.',
+                                            'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                           'Result': {'$ref': '#/definitions/UserAccessResults'}},
+                                            'type': 'object'},
+                    'HostedModelConfigs': {'description': 'HostedModelConfigs '
+                                                          'returns all the '
+                                                          'information that the '
+                                                          'client needs in\n'
+                                                          'order to connect '
+                                                          'directly with the host '
+                                                          "model's provider and "
+                                                          'destroy it\n'
+                                                          'directly.',
+                                           'properties': {'Result': {'$ref': '#/definitions/HostedModelConfigsResults'}},
+                                           'type': 'object'},
+                    'IdentityProviderURL': {'description': 'IdentityProviderURL '
+                                                           'returns the URL of the '
+                                                           'configured external '
+                                                           'identity\n'
+                                                           'provider for this '
+                                                           'controller or an empty '
+                                                           'string if no external '
+                                                           'identity\n'
+                                                           'provider has been '
+                                                           'configured when the '
+                                                           'controller was '
+                                                           'bootstrapped.\n'
+                                                           '\n'
+                                                           'NOTE: the '
+                                                           'implementation '
+                                                           'intentionally does not '
+                                                           'check for '
+                                                           'SuperuserAccess\n'
+                                                           'as the URL is known '
+                                                           'even to users with '
+                                                           'login access.',
+                                            'properties': {'Result': {'$ref': '#/definitions/StringResult'}},
+                                            'type': 'object'},
+                    'InitiateMigration': {'description': 'InitiateMigration '
+                                                         'attempts to begin the '
+                                                         'migration of one or\n'
+                                                         'more models to other '
+                                                         'controllers.',
+                                          'properties': {'Params': {'$ref': '#/definitions/InitiateMigrationArgs'},
+                                                         'Result': {'$ref': '#/definitions/InitiateMigrationResults'}},
+                                          'type': 'object'},
+                    'ListBlockedModels': {'description': 'ListBlockedModels '
+                                                         'returns a list of all '
+                                                         'models on the '
+                                                         'controller\n'
+                                                         'which have a block in '
+                                                         'place.  The resulting '
+                                                         'slice is sorted by '
+                                                         'model\n'
+                                                         'name, then owner. '
+                                                         'Callers must be '
+                                                         'controller '
+                                                         'administrators to '
+                                                         'retrieve the\n'
+                                                         'list.',
+                                          'properties': {'Result': {'$ref': '#/definitions/ModelBlockInfoList'}},
+                                          'type': 'object'},
+                    'ModelConfig': {'description': 'ModelConfig returns the model '
+                                                   'config for the controller\n'
+                                                   'model.  For information on the '
+                                                   'current model, use\n'
+                                                   'client.ModelGet',
+                                    'properties': {'Result': {'$ref': '#/definitions/ModelConfigResults'}},
+                                    'type': 'object'},
+                    'ModelStatus': {'description': 'ModelStatus returns a summary '
+                                                   'of the model.',
+                                    'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                   'Result': {'$ref': '#/definitions/ModelStatusResults'}},
+                                    'type': 'object'},
+                    'ModifyControllerAccess': {'description': 'ModifyControllerAccess '
+                                                              'changes the model '
+                                                              'access granted to '
+                                                              'users.',
+                                               'properties': {'Params': {'$ref': '#/definitions/ModifyControllerAccessRequest'},
+                                                              'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                               'type': 'object'},
+                    'MongoVersion': {'description': 'MongoVersion allows the '
+                                                    'introspection of the mongo '
+                                                    'version per controller',
+                                     'properties': {'Result': {'$ref': '#/definitions/StringResult'}},
+                                     'type': 'object'},
+                    'RemoveBlocks': {'description': 'RemoveBlocks removes all the '
+                                                    'blocks in the controller.',
+                                     'properties': {'Params': {'$ref': '#/definitions/RemoveBlocksArgs'}},
+                                     'type': 'object'},
+                    'WatchAllModelSummaries': {'description': 'WatchAllModelSummaries '
+                                                              'starts watching the '
+                                                              'summary updates '
+                                                              'from the cache.\n'
+                                                              'This method is '
+                                                              'superuser access '
+                                                              'only, and watches '
+                                                              'all models in the\n'
+                                                              'controller.',
+                                               'properties': {'Result': {'$ref': '#/definitions/SummaryWatcherID'}},
+                                               'type': 'object'},
+                    'WatchAllModels': {'description': 'WatchAllModels starts '
+                                                      'watching events for all '
+                                                      'models in the\n'
+                                                      'controller. The returned '
+                                                      'AllWatcherId should be used '
+                                                      'with Next on the\n'
+                                                      'AllModelWatcher endpoint to '
+                                                      'receive deltas.',
+                                       'properties': {'Result': {'$ref': '#/definitions/AllWatcherId'}},
+                                       'type': 'object'},
+                    'WatchCloudSpecsChanges': {'description': 'WatchCloudSpecsChanges '
+                                                              'returns a watcher '
+                                                              'for cloud spec '
+                                                              'changes.',
+                                               'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                              'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
+                                               'type': 'object'},
+                    'WatchModelSummaries': {'description': 'WatchModelSummaries '
+                                                           'starts watching the '
+                                                           'summary updates from '
+                                                           'the cache.\n'
+                                                           'Only models that the '
+                                                           'user has access to are '
+                                                           'returned.',
+                                            'properties': {'Result': {'$ref': '#/definitions/SummaryWatcherID'}},
+                                            'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(UserModelList)
+    async def AllModels(self):
+        '''
+        AllModels allows controller administrators to get the list of all the
+        models in the controller.
+
+
+        Returns -> UserModelList
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='AllModels',
+                   version=11,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CloudSpecResults)
+    async def CloudSpec(self, entities=None):
+        '''
+        CloudSpec returns the model's cloud spec.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> CloudSpecResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='CloudSpec',
+                   version=11,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def ConfigSet(self, config=None):
+        '''
+        ConfigSet changes the value of specified controller configuration
+        settings. Only some settings can be changed after bootstrap.
+        Settings that aren't specified in the params are left unchanged.
+
+        config : typing.Mapping[str, typing.Any]
+        Returns -> None
+        '''
+        if config is not None and not isinstance(config, dict):
+            raise Exception("Expected config to be a Mapping, received: {}".format(type(config)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='ConfigSet',
+                   version=11,
+                   params=_params)
+        _params['config'] = config
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ControllerAPIInfoResults)
+    async def ControllerAPIInfoForModels(self, entities=None):
+        '''
+        ControllerAPIInfoForModels returns the controller api connection details for the specified models.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ControllerAPIInfoResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='ControllerAPIInfoForModels',
+                   version=11,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ControllerConfigResult)
+    async def ControllerConfig(self):
+        '''
+        ControllerConfig returns the controller's configuration.
+
+
+        Returns -> ControllerConfigResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='ControllerConfig',
+                   version=11,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ControllerVersionResults)
+    async def ControllerVersion(self):
+        '''
+        ControllerVersion returns the version information associated with this
+        controller binary.
+
+        NOTE: the implementation intentionally does not check for SuperuserAccess
+        as the Version is known even to users with login access.
+
+
+        Returns -> ControllerVersionResults
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='ControllerVersion',
+                   version=11,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def DestroyController(self, destroy_models=None, destroy_storage=None, force=None, max_wait=None, model_timeout=None):
+        '''
+        DestroyController destroys the controller.
+
+        If the args specify the destruction of the models, this method will
+        attempt to do so. Otherwise, if the controller has any non-empty,
+        non-Dead hosted models, then an error with the code
+        params.CodeHasHostedModels will be transmitted.
+
+        destroy_models : bool
+        destroy_storage : bool
+        force : bool
+        max_wait : int
+        model_timeout : int
+        Returns -> None
+        '''
+        if destroy_models is not None and not isinstance(destroy_models, bool):
+            raise Exception("Expected destroy_models to be a bool, received: {}".format(type(destroy_models)))
+
+        if destroy_storage is not None and not isinstance(destroy_storage, bool):
+            raise Exception("Expected destroy_storage to be a bool, received: {}".format(type(destroy_storage)))
+
+        if force is not None and not isinstance(force, bool):
+            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
+
+        if max_wait is not None and not isinstance(max_wait, int):
+            raise Exception("Expected max_wait to be a int, received: {}".format(type(max_wait)))
+
+        if model_timeout is not None and not isinstance(model_timeout, int):
+            raise Exception("Expected model_timeout to be a int, received: {}".format(type(model_timeout)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='DestroyController',
+                   version=11,
+                   params=_params)
+        _params['destroy-models'] = destroy_models
+        _params['destroy-storage'] = destroy_storage
+        _params['force'] = force
+        _params['max-wait'] = max_wait
+        _params['model-timeout'] = model_timeout
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CloudSpecResult)
+    async def GetCloudSpec(self):
+        '''
+        GetCloudSpec constructs the CloudSpec for a validated and authorized model.
+
+
+        Returns -> CloudSpecResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='GetCloudSpec',
+                   version=11,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(UserAccessResults)
+    async def GetControllerAccess(self, entities=None):
+        '''
+        GetControllerAccess returns the level of access the specified users
+        have on the controller.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> UserAccessResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='GetControllerAccess',
+                   version=11,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(HostedModelConfigsResults)
+    async def HostedModelConfigs(self):
+        '''
+        HostedModelConfigs returns all the information that the client needs in
+        order to connect directly with the host model's provider and destroy it
+        directly.
+
+
+        Returns -> HostedModelConfigsResults
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='HostedModelConfigs',
+                   version=11,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResult)
+    async def IdentityProviderURL(self):
+        '''
+        IdentityProviderURL returns the URL of the configured external identity
+        provider for this controller or an empty string if no external identity
+        provider has been configured when the controller was bootstrapped.
+
+        NOTE: the implementation intentionally does not check for SuperuserAccess
+        as the URL is known even to users with login access.
+
+
+        Returns -> StringResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='IdentityProviderURL',
+                   version=11,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(InitiateMigrationResults)
+    async def InitiateMigration(self, specs=None):
+        '''
+        InitiateMigration attempts to begin the migration of one or
+        more models to other controllers.
+
+        specs : typing.Sequence[~MigrationSpec]
+        Returns -> InitiateMigrationResults
+        '''
+        if specs is not None and not isinstance(specs, (bytes, str, list)):
+            raise Exception("Expected specs to be a Sequence, received: {}".format(type(specs)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='InitiateMigration',
+                   version=11,
+                   params=_params)
+        _params['specs'] = specs
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ModelBlockInfoList)
+    async def ListBlockedModels(self):
+        '''
+        ListBlockedModels returns a list of all models on the controller
+        which have a block in place.  The resulting slice is sorted by model
+        name, then owner. Callers must be controller administrators to retrieve the
+        list.
+
+
+        Returns -> ModelBlockInfoList
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='ListBlockedModels',
+                   version=11,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ModelConfigResults)
+    async def ModelConfig(self):
+        '''
+        ModelConfig returns the model config for the controller
+        model.  For information on the current model, use
+        client.ModelGet
+
+
+        Returns -> ModelConfigResults
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='ModelConfig',
+                   version=11,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ModelStatusResults)
+    async def ModelStatus(self, entities=None):
+        '''
+        ModelStatus returns a summary of the model.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ModelStatusResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='ModelStatus',
+                   version=11,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def ModifyControllerAccess(self, changes=None):
+        '''
+        ModifyControllerAccess changes the model access granted to users.
+
+        changes : typing.Sequence[~ModifyControllerAccess]
+        Returns -> ErrorResults
+        '''
+        if changes is not None and not isinstance(changes, (bytes, str, list)):
+            raise Exception("Expected changes to be a Sequence, received: {}".format(type(changes)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='ModifyControllerAccess',
+                   version=11,
+                   params=_params)
+        _params['changes'] = changes
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResult)
+    async def MongoVersion(self):
+        '''
+        MongoVersion allows the introspection of the mongo version per controller
+
+
+        Returns -> StringResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='MongoVersion',
+                   version=11,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def RemoveBlocks(self, all_=None):
+        '''
+        RemoveBlocks removes all the blocks in the controller.
+
+        all_ : bool
+        Returns -> None
+        '''
+        if all_ is not None and not isinstance(all_, bool):
+            raise Exception("Expected all_ to be a bool, received: {}".format(type(all_)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='RemoveBlocks',
+                   version=11,
+                   params=_params)
+        _params['all'] = all_
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SummaryWatcherID)
+    async def WatchAllModelSummaries(self):
+        '''
+        WatchAllModelSummaries starts watching the summary updates from the cache.
+        This method is superuser access only, and watches all models in the
+        controller.
+
+
+        Returns -> SummaryWatcherID
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='WatchAllModelSummaries',
+                   version=11,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(AllWatcherId)
+    async def WatchAllModels(self):
+        '''
+        WatchAllModels starts watching events for all models in the
+        controller. The returned AllWatcherId should be used with Next on the
+        AllModelWatcher endpoint to receive deltas.
+
+
+        Returns -> AllWatcherId
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='WatchAllModels',
+                   version=11,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResults)
+    async def WatchCloudSpecsChanges(self, entities=None):
+        '''
+        WatchCloudSpecsChanges returns a watcher for cloud spec changes.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> NotifyWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='WatchCloudSpecsChanges',
+                   version=11,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SummaryWatcherID)
+    async def WatchModelSummaries(self):
+        '''
+        WatchModelSummaries starts watching the summary updates from the cache.
+        Only models that the user has access to are returned.
+
+
+        Returns -> SummaryWatcherID
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='WatchModelSummaries',
+                   version=11,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
 class ProvisionerFacade(Type):
     name = 'Provisioner'
     version = 11
@@ -1674,7 +2730,6 @@ class ProvisionerFacade(Type):
                                                       'snap-store-assertions',
                                                       'snap-store-proxy-id',
                                                       'snap-store-proxy-url',
-                                                      'apt-mirror',
                                                       'UpdateBehavior'],
                                          'type': 'object'},
                      'ContainerLXDProfile': {'additionalProperties': False,
@@ -2215,6 +3270,7 @@ class ProvisionerFacade(Type):
                                               'container': {'type': 'string'},
                                               'cores': {'type': 'integer'},
                                               'cpu-power': {'type': 'integer'},
+                                              'instance-role': {'type': 'string'},
                                               'instance-type': {'type': 'string'},
                                               'mem': {'type': 'integer'},
                                               'root-disk': {'type': 'integer'},
@@ -2673,20 +3729,6 @@ class ProvisionerFacade(Type):
                               'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                              'Result': {'$ref': '#/definitions/ToolsResults'}},
                               'type': 'object'},
-                    'UpdateStatus': {'description': 'UpdateStatus updates the '
-                                                    'status data of each given '
-                                                    'entity.\n'
-                                                    'TODO(fwereade): WTF. This '
-                                                    'method exists *only* for the '
-                                                    'convenience of the\n'
-                                                    '*client* API -- and is itself '
-                                                    'completely broken -- but we '
-                                                    'still expose it\n'
-                                                    'in every facade with a '
-                                                    'StatusSetter? FFS.',
-                                     'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
-                                                    'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                     'type': 'object'},
                     'WatchAPIHostPorts': {'description': 'WatchAPIHostPorts '
                                                          'watches the API server '
                                                          'addresses.',
@@ -3764,32 +4806,6 @@ class ProvisionerFacade(Type):
         _params = dict()
         msg = dict(type='Provisioner',
                    request='Tools',
-                   version=11,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
-    async def UpdateStatus(self, entities=None):
-        '''
-        UpdateStatus updates the status data of each given entity.
-        TODO(fwereade): WTF. This method exists *only* for the convenience of the
-        *client* API -- and is itself completely broken -- but we still expose it
-        in every facade with a StatusSetter? FFS.
-
-        entities : typing.Sequence[~EntityStatusArgs]
-        Returns -> ErrorResults
-        '''
-        if entities is not None and not isinstance(entities, (bytes, str, list)):
-            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Provisioner',
-                   request='UpdateStatus',
                    version=11,
                    params=_params)
         _params['entities'] = entities

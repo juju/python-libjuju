@@ -1263,8 +1263,7 @@ class CharmsFacade(Type):
                                                                 'type': 'array'}},
                                        'type': 'object'},
                      'CharmMeta': {'additionalProperties': False,
-                                   'properties': {'assumes': {'items': {'type': 'string'},
-                                                              'type': 'array'},
+                                   'properties': {'assumes-expr': {'$ref': '#/definitions/ExpressionTree'},
                                                   'categories': {'items': {'type': 'string'},
                                                                  'type': 'array'},
                                                   'containers': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmContainer'}},
@@ -1328,6 +1327,7 @@ class CharmsFacade(Type):
                                      'properties': {'architecture': {'type': 'string'},
                                                     'hash': {'type': 'string'},
                                                     'id': {'type': 'string'},
+                                                    'instance-key': {'type': 'string'},
                                                     'os': {'type': 'string'},
                                                     'revision': {'type': 'integer'},
                                                     'risk': {'type': 'string'},
@@ -1495,6 +1495,11 @@ class CharmsFacade(Type):
                                                                  'type': 'array'}},
                                       'required': ['results'],
                                       'type': 'object'},
+                     'ExpressionTree': {'additionalProperties': False,
+                                        'properties': {'Expression': {'additionalProperties': True,
+                                                                      'type': 'object'}},
+                                        'required': ['Expression'],
+                                        'type': 'object'},
                      'IsMeteredResult': {'additionalProperties': False,
                                          'properties': {'metered': {'type': 'boolean'}},
                                          'required': ['metered'],
@@ -1568,10 +1573,7 @@ class CharmsFacade(Type):
                                                                  'Result': {'$ref': '#/definitions/CharmOriginResult'}},
                                                   'type': 'object'},
                     'CharmInfo': {'description': 'CharmInfo returns information '
-                                                 'about the requested charm.\n'
-                                                 'NOTE: thumper 2016-06-29, this '
-                                                 'is not a bulk call and probably '
-                                                 'should be.',
+                                                 'about the requested charm.',
                                   'properties': {'Params': {'$ref': '#/definitions/CharmURL'},
                                                  'Result': {'$ref': '#/definitions/Charm'}},
                                   'type': 'object'},
@@ -1715,7 +1717,6 @@ class CharmsFacade(Type):
     async def CharmInfo(self, url=None):
         '''
         CharmInfo returns information about the requested charm.
-        NOTE: thumper 2016-06-29, this is not a bulk call and probably should be.
 
         url : str
         Returns -> Charm
@@ -4659,20 +4660,6 @@ class StorageProvisionerFacade(Type):
                                       'properties': {'Params': {'$ref': '#/definitions/Volumes'},
                                                      'Result': {'$ref': '#/definitions/ErrorResults'}},
                                       'type': 'object'},
-                    'UpdateStatus': {'description': 'UpdateStatus updates the '
-                                                    'status data of each given '
-                                                    'entity.\n'
-                                                    'TODO(fwereade): WTF. This '
-                                                    'method exists *only* for the '
-                                                    'convenience of the\n'
-                                                    '*client* API -- and is itself '
-                                                    'completely broken -- but we '
-                                                    'still expose it\n'
-                                                    'in every facade with a '
-                                                    'StatusSetter? FFS.',
-                                     'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
-                                                    'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                     'type': 'object'},
                     'VolumeAttachmentParams': {'description': 'VolumeAttachmentParams '
                                                               'returns the '
                                                               'parameters for '
@@ -5261,32 +5248,6 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['volumes'] = volumes
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
-    async def UpdateStatus(self, entities=None):
-        '''
-        UpdateStatus updates the status data of each given entity.
-        TODO(fwereade): WTF. This method exists *only* for the convenience of the
-        *client* API -- and is itself completely broken -- but we still expose it
-        in every facade with a StatusSetter? FFS.
-
-        entities : typing.Sequence[~EntityStatusArgs]
-        Returns -> ErrorResults
-        '''
-        if entities is not None and not isinstance(entities, (bytes, str, list)):
-            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='StorageProvisioner',
-                   request='UpdateStatus',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
