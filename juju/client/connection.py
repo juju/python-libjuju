@@ -756,7 +756,6 @@ class Connection:
         elif not self.is_debug_log_connection and not self._receiver_task:
             self._receiver_task = jasyncio.create_task(self._receiver())
 
-
         log.debug("Driver connected to juju %s", self.addr)
         self.monitor.close_called.clear()
 
