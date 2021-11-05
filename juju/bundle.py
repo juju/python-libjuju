@@ -81,7 +81,7 @@ class BundleHandler:
         """Validate the bundle for known issues, raises an error if it
         encounters a known problem
         """
-        apps_dict = bundle.get('applications', bundle.get('services', {}))
+        apps_dict = bundle.get('applications', {})
         for app_name in self.applications:
             app_dict = apps_dict[app_name]
             app_trusted = app_dict.get('trust')
@@ -107,7 +107,7 @@ class BundleHandler:
         apps, args = [], []
 
         default_series = bundle.get('series')
-        apps_dict = bundle.get('applications', bundle.get('services', {}))
+        apps_dict = bundle.get('applications', {})
         for app_name in self.applications:
             app_dict = apps_dict[app_name]
             charm_dir = app_dict['charm']
@@ -156,7 +156,7 @@ class BundleHandler:
                     app_name,
                     charm_url,
                     utils.get_local_charm_metadata(charm_dir),
-                    resources=bundle.get('applications', bundle.get('services', {}))[app_name].get("resources", {}),
+                    resources=bundle.get('applications', {app_name: {}})[app_name].get("resources", {}),
                 )
                 apps_dict[app_name]['charm'] = charm_url
                 apps_dict[app_name]["resources"] = resources
@@ -171,8 +171,8 @@ class BundleHandler:
         relative paths, so backend can't handle them.
 
         """
-        bundle_apps = [self.bundle.get('applications', self.bundle.get('services', {}))]
-        overlay_apps = [overlay.get('applications', self.bundle.get('services', {})) for overlay in self.overlays]
+        bundle_apps = [self.bundle.get('applications', {})]
+        overlay_apps = [overlay.get('applications', {}) for overlay in self.overlays]
 
         for apps in bundle_apps + overlay_apps:
             for app_name, app in apps.items():
@@ -182,7 +182,10 @@ class BundleHandler:
                         # resolve the file
                         if not bundle_dir:
                             raise NotImplementedError('unable to resolve paths for config:include-file for non-local charms')
-                        config_path = (bundle_dir / Path(app['options']['config'].split('//')[1])).resolve()
+                        try:
+                            config_path = (bundle_dir / Path(app['options']['config'].split('//')[1])).resolve()
+                        except IndexError:
+                            raise JujuError('the path for the included file should start with // and be relative to the bundle')
                         if not config_path.exists():
                             raise JujuError('unable to locate config file : %s for : %s' % (config_path, app_name))
 
@@ -202,7 +205,11 @@ class BundleHandler:
                             # resolve the file
                             if not bundle_dir:
                                 raise NotImplementedError('unable to resolve paths for config:include-base64 for non-local charms')
-                            base64_path = (bundle_dir / Path(option_val.split('//')[1])).resolve()
+                            try:
+                                base64_path = (bundle_dir / Path(option_val.split('//')[1])).resolve()
+                            except IndexError:
+                                raise JujuError('the path for the included base64 file should start with // and be relative to the bundle')
+
                             if not base64_path.exists():
                                 raise JujuError('unable to locate the base64 file : %s for : %s' % (base64_path, app_name))
 
@@ -249,7 +256,7 @@ class BundleHandler:
         # gather the names of the removed charms so model.deploy
         # wouldn't wait for them to appear in the model
         for overlay in self.overlays:
-            overlay_apps = overlay.get('applications', overlay.get('services', {}))
+            overlay_apps = overlay.get('applications', {})
             for charm_name, val in overlay_apps.items():
                 if val is None:
                     self.overlay_removed_charms.add(charm_name)
@@ -377,14 +384,12 @@ class BundleHandler:
 
     @property
     def applications(self):
-        apps_dict = self.bundle.get('applications',
-                                    self.bundle.get('services', {}))
+        apps_dict = self.bundle.get('applications', {})
         return set(apps_dict.keys()) - self.overlay_removed_charms
 
     @property
     def applications_specs(self):
-        return self.bundle.get('applications',
-                               self.bundle.get('services', {}))
+        return self.bundle.get('applications', {})
 
     def resolve_relation(self, reference):
         parts = reference.split(":", maxsplit=1)
