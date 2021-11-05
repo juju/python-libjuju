@@ -3015,6 +3015,311 @@ class BundleFacade(Type):
 
 
 
+class CAASAgentFacade(Type):
+    name = 'CAASAgent'
+    version = 2
+    schema =     {'definitions': {'CloudCredential': {'additionalProperties': False,
+                                         'properties': {'attrs': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                  'type': 'object'},
+                                                        'auth-type': {'type': 'string'},
+                                                        'redacted': {'items': {'type': 'string'},
+                                                                     'type': 'array'}},
+                                         'required': ['auth-type'],
+                                         'type': 'object'},
+                     'CloudSpec': {'additionalProperties': False,
+                                   'properties': {'cacertificates': {'items': {'type': 'string'},
+                                                                     'type': 'array'},
+                                                  'credential': {'$ref': '#/definitions/CloudCredential'},
+                                                  'endpoint': {'type': 'string'},
+                                                  'identity-endpoint': {'type': 'string'},
+                                                  'is-controller-cloud': {'type': 'boolean'},
+                                                  'name': {'type': 'string'},
+                                                  'region': {'type': 'string'},
+                                                  'skip-tls-verify': {'type': 'boolean'},
+                                                  'storage-endpoint': {'type': 'string'},
+                                                  'type': {'type': 'string'}},
+                                   'required': ['type', 'name'],
+                                   'type': 'object'},
+                     'CloudSpecResult': {'additionalProperties': False,
+                                         'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                        'result': {'$ref': '#/definitions/CloudSpec'}},
+                                         'type': 'object'},
+                     'CloudSpecResults': {'additionalProperties': False,
+                                          'properties': {'results': {'items': {'$ref': '#/definitions/CloudSpecResult'},
+                                                                     'type': 'array'}},
+                                          'type': 'object'},
+                     'ControllerAPIInfoResult': {'additionalProperties': False,
+                                                 'properties': {'addresses': {'items': {'type': 'string'},
+                                                                              'type': 'array'},
+                                                                'cacert': {'type': 'string'},
+                                                                'error': {'$ref': '#/definitions/Error'}},
+                                                 'required': ['addresses',
+                                                              'cacert'],
+                                                 'type': 'object'},
+                     'ControllerAPIInfoResults': {'additionalProperties': False,
+                                                  'properties': {'results': {'items': {'$ref': '#/definitions/ControllerAPIInfoResult'},
+                                                                             'type': 'array'}},
+                                                  'required': ['results'],
+                                                  'type': 'object'},
+                     'ControllerConfigResult': {'additionalProperties': False,
+                                                'properties': {'config': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                       'type': 'object'}},
+                                                                          'type': 'object'}},
+                                                'required': ['config'],
+                                                'type': 'object'},
+                     'Entities': {'additionalProperties': False,
+                                  'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
+                                                              'type': 'array'}},
+                                  'required': ['entities'],
+                                  'type': 'object'},
+                     'Entity': {'additionalProperties': False,
+                                'properties': {'tag': {'type': 'string'}},
+                                'required': ['tag'],
+                                'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ModelConfigResult': {'additionalProperties': False,
+                                           'properties': {'config': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                  'type': 'object'}},
+                                                                     'type': 'object'}},
+                                           'required': ['config'],
+                                           'type': 'object'},
+                     'ModelTag': {'additionalProperties': False, 'type': 'object'},
+                     'NotifyWatchResult': {'additionalProperties': False,
+                                           'properties': {'NotifyWatcherId': {'type': 'string'},
+                                                          'error': {'$ref': '#/definitions/Error'}},
+                                           'required': ['NotifyWatcherId'],
+                                           'type': 'object'},
+                     'NotifyWatchResults': {'additionalProperties': False,
+                                            'properties': {'results': {'items': {'$ref': '#/definitions/NotifyWatchResult'},
+                                                                       'type': 'array'}},
+                                            'required': ['results'],
+                                            'type': 'object'}},
+     'properties': {'CloudSpec': {'description': "CloudSpec returns the model's "
+                                                 'cloud spec.',
+                                  'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                 'Result': {'$ref': '#/definitions/CloudSpecResults'}},
+                                  'type': 'object'},
+                    'ControllerAPIInfoForModels': {'description': 'ControllerAPIInfoForModels '
+                                                                  'returns the '
+                                                                  'controller api '
+                                                                  'connection '
+                                                                  'details for the '
+                                                                  'specified '
+                                                                  'models.',
+                                                   'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                                  'Result': {'$ref': '#/definitions/ControllerAPIInfoResults'}},
+                                                   'type': 'object'},
+                    'ControllerConfig': {'description': 'ControllerConfig returns '
+                                                        "the controller's "
+                                                        'configuration.',
+                                         'properties': {'Result': {'$ref': '#/definitions/ControllerConfigResult'}},
+                                         'type': 'object'},
+                    'GetCloudSpec': {'description': 'GetCloudSpec constructs the '
+                                                    'CloudSpec for a validated and '
+                                                    'authorized model.',
+                                     'properties': {'Params': {'$ref': '#/definitions/ModelTag'},
+                                                    'Result': {'$ref': '#/definitions/CloudSpecResult'}},
+                                     'type': 'object'},
+                    'ModelConfig': {'description': 'ModelConfig returns the '
+                                                   "current model's configuration.",
+                                    'properties': {'Result': {'$ref': '#/definitions/ModelConfigResult'}},
+                                    'type': 'object'},
+                    'WatchCloudSpecsChanges': {'description': 'WatchCloudSpecsChanges '
+                                                              'returns a watcher '
+                                                              'for cloud spec '
+                                                              'changes.',
+                                               'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                              'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
+                                               'type': 'object'},
+                    'WatchForModelConfigChanges': {'description': 'WatchForModelConfigChanges '
+                                                                  'returns a '
+                                                                  'NotifyWatcher '
+                                                                  'that observes\n'
+                                                                  'changes to the '
+                                                                  'model '
+                                                                  'configuration.\n'
+                                                                  'Note that '
+                                                                  'although the '
+                                                                  'NotifyWatchResult '
+                                                                  'contains an '
+                                                                  'Error field,\n'
+                                                                  "it's not used "
+                                                                  'because we are '
+                                                                  'only returning '
+                                                                  'a single '
+                                                                  'watcher,\n'
+                                                                  'so we use the '
+                                                                  'regular error '
+                                                                  'return.',
+                                                   'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
+                                                   'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(CloudSpecResults)
+    async def CloudSpec(self, entities=None):
+        '''
+        CloudSpec returns the model's cloud spec.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> CloudSpecResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASAgent',
+                   request='CloudSpec',
+                   version=2,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ControllerAPIInfoResults)
+    async def ControllerAPIInfoForModels(self, entities=None):
+        '''
+        ControllerAPIInfoForModels returns the controller api connection details for the specified models.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ControllerAPIInfoResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASAgent',
+                   request='ControllerAPIInfoForModels',
+                   version=2,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ControllerConfigResult)
+    async def ControllerConfig(self):
+        '''
+        ControllerConfig returns the controller's configuration.
+
+
+        Returns -> ControllerConfigResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASAgent',
+                   request='ControllerConfig',
+                   version=2,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CloudSpecResult)
+    async def GetCloudSpec(self):
+        '''
+        GetCloudSpec constructs the CloudSpec for a validated and authorized model.
+
+
+        Returns -> CloudSpecResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASAgent',
+                   request='GetCloudSpec',
+                   version=2,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ModelConfigResult)
+    async def ModelConfig(self):
+        '''
+        ModelConfig returns the current model's configuration.
+
+
+        Returns -> ModelConfigResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASAgent',
+                   request='ModelConfig',
+                   version=2,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResults)
+    async def WatchCloudSpecsChanges(self, entities=None):
+        '''
+        WatchCloudSpecsChanges returns a watcher for cloud spec changes.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> NotifyWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASAgent',
+                   request='WatchCloudSpecsChanges',
+                   version=2,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResult)
+    async def WatchForModelConfigChanges(self):
+        '''
+        WatchForModelConfigChanges returns a NotifyWatcher that observes
+        changes to the model configuration.
+        Note that although the NotifyWatchResult contains an Error field,
+        it's not used because we are only returning a single watcher,
+        so we use the regular error return.
+
+
+        Returns -> NotifyWatchResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASAgent',
+                   request='WatchForModelConfigChanges',
+                   version=2,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
 class CAASUnitProvisionerFacade(Type):
     name = 'CAASUnitProvisioner'
     version = 2
@@ -3071,6 +3376,196 @@ class CAASUnitProvisionerFacade(Type):
                                                                 'type': 'array'}},
                                      'required': ['results'],
                                      'type': 'object'},
+                     'Charm': {'additionalProperties': False,
+                               'properties': {'actions': {'$ref': '#/definitions/CharmActions'},
+                                              'config': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmOption'}},
+                                                         'type': 'object'},
+                                              'lxd-profile': {'$ref': '#/definitions/CharmLXDProfile'},
+                                              'manifest': {'$ref': '#/definitions/CharmManifest'},
+                                              'meta': {'$ref': '#/definitions/CharmMeta'},
+                                              'metrics': {'$ref': '#/definitions/CharmMetrics'},
+                                              'revision': {'type': 'integer'},
+                                              'url': {'type': 'string'}},
+                               'required': ['revision', 'url', 'config'],
+                               'type': 'object'},
+                     'CharmActionSpec': {'additionalProperties': False,
+                                         'properties': {'description': {'type': 'string'},
+                                                        'params': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                'type': 'object'}},
+                                                                   'type': 'object'}},
+                                         'required': ['description', 'params'],
+                                         'type': 'object'},
+                     'CharmActions': {'additionalProperties': False,
+                                      'properties': {'specs': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmActionSpec'}},
+                                                               'type': 'object'}},
+                                      'type': 'object'},
+                     'CharmBase': {'additionalProperties': False,
+                                   'properties': {'architectures': {'items': {'type': 'string'},
+                                                                    'type': 'array'},
+                                                  'channel': {'type': 'string'},
+                                                  'name': {'type': 'string'}},
+                                   'type': 'object'},
+                     'CharmContainer': {'additionalProperties': False,
+                                        'properties': {'mounts': {'items': {'$ref': '#/definitions/CharmMount'},
+                                                                  'type': 'array'},
+                                                       'resource': {'type': 'string'}},
+                                        'type': 'object'},
+                     'CharmDeployment': {'additionalProperties': False,
+                                         'properties': {'min-version': {'type': 'string'},
+                                                        'mode': {'type': 'string'},
+                                                        'service': {'type': 'string'},
+                                                        'type': {'type': 'string'}},
+                                         'required': ['type',
+                                                      'mode',
+                                                      'service',
+                                                      'min-version'],
+                                         'type': 'object'},
+                     'CharmDevice': {'additionalProperties': False,
+                                     'properties': {'CountMax': {'type': 'integer'},
+                                                    'CountMin': {'type': 'integer'},
+                                                    'Description': {'type': 'string'},
+                                                    'Name': {'type': 'string'},
+                                                    'Type': {'type': 'string'}},
+                                     'required': ['Name',
+                                                  'Description',
+                                                  'Type',
+                                                  'CountMin',
+                                                  'CountMax'],
+                                     'type': 'object'},
+                     'CharmLXDProfile': {'additionalProperties': False,
+                                         'properties': {'config': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                   'type': 'object'},
+                                                        'description': {'type': 'string'},
+                                                        'devices': {'patternProperties': {'.*': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                                                 'type': 'object'}},
+                                                                    'type': 'object'}},
+                                         'required': ['config',
+                                                      'description',
+                                                      'devices'],
+                                         'type': 'object'},
+                     'CharmManifest': {'additionalProperties': False,
+                                       'properties': {'bases': {'items': {'$ref': '#/definitions/CharmBase'},
+                                                                'type': 'array'}},
+                                       'type': 'object'},
+                     'CharmMeta': {'additionalProperties': False,
+                                   'properties': {'assumes-expr': {'$ref': '#/definitions/ExpressionTree'},
+                                                  'categories': {'items': {'type': 'string'},
+                                                                 'type': 'array'},
+                                                  'containers': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmContainer'}},
+                                                                 'type': 'object'},
+                                                  'deployment': {'$ref': '#/definitions/CharmDeployment'},
+                                                  'description': {'type': 'string'},
+                                                  'devices': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmDevice'}},
+                                                              'type': 'object'},
+                                                  'extra-bindings': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                     'type': 'object'},
+                                                  'min-juju-version': {'type': 'string'},
+                                                  'name': {'type': 'string'},
+                                                  'payload-classes': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmPayloadClass'}},
+                                                                      'type': 'object'},
+                                                  'peers': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmRelation'}},
+                                                            'type': 'object'},
+                                                  'provides': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmRelation'}},
+                                                               'type': 'object'},
+                                                  'requires': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmRelation'}},
+                                                               'type': 'object'},
+                                                  'resources': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmResourceMeta'}},
+                                                                'type': 'object'},
+                                                  'series': {'items': {'type': 'string'},
+                                                             'type': 'array'},
+                                                  'storage': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmStorage'}},
+                                                              'type': 'object'},
+                                                  'subordinate': {'type': 'boolean'},
+                                                  'summary': {'type': 'string'},
+                                                  'tags': {'items': {'type': 'string'},
+                                                           'type': 'array'},
+                                                  'terms': {'items': {'type': 'string'},
+                                                            'type': 'array'}},
+                                   'required': ['name',
+                                                'summary',
+                                                'description',
+                                                'subordinate'],
+                                   'type': 'object'},
+                     'CharmMetric': {'additionalProperties': False,
+                                     'properties': {'description': {'type': 'string'},
+                                                    'type': {'type': 'string'}},
+                                     'required': ['type', 'description'],
+                                     'type': 'object'},
+                     'CharmMetrics': {'additionalProperties': False,
+                                      'properties': {'metrics': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmMetric'}},
+                                                                 'type': 'object'},
+                                                     'plan': {'$ref': '#/definitions/CharmPlan'}},
+                                      'required': ['metrics', 'plan'],
+                                      'type': 'object'},
+                     'CharmMount': {'additionalProperties': False,
+                                    'properties': {'location': {'type': 'string'},
+                                                   'storage': {'type': 'string'}},
+                                    'type': 'object'},
+                     'CharmOption': {'additionalProperties': False,
+                                     'properties': {'default': {'additionalProperties': True,
+                                                                'type': 'object'},
+                                                    'description': {'type': 'string'},
+                                                    'type': {'type': 'string'}},
+                                     'required': ['type'],
+                                     'type': 'object'},
+                     'CharmPayloadClass': {'additionalProperties': False,
+                                           'properties': {'name': {'type': 'string'},
+                                                          'type': {'type': 'string'}},
+                                           'required': ['name', 'type'],
+                                           'type': 'object'},
+                     'CharmPlan': {'additionalProperties': False,
+                                   'properties': {'required': {'type': 'boolean'}},
+                                   'required': ['required'],
+                                   'type': 'object'},
+                     'CharmRelation': {'additionalProperties': False,
+                                       'properties': {'interface': {'type': 'string'},
+                                                      'limit': {'type': 'integer'},
+                                                      'name': {'type': 'string'},
+                                                      'optional': {'type': 'boolean'},
+                                                      'role': {'type': 'string'},
+                                                      'scope': {'type': 'string'}},
+                                       'required': ['name',
+                                                    'role',
+                                                    'interface',
+                                                    'optional',
+                                                    'limit',
+                                                    'scope'],
+                                       'type': 'object'},
+                     'CharmResourceMeta': {'additionalProperties': False,
+                                           'properties': {'description': {'type': 'string'},
+                                                          'name': {'type': 'string'},
+                                                          'path': {'type': 'string'},
+                                                          'type': {'type': 'string'}},
+                                           'required': ['name',
+                                                        'type',
+                                                        'path',
+                                                        'description'],
+                                           'type': 'object'},
+                     'CharmStorage': {'additionalProperties': False,
+                                      'properties': {'count-max': {'type': 'integer'},
+                                                     'count-min': {'type': 'integer'},
+                                                     'description': {'type': 'string'},
+                                                     'location': {'type': 'string'},
+                                                     'minimum-size': {'type': 'integer'},
+                                                     'name': {'type': 'string'},
+                                                     'properties': {'items': {'type': 'string'},
+                                                                    'type': 'array'},
+                                                     'read-only': {'type': 'boolean'},
+                                                     'shared': {'type': 'boolean'},
+                                                     'type': {'type': 'string'}},
+                                      'required': ['name',
+                                                   'description',
+                                                   'type',
+                                                   'shared',
+                                                   'read-only',
+                                                   'count-min',
+                                                   'count-max',
+                                                   'minimum-size'],
+                                      'type': 'object'},
+                     'CharmURL': {'additionalProperties': False,
+                                  'properties': {'url': {'type': 'string'}},
+                                  'required': ['url'],
+                                  'type': 'object'},
                      'ConfigResult': {'additionalProperties': False,
                                       'properties': {'config': {'patternProperties': {'.*': {'additionalProperties': True,
                                                                                              'type': 'object'}},
@@ -3125,6 +3620,11 @@ class CAASUnitProvisionerFacade(Type):
                                                                  'type': 'array'}},
                                       'required': ['results'],
                                       'type': 'object'},
+                     'ExpressionTree': {'additionalProperties': False,
+                                        'properties': {'Expression': {'additionalProperties': True,
+                                                                      'type': 'object'}},
+                                        'required': ['Expression'],
+                                        'type': 'object'},
                      'IntResult': {'additionalProperties': False,
                                    'properties': {'error': {'$ref': '#/definitions/Error'},
                                                   'result': {'type': 'integer'}},
@@ -3352,6 +3852,7 @@ class CAASUnitProvisionerFacade(Type):
                                               'container': {'type': 'string'},
                                               'cores': {'type': 'integer'},
                                               'cpu-power': {'type': 'integer'},
+                                              'instance-role': {'type': 'string'},
                                               'instance-type': {'type': 'string'},
                                               'mem': {'type': 'integer'},
                                               'root-disk': {'type': 'integer'},
@@ -3364,7 +3865,14 @@ class CAASUnitProvisionerFacade(Type):
                                               'zones': {'items': {'type': 'string'},
                                                         'type': 'array'}},
                                'type': 'object'}},
-     'properties': {'ApplicationsConfig': {'description': 'ApplicationsConfig '
+     'properties': {'ApplicationCharmInfo': {'description': 'ApplicationCharmInfo '
+                                                            'returns information '
+                                                            'about an '
+                                                            "application's charm.",
+                                             'properties': {'Params': {'$ref': '#/definitions/Entity'},
+                                                            'Result': {'$ref': '#/definitions/Charm'}},
+                                             'type': 'object'},
+                    'ApplicationsConfig': {'description': 'ApplicationsConfig '
                                                           'returns the config for '
                                                           'the specified '
                                                           'applications.',
@@ -3387,6 +3895,11 @@ class CAASUnitProvisionerFacade(Type):
                                           'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                          'Result': {'$ref': '#/definitions/BoolResults'}},
                                           'type': 'object'},
+                    'CharmInfo': {'description': 'CharmInfo returns information '
+                                                 'about the requested charm.',
+                                  'properties': {'Params': {'$ref': '#/definitions/CharmURL'},
+                                                 'Result': {'$ref': '#/definitions/Charm'}},
+                                  'type': 'object'},
                     'ClearApplicationsResources': {'description': 'ClearApplicationsResources '
                                                                   'clears the '
                                                                   'flags which '
@@ -3444,9 +3957,14 @@ class CAASUnitProvisionerFacade(Type):
                                                 'properties': {'Params': {'$ref': '#/definitions/UpdateApplicationUnitArgs'},
                                                                'Result': {'$ref': '#/definitions/UpdateApplicationUnitResults'}},
                                                 'type': 'object'},
+                    'Watch': {'description': 'Watch starts a NotifyWatcher for '
+                                             'each entity given.',
+                              'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                             'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
+                              'type': 'object'},
                     'WatchApplications': {'description': 'WatchApplications starts '
                                                          'a StringsWatcher to '
-                                                         'watch applications '
+                                                         'watch applications\n'
                                                          'deployed to this model.',
                                           'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
                                           'type': 'object'},
@@ -3481,6 +3999,29 @@ class CAASUnitProvisionerFacade(Type):
                                      'type': 'object'}},
      'type': 'object'}
     
+
+    @ReturnMapping(Charm)
+    async def ApplicationCharmInfo(self, tag=None):
+        '''
+        ApplicationCharmInfo returns information about an application's charm.
+
+        tag : str
+        Returns -> Charm
+        '''
+        if tag is not None and not isinstance(tag, (bytes, str)):
+            raise Exception("Expected tag to be a str, received: {}".format(type(tag)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASUnitProvisioner',
+                   request='ApplicationCharmInfo',
+                   version=2,
+                   params=_params)
+        _params['tag'] = tag
+        reply = await self.rpc(msg)
+        return reply
+
+
 
     @ReturnMapping(ApplicationGetConfigResults)
     async def ApplicationsConfig(self, entities=None):
@@ -3546,6 +4087,29 @@ class CAASUnitProvisionerFacade(Type):
                    version=2,
                    params=_params)
         _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(Charm)
+    async def CharmInfo(self, url=None):
+        '''
+        CharmInfo returns information about the requested charm.
+
+        url : str
+        Returns -> Charm
+        '''
+        if url is not None and not isinstance(url, (bytes, str)):
+            raise Exception("Expected url to be a str, received: {}".format(type(url)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASUnitProvisioner',
+                   request='CharmInfo',
+                   version=2,
+                   params=_params)
+        _params['url'] = url
         reply = await self.rpc(msg)
         return reply
 
@@ -3715,10 +4279,34 @@ class CAASUnitProvisionerFacade(Type):
 
 
 
+    @ReturnMapping(NotifyWatchResults)
+    async def Watch(self, entities=None):
+        '''
+        Watch starts a NotifyWatcher for each entity given.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> NotifyWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASUnitProvisioner',
+                   request='Watch',
+                   version=2,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
     @ReturnMapping(StringsWatchResult)
     async def WatchApplications(self):
         '''
-        WatchApplications starts a StringsWatcher to watch applications deployed to this model.
+        WatchApplications starts a StringsWatcher to watch applications
+        deployed to this model.
 
 
         Returns -> StringsWatchResult
@@ -6279,6 +6867,7 @@ class CrossModelRelationsFacade(Type):
                      'RegisterRemoteRelationArg': {'additionalProperties': False,
                                                    'properties': {'application-token': {'type': 'string'},
                                                                   'bakery-version': {'type': 'integer'},
+                                                                  'consume-version': {'type': 'integer'},
                                                                   'local-endpoint-name': {'type': 'string'},
                                                                   'macaroons': {'items': {'$ref': '#/definitions/Macaroon'},
                                                                                 'type': 'array'},
@@ -6471,7 +7060,7 @@ class CrossModelRelationsFacade(Type):
                                                'properties': {'Params': {'$ref': '#/definitions/RemoteRelationsChanges'},
                                                               'Result': {'$ref': '#/definitions/ErrorResults'}},
                                                'type': 'object'},
-                    'RegisterRemoteRelations': {'description': 'RegisterRemoteRelationArgs '
+                    'RegisterRemoteRelations': {'description': 'RegisterRemoteRelations '
                                                                'sets up the model '
                                                                'to participate\n'
                                                                'in the specified '
@@ -6600,7 +7189,7 @@ class CrossModelRelationsFacade(Type):
     @ReturnMapping(RegisterRemoteRelationResults)
     async def RegisterRemoteRelations(self, relations=None):
         '''
-        RegisterRemoteRelationArgs sets up the model to participate
+        RegisterRemoteRelations sets up the model to participate
         in the specified relations. This operation is idempotent.
 
         relations : typing.Sequence[~RegisterRemoteRelationArg]
@@ -7231,6 +7820,7 @@ class HighAvailabilityFacade(Type):
                                               'container': {'type': 'string'},
                                               'cores': {'type': 'integer'},
                                               'cpu-power': {'type': 'integer'},
+                                              'instance-role': {'type': 'string'},
                                               'instance-type': {'type': 'string'},
                                               'mem': {'type': 'integer'},
                                               'root-disk': {'type': 'integer'},
@@ -10726,7 +11316,8 @@ class ProxyUpdaterFacade(Type):
                                                   'no-proxy'],
                                      'type': 'object'},
                      'ProxyConfigResult': {'additionalProperties': False,
-                                           'properties': {'apt-proxy-settings': {'$ref': '#/definitions/ProxyConfig'},
+                                           'properties': {'apt-mirror': {'type': 'string'},
+                                                          'apt-proxy-settings': {'$ref': '#/definitions/ProxyConfig'},
                                                           'error': {'$ref': '#/definitions/Error'},
                                                           'juju-proxy-settings': {'$ref': '#/definitions/ProxyConfig'},
                                                           'legacy-proxy-settings': {'$ref': '#/definitions/ProxyConfig'},
@@ -10751,12 +11342,15 @@ class ProxyUpdaterFacade(Type):
                     'WatchForProxyConfigAndAPIHostPortChanges': {'description': 'WatchForProxyConfigAndAPIHostPortChanges '
                                                                                 'watches '
                                                                                 'for '
-                                                                                'cleanups '
+                                                                                'changes '
                                                                                 'to '
-                                                                                'be '
-                                                                                'perfomed '
-                                                                                'in '
-                                                                                'state',
+                                                                                'the '
+                                                                                'proxy '
+                                                                                'and '
+                                                                                'api '
+                                                                                'host '
+                                                                                'port '
+                                                                                'settings.',
                                                                  'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                                                 'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
                                                                  'type': 'object'}},
@@ -10789,7 +11383,7 @@ class ProxyUpdaterFacade(Type):
     @ReturnMapping(NotifyWatchResults)
     async def WatchForProxyConfigAndAPIHostPortChanges(self, entities=None):
         '''
-        WatchForProxyConfigAndAPIHostPortChanges watches for cleanups to be perfomed in state
+        WatchForProxyConfigAndAPIHostPortChanges watches for changes to the proxy and api host port settings.
 
         entities : typing.Sequence[~Entity]
         Returns -> NotifyWatchResults
@@ -11083,7 +11677,8 @@ class RemoteRelationsFacade(Type):
                                       'type': 'object'},
                      'Macaroon': {'additionalProperties': False, 'type': 'object'},
                      'RemoteApplication': {'additionalProperties': False,
-                                           'properties': {'is-consumer-proxy': {'type': 'boolean'},
+                                           'properties': {'consume-version': {'type': 'integer'},
+                                                          'is-consumer-proxy': {'type': 'boolean'},
                                                           'life': {'type': 'string'},
                                                           'macaroon': {'$ref': '#/definitions/Macaroon'},
                                                           'model-uuid': {'type': 'string'},
@@ -11812,6 +12407,7 @@ class ResourcesFacade(Type):
                                      'properties': {'architecture': {'type': 'string'},
                                                     'hash': {'type': 'string'},
                                                     'id': {'type': 'string'},
+                                                    'instance-key': {'type': 'string'},
                                                     'os': {'type': 'string'},
                                                     'revision': {'type': 'integer'},
                                                     'risk': {'type': 'string'},
@@ -12134,7 +12730,7 @@ class SSHClientFacade(Type):
                                                      'preferred public network '
                                                      'address for one\n'
                                                      'or more entities. Machines '
-                                                     'and units are suppored.',
+                                                     'and units are supported.',
                                       'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                      'Result': {'$ref': '#/definitions/SSHAddressResults'}},
                                       'type': 'object'},
@@ -12225,7 +12821,7 @@ class SSHClientFacade(Type):
     async def PublicAddress(self, entities=None):
         '''
         PublicAddress reports the preferred public network address for one
-        or more entities. Machines and units are suppored.
+        or more entities. Machines and units are supported.
 
         entities : typing.Sequence[~Entity]
         Returns -> SSHAddressResults

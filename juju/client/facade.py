@@ -256,6 +256,8 @@ class Args(list):
                     self.append((name, rtype))
 
     def do_explode(self, kind):
+        if kind is Any:
+            return False
         if kind in basic_types or type(kind) is typing.TypeVar:
             return False
         if typing_inspect.is_generic_type(kind) and issubclass(typing_inspect.get_origin(kind), Sequence):
