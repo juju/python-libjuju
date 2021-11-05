@@ -19,15 +19,14 @@ async def test_unit_public_address(event_loop):
             num_units=2,
         )
 
-        await model.block_until(
-            lambda: app.units,
-            timeout=480,
-        )
+        # wait for the units to come up
+        await model.block_until(lambda: app.units, timeout=480)
 
+        # make sure we have some units to test with
         assert len(app.units) >= 1
 
         for unit in app.units:
-            addr = await unit.get_public_address(timeout=60 * 4)
+            addr = await unit.get_public_address(timeout=480)
             assert addr, 'unit public address not set'
 
 
