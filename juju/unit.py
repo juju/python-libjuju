@@ -119,7 +119,7 @@ class Unit(model.ModelEntity):
             if self.public_address is None:
                 await self.model.block_until(
                     lambda: self.public_address,
-                    timeout=60)
+                    timeout=timeout)
         except jasyncio.TimeoutError:
             return None
         return self.public_address
