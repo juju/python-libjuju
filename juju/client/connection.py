@@ -690,11 +690,15 @@ class Connection:
         async with monitor.reconnecting:
             await self.close(to_reconnect=True)
             connector = self._connect if self.is_debug_log_connection else self._connect_with_login
-            await connector(
+            res = await connector(
                 [(self.endpoint, self.cacert)]
                 if not self.endpoints else
                 self.endpoints
             )
+            if connector is self._connect_with_login:
+                self._build_facades(res.get('facades', {}))
+                if not self._pinger_task:
+                    self._pinger_task = jasyncio.create_task(self._pinger())
 
     async def _connect(self, endpoints):
         if len(endpoints) == 0:
@@ -752,10 +756,6 @@ class Connection:
         elif not self.is_debug_log_connection and not self._receiver_task:
             self._receiver_task = jasyncio.create_task(self._receiver())
 
-        #  In any type of connection, if we don't have a _pinger_task
-        #  yet, then schedule a new one
-        if not self._pinger_task:
-            self._pinger_task = jasyncio.create_task(self._pinger())
 
         log.debug("Driver connected to juju %s", self.addr)
         self.monitor.close_called.clear()
@@ -799,8 +799,6 @@ class Connection:
         finally:
             if not success:
                 await self.close()
-            else:
-                self._pinger_task = jasyncio.create_task(self._pinger())
 
     async def _connect_with_redirect(self, endpoints):
         try:
@@ -811,6 +809,8 @@ class Connection:
                 raise
             login_result = await self._connect_with_login(e.endpoints)
         self._build_facades(login_result.get('facades', {}))
+        if not self._pinger_task:
+            self._pinger_task = jasyncio.create_task(self._pinger())
 
     def _build_facades(self, facades):
         self.facades.clear()
