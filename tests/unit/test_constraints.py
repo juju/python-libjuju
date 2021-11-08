@@ -33,6 +33,10 @@ class TestConstraints(unittest.TestCase):
         self.assertEqual(_("10M"), 10)
         self.assertEqual(_("10"), 10)
         self.assertEqual(_("foo,bar"), "foo,bar")
+        self.assertEqual(_("false"), False)
+        self.assertEqual(_("true"), True)
+        self.assertEqual(_("FALSE"), False)
+        self.assertEqual(_("TRUE"), True)
 
     def test_normalize_list_val(self):
         _ = constraints.normalize_list_value
@@ -128,3 +132,4 @@ class TestConstraints(unittest.TestCase):
                  "2ndattr": "another-attr"
              }}
         )
+    
