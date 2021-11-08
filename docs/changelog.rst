@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+Next Release
+^^^^^
+
+* Legacy "services" are removed in https://github.com/juju/python-libjuju/pull/566
+
 2.9.4
 ^^^^^
 
