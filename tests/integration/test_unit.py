@@ -12,9 +12,9 @@ from .. import base
 async def test_unit_public_address(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy(
-            'cs:ubuntu-0',
+            'ch:ubuntu',
             application_name='ubuntu',
-            series='trusty',
+            series='bionic',
             channel='stable',
             num_units=2,
         )
