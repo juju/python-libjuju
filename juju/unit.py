@@ -2,7 +2,7 @@ import logging
 
 import pyrfc3339
 
-from . import model, tag
+from . import model, tag, jasyncio
 from .annotationhelper import _get_annotations, _set_annotations
 from .client import client
 
@@ -101,6 +101,28 @@ class Unit(model.ModelEntity):
 
         return await app_facade.DestroyUnits(unit_names=[self.name])
     remove = destroy
+
+    async def get_public_address(self, timeout=60):
+        """Return the public address of this unit. Waits until the unit is
+        assigned a public address.
+
+        In case of a timeout, a None is returned (instead of a
+        TimeoutError)
+
+        :param int timeout (60): Maximum seconds to wait for unit to
+        be assigned an address.
+
+        :return int public-address
+
+        """
+        try:
+            if self.public_address is None:
+                await self.model.block_until(
+                    lambda: self.public_address,
+                    timeout=timeout)
+        except jasyncio.TimeoutError:
+            return None
+        return self.public_address
 
     def get_resources(self, details=False):
         """Return resources for this unit.
