@@ -1533,16 +1533,15 @@ class Model:
         return ss['SupportedSeries'][0]
 
     async def deploy(
-            self, entity_url, application_name=None, bind=None, budget=None,
+            self, entity_url, application_name=None, bind=None,
             channel=None, config=None, constraints=None, force=False,
-            num_units=1, plan=None, resources=None, series=None, storage=None,
-            to=None, devices=None, trust=False):
+            num_units=1, overlays=[], plan=None, resources=None, series=None,
+            storage=None, to=None, devices=None, trust=False):
         """Deploy a new service or bundle.
 
         :param str entity_url: Charm or bundle url
         :param str application_name: Name to give the service
         :param dict bind: <charm endpoint>:<network space> pairs
-        :param dict budget: <budget name>:<limit> pairs
         :param str channel: Charm store channel from which to retrieve
             the charm or bundle, e.g. 'edge'
         :param dict config: Charm configuration dictionary
@@ -1551,6 +1550,7 @@ class Model:
         :param bool force: Allow charm to be deployed to a machine running
             an unsupported series
         :param int num_units: Number of units to deploy
+        :param [] overlays: Bundles to overlay on the primary bundle, applied in order
         :param str plan: Plan under which to deploy charm
         :param dict resources: <resource name>:<file path> pairs
         :param str series: Series on which to deploy
@@ -1597,10 +1597,10 @@ class Model:
         series = res.origin.series or series
         if res.is_bundle:
             handler = BundleHandler(self, trusted=trust, forced=force)
-            await handler.fetch_plan(url, res.origin)
+            await handler.fetch_plan(url, res.origin, overlays=overlays)
             await handler.execute_plan()
             extant_apps = {app for app in self.applications}
-            pending_apps = set(handler.applications) - extant_apps
+            pending_apps = handler.applications - extant_apps
             if pending_apps:
                 # new apps will usually be in the model by now, but if some
                 # haven't made it yet we'll need to wait on them to be added
@@ -1612,6 +1612,8 @@ class Model:
             return [app for name, app in self.applications.items()
                     if name in handler.applications]
         else:
+            if overlays:
+                raise JujuError("options provided but not supported when deploying a charm: overlays=%s" % overlays)
             # XXX: we're dropping local resources here, but we don't
             # actually support them yet anyway
             if not res.is_local:

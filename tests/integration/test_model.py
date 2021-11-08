@@ -23,13 +23,15 @@ from .. import base
 MB = 1
 GB = 1024
 SSH_KEY = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCsYMJGNGG74HAJha3n2CFmWYsOOaORnJK6VqNy86pj0MIpvRXBzFzVy09uPQ66GOQhTEoJHEqE77VMui7+62AcMXT+GG7cFHcnU8XVQsGM6UirCcNyWNysfiEMoAdZScJf/GvoY87tMEszhZIUV37z8PUBx6twIqMdr31W1J0IaPa+sV6FEDadeLaNTvancDcHK1zuKsL39jzAg7+LYjKJfEfrsQP+lj/EQcjtKqlhVS5kzsJVfx8ZEd0xhW5G7N6bCdKNalS8mKCMaBXJpijNQ82AiyqCIDCRrre2To0/i7pTjRiL0U9f9mV3S4NJaQaokR050w/ZLySFf6F7joJT mathijs@Qrama-Mathijs'  # noqa
+HERE_DIR = Path(__file__).absolute().parent
+TESTS_DIR = HERE_DIR.parent
+OVERLAYS_DIR = HERE_DIR / 'bundle' / 'test-overlays'
 
 
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_deploy_local_bundle_dir(event_loop):
-    tests_dir = Path(__file__).absolute().parent.parent
-    bundle_path = tests_dir / 'bundle'
+    bundle_path = TESTS_DIR / 'bundle'
 
     async with base.CleanModel() as model:
         await model.deploy(str(bundle_path))
@@ -45,8 +47,7 @@ async def test_deploy_local_bundle_dir(event_loop):
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_deploy_local_bundle_file(event_loop):
-    tests_dir = Path(__file__).absolute().parent.parent
-    bundle_path = tests_dir / 'bundle'
+    bundle_path = TESTS_DIR / 'bundle'
     mini_bundle_file_path = bundle_path / 'mini-bundle.yaml'
 
     async with base.CleanModel() as model:
@@ -62,9 +63,41 @@ async def test_deploy_local_bundle_file(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_deploy_local_bundle_include_file(event_loop):
+    bundle_dir = TESTS_DIR / 'integration' / 'bundle'
+    bundle_yaml_path = bundle_dir / 'bundle-include-file.yaml'
+
+    async with base.CleanModel() as model:
+        await model.deploy(str(bundle_yaml_path))
+
+        mysql = model.applications.get('mysql', None)
+        ghost = model.applications.get('ghost', None)
+        test = model.applications.get('test', None)
+        assert mysql and ghost and test
+        assert ghost.config.get('port', None) == 2369
+        assert ghost.config.get('url', "") == 'http://my-ghost.blg'
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_deploy_local_bundle_include_base64(event_loop):
+    bundle_dir = TESTS_DIR / 'integration' / 'bundle'
+    bundle_yaml_path = bundle_dir / 'bundle-include-base64.yaml'
+
+    async with base.CleanModel() as model:
+        await model.deploy(str(bundle_yaml_path))
+
+        mysql = model.applications.get('mysql', None)
+        ghost = model.applications.get('ghost', None)
+        test = model.applications.get('test', None)
+        assert mysql and ghost and test
+        assert mysql.config.get('tuning-level', '') == 'fast'
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_deploy_bundle_local_charms(event_loop):
-    tests_dir = Path(__file__).absolute().parent
-    bundle_path = tests_dir / 'bundle' / 'local.yaml'
+    bundle_path = TESTS_DIR / 'integration' / 'bundle' / 'local.yaml'
 
     async with base.CleanModel() as model:
         await model.deploy(bundle_path)
@@ -80,8 +113,7 @@ async def test_deploy_bundle_local_charms(event_loop):
 @pytest.mark.asyncio
 async def test_deploy_invalid_bundle(event_loop):
     pytest.skip('test_deploy_invalid_bundle intermittent test failure')
-    tests_dir = Path(__file__).absolute().parent.parent
-    bundle_path = tests_dir / 'bundle' / 'invalid.yaml'
+    bundle_path = TESTS_DIR / 'bundle' / 'invalid.yaml'
     async with base.CleanModel() as model:
         with pytest.raises(JujuError):
             await model.deploy(str(bundle_path))
@@ -90,9 +122,7 @@ async def test_deploy_invalid_bundle(event_loop):
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_deploy_local_charm(event_loop):
-    from pathlib import Path
-    tests_dir = Path(__file__).absolute().parent.parent
-    charm_path = tests_dir / 'charm'
+    charm_path = TESTS_DIR / 'charm'
 
     async with base.CleanModel() as model:
         await model.deploy(str(charm_path))
@@ -104,9 +134,7 @@ async def test_deploy_local_charm(event_loop):
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_wait_local_charm_blocked(event_loop):
-    from pathlib import Path
-    tests_dir = Path(__file__).absolute().parent.parent
-    charm_path = tests_dir / 'charm'
+    charm_path = TESTS_DIR / 'charm'
 
     async with base.CleanModel() as model:
         await model.deploy(str(charm_path), config={'status': 'blocked'})
@@ -121,9 +149,7 @@ async def test_wait_local_charm_blocked(event_loop):
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_wait_local_charm_waiting_timeout(event_loop):
-    from pathlib import Path
-    tests_dir = Path(__file__).absolute().parent.parent
-    charm_path = tests_dir / 'charm'
+    charm_path = TESTS_DIR / 'charm'
 
     async with base.CleanModel() as model:
         await model.deploy(str(charm_path), config={'status': 'waiting'})
@@ -139,16 +165,75 @@ async def test_deploy_bundle(event_loop):
     async with base.CleanModel() as model:
         await model.deploy('cs:bundle/wiki-simple')
 
+        # wiki-simple bundle deploys wiki and mysql and relates them
         for app in ('wiki', 'mysql'):
             assert app in model.applications
 
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_deploy_local_bundle_with_overlay_multi(event_loop):
+    async with base.CleanModel() as model:
+        bundle_with_overlay_path = OVERLAYS_DIR / 'bundle-with-overlay-multi.yaml'
+        await model.deploy(bundle_with_overlay_path)
+
+        # this bundle deploys mysql and ghost apps and relates them,
+        # but the overlay attached removes ghost, so
+        assert 'mysql' in model.applications
+        assert 'ghost' not in model.applications
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_deploy_bundle_with_overlay_as_argument(event_loop):
+    async with base.CleanModel() as model:
+        overlay_path = OVERLAYS_DIR / 'wiki-simple-overlay.yaml'
+
+        await model.deploy('cs:bundle/wiki-simple', overlays=[overlay_path])
+        # our overlay requests to remove mysql and add memcached and
+        # relate wiki with memcached, so
+        assert 'mysql' not in model.applications
+        assert 'memcached' in model.applications
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_deploy_bundle_with_multi_overlay_as_argument(event_loop):
+    async with base.CleanModel() as model:
+        overlay_path = OVERLAYS_DIR / 'wiki-multi-overlay.yaml'
+
+        await model.deploy('cs:bundle/wiki-simple', overlays=[overlay_path])
+        # our overlay has multiple parts, the first part removes mysql
+        # and adds memcached, and the second once reverses it, so
+        assert 'mysql' in model.applications
+        assert 'memcached' not in model.applications
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_deploy_bundle_with_multiple_overlays_with_include_files(event_loop):
+    async with base.CleanModel() as model:
+        bundle_yaml_path = TESTS_DIR / 'integration' / 'bundle' / 'bundle.yaml'
+        overlay1_path = OVERLAYS_DIR / 'wiki-overlay1.yaml'
+        overlay2_path = OVERLAYS_DIR / 'wiki-overlay2.yaml'
+
+        await model.deploy(str(bundle_yaml_path), overlays=[overlay1_path, overlay2_path])
+        # the bundle : installs ghost, mysql and a local test charm
+        # overlay1   : removes test, mysql, installs memcached
+        # overlay2   : removes memcached, adds config to ghost with include-file
+        assert 'mysql' not in model.applications
+        assert 'test' not in model.applications
+        assert 'memcached' not in model.applications
+        assert 'ghost' in model.applications
+        ghost = model.applications.get('ghost', None)
+        assert ghost.config.get('port', None) == 2369
+        assert ghost.config.get('url', "") == 'http://my-ghost.blg'
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_deploy_local_charm_folder_symlink(event_loop):
-    from pathlib import Path
-    tests_dir = Path(__file__).absolute().parent.parent
-    charm_path = tests_dir / 'charm-folder-symlink'
+    charm_path = TESTS_DIR / 'charm-folder-symlink'
 
     async with base.CleanModel() as model:
         simple = await model.deploy(str(charm_path))
@@ -497,8 +582,7 @@ async def test_store_resources_charm(event_loop):
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_local_oci_image_resource_charm(event_loop):
-    tests_dir = Path(__file__).absolute().parent
-    charm_path = tests_dir / 'oci-image-charm'
+    charm_path = TESTS_DIR / 'integration' / 'oci-image-charm'
     async with base.CleanModel() as model:
         resources = {"oci-image": "ubuntu/latest"}
         charm = await model.deploy(str(charm_path), resources=resources)
