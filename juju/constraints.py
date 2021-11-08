@@ -81,7 +81,7 @@ def normalize_value(value):
 
     if value.isdigit():
         return int(value)
-    
+
     if value.lower() == 'true':
         return True
     if value.lower() == 'false':

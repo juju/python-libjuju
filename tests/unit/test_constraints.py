@@ -132,4 +132,3 @@ class TestConstraints(unittest.TestCase):
                  "2ndattr": "another-attr"
              }}
         )
-    
