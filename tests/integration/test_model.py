@@ -667,7 +667,7 @@ async def test_get_machines(event_loop):
 @pytest.mark.asyncio
 async def test_watcher_reconnect(event_loop):
     async with base.CleanModel() as model:
-        await model.connection().ws.close()
+        await model.connection().close()
         await block_until(model.is_connected, timeout=3)
 
 

@@ -186,7 +186,7 @@ class Monitor:
             return self.DISCONNECTED
 
         # connection cleanly disconnected or not yet opened
-        if not connection.ws:
+        if not connection._ws:
             return self.DISCONNECTED
 
         # close called but not yet complete
@@ -199,7 +199,7 @@ class Monitor:
         else:
             stopped = connection._receiver_task.cancelled()
 
-        if stopped or not connection.ws.open:
+        if stopped or not connection._ws.open:
             return self.ERROR
 
         # everything is fine!
@@ -287,7 +287,7 @@ class Connection:
         # _connect_with_redirect method, but create them here
         # as a reminder that they will exist.
         self.addr = None
-        self.ws = None
+        self._ws = None
         self.endpoint = None
         self.endpoints = None
         self.cacert = None
@@ -392,7 +392,7 @@ class Connection:
         )), url, endpoint, cacert
 
     async def close(self, to_reconnect=False):
-        if not self.ws:
+        if not self._ws:
             return
         self.monitor.close_called.set()
 
@@ -410,8 +410,8 @@ class Connection:
         #  Allow a second for tasks to be cancelled
         await jasyncio.sleep(1)
 
-        if self.ws and not self.ws.closed:
-            ws_close_task = jasyncio.create_task(self.ws.close())
+        if self._ws and not self._ws.closed:
+            ws_close_task = jasyncio.create_task(self._ws.close())
             done, pending = await jasyncio.wait([ws_close_task])
 
             assert ws_close_task in done
@@ -421,7 +421,7 @@ class Connection:
             assert ws_close_task.exception() is None, 'the websocket is unable to close properly, try making a new connection from scratch'
             #  proof that the errors we see in the output dont belong
             #  to us, but belongs to websockets library
-        self.ws = None
+        self._ws = None
 
         if self.proxy is not None:
             self.proxy.close()
@@ -439,7 +439,7 @@ class Connection:
         try:
             while self.is_open:
                 result = await utils.run_with_interrupt(
-                    self.ws.recv(),
+                    self._ws.recv(),
                     self.monitor.close_called)
                 if self.monitor.close_called.is_set():
                     break
@@ -475,7 +475,7 @@ class Connection:
         try:
             while self.is_open:
                 result = await utils.run_with_interrupt(
-                    self.ws.recv(),
+                    self._ws.recv(),
                     self.monitor.close_called)
                 if self.monitor.close_called.is_set():
                     break
@@ -552,7 +552,7 @@ class Connection:
                 raise websockets.exceptions.ConnectionClosed(
                     0, 'websocket closed')
             try:
-                await self.ws.send(outgoing)
+                await self._ws.send(outgoing)
                 break
             except websockets.ConnectionClosed:
                 if attempt == 2:
@@ -740,7 +740,7 @@ class Connection:
             break
         for task in tasks:
             task.cancel()
-        self.ws = result[0]
+        self._ws = result[0]
         self.addr = result[1]
         self.endpoint = result[2]
         self.cacert = result[3]
