@@ -4,7 +4,7 @@ Changelog
 Next Release
 ^^^^^^^^^^^^
 
-* Legacy "services" are removed in https://github.com/juju/python-libjuju/pull/566
+* Legacy "services" for describing "applications" within bundles are no longer supported. "applications" can be used as a direct replacement for "services" in bundles.yaml.
 
 2.9.4
 ^^^^^
