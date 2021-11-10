@@ -3,6 +3,7 @@ import io
 import os
 import zipfile
 import requests
+import base64
 from contextlib import closing
 from pathlib import Path
 
@@ -29,6 +30,9 @@ class BundleHandler:
         self.model = model
         self.trusted = trusted
         self.forced = forced
+        self.bundle = None
+        self.overlays = []
+        self.overlay_removed_charms = set()
 
         self.charmstore = model.charmstore
         self.plan = []
@@ -77,7 +81,7 @@ class BundleHandler:
         """Validate the bundle for known issues, raises an error if it
         encounters a known problem
         """
-        apps_dict = bundle.get('applications', bundle.get('services', {}))
+        apps_dict = bundle.get('applications', {})
         for app_name in self.applications:
             app_dict = apps_dict[app_name]
             app_trusted = app_dict.get('trust')
@@ -103,7 +107,7 @@ class BundleHandler:
         apps, args = [], []
 
         default_series = bundle.get('series')
-        apps_dict = bundle.get('applications', bundle.get('services', {}))
+        apps_dict = bundle.get('applications', {})
         for app_name in self.applications:
             app_dict = apps_dict[app_name]
             charm_dir = app_dict['charm']
@@ -152,14 +156,70 @@ class BundleHandler:
                     app_name,
                     charm_url,
                     utils.get_local_charm_metadata(charm_dir),
-                    resources=bundle["applications"][app_name].get("resources", {}),
+                    resources=bundle.get('applications', {app_name: {}})[app_name].get("resources", {}),
                 )
                 apps_dict[app_name]['charm'] = charm_url
                 apps_dict[app_name]["resources"] = resources
 
         return bundle
 
-    async def fetch_plan(self, charm_url, origin):
+    def _resolve_include_file_config(self, bundle_dir):
+        """if any of the applications (including the ones in the overlays)
+        have "config: include-file:..." or "config:
+        include-base64:...", then we have to resolve and inline them
+        into the bundle here because they're all files with local
+        relative paths, so backend can't handle them.
+
+        """
+        bundle_apps = [self.bundle.get('applications', {})]
+        overlay_apps = [overlay.get('applications', {}) for overlay in self.overlays]
+
+        for apps in bundle_apps + overlay_apps:
+            for app_name, app in apps.items():
+
+                if app and 'options' in app:
+                    if 'config' in app['options'] and app['options']['config'].startswith('include-file'):
+                        # resolve the file
+                        if not bundle_dir:
+                            raise NotImplementedError('unable to resolve paths for config:include-file for non-local charms')
+                        try:
+                            config_path = (bundle_dir / Path(app['options']['config'].split('//')[1])).resolve()
+                        except IndexError:
+                            raise JujuError('the path for the included file should start with // and be relative to the bundle')
+                        if not config_path.exists():
+                            raise JujuError('unable to locate config file : %s for : %s' % (config_path, app_name))
+
+                        # get the contents of the file
+                        config_contents = yaml.safe_load(config_path.read_text())
+
+                        # inline the configurations for the current app into
+                        # the app['options']
+                        for key, val in config_contents[app_name].items():
+                            app['options'][key] = val
+
+                        # remove the 'include-file' config
+                        app['options'].pop('config')
+
+                    for option_key, option_val in app['options'].items():
+                        if isinstance(option_val, str) and option_val.startswith('include-base64'):
+                            # resolve the file
+                            if not bundle_dir:
+                                raise NotImplementedError('unable to resolve paths for config:include-base64 for non-local charms')
+                            try:
+                                base64_path = (bundle_dir / Path(option_val.split('//')[1])).resolve()
+                            except IndexError:
+                                raise JujuError('the path for the included base64 file should start with // and be relative to the bundle')
+
+                            if not base64_path.exists():
+                                raise JujuError('unable to locate the base64 file : %s for : %s' % (base64_path, app_name))
+
+                            # inline the base64 encoded config value
+                            base64_contents = base64.b64decode(base64_path.read_text())
+                            app['options'][option_key] = base64_contents
+
+        return self.bundle, self.overlays
+
+    async def fetch_plan(self, charm_url, origin, overlays=[]):
         entity_id = charm_url.path()
         is_local = Schema.LOCAL.matches(charm_url.schema)
         bundle_dir = None
@@ -181,14 +241,40 @@ class BundleHandler:
         if not bundle_yaml:
             raise JujuError('empty bundle, nothing to deploy')
 
-        self.bundle = yaml.safe_load(bundle_yaml)
+        _bundles = [b for b in yaml.safe_load_all(bundle_yaml)]
+        self.overlays = _bundles[1:]
+        self.bundle = _bundles[0]
+
+        if overlays != []:
+            for overlay_yaml_path in overlays:
+                try:
+                    overlay_contents = Path(overlay_yaml_path).read_text()
+                except (OSError, IOError) as e:
+                    raise JujuError('unable to open overlay %s \n %s' % (overlay_yaml_path, e))
+                self.overlays.extend(yaml.safe_load_all(overlay_contents))
+
+        # gather the names of the removed charms so model.deploy
+        # wouldn't wait for them to appear in the model
+        for overlay in self.overlays:
+            overlay_apps = overlay.get('applications', {})
+            for charm_name, val in overlay_apps.items():
+                if val is None:
+                    self.overlay_removed_charms.add(charm_name)
+
         self.bundle = await self._validate_bundle(self.bundle)
         if is_local:
             self.bundle = await self._handle_local_charms(self.bundle, bundle_dir)
 
+        self.bundle, self.overlays = self._resolve_include_file_config(bundle_dir)
+
+        _yaml_data = [yaml.dump(self.bundle)]
+        for overlay in self.overlays:
+            _yaml_data.append(yaml.dump(overlay).replace('null', ''))
+        yaml_data = "---\n".join(_yaml_data)
+
         self.plan = await self.bundle_facade.GetChanges(
             bundleurl=entity_id,
-            yaml=yaml.dump(self.bundle))
+            yaml=yaml_data)
 
         if self.plan.errors:
             raise JujuError(self.plan.errors)
@@ -298,14 +384,12 @@ class BundleHandler:
 
     @property
     def applications(self):
-        apps_dict = self.bundle.get('applications',
-                                    self.bundle.get('services', {}))
-        return list(apps_dict.keys())
+        apps_dict = self.bundle.get('applications', {})
+        return set(apps_dict.keys()) - self.overlay_removed_charms
 
     @property
     def applications_specs(self):
-        return self.bundle.get('applications',
-                               self.bundle.get('services', {}))
+        return self.bundle.get('applications', {})
 
     def resolve_relation(self, reference):
         parts = reference.split(":", maxsplit=1)

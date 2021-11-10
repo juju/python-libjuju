@@ -6,7 +6,10 @@ applications:
   mysql:
     charm: "cs:trusty/mysql-57"
     num_units: 1
+    options:
+      max-connections: 2
+      tuning-level: include-base64://config-base64.yaml
   test:
-    charm: "./tests/integration/charm"
+    charm: "../charm"
 relations:
   - ["ghost", "mysql"]

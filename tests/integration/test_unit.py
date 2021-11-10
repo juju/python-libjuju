@@ -9,6 +9,29 @@ from .. import base
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_unit_public_address(event_loop):
+    async with base.CleanModel() as model:
+        app = await model.deploy(
+            'ch:ubuntu',
+            application_name='ubuntu',
+            series='bionic',
+            channel='stable',
+            num_units=2,
+        )
+
+        # wait for the units to come up
+        await model.block_until(lambda: app.units, timeout=480)
+
+        # make sure we have some units to test with
+        assert len(app.units) >= 1
+
+        for unit in app.units:
+            addr = await unit.get_public_address(timeout=480)
+            assert addr, 'unit public address not set'
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_run(event_loop):
     from juju.action import Action
 

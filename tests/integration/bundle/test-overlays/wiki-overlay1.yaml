@@ -1,0 +1,7 @@
+description: An overlay for the wiki-simple bundle to remove mysql and add memcached
+applications:
+  test:
+  mysql:
+  memcached:
+    charm: "cs:memcached-34"
+    num_units: 1
