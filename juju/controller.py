@@ -855,3 +855,27 @@ class Controller:
         log.debug('Starting watcher task for model summaries')
         jasyncio.ensure_future(_watcher(stop_event))
         return stop_event
+
+
+class ConnectedController(Controller):
+    def __init__(
+        self,
+        connection,
+        max_frame_size=None,
+        bakery_client=None,
+        jujudata=None,
+    ):
+        super().__init__(
+            max_frame_size=max_frame_size,
+            bakery_client=bakery_client,
+            jujudata=jujudata)
+        self._conn = connection
+
+    async def __aenter__(self):
+        kwargs = self._conn.connect_params()
+        kwargs.pop('uuid')
+        await self._connect_direct(**kwargs)
+        return self
+
+    async def __aexit__(self, exc_type, exc, tb):
+        await self.disconnect()
