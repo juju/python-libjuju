@@ -2402,9 +2402,11 @@ class Model:
         @param offer_name: over ride the offer name to help the consumer
         """
         controller = await self.get_controller()
-        return await controller.create_offer(self.info.uuid, endpoint,
-                                             offer_name=offer_name,
-                                             application_name=application_name)
+        offer_result = await controller.create_offer(self.info.uuid, endpoint,
+                                                     offer_name=offer_name,
+                                                     application_name=application_name)
+        await controller.disconnect()
+        return offer_result
 
     async def list_offers(self):
         """
