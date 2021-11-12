@@ -411,16 +411,7 @@ class Connection:
         await jasyncio.sleep(1)
 
         if self._ws and not self._ws.closed:
-            ws_close_task = jasyncio.create_task(self._ws.close())
-            done, pending = await jasyncio.wait([ws_close_task])
-
-            assert ws_close_task in done
-
-            #  close_task.exception() is None means that close_task
-            #  (ws.close()) actually completed without any errors
-            assert ws_close_task.exception() is None, 'the websocket is unable to close properly, try making a new connection from scratch'
-            #  proof that the errors we see in the output dont belong
-            #  to us, but belongs to websockets library
+            await self._ws.close()
         self._ws = None
 
         if self.proxy is not None:
@@ -476,7 +467,8 @@ class Connection:
             while self.is_open:
                 result = await utils.run_with_interrupt(
                     self._ws.recv(),
-                    self.monitor.close_called)
+                    self.monitor.close_called,
+                    log=log)
                 if self.monitor.close_called.is_set():
                     break
                 if result is not None:
@@ -517,7 +509,8 @@ class Connection:
             while True:
                 await utils.run_with_interrupt(
                     _do_ping(),
-                    self.monitor.close_called)
+                    self.monitor.close_called,
+                    log=log)
                 if self.monitor.close_called.is_set():
                     break
                 await jasyncio.sleep(10)
