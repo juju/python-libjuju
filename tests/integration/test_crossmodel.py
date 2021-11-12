@@ -14,7 +14,7 @@ async def test_offer(event_loop):
         await model.deploy(
             'cs:~jameinel/ubuntu-lite-7',
             application_name='ubuntu',
-            series='bionic',
+            series='focal',
             channel='stable',
         )
         assert 'ubuntu' in model.applications
@@ -35,7 +35,7 @@ async def test_consume(event_loop):
         await model_1.deploy(
             'cs:~jameinel/ubuntu-lite-7',
             application_name='ubuntu',
-            series='bionic',
+            series='focal',
             channel='stable',
         )
         assert 'ubuntu' in model_1.applications
@@ -65,7 +65,7 @@ async def test_remove_saas(event_loop):
         await model_1.deploy(
             'cs:~jameinel/ubuntu-lite-7',
             application_name='ubuntu',
-            series='bionic',
+            series='focal',
             channel='stable',
         )
         assert 'ubuntu' in model_1.applications
@@ -98,7 +98,7 @@ async def test_add_relation_with_offer(event_loop):
         application = await model_1.deploy(
             'ch:mysql',
             application_name='mysql',
-            series='xenial',
+            series='focal',
             channel='stable',
         )
         assert 'mysql' in model_1.applications
@@ -115,7 +115,7 @@ async def test_add_relation_with_offer(event_loop):
             await model_2.deploy(
                 'ch:mediawiki',
                 application_name='mediawiki',
-                series='xenial',
+                series='focal',
                 channel='stable',
             )
             await model_2.block_until(
