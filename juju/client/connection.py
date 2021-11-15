@@ -341,6 +341,11 @@ class Connection:
         raise Exception("Unable to connect to websocket")
 
     @property
+    def ws(self):
+        log.warning('Direct access to the websocket object may cause disruptions in asyncio event handling.')
+        return self._ws
+
+    @property
     def username(self):
         if not self.usertag:
             return None
