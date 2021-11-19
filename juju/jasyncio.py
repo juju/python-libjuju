@@ -24,6 +24,9 @@ import asyncio
 import signal
 import functools
 import websockets
+import logging
+
+ROOT_LOGGER = logging.getLogger()
 
 from asyncio import Event, TimeoutError, Queue, ensure_future, \
     gather, sleep, wait_for, create_subprocess_exec, subprocess, \
@@ -46,7 +49,7 @@ except ImportError:
         return asyncio.ensure_future(coro)
 
 
-def create_task_with_handler(coro, task_name, logger):
+def create_task_with_handler(coro, task_name, logger=ROOT_LOGGER):
     """Wrapper around "asyncio.create_task" to make sure the task
     exceptions are handled properly.
 
