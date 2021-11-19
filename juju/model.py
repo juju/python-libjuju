@@ -1035,10 +1035,6 @@ class Model:
                         results = await utils.run_with_interrupt(
                             allwatcher.Next(),
                             self._watch_stopping)
-                    except GeneratorExit:
-                        # this means we're in the middle of a
-                        # tear-down, so everything should shutdown
-                        break
                     except JujuAPIError as e:
                         if 'watcher was stopped' not in str(e):
                             raise

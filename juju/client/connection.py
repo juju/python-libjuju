@@ -425,7 +425,10 @@ class Connection:
     async def _recv(self, request_id):
         if not self.is_open:
             raise websockets.exceptions.ConnectionClosed(0, 'websocket closed')
-        return await self.messages.get(request_id)
+        try:
+            return await self.messages.get(request_id)
+        except GeneratorExit:
+            return {}
 
     def _close_debug_log_target(self):
         if self.debug_log_target is not sys.stdout:
