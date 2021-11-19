@@ -1829,8 +1829,7 @@ class Model:
 
         for name, path in resources.items():
             resource_type = metadata["resources"][name]["type"]
-            if resource_type != "oci-image":
-                # For  now only oci-images are supported
+            if resource_type not in ["oci-image", "file"]:
                 log.info("Resource {} of type {} is not supported".format(name, resource_type))
                 continue
 
@@ -1841,7 +1840,7 @@ class Model:
                 'path': path,
                 'revision': 0,
                 'size': 0,
-                'type_': 'oci-image',
+                'type_': resource_type,
                 'origin': 'upload',
             }
 
@@ -1854,14 +1853,19 @@ class Model:
             pending_id = response.pending_ids[0]
             resource_map[name] = pending_id
 
-            # TODO Docker Image validation and support for local images.
-            docker_image_details = {
-                'registrypath': path,
-                'username': '',
-                'password': '',
-            }
+            if resource_type == "oci-image":
+                # TODO Docker Image validation and support for local images.
+                docker_image_details = {
+                    'registrypath': path,
+                    'username': '',
+                    'password': '',
+                }
 
-            data = yaml.dump(docker_image_details)
+                data = yaml.dump(docker_image_details)
+            else:
+                p = Path(path)
+                # f = p.open()
+                data = p.read_text() if p.exists() else ''
 
             if sys.version_info[0:2] == (3, 5):
                 hash_alg = hashlib.sha384
@@ -1875,7 +1879,10 @@ class Model:
             query = "?pendingid={}".format(pending_id)
             url = "{}/applications/{}/resources/{}{}".format(
                 path_prefix, application, name, query)
-            disp = "multipart/form-data; filename=\"{}\"".format(path)
+            if resource_type == "oci-image":
+                disp = "multipart/form-data; filename=\"{}\"".format(path)
+            else:
+                disp = "form-data; filename=\"{}\"".format(path)
 
             headers['Content-Type'] = 'application/octet-stream'
             headers['Content-Length'] = len(data)
