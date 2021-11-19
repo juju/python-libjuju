@@ -667,7 +667,7 @@ async def test_get_machines(event_loop):
 @pytest.mark.asyncio
 async def test_watcher_reconnect(event_loop):
     async with base.CleanModel() as model:
-        await model.connection().ws.close()
+        await model.connection().close()
         await block_until(model.is_connected, timeout=3)
 
 
@@ -819,6 +819,7 @@ async def test_backups(event_loop):
 
     # Cleanup
     os.remove(local_file_name)
+    await m.disconnect()
 
 
 @base.bootstrapped
@@ -832,18 +833,23 @@ async def test_model_cache_update(event_loop):
         await controller.connect_current()
 
         model_name = "new-test-model"
-        await controller.add_model(model_name)
+        m = await controller.add_model(model_name)
 
         model_uuids = await controller.model_uuids()
         assert model_name in model_uuids
 
         model = Model()
+
         try:
             await model.connect(model_name=model_name)
         except JujuConnectionError:
             # avoid leaking the model if the test fails
+            await model.disconnect()
+            await m.disconnect()
             await controller.destroy_models(model_name)
             raise
 
         # cleanup
+        await model.disconnect()
+        await m.disconnect()
         await controller.destroy_models(model_name)

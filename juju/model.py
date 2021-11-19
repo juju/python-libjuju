@@ -28,7 +28,7 @@ from .client import client, connector
 from .client.client import ConfigValue, Value
 from .client.overrides import Caveat, Macaroon
 from .constraints import parse as parse_constraints
-from .controller import Controller
+from .controller import Controller, ConnectedController
 from .delta import get_entity_class, get_entity_delta
 from .errors import JujuAPIError, JujuError, JujuModelConfigError, JujuBackupError
 from .errors import JujuAppError, JujuUnitError, JujuAgentError, JujuMachineError
@@ -1344,8 +1344,8 @@ class Model:
                 raise JujuError("cannot add relation to {}: remote endpoints not supported".format(remote_endpoint.string()))
 
             if remote_endpoint.has_empty_source():
-                current = await self.get_controller()
-                remote_endpoint.source = current.controller_name
+                async with ConnectedController(self.connection()) as current:
+                    remote_endpoint.source = current.controller_name
             # consume the remote endpoint
             await self.consume(remote_endpoint.string(),
                                application_alias=remote_endpoint.application,
@@ -2401,18 +2401,18 @@ class Model:
         @param endpoint: holds the application and endpoint you want to offer
         @param offer_name: over ride the offer name to help the consumer
         """
-        controller = await self.get_controller()
-        return await controller.create_offer(self.info.uuid, endpoint,
-                                             offer_name=offer_name,
-                                             application_name=application_name)
+        async with ConnectedController(self.connection()) as controller:
+            return await controller.create_offer(self.info.uuid, endpoint,
+                                                 offer_name=offer_name,
+                                                 application_name=application_name)
 
     async def list_offers(self):
         """
         Offers list information about applications' endpoints that have been
         shared and who is connected.
         """
-        controller = await self.get_controller()
-        return await controller.list_offers(self.info.name)
+        async with ConnectedController(self.connection()) as controller:
+            return await controller.list_offers(self.info.name)
 
     async def remove_offer(self, endpoint, force=False):
         """
@@ -2421,8 +2421,8 @@ class Model:
         Offers will also remove relations to those offers, use force to do
         so, without an error.
         """
-        controller = await self.get_controller()
-        return await controller.remove_offer(self.info.uuid, endpoint, force)
+        async with ConnectedController(self.connection()) as controller:
+            return await controller.remove_offer(self.info.uuid, endpoint, force)
 
     async def consume(self, endpoint, application_alias="", controller_name=None, controller=None):
         """
@@ -2520,9 +2520,9 @@ class Model:
     async def _get_source_api(self, url, controller_name=None):
         controller = Controller()
         if url.has_empty_source():
-            current = await self.get_controller()
-            if current.controller_name is not None:
-                controller_name = current.controller_name
+            async with ConnectedController(self.connection()) as current:
+                if current.controller_name is not None:
+                    controller_name = current.controller_name
         await controller.connect(controller_name=controller_name)
         return controller
 

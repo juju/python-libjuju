@@ -14,7 +14,7 @@ async def test_offer(event_loop):
         await model.deploy(
             'cs:~jameinel/ubuntu-lite-7',
             application_name='ubuntu',
-            series='bionic',
+            series='focal',
             channel='stable',
         )
         assert 'ubuntu' in model.applications
@@ -35,7 +35,7 @@ async def test_consume(event_loop):
         await model_1.deploy(
             'cs:~jameinel/ubuntu-lite-7',
             application_name='ubuntu',
-            series='bionic',
+            series='focal',
             channel='stable',
         )
         assert 'ubuntu' in model_1.applications
@@ -65,7 +65,7 @@ async def test_remove_saas(event_loop):
         await model_1.deploy(
             'cs:~jameinel/ubuntu-lite-7',
             application_name='ubuntu',
-            series='bionic',
+            series='focal',
             channel='stable',
         )
         assert 'ubuntu' in model_1.applications
@@ -96,9 +96,9 @@ async def test_remove_saas(event_loop):
 async def test_add_relation_with_offer(event_loop):
     async with base.CleanModel() as model_1:
         application = await model_1.deploy(
-            'cs:mysql-58',
+            'ch:mysql',
             application_name='mysql',
-            series='bionic',
+            series='focal',
             channel='stable',
         )
         assert 'mysql' in model_1.applications
@@ -113,17 +113,16 @@ async def test_add_relation_with_offer(event_loop):
         # farm off a new model to test the consumption
         async with base.CleanModel() as model_2:
             await model_2.deploy(
-                'cs:trusty/wordpress-5',
-                application_name='wordpress',
-                series='xenial',
+                'ch:mediawiki',
+                application_name='mediawiki',
+                series='focal',
                 channel='stable',
             )
             await model_2.block_until(
                 lambda: all(unit.agent_status == 'idle'
                             for unit in application.units))
 
-            await model_2.add_relation("wordpress", "admin/{}.mysql".format(model_1.info.name))
-
+            await model_2.add_relation("mediawiki:db", "admin/{}.mysql".format(model_1.info.name))
             status = await model_2.get_status()
             if 'mysql' not in status.remote_applications:
                 raise Exception("Expected mysql in saas")

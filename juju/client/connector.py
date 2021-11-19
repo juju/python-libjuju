@@ -69,6 +69,8 @@ class Connector:
             assert self._connection
             self._log_connection = await Connection.connect(**kwargs)
         else:
+            if self._connection:
+                await self._connection.close()
             self._connection = await Connection.connect(**kwargs)
 
     async def disconnect(self):

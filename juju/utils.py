@@ -143,7 +143,7 @@ async def wait_for_bundle(model, bundle, **kwargs):
     await model.wait_for_idle(apps, **kwargs)
 
 
-async def run_with_interrupt(task, *events):
+async def run_with_interrupt(task, *events, log=None):
     """
     Awaits a task while allowing it to be interrupted by one or more
     `asyncio.Event`s.
@@ -156,7 +156,7 @@ async def run_with_interrupt(task, *events):
     :param events: One or more `asyncio.Event`s which, if set, will interrupt
         `task` and cause it to be cancelled.
     """
-    task = jasyncio.ensure_future(task)
+    task = jasyncio.create_task_with_handler(task, 'tmp', log)
     event_tasks = [jasyncio.ensure_future(event.wait()) for event in events]
     done, pending = await jasyncio.wait([task] + event_tasks,
                                         return_when=jasyncio.FIRST_COMPLETED)

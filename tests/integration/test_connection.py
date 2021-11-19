@@ -44,7 +44,7 @@ async def test_monitor_catches_error(event_loop):
             # grab the reconnect lock to prevent automatic
             # reconnecting during the test
             async with conn.monitor.reconnecting:
-                await conn.ws.close()  # this could be racy with reconnect
+                await conn._ws.close()  # this could be racy with reconnect
                 # if auto-reconnect is not disabled by lock, force this
                 # test to fail by deferring to the reconnect task via sleep
                 await jasyncio.sleep(0.1)
@@ -78,7 +78,7 @@ async def test_reconnect(event_loop):
         try:
             await jasyncio.sleep(0.1)
             assert conn.is_open
-            await conn.ws.close()
+            await conn._ws.close()
             assert not conn.is_open
             await model.block_until(lambda: conn.is_open, timeout=3)
         finally:

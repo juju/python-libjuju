@@ -19,3 +19,4 @@ async def test_get_controllers(event_loop):
         cc = await j.get_controller(controller.controller_name)
         assert isinstance(cc, Controller)
         assert controller.connection().endpoint == cc.connection().endpoint
+        await cc.disconnect()

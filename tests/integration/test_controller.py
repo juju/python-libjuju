@@ -99,7 +99,9 @@ async def test_reset_user_password(event_loop):
             pass
         finally:
             # No connection with old password
-            assert new_connection is None
+            if new_connection:
+                await new_connection.close()
+                raise AssertionError()
 
 
 @base.bootstrapped

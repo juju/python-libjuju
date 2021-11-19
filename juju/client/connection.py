@@ -186,7 +186,7 @@ class Monitor:
             return self.DISCONNECTED
 
         # connection cleanly disconnected or not yet opened
-        if not connection.ws:
+        if not connection._ws:
             return self.DISCONNECTED
 
         # close called but not yet complete
@@ -199,7 +199,7 @@ class Monitor:
         else:
             stopped = connection._receiver_task.cancelled()
 
-        if stopped or not connection.ws.open:
+        if stopped or not connection._ws.open:
             return self.ERROR
 
         # everything is fine!
@@ -287,7 +287,7 @@ class Connection:
         # _connect_with_redirect method, but create them here
         # as a reminder that they will exist.
         self.addr = None
-        self.ws = None
+        self._ws = None
         self.endpoint = None
         self.endpoints = None
         self.cacert = None
@@ -341,6 +341,11 @@ class Connection:
         raise Exception("Unable to connect to websocket")
 
     @property
+    def ws(self):
+        log.warning('Direct access to the websocket object may cause disruptions in asyncio event handling.')
+        return self._ws
+
+    @property
     def username(self):
         if not self.usertag:
             return None
@@ -389,11 +394,10 @@ class Connection:
             max_size=self.max_frame_size,
             server_hostname=server_hostname,
             sock=sock,
-            ping_interval=None
         )), url, endpoint, cacert
 
     async def close(self, to_reconnect=False):
-        if not self.ws:
+        if not self._ws:
             return
         self.monitor.close_called.set()
 
@@ -411,18 +415,9 @@ class Connection:
         #  Allow a second for tasks to be cancelled
         await jasyncio.sleep(1)
 
-        if self.ws and not self.ws.closed:
-            ws_close_task = jasyncio.create_task(self.ws.close())
-            done, pending = await jasyncio.wait([ws_close_task])
-
-            assert ws_close_task in done
-
-            #  close_task.exception() is None means that close_task
-            #  (ws.close()) actually completed without any errors
-            assert ws_close_task.exception() is None, 'the websocket is unable to close properly, try making a new connection from scratch'
-            #  proof that the errors we see in the output dont belong
-            #  to us, but belongs to websockets library
-        self.ws = None
+        if self._ws and not self._ws.closed:
+            await self._ws.close()
+        self._ws = None
 
         if self.proxy is not None:
             self.proxy.close()
@@ -430,7 +425,10 @@ class Connection:
     async def _recv(self, request_id):
         if not self.is_open:
             raise websockets.exceptions.ConnectionClosed(0, 'websocket closed')
-        return await self.messages.get(request_id)
+        try:
+            return await self.messages.get(request_id)
+        except GeneratorExit:
+            return {}
 
     def _close_debug_log_target(self):
         if self.debug_log_target is not sys.stdout:
@@ -440,7 +438,7 @@ class Connection:
         try:
             while self.is_open:
                 result = await utils.run_with_interrupt(
-                    self.ws.recv(),
+                    self._ws.recv(),
                     self.monitor.close_called)
                 if self.monitor.close_called.is_set():
                     break
@@ -476,8 +474,9 @@ class Connection:
         try:
             while self.is_open:
                 result = await utils.run_with_interrupt(
-                    self.ws.recv(),
-                    self.monitor.close_called)
+                    self._ws.recv(),
+                    self.monitor.close_called,
+                    log=log)
                 if self.monitor.close_called.is_set():
                     break
                 if result is not None:
@@ -518,7 +517,8 @@ class Connection:
             while True:
                 await utils.run_with_interrupt(
                     _do_ping(),
-                    self.monitor.close_called)
+                    self.monitor.close_called,
+                    log=log)
                 if self.monitor.close_called.is_set():
                     break
                 await jasyncio.sleep(10)
@@ -553,7 +553,7 @@ class Connection:
                 raise websockets.exceptions.ConnectionClosed(
                     0, 'websocket closed')
             try:
-                await self.ws.send(outgoing)
+                await self._ws.send(outgoing)
                 break
             except websockets.ConnectionClosed:
                 if attempt == 2:
@@ -690,11 +690,15 @@ class Connection:
         async with monitor.reconnecting:
             await self.close(to_reconnect=True)
             connector = self._connect if self.is_debug_log_connection else self._connect_with_login
-            await connector(
+            res = await connector(
                 [(self.endpoint, self.cacert)]
                 if not self.endpoints else
                 self.endpoints
             )
+            if connector is self._connect_with_login:
+                self._build_facades(res.get('facades', {}))
+                if not self._pinger_task:
+                    self._pinger_task = jasyncio.create_task(self._pinger())
 
     async def _connect(self, endpoints):
         if len(endpoints) == 0:
@@ -737,7 +741,7 @@ class Connection:
             break
         for task in tasks:
             task.cancel()
-        self.ws = result[0]
+        self._ws = result[0]
         self.addr = result[1]
         self.endpoint = result[2]
         self.cacert = result[3]
@@ -751,11 +755,6 @@ class Connection:
         #  receiver_task yet, then schedule a _receiver_task
         elif not self.is_debug_log_connection and not self._receiver_task:
             self._receiver_task = jasyncio.create_task(self._receiver())
-
-        #  In any type of connection, if we don't have a _pinger_task
-        #  yet, then schedule a new one
-        if not self._pinger_task:
-            self._pinger_task = jasyncio.create_task(self._pinger())
 
         log.debug("Driver connected to juju %s", self.addr)
         self.monitor.close_called.clear()
@@ -799,8 +798,6 @@ class Connection:
         finally:
             if not success:
                 await self.close()
-            else:
-                self._pinger_task = jasyncio.create_task(self._pinger())
 
     async def _connect_with_redirect(self, endpoints):
         try:
@@ -811,6 +808,8 @@ class Connection:
                 raise
             login_result = await self._connect_with_login(e.endpoints)
         self._build_facades(login_result.get('facades', {}))
+        if not self._pinger_task:
+            self._pinger_task = jasyncio.create_task(self._pinger())
 
     def _build_facades(self, facades):
         self.facades.clear()
