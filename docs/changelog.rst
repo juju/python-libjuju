@@ -5,6 +5,7 @@ Next Release
 ^^^^^^^^^^^^
 
 * Legacy "services" for describing "applications" within bundles are no longer supported. "applications" can be used as a direct replacement for "services" in bundles.yaml.
+* The websocket (ws) in a Connection object became a read-only property.
 
 2.9.4
 ^^^^^
