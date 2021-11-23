@@ -603,11 +603,15 @@ async def test_local_file_resource_charm(event_loop):
     charm_path = TESTS_DIR / 'integration' / 'file-resource-charm'
     async with base.CleanModel() as model:
         resources = {"file-res": "test.file"}
-        charm = await model.deploy(str(charm_path), resources=resources)
+        app = await model.deploy(str(charm_path), resources=resources)
         assert 'file-resource-charm' in model.applications
 
         await model.wait_for_idle()
-        assert charm.units[0].agent_status == 'idle'
+        assert app.units[0].agent_status == 'idle'
+
+        ress = await app.get_resources()
+        assert 'file-res' in ress
+        assert ress['file-res']
 
 
 @base.bootstrapped
