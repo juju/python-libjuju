@@ -18,6 +18,7 @@ async def main():
     # connect to current model with current user, per Juju CLI
     await model.connect()
 
+    application = None
     try:
         print('Deploying local-charm')
         base_dir = Path(__file__).absolute().parent.parent
@@ -33,6 +34,11 @@ async def main():
 
         print('Removing Charm')
         await application.remove()
+    except Exception as e:
+        print(e)
+        if application:
+            await application.remove()
+        await model.disconnect()
     finally:
         print('Disconnecting from model')
         await model.disconnect()
