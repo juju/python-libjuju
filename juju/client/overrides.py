@@ -16,7 +16,6 @@ __patches__ = [
     'ResourcesFacade',
     'AllWatcherFacade',
     'ActionFacade',
-    'ModelSummaryWatcherFacade',
 ]
 
 
@@ -106,20 +105,6 @@ class AllWatcherFacade(Type):
 
             result = await client.WatchAll()
             self.Id = result.watcher_id
-
-        msg['Id'] = self.Id
-        result = await self.connection.rpc(msg, encoder=TypeEncoder)
-        return result
-
-
-class ModelSummaryWatcherFacade(Type):
-    """
-    Patch rpc method of model summary watcher to add in 'id' stuff.
-
-    """
-    async def rpc(self, msg):
-        if not hasattr(self, 'Id'):
-            raise RuntimeError('Missing "Id" field')
 
         msg['Id'] = self.Id
         result = await self.connection.rpc(msg, encoder=TypeEncoder)

@@ -1033,6 +1033,20 @@ class AllModelWatcherFacade(Type):
 
 
 
+    async def rpc(self, msg):
+        '''
+        Patch rpc method to add Id.
+        '''
+        if not hasattr(self, 'Id'):
+            raise RuntimeError('Missing "Id" field')
+        msg['Id'] = id
+
+        from .facade import TypeEncoder
+        reply = await self.connection.rpc(msg, encoder=TypeEncoder)
+        return reply
+
+
+
 class AnnotationsFacade(Type):
     name = 'Annotations'
     version = 2
@@ -7688,6 +7702,20 @@ class EntityWatcherFacade(Type):
 
 
 
+    async def rpc(self, msg):
+        '''
+        Patch rpc method to add Id.
+        '''
+        if not hasattr(self, 'Id'):
+            raise RuntimeError('Missing "Id" field')
+        msg['Id'] = id
+
+        from .facade import TypeEncoder
+        reply = await self.connection.rpc(msg, encoder=TypeEncoder)
+        return reply
+
+
+
 class FilesystemAttachmentsWatcherFacade(Type):
     name = 'FilesystemAttachmentsWatcher'
     version = 2
@@ -7766,6 +7794,20 @@ class FilesystemAttachmentsWatcherFacade(Type):
                    params=_params)
 
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    async def rpc(self, msg):
+        '''
+        Patch rpc method to add Id.
+        '''
+        if not hasattr(self, 'Id'):
+            raise RuntimeError('Missing "Id" field')
+        msg['Id'] = id
+
+        from .facade import TypeEncoder
+        reply = await self.connection.rpc(msg, encoder=TypeEncoder)
         return reply
 
 
@@ -14554,6 +14596,20 @@ class VolumeAttachmentsWatcherFacade(Type):
                    params=_params)
 
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    async def rpc(self, msg):
+        '''
+        Patch rpc method to add Id.
+        '''
+        if not hasattr(self, 'Id'):
+            raise RuntimeError('Missing "Id" field')
+        msg['Id'] = id
+
+        from .facade import TypeEncoder
+        reply = await self.connection.rpc(msg, encoder=TypeEncoder)
         return reply
 
 
