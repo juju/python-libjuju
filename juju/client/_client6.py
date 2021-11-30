@@ -789,6 +789,196 @@ class ActionFacade(Type):
 
 
 
+class BundleFacade(Type):
+    name = 'Bundle'
+    version = 6
+    schema =     {'definitions': {'BundleChange': {'additionalProperties': False,
+                                      'properties': {'args': {'items': {'additionalProperties': True,
+                                                                        'type': 'object'},
+                                                              'type': 'array'},
+                                                     'id': {'type': 'string'},
+                                                     'method': {'type': 'string'},
+                                                     'requires': {'items': {'type': 'string'},
+                                                                  'type': 'array'}},
+                                      'required': ['id',
+                                                   'method',
+                                                   'args',
+                                                   'requires'],
+                                      'type': 'object'},
+                     'BundleChangesMapArgs': {'additionalProperties': False,
+                                              'properties': {'args': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                   'type': 'object'}},
+                                                                      'type': 'object'},
+                                                             'id': {'type': 'string'},
+                                                             'method': {'type': 'string'},
+                                                             'requires': {'items': {'type': 'string'},
+                                                                          'type': 'array'}},
+                                              'required': ['id',
+                                                           'method',
+                                                           'args',
+                                                           'requires'],
+                                              'type': 'object'},
+                     'BundleChangesMapArgsResults': {'additionalProperties': False,
+                                                     'properties': {'changes': {'items': {'$ref': '#/definitions/BundleChangesMapArgs'},
+                                                                                'type': 'array'},
+                                                                    'errors': {'items': {'type': 'string'},
+                                                                               'type': 'array'}},
+                                                     'type': 'object'},
+                     'BundleChangesParams': {'additionalProperties': False,
+                                             'properties': {'bundleURL': {'type': 'string'},
+                                                            'yaml': {'type': 'string'}},
+                                             'required': ['yaml', 'bundleURL'],
+                                             'type': 'object'},
+                     'BundleChangesResults': {'additionalProperties': False,
+                                              'properties': {'changes': {'items': {'$ref': '#/definitions/BundleChange'},
+                                                                         'type': 'array'},
+                                                             'errors': {'items': {'type': 'string'},
+                                                                        'type': 'array'}},
+                                              'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ExportBundleParams': {'additionalProperties': False,
+                                            'properties': {'include-charm-defaults': {'type': 'boolean'}},
+                                            'type': 'object'},
+                     'StringResult': {'additionalProperties': False,
+                                      'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                     'result': {'type': 'string'}},
+                                      'required': ['result'],
+                                      'type': 'object'}},
+     'properties': {'ExportBundle': {'description': 'ExportBundle exports the '
+                                                    'current model configuration '
+                                                    'as bundle.',
+                                     'properties': {'Params': {'$ref': '#/definitions/ExportBundleParams'},
+                                                    'Result': {'$ref': '#/definitions/StringResult'}},
+                                     'type': 'object'},
+                    'GetChanges': {'description': 'GetChanges returns the list of '
+                                                  'changes required to deploy the '
+                                                  'given bundle\n'
+                                                  'data. The changes are sorted by '
+                                                  'requirements, so that they can '
+                                                  'be applied in\n'
+                                                  'order.\n'
+                                                  'GetChanges has been superseded '
+                                                  'in favour of GetChangesMapArgs. '
+                                                  "It's\n"
+                                                  'preferable to use that new '
+                                                  'method to add new functionality '
+                                                  'and move clients\n'
+                                                  'away from this one.',
+                                   'properties': {'Params': {'$ref': '#/definitions/BundleChangesParams'},
+                                                  'Result': {'$ref': '#/definitions/BundleChangesResults'}},
+                                   'type': 'object'},
+                    'GetChangesMapArgs': {'description': 'GetChangesMapArgs '
+                                                         'returns the list of '
+                                                         'changes required to '
+                                                         'deploy the given\n'
+                                                         'bundle data. The changes '
+                                                         'are sorted by '
+                                                         'requirements, so that '
+                                                         'they can be\n'
+                                                         'applied in order.\n'
+                                                         'V4 GetChangesMapArgs is '
+                                                         'not supported on '
+                                                         'anything less than v4',
+                                          'properties': {'Params': {'$ref': '#/definitions/BundleChangesParams'},
+                                                         'Result': {'$ref': '#/definitions/BundleChangesMapArgsResults'}},
+                                          'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(StringResult)
+    async def ExportBundle(self, include_charm_defaults=None):
+        '''
+        ExportBundle exports the current model configuration as bundle.
+
+        include_charm_defaults : bool
+        Returns -> StringResult
+        '''
+        if include_charm_defaults is not None and not isinstance(include_charm_defaults, bool):
+            raise Exception("Expected include_charm_defaults to be a bool, received: {}".format(type(include_charm_defaults)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Bundle',
+                   request='ExportBundle',
+                   version=6,
+                   params=_params)
+        _params['include-charm-defaults'] = include_charm_defaults
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(BundleChangesResults)
+    async def GetChanges(self, bundleurl=None, yaml=None):
+        '''
+        GetChanges returns the list of changes required to deploy the given bundle
+        data. The changes are sorted by requirements, so that they can be applied in
+        order.
+        GetChanges has been superseded in favour of GetChangesMapArgs. It's
+        preferable to use that new method to add new functionality and move clients
+        away from this one.
+
+        bundleurl : str
+        yaml : str
+        Returns -> BundleChangesResults
+        '''
+        if bundleurl is not None and not isinstance(bundleurl, (bytes, str)):
+            raise Exception("Expected bundleurl to be a str, received: {}".format(type(bundleurl)))
+
+        if yaml is not None and not isinstance(yaml, (bytes, str)):
+            raise Exception("Expected yaml to be a str, received: {}".format(type(yaml)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Bundle',
+                   request='GetChanges',
+                   version=6,
+                   params=_params)
+        _params['bundleURL'] = bundleurl
+        _params['yaml'] = yaml
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(BundleChangesMapArgsResults)
+    async def GetChangesMapArgs(self, bundleurl=None, yaml=None):
+        '''
+        GetChangesMapArgs returns the list of changes required to deploy the given
+        bundle data. The changes are sorted by requirements, so that they can be
+        applied in order.
+        V4 GetChangesMapArgs is not supported on anything less than v4
+
+        bundleurl : str
+        yaml : str
+        Returns -> BundleChangesMapArgsResults
+        '''
+        if bundleurl is not None and not isinstance(bundleurl, (bytes, str)):
+            raise Exception("Expected bundleurl to be a str, received: {}".format(type(bundleurl)))
+
+        if yaml is not None and not isinstance(yaml, (bytes, str)):
+            raise Exception("Expected yaml to be a str, received: {}".format(type(yaml)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Bundle',
+                   request='GetChangesMapArgs',
+                   version=6,
+                   params=_params)
+        _params['bundleURL'] = bundleurl
+        _params['yaml'] = yaml
+        reply = await self.rpc(msg)
+        return reply
+
+
+
 class CloudFacade(Type):
     name = 'Cloud'
     version = 6
