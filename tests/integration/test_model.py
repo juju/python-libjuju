@@ -53,11 +53,11 @@ async def test_deploy_local_bundle_file(event_loop):
     async with base.CleanModel() as model:
         await model.deploy(str(mini_bundle_file_path))
 
-        dummy_sink = model.applications.get('dummy-sink')
-        dummy_subordinate = model.applications.get('dummy-subordinate')
-        assert dummy_sink and dummy_subordinate
-        await model.block_until(lambda: (len(dummy_sink.units) == 1 and
-                                len(dummy_subordinate.units) == 1),
+        ghost = model.applications.get('ghost')
+        mysql = model.applications.get('mysql')
+        assert ghost and mysql
+        await model.block_until(lambda: (len(ghost.units) == 1 and
+                                len(mysql.units) == 1),
                                 timeout=60 * 4)
 
 
