@@ -557,6 +557,28 @@ def makeFunc(cls, name, description, params, result, _async=True):
     return func, fsource
 
 
+def makeRPCFunc(cls):
+    source = """
+
+async def rpc(self, msg):
+    '''
+    Patch rpc method to add Id.
+    '''
+    if not hasattr(self, 'Id'):
+        raise RuntimeError('Missing "Id" field')
+    msg['Id'] = id
+
+    from .facade import TypeEncoder
+    reply = await self.connection.rpc(msg, encoder=TypeEncoder)
+    return reply
+
+"""
+    ns = _getns(cls.schema)
+    exec(source, ns)
+    func = ns["rpc"]
+    return func, source
+
+
 def buildMethods(cls, capture):
     properties = cls.schema['properties']
     for methodname in sorted(properties):
@@ -584,6 +606,14 @@ def _buildMethod(cls, name):
             else:
                 result = SCHEMA_TO_PYTHON[spec['type']]
     return makeFunc(cls, name, description, params, result)
+
+
+def buildWatcherRPCMethods(cls, capture):
+    properties = cls.schema['properties']
+    if "Next" in properties and "Stop" in properties:
+        method, source = makeRPCFunc(cls)
+        setattr(cls, "rpc", method)
+        capture["{}Facade".format(cls.__name__)].write(source, depth=1)
 
 
 def buildFacade(schema):
@@ -871,6 +901,8 @@ def generate_facades(schemas):
             captures[schema.version][cls_name].write(source)
             # Build the methods for each Facade class.
             buildMethods(cls, captures[schema.version])
+            # Build the override RPC method if the Facade is a watcher.
+            buildWatcherRPCMethods(cls, captures[schema.version])
             # Mark this Facade class as being done for this version --
             # helps mitigate some excessive looping.
             CLASSES[schema.name] = cls
