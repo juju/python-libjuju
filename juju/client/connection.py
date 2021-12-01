@@ -303,7 +303,7 @@ class Connection:
         self.debug_log_target = debug_log_conn
         self.is_debug_log_connection = debug_log_conn is not None
         self.debug_log_params = debug_log_params
-        self.debug_log_params.setdefault('lines-shown-so-far', 0)
+        self.debug_log_shown_lines = 0  # number of lines
 
         # Create that _Task objects but don't start the tasks yet.
         self._pinger_task = None
@@ -443,6 +443,34 @@ class Connection:
         if self.debug_log_target is not sys.stdout:
             self.debug_log_target.close()
 
+    def debug_log_filter_write(self, result):
+
+        write_or_not = True
+
+        lev = result['sev']
+        mod = result['mod']
+        msg = result['msg']
+
+        # get the parameters for the debug_log to decide write_or_not
+
+        # no_tail = self.debug_log_params['no_tail']
+        # exclude_module = self.debug_log_params['exclude_module']
+        # include_module = self.debug_log_params['include_module']
+        # include = self.debug_log_params['include']
+        # level = self.debug_log_params['level']
+        # lines = self.debug_log_params['lines']
+        # replay = self.debug_log_params['replay']
+        # exclude = self.debug_log_params['exclude']
+
+        if write_or_not:
+            tag = result['tag']
+            ts = parse(result['ts'])
+
+            self.debug_log_target.write("%s %02d:%02d:%02d %s %s %s\n" % (tag, ts.hour, ts.minute, ts.second, lev, mod, msg))
+            return 1
+        else:
+            return 0
+
     async def _debug_logger(self):
         try:
             while self.is_open:
@@ -455,24 +483,20 @@ class Connection:
                 if result is not None and result != '{}\n':
                     result = json.loads(result)
 
-                    tag = result['tag']
-                    ts = parse(result['ts'])
-                    lev = result['sev']
-                    mod = result['mod']
-                    msg = result['msg']
+                    number_of_lines_written = self.debug_log_filter_write(result)
 
-                    self.debug_log_target.write("%s %02d:%02d:%02d %s %s %s\n" % (tag, ts.hour, ts.minute, ts.second, lev, mod, msg))
+                    self.debug_log_shown_lines += number_of_lines_written
 
-                    self.debug_log_params['lines-shown-so-far'] += 1
-                    if self.debug_log_params['lines-shown-so-far'] >= self.debug_log_params['limit']:
-                        await self.close()
+                    if self.debug_log_shown_lines >= self.debug_log_params['limit']:
+                        jasyncio.create_task(self.close())
                         return
 
         except KeyError as e:
             log.exception('Unexpected debug line -- %s' % e)
-            await self.close()
+            jasyncio.create_task(self.close())
             raise
         except jasyncio.CancelledError:
+            jasyncio.create_task(self.close())
             raise
         except websockets.exceptions.ConnectionClosed:
             log.warning('Debug Logger: Connection closed, reconnecting')
@@ -483,7 +507,7 @@ class Connection:
             return
         except Exception as e:
             log.exception("Error in debug logger : %s" % e)
-            await self.close()
+            jasyncio.create_task(self.close())
             raise
 
     async def _receiver(self):
