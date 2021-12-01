@@ -1514,7 +1514,18 @@ class Model:
         if not self.is_connected():
             await self.connect()
 
-        await self.connect(debug_log_conn=target)
+        params = {
+            'no_tail': no_tail,
+            'exclude_module': exclude_module,
+            'include_module': include_module,
+            'include': include,
+            'level': level,
+            'limit': limit,
+            'lines': lines,
+            'replay': replay,
+            'exclude': exclude,
+        }
+        await self.connect(debug_log_conn=target, debug_log_params=params)
 
     def _get_series(self, entity_url, entity):
         # try to get the series from the provided charm URL

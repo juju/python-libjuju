@@ -238,7 +238,8 @@ class Connection:
             retry_backoff=10,
             specified_facades=None,
             proxy=None,
-            debug_log_conn=None
+            debug_log_conn=None,
+            debug_log_params={}
     ):
         """Connect to the websocket.
 
@@ -266,6 +267,7 @@ class Connection:
         :param specified_facades: Define a series of facade versions you wish to override
             to prevent using the conservative client pinning with in the client.
         :param TextIOWrapper debug_log_conn: target if this is a debug log connection
+        :param dict debug_log_params: filtering parameters for the debug-log output
         """
         self = cls()
         if endpoint is None:
@@ -300,6 +302,8 @@ class Connection:
 
         self.debug_log_target = debug_log_conn
         self.is_debug_log_connection = debug_log_conn is not None
+        self.debug_log_params = debug_log_params
+        self.debug_log_params.setdefault('lines-shown-so-far', 0)
 
         # Create that _Task objects but don't start the tasks yet.
         self._pinger_task = None
@@ -444,7 +448,8 @@ class Connection:
             while self.is_open:
                 result = await utils.run_with_interrupt(
                     self._ws.recv(),
-                    self.monitor.close_called)
+                    self.monitor.close_called,
+                    log=log)
                 if self.monitor.close_called.is_set():
                     break
                 if result is not None and result != '{}\n':
@@ -452,11 +457,17 @@ class Connection:
 
                     tag = result['tag']
                     ts = parse(result['ts'])
-                    sev = result['sev']
+                    lev = result['sev']
                     mod = result['mod']
                     msg = result['msg']
 
-                    self.debug_log_target.write("%s %02d:%02d:%02d %s %s %s\n" % (tag, ts.hour, ts.minute, ts.second, sev, mod, msg))
+                    self.debug_log_target.write("%s %02d:%02d:%02d %s %s %s\n" % (tag, ts.hour, ts.minute, ts.second, lev, mod, msg))
+
+                    self.debug_log_params['lines-shown-so-far'] += 1
+                    if self.debug_log_params['lines-shown-so-far'] >= self.debug_log_params['limit']:
+                        await self.close()
+                        return
+
         except KeyError as e:
             log.exception('Unexpected debug line -- %s' % e)
             await self.close()
