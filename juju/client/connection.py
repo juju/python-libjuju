@@ -448,7 +448,7 @@ class Connection:
         write_or_not = True
 
         entity = result['tag']
-        lev = result['sev']
+        msg_lev = result['sev']
         mod = result['mod']
         msg = result['msg']
 
@@ -464,14 +464,22 @@ class Connection:
             (only_these_modules == [] or mod in only_these_modules) and \
             (included_entities == [] or entity in included_entities)
 
-        # level = self.debug_log_params['level']
+        LEVELS = ['TRACE', 'DEBUG', 'INFO', 'WARNING', 'ERROR']
+        log_level = self.debug_log_params['level']
+
+        if log_level != "" and log_level not in LEVELS:
+            log.warning("Debug Logger: level should be one of %s, given %s" % (LEVELS, log_level))
+        else:
+            write_or_not = write_or_not and \
+                (log_level == "" or (LEVELS.index(msg_lev) >= LEVELS.index(log_level)))
+
         # lines = self.debug_log_params['lines']
         # no_tail = self.debug_log_params['no_tail']
 
         if write_or_not:
             ts = parse(result['ts'])
 
-            self.debug_log_target.write("%s %02d:%02d:%02d %s %s %s\n" % (entity, ts.hour, ts.minute, ts.second, lev, mod, msg))
+            self.debug_log_target.write("%s %02d:%02d:%02d %s %s %s\n" % (entity, ts.hour, ts.minute, ts.second, msg_lev, mod, msg))
             return 1
         else:
             return 0

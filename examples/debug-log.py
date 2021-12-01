@@ -11,11 +11,12 @@ async def main():
     await model.connect_current()
 
     await model.debug_log(
-        limit=15,
-        exclude_module=['juju.worker.logforwarder'],
+        # limit=15,
+        # exclude_module=['juju.worker.logforwarder'],
         # include_module=['juju.worker.dependency'], # <- only log dependency module
         # include=['machine-0'], # <- only log from machine-0
         # exclude=['machine-0'], # <- no log from machine-0
+        level='WARNING',
     )
 
     application = await model.deploy(

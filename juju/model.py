@@ -1491,8 +1491,8 @@ class Model:
 
     async def debug_log(
             self, target=sys.stdout, no_tail=False, exclude_module=[],
-            include_module=[], include=[], level=None, limit=0, lines=10,
-            exclude=[]):
+            include_module=[], include=[], level="", limit=sys.maxsize,
+            lines=10, exclude=[]):
         """Get log messages for this model.
 
         :param bool no_tail: Stop after returning existing log messages
