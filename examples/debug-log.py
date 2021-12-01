@@ -12,7 +12,9 @@ async def main():
 
     await model.debug_log(
         limit=15,
-        exclude_module=['juju.worker.logforwarder'])
+        exclude_module=['juju.worker.logforwarder'],
+        include_module=['juju.worker.provisioner'], # <- only log provisioner
+    )
 
     application = await model.deploy(
         'cs:ubuntu-10',

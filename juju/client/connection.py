@@ -454,7 +454,9 @@ class Connection:
         excluded_modules = self.debug_log_params['exclude_module']
         write_or_not = write_or_not and (mod not in excluded_modules)
 
-        # include_module = self.debug_log_params['include_module']
+        only_these_modules = self.debug_log_params['include_module']
+        write_or_not = write_or_not and (only_these_modules is not [] and mod in only_these_modules)
+
         # include = self.debug_log_params['include']
         # level = self.debug_log_params['level']
         # lines = self.debug_log_params['lines']
