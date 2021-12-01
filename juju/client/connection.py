@@ -416,11 +416,9 @@ class Connection:
         if self._receiver_task:
             self._receiver_task.cancel()
             self._receiver_task = None
-        if self._debug_log_task and not to_reconnect:
-            #  Don't need to cancel the _debug_log_task for reconnects
+        if self._debug_log_task:
             self._debug_log_task.cancel()
             self._debug_log_task = None
-            self._close_debug_log_target()
         #  Allow a second for tasks to be cancelled
         await jasyncio.sleep(1)
 
@@ -438,10 +436,6 @@ class Connection:
             return await self.messages.get(request_id)
         except GeneratorExit:
             return {}
-
-    def _close_debug_log_target(self):
-        if self.debug_log_target is not sys.stdout:
-            self.debug_log_target.close()
 
     def debug_log_filter_write(self, result):
 
@@ -748,7 +742,7 @@ class Connection:
                 if not self.endpoints else
                 self.endpoints
             )
-            if connector is self._connect_with_login:
+            if not self.is_debug_log_connection:
                 self._build_facades(res.get('facades', {}))
                 if not self._pinger_task:
                     self._pinger_task = jasyncio.create_task(self._pinger())

@@ -16,7 +16,7 @@ async def main():
         # include_module=['juju.worker.dependency'], # <- only log dependency module
         # include=['machine-0'], # <- only log from machine-0
         # exclude=['machine-0'], # <- no log from machine-0
-        level='WARNING',
+        # level='WARNING',
     )
 
     application = await model.deploy(
