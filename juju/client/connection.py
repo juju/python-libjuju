@@ -447,28 +447,31 @@ class Connection:
 
         write_or_not = True
 
+        entity = result['tag']
         lev = result['sev']
         mod = result['mod']
         msg = result['msg']
 
+        excluded_entities = self.debug_log_params['exclude']
         excluded_modules = self.debug_log_params['exclude_module']
-        write_or_not = write_or_not and (mod not in excluded_modules)
+        write_or_not = write_or_not and \
+            (mod not in excluded_modules) and \
+            (entity not in excluded_entities)
 
+        included_entities = self.debug_log_params['include']
         only_these_modules = self.debug_log_params['include_module']
-        write_or_not = write_or_not and (only_these_modules is not [] and mod in only_these_modules)
+        write_or_not = write_or_not and \
+            (only_these_modules == [] or mod in only_these_modules) and \
+            (included_entities == [] or entity in included_entities)
 
-        # include = self.debug_log_params['include']
         # level = self.debug_log_params['level']
         # lines = self.debug_log_params['lines']
-        # replay = self.debug_log_params['replay']
-        # exclude = self.debug_log_params['exclude']
         # no_tail = self.debug_log_params['no_tail']
 
         if write_or_not:
-            tag = result['tag']
             ts = parse(result['ts'])
 
-            self.debug_log_target.write("%s %02d:%02d:%02d %s %s %s\n" % (tag, ts.hour, ts.minute, ts.second, lev, mod, msg))
+            self.debug_log_target.write("%s %02d:%02d:%02d %s %s %s\n" % (entity, ts.hour, ts.minute, ts.second, lev, mod, msg))
             return 1
         else:
             return 0

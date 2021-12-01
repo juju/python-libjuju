@@ -13,7 +13,9 @@ async def main():
     await model.debug_log(
         limit=15,
         exclude_module=['juju.worker.logforwarder'],
-        include_module=['juju.worker.provisioner'], # <- only log provisioner
+        # include_module=['juju.worker.dependency'], # <- only log dependency module
+        # include=['machine-0'], # <- only log from machine-0
+        # exclude=['machine-0'], # <- no log from machine-0
     )
 
     application = await model.deploy(
