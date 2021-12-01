@@ -451,16 +451,16 @@ class Connection:
         mod = result['mod']
         msg = result['msg']
 
-        # get the parameters for the debug_log to decide write_or_not
+        excluded_modules = self.debug_log_params['exclude_module']
+        write_or_not = write_or_not and (mod not in excluded_modules)
 
-        # no_tail = self.debug_log_params['no_tail']
-        # exclude_module = self.debug_log_params['exclude_module']
         # include_module = self.debug_log_params['include_module']
         # include = self.debug_log_params['include']
         # level = self.debug_log_params['level']
         # lines = self.debug_log_params['lines']
         # replay = self.debug_log_params['replay']
         # exclude = self.debug_log_params['exclude']
+        # no_tail = self.debug_log_params['no_tail']
 
         if write_or_not:
             tag = result['tag']

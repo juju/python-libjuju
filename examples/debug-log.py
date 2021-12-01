@@ -10,7 +10,9 @@ async def main():
     model = Model()
     await model.connect_current()
 
-    await model.debug_log(limit=3)
+    await model.debug_log(
+        limit=15,
+        exclude_module=['juju.worker.logforwarder'])
 
     application = await model.deploy(
         'cs:ubuntu-10',
