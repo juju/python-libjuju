@@ -1683,7 +1683,7 @@ class Model:
             return await charms_facade.AddCharm(charm_origin=origin, url=charm_url, force=False)
 
         client_facade = client.ClientFacade.from_connection(self.connection())
-        await client_facade.AddCharm(channel=str(origin.risk), url=charm_url, force=False)
+        return await client_facade.AddCharm(channel=str(origin.risk), url=charm_url, force=False)
 
     async def _resolve_charm(self, url, origin):
         charms_cls = client.CharmsFacade
