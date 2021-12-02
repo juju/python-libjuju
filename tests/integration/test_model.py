@@ -599,6 +599,23 @@ async def test_local_oci_image_resource_charm(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_local_file_resource_charm(event_loop):
+    charm_path = TESTS_DIR / 'integration' / 'file-resource-charm'
+    async with base.CleanModel() as model:
+        resources = {"file-res": "test.file"}
+        app = await model.deploy(str(charm_path), resources=resources)
+        assert 'file-resource-charm' in model.applications
+
+        await model.wait_for_idle()
+        assert app.units[0].agent_status == 'idle'
+
+        ress = await app.get_resources()
+        assert 'file-res' in ress
+        assert ress['file-res']
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_store_resources_bundle(event_loop):
     pytest.skip('test_store_resources_bundle intermittent test failure')
     async with base.CleanModel() as model:

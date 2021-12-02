@@ -1829,8 +1829,7 @@ class Model:
 
         for name, path in resources.items():
             resource_type = metadata["resources"][name]["type"]
-            if resource_type != "oci-image":
-                # For  now only oci-images are supported
+            if resource_type not in {"oci-image", "file"}:
                 log.info("Resource {} of type {} is not supported".format(name, resource_type))
                 continue
 
@@ -1841,7 +1840,7 @@ class Model:
                 'path': path,
                 'revision': 0,
                 'size': 0,
-                'type_': 'oci-image',
+                'type_': resource_type,
                 'origin': 'upload',
             }
 
@@ -1854,40 +1853,44 @@ class Model:
             pending_id = response.pending_ids[0]
             resource_map[name] = pending_id
 
-            # TODO Docker Image validation and support for local images.
-            docker_image_details = {
-                'registrypath': path,
-                'username': '',
-                'password': '',
-            }
+            if resource_type == "oci-image":
+                # TODO Docker Image validation and support for local images.
+                docker_image_details = {
+                    'registrypath': path,
+                    'username': '',
+                    'password': '',
+                }
 
-            data = yaml.dump(docker_image_details)
+                data = yaml.dump(docker_image_details)
 
-            if sys.version_info[0:2] == (3, 5):
-                hash_alg = hashlib.sha384
-            else:
-                hash_alg = hashlib.sha3_384
+                if sys.version_info[0:2] == (3, 5):
+                    hash_alg = hashlib.sha384
+                else:
+                    hash_alg = hashlib.sha3_384
 
-            charmresource['fingerprint'] = hash_alg(bytes(data, 'utf-8')).digest()
+                charmresource['fingerprint'] = hash_alg(bytes(data, 'utf-8')).digest()
 
-            conn, headers, path_prefix = self.connection().https_connection()
+                conn, headers, path_prefix = self.connection().https_connection()
 
-            query = "?pendingid={}".format(pending_id)
-            url = "{}/applications/{}/resources/{}{}".format(
-                path_prefix, application, name, query)
-            disp = "multipart/form-data; filename=\"{}\"".format(path)
+                query = "?pendingid={}".format(pending_id)
+                url = "{}/applications/{}/resources/{}{}".format(
+                    path_prefix, application, name, query)
+                if resource_type == "oci-image":
+                    disp = "multipart/form-data; filename=\"{}\"".format(path)
+                else:
+                    disp = "form-data; filename=\"{}\"".format(path)
 
-            headers['Content-Type'] = 'application/octet-stream'
-            headers['Content-Length'] = len(data)
-            headers['Content-Sha384'] = charmresource['fingerprint'].hex()
-            headers['Content-Disposition'] = disp
+                headers['Content-Type'] = 'application/octet-stream'
+                headers['Content-Length'] = len(data)
+                headers['Content-Sha384'] = charmresource['fingerprint'].hex()
+                headers['Content-Disposition'] = disp
 
-            conn.request('PUT', url, data, headers)
+                conn.request('PUT', url, data, headers)
 
-            response = conn.getresponse()
-            result = response.read().decode()
-            if not response.status == 200:
-                raise JujuError(result)
+                response = conn.getresponse()
+                result = response.read().decode()
+                if not response.status == 200:
+                    raise JujuError(result)
 
         return resource_map
 
