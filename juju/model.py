@@ -1490,9 +1490,9 @@ class Model:
         raise NotImplementedError()
 
     async def debug_log(
-            self, target=sys.stdout, no_tail=False, exclude_module=None,
-            include_module=None, include=None, level=None, limit=0, lines=10,
-            replay=False, exclude=None):
+            self, target=sys.stdout, no_tail=False, exclude_module=[],
+            include_module=[], include=[], level="", limit=sys.maxsize,
+            lines=10, exclude=[]):
         """Get log messages for this model.
 
         :param bool no_tail: Stop after returning existing log messages
@@ -1507,14 +1507,23 @@ class Model:
             filtered) lines are shown
         :param int lines: Yield this many of the most recent lines, and keep
             yielding
-        :param bool replay: Yield the entire log, and keep yielding
         :param list exclude: Do not show log messages for these entities
 
         """
         if not self.is_connected():
             await self.connect()
 
-        await self.connect(debug_log_conn=target)
+        params = {
+            'no_tail': no_tail,
+            'exclude_module': exclude_module,
+            'include_module': include_module,
+            'include': include,
+            'level': level,
+            'limit': limit,
+            'lines': lines,
+            'exclude': exclude,
+        }
+        await self.connect(debug_log_conn=target, debug_log_params=params)
 
     def _get_series(self, entity_url, entity):
         # try to get the series from the provided charm URL

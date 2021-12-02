@@ -3,20 +3,21 @@ This example demonstrate how debug-log works
 
 """
 from juju import jasyncio
-import logging
-import sys
-from logging import getLogger
 from juju.model import Model
-
-LOG = getLogger(__name__)
-logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 
 async def main():
     model = Model()
     await model.connect_current()
 
-    await model.debug_log()
+    await model.debug_log(
+        # limit=15,
+        # exclude_module=['juju.worker.logforwarder'],
+        # include_module=['juju.worker.dependency'], # <- only log dependency module
+        # include=['machine-0'], # <- only log from machine-0
+        # exclude=['machine-0'], # <- no log from machine-0
+        # level='WARNING',
+    )
 
     application = await model.deploy(
         'cs:ubuntu-10',

@@ -1,4 +1,3 @@
-import sys
 import base64
 import json
 import logging
@@ -238,7 +237,8 @@ class Connection:
             retry_backoff=10,
             specified_facades=None,
             proxy=None,
-            debug_log_conn=None
+            debug_log_conn=None,
+            debug_log_params={}
     ):
         """Connect to the websocket.
 
@@ -266,6 +266,7 @@ class Connection:
         :param specified_facades: Define a series of facade versions you wish to override
             to prevent using the conservative client pinning with in the client.
         :param TextIOWrapper debug_log_conn: target if this is a debug log connection
+        :param dict debug_log_params: filtering parameters for the debug-log output
         """
         self = cls()
         if endpoint is None:
@@ -300,6 +301,8 @@ class Connection:
 
         self.debug_log_target = debug_log_conn
         self.is_debug_log_connection = debug_log_conn is not None
+        self.debug_log_params = debug_log_params
+        self.debug_log_shown_lines = 0  # number of lines
 
         # Create that _Task objects but don't start the tasks yet.
         self._pinger_task = None
@@ -412,11 +415,9 @@ class Connection:
         if self._receiver_task:
             self._receiver_task.cancel()
             self._receiver_task = None
-        if self._debug_log_task and not to_reconnect:
-            #  Don't need to cancel the _debug_log_task for reconnects
+        if self._debug_log_task:
             self._debug_log_task.cancel()
             self._debug_log_task = None
-            self._close_debug_log_target()
         #  Allow a second for tasks to be cancelled
         await jasyncio.sleep(1)
 
@@ -435,33 +436,74 @@ class Connection:
         except GeneratorExit:
             return {}
 
-    def _close_debug_log_target(self):
-        if self.debug_log_target is not sys.stdout:
-            self.debug_log_target.close()
+    def debug_log_filter_write(self, result):
+
+        write_or_not = True
+
+        entity = result['tag']
+        msg_lev = result['sev']
+        mod = result['mod']
+        msg = result['msg']
+
+        excluded_entities = self.debug_log_params['exclude']
+        excluded_modules = self.debug_log_params['exclude_module']
+        write_or_not = write_or_not and \
+            (mod not in excluded_modules) and \
+            (entity not in excluded_entities)
+
+        included_entities = self.debug_log_params['include']
+        only_these_modules = self.debug_log_params['include_module']
+        write_or_not = write_or_not and \
+            (only_these_modules == [] or mod in only_these_modules) and \
+            (included_entities == [] or entity in included_entities)
+
+        LEVELS = ['TRACE', 'DEBUG', 'INFO', 'WARNING', 'ERROR']
+        log_level = self.debug_log_params['level']
+
+        if log_level != "" and log_level not in LEVELS:
+            log.warning("Debug Logger: level should be one of %s, given %s" % (LEVELS, log_level))
+        else:
+            write_or_not = write_or_not and \
+                (log_level == "" or (LEVELS.index(msg_lev) >= LEVELS.index(log_level)))
+
+        # TODO
+        # lines = self.debug_log_params['lines']
+        # no_tail = self.debug_log_params['no_tail']
+
+        if write_or_not:
+            ts = parse(result['ts'])
+
+            self.debug_log_target.write("%s %02d:%02d:%02d %s %s %s\n" % (entity, ts.hour, ts.minute, ts.second, msg_lev, mod, msg))
+            return 1
+        else:
+            return 0
 
     async def _debug_logger(self):
         try:
             while self.is_open:
                 result = await utils.run_with_interrupt(
                     self._ws.recv(),
-                    self.monitor.close_called)
+                    self.monitor.close_called,
+                    log=log)
                 if self.monitor.close_called.is_set():
                     break
                 if result is not None and result != '{}\n':
                     result = json.loads(result)
 
-                    tag = result['tag']
-                    ts = parse(result['ts'])
-                    sev = result['sev']
-                    mod = result['mod']
-                    msg = result['msg']
+                    number_of_lines_written = self.debug_log_filter_write(result)
 
-                    self.debug_log_target.write("%s %02d:%02d:%02d %s %s %s\n" % (tag, ts.hour, ts.minute, ts.second, sev, mod, msg))
+                    self.debug_log_shown_lines += number_of_lines_written
+
+                    if self.debug_log_shown_lines >= self.debug_log_params['limit']:
+                        jasyncio.create_task(self.close())
+                        return
+
         except KeyError as e:
             log.exception('Unexpected debug line -- %s' % e)
-            await self.close()
+            jasyncio.create_task(self.close())
             raise
         except jasyncio.CancelledError:
+            jasyncio.create_task(self.close())
             raise
         except websockets.exceptions.ConnectionClosed:
             log.warning('Debug Logger: Connection closed, reconnecting')
@@ -472,7 +514,7 @@ class Connection:
             return
         except Exception as e:
             log.exception("Error in debug logger : %s" % e)
-            await self.close()
+            jasyncio.create_task(self.close())
             raise
 
     async def _receiver(self):
@@ -700,7 +742,7 @@ class Connection:
                 if not self.endpoints else
                 self.endpoints
             )
-            if connector is self._connect_with_login:
+            if not self.is_debug_log_connection:
                 self._build_facades(res.get('facades', {}))
                 if not self._pinger_task:
                     self._pinger_task = jasyncio.create_task(self._pinger())
