@@ -4,7 +4,8 @@ saas:
     url: admin/{}.mysql
 applications:
   wordpress:
-    charm: cs:wordpress
+    charm: wordpress
+    channel: stable
     num_units: 1
 relations:
 - - wordpress:db

@@ -1,5 +1,6 @@
-series: xenial
+description: An overlay for tests
 applications:
+  ntp:
   ghost:
     charm: "ghost"
     channel: stable
@@ -7,6 +8,6 @@ applications:
   mysql:
     charm: "mysql"
     channel: stable
-    num_units: 1
+    num_units: 1  
 relations:
   - ["ghost", "mysql"]

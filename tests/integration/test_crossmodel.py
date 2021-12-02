@@ -164,7 +164,7 @@ async def test_add_bundle(event_loop):
                 raise
 
             await model_1.deploy(
-                'cs:mysql-58',
+                'mysql',
                 application_name='mysql',
                 series='bionic',
                 channel='stable',
