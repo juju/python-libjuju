@@ -1,4 +1,3 @@
-import sys
 import base64
 import json
 import logging
@@ -467,6 +466,7 @@ class Connection:
             write_or_not = write_or_not and \
                 (log_level == "" or (LEVELS.index(msg_lev) >= LEVELS.index(log_level)))
 
+        # TODO
         # lines = self.debug_log_params['lines']
         # no_tail = self.debug_log_params['no_tail']
 
