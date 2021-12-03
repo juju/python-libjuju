@@ -39,7 +39,7 @@ async def test_run(event_loop):
         app = await model.deploy(
             'ubuntu',
             application_name='ubuntu',
-            series='trusty',
+            series='focal',
             channel='stable',
         )
 

@@ -167,7 +167,7 @@ async def test_add_bundle(event_loop):
             await model_1.deploy(
                 'mysql',
                 application_name='mysql',
-                series='bionic',
+                series='xenial',
                 channel='stable',
             )
             assert 'mysql' in model_1.applications
