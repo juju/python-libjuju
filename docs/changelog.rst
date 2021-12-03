@@ -1,9 +1,35 @@
 Changelog
 ---------
 
-Next Release
-^^^^^^^^^^^^
+2.9.5
+^^^^^
 
+Friday December 3 2021
+
+## What's Changed
+
+* remove the event loop arguments by @cderici in https://github.com/juju/python-libjuju/pull/560
+* add debug-log by @cderici in https://github.com/juju/python-libjuju/pull/562
+* Model status by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/563
+* Pin cffi version to 1.14.6 for Python 3.5 by @cderici in https://github.com/juju/python-libjuju/pull/570
+* Wait for applications to terminate on model reset by @balbirthomas in https://github.com/juju/python-libjuju/pull/572
+* Babysitting python3.5 by @cderici in https://github.com/juju/python-libjuju/pull/571
+* Deploy charmhub bundles by @cderici in https://github.com/juju/python-libjuju/pull/569
+* Facade schemas for 2.9.17 by @SimonRichardson in https://github.com/juju/python-libjuju/pull/579
+* Bundles with overlays by @cderici in https://github.com/juju/python-libjuju/pull/566
+* Consistently getting a unit's public address by @cderici in https://github.com/juju/python-libjuju/pull/573
+* [JUJU-158] Add python3.9 to setup.py by @cderici in https://github.com/juju/python-libjuju/pull/585
+* [JUJU-157] Add note for removing services by @cderici in https://github.com/juju/python-libjuju/pull/583
+* Added boolean entries to normalize values. by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/582
+* [JUJU-138] Streamlining asyncio tasks/events by @cderici in https://github.com/juju/python-libjuju/pull/580
+* [JUJU-234] Fix for small bug in task handling by @cderici in https://github.com/juju/python-libjuju/pull/589
+* Ensure all watchers validate for the Id by @SimonRichardson in https://github.com/juju/python-libjuju/pull/592
+* [JUJU-276] Facade schemas for 2.9.19 by @cderici in https://github.com/juju/python-libjuju/pull/594
+* [JUJU-238] Small bug fix for old ClientFacade support by @cderici in https://github.com/juju/python-libjuju/pull/593
+* [JUJU-239] Debug-log parameters by @cderici in https://github.com/juju/python-libjuju/pull/595
+* [JUJU-213] Local type `file` resource support by @cderici in https://github.com/juju/python-libjuju/pull/590
+* [JUJU-289] Use provided series in deploy if supported by @jack-w-shaw in https://github.com/juju/python-libjuju/pull/596
+* [JUJU-292] Update the charms in the tests to use Charmhub by @cderici in https://github.com/juju/python-libjuju/pull/597
 * Legacy "services" for describing "applications" within bundles are no longer supported. "applications" can be used as a direct replacement for "services" in bundles.yaml.
 * The websocket (ws) in a Connection object became a read-only property.
 
@@ -11,8 +37,6 @@ Next Release
 ^^^^^
 
 Tuesday October 12 2021
-
-## What's Changed
 
 * Charmhub deploy charm by @SimonRichardson in https://github.com/juju/python-libjuju/pull/483
 * add wait_for_status instead of wait_for_active by @sed-i in https://github.com/juju/python-libjuju/pull/517
