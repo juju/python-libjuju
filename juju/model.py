@@ -542,17 +542,26 @@ class CharmhubDeployType:
         ch = Channel('latest', 'stable')
         if channel is not None:
             ch = Channel.parse(channel).normalize()
+
         origin = client.CharmOrigin(source="charm-hub",
                                     architecture=architecture,
                                     risk=ch.risk,
                                     track=ch.track)
-        charm_url, origin = await self.charm_resolver(url, origin)
+
+        charm_url, origin, supported_series = await self.charm_resolver(url, origin)
 
         if app_name is None:
             app_name = url.name
 
+        if series:
+            if series in supported_series:
+                origin.series = series
+                charm_url.series = series
+            else:
+                raise JujuError("Series {} not supported for {}. Only {}".format(series, url, supported_series))
+
         return DeployTypeResult(
-            identifier=charm_url,
+            identifier=str(charm_url),
             app_name=app_name,
             origin=origin,
             is_bundle=origin.type_ == "bundle",
@@ -1721,7 +1730,7 @@ class Model:
         if result.error:
             raise JujuError(result.error.message)
 
-        return (result.url, result.charm_origin)
+        return (URL.parse(result.url), result.charm_origin, result.supported_series)
 
     async def _resolve_architecture(self, url):
         if url.architecture:

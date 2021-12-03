@@ -279,6 +279,29 @@ async def test_deploy_channels_revs(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_deploy_from_ch_with_series(event_loop):
+    charm = 'ch:ubuntu'
+    for series in ['xenial', 'bionic', 'focal']:
+        async with base.CleanModel() as model:
+            app_name = "ubuntu-{}".format(series)
+            await model.deploy(charm, application_name=app_name, series=series)
+            assert (await model.get_status())["applications"][app_name]["series"] == series
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_deploy_from_ch_with_invalid_series(event_loop):
+    async with base.CleanModel() as model:
+        charm = 'ch:ubuntu'
+        try:
+            await model.deploy(charm, series='invalid')
+            assert False, 'Invalid deployment should raise JujuError'
+        except JujuError:
+            pass
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_add_machine(event_loop):
     from juju.machine import Machine
 

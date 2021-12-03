@@ -98,7 +98,7 @@ async def test_add_relation_with_offer(event_loop):
         application = await model_1.deploy(
             'ch:mysql',
             application_name='mysql',
-            series='focal',
+            series='xenial',
             channel='stable',
         )
         assert 'mysql' in model_1.applications
@@ -115,7 +115,7 @@ async def test_add_relation_with_offer(event_loop):
             await model_2.deploy(
                 'ch:mediawiki',
                 application_name='mediawiki',
-                series='focal',
+                series='trusty',
                 channel='stable',
             )
             await model_2.block_until(
