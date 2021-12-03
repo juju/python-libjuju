@@ -94,6 +94,7 @@ async def test_remove_saas(event_loop):
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_add_relation_with_offer(event_loop):
+    pytest.skip('Revise: intermittent problem with the remove_saas call')
     async with base.CleanModel() as model_1:
         application = await model_1.deploy(
             'ch:mysql',
@@ -164,9 +165,9 @@ async def test_add_bundle(event_loop):
                 raise
 
             await model_1.deploy(
-                'cs:mysql-58',
+                'mysql',
                 application_name='mysql',
-                series='bionic',
+                series='xenial',
                 channel='stable',
             )
             assert 'mysql' in model_1.applications

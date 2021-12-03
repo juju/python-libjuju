@@ -548,7 +548,8 @@ class CharmhubDeployType:
                                     risk=ch.risk,
                                     track=ch.track)
 
-        charm_url, origin, supported_series = await self.charm_resolver(url, origin)
+        charm_url_str, origin, supported_series = await self.charm_resolver(url, origin)
+        charm_url = URL.parse(charm_url_str)
 
         if app_name is None:
             app_name = url.name
@@ -1730,7 +1731,7 @@ class Model:
         if result.error:
             raise JujuError(result.error.message)
 
-        return (URL.parse(result.url), result.charm_origin, result.supported_series)
+        return (result.url, result.charm_origin, result.supported_series)
 
     async def _resolve_architecture(self, url):
         if url.architecture:
