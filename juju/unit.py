@@ -2,7 +2,9 @@ import logging
 
 import pyrfc3339
 
-from . import model, tag, jasyncio
+from juju.errors import JujuAPIError
+
+from . import model, tag
 from .annotationhelper import _get_annotations, _set_annotations
 from .client import client
 
@@ -67,6 +69,7 @@ class Unit(model.ModelEntity):
     def public_address(self):
         """ Get the public address.
 
+        This property is deprecated, use get_public_address method.
         """
         return self.safe_data['public-address'] or None
 
@@ -102,27 +105,20 @@ class Unit(model.ModelEntity):
         return await app_facade.DestroyUnits(unit_names=[self.name])
     remove = destroy
 
-    async def get_public_address(self, timeout=60):
-        """Return the public address of this unit. Waits until the unit is
-        assigned a public address.
-
-        In case of a timeout, a None is returned (instead of a
-        TimeoutError)
-
-        :param int timeout (60): Maximum seconds to wait for unit to
-        be assigned an address.
+    async def get_public_address(self):
+        """Return the public address of this unit.
 
         :return int public-address
-
         """
-        try:
-            if self.public_address is None:
-                await self.model.block_until(
-                    lambda: self.public_address,
-                    timeout=timeout)
-        except jasyncio.TimeoutError:
-            return None
-        return self.public_address
+        addr = self.safe_data['public-address'] or None
+        if addr is not None:
+            return addr
+
+        app_facade = client.ApplicationFacade.from_connection(self.connection)
+        defResult = await app_facade.UnitsInfo(entities=[client.Entity(self.tag)])
+        if defResult is not None and len(defResult.results) > 1:
+            raise JujuAPIError("expected one result")
+        return defResult.results[0].result.get('public_address', None)
 
     def get_resources(self, details=False):
         """Return resources for this unit.
