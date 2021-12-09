@@ -16,7 +16,7 @@ async def test_unit_public_address(event_loop):
             application_name='ubuntu',
             series='bionic',
             channel='stable',
-            num_units=2,
+            num_units=1,
         )
 
         # wait for the units to come up
@@ -24,10 +24,20 @@ async def test_unit_public_address(event_loop):
 
         # make sure we have some units to test with
         assert len(app.units) >= 1
+        unit = app.units[0]
+
+        await asyncio.wait_for(
+            model.block_until(lambda: unit.machine),
+            timeout=60)
+        machine = unit.machine
+        await asyncio.wait_for(
+            model.block_until(lambda: (machine.status == 'running' and
+                                       machine.agent_status == 'started')),
+            timeout=480)
 
         for unit in app.units:
-            addr = await unit.get_public_address(timeout=480)
-            assert addr, 'unit public address not set'
+            addr = await unit.get_public_address()
+            assert addr is not None
 
 
 @base.bootstrapped
