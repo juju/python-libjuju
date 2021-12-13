@@ -12,6 +12,7 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 
+import hashlib
 import json
 import logging
 import pathlib
@@ -432,6 +433,40 @@ class Application(model.ModelEntity):
         if not schema:
             actions = {k: v.description for k, v in actions.items()}
         return actions
+
+    def attach_resource(self, resource_name, file_name, file_obj):
+        """Updates the resource for an application by uploading file from
+        local disk to the Juju controller.
+
+        :param str resource_name: Name of the resource to be updated.
+        :param str file_name: Name of the local file to be uploaded.
+        :param TextIOWrapper file_obj: Actual object to be read for data.
+        """
+        conn, headers, path_prefix = self.connection.https_connection()
+
+        url = "{}/applications/{}/resources/{}".format(
+            path_prefix, self.name, resource_name)
+
+        data = file_obj.read()
+
+        headers['Content-Type'] = 'application/octet-stream'
+        headers['Content-Length'] = len(data)
+        headers['Content-Sha384'] = hashlib.sha384(bytes(data, 'utf-8')).hexdigest()
+
+        file_name = str(file_name)
+        if not file_name.startswith('./'):
+            file_name = './' + file_name
+
+        headers['Content-Disposition'] = "form-data; filename=\"{}\"".format(file_name)
+        headers['Accept-Encoding'] = 'gzip'
+        headers['Bakery-Protocol-Version'] = 3
+        headers['Connection'] = 'close'
+
+        conn.request('PUT', url, data, headers)
+        response = conn.getresponse()
+        result = response.read().decode()
+        if not response.status == 200:
+            raise JujuError(result)
 
     async def get_resources(self):
         """Return resources for this application.
