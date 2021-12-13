@@ -657,7 +657,7 @@ async def test_attach_resource(event_loop):
         await model.wait_for_idle()
         assert app.units[0].agent_status == 'idle'
 
-        with open(charm_path / 'test.file') as f:
+        with open(str(charm_path / 'test.file')) as f:
             app.attach_resource('file-res', 'test.file', f)
 
 
