@@ -1,4 +1,3 @@
-import asyncio
 from pathlib import Path
 
 import pytest
@@ -96,7 +95,7 @@ async def test_status(event_loop):
                 return False
             return app.status == 'blocked'
 
-        await asyncio.wait_for(model.block_until(app_ready), timeout=480)
+        await model.block_until(app_ready, timeout=480)
         assert app.status == 'blocked'
 
 
@@ -209,24 +208,15 @@ async def test_upgrade_charm_resource(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy('cs:~juju-qa/bionic/upgrade-charm-resource-test-0')
 
-        def units_ready():
-            if not app.units:
-                return False
-            unit = app.units[0]
-            return unit.workload_status == 'active' and \
-                unit.agent_status == 'idle'
-
-        await asyncio.wait_for(model.block_until(units_ready), timeout=480)
+        await model.wait_for_idle(wait_for_units=1)
         unit = app.units[0]
         expected_message = 'I have no resource.'
         assert unit.workload_status_message == expected_message
 
         await app.upgrade_charm(revision=1)
-        await asyncio.wait_for(
-            model.block_until(
-                lambda: unit.workload_status_message != 'I have no resource.'
-            ),
-            timeout=60
+        await model.block_until(
+            lambda: unit.workload_status_message != 'I have no resource.',
+            timeout=60,
         )
         expected_message = 'My resource: I am the resource.'
         assert app.units[0].workload_status_message == expected_message
