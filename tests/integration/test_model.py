@@ -732,7 +732,7 @@ async def test_get_machines(event_loop):
 async def test_wait_for_idle_without_units(event_loop):
     async with base.CleanModel() as model:
         await model.deploy(
-            'cs:~jameinel/ubuntu-lite-7',
+            'ubuntu',
             application_name='ubuntu',
             series='bionic',
             channel='stable',
@@ -740,6 +740,35 @@ async def test_wait_for_idle_without_units(event_loop):
         )
         with pytest.raises(jasyncio.TimeoutError):
             await model.wait_for_idle(timeout=10)
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_wait_for_idle_with_not_enough_units(event_loop):
+    async with base.CleanModel() as model:
+        await model.deploy(
+            'ubuntu',
+            application_name='ubuntu',
+            series='bionic',
+            channel='stable',
+            num_units=2,
+        )
+        with pytest.raises(jasyncio.TimeoutError):
+            await model.wait_for_idle(timeout=5 * 60, wait_for_units=3)
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_wait_for_idle_with_enough_units(event_loop):
+    async with base.CleanModel() as model:
+        await model.deploy(
+            'ubuntu',
+            application_name='ubuntu',
+            series='bionic',
+            channel='stable',
+            num_units=3,
+        )
+        await model.wait_for_idle(timeout=5 * 60, wait_for_units=3)
 
 
 @base.bootstrapped
