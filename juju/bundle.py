@@ -125,13 +125,8 @@ class BundleHandler:
             series = (
                 app_dict.get('series') or
                 default_series or
-                get_charm_series(charm_dir)
+                await get_charm_series(charm_dir, self.model)
             )
-            if not series:
-                model_config = await self.model.get_config()
-                default_series = model_config.get("default-series")
-                if default_series:
-                    default_series = series = default_series.value
             if not series:
                 raise JujuError(
                     "Couldn't determine series for charm at {}. "
@@ -410,11 +405,14 @@ def is_local_charm(charm_url):
     return charm_url.startswith('.') or charm_url.startswith('local:') or os.path.isabs(charm_url)
 
 
-def get_charm_series(path):
+async def get_charm_series(path, model):
     """Inspects the charm directory at ``path`` and returns a default
     series from its metadata.yaml (the first item in the 'series' list).
 
+    Tries to extract the informiation from the given model if no
+    series is determined from the path.
     Returns None if no series can be determined.
+
     """
     path = Path(path)
     try:
@@ -432,8 +430,16 @@ def get_charm_series(path):
             mark = exc.problem_mark
             log.error("Error parsing YAML file {}, line {}, column: {}".format(md, mark.line, mark.column))
         raise
-    series = data.get('series')
-    return series[0] if series else None
+    _series = data.get('series')
+    series = _series[0] if _series else None
+
+    if series is None:
+        model_config = await model.get_config()
+        default_series = model_config.get("default-series")
+        if default_series:
+            series = default_series.value
+
+    return series
 
 
 class ChangeSet:

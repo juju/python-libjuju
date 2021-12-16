@@ -755,7 +755,7 @@ class Application(model.ModelEntity):
         charm_dir = path.expanduser().resolve()
         model_config = await self.get_config()
 
-        series = get_charm_series(charm_dir)
+        series = await get_charm_series(charm_dir, self.model)
         if not series:
             model_config = await self.get_config()
             default_series = model_config.get("default-series")
