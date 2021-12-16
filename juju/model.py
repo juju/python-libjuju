@@ -742,6 +742,10 @@ class Model:
         """
         return await self.connect()
 
+    async def connect_to(self, connection):
+        conn_params = connection.connect_params()
+        await self._connect_direct(**conn_params)
+
     async def _connect_direct(self, **kwargs):
         await self.disconnect()
         await self._connector.connect(**kwargs)
