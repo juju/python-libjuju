@@ -1655,7 +1655,7 @@ class Model:
                 metadata = utils.get_local_charm_metadata(charm_dir)
                 if not application_name:
                     application_name = metadata['name']
-                series = series or get_charm_series(charm_dir, self)
+                series = series or await get_charm_series(charm_dir, self)
                 if not series:
                     model_config = await self.get_config()
                     default_series = model_config.get("default-series")
