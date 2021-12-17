@@ -933,6 +933,29 @@ async def test_backups(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_connect_to_connection(event_loop):
+    async with base.CleanModel() as test_model:
+        # get the connection from test_model
+        conn = test_model.connection()
+
+        # make a new Model obj
+        m = Model()
+
+        # it's not connected yet
+        assert not m.is_connected()
+
+        # connect it directly to the connection
+        await m.connect_to(conn)
+
+        # it is connected
+        assert m.is_connected()
+
+        # cleanup
+        await m.disconnect()
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_model_cache_update(event_loop):
     """Connecting to a new model shouldn't fail because the cache is not
     updated yet
