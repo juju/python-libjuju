@@ -3,7 +3,8 @@ This example:
 
 1. Connects to the current model
 2. Deploy a bundle and waits until it reports itself active
-3. Destroys the units and applications
+3. Upgrades the charm with a local path
+4. Destroys the units and applications
 
 """
 from juju import jasyncio
@@ -26,7 +27,9 @@ async def main():
         await model.wait_for_idle(status='active')
         print("Successfully deployed!")
 
-        await applications[0].upgrade_charm(path='./examples/charms/onos.charm')
+        local_path = './examples/charms/onos.charm'
+        print('Upgrading charm with %s' % local_path)
+        await applications[0].upgrade_charm(path=local_path)
 
         await model.wait_for_idle(status='active')
 
