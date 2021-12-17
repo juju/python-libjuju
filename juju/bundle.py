@@ -434,10 +434,13 @@ async def get_charm_series(path, model):
     series = _series[0] if _series else None
 
     if series is None:
+        # get the ConfigValue for the 'default-series' from the model
         model_config = await model.get_config()
-        default_series = model_config.get("default-series")
-        if default_series:
-            series = default_series.value
+        _default_series = model_config.get("default-series")
+
+        if _default_series is not None:
+            # then update the series with its value
+            series = _default_series.value
 
     return series
 
