@@ -29,7 +29,7 @@ async def test_block_coroutine(event_loop):
             return False
 
         await utils.block_until_with_coroutine(is_leader_elected,
-                                               timeout=60)
+                                               timeout=480)
 
 
 @base.bootstrapped
