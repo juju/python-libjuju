@@ -118,7 +118,7 @@ class Unit(model.ModelEntity):
         defResult = await app_facade.UnitsInfo(entities=[client.Entity(self.tag)])
         if defResult is not None and len(defResult.results) > 1:
             raise JujuAPIError("expected one result")
-        return defResult.results[0].result.get('public_address', None)
+        return defResult.results[0].result.get('public-address', None)
 
     def get_resources(self, details=False):
         """Return resources for this unit.
