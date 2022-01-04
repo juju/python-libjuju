@@ -21,7 +21,12 @@ async def test_block_coroutine(event_loop):
         )
 
         async def is_leader_elected():
-            return any([await u.is_leader_from_status() for u in app.units])
+            # TODO: cleanup/refactor the code below when the py3.5
+            # support is dropped
+            for u in app.units:
+                if await u.is_leader_from_status():
+                    return True
+            return False
 
         await utils.block_until_with_coroutine(is_leader_elected,
                                                timeout=60)
