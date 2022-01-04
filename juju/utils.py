@@ -130,7 +130,7 @@ async def block_until_with_coroutine(condition_coroutine, timeout=None, wait_per
     async def _block():
         while not await condition_coroutine():
             await jasyncio.sleep(wait_period)
-    await jasyncio.wait_for(_block(), timeout)
+    await jasyncio.wait_for(_block(), timeout=timeout)
 
 
 async def wait_for_bundle(model, bundle, **kwargs):
