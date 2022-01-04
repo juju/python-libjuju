@@ -239,6 +239,8 @@ class Machine(model.ModelEntity):
             scope = address['scope']
             if scope == 'public' or scope == 'local-cloud':
                 return address['value']
+            if scope == 'local-fan':
+                return address['value']
         return None
 
     @property
