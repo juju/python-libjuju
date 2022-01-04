@@ -773,6 +773,48 @@ async def test_wait_for_idle_with_enough_units(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_wait_for_idle_with_exact_units(event_loop):
+    async with base.CleanModel() as model:
+        await model.deploy(
+            'ubuntu',
+            application_name='ubuntu',
+            series='bionic',
+            channel='stable',
+            num_units=2,
+        )
+        await model.wait_for_idle(timeout=5 * 60, wait_for_exact_units=2)
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_wait_for_idle_with_exact_units_scale_down(event_loop):
+    """Deploys 3 units, waits for them to be idle, then removes 2 of them,
+    then waits for exactly 1 unit to be left.
+
+    """
+    async with base.CleanModel() as model:
+        app = await model.deploy(
+            'ubuntu',
+            application_name='ubuntu',
+            series='bionic',
+            channel='stable',
+            num_units=3,
+        )
+        await model.wait_for_idle(timeout=5 * 60, wait_for_exact_units=3)
+
+        two_units_to_remove = [u.name for u in app.units[:2]]
+        await app.destroy_units(*two_units_to_remove)
+
+        # assert that the following wait is not returning instantaneously
+        starttime = time.time()
+        await model.wait_for_idle(timeout=5 * 60, wait_for_exact_units=1)
+        endtime = time.time()
+        # checking if waited more than 10ms
+        assert (endtime - starttime) > 0.001
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_watcher_reconnect(event_loop):
     async with base.CleanModel() as model:
         await model.connection().close()

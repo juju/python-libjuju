@@ -2554,7 +2554,7 @@ class Model:
 
     async def wait_for_idle(self, apps=None, raise_on_error=True, raise_on_blocked=False,
                             wait_for_active=False, timeout=10 * 60, idle_period=15, check_freq=0.5,
-                            status=None, wait_for_units=1):
+                            status=None, wait_for_units=1, wait_for_exact_units=-1):
         """Wait for applications in the model to settle into an idle state.
 
         :param apps (list[str]): Optional list of specific app names to wait on.
@@ -2593,6 +2593,11 @@ class Model:
         :param wait_for_units (int): The least number of units to be expected before
             going into the idle state.
             The default is 1 unit.
+
+        :param wait_for_exact_units (int): The exact number of units to be expected before
+            going into the idle state. (e.g. useful for scaling down).
+            The default is -1 unit.
+            When positive, takes precedence over the `wait_for_units` parameter.
         """
         if wait_for_active:
             warnings.warn("wait_for_active is deprecated; use status", DeprecationWarning)
@@ -2636,7 +2641,12 @@ class Model:
                     errors.setdefault("App", []).append(app.name)
                 if raise_on_blocked and app.status == "blocked":
                     blocks.setdefault("App", []).append(app.name)
-                if len(app.units) < wait_for_units:
+                if wait_for_exact_units > 0:
+                    if len(app.units) != wait_for_exact_units:
+                        busy.append(app.name + " (waiting for exactly %s units, current : %s)" %
+                                    (wait_for_exact_units, len(app.units)))
+                        continue
+                elif len(app.units) < wait_for_units:
                     busy.append(app.name + " (not enough units yet - %s/%s)" %
                                 (len(app.units), wait_for_units))
                     continue
