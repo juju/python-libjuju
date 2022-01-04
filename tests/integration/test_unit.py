@@ -1,10 +1,30 @@
 import asyncio
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-
 import pytest
 
+from juju import utils
+
 from .. import base
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_block_coroutine(event_loop):
+    async with base.CleanModel() as model:
+        app = await model.deploy(
+            'ch:ubuntu',
+            application_name='ubuntu',
+            series='bionic',
+            channel='stable',
+            num_units=3,
+        )
+
+        async def is_leader_elected():
+            return any([await u.is_leader_from_status() for u in app.units])
+
+        await utils.block_until_with_coroutine(is_leader_elected,
+                                               timeout=60)
 
 
 @base.bootstrapped
