@@ -235,7 +235,6 @@ class Machine(model.ModelEntity):
         May return None if no suitable address is found.
         """
         addresses = self.safe_data['addresses'] or []
-        return_addresses = []
         ordered_addresses = []
         ordered_scopes = ['public', 'local-cloud', 'local-fan']
         for scope in ordered_scopes:
@@ -246,9 +245,7 @@ class Machine(model.ModelEntity):
             scope = address['scope']
             for check_scope in ordered_scopes:
                 if scope == check_scope:
-                    return_addresses.append(address['value'])
-        if return_addresses:
-            return return_addresses[0]
+                    return address['value']
         return None
 
     @property
