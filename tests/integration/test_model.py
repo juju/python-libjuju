@@ -419,7 +419,7 @@ async def add_manual_machine_ssh(event_loop, is_root=False):
             'name': test_name,
             'source': {
                 'type': 'image',
-                'alias': 'bionic',
+                'alias': 'focal',
                 'mode': 'pull',
                 'protocol': 'simplestreams',
                 'server': 'https://cloud-images.ubuntu.com/releases',

@@ -123,6 +123,16 @@ async def block_until(*conditions, timeout=None, wait_period=0.5):
     await jasyncio.wait_for(_block(), timeout)
 
 
+async def block_until_with_coroutine(condition_coroutine, timeout=None, wait_period=0.5):
+    """Return only after the given coroutine returns True.
+
+    """
+    async def _block():
+        while not await condition_coroutine():
+            await jasyncio.sleep(wait_period)
+    await jasyncio.wait_for(_block(), timeout=timeout)
+
+
 async def wait_for_bundle(model, bundle, **kwargs):
     """Helper to wait for just the apps in a specific bundle.
 
