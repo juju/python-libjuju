@@ -235,10 +235,17 @@ class Machine(model.ModelEntity):
         May return None if no suitable address is found.
         """
         addresses = self.safe_data['addresses'] or []
-        for address in addresses:
+        ordered_addresses = []
+        ordered_scopes = ['public', 'local-cloud', 'local-fan']
+        for scope in ordered_scopes:
+            for address in addresses:
+                if scope == address['scope']:
+                    ordered_addresses.append(address)
+        for address in ordered_addresses:
             scope = address['scope']
-            if scope == 'public' or scope == 'local-cloud':
-                return address['value']
+            for check_scope in ordered_scopes:
+                if scope == check_scope:
+                    return address['value']
         return None
 
     @property
