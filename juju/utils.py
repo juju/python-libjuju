@@ -95,6 +95,7 @@ class IdQueue:
     """
     Wrapper around asyncio.Queue that maintains a separate queue for each ID.
     """
+
     def __init__(self, maxsize=0):
         self._queues = defaultdict(partial(jasyncio.Queue, maxsize))
 
@@ -115,6 +116,8 @@ class IdQueue:
 
 async def block_until(*conditions, timeout=None, wait_period=0.5):
     """Return only after all conditions are true.
+    If a timeout occurs, it cancels the task and raises
+    asyncio.TimeoutError.
 
     """
     async def _block():
@@ -125,7 +128,8 @@ async def block_until(*conditions, timeout=None, wait_period=0.5):
 
 async def block_until_with_coroutine(condition_coroutine, timeout=None, wait_period=0.5):
     """Return only after the given coroutine returns True.
-
+    If a timeout occurs, it cancels the task and raises
+    asyncio.TimeoutError.
     """
     async def _block():
         while not await condition_coroutine():
