@@ -1,12 +1,28 @@
 Changelog
 ---------
 
+2.9.6
+^^^^^
+
+Thursday January 27 2022
+
+## What's Changed
+
+* [JUJU-320] Unit public address by @SimonRichardson in https://github.com/juju/python-libjuju/pull/600
+* [JUJU-244] Add attach-resource by @cderici in https://github.com/juju/python-libjuju/pull/601
+* [JUJU-140] Model.wait_for_idle -- for apps with no units yet by @cderici in https://github.com/juju/python-libjuju/pull/575
+* [JUJU-367] Improve `get_charm_series` to check the model for series for a local charm by @cderici in https://github.com/juju/python-libjuju/pull/607
+* [JUJU-366] Utility for connecting directly to existing connection by @cderici in https://github.com/juju/python-libjuju/pull/605
+* Use public-address key instead of public_address by @wolsen in https://github.com/juju/python-libjuju/pull/610
+* [JUJU-376] `wait_for_idle` to support scale down by @cderici in https://github.com/juju/python-libjuju/pull/613
+* [JUJU-378] Utility for block_until-ing with a custom coroutine by @cderici in https://github.com/juju/python-libjuju/pull/614
+* Fallback to 'local-fan' by @dparv in https://github.com/juju/python-libjuju/pull/612
+* Minor comments on docs for block_until related functions. by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/617
+
 2.9.5
 ^^^^^
 
 Friday December 3 2021
-
-## What's Changed
 
 * remove the event loop arguments by @cderici in https://github.com/juju/python-libjuju/pull/560
 * add debug-log by @cderici in https://github.com/juju/python-libjuju/pull/562
