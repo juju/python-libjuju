@@ -8,6 +8,7 @@ import logging
 import sys
 from logging import getLogger
 from juju.model import Model
+from juju.status import formatted_status
 
 LOG = getLogger(__name__)
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
@@ -31,7 +32,8 @@ async def main():
             # By setting raw to True, the returned
             # entry contains a FullStatus object with
             # all the available status data.
-            status = await model.status(raw=True)
+            # status = await model.status(raw=True)
+            status = await formatted_status(model)
             print(status)
         except Exception as e:
             print(e)

@@ -112,10 +112,14 @@ def _print_status_apps(result_status):
         # like in ch:amd64/trusty/mediawiki-28
         charm_name = app.charm.split('/')[-1]
         charm_name = charm_name.split('-')[0]
+        work_ver = 'NA' if app.workload_version is None else app.workload_version
+        charm_channel = 'NA' if app.charm_channel is None else app.charm_channel
+        app_units = 'NA' if app.units is None else len(app.units)
+        app_status = 'NA' if app.status.status is None else app.status.status
         result_str += '\n'
         result_str += limits.format(
-            name, app.workload_version, app.status.status, len(app.units), charm_name,
-            app.charm_channel)
+            name, work_ver, app_status, app_units, charm_name,
+            charm_channel)
     result_str += '\n'
     return result_str
 
