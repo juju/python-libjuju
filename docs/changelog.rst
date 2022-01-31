@@ -18,6 +18,7 @@ Thursday January 27 2022
 * [JUJU-378] Utility for block_until-ing with a custom coroutine by @cderici in https://github.com/juju/python-libjuju/pull/614
 * Fallback to 'local-fan' by @dparv in https://github.com/juju/python-libjuju/pull/612
 * Minor comments on docs for block_until related functions. by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/617
+* Additional checks in print status. by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/622
 
 2.9.5
 ^^^^^
