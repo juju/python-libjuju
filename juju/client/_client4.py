@@ -971,6 +971,583 @@ class ApplicationFacade(Type):
 
 
 
+class ApplicationOffersFacade(Type):
+    name = 'ApplicationOffers'
+    version = 4
+    schema =     {'definitions': {'AddApplicationOffer': {'additionalProperties': False,
+                                             'properties': {'application-description': {'type': 'string'},
+                                                            'application-name': {'type': 'string'},
+                                                            'endpoints': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                          'type': 'object'},
+                                                            'model-tag': {'type': 'string'},
+                                                            'offer-name': {'type': 'string'},
+                                                            'owner-tag': {'type': 'string'}},
+                                             'required': ['model-tag',
+                                                          'offer-name',
+                                                          'application-name',
+                                                          'application-description',
+                                                          'endpoints'],
+                                             'type': 'object'},
+                     'AddApplicationOffers': {'additionalProperties': False,
+                                              'properties': {'Offers': {'items': {'$ref': '#/definitions/AddApplicationOffer'},
+                                                                        'type': 'array'}},
+                                              'required': ['Offers'],
+                                              'type': 'object'},
+                     'ApplicationOfferAdminDetails': {'additionalProperties': False,
+                                                      'properties': {'ApplicationOfferDetails': {'$ref': '#/definitions/ApplicationOfferDetails'},
+                                                                     'application-description': {'type': 'string'},
+                                                                     'application-name': {'type': 'string'},
+                                                                     'bindings': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                                  'type': 'object'},
+                                                                     'charm-url': {'type': 'string'},
+                                                                     'connections': {'items': {'$ref': '#/definitions/OfferConnection'},
+                                                                                     'type': 'array'},
+                                                                     'endpoints': {'items': {'$ref': '#/definitions/RemoteEndpoint'},
+                                                                                   'type': 'array'},
+                                                                     'offer-name': {'type': 'string'},
+                                                                     'offer-url': {'type': 'string'},
+                                                                     'offer-uuid': {'type': 'string'},
+                                                                     'source-model-tag': {'type': 'string'},
+                                                                     'spaces': {'items': {'$ref': '#/definitions/RemoteSpace'},
+                                                                                'type': 'array'},
+                                                                     'users': {'items': {'$ref': '#/definitions/OfferUserDetails'},
+                                                                               'type': 'array'}},
+                                                      'required': ['source-model-tag',
+                                                                   'offer-uuid',
+                                                                   'offer-url',
+                                                                   'offer-name',
+                                                                   'application-description',
+                                                                   'ApplicationOfferDetails',
+                                                                   'application-name',
+                                                                   'charm-url'],
+                                                      'type': 'object'},
+                     'ApplicationOfferDetails': {'additionalProperties': False,
+                                                 'properties': {'application-description': {'type': 'string'},
+                                                                'bindings': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                             'type': 'object'},
+                                                                'endpoints': {'items': {'$ref': '#/definitions/RemoteEndpoint'},
+                                                                              'type': 'array'},
+                                                                'offer-name': {'type': 'string'},
+                                                                'offer-url': {'type': 'string'},
+                                                                'offer-uuid': {'type': 'string'},
+                                                                'source-model-tag': {'type': 'string'},
+                                                                'spaces': {'items': {'$ref': '#/definitions/RemoteSpace'},
+                                                                           'type': 'array'},
+                                                                'users': {'items': {'$ref': '#/definitions/OfferUserDetails'},
+                                                                          'type': 'array'}},
+                                                 'required': ['source-model-tag',
+                                                              'offer-uuid',
+                                                              'offer-url',
+                                                              'offer-name',
+                                                              'application-description'],
+                                                 'type': 'object'},
+                     'ApplicationOfferResult': {'additionalProperties': False,
+                                                'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                               'result': {'$ref': '#/definitions/ApplicationOfferAdminDetails'}},
+                                                'type': 'object'},
+                     'ApplicationOffersResults': {'additionalProperties': False,
+                                                  'properties': {'results': {'items': {'$ref': '#/definitions/ApplicationOfferResult'},
+                                                                             'type': 'array'}},
+                                                  'type': 'object'},
+                     'ConsumeOfferDetails': {'additionalProperties': False,
+                                             'properties': {'external-controller': {'$ref': '#/definitions/ExternalControllerInfo'},
+                                                            'macaroon': {'$ref': '#/definitions/Macaroon'},
+                                                            'offer': {'$ref': '#/definitions/ApplicationOfferDetails'}},
+                                             'type': 'object'},
+                     'ConsumeOfferDetailsArg': {'additionalProperties': False,
+                                                'properties': {'offer-urls': {'$ref': '#/definitions/OfferURLs'},
+                                                               'user-tag': {'type': 'string'}},
+                                                'required': ['offer-urls'],
+                                                'type': 'object'},
+                     'ConsumeOfferDetailsResult': {'additionalProperties': False,
+                                                   'properties': {'ConsumeOfferDetails': {'$ref': '#/definitions/ConsumeOfferDetails'},
+                                                                  'error': {'$ref': '#/definitions/Error'},
+                                                                  'external-controller': {'$ref': '#/definitions/ExternalControllerInfo'},
+                                                                  'macaroon': {'$ref': '#/definitions/Macaroon'},
+                                                                  'offer': {'$ref': '#/definitions/ApplicationOfferDetails'}},
+                                                   'required': ['ConsumeOfferDetails'],
+                                                   'type': 'object'},
+                     'ConsumeOfferDetailsResults': {'additionalProperties': False,
+                                                    'properties': {'results': {'items': {'$ref': '#/definitions/ConsumeOfferDetailsResult'},
+                                                                               'type': 'array'}},
+                                                    'type': 'object'},
+                     'DestroyApplicationOffers': {'additionalProperties': False,
+                                                  'properties': {'force': {'type': 'boolean'},
+                                                                 'offer-urls': {'items': {'type': 'string'},
+                                                                                'type': 'array'}},
+                                                  'required': ['offer-urls'],
+                                                  'type': 'object'},
+                     'EndpointFilterAttributes': {'additionalProperties': False,
+                                                  'properties': {'interface': {'type': 'string'},
+                                                                 'name': {'type': 'string'},
+                                                                 'role': {'type': 'string'}},
+                                                  'required': ['role',
+                                                               'interface',
+                                                               'name'],
+                                                  'type': 'object'},
+                     'EntityStatus': {'additionalProperties': False,
+                                      'properties': {'data': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                           'type': 'object'}},
+                                                              'type': 'object'},
+                                                     'info': {'type': 'string'},
+                                                     'since': {'format': 'date-time',
+                                                               'type': 'string'},
+                                                     'status': {'type': 'string'}},
+                                      'required': ['status', 'info', 'since'],
+                                      'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ErrorResult': {'additionalProperties': False,
+                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
+                                     'type': 'object'},
+                     'ErrorResults': {'additionalProperties': False,
+                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
+                                                                 'type': 'array'}},
+                                      'required': ['results'],
+                                      'type': 'object'},
+                     'ExternalControllerInfo': {'additionalProperties': False,
+                                                'properties': {'addrs': {'items': {'type': 'string'},
+                                                                         'type': 'array'},
+                                                               'ca-cert': {'type': 'string'},
+                                                               'controller-alias': {'type': 'string'},
+                                                               'controller-tag': {'type': 'string'}},
+                                                'required': ['controller-tag',
+                                                             'controller-alias',
+                                                             'addrs',
+                                                             'ca-cert'],
+                                                'type': 'object'},
+                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
+                     'ModifyOfferAccess': {'additionalProperties': False,
+                                           'properties': {'access': {'type': 'string'},
+                                                          'action': {'type': 'string'},
+                                                          'offer-url': {'type': 'string'},
+                                                          'user-tag': {'type': 'string'}},
+                                           'required': ['user-tag',
+                                                        'action',
+                                                        'access',
+                                                        'offer-url'],
+                                           'type': 'object'},
+                     'ModifyOfferAccessRequest': {'additionalProperties': False,
+                                                  'properties': {'changes': {'items': {'$ref': '#/definitions/ModifyOfferAccess'},
+                                                                             'type': 'array'}},
+                                                  'required': ['changes'],
+                                                  'type': 'object'},
+                     'OfferConnection': {'additionalProperties': False,
+                                         'properties': {'endpoint': {'type': 'string'},
+                                                        'ingress-subnets': {'items': {'type': 'string'},
+                                                                            'type': 'array'},
+                                                        'relation-id': {'type': 'integer'},
+                                                        'source-model-tag': {'type': 'string'},
+                                                        'status': {'$ref': '#/definitions/EntityStatus'},
+                                                        'username': {'type': 'string'}},
+                                         'required': ['source-model-tag',
+                                                      'relation-id',
+                                                      'username',
+                                                      'endpoint',
+                                                      'status',
+                                                      'ingress-subnets'],
+                                         'type': 'object'},
+                     'OfferFilter': {'additionalProperties': False,
+                                     'properties': {'allowed-users': {'items': {'type': 'string'},
+                                                                      'type': 'array'},
+                                                    'application-description': {'type': 'string'},
+                                                    'application-name': {'type': 'string'},
+                                                    'application-user': {'type': 'string'},
+                                                    'connected-users': {'items': {'type': 'string'},
+                                                                        'type': 'array'},
+                                                    'endpoints': {'items': {'$ref': '#/definitions/EndpointFilterAttributes'},
+                                                                  'type': 'array'},
+                                                    'model-name': {'type': 'string'},
+                                                    'offer-name': {'type': 'string'},
+                                                    'owner-name': {'type': 'string'}},
+                                     'required': ['owner-name',
+                                                  'model-name',
+                                                  'offer-name',
+                                                  'application-name',
+                                                  'application-description',
+                                                  'application-user',
+                                                  'endpoints',
+                                                  'connected-users',
+                                                  'allowed-users'],
+                                     'type': 'object'},
+                     'OfferFilters': {'additionalProperties': False,
+                                      'properties': {'Filters': {'items': {'$ref': '#/definitions/OfferFilter'},
+                                                                 'type': 'array'}},
+                                      'required': ['Filters'],
+                                      'type': 'object'},
+                     'OfferURLs': {'additionalProperties': False,
+                                   'properties': {'bakery-version': {'type': 'integer'},
+                                                  'offer-urls': {'items': {'type': 'string'},
+                                                                 'type': 'array'}},
+                                   'type': 'object'},
+                     'OfferUserDetails': {'additionalProperties': False,
+                                          'properties': {'access': {'type': 'string'},
+                                                         'display-name': {'type': 'string'},
+                                                         'user': {'type': 'string'}},
+                                          'required': ['user',
+                                                       'display-name',
+                                                       'access'],
+                                          'type': 'object'},
+                     'QueryApplicationOffersResults': {'additionalProperties': False,
+                                                       'properties': {'results': {'items': {'$ref': '#/definitions/ApplicationOfferAdminDetails'},
+                                                                                  'type': 'array'}},
+                                                       'required': ['results'],
+                                                       'type': 'object'},
+                     'RemoteApplicationInfo': {'additionalProperties': False,
+                                               'properties': {'description': {'type': 'string'},
+                                                              'endpoints': {'items': {'$ref': '#/definitions/RemoteEndpoint'},
+                                                                            'type': 'array'},
+                                                              'icon-url-path': {'type': 'string'},
+                                                              'model-tag': {'type': 'string'},
+                                                              'name': {'type': 'string'},
+                                                              'offer-url': {'type': 'string'},
+                                                              'source-model-label': {'type': 'string'}},
+                                               'required': ['model-tag',
+                                                            'name',
+                                                            'description',
+                                                            'offer-url',
+                                                            'endpoints',
+                                                            'icon-url-path'],
+                                               'type': 'object'},
+                     'RemoteApplicationInfoResult': {'additionalProperties': False,
+                                                     'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                                    'result': {'$ref': '#/definitions/RemoteApplicationInfo'}},
+                                                     'type': 'object'},
+                     'RemoteApplicationInfoResults': {'additionalProperties': False,
+                                                      'properties': {'results': {'items': {'$ref': '#/definitions/RemoteApplicationInfoResult'},
+                                                                                 'type': 'array'}},
+                                                      'required': ['results'],
+                                                      'type': 'object'},
+                     'RemoteEndpoint': {'additionalProperties': False,
+                                        'properties': {'interface': {'type': 'string'},
+                                                       'limit': {'type': 'integer'},
+                                                       'name': {'type': 'string'},
+                                                       'role': {'type': 'string'}},
+                                        'required': ['name',
+                                                     'role',
+                                                     'interface',
+                                                     'limit'],
+                                        'type': 'object'},
+                     'RemoteSpace': {'additionalProperties': False,
+                                     'properties': {'cloud-type': {'type': 'string'},
+                                                    'name': {'type': 'string'},
+                                                    'provider-attributes': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                         'type': 'object'}},
+                                                                            'type': 'object'},
+                                                    'provider-id': {'type': 'string'},
+                                                    'subnets': {'items': {'$ref': '#/definitions/Subnet'},
+                                                                'type': 'array'}},
+                                     'required': ['cloud-type',
+                                                  'name',
+                                                  'provider-id',
+                                                  'provider-attributes',
+                                                  'subnets'],
+                                     'type': 'object'},
+                     'Subnet': {'additionalProperties': False,
+                                'properties': {'cidr': {'type': 'string'},
+                                               'life': {'type': 'string'},
+                                               'provider-id': {'type': 'string'},
+                                               'provider-network-id': {'type': 'string'},
+                                               'provider-space-id': {'type': 'string'},
+                                               'space-tag': {'type': 'string'},
+                                               'status': {'type': 'string'},
+                                               'vlan-tag': {'type': 'integer'},
+                                               'zones': {'items': {'type': 'string'},
+                                                         'type': 'array'}},
+                                'required': ['cidr',
+                                             'vlan-tag',
+                                             'life',
+                                             'space-tag',
+                                             'zones'],
+                                'type': 'object'}},
+     'properties': {'ApplicationOffers': {'description': 'ApplicationOffers gets '
+                                                         'details about remote '
+                                                         'applications that match '
+                                                         'given URLs.',
+                                          'properties': {'Params': {'$ref': '#/definitions/OfferURLs'},
+                                                         'Result': {'$ref': '#/definitions/ApplicationOffersResults'}},
+                                          'type': 'object'},
+                    'DestroyOffers': {'description': 'DestroyOffers removes the '
+                                                     'offers specified by the '
+                                                     'given URLs, forcing if '
+                                                     'necessary.',
+                                      'properties': {'Params': {'$ref': '#/definitions/DestroyApplicationOffers'},
+                                                     'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                      'type': 'object'},
+                    'FindApplicationOffers': {'description': 'FindApplicationOffers '
+                                                             'gets details about '
+                                                             'remote applications '
+                                                             'that match given '
+                                                             'filter.',
+                                              'properties': {'Params': {'$ref': '#/definitions/OfferFilters'},
+                                                             'Result': {'$ref': '#/definitions/QueryApplicationOffersResults'}},
+                                              'type': 'object'},
+                    'GetConsumeDetails': {'description': 'GetConsumeDetails '
+                                                         'returns the details '
+                                                         'necessary to pass to '
+                                                         'another model\n'
+                                                         'to allow the specified '
+                                                         'args user to consume the '
+                                                         'offers represented by '
+                                                         'the args URLs.',
+                                          'properties': {'Params': {'$ref': '#/definitions/ConsumeOfferDetailsArg'},
+                                                         'Result': {'$ref': '#/definitions/ConsumeOfferDetailsResults'}},
+                                          'type': 'object'},
+                    'ListApplicationOffers': {'description': 'ListApplicationOffers '
+                                                             'gets deployed '
+                                                             'details about '
+                                                             'application offers '
+                                                             'that match given '
+                                                             'filter.\n'
+                                                             'The results contain '
+                                                             'details about the '
+                                                             'deployed '
+                                                             'applications such as '
+                                                             'connection count.',
+                                              'properties': {'Params': {'$ref': '#/definitions/OfferFilters'},
+                                                             'Result': {'$ref': '#/definitions/QueryApplicationOffersResults'}},
+                                              'type': 'object'},
+                    'ModifyOfferAccess': {'description': 'ModifyOfferAccess '
+                                                         'changes the application '
+                                                         'offer access granted to '
+                                                         'users.',
+                                          'properties': {'Params': {'$ref': '#/definitions/ModifyOfferAccessRequest'},
+                                                         'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                          'type': 'object'},
+                    'Offer': {'description': 'Offer makes application endpoints '
+                                             'available for consumption at a '
+                                             'specified URL.',
+                              'properties': {'Params': {'$ref': '#/definitions/AddApplicationOffers'},
+                                             'Result': {'$ref': '#/definitions/ErrorResults'}},
+                              'type': 'object'},
+                    'RemoteApplicationInfo': {'description': 'RemoteApplicationInfo '
+                                                             'returns information '
+                                                             'about the requested '
+                                                             'remote application.\n'
+                                                             'This call currently '
+                                                             'has no client side '
+                                                             'API, only there for '
+                                                             'the GUI at this '
+                                                             'stage.',
+                                              'properties': {'Params': {'$ref': '#/definitions/OfferURLs'},
+                                                             'Result': {'$ref': '#/definitions/RemoteApplicationInfoResults'}},
+                                              'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(ApplicationOffersResults)
+    async def ApplicationOffers(self, bakery_version=None, offer_urls=None):
+        '''
+        ApplicationOffers gets details about remote applications that match given URLs.
+
+        bakery_version : int
+        offer_urls : typing.Sequence[str]
+        Returns -> ApplicationOffersResults
+        '''
+        if bakery_version is not None and not isinstance(bakery_version, int):
+            raise Exception("Expected bakery_version to be a int, received: {}".format(type(bakery_version)))
+
+        if offer_urls is not None and not isinstance(offer_urls, (bytes, str, list)):
+            raise Exception("Expected offer_urls to be a Sequence, received: {}".format(type(offer_urls)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ApplicationOffers',
+                   request='ApplicationOffers',
+                   version=4,
+                   params=_params)
+        _params['bakery-version'] = bakery_version
+        _params['offer-urls'] = offer_urls
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def DestroyOffers(self, force=None, offer_urls=None):
+        '''
+        DestroyOffers removes the offers specified by the given URLs, forcing if necessary.
+
+        force : bool
+        offer_urls : typing.Sequence[str]
+        Returns -> ErrorResults
+        '''
+        if force is not None and not isinstance(force, bool):
+            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
+
+        if offer_urls is not None and not isinstance(offer_urls, (bytes, str, list)):
+            raise Exception("Expected offer_urls to be a Sequence, received: {}".format(type(offer_urls)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ApplicationOffers',
+                   request='DestroyOffers',
+                   version=4,
+                   params=_params)
+        _params['force'] = force
+        _params['offer-urls'] = offer_urls
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(QueryApplicationOffersResults)
+    async def FindApplicationOffers(self, filters=None):
+        '''
+        FindApplicationOffers gets details about remote applications that match given filter.
+
+        filters : typing.Sequence[~OfferFilter]
+        Returns -> QueryApplicationOffersResults
+        '''
+        if filters is not None and not isinstance(filters, (bytes, str, list)):
+            raise Exception("Expected filters to be a Sequence, received: {}".format(type(filters)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ApplicationOffers',
+                   request='FindApplicationOffers',
+                   version=4,
+                   params=_params)
+        _params['Filters'] = filters
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ConsumeOfferDetailsResults)
+    async def GetConsumeDetails(self, offer_urls=None, user_tag=None):
+        '''
+        GetConsumeDetails returns the details necessary to pass to another model
+        to allow the specified args user to consume the offers represented by the args URLs.
+
+        offer_urls : OfferURLs
+        user_tag : str
+        Returns -> ConsumeOfferDetailsResults
+        '''
+        if offer_urls is not None and not isinstance(offer_urls, (dict, OfferURLs)):
+            raise Exception("Expected offer_urls to be a OfferURLs, received: {}".format(type(offer_urls)))
+
+        if user_tag is not None and not isinstance(user_tag, (bytes, str)):
+            raise Exception("Expected user_tag to be a str, received: {}".format(type(user_tag)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ApplicationOffers',
+                   request='GetConsumeDetails',
+                   version=4,
+                   params=_params)
+        _params['offer-urls'] = offer_urls
+        _params['user-tag'] = user_tag
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(QueryApplicationOffersResults)
+    async def ListApplicationOffers(self, filters=None):
+        '''
+        ListApplicationOffers gets deployed details about application offers that match given filter.
+        The results contain details about the deployed applications such as connection count.
+
+        filters : typing.Sequence[~OfferFilter]
+        Returns -> QueryApplicationOffersResults
+        '''
+        if filters is not None and not isinstance(filters, (bytes, str, list)):
+            raise Exception("Expected filters to be a Sequence, received: {}".format(type(filters)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ApplicationOffers',
+                   request='ListApplicationOffers',
+                   version=4,
+                   params=_params)
+        _params['Filters'] = filters
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def ModifyOfferAccess(self, changes=None):
+        '''
+        ModifyOfferAccess changes the application offer access granted to users.
+
+        changes : typing.Sequence[~ModifyOfferAccess]
+        Returns -> ErrorResults
+        '''
+        if changes is not None and not isinstance(changes, (bytes, str, list)):
+            raise Exception("Expected changes to be a Sequence, received: {}".format(type(changes)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ApplicationOffers',
+                   request='ModifyOfferAccess',
+                   version=4,
+                   params=_params)
+        _params['changes'] = changes
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def Offer(self, offers=None):
+        '''
+        Offer makes application endpoints available for consumption at a specified URL.
+
+        offers : typing.Sequence[~AddApplicationOffer]
+        Returns -> ErrorResults
+        '''
+        if offers is not None and not isinstance(offers, (bytes, str, list)):
+            raise Exception("Expected offers to be a Sequence, received: {}".format(type(offers)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ApplicationOffers',
+                   request='Offer',
+                   version=4,
+                   params=_params)
+        _params['Offers'] = offers
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(RemoteApplicationInfoResults)
+    async def RemoteApplicationInfo(self, bakery_version=None, offer_urls=None):
+        '''
+        RemoteApplicationInfo returns information about the requested remote application.
+        This call currently has no client side API, only there for the GUI at this stage.
+
+        bakery_version : int
+        offer_urls : typing.Sequence[str]
+        Returns -> RemoteApplicationInfoResults
+        '''
+        if bakery_version is not None and not isinstance(bakery_version, int):
+            raise Exception("Expected bakery_version to be a int, received: {}".format(type(bakery_version)))
+
+        if offer_urls is not None and not isinstance(offer_urls, (bytes, str, list)):
+            raise Exception("Expected offer_urls to be a Sequence, received: {}".format(type(offer_urls)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ApplicationOffers',
+                   request='RemoteApplicationInfo',
+                   version=4,
+                   params=_params)
+        _params['bakery-version'] = bakery_version
+        _params['offer-urls'] = offer_urls
+        reply = await self.rpc(msg)
+        return reply
+
+
+
 class BundleFacade(Type):
     name = 'Bundle'
     version = 4
@@ -6461,7 +7038,7 @@ class StorageProvisionerFacade(Type):
                                'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                               'Result': {'$ref': '#/definitions/ErrorResults'}},
                                'type': 'object'},
-                    'RemoveAttachment': {'description': 'RemoveAttachments removes '
+                    'RemoveAttachment': {'description': 'RemoveAttachment removes '
                                                         'the specified machine '
                                                         'storage attachments\n'
                                                         'from state.',
@@ -6895,7 +7472,7 @@ class StorageProvisionerFacade(Type):
     @ReturnMapping(ErrorResults)
     async def RemoveAttachment(self, ids=None):
         '''
-        RemoveAttachments removes the specified machine storage attachments
+        RemoveAttachment removes the specified machine storage attachments
         from state.
 
         ids : typing.Sequence[~MachineStorageId]

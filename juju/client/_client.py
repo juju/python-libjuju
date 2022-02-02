@@ -195,6 +195,10 @@ class CAASUnitProvisionerFacade(TypeFactory):
     pass
 
 
+class CharmDownloaderFacade(TypeFactory):
+    pass
+
+
 class CharmHubFacade(TypeFactory):
     pass
 
