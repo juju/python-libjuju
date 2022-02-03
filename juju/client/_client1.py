@@ -5613,6 +5613,129 @@ class CAASUnitProvisionerFacade(Type):
 
 
 
+class CharmDownloaderFacade(Type):
+    name = 'CharmDownloader'
+    version = 1
+    schema =     {'definitions': {'Entities': {'additionalProperties': False,
+                                  'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
+                                                              'type': 'array'}},
+                                  'required': ['entities'],
+                                  'type': 'object'},
+                     'Entity': {'additionalProperties': False,
+                                'properties': {'tag': {'type': 'string'}},
+                                'required': ['tag'],
+                                'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ErrorResult': {'additionalProperties': False,
+                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
+                                     'type': 'object'},
+                     'ErrorResults': {'additionalProperties': False,
+                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
+                                                                 'type': 'array'}},
+                                      'required': ['results'],
+                                      'type': 'object'},
+                     'StringsWatchResult': {'additionalProperties': False,
+                                            'properties': {'changes': {'items': {'type': 'string'},
+                                                                       'type': 'array'},
+                                                           'error': {'$ref': '#/definitions/Error'},
+                                                           'watcher-id': {'type': 'string'}},
+                                            'required': ['watcher-id'],
+                                            'type': 'object'}},
+     'properties': {'DownloadApplicationCharms': {'description': 'DownloadApplicationCharms '
+                                                                 'iterates the '
+                                                                 'list of provided '
+                                                                 'applications '
+                                                                 'and\n'
+                                                                 'downloads any '
+                                                                 'referenced '
+                                                                 'charms that have '
+                                                                 'not yet been '
+                                                                 'persisted to '
+                                                                 'the\n'
+                                                                 'blob store.',
+                                                  'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                                 'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                                  'type': 'object'},
+                    'WatchApplicationsWithPendingCharms': {'description': 'WatchApplicationsWithPendingCharms '
+                                                                          'registers '
+                                                                          'and '
+                                                                          'returns '
+                                                                          'a '
+                                                                          'watcher '
+                                                                          'instance\n'
+                                                                          'that '
+                                                                          'reports '
+                                                                          'the ID '
+                                                                          'of '
+                                                                          'applications '
+                                                                          'that '
+                                                                          'reference '
+                                                                          'a charm '
+                                                                          'which '
+                                                                          'has not '
+                                                                          'yet\n'
+                                                                          'been '
+                                                                          'downloaded.',
+                                                           'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
+                                                           'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(ErrorResults)
+    async def DownloadApplicationCharms(self, entities=None):
+        '''
+        DownloadApplicationCharms iterates the list of provided applications and
+        downloads any referenced charms that have not yet been persisted to the
+        blob store.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CharmDownloader',
+                   request='DownloadApplicationCharms',
+                   version=1,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResult)
+    async def WatchApplicationsWithPendingCharms(self):
+        '''
+        WatchApplicationsWithPendingCharms registers and returns a watcher instance
+        that reports the ID of applications that reference a charm which has not yet
+        been downloaded.
+
+
+        Returns -> StringsWatchResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CharmDownloader',
+                   request='WatchApplicationsWithPendingCharms',
+                   version=1,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
 class CharmHubFacade(Type):
     name = 'CharmHub'
     version = 1

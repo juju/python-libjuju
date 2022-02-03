@@ -401,21 +401,23 @@ class ActionsByReceivers(Type):
 
 
 class AddApplicationOffer(Type):
-    _toSchema = {'application_description': 'application-description', 'application_name': 'application-name', 'endpoints': 'endpoints', 'model_tag': 'model-tag', 'offer_name': 'offer-name'}
-    _toPy = {'application-description': 'application_description', 'application-name': 'application_name', 'endpoints': 'endpoints', 'model-tag': 'model_tag', 'offer-name': 'offer_name'}
-    def __init__(self, application_description=None, application_name=None, endpoints=None, model_tag=None, offer_name=None, **unknown_fields):
+    _toSchema = {'application_description': 'application-description', 'application_name': 'application-name', 'endpoints': 'endpoints', 'model_tag': 'model-tag', 'offer_name': 'offer-name', 'owner_tag': 'owner-tag'}
+    _toPy = {'application-description': 'application_description', 'application-name': 'application_name', 'endpoints': 'endpoints', 'model-tag': 'model_tag', 'offer-name': 'offer_name', 'owner-tag': 'owner_tag'}
+    def __init__(self, application_description=None, application_name=None, endpoints=None, model_tag=None, offer_name=None, owner_tag=None, **unknown_fields):
         '''
         application_description : str
         application_name : str
         endpoints : typing.Mapping[str, str]
         model_tag : str
         offer_name : str
+        owner_tag : str
         '''
         application_description_ = application_description
         application_name_ = application_name
         endpoints_ = endpoints
         model_tag_ = model_tag
         offer_name_ = offer_name
+        owner_tag_ = owner_tag
 
         # Validate arguments against known Juju API types.
         if application_description_ is not None and not isinstance(application_description_, (bytes, str)):
@@ -433,11 +435,15 @@ class AddApplicationOffer(Type):
         if offer_name_ is not None and not isinstance(offer_name_, (bytes, str)):
             raise Exception("Expected offer_name_ to be a str, received: {}".format(type(offer_name_)))
 
+        if owner_tag_ is not None and not isinstance(owner_tag_, (bytes, str)):
+            raise Exception("Expected owner_tag_ to be a str, received: {}".format(type(owner_tag_)))
+
         self.application_description = application_description_
         self.application_name = application_name_
         self.endpoints = endpoints_
         self.model_tag = model_tag_
         self.offer_name = offer_name_
+        self.owner_tag = owner_tag_
         self.unknown_fields = unknown_fields
 
 
@@ -3365,29 +3371,23 @@ class AuthUserInfo(Type):
 
 
 class BackupsCreateArgs(Type):
-    _toSchema = {'keep_copy': 'keep-copy', 'no_download': 'no-download', 'notes': 'notes'}
-    _toPy = {'keep-copy': 'keep_copy', 'no-download': 'no_download', 'notes': 'notes'}
-    def __init__(self, keep_copy=None, no_download=None, notes=None, **unknown_fields):
+    _toSchema = {'no_download': 'no-download', 'notes': 'notes'}
+    _toPy = {'no-download': 'no_download', 'notes': 'notes'}
+    def __init__(self, no_download=None, notes=None, **unknown_fields):
         '''
-        keep_copy : bool
         no_download : bool
         notes : str
         '''
-        keep_copy_ = keep_copy
         no_download_ = no_download
         notes_ = notes
 
         # Validate arguments against known Juju API types.
-        if keep_copy_ is not None and not isinstance(keep_copy_, bool):
-            raise Exception("Expected keep_copy_ to be a bool, received: {}".format(type(keep_copy_)))
-
         if no_download_ is not None and not isinstance(no_download_, bool):
             raise Exception("Expected no_download_ to be a bool, received: {}".format(type(no_download_)))
 
         if notes_ is not None and not isinstance(notes_, (bytes, str)):
             raise Exception("Expected notes_ to be a str, received: {}".format(type(notes_)))
 
-        self.keep_copy = keep_copy_
         self.no_download = no_download_
         self.notes = notes_
         self.unknown_fields = unknown_fields
@@ -13317,6 +13317,78 @@ class LeaseOperation(Type):
 
 
 
+class LeaseOperationCommand(Type):
+    _toSchema = {'duration': 'duration', 'holder': 'holder', 'lease': 'lease', 'model_uuid': 'model-uuid', 'namespace': 'namespace', 'new_time': 'new-time', 'old_time': 'old-time', 'operation': 'operation', 'pin_entity': 'pin-entity', 'version': 'version'}
+    _toPy = {'duration': 'duration', 'holder': 'holder', 'lease': 'lease', 'model-uuid': 'model_uuid', 'namespace': 'namespace', 'new-time': 'new_time', 'old-time': 'old_time', 'operation': 'operation', 'pin-entity': 'pin_entity', 'version': 'version'}
+    def __init__(self, duration=None, holder=None, lease=None, model_uuid=None, namespace=None, new_time=None, old_time=None, operation=None, pin_entity=None, version=None, **unknown_fields):
+        '''
+        duration : int
+        holder : str
+        lease : str
+        model_uuid : str
+        namespace : str
+        new_time : str
+        old_time : str
+        operation : str
+        pin_entity : str
+        version : int
+        '''
+        duration_ = duration
+        holder_ = holder
+        lease_ = lease
+        model_uuid_ = model_uuid
+        namespace_ = namespace
+        new_time_ = new_time
+        old_time_ = old_time
+        operation_ = operation
+        pin_entity_ = pin_entity
+        version_ = version
+
+        # Validate arguments against known Juju API types.
+        if duration_ is not None and not isinstance(duration_, int):
+            raise Exception("Expected duration_ to be a int, received: {}".format(type(duration_)))
+
+        if holder_ is not None and not isinstance(holder_, (bytes, str)):
+            raise Exception("Expected holder_ to be a str, received: {}".format(type(holder_)))
+
+        if lease_ is not None and not isinstance(lease_, (bytes, str)):
+            raise Exception("Expected lease_ to be a str, received: {}".format(type(lease_)))
+
+        if model_uuid_ is not None and not isinstance(model_uuid_, (bytes, str)):
+            raise Exception("Expected model_uuid_ to be a str, received: {}".format(type(model_uuid_)))
+
+        if namespace_ is not None and not isinstance(namespace_, (bytes, str)):
+            raise Exception("Expected namespace_ to be a str, received: {}".format(type(namespace_)))
+
+        if new_time_ is not None and not isinstance(new_time_, (bytes, str)):
+            raise Exception("Expected new_time_ to be a str, received: {}".format(type(new_time_)))
+
+        if old_time_ is not None and not isinstance(old_time_, (bytes, str)):
+            raise Exception("Expected old_time_ to be a str, received: {}".format(type(old_time_)))
+
+        if operation_ is not None and not isinstance(operation_, (bytes, str)):
+            raise Exception("Expected operation_ to be a str, received: {}".format(type(operation_)))
+
+        if pin_entity_ is not None and not isinstance(pin_entity_, (bytes, str)):
+            raise Exception("Expected pin_entity_ to be a str, received: {}".format(type(pin_entity_)))
+
+        if version_ is not None and not isinstance(version_, int):
+            raise Exception("Expected version_ to be a int, received: {}".format(type(version_)))
+
+        self.duration = duration_
+        self.holder = holder_
+        self.lease = lease_
+        self.model_uuid = model_uuid_
+        self.namespace = namespace_
+        self.new_time = new_time_
+        self.old_time = old_time_
+        self.operation = operation_
+        self.pin_entity = pin_entity_
+        self.version = version_
+        self.unknown_fields = unknown_fields
+
+
+
 class LeaseOperations(Type):
     _toSchema = {'commands': 'commands'}
     _toPy = {'commands': 'commands'}
@@ -13325,6 +13397,24 @@ class LeaseOperations(Type):
         commands : typing.Sequence[~LeaseOperation]
         '''
         commands_ = [LeaseOperation.from_json(o) for o in commands or []]
+
+        # Validate arguments against known Juju API types.
+        if commands_ is not None and not isinstance(commands_, (bytes, str, list)):
+            raise Exception("Expected commands_ to be a Sequence, received: {}".format(type(commands_)))
+
+        self.commands = commands_
+        self.unknown_fields = unknown_fields
+
+
+
+class LeaseOperationsV2(Type):
+    _toSchema = {'commands': 'commands'}
+    _toPy = {'commands': 'commands'}
+    def __init__(self, commands=None, **unknown_fields):
+        '''
+        commands : typing.Sequence[~LeaseOperationCommand]
+        '''
+        commands_ = [LeaseOperationCommand.from_json(o) for o in commands or []]
 
         # Validate arguments against known Juju API types.
         if commands_ is not None and not isinstance(commands_, (bytes, str, list)):

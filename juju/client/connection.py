@@ -30,6 +30,7 @@ client_facades = {
     'Bundle': {'versions': [1, 2, 3, 4, 5, 6]},
     'CharmHub': {'versions': [1]},
     'CharmRevisionUpdater': {'versions': [2]},
+    'CharmDownloader': {'versions': [1]},
     'Charms': {'versions': [2, 3, 4]},
     'Cleaner': {'versions': [2]},
     'Client': {'versions': [1, 2]},

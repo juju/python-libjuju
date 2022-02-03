@@ -1047,6 +1047,87 @@ class AllModelWatcherFacade(Type):
 
 
 
+class AllWatcherFacade(Type):
+    name = 'AllWatcher'
+    version = 2
+    schema =     {'definitions': {'AllWatcherNextResults': {'additionalProperties': False,
+                                               'properties': {'deltas': {'items': {'$ref': '#/definitions/Delta'},
+                                                                         'type': 'array'}},
+                                               'required': ['deltas'],
+                                               'type': 'object'},
+                     'Delta': {'additionalProperties': False,
+                               'properties': {'entity': {'additionalProperties': True,
+                                                         'type': 'object'},
+                                              'removed': {'type': 'boolean'}},
+                               'required': ['removed', 'entity'],
+                               'type': 'object'}},
+     'properties': {'Next': {'description': 'Next will return the current state of '
+                                            'everything on the first call\n'
+                                            'and subsequent calls will',
+                             'properties': {'Result': {'$ref': '#/definitions/AllWatcherNextResults'}},
+                             'type': 'object'},
+                    'Stop': {'description': 'Stop stops the watcher.',
+                             'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(AllWatcherNextResults)
+    async def Next(self):
+        '''
+        Next will return the current state of everything on the first call
+        and subsequent calls will
+
+
+        Returns -> AllWatcherNextResults
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='AllWatcher',
+                   request='Next',
+                   version=2,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def Stop(self):
+        '''
+        Stop stops the watcher.
+
+
+        Returns -> None
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='AllWatcher',
+                   request='Stop',
+                   version=2,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    async def rpc(self, msg):
+        '''
+        Patch rpc method to add Id.
+        '''
+        if not hasattr(self, 'Id'):
+            raise RuntimeError('Missing "Id" field')
+        msg['Id'] = id
+
+        from .facade import TypeEncoder
+        reply = await self.connection.rpc(msg, encoder=TypeEncoder)
+        return reply
+
+
+
 class AnnotationsFacade(Type):
     name = 'Annotations'
     version = 2
@@ -2510,12 +2591,9 @@ class BackupsFacade(Type):
     name = 'Backups'
     version = 2
     schema =     {'definitions': {'BackupsCreateArgs': {'additionalProperties': False,
-                                           'properties': {'keep-copy': {'type': 'boolean'},
-                                                          'no-download': {'type': 'boolean'},
+                                           'properties': {'no-download': {'type': 'boolean'},
                                                           'notes': {'type': 'string'}},
-                                           'required': ['notes',
-                                                        'keep-copy',
-                                                        'no-download'],
+                                           'required': ['notes', 'no-download'],
                                            'type': 'object'},
                      'BackupsInfoArgs': {'additionalProperties': False,
                                          'properties': {'id': {'type': 'string'}},
@@ -2615,10 +2693,6 @@ class BackupsFacade(Type):
      'properties': {'Create': {'properties': {'Params': {'$ref': '#/definitions/BackupsCreateArgs'},
                                               'Result': {'$ref': '#/definitions/BackupsMetadataResult'}},
                                'type': 'object'},
-                    'FinishRestore': {'description': 'FinishRestore implements the '
-                                                     'server side of '
-                                                     'Backups.FinishRestore.',
-                                      'type': 'object'},
                     'Info': {'description': 'Info provides the implementation of '
                                             'the API method.',
                              'properties': {'Params': {'$ref': '#/definitions/BackupsInfoArgs'},
@@ -2629,10 +2703,6 @@ class BackupsFacade(Type):
                              'properties': {'Params': {'$ref': '#/definitions/BackupsListArgs'},
                                             'Result': {'$ref': '#/definitions/BackupsListResult'}},
                              'type': 'object'},
-                    'PrepareRestore': {'description': 'PrepareRestore implements '
-                                                      'the server side of '
-                                                      'Backups.PrepareRestore.',
-                                       'type': 'object'},
                     'Remove': {'description': 'Remove deletes the backups defined '
                                               'by ID from the database.',
                                'properties': {'Params': {'$ref': '#/definitions/BackupsRemoveArgs'},
@@ -2646,16 +2716,12 @@ class BackupsFacade(Type):
     
 
     @ReturnMapping(BackupsMetadataResult)
-    async def Create(self, keep_copy=None, no_download=None, notes=None):
+    async def Create(self, no_download=None, notes=None):
         '''
-        keep_copy : bool
         no_download : bool
         notes : str
         Returns -> BackupsMetadataResult
         '''
-        if keep_copy is not None and not isinstance(keep_copy, bool):
-            raise Exception("Expected keep_copy to be a bool, received: {}".format(type(keep_copy)))
-
         if no_download is not None and not isinstance(no_download, bool):
             raise Exception("Expected no_download to be a bool, received: {}".format(type(no_download)))
 
@@ -2668,30 +2734,8 @@ class BackupsFacade(Type):
                    request='Create',
                    version=2,
                    params=_params)
-        _params['keep-copy'] = keep_copy
         _params['no-download'] = no_download
         _params['notes'] = notes
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(None)
-    async def FinishRestore(self):
-        '''
-        FinishRestore implements the server side of Backups.FinishRestore.
-
-
-        Returns -> None
-        '''
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Backups',
-                   request='FinishRestore',
-                   version=2,
-                   params=_params)
-
         reply = await self.rpc(msg)
         return reply
 
@@ -2733,27 +2777,6 @@ class BackupsFacade(Type):
         _params = dict()
         msg = dict(type='Backups',
                    request='List',
-                   version=2,
-                   params=_params)
-
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(None)
-    async def PrepareRestore(self):
-        '''
-        PrepareRestore implements the server side of Backups.PrepareRestore.
-
-
-        Returns -> None
-        '''
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Backups',
-                   request='PrepareRestore',
                    version=2,
                    params=_params)
 
@@ -11440,6 +11463,72 @@ class ProxyUpdaterFacade(Type):
                    version=2,
                    params=_params)
         _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+class RaftLeaseFacade(Type):
+    name = 'RaftLease'
+    version = 2
+    schema =     {'definitions': {'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ErrorResult': {'additionalProperties': False,
+                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
+                                     'type': 'object'},
+                     'ErrorResults': {'additionalProperties': False,
+                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
+                                                                 'type': 'array'}},
+                                      'required': ['results'],
+                                      'type': 'object'},
+                     'LeaseOperationCommand': {'additionalProperties': False,
+                                               'properties': {'duration': {'type': 'integer'},
+                                                              'holder': {'type': 'string'},
+                                                              'lease': {'type': 'string'},
+                                                              'model-uuid': {'type': 'string'},
+                                                              'namespace': {'type': 'string'},
+                                                              'new-time': {'format': 'date-time',
+                                                                           'type': 'string'},
+                                                              'old-time': {'format': 'date-time',
+                                                                           'type': 'string'},
+                                                              'operation': {'type': 'string'},
+                                                              'pin-entity': {'type': 'string'},
+                                                              'version': {'type': 'integer'}},
+                                               'required': ['version', 'operation'],
+                                               'type': 'object'},
+                     'LeaseOperationsV2': {'additionalProperties': False,
+                                           'properties': {'commands': {'items': {'$ref': '#/definitions/LeaseOperationCommand'},
+                                                                       'type': 'array'}},
+                                           'required': ['commands'],
+                                           'type': 'object'}},
+     'properties': {'ApplyLease': {'properties': {'Params': {'$ref': '#/definitions/LeaseOperationsV2'},
+                                                  'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                   'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(ErrorResults)
+    async def ApplyLease(self, commands=None):
+        '''
+        commands : typing.Sequence[~LeaseOperationCommand]
+        Returns -> ErrorResults
+        '''
+        if commands is not None and not isinstance(commands, (bytes, str, list)):
+            raise Exception("Expected commands to be a Sequence, received: {}".format(type(commands)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='RaftLease',
+                   request='ApplyLease',
+                   version=2,
+                   params=_params)
+        _params['commands'] = commands
         reply = await self.rpc(msg)
         return reply
 
