@@ -1062,5 +1062,7 @@ async def test_disconnect_clears_safe_data(event_loop):
 
             with pytest.raises(DeadEntityException):
                 await u.get_public_address()
+
+            await controller.destroy_model(model_name)
         except Exception:  # Intentional generic exception
             await controller.destroy_model(model_name)
