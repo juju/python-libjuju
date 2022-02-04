@@ -363,11 +363,12 @@ class ModelEntity:
     def safe_data(self):
         """The data dictionary for this entity.
 
-        If this `ModelEntity` points to the dead state, it will
-        raise `DeadEntityException`.
+        If this `ModelEntity` points to the dead state, or the model
+        is not connected anymore, it will raise `DeadEntityException`.
 
         """
-        if self.data is None:
+
+        if self.data is None or not self.model.is_connected():
             raise DeadEntityException(
                 "Entity {}:{} is dead - its attributes can no longer be "
                 "accessed. Use the .previous() method on this object to get "

@@ -15,6 +15,7 @@ import pytest
 from juju import jasyncio
 from juju.client.client import ApplicationFacade, ConfigValue
 from juju.errors import JujuError, JujuUnitError, JujuConnectionError
+from juju.exceptions import DeadEntityException
 from juju.model import Model, ModelObserver
 from juju.utils import block_until, run_with_interrupt, wait_for_bundle
 
@@ -1027,3 +1028,39 @@ async def test_model_cache_update(event_loop):
         await model.disconnect()
         await m.disconnect()
         await controller.destroy_models(model_name)
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_disconnect_clears_safe_data(event_loop):
+    """Disconnecting a model should clear out the safe_data and render the
+    data in there inaccessible.
+
+    """
+    async with base.CleanController() as controller:
+        await controller.connect_current()
+
+        model_name = "new-test-model"
+        model = await controller.add_model(model_name)
+
+        app = await model.deploy(
+            'ubuntu',
+            application_name='ubuntu',
+            series='bionic',
+            channel='stable',
+            num_units=3,
+        )
+
+        await model.wait_for_idle(timeout=5 * 60, wait_for_units=1)
+        u = app.units[0]
+
+        try:
+            await model.disconnect()
+
+            with pytest.raises(DeadEntityException):
+                u.public_address
+
+            with pytest.raises(DeadEntityException):
+                await u.get_public_address()
+        except Exception: # Intentional generic exception
+            await controller.destroy_model(model_name)
