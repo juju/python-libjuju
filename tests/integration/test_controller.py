@@ -135,6 +135,20 @@ async def test_list_models(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_list_models_user_access(event_loop):
+    async with base.CleanController() as controller:
+        username = 'test-grant{}'.format(uuid.uuid4())
+        user = await controller.add_user(username)
+        await user.grant(acl='superuser')
+        assert user.access == 'superuser'
+        models1 = await controller.list_models(username)
+        await user.revoke(acl='superuser')
+        models2 = await controller.list_models(username)
+        assert len(models1) > len(models2)
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_get_model(event_loop):
     async with base.CleanController() as controller:
         by_name, by_uuid = None, None
