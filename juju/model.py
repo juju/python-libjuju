@@ -1611,11 +1611,15 @@ class Model:
         entity_url = str(entity_url)
         if is_local_charm(entity_url) and not entity_url.startswith("local:"):
             entity_url = "local:{}".format(entity_url)
-        url = URL.parse(str(entity_url))
+
+        assume_charmstore = client.CharmsFacade.best_facade_version(self.connection()) < 3
+        url = URL.parse(str(entity_url), force_v1=assume_charmstore)
+
         architecture = await self._resolve_architecture(url)
 
         if str(url.schema) not in self.deploy_types:
             raise JujuError("unknown deploy type {}, expected charmhub, charmstore or local".format(url.schema))
+
         res = await self.deploy_types[str(url.schema)].resolve(url, architecture, application_name, channel, series, entity_url)
 
         if res.identifier is None:
@@ -1646,7 +1650,7 @@ class Model:
             # actually support them yet anyway
             if not res.is_local:
                 add_charm_res = await self._add_charm(identifier, res.origin)
-                charm_origin = add_charm_res.charm_origin
+                charm_origin = add_charm_res.get('charm_origin', '')
 
                 if Schema.CHARM_HUB.matches(url.schema):
                     resources = await self._add_charmhub_resources(res.app_name,

@@ -29,11 +29,12 @@ class URL:
         self.architecture = architecture
 
     @staticmethod
-    def parse(s):
+    def parse(s, force_v1=False):
         """parse parses the provided charm URL string into its respective
             structure.
 
             A missing schema is assumed to be 'ch'.
+            If force_v1 is True, then it is assumed to be 'cs'.
 
         """
         u = urlparse(s)
@@ -42,7 +43,7 @@ class URL:
 
         if Schema.LOCAL.matches(u.scheme):
             c = URL(Schema.LOCAL, name=u.path)
-        elif Schema.CHARM_STORE.matches(u.scheme):
+        elif force_v1 or Schema.CHARM_STORE.matches(u.scheme):
             c = parse_v1_url(Schema.CHARM_STORE, u, s)
         else:
             c = parse_v2_url(u, s)
