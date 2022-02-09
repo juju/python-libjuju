@@ -1612,8 +1612,10 @@ class Model:
         if is_local_charm(entity_url) and not entity_url.startswith("local:"):
             entity_url = "local:{}".format(entity_url)
 
-        assume_charmstore = client.CharmsFacade.best_facade_version(self.connection()) < 3
-        url = URL.parse(str(entity_url), force_v1=assume_charmstore)
+        if client.CharmsFacade.best_facade_version(self.connection()) < 3:
+            url = URL.parse(str(entity_url), default_store=Schema.CHARM_STORE)
+        else:
+            url = URL.parse(str(entity_url))
 
         architecture = await self._resolve_architecture(url)
 

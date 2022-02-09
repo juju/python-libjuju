@@ -29,12 +29,11 @@ class URL:
         self.architecture = architecture
 
     @staticmethod
-    def parse(s, force_v1=False):
+    def parse(s, default_store=Schema.CHARM_HUB):
         """parse parses the provided charm URL string into its respective
             structure.
 
             A missing schema is assumed to be 'ch'.
-            If force_v1 is True, then it is assumed to be 'cs'.
 
         """
         u = urlparse(s)
@@ -43,12 +42,19 @@ class URL:
 
         if Schema.LOCAL.matches(u.scheme):
             c = URL(Schema.LOCAL, name=u.path)
-        elif force_v1 or Schema.CHARM_STORE.matches(u.scheme):
-            c = parse_v1_url(Schema.CHARM_STORE, u, s)
         else:
-            c = parse_v2_url(u, s)
+            cs_match = Schema.CHARM_STORE.matches(u.scheme)
+            default_is_cs = Schema.CHARM_STORE.matches(default_store)
 
-        if not c.schema:
+            ch_match = Schema.CHARM_HUB.matches(u.scheme)
+            default_is_ch = Schema.CHARM_HUB.matches(default_store)
+
+            if cs_match or (not ch_match and default_is_cs):
+                c = parse_v1_url(Schema.CHARM_STORE, u, s)
+            elif ch_match or default_is_ch:
+                c = parse_v2_url(u, s)
+
+        if not c or not c.schema:
             raise JujuError("expected schema for charm or bundle URL {}".format(u))
         return c
 
