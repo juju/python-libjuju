@@ -146,6 +146,11 @@ async def test_list_models_user_access(event_loop):
         models2 = await controller.list_models(username)
         assert len(models1) > len(models2)
 
+        # testing all_models flag
+        await user.grant(acl='superuser')
+        models_all = await controller.list_models(username, all_=True)
+        assert models1 == models_all
+
 
 @base.bootstrapped
 @pytest.mark.asyncio

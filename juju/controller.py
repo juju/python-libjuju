@@ -529,19 +529,35 @@ class Controller:
         .. deprecated:: 0.7.0
            Use :meth:`.list_models` instead.
         """
-        return await self.list_models(username)
+        return await self.list_models(username, all_)
 
-    async def model_uuids(self, username=None):
+    async def model_uuids(self, username=None, all_=False):
         """Return a mapping of model names to UUIDs the given user can access.
 
+        :param str username: Optional username argument, defaults to
+        current connected user.
+
+        :param bool all_: Flag to list all models, regardless of
+        user accessibility (administrative users only)
+
+        :returns: {str name : str UUID}
         """
-        model_facade = client.ModelManagerFacade.from_connection(
+
+        facade = client.ModelManagerFacade.from_connection(
             self.connection())
+        if all_:
+            facade = client.ControllerFacade.from_connection(
+                self.connection())
+
         u_name = username if username else self.get_current_username()
         user = tag.user(u_name)
         for attempt in (1, 2, 3):
             try:
-                userModelList = await model_facade.ListModels(tag=user)
+                if all_:
+                    userModelList = await facade.AllModels()
+                else:
+                    userModelList = await facade.ListModels(tag=user)
+
                 return {um.model.name: um.model.uuid
                         for um in userModelList.user_models}
             except errors.JujuAPIError as e:
@@ -551,31 +567,12 @@ class Controller:
                     raise
                 await jasyncio.sleep(attempt)
 
-    async def all_model_uuids(self):
-        """Return a mapping of model names to UUIDs. Requires superuser
-        access.
-
-        """
-        controller_facade = client.ControllerFacade.from_connection(
-            self.connection())
-        for attempt in (1, 2, 3):
-            try:
-                response = await controller_facade.AllModels()
-                return {um.model.name: um.model.uuid
-                        for um in response.user_models}
-            except errors.JujuAPIError as e:
-                # retry concurrency error until resolved in Juju
-                # see: https://bugs.launchpad.net/juju/+bug/1721786
-                if 'has been removed' not in e.message or attempt == 3:
-                    raise
-                await jasyncio.sleep(attempt)
-
-    async def list_models(self, username=None):
+    async def list_models(self, username=None, all_=False):
         """Return list of names of the available models on this controller.
 
         Equivalent to ``sorted((await self.model_uuids()).keys())``
         """
-        uuids = await self.model_uuids(username)
+        uuids = await self.model_uuids(username, all_)
         return sorted(uuids.keys())
 
     def get_payloads(self, *patterns):
