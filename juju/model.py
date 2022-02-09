@@ -509,6 +509,7 @@ class CharmStoreDeployType:
         result = await self.charmstore.entity(str(url),
                                               channel=channel,
                                               include_stats=False)
+
         identifier = result['Id']
         is_bundle = url.series == "bundle"
         if not series:
@@ -1818,7 +1819,7 @@ class Model:
                 'size': resource['Size'],
                 'type_': resource['Type'],
                 'origin': 'store',
-            } for resource in entity['Meta']['resources']
+            } for resource in entity['Meta'].get('resources', [])
         ]
 
         if overrides:
