@@ -495,6 +495,11 @@ class CharmStoreDeployType:
         self.charmstore = charmstore
         self.get_series = get_series
 
+    @staticmethod
+    def _default_app_name(meta):
+        suggested_name = meta.get('charm-metadata', {}).get('Name')
+        return suggested_name or meta.get('id', {}).get('Name')
+
     async def resolve(self, url, architecture, app_name=None, channel=None, series=None, entity_url=None):
         """resolve attempts to resolve charmstore charms or bundles. A request
         to the charmstore is required to get more information about the
@@ -510,7 +515,7 @@ class CharmStoreDeployType:
             series = self.get_series(entity_url, result)
 
         if app_name is None and not is_bundle:
-            app_name = result['Meta']['charm-metadata']['Name']
+            app_name = self._default_app_name(result['Meta'])
 
         origin = client.CharmOrigin(source="charm-store",
                                     architecture=architecture,
