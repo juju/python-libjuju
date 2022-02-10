@@ -42,17 +42,11 @@ class URL:
 
         if Schema.LOCAL.matches(u.scheme):
             c = URL(Schema.LOCAL, name=u.path)
+        elif Schema.CHARM_STORE.matches(u.scheme) or \
+             (u.scheme == "" and Schema.CHARM_STORE.matches(default_store)):
+            c = parse_v1_url(Schema.CHARM_STORE, u, s)
         else:
-            cs_match = Schema.CHARM_STORE.matches(u.scheme)
-            default_is_cs = Schema.CHARM_STORE.matches(default_store)
-
-            ch_match = Schema.CHARM_HUB.matches(u.scheme)
-            default_is_ch = Schema.CHARM_HUB.matches(default_store)
-
-            if cs_match or (not ch_match and default_is_cs):
-                c = parse_v1_url(Schema.CHARM_STORE, u, s)
-            elif ch_match or default_is_ch:
-                c = parse_v2_url(u, s)
+            c = parse_v2_url(u, s)
 
         if not c or not c.schema:
             raise JujuError("expected schema for charm or bundle URL {}".format(u))
