@@ -43,7 +43,7 @@ class URL:
         if Schema.LOCAL.matches(u.scheme):
             c = URL(Schema.LOCAL, name=u.path)
         elif Schema.CHARM_STORE.matches(u.scheme) or \
-             (u.scheme == "" and Schema.CHARM_STORE.matches(default_store)):
+                (u.scheme == "" and Schema.CHARM_STORE.matches(default_store)):
             c = parse_v1_url(Schema.CHARM_STORE, u, s)
         else:
             c = parse_v2_url(u, s)
