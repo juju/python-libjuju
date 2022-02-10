@@ -524,36 +524,37 @@ class Controller:
         cloud = list(result.clouds.keys())[0]  # only lives on one cloud
         return tag.untag('cloud-', cloud)
 
-    async def get_models(self, all_=False, username=None):
+    async def get_models(self, all=False, username=None):
         """
         .. deprecated:: 0.7.0
            Use :meth:`.list_models` instead.
         """
-        return await self.list_models(username, all_)
+        return await self.list_models(username, all)
 
-    async def model_uuids(self, username=None, all_=False):
+    async def model_uuids(self, username=None, all=False):
         """Return a mapping of model names to UUIDs the given user can access.
 
         :param str username: Optional username argument, defaults to
         current connected user.
 
-        :param bool all_: Flag to list all models, regardless of
+        :param bool all: Flag to list all models, regardless of
         user accessibility (administrative users only)
 
         :returns: {str name : str UUID}
         """
 
-        facade = client.ModelManagerFacade.from_connection(
-            self.connection())
-        if all_:
+        if all:
             facade = client.ControllerFacade.from_connection(
                 self.connection())
+        else:
+            facade = client.ModelManagerFacade.from_connection(
+                self.connection())
+            u_name = username if username else self.get_current_username()
+            user = tag.user(u_name)
 
-        u_name = username if username else self.get_current_username()
-        user = tag.user(u_name)
         for attempt in (1, 2, 3):
             try:
-                if all_:
+                if all:
                     userModelList = await facade.AllModels()
                 else:
                     userModelList = await facade.ListModels(tag=user)
@@ -567,12 +568,12 @@ class Controller:
                     raise
                 await jasyncio.sleep(attempt)
 
-    async def list_models(self, username=None, all_=False):
+    async def list_models(self, username=None, all=False):
         """Return list of names of the available models on this controller.
 
         Equivalent to ``sorted((await self.model_uuids()).keys())``
         """
-        uuids = await self.model_uuids(username, all_)
+        uuids = await self.model_uuids(username, all)
         return sorted(uuids.keys())
 
     def get_payloads(self, *patterns):
