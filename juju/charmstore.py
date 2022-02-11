@@ -4,7 +4,6 @@ import theblues.charmstore
 import theblues.errors
 
 from urllib.parse import urlencode
-from urllib.error import HTTPError
 
 
 from . import jasyncio
@@ -37,11 +36,6 @@ class CharmStore:
 
         try:
             data = self._cs._get(url)
-        except HTTPError as err:
-            if err.code == 404:
-                return {}
-            else:
-                raise
         except theblues.charmstore.EntityNotFound:
             return {}
         return data.json()
