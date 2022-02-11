@@ -2,7 +2,10 @@ from functools import partial
 
 import theblues.charmstore
 import theblues.errors
+
 from urllib.parse import urlencode
+from urllib.error import HTTPError
+
 
 from . import jasyncio
 
@@ -30,9 +33,17 @@ class CharmStore:
         url = '{}/{}/meta/resources'.format(self._cs.url,
                                             CharmStore._get_path(entity_id))
         if isinstance(channel, str):
-            url += '?channel={}'.format(urlencode(channel))
+            url += '?{}'.format(urlencode({"channel": channel}))
 
-        data = self._cs._get(url)
+        try:
+            data = self._cs._get(url)
+        except HTTPError as err:
+            if err.code == 404:
+                return {}
+            else:
+                raise
+        except theblues.charmstore.EntityNotFound:
+            return {}
         return data.json()
 
     def _entity(self, *args, **kwargs):
