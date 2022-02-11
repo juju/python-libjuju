@@ -1,12 +1,20 @@
 Changelog
 ---------
 
+2.9.7
+^^^^^
+
+Friday February 11 2022
+
+## What's Changed
+
+* [JUJU-556] Facade schemas for Juju 2.9.24 by @cderici in https://github.com/juju/python-libjuju/pull/626
+* Provide extra metadata with charmstore.entity(...)  by @addyess in https://github.com/juju/python-libjuju/pull/635
+
 2.9.6
 ^^^^^
 
 Thursday January 27 2022
-
-## What's Changed
 
 * [JUJU-320] Unit public address by @SimonRichardson in https://github.com/juju/python-libjuju/pull/600
 * [JUJU-244] Add attach-resource by @cderici in https://github.com/juju/python-libjuju/pull/601
