@@ -509,6 +509,7 @@ class CharmStoreDeployType:
         result = await self.charmstore.entity(str(url),
                                               channel=channel,
                                               include_stats=False)
+
         identifier = result['Id']
         is_bundle = url.series == "bundle"
         if not series:
@@ -1611,11 +1612,17 @@ class Model:
         entity_url = str(entity_url)
         if is_local_charm(entity_url) and not entity_url.startswith("local:"):
             entity_url = "local:{}".format(entity_url)
-        url = URL.parse(str(entity_url))
+
+        if client.CharmsFacade.best_facade_version(self.connection()) < 3:
+            url = URL.parse(str(entity_url), default_store=Schema.CHARM_STORE)
+        else:
+            url = URL.parse(str(entity_url))
+
         architecture = await self._resolve_architecture(url)
 
         if str(url.schema) not in self.deploy_types:
             raise JujuError("unknown deploy type {}, expected charmhub, charmstore or local".format(url.schema))
+
         res = await self.deploy_types[str(url.schema)].resolve(url, architecture, application_name, channel, series, entity_url)
 
         if res.identifier is None:
@@ -1646,7 +1653,7 @@ class Model:
             # actually support them yet anyway
             if not res.is_local:
                 add_charm_res = await self._add_charm(identifier, res.origin)
-                charm_origin = add_charm_res.charm_origin
+                charm_origin = add_charm_res.get('charm_origin', '')
 
                 if Schema.CHARM_HUB.matches(url.schema):
                     resources = await self._add_charmhub_resources(res.app_name,
@@ -1812,7 +1819,7 @@ class Model:
                 'size': resource['Size'],
                 'type_': resource['Type'],
                 'origin': 'store',
-            } for resource in entity['Meta']['resources']
+            } for resource in entity['Meta'].get('resources', [])
         ]
 
         if overrides:
