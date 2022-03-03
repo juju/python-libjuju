@@ -77,22 +77,6 @@ class Unit(model.ModelEntity):
     def tag(self):
         return tag.unit(self.name)
 
-    def add_storage(self, name, constraints=None):
-        """Add unit storage dynamically.
-
-        :param str name: Storage name, as specified by the charm
-        :param str constraints: Comma-separated list of constraints in the
-            form 'POOL,COUNT,SIZE'
-
-        """
-        raise NotImplementedError()
-
-    def collect_metrics(self):
-        """Collect metrics on this unit.
-
-        """
-        raise NotImplementedError()
-
     async def destroy(self):
         """Destroy this unit.
 
@@ -119,15 +103,6 @@ class Unit(model.ModelEntity):
         if defResult is not None and len(defResult.results) > 1:
             raise JujuAPIError("expected one result")
         return defResult.results[0].result.get('public-address', None)
-
-    def get_resources(self, details=False):
-        """Return resources for this unit.
-
-        :param bool details: Include detailed info about resources used by each
-            unit
-
-        """
-        raise NotImplementedError()
 
     async def resolved(self, retry=False):
         """Mark unit errors resolved.
@@ -234,12 +209,6 @@ class Unit(model.ModelEntity):
         await self.machine.scp_from(source, destination, user=user,
                                     proxy=proxy, scp_opts=scp_opts)
 
-    def set_meter_status(self):
-        """Set the meter status on this unit.
-
-        """
-        raise NotImplementedError()
-
     async def ssh(
             self, command, user='ubuntu', proxy=False, ssh_opts=None):
         """Execute a command over SSH on this unit.
@@ -251,15 +220,6 @@ class Unit(model.ModelEntity):
 
         """
         return await self.machine.ssh(command, user, proxy, ssh_opts)
-
-    def status_history(self, num=20, utc=False):
-        """Get status history for this unit.
-
-        :param int num: Size of history backlog
-        :param bool utc: Display time as UTC in RFC3339 format
-
-        """
-        raise NotImplementedError()
 
     async def is_leader_from_status(self):
         """

@@ -479,13 +479,6 @@ class Controller:
         entity = client.Entity(tag.user(username))
         return await user_facade.EnableUser(entities=[entity])
 
-    def kill(self):
-        """Forcibly terminate all machines and other associated resources for
-        this controller.
-
-        """
-        raise NotImplementedError()
-
     async def cloud(self, name=None):
         """Get Cloud
 
@@ -575,39 +568,6 @@ class Controller:
         """
         uuids = await self.model_uuids(username, all)
         return sorted(uuids.keys())
-
-    def get_payloads(self, *patterns):
-        """Return list of known payloads.
-
-        :param str *patterns: Patterns to match against
-
-        Each pattern will be checked against the following info in Juju::
-
-            - unit name
-            - machine id
-            - payload type
-            - payload class
-            - payload id
-            - payload tag
-            - payload status
-
-        """
-        raise NotImplementedError()
-
-    def login(self):
-        """Log in to this controller.
-
-        """
-        raise NotImplementedError()
-
-    def logout(self, force=False):
-        """Log out of this controller.
-
-        :param bool force: Don't fail even if user not previously logged in
-            with a password
-
-        """
-        raise NotImplementedError()
 
     async def get_current_user(self, secret_key=None):
         """Returns the user object associated with the current connection.

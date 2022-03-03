@@ -175,21 +175,6 @@ class Application(model.ModelEntity):
                                           scale_change=scale_change)
         ])
 
-    def attach(self, resource_name, file_path):
-        """Upload a file as a resource for this application.
-
-        :param str resource: Name of the resource
-        :param str file_path: Path to the file to upload
-
-        """
-        raise NotImplementedError()
-
-    def collect_metrics(self):
-        """Collect metrics on this application.
-
-        """
-        raise NotImplementedError()
-
     async def destroy_relation(self, local_relation, remote_relation):
         """Remove a relation to another application.
 
@@ -581,31 +566,6 @@ class Application(model.ModelEntity):
             'Setting constraints for %s: %s', self.name, constraints)
 
         return await app_facade.SetConstraints(application=self.name, constraints=constraints)
-
-    def set_meter_status(self, status, info=None):
-        """Set the meter status on this status.
-
-        :param str status: Meter status, e.g. 'RED', 'AMBER'
-        :param str info: Extra info message
-
-        """
-        raise NotImplementedError()
-
-    def set_plan(self, plan_name):
-        """Set the plan for this application, effective immediately.
-
-        :param str plan_name: Name of plan
-
-        """
-        raise NotImplementedError()
-
-    def update_allocation(self, allocation):
-        """Update existing allocation for this application.
-
-        :param int allocation: The allocation to set
-
-        """
-        raise NotImplementedError()
 
     async def refresh(
             self, channel=None, force=False, force_series=False, force_units=False,

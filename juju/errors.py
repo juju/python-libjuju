@@ -103,3 +103,7 @@ class JujuApplicationConfigError(JujuConfigError):
 
 class JujuModelConfigError(JujuConfigError):
     pass
+
+
+class AbstractMethodError(Exception):
+    pass

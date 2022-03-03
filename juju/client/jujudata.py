@@ -18,68 +18,6 @@ class NoModelException(Exception):
 class JujuData:
     __metaclass__ = abc.ABCMeta
 
-    @abc.abstractmethod
-    def current_controller(self):
-        '''Return the current controller name'''
-        raise NotImplementedError()
-
-    @abc.abstractmethod
-    def controllers(self):
-        '''Return all the currently known controllers as a dict
-        mapping controller name to a dict containing the
-        following string keys:
-        uuid: The UUID of the controller
-        api-endpoints: A list of host:port addresses for the controller.
-        ca-cert: the PEM-encoded CA cert of the controller (optional)
-
-        This is compatible with the "controllers" entry in the YAML-unmarshaled data
-        stored in ~/.local/share/juju/controllers.yaml.
-        '''
-        raise NotImplementedError()
-
-    @abc.abstractmethod
-    def models(self):
-        '''Return all the currently known models as a dict
-        containing a key for each known controller,
-        each holding a dict value containing an optional "current-model"
-        key (the name of the current model for that controller,
-        if there is one), and a dict mapping fully-qualified
-        model names to a dict containing a "uuid" key with the
-        key for that model.
-        This is compatible with the YAML-unmarshaled data
-        stored in ~/.local/share/juju/models.yaml.
-        '''
-        raise NotImplementedError()
-
-    @abc.abstractmethod
-    def accounts(self):
-        '''Return the currently known accounts, as a dict
-        containing a key for each known controller, with
-        each value holding a dict with the following keys:
-
-        user: The username to use when logging into the controller (str)
-        password: The password to use when logging into the controller (str, optional)
-        '''
-        raise NotImplementedError()
-
-    @abc.abstractmethod
-    def cookies_for_controller(self, controller_name):
-        '''Return the cookie jar to use when connecting to the
-        controller with the given name.
-        :return http.cookiejar.CookieJar
-        '''
-        raise NotImplementedError()
-
-    @abc.abstractmethod
-    def current_model(self, controller_name=None, model_only=False):
-        '''Return the current model, qualified by its controller name.
-        If controller_name is specified, the current model for
-        that controller will be returned.
-        If model_only is true, only the model name, not qualified by
-        its controller name, will be returned.
-        '''
-        raise NotImplementedError()
-
     def parse_model(self, model):
         """Split the given model_name into controller and model parts.
         If the controller part is empty, the current controller will be used.

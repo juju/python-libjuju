@@ -1,5 +1,7 @@
 from abc import abstractmethod
 
+from juju.errors import AbstractMethodError
+
 
 class ProxyNotConnectedError(Exception):
     pass
@@ -12,12 +14,12 @@ class Proxy():
 
     @abstractmethod
     def connect(self):
-        raise NotImplementedError()
+        raise AbstractMethodError()
 
     @abstractmethod
     def close(self):
-        raise NotImplementedError()
+        raise AbstractMethodError()
 
     @abstractmethod
     def socket(self):
-        raise NotImplementedError()
+        raise AbstractMethodError()
