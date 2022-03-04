@@ -1608,7 +1608,7 @@ class Model:
             # actually support them yet anyway
             if not res.is_local:
                 add_charm_res = await self._add_charm(identifier, res.origin)
-                charm_origin = add_charm_res.get('charm_origin', '')
+                charm_origin = add_charm_res.get('charm_origin', res.origin)
 
                 if Schema.CHARM_HUB.matches(url.schema):
                     resources = await self._add_charmhub_resources(res.app_name,
