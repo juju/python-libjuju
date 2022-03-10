@@ -70,8 +70,7 @@ class CharmStore:
             result['Meta']['resources'] = resources
         return result
 
-    def _files(self, entity_id, manifest=None, filename=None,
-              read_file=False, channel=None):
+    def _files(self, entity_id, manifest=None, filename=None, read_file=False, channel=None):
         '''
         Overloads the files method from theblues.charmstore.CharmStore
         that method used APIs which are no longer implemented

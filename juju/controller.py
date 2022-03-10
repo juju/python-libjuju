@@ -479,13 +479,6 @@ class Controller:
         entity = client.Entity(tag.user(username))
         return await user_facade.EnableUser(entities=[entity])
 
-    def kill(self):
-        """Forcibly terminate all machines and other associated resources for
-        this controller.
-
-        """
-        raise NotImplementedError()
-
     async def cloud(self, name=None):
         """Get Cloud
 
@@ -524,32 +517,43 @@ class Controller:
         cloud = list(result.clouds.keys())[0]  # only lives on one cloud
         return tag.untag('cloud-', cloud)
 
-    async def get_models(self, all_=False, username=None):
+    async def get_models(self, all=False, username=None):
         """
         .. deprecated:: 0.7.0
            Use :meth:`.list_models` instead.
         """
-        controller_facade = client.ControllerFacade.from_connection(
-            self.connection())
-        for attempt in (1, 2, 3):
-            try:
-                return await controller_facade.AllModels()
-            except errors.JujuAPIError as e:
-                # retry concurrency error until resolved in Juju
-                # see: https://bugs.launchpad.net/juju/+bug/1721786
-                if 'has been removed' not in e.message or attempt == 3:
-                    raise
+        return await self.list_models(username, all)
 
-    async def model_uuids(self):
-        """Return a mapping of model names to UUIDs.
+    async def model_uuids(self, username=None, all=False):
+        """Return a mapping of model names to UUIDs the given user can access.
+
+        :param str username: Optional username argument, defaults to
+        current connected user.
+
+        :param bool all: Flag to list all models, regardless of
+        user accessibility (administrative users only)
+
+        :returns: {str name : str UUID}
         """
-        controller_facade = client.ControllerFacade.from_connection(
-            self.connection())
+
+        if all:
+            facade = client.ControllerFacade.from_connection(
+                self.connection())
+        else:
+            facade = client.ModelManagerFacade.from_connection(
+                self.connection())
+            u_name = username if username else self.get_current_username()
+            user = tag.user(u_name)
+
         for attempt in (1, 2, 3):
             try:
-                response = await controller_facade.AllModels()
+                if all:
+                    userModelList = await facade.AllModels()
+                else:
+                    userModelList = await facade.ListModels(tag=user)
+
                 return {um.model.name: um.model.uuid
-                        for um in response.user_models}
+                        for um in userModelList.user_models}
             except errors.JujuAPIError as e:
                 # retry concurrency error until resolved in Juju
                 # see: https://bugs.launchpad.net/juju/+bug/1721786
@@ -557,46 +561,29 @@ class Controller:
                     raise
                 await jasyncio.sleep(attempt)
 
-    async def list_models(self):
+    async def list_models(self, username=None, all=False):
         """Return list of names of the available models on this controller.
 
         Equivalent to ``sorted((await self.model_uuids()).keys())``
         """
-        uuids = await self.model_uuids()
+        uuids = await self.model_uuids(username, all)
         return sorted(uuids.keys())
 
-    def get_payloads(self, *patterns):
-        """Return list of known payloads.
+    async def get_current_user(self, secret_key=None):
+        """Returns the user object associated with the current connection.
+        :param str secret_key: Issued by juju when add or reset user
+            password
 
-        :param str *patterns: Patterns to match against
-
-        Each pattern will be checked against the following info in Juju::
-
-            - unit name
-            - machine id
-            - payload type
-            - payload class
-            - payload id
-            - payload tag
-            - payload status
-
+        :returns: A :class:`~juju.user.User` instance
         """
-        raise NotImplementedError()
+        return await self.get_user(self.connection().username)
 
-    def login(self):
-        """Log in to this controller.
+    def get_current_username(self):
+        """Returns the username associated with the current connection.
 
+        :returns: :str: username of the connected user
         """
-        raise NotImplementedError()
-
-    def logout(self, force=False):
-        """Log out of this controller.
-
-        :param bool force: Don't fail even if user not previously logged in
-            with a password
-
-        """
-        raise NotImplementedError()
+        return self.connection().username
 
     async def get_model(self, model):
         """Get a model by name or UUID.
@@ -687,7 +674,7 @@ class Controller:
         controller_facade = client.ControllerFacade.from_connection(
             self.connection())
         user = tag.user(username)
-        changes = client.ModifyControllerAccess('login', 'revoke', user)
+        changes = client.ModifyControllerAccess(acl, 'revoke', user)
         return await controller_facade.ModifyControllerAccess(changes=[changes])
 
     async def grant_model(self, username, model_uuid, acl='read'):

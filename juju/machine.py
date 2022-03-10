@@ -32,15 +32,6 @@ class Machine(model.ModelEntity):
             'machine', self.id, 'remove')
     remove = destroy
 
-    def run(self, command, timeout=None):
-        """Run command on this machine.
-
-        :param str command: The command to run
-        :param int timeout: Time to wait before command is considered failed
-
-        """
-        raise NotImplementedError()
-
     async def get_annotations(self):
         """Get annotations on this machine.
 
@@ -170,15 +161,6 @@ class Machine(model.ModelEntity):
             raise JujuError("command failed: %s with %s" % (cmd, stderr.decode()))
         # stdout is a bytes-like object, returning a string might be more useful
         return stdout.decode()
-
-    def status_history(self, num=20, utc=False):
-        """Get status history for this machine.
-
-        :param int num: Size of history backlog
-        :param bool utc: Display time as UTC in RFC3339 format
-
-        """
-        raise NotImplementedError()
 
     @property
     def agent_status(self):

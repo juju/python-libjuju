@@ -67,10 +67,10 @@ class User(object):
         if await self.controller.grant(self.username, acl):
             self._user_info.access = acl
 
-    async def revoke(self):
+    async def revoke(self, acl='login'):
         """Removes all access rights for this user from the controller.
         """
-        await self.controller.revoke(self.username)
+        await self.controller.revoke(self.username, acl)
         self._user_info.access = ''
 
     async def disable(self):

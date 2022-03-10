@@ -509,6 +509,7 @@ class CharmStoreDeployType:
         result = await self.charmstore.entity(str(url),
                                               channel=channel,
                                               include_stats=False)
+
         identifier = result['Id']
         is_bundle = url.series == "bundle" or url.parse(identifier).series == "bundle"
         if not series:
@@ -1425,16 +1426,6 @@ class Model:
         return await key_facade.AddKeys(ssh_keys=[key], user=user)
     add_ssh_keys = add_ssh_key
 
-    def add_subnet(self, cidr_or_id, space, *zones):
-        """Add an existing subnet to this model.
-
-        :param str cidr_or_id: CIDR or provider ID of the existing subnet
-        :param str space: Network space with which to associate
-        :param str *zones: Zone(s) in which the subnet resides
-
-        """
-        raise NotImplementedError()
-
     async def get_backups(self):
         """Retrieve metadata for backups in this model.
 
@@ -1446,31 +1437,6 @@ class Model:
         if 'list' not in backups_metadata:
             raise JujuAPIError("Unexpected response metadata : %s" % backups_metadata)
         return backups_metadata['list']
-
-    def block(self, *commands):
-        """Add a new block to this model.
-
-        :param str *commands: The commands to block. Valid values are
-            'all-changes', 'destroy-model', 'remove-object'
-
-        """
-        raise NotImplementedError()
-
-    def get_blocks(self):
-        """List blocks for this model.
-
-        """
-        raise NotImplementedError()
-
-    def get_cached_images(self, arch=None, kind=None, series=None):
-        """Return a list of cached OS images.
-
-        :param str arch: Filter by image architecture
-        :param str kind: Filter by image kind, e.g. 'lxd'
-        :param str series: Filter by image series, e.g. 'xenial'
-
-        """
-        raise NotImplementedError()
 
     async def create_backup(self, notes=None):
         """Create a backup of this model.
@@ -1497,16 +1463,6 @@ class Model:
         file_name = self.download_backup(backup_id)
 
         return file_name, backup_metadata
-
-    def create_storage_pool(self, name, provider_type, **pool_config):
-        """Create or define a storage pool.
-
-        :param str name: Name to give the storage pool
-        :param str provider_type: Pool provider type
-        :param **pool_config: key/value pool configuration pairs
-
-        """
-        raise NotImplementedError()
 
     async def debug_log(
             self, target=sys.stdout, no_tail=False, exclude_module=[],
@@ -1614,11 +1570,17 @@ class Model:
         entity_url = str(entity_url)
         if is_local_charm(entity_url) and not entity_url.startswith("local:"):
             entity_url = "local:{}".format(entity_url)
-        url = URL.parse(str(entity_url))
+
+        if client.CharmsFacade.best_facade_version(self.connection()) < 3:
+            url = URL.parse(str(entity_url), default_store=Schema.CHARM_STORE)
+        else:
+            url = URL.parse(str(entity_url))
+
         architecture = await self._resolve_architecture(url)
 
         if str(url.schema) not in self.deploy_types:
             raise JujuError("unknown deploy type {}, expected charmhub, charmstore or local".format(url.schema))
+
         res = await self.deploy_types[str(url.schema)].resolve(url, architecture, application_name, channel, series, entity_url)
 
         if res.identifier is None:
@@ -1649,7 +1611,12 @@ class Model:
             # actually support them yet anyway
             if not res.is_local:
                 add_charm_res = await self._add_charm(identifier, res.origin)
-                charm_origin = add_charm_res.charm_origin
+                if isinstance(add_charm_res, dict):
+                    # This is for backwards compatibility for older
+                    # versions where AddCharm returns a dictionary
+                    charm_origin = add_charm_res.get('charm_origin', res.origin)
+                else:
+                    charm_origin = add_charm_res.charm_origin
 
                 if Schema.CHARM_HUB.matches(url.schema):
                     resources = await self._add_charmhub_resources(res.app_name,
@@ -1815,7 +1782,7 @@ class Model:
                 'size': resource['Size'],
                 'type_': resource['Type'],
                 'origin': 'store',
-            } for resource in entity['Meta']['resources']
+            } for resource in entity['Meta'].get('resources', [])
         ]
 
         if overrides:
@@ -1953,12 +1920,6 @@ class Model:
             raise JujuError('\n'.join(errors))
         return await self._wait_for_new('application', application)
 
-    async def destroy(self):
-        """Terminate all machines and resources for this model.
-            Is already implemented in controller.py.
-        """
-        raise NotImplementedError()
-
     async def destroy_unit(self, *unit_names):
         """Destroy units by name.
 
@@ -2012,25 +1973,6 @@ class Model:
         log.info("Backup archive downloaded in : %s" % file_name)
         return file_name
 
-    def enable_ha(
-            self, num_controllers=0, constraints=None, series=None, to=None):
-        """Ensure sufficient controllers exist to provide redundancy.
-
-        :param int num_controllers: Number of controllers to make available
-        :param constraints: Constraints to apply to the controller machines
-        :type constraints: :class:`juju.Constraints`
-        :param str series: Series of the controller machines
-        :param list to: Placement directives for controller machines, e.g.::
-
-            '23' - machine 23
-            'lxc:7' - new lxc container on machine 7
-            '24/lxc/3' - lxc container 3 or machine 24
-
-            If None, a new machine is provisioned.
-
-        """
-        raise NotImplementedError()
-
     async def get_config(self):
         """Return the configuration settings for this model.
 
@@ -2071,26 +2013,11 @@ class Model:
                                                       constraint)
         return constraints
 
-    def import_ssh_key(self, identity):
-        """Add a public SSH key from a trusted indentity source to this model.
-
-        :param str identity: User identity in the form <lp|gh>:<username>
-
-        """
-        raise NotImplementedError()
-    import_ssh_keys = import_ssh_key
-
     async def get_machines(self):
         """Return list of machines in this model.
 
         """
         return list(self.state.machines.keys())
-
-    def get_shares(self):
-        """Return list of all users with access to this model.
-
-        """
-        raise NotImplementedError()
 
     async def get_spaces(self):
         """Return list of all known spaces, including associated subnets.
@@ -2113,39 +2040,6 @@ class Model:
         return await key_facade.ListKeys(entities=entities, mode=raw_ssh)
     get_ssh_keys = get_ssh_key
 
-    def get_storage(self, filesystem=False, volume=False):
-        """Return details of storage instances.
-
-        :param bool filesystem: Include filesystem storage
-        :param bool volume: Include volume storage
-
-        """
-        raise NotImplementedError()
-
-    def get_storage_pools(self, names=None, providers=None):
-        """Return list of storage pools.
-
-        :param list names: Only include pools with these names
-        :param list providers: Only include pools for these providers
-
-        """
-        raise NotImplementedError()
-
-    def get_subnets(self, space=None, zone=None):
-        """Return list of known subnets.
-
-        :param str space: Only include subnets in this space
-        :param str zone: Only include subnets in this zone
-
-        """
-        raise NotImplementedError()
-
-    def remove_blocks(self):
-        """Remove all blocks from this model.
-
-        """
-        raise NotImplementedError()
-
     async def remove_backup(self, backup_id):
         """Delete a backup.
 
@@ -2163,25 +2057,6 @@ class Model:
         """
         backups_facade = client.BackupsFacade.from_connection(self.connection())
         return await backups_facade.Remove(backup_ids)
-
-    def remove_cached_images(self, arch=None, kind=None, series=None):
-        """Remove cached OS images.
-
-        :param str arch: Architecture of the images to remove
-        :param str kind: Image kind to remove, e.g. 'lxd'
-        :param str series: Image series to remove, e.g. 'xenial'
-
-        """
-        raise NotImplementedError()
-
-    def remove_machine(self, *machine_ids):
-        """Remove a machine from this model.
-
-        :param str *machine_ids: Ids of the machines to remove
-
-        """
-        raise NotImplementedError()
-    remove_machines = remove_machine
 
     async def remove_ssh_key(self, user, key):
         """Remove a public SSH key(s) from this model.
@@ -2211,21 +2086,6 @@ class Model:
 
         """
         raise DeprecationWarning("juju restore-backup is deprecated in favor of the stand-alone 'juju-restore' tool: https://github.com/juju/juju-restore")
-
-    def retry_provisioning(self):
-        """Retry provisioning for failed machines.
-
-        """
-        raise NotImplementedError()
-
-    def run(self, command, timeout=None):
-        """Run command on all machines in this model.
-
-        :param str command: The command to run
-        :param int timeout: Time to wait before command is considered failed
-
-        """
-        raise NotImplementedError()
 
     async def set_config(self, config):
         """Set configuration keys on this model.
@@ -2331,69 +2191,6 @@ class Model:
         """
         client_facade = client.ClientFacade.from_connection(self.connection())
         return await client_facade.FullStatus(patterns=filters)
-
-    def sync_tools(
-            self, all_=False, destination=None, dry_run=False, public=False,
-            source=None, stream=None, version=None):
-        """Copy Juju tools into this model.
-
-        :param bool all_: Copy all versions, not just the latest
-        :param str destination: Path to local destination directory
-        :param bool dry_run: Don't do the actual copy
-        :param bool public: Tools are for a public cloud, so generate mirrors
-            information
-        :param str source: Path to local source directory
-        :param str stream: Simplestreams stream for which to sync metadata
-        :param str version: Copy a specific major.minor version
-
-        """
-        raise NotImplementedError()
-
-    def unblock(self, *commands):
-        """Unblock an operation that would alter this model.
-
-        :param str *commands: The commands to unblock. Valid values are
-            'all-changes', 'destroy-model', 'remove-object'
-
-        """
-        raise NotImplementedError()
-
-    def unset_config(self, *keys):
-        """Unset configuration on this model.
-
-        :param str *keys: The keys to unset
-
-        """
-        raise NotImplementedError()
-
-    def upgrade_gui(self):
-        """Upgrade the Juju GUI for this model.
-
-        """
-        raise NotImplementedError()
-
-    def upgrade_juju(
-            self, dry_run=False, reset_previous_upgrade=False,
-            upload_tools=False, version=None):
-        """Upgrade Juju on all machines in a model.
-
-        :param bool dry_run: Don't do the actual upgrade
-        :param bool reset_previous_upgrade: Clear the previous (incomplete)
-            upgrade status
-        :param bool upload_tools: Upload local version of tools
-        :param str version: Upgrade to a specific version
-
-        """
-        raise NotImplementedError()
-
-    def upload_backup(self, archive_path):
-        """Store a backup archive remotely in Juju.
-
-        :param str archive_path: Path to local archive
-        :return str created backup ID
-
-        """
-        raise NotImplementedError()
 
     async def get_metrics(self, *tags):
         """Retrieve metrics.
