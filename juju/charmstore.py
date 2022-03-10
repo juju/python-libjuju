@@ -1,10 +1,14 @@
 from functools import partial
+from contextlib import closing
+import io
+import zipfile
 
 import theblues.charmstore
 import theblues.errors
 
 from urllib.parse import urlencode
 
+from .errors import JujuError
 
 from . import jasyncio
 
@@ -66,6 +70,33 @@ class CharmStore:
             result['Meta']['resources'] = resources
         return result
 
+    def _files(self, entity_id, manifest=None, filename=None,
+              read_file=False, channel=None):
+        '''
+        Overloads the files method from theblues.charmstore.CharmStore
+        that method used APIs which are no longer implemented
+        https://api.snapcraft.io/docs/charm-compat-api.html
+
+        Get the files or file contents of a file for an entity.
+
+        If filename is provided and read_file is true, the *contents* of the
+        file are returned, if the file exists.
+
+        @param entity_id The id of the entity to get files for
+        @param filename  The name of the file in the archive to get.
+        @param manifest  Remains for compatibility but is unused
+        @param read_file Whether to get the url for the file or the file
+            contents.
+        @param channel Optional channel name.
+        '''
+        assert read_file, "This method no longer supports returning a dictionary of URLs to files"
+        archive_resp = self._cs._get(self._cs.archive_url(entity_id, channel))
+        with closing(archive_resp), zipfile.ZipFile(io.BytesIO(archive_resp.content)) as archive:
+            for member in archive.infolist():
+                if member.filename == filename:
+                    return archive.read(member)
+            raise JujuError("{} not found".format(filename))
+
     def __getattr__(self, name):
         """
         Wrap method calls in coroutines that use run_in_executor to make them
@@ -73,6 +104,8 @@ class CharmStore:
         """
         if name == "entity":
             attr = self._entity
+        elif name == "files":
+            attr = self._files
         else:
             attr = getattr(self._cs, name)
         if not callable(attr):
