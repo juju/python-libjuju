@@ -1622,7 +1622,7 @@ class Model:
                     resources = await self._add_charmhub_resources(res.app_name,
                                                                    identifier,
                                                                    add_charm_res.charm_origin)
-                    charm_info = await self.charmhub.info(res.app_name)
+                    charm_info = await self.charmhub.info(url.name)
                     is_subordinate = False
                     try:
                         is_subordinate = charm_info.result.charm.subordinate
