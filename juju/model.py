@@ -511,9 +511,9 @@ class CharmStoreDeployType:
                                               include_stats=False)
 
         identifier = result['Id']
-        is_bundle = url.series == "bundle"
+        is_bundle = url.series == "bundle" or url.parse(identifier).series == "bundle"
         if not series:
-            series = self.get_series(entity_url, result)
+            series = "bundle" if is_bundle else self.get_series(entity_url, result)
 
         if app_name is None and not is_bundle:
             app_name = self._default_app_name(result['Meta'])
@@ -1513,7 +1513,10 @@ class Model:
             return parts[0]
         # series was not supplied at all, so use the newest
         # supported series according to the charm store
-        ss = entity['Meta']['supported-series']
+        ss = entity['Meta'].get('supported-series')
+        if not ss:
+            log.error("Entity {} has no 'supported-series' in {}".format(entity_url, entity))
+            raise JujuError("Unable to determine series for {}".format(entity_url))
         return ss['SupportedSeries'][0]
 
     async def deploy(
