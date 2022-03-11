@@ -149,7 +149,7 @@ async def test_list_models_user_access(event_loop):
         # testing all flag
         await user.grant(acl='superuser')
         models_all = await controller.list_models(username, all=True)
-        assert models1 == models_all
+        assert len(models_all) >= len(models1)
 
 
 @base.bootstrapped
