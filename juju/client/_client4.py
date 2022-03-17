@@ -1902,6 +1902,7 @@ class CharmsFacade(Type):
                                      'type': 'object'},
                      'CharmOrigin': {'additionalProperties': False,
                                      'properties': {'architecture': {'type': 'string'},
+                                                    'branch': {'type': 'string'},
                                                     'hash': {'type': 'string'},
                                                     'id': {'type': 'string'},
                                                     'instance-key': {'type': 'string'},
