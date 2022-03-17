@@ -131,6 +131,11 @@ class Application(model.ModelEntity):
             If None, a new machine is provisioned.
 
         """
+
+        if self.model.info.type_ == 'caas':
+            log.warning('adding units to a container-based model not supported, auto-switching to scale')
+            return await self.scale(scale_change=count)
+
         app_facade = self._facade()
 
         log.debug(
