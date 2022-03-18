@@ -5515,11 +5515,12 @@ class CharmOption(Type):
 
 
 class CharmOrigin(Type):
-    _toSchema = {'architecture': 'architecture', 'hash_': 'hash', 'id_': 'id', 'instance_key': 'instance-key', 'os': 'os', 'revision': 'revision', 'risk': 'risk', 'series': 'series', 'source': 'source', 'track': 'track', 'type_': 'type'}
-    _toPy = {'architecture': 'architecture', 'hash': 'hash_', 'id': 'id_', 'instance-key': 'instance_key', 'os': 'os', 'revision': 'revision', 'risk': 'risk', 'series': 'series', 'source': 'source', 'track': 'track', 'type': 'type_'}
-    def __init__(self, architecture=None, hash_=None, id_=None, instance_key=None, os=None, revision=None, risk=None, series=None, source=None, track=None, type_=None, **unknown_fields):
+    _toSchema = {'architecture': 'architecture', 'branch': 'branch', 'hash_': 'hash', 'id_': 'id', 'instance_key': 'instance-key', 'os': 'os', 'revision': 'revision', 'risk': 'risk', 'series': 'series', 'source': 'source', 'track': 'track', 'type_': 'type'}
+    _toPy = {'architecture': 'architecture', 'branch': 'branch', 'hash': 'hash_', 'id': 'id_', 'instance-key': 'instance_key', 'os': 'os', 'revision': 'revision', 'risk': 'risk', 'series': 'series', 'source': 'source', 'track': 'track', 'type': 'type_'}
+    def __init__(self, architecture=None, branch=None, hash_=None, id_=None, instance_key=None, os=None, revision=None, risk=None, series=None, source=None, track=None, type_=None, **unknown_fields):
         '''
         architecture : str
+        branch : str
         hash_ : str
         id_ : str
         instance_key : str
@@ -5532,6 +5533,7 @@ class CharmOrigin(Type):
         type_ : str
         '''
         architecture_ = architecture
+        branch_ = branch
         hash__ = hash_
         id__ = id_
         instance_key_ = instance_key
@@ -5546,6 +5548,9 @@ class CharmOrigin(Type):
         # Validate arguments against known Juju API types.
         if architecture_ is not None and not isinstance(architecture_, (bytes, str)):
             raise Exception("Expected architecture_ to be a str, received: {}".format(type(architecture_)))
+
+        if branch_ is not None and not isinstance(branch_, (bytes, str)):
+            raise Exception("Expected branch_ to be a str, received: {}".format(type(branch_)))
 
         if hash__ is not None and not isinstance(hash__, (bytes, str)):
             raise Exception("Expected hash__ to be a str, received: {}".format(type(hash__)))
@@ -5578,6 +5583,7 @@ class CharmOrigin(Type):
             raise Exception("Expected type__ to be a str, received: {}".format(type(type__)))
 
         self.architecture = architecture_
+        self.branch = branch_
         self.hash_ = hash__
         self.id_ = id__
         self.instance_key = instance_key_
@@ -23753,23 +23759,29 @@ class SetMigrationStatusMessageArgs(Type):
 
 
 class SetModelAgentVersion(Type):
-    _toSchema = {'force': 'force', 'version': 'version'}
-    _toPy = {'force': 'force', 'version': 'version'}
-    def __init__(self, force=None, version=None, **unknown_fields):
+    _toSchema = {'agent_stream': 'agent-stream', 'force': 'force', 'version': 'version'}
+    _toPy = {'agent-stream': 'agent_stream', 'force': 'force', 'version': 'version'}
+    def __init__(self, agent_stream=None, force=None, version=None, **unknown_fields):
         '''
+        agent_stream : str
         force : bool
         version : Number
         '''
+        agent_stream_ = agent_stream
         force_ = force
         version_ = Number.from_json(version) if version else None
 
         # Validate arguments against known Juju API types.
+        if agent_stream_ is not None and not isinstance(agent_stream_, (bytes, str)):
+            raise Exception("Expected agent_stream_ to be a str, received: {}".format(type(agent_stream_)))
+
         if force_ is not None and not isinstance(force_, bool):
             raise Exception("Expected force_ to be a bool, received: {}".format(type(force_)))
 
         if version_ is not None and not isinstance(version_, (dict, Number)):
             raise Exception("Expected version_ to be a Number, received: {}".format(type(version_)))
 
+        self.agent_stream = agent_stream_
         self.force = force_
         self.version = version_
         self.unknown_fields = unknown_fields

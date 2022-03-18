@@ -4771,9 +4771,9 @@ class CleanerFacade(Type):
                                            'type': 'object'}},
      'properties': {'Cleanup': {'description': 'Cleanup triggers a state cleanup',
                                 'type': 'object'},
-                    'WatchCleanups': {'description': 'WatchChanges watches for '
-                                                     'cleanups to be perfomed in '
-                                                     'state',
+                    'WatchCleanups': {'description': 'WatchCleanups watches for '
+                                                     'cleanups to be performed in '
+                                                     'state.',
                                       'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
                                       'type': 'object'}},
      'type': 'object'}
@@ -4803,7 +4803,7 @@ class CleanerFacade(Type):
     @ReturnMapping(NotifyWatchResult)
     async def WatchCleanups(self):
         '''
-        WatchChanges watches for cleanups to be perfomed in state
+        WatchCleanups watches for cleanups to be performed in state.
 
 
         Returns -> NotifyWatchResult
@@ -12536,6 +12536,7 @@ class ResourcesFacade(Type):
                                                    'type': 'object'},
                      'CharmOrigin': {'additionalProperties': False,
                                      'properties': {'architecture': {'type': 'string'},
+                                                    'branch': {'type': 'string'},
                                                     'hash': {'type': 'string'},
                                                     'id': {'type': 'string'},
                                                     'instance-key': {'type': 'string'},
