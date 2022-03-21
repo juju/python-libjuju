@@ -1,12 +1,27 @@
 Changelog
 ---------
 
+2.9.8
+^^^^^
+
+Monday March 21 2022
+
+## What's Changed
+
+* [JUJU-567] Use ModelManager instead of ControllerFacade to list available models by @cderici in https://github.com/juju/python-libjuju/pull/632
+* [JUJU-573] Fix charm resolution for Juju 2.8.11 by @cderici in https://github.com/juju/python-libjuju/pull/633
+* [JUJU-704] Remove non-implemented (stuıb) functions by @cderici in https://github.com/juju/python-libjuju/pull/646
+* [JUJU-676] Avoid defaulting to empty string for charm origin by @cderici in https://github.com/juju/python-libjuju/pull/647
+* Charmstore compatability of deploying bundles by @addyess in https://github.com/juju/python-libjuju/pull/650
+* [JUJU-731] Subordinate charm num unit by @cderici in https://github.com/juju/python-libjuju/pull/648
+* [JUJU-769] Facade schemas for 2.9.27 by @cderici in https://github.com/juju/python-libjuju/pull/652
+* [JUJU-771] Auto switch to scale from add_unit on container based models by @cderici in https://github.com/juju/python-libjuju/pull/653
+
+
 2.9.7
 ^^^^^
 
 Friday February 11 2022
-
-## What's Changed
 
 * [JUJU-556] Facade schemas for Juju 2.9.24 by @cderici in https://github.com/juju/python-libjuju/pull/626
 * Provide extra metadata with charmstore.entity(...)  by @addyess in https://github.com/juju/python-libjuju/pull/635
