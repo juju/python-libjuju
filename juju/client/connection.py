@@ -512,7 +512,7 @@ class Connection:
             # be cancelled by the reconnect and we don't want the reconnect
             # to be aborted half-way through
             jasyncio.ensure_future(self.reconnect())
-            return
+            raise
         except Exception as e:
             log.exception("Error in debug logger : %s" % e)
             jasyncio.create_task(self.close())
@@ -539,7 +539,7 @@ class Connection:
             # be cancelled by the reconnect and we don't want the reconnect
             # to be aborted half-way through
             jasyncio.ensure_future(self.reconnect())
-            return
+            raise
         except Exception as e:
             log.exception("Error in receiver")
             # make pending listeners aware of the error
@@ -576,7 +576,7 @@ class Connection:
             # The connection has closed - we can't do anything
             # more until the connection is restarted.
             log.debug('ping failed because of closed connection')
-            pass
+            raise
 
     async def rpc(self, msg, encoder=None):
         '''Make an RPC to the API. The message is encoded as JSON
