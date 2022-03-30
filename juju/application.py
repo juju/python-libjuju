@@ -441,7 +441,8 @@ class Application(model.ModelEntity):
 
         headers['Content-Type'] = 'application/octet-stream'
         headers['Content-Length'] = len(data)
-        headers['Content-Sha384'] = hashlib.sha384(bytes(data, 'utf-8')).hexdigest()
+        data_bytes = data if isinstance(data, bytes) else bytes(data, 'utf-8')
+        headers['Content-Sha384'] = hashlib.sha384(data_bytes).hexdigest()
 
         file_name = str(file_name)
         if not file_name.startswith('./'):

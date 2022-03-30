@@ -660,6 +660,9 @@ async def test_attach_resource(event_loop):
         with open(str(charm_path / 'test.file')) as f:
             app.attach_resource('file-res', 'test.file', f)
 
+        with open(str(charm_path / 'test.file'), 'rb') as f:
+            app.attach_resource('file-res', 'test.file', f)
+
 
 @base.bootstrapped
 @pytest.mark.asyncio
