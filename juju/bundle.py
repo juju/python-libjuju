@@ -894,7 +894,7 @@ class AddRelationChange(ChangeInfo):
             return existing[0]
 
         log.info('Relating %s <-> %s', ep1, ep2)
-        return await context.model.add_relation(ep1, ep2)
+        return await context.model.relate(ep1, ep2)
 
     def __str__(self):
         return "add relation {endpoint1} - {endpoint2}".format(endpoint1=self.endpoint1,

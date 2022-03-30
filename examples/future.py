@@ -29,7 +29,7 @@ async def main():
         channel='stable',
         num_units=0,
     )
-    await model.add_relation(
+    await model.relate(
         'ubuntu',
         'nrpe',
     )

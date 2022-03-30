@@ -556,7 +556,7 @@ async def test_relate(event_loop):
 
         with mock.patch.object(ApplicationFacade, 'from_connection',
                                return_value=mock_app_facade):
-            my_relation = await run_with_interrupt(model.add_relation(
+            my_relation = await run_with_interrupt(model.relate(
                 'ubuntu',
                 'nrpe',
             ), timeout)

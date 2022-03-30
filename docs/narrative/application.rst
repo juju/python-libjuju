@@ -95,7 +95,7 @@ application. The `mysql_app` object is an instance of
 
 Adding and Removing Relations
 -----------------------------
-The :meth:`juju.application.Application.add_relation` method returns a
+The :meth:`juju.application.Application.relate` method returns a
 :class:`juju.relation.Relation` instance.
 
 .. code:: python
@@ -122,7 +122,7 @@ The :meth:`juju.application.Application.add_relation` method returns a
   )
 
   # Add the master-slave relation
-  relation = await mysql_master.add_relation(
+  relation = await mysql_master.relate(
       # Name of the relation on the local (mysql-master) side
       'master',
       # Name of the app:relation on the remote side

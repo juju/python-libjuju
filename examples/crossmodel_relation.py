@@ -66,7 +66,7 @@ async def main():
             lambda: all(unit.agent_status == 'executing'
                         for unit in application_2.units))
 
-        await consuming_model.add_relation('wordpress', 'admin/test-cmr-1.mysql')
+        await consuming_model.relate('wordpress', 'admin/test-cmr-1.mysql')
 
         print('Exporting bundle')
         with tempfile.TemporaryDirectory() as dirpath:

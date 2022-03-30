@@ -93,7 +93,7 @@ async def test_remove_saas(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_add_relation_with_offer(event_loop):
+async def test_relate_with_offer(event_loop):
     pytest.skip('Revise: intermittent problem with the remove_saas call')
     async with base.CleanModel() as model_1:
         application = await model_1.deploy(
@@ -123,7 +123,7 @@ async def test_add_relation_with_offer(event_loop):
                 lambda: all(unit.agent_status == 'idle'
                             for unit in application.units))
 
-            await model_2.add_relation("mediawiki:db", "admin/{}.mysql".format(model_1.info.name))
+            await model_2.relate("mediawiki:db", "admin/{}.mysql".format(model_1.info.name))
             status = await model_2.get_status()
             if 'mysql' not in status.remote_applications:
                 raise Exception("Expected mysql in saas")
