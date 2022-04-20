@@ -65,9 +65,9 @@ def create_task_with_handler(coro, task_name, logger=ROOT_LOGGER):
         try:
             task.result()
         except CancelledError:
-            raise
+            pass
         except websockets.exceptions.ConnectionClosed:
-            raise
+            return
         except Exception as e:
             # This really is an arbitrary exception we need to catch
             #
@@ -76,7 +76,6 @@ def create_task_with_handler(coro, task_name, logger=ROOT_LOGGER):
             # event_handler, which won't do anything but yell 'Task
             # exception was never retrieved' anyways.
             logger.exception("Task %s raised an exception: %s" % (task_name, e))
-            raise
 
     task = create_task(coro)
     task.add_done_callback(functools.partial(_task_result_exp_handler, task_name=task_name, logger=logger))
