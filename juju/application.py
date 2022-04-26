@@ -339,6 +339,18 @@ class Application(model.ModelEntity):
         log.debug("Unexposing %s", self.name)
         return await app_facade.Unexpose(application=self.name)
 
+    async def get_series(self):
+        """Return the series on which the application is deployed
+
+        :return: str series
+        """
+        app_facade = self._facade()
+
+        log.debug(
+            'Getting series for %s', self.name)
+
+        return (await app_facade.Get(application=self.name)).series
+
     async def get_config(self):
         """Return the configuration settings dict for this application.
         """
@@ -728,9 +740,12 @@ class Application(model.ModelEntity):
         charm_dir = path.expanduser().resolve()
         model_config = await self.get_config()
 
-        series = await get_charm_series(charm_dir, self.model)
+        series = (
+            await self.get_series() or
+            self.model.info.get('default-series', '') or
+            await get_charm_series(charm_dir, self.model)
+        )
         if not series:
-            model_config = await self.get_config()
             default_series = model_config.get("default-series")
             if default_series:
                 series = default_series.value

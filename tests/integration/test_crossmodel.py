@@ -165,20 +165,19 @@ async def test_add_bundle(event_loop):
                 raise
 
             await model_1.deploy(
-                'mysql',
-                application_name='mysql',
-                series='xenial',
+                'influxdb',
+                application_name='influxdb',
                 channel='stable',
             )
-            assert 'mysql' in model_1.applications
+            assert 'influxdb' in model_1.applications
             await model_1.wait_for_idle(status="active")
 
-            await model_1.create_offer("mysql:db")
+            await model_1.create_offer("influxdb:grafana-source")
 
             offers = await model_1.list_offers()
 
             await model_1.block_until(
-                lambda: all(offer.application_name == 'mysql'
+                lambda: all(offer.application_name == 'influxdb'
                             for offer in offers.results),
                 timeout=60 * wait_for_min)
 
@@ -187,4 +186,4 @@ async def test_add_bundle(event_loop):
                 await model_2.deploy('local:{}'.format(tmp_path))
                 await model_2.wait_for_idle(status="active")
 
-            await model_1.remove_offer("admin/{}.mysql".format(model_1.info.name), force=True)
+            await model_1.remove_offer("admin/{}.influxdb".format(model_1.info.name), force=True)
