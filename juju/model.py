@@ -1342,6 +1342,13 @@ class Model:
         return await self._wait_for_new('machine', machine_id)
 
     async def add_relation(self, relation1, relation2):
+        """
+        .. deprecated:: 2.9.9
+           Use ``relate()`` instead
+        """
+        return await self.relate(relation1, relation2)
+
+    async def relate(self, relation1, relation2):
         """Add a relation between two applications.
 
         :param str relation1: '<application>[:<relation_name>]'

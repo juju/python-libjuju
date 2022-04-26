@@ -83,7 +83,7 @@ async def main():
             # subordinates must be deployed without units
             num_units=0,
         )
-        my_relation = await model.add_relation(
+        my_relation = await model.relate(
             'ubuntu',
             'nrpe',
         )

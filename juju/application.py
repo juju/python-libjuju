@@ -107,6 +107,13 @@ class Application(model.ModelEntity):
         return tag.application(self.name)
 
     async def add_relation(self, local_relation, remote_relation):
+        """
+        .. deprecated:: 2.9.9
+           Use ``relate()`` instead
+        """
+        return await self.relate(local_relation, remote_relation)
+
+    async def relate(self, local_relation, remote_relation):
         """Add a relation to another application.
 
         :param str local_relation: Name of relation on this application
@@ -117,7 +124,7 @@ class Application(model.ModelEntity):
         if ':' not in local_relation:
             local_relation = '{}:{}'.format(self.name, local_relation)
 
-        return await self.model.add_relation(local_relation, remote_relation)
+        return await self.model.relate(local_relation, remote_relation)
 
     async def add_unit(self, count=1, to=None):
         """Add one or more units to this application.
