@@ -257,6 +257,7 @@ class BundleHandler:
                     self.overlay_removed_charms.add(charm_name)
 
         self.bundle = await self._validate_bundle(self.bundle)
+
         if is_local:
             self.bundle = await self._handle_local_charms(self.bundle, bundle_dir)
 
@@ -316,6 +317,7 @@ class BundleHandler:
         deployed = dict()
 
         specs = self.applications_specs
+
         for name in self.applications:
             spec = specs[name]
             app = self.model.applications.get(name, None)
@@ -593,8 +595,7 @@ class AddApplicationChange(ChangeInfo):
             raise JujuError("expected origin to be valid for application {} and charm {} with channel {}".format(self.application, str(url), str(channel)))
 
         if self.series is None or self.series == "":
-            self.series = context.bundle.get("bundle",
-                                             context.bundle.get("series", None))
+            self.series = context.bundle.get("series", None)
 
         if Schema.CHARM_STORE.matches(url.schema):
             resources = await context.model._add_store_resources(
