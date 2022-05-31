@@ -347,7 +347,7 @@ class TestAddApplicationChangeRun:
         model._deploy.assert_called_once()
         model._deploy.assert_called_with(charm_url="cs:charm1",
                                          application="application",
-                                         series="kubernetes",
+                                         series=None,
                                          config="options",
                                          constraints="constraints",
                                          endpoint_bindings="endpoint_bindings",
