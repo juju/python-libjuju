@@ -1858,7 +1858,7 @@ class Model:
                 'description': '',
                 'fingerprint': '',
                 'name': name,
-                'path': path,
+                'path': Path(path).name,
                 'revision': 0,
                 'size': 0,
                 'type_': resource_type,
