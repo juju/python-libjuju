@@ -1,12 +1,21 @@
 Changelog
 ---------
 
+2.9.10
+^^^^^^
+
+Thursday June 9 2022
+
+## What's Changed
+
+* [JUJU-1155] Avoid incorrectly setting `series: kubernetes` for sidecar charms in k8s bundles by @cderici in https://github.com/juju/python-libjuju/pull/679
+* [JUJU-1172] Visiting the pylibjuju CI by @cderici in https://github.com/juju/python-libjuju/pull/681
+* [JUJU-1124] Avoid sending path across the wire for local resource file name by @cderici in https://github.com/juju/python-libjuju/pull/678
+
 2.9.9
 ^^^^^
 
 Wednesday April 26 2022
-
-## What's Changed
 
 * [JUJU-835] Avoid ignoring asyncio exceptions in coroutines by @cderici in https://github.com/juju/python-libjuju/pull/658
 * [JUJU-843] Attach-resource to check if given binary file by @cderici in https://github.com/juju/python-libjuju/pull/659
