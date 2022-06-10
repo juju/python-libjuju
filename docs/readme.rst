@@ -36,6 +36,7 @@ Installation
 
 Quickstart
 ----------
+
 Here's a simple example that shows basic usage of the library. The example
 connects to the currently active Juju model, deploys a single unit of the
 ubuntu charm, then exits:
@@ -101,6 +102,25 @@ example, to run ``examples/connect_current_model.py``, use:
 .. code:: bash
 
   tox -e example -- examples/connect_current_model.py
+
+
+REPL
+^^^^
+
+To experiment with the library in a REPL, launch python in asyncio mode
+
+.. code:: bash
+
+  $ python3 -m asyncio
+
+and then, to connect to the current model and fetch status:
+
+.. code::
+
+  >>> from juju.model import Model
+  >>> model = Model()
+  >>> await model.connect_current()
+  >>> status = await model.get_status()
 
 
 Versioning
