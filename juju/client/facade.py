@@ -7,11 +7,12 @@ import pprint
 import re
 import textwrap
 import typing
-import typing_inspect
 from collections import defaultdict
 from glob import glob
 from pathlib import Path
 from typing import Any, Mapping, Sequence, TypeVar
+
+import typing_inspect
 
 from . import codegen
 
@@ -664,14 +665,31 @@ class Type:
                 data = json.loads(data)
             except json.JSONDecodeError:
                 raise
-        d = {}
-        for k, v in (data or {}).items():
-            d[cls._toPy.get(k, k)] = v
-
-        try:
+        if isinstance(data, dict):
+            d = {}
+            for k, v in (data or {}).items():
+                d[cls._toPy.get(k, k)] = v
+            try:
+                return cls(**d)
+            except TypeError:
+                raise
+        if isinstance(data, list):
+            # WARNING: not tested with any-all
+            # check: https://juju.is/docs/sdk/assumes
+            # assumes are in the form of a list
+            d = {}
+            for entry in data:
+                if '>' or '>=' in entry:
+                    # something like juju >= 2.9.31
+                    i = entry.index('>')
+                    key = entry[:i].strip()
+                    value = entry[i:].strip()
+                    d[key] = value
+                else:
+                    # something like k8s-api
+                    d[entry]=''
             return cls(**d)
-        except TypeError:
-            raise
+        return None
 
     def serialize(self):
         d = {}
