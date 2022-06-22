@@ -687,7 +687,7 @@ class Type:
                     d[key] = value
                 else:
                     # something like k8s-api
-                    d[entry]=''
+                    d[entry] = ''
             return cls(**d)
         return None
 
