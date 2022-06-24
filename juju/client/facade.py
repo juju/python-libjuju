@@ -674,7 +674,6 @@ class Type:
             except TypeError:
                 raise
         if isinstance(data, list):
-            # WARNING: not tested with any-all
             # check: https://juju.is/docs/sdk/assumes
             # assumes are in the form of a list
             d = {}

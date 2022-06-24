@@ -21,5 +21,8 @@ tags:
   - misc
   - application_development
 subordinate: false
+# check: https://juju.is/docs/sdk/assumes for more details 
 assumes:
-  - juju >= 2.9
+  - any_of:
+    - juju >= 2.9
+    - k8s-api
