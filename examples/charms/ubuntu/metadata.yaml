@@ -21,3 +21,5 @@ tags:
   - misc
   - application_development
 subordinate: false
+assumes:
+  - juju >= 2.9
