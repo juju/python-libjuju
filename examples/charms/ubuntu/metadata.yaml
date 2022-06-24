@@ -1,9 +1,16 @@
+# Copyright 2022 jtirado
+# See LICENSE file for licensing details.
+
+# For a complete list of supported options, see:
+# https://juju.is/docs/sdk/metadata-reference
 name: ubuntu-lite
-summary: The smallest charm I could come up with that still looks nice.
-maintainer: John Arbash Meinel <john@arbash-meinel.com>
+display-name: |
+  Ubuntu-Lite
 description: |
-  Run an Ubuntu system, but don't do a whole lot else.
-series: ["xenial", "bionic", "trusty"]
+  Ubuntu-lite is a reduced image for testing inside.
+summary: |
+  Ubuntu-lite is a reduced image for testing inside.
+series: ["xenial", "bionic", "trusty", "jammy"]
 provides:
   ubuntu:
     interface: ubuntu
