@@ -49,7 +49,7 @@ ubuntu charm, then exits:
   import logging
   import sys
 
-  from juju import loop
+  from juju import jasyncio
   from juju.model import Model
 
 
@@ -88,7 +88,7 @@ ubuntu charm, then exits:
 
       # Run the deploy coroutine in an asyncio event loop, using a helper
       # that abstracts loop creation and teardown.
-      loop.run(deploy())
+      jasyncio.run(deploy())
 
 
   if __name__ == '__main__':
