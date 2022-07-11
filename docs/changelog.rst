@@ -1,12 +1,35 @@
 Changelog
 ---------
 
+2.9.10
+^^^^^^
+
+Thursday June 9 2022
+
+## What's Changed
+
+* [JUJU-1155] Avoid incorrectly setting `series: kubernetes` for sidecar charms in k8s bundles by @cderici in https://github.com/juju/python-libjuju/pull/679
+* [JUJU-1172] Visiting the pylibjuju CI by @cderici in https://github.com/juju/python-libjuju/pull/681
+* [JUJU-1124] Avoid sending path across the wire for local resource file name by @cderici in https://github.com/juju/python-libjuju/pull/678
+
+2.9.9
+^^^^^
+
+Wednesday April 26 2022
+
+* [JUJU-835] Avoid ignoring asyncio exceptions in coroutines by @cderici in https://github.com/juju/python-libjuju/pull/658
+* [JUJU-843] Attach-resource to check if given binary file by @cderici in https://github.com/juju/python-libjuju/pull/659
+* [JUJU-858] Add quality of life feature ensure application removal at return by @cderici in https://github.com/juju/python-libjuju/pull/665
+* [JUJU-965] Add a bit of client side constraint validation by @cderici in https://github.com/juju/python-libjuju/pull/666
+* support python3.10 with later versions of websockets by @addyess in https://github.com/juju/python-libjuju/pull/673
+* Revert "Avoid ignoring asyncio exceptions in coroutines" by @simskij in https://github.com/juju/python-libjuju/pull/672
+* [JUJU-796] Add relate method and deprecate add-relation by @jack-w-shaw in https://github.com/juju/python-libjuju/pull/660
+* [JUJU-981] Get series from deployed app instead of metadata when charm upgrade by @cderici in https://github.com/juju/python-libjuju/pull/671
+
 2.9.8
 ^^^^^
 
 Monday March 21 2022
-
-## What's Changed
 
 * [JUJU-567] Use ModelManager instead of ControllerFacade to list available models by @cderici in https://github.com/juju/python-libjuju/pull/632
 * [JUJU-573] Fix charm resolution for Juju 2.8.11 by @cderici in https://github.com/juju/python-libjuju/pull/633
@@ -16,7 +39,6 @@ Monday March 21 2022
 * [JUJU-731] Subordinate charm num unit by @cderici in https://github.com/juju/python-libjuju/pull/648
 * [JUJU-769] Facade schemas for 2.9.27 by @cderici in https://github.com/juju/python-libjuju/pull/652
 * [JUJU-771] Auto switch to scale from add_unit on container based models by @cderici in https://github.com/juju/python-libjuju/pull/653
-
 
 2.9.7
 ^^^^^

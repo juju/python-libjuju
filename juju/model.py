@@ -875,6 +875,21 @@ class Model:
             lambda: len(self.machines) == 0
         )
 
+    async def remove_application(self, app_name, block_until_done=False):
+        """Removes the given application from the model.
+
+        :param str app_name: Name of the application
+        :param bool block_until_done: Ensure the app is removed from the
+        model when returned
+        """
+        if app_name not in self.applications:
+            raise JujuError("Given application doesn't seem to appear in the\
+             model: %s\nCurrent applications are: %s" %
+                            (app_name, self.applications))
+        await self.applications[app_name].remove()
+        if block_until_done:
+            await self.block_until(lambda: app_name not in self.applications)
+
     async def block_until(self, *conditions, timeout=None, wait_period=0.5):
         """Return only after all conditions are true.
 
@@ -1327,6 +1342,13 @@ class Model:
         return await self._wait_for_new('machine', machine_id)
 
     async def add_relation(self, relation1, relation2):
+        """
+        .. deprecated:: 2.9.9
+           Use ``relate()`` instead
+        """
+        return await self.relate(relation1, relation2)
+
+    async def relate(self, relation1, relation2):
         """Add a relation between two applications.
 
         :param str relation1: '<application>[:<relation_name>]'
@@ -1836,7 +1858,7 @@ class Model:
                 'description': '',
                 'fingerprint': '',
                 'name': name,
-                'path': path,
+                'path': Path(path).name,
                 'revision': 0,
                 'size': 0,
                 'type_': resource_type,

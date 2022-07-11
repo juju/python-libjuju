@@ -93,7 +93,7 @@ async def test_remove_saas(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_add_relation_with_offer(event_loop):
+async def test_relate_with_offer(event_loop):
     pytest.skip('Revise: intermittent problem with the remove_saas call')
     async with base.CleanModel() as model_1:
         application = await model_1.deploy(
@@ -123,7 +123,7 @@ async def test_add_relation_with_offer(event_loop):
                 lambda: all(unit.agent_status == 'idle'
                             for unit in application.units))
 
-            await model_2.add_relation("mediawiki:db", "admin/{}.mysql".format(model_1.info.name))
+            await model_2.relate("mediawiki:db", "admin/{}.mysql".format(model_1.info.name))
             status = await model_2.get_status()
             if 'mysql' not in status.remote_applications:
                 raise Exception("Expected mysql in saas")
@@ -165,20 +165,19 @@ async def test_add_bundle(event_loop):
                 raise
 
             await model_1.deploy(
-                'mysql',
-                application_name='mysql',
-                series='xenial',
+                'influxdb',
+                application_name='influxdb',
                 channel='stable',
             )
-            assert 'mysql' in model_1.applications
+            assert 'influxdb' in model_1.applications
             await model_1.wait_for_idle(status="active")
 
-            await model_1.create_offer("mysql:db")
+            await model_1.create_offer("influxdb:grafana-source")
 
             offers = await model_1.list_offers()
 
             await model_1.block_until(
-                lambda: all(offer.application_name == 'mysql'
+                lambda: all(offer.application_name == 'influxdb'
                             for offer in offers.results),
                 timeout=60 * wait_for_min)
 
@@ -187,4 +186,4 @@ async def test_add_bundle(event_loop):
                 await model_2.deploy('local:{}'.format(tmp_path))
                 await model_2.wait_for_idle(status="active")
 
-            await model_1.remove_offer("admin/{}.mysql".format(model_1.info.name), force=True)
+            await model_1.remove_offer("admin/{}.influxdb".format(model_1.info.name), force=True)

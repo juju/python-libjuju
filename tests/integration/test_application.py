@@ -235,3 +235,15 @@ async def test_trusted(event_loop):
         await ubuntu_app.set_trusted(False)
         trusted = await ubuntu_app.get_trusted()
         assert trusted is False
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_app_remove_wait_flag(event_loop):
+    async with base.CleanModel() as model:
+        app = await model.deploy('cs:ubuntu')
+        a_name = app.name
+        await model.wait_for_idle(status="active")
+
+        await model.remove_application(app.name, block_until_done=True)
+        assert a_name not in model.applications

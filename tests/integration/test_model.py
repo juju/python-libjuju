@@ -23,8 +23,8 @@ from .. import base
 MB = 1
 GB = 1024
 SSH_KEY = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCsYMJGNGG74HAJha3n2CFmWYsOOaORnJK6VqNy86pj0MIpvRXBzFzVy09uPQ66GOQhTEoJHEqE77VMui7+62AcMXT+GG7cFHcnU8XVQsGM6UirCcNyWNysfiEMoAdZScJf/GvoY87tMEszhZIUV37z8PUBx6twIqMdr31W1J0IaPa+sV6FEDadeLaNTvancDcHK1zuKsL39jzAg7+LYjKJfEfrsQP+lj/EQcjtKqlhVS5kzsJVfx8ZEd0xhW5G7N6bCdKNalS8mKCMaBXJpijNQ82AiyqCIDCRrre2To0/i7pTjRiL0U9f9mV3S4NJaQaokR050w/ZLySFf6F7joJT mathijs@Qrama-Mathijs'  # noqa
-HERE_DIR = Path(__file__).absolute().parent
-TESTS_DIR = HERE_DIR.parent
+HERE_DIR = Path(__file__).absolute().parent  # tests/integration
+TESTS_DIR = HERE_DIR.parent  # tests/
 OVERLAYS_DIR = HERE_DIR / 'bundle' / 'test-overlays'
 
 
@@ -58,6 +58,20 @@ async def test_deploy_local_bundle_file(event_loop):
         assert ghost and mysql
         await model.block_until(lambda: (len(ghost.units) == 1 and
                                 len(mysql.units) == 1),
+                                timeout=60 * 4)
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_deploy_bundle_local_resource_relative_path(event_loop):
+    bundle_file_path = HERE_DIR / 'bundle-file-resource.yaml'
+
+    async with base.CleanModel() as model:
+        await model.deploy(str(bundle_file_path))
+
+        app = model.applications.get('file-resource-charm')
+        assert app
+        await model.block_until(lambda: (len(app.units) == 1),
                                 timeout=60 * 4)
 
 
@@ -556,7 +570,7 @@ async def test_relate(event_loop):
 
         with mock.patch.object(ApplicationFacade, 'from_connection',
                                return_value=mock_app_facade):
-            my_relation = await run_with_interrupt(model.add_relation(
+            my_relation = await run_with_interrupt(model.relate(
                 'ubuntu',
                 'nrpe',
             ), timeout)

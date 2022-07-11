@@ -457,7 +457,7 @@ class TestAddApplicationChangeRun:
         model._deploy.assert_called_once()
         model._deploy.assert_called_with(charm_url="cs:charm1",
                                          application="application",
-                                         series="kubernetes",
+                                         series=None,
                                          config="options",
                                          constraints="constraints",
                                          endpoint_bindings="endpoint_bindings",
@@ -669,7 +669,7 @@ class TestAddRelationChangeRun:
         rel2 = mock.Mock(name="rel2", **{"matches.return_value": True})
 
         model = mock.Mock()
-        model.add_relation = base.AsyncMock(return_value=rel2)
+        model.relate = base.AsyncMock(return_value=rel2)
 
         context = mock.Mock()
         context.resolve_relation = mock.Mock(side_effect=['endpoint_1', 'endpoint_2'])
@@ -679,17 +679,17 @@ class TestAddRelationChangeRun:
         result = await change.run(context)
         assert result is rel2
 
-        model.add_relation.assert_called_once()
-        model.add_relation.assert_called_with("endpoint_1", "endpoint_2")
+        model.relate.assert_called_once()
+        model.relate.assert_called_with("endpoint_1", "endpoint_2")
 
         # confirm that it's idempotent
         context.resolve_relation = mock.Mock(side_effect=['endpoint_1', 'endpoint_2'])
-        model.add_relation.reset_mock()
-        model.add_relation.return_value = None
+        model.relate.reset_mock()
+        model.relate.return_value = None
         model.relations = [rel1, rel2]
         result = await change.run(context)
         assert result is rel2
-        assert not model.add_relation.called
+        assert not model.relate.called
 
 
 class TestAddUnitChange(unittest.TestCase):

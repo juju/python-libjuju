@@ -3,7 +3,6 @@ This example demonstrate how status works
 
 """
 from juju import jasyncio
-from juju import loop
 import logging
 import sys
 from logging import getLogger
@@ -43,4 +42,4 @@ async def main():
     await model.disconnect()
 
 if __name__ == '__main__':
-    loop.run(main())
+    jasyncio.run(main())

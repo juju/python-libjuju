@@ -4,7 +4,7 @@ This example:
 2. Deploy a bundle from charmhub and waits until it reports itself active
 3. Destroys the unit and application
 """
-from juju import loop
+from juju import jasyncio
 from juju.model import Model
 
 
@@ -30,4 +30,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    loop.run(main())
+    jasyncio.run(main())
