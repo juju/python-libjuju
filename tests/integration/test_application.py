@@ -241,7 +241,7 @@ async def test_trusted(event_loop):
 @pytest.mark.asyncio
 async def test_app_remove_wait_flag(event_loop):
     async with base.CleanModel() as model:
-        app = await model.deploy('cs:ubuntu')
+        app = await model.deploy('ubuntu')
         a_name = app.name
         await model.wait_for_idle(status="active")
 
