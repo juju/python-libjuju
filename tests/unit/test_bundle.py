@@ -225,6 +225,64 @@ class TestAddApplicationChangeRun:
         model._deploy.assert_called_once()
 
     @pytest.mark.asyncio
+    async def test_run_with_charmstore_charm_no_channel(self, event_loop):
+        """Test to verify if when the given channel is None, the channel defaults to "stable", which
+            is the default channel value for the Chart Store
+        """
+
+        change = AddApplicationChange(1, [], params={"charm": "cs:charm",
+                                                     "series": "series",
+                                                     "application": "application",
+                                                     "options": "options",
+                                                     "constraints": "constraints",
+                                                     "storage": "storage",
+                                                     "endpoint-bindings": "endpoint_bindings",
+                                                     "resources": "resources",
+                                                     "devices": "devices",
+                                                     "num-units": "num_units",
+                                                     "channel": None})
+
+        model = mock.Mock()
+        model._deploy = base.AsyncMock(return_value=None)
+        model._add_store_resources = base.AsyncMock(return_value=["resource1"])
+        model.applications = {}
+
+        context = mock.Mock()
+        context.resolve.return_value = "cs:charm1"
+        context.origins = {"cs:charm1": {"stable": {}}}
+        context.trusted = False
+        context.model = model
+
+        result = await change.run(context)
+        assert result == "application"
+
+        model._add_store_resources.assert_called_once()
+        model._add_store_resources.assert_called_with("application",
+                                                      "cs:charm1",
+                                                      overrides="resources")
+
+        model._deploy.assert_called_once()
+        model._deploy.assert_called_with(charm_url="cs:charm1",
+                                         application="application",
+                                         series="series",
+                                         config="options",
+                                         constraints="constraints",
+                                         endpoint_bindings="endpoint_bindings",
+                                         resources=["resource1"],
+                                         storage="storage",
+                                         devices="devices",
+                                         channel="stable",
+                                         charm_origin=ANY,
+                                         num_units="num_units")
+
+        # confirm that it's idempotent
+        model.applications = {"application": None}
+        result = await change.run(context)
+        assert result == "application"
+        model._add_store_resources.assert_called_once()
+        model._deploy.assert_called_once()
+
+    @pytest.mark.asyncio
     async def test_run_with_charmhub_charm(self, event_loop):
         change = AddApplicationChange(1, [], params={"charm": "charm",
                                                      "series": "series",
@@ -273,6 +331,58 @@ class TestAddApplicationChangeRun:
                                          num_units="num_units")
 
     @pytest.mark.asyncio
+    async def test_run_with_charmhub_charm_no_channel(self, event_loop):
+        """Test to verify if when the given channel is None, the channel defaults to "local/stable", which
+            is the default channel value for the Charm Hub
+        """
+        change = AddApplicationChange(1, [], params={"charm": "charm",
+                                                     "series": "series",
+                                                     "application": "application",
+                                                     "options": "options",
+                                                     "constraints": "constraints",
+                                                     "storage": "storage",
+                                                     "endpoint-bindings": "endpoint_bindings",
+                                                     "resources": "resources",
+                                                     "devices": "devices",
+                                                     "num-units": "num_units",
+                                                     "channel": None
+                                                     })
+
+        model = Mock()
+        model._deploy = base.AsyncMock(return_value=None)
+        model._add_charmhub_resources = base.AsyncMock(return_value=["resource1"])
+        model.applications = {}
+
+        context = Mock()
+        context.resolve.return_value = "ch:charm1"
+        context.origins = {"ch:charm1": {"stable": Mock()}}
+        context.trusted = False
+        context.model = model
+
+        info = Mock()
+        info.result.id_ = "12345"
+        info.errors.error_list.code = ''
+        info_func = base.AsyncMock(return_value=info)
+
+        with patch.object(charmhub.CharmHub, 'info', info_func):
+            result = await change.run(context)
+        assert result == "application"
+
+        model._deploy.assert_called_once()
+        model._deploy.assert_called_with(charm_url="ch:charm1",
+                                         application="application",
+                                         series="series",
+                                         config="options",
+                                         constraints="constraints",
+                                         endpoint_bindings="endpoint_bindings",
+                                         resources=["resource1"],
+                                         storage="storage",
+                                         devices="devices",
+                                         channel="latest/stable",
+                                         charm_origin=ANY,
+                                         num_units="num_units")
+
+    @pytest.mark.asyncio
     async def test_run_local(self, event_loop):
         change = AddApplicationChange(1, [], params={"charm": "local:charm",
                                                      "series": "series",
@@ -308,7 +418,7 @@ class TestAddApplicationChangeRun:
                                          storage="storage",
                                          devices="devices",
                                          num_units="num_units",
-                                         channel=None,
+                                         channel="",
                                          charm_origin=ANY)
 
     @pytest.mark.asyncio
