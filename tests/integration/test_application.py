@@ -226,7 +226,7 @@ async def test_upgrade_charm_resource(event_loop):
 @pytest.mark.asyncio
 async def test_trusted(event_loop):
     async with base.CleanModel() as model:
-        await model.deploy('cs:~juju-qa/bundle/basic-trusted-1', trust=True)
+        await model.deploy('ubuntu', trust=True)
 
         ubuntu_app = model.applications['ubuntu']
         trusted = await ubuntu_app.get_trusted()
