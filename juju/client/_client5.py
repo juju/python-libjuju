@@ -1715,84 +1715,7 @@ class BundleFacade(Type):
 class ClientFacade(Type):
     name = 'Client'
     version = 5
-    schema =     {'definitions': {'APIHostPortsResult': {'additionalProperties': False,
-                                            'properties': {'servers': {'items': {'items': {'$ref': '#/definitions/HostPort'},
-                                                                                 'type': 'array'},
-                                                                       'type': 'array'}},
-                                            'required': ['servers'],
-                                            'type': 'object'},
-                     'AddCharm': {'additionalProperties': False,
-                                  'properties': {'channel': {'type': 'string'},
-                                                 'force': {'type': 'boolean'},
-                                                 'url': {'type': 'string'}},
-                                  'required': ['url', 'channel', 'force'],
-                                  'type': 'object'},
-                     'AddCharmWithAuthorization': {'additionalProperties': False,
-                                                   'properties': {'channel': {'type': 'string'},
-                                                                  'force': {'type': 'boolean'},
-                                                                  'macaroon': {'$ref': '#/definitions/Macaroon'},
-                                                                  'url': {'type': 'string'}},
-                                                   'required': ['url',
-                                                                'channel',
-                                                                'macaroon',
-                                                                'force'],
-                                                   'type': 'object'},
-                     'AddMachineParams': {'additionalProperties': False,
-                                          'properties': {'addresses': {'items': {'$ref': '#/definitions/Address'},
-                                                                       'type': 'array'},
-                                                         'constraints': {'$ref': '#/definitions/Value'},
-                                                         'container-type': {'type': 'string'},
-                                                         'disks': {'items': {'$ref': '#/definitions/Constraints'},
-                                                                   'type': 'array'},
-                                                         'hardware-characteristics': {'$ref': '#/definitions/HardwareCharacteristics'},
-                                                         'instance-id': {'type': 'string'},
-                                                         'jobs': {'items': {'type': 'string'},
-                                                                  'type': 'array'},
-                                                         'nonce': {'type': 'string'},
-                                                         'parent-id': {'type': 'string'},
-                                                         'placement': {'$ref': '#/definitions/Placement'},
-                                                         'series': {'type': 'string'}},
-                                          'required': ['series',
-                                                       'constraints',
-                                                       'jobs',
-                                                       'parent-id',
-                                                       'container-type',
-                                                       'instance-id',
-                                                       'nonce',
-                                                       'hardware-characteristics',
-                                                       'addresses'],
-                                          'type': 'object'},
-                     'AddMachines': {'additionalProperties': False,
-                                     'properties': {'params': {'items': {'$ref': '#/definitions/AddMachineParams'},
-                                                               'type': 'array'}},
-                                     'required': ['params'],
-                                     'type': 'object'},
-                     'AddMachinesResult': {'additionalProperties': False,
-                                           'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                          'machine': {'type': 'string'}},
-                                           'required': ['machine'],
-                                           'type': 'object'},
-                     'AddMachinesResults': {'additionalProperties': False,
-                                            'properties': {'machines': {'items': {'$ref': '#/definitions/AddMachinesResult'},
-                                                                        'type': 'array'}},
-                                            'required': ['machines'],
-                                            'type': 'object'},
-                     'Address': {'additionalProperties': False,
-                                 'properties': {'cidr': {'type': 'string'},
-                                                'config-type': {'type': 'string'},
-                                                'is-secondary': {'type': 'boolean'},
-                                                'scope': {'type': 'string'},
-                                                'space-id': {'type': 'string'},
-                                                'space-name': {'type': 'string'},
-                                                'type': {'type': 'string'},
-                                                'value': {'type': 'string'}},
-                                 'required': ['value', 'type', 'scope'],
-                                 'type': 'object'},
-                     'AgentVersionResult': {'additionalProperties': False,
-                                            'properties': {'version': {'$ref': '#/definitions/Number'}},
-                                            'required': ['version'],
-                                            'type': 'object'},
-                     'AllWatcherId': {'additionalProperties': False,
+    schema =     {'definitions': {'AllWatcherId': {'additionalProperties': False,
                                       'properties': {'watcher-id': {'type': 'string'}},
                                       'required': ['watcher-id'],
                                       'type': 'object'},
@@ -1884,53 +1807,6 @@ class ClientFacade(Type):
                                                    'created',
                                                    'created-by'],
                                       'type': 'object'},
-                     'BundleChange': {'additionalProperties': False,
-                                      'properties': {'args': {'items': {'additionalProperties': True,
-                                                                        'type': 'object'},
-                                                              'type': 'array'},
-                                                     'id': {'type': 'string'},
-                                                     'method': {'type': 'string'},
-                                                     'requires': {'items': {'type': 'string'},
-                                                                  'type': 'array'}},
-                                      'required': ['id',
-                                                   'method',
-                                                   'args',
-                                                   'requires'],
-                                      'type': 'object'},
-                     'BundleChangesParams': {'additionalProperties': False,
-                                             'properties': {'bundleURL': {'type': 'string'},
-                                                            'yaml': {'type': 'string'}},
-                                             'required': ['yaml', 'bundleURL'],
-                                             'type': 'object'},
-                     'BundleChangesResults': {'additionalProperties': False,
-                                              'properties': {'changes': {'items': {'$ref': '#/definitions/BundleChange'},
-                                                                         'type': 'array'},
-                                                             'errors': {'items': {'type': 'string'},
-                                                                        'type': 'array'}},
-                                              'type': 'object'},
-                     'BytesResult': {'additionalProperties': False,
-                                     'properties': {'result': {'items': {'type': 'integer'},
-                                                               'type': 'array'}},
-                                     'required': ['result'],
-                                     'type': 'object'},
-                     'ConfigValue': {'additionalProperties': False,
-                                     'properties': {'source': {'type': 'string'},
-                                                    'value': {'additionalProperties': True,
-                                                              'type': 'object'}},
-                                     'required': ['value', 'source'],
-                                     'type': 'object'},
-                     'Constraints': {'additionalProperties': False,
-                                     'properties': {'Count': {'type': 'integer'},
-                                                    'Pool': {'type': 'string'},
-                                                    'Size': {'type': 'integer'}},
-                                     'required': ['Pool', 'Size', 'Count'],
-                                     'type': 'object'},
-                     'DestroyMachines': {'additionalProperties': False,
-                                         'properties': {'force': {'type': 'boolean'},
-                                                        'machine-names': {'items': {'type': 'string'},
-                                                                          'type': 'array'}},
-                                         'required': ['machine-names', 'force'],
-                                         'type': 'object'},
                      'DetailedStatus': {'additionalProperties': False,
                                         'properties': {'data': {'patternProperties': {'.*': {'additionalProperties': True,
                                                                                              'type': 'object'}},
@@ -1961,25 +1837,6 @@ class ClientFacade(Type):
                                                      'role',
                                                      'subordinate'],
                                         'type': 'object'},
-                     'Entities': {'additionalProperties': False,
-                                  'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
-                                                              'type': 'array'}},
-                                  'required': ['entities'],
-                                  'type': 'object'},
-                     'Entity': {'additionalProperties': False,
-                                'properties': {'tag': {'type': 'string'}},
-                                'required': ['tag'],
-                                'type': 'object'},
-                     'EntityStatus': {'additionalProperties': False,
-                                      'properties': {'data': {'patternProperties': {'.*': {'additionalProperties': True,
-                                                                                           'type': 'object'}},
-                                                              'type': 'object'},
-                                                     'info': {'type': 'string'},
-                                                     'since': {'format': 'date-time',
-                                                               'type': 'string'},
-                                                     'status': {'type': 'string'}},
-                                      'required': ['status', 'info', 'since'],
-                                      'type': 'object'},
                      'Error': {'additionalProperties': False,
                                'properties': {'code': {'type': 'string'},
                                               'info': {'patternProperties': {'.*': {'additionalProperties': True,
@@ -1988,14 +1845,6 @@ class ClientFacade(Type):
                                               'message': {'type': 'string'}},
                                'required': ['message', 'code'],
                                'type': 'object'},
-                     'ErrorResult': {'additionalProperties': False,
-                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
-                                     'type': 'object'},
-                     'ErrorResults': {'additionalProperties': False,
-                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
-                                                                 'type': 'array'}},
-                                      'required': ['results'],
-                                      'type': 'object'},
                      'ExposedEndpoint': {'additionalProperties': False,
                                          'properties': {'expose-to-cidrs': {'items': {'type': 'string'},
                                                                             'type': 'array'},
@@ -2008,13 +1857,11 @@ class ClientFacade(Type):
                                                         'major': {'type': 'integer'},
                                                         'minor': {'type': 'integer'},
                                                         'number': {'$ref': '#/definitions/Number'},
-                                                        'os-type': {'type': 'string'},
-                                                        'series': {'type': 'string'}},
+                                                        'os-type': {'type': 'string'}},
                                          'required': ['number',
                                                       'major',
                                                       'minor',
                                                       'arch',
-                                                      'series',
                                                       'os-type',
                                                       'agentstream'],
                                          'type': 'object'},
@@ -2049,44 +1896,12 @@ class ClientFacade(Type):
                                                  'controller-timestamp',
                                                  'branches'],
                                     'type': 'object'},
-                     'GetConstraintsResults': {'additionalProperties': False,
-                                               'properties': {'constraints': {'$ref': '#/definitions/Value'}},
-                                               'required': ['constraints'],
-                                               'type': 'object'},
-                     'HardwareCharacteristics': {'additionalProperties': False,
-                                                 'properties': {'arch': {'type': 'string'},
-                                                                'availability-zone': {'type': 'string'},
-                                                                'cpu-cores': {'type': 'integer'},
-                                                                'cpu-power': {'type': 'integer'},
-                                                                'mem': {'type': 'integer'},
-                                                                'root-disk': {'type': 'integer'},
-                                                                'root-disk-source': {'type': 'string'},
-                                                                'tags': {'items': {'type': 'string'},
-                                                                         'type': 'array'}},
-                                                 'type': 'object'},
                      'History': {'additionalProperties': False,
                                  'properties': {'error': {'$ref': '#/definitions/Error'},
                                                 'statuses': {'items': {'$ref': '#/definitions/DetailedStatus'},
                                                              'type': 'array'}},
                                  'required': ['statuses'],
                                  'type': 'object'},
-                     'HostPort': {'additionalProperties': False,
-                                  'properties': {'Address': {'$ref': '#/definitions/Address'},
-                                                 'cidr': {'type': 'string'},
-                                                 'config-type': {'type': 'string'},
-                                                 'is-secondary': {'type': 'boolean'},
-                                                 'port': {'type': 'integer'},
-                                                 'scope': {'type': 'string'},
-                                                 'space-id': {'type': 'string'},
-                                                 'space-name': {'type': 'string'},
-                                                 'type': {'type': 'string'},
-                                                 'value': {'type': 'string'}},
-                                  'required': ['value',
-                                               'type',
-                                               'scope',
-                                               'Address',
-                                               'port'],
-                                  'type': 'object'},
                      'LXDProfile': {'additionalProperties': False,
                                     'properties': {'config': {'patternProperties': {'.*': {'type': 'string'}},
                                                               'type': 'object'},
@@ -2098,17 +1913,6 @@ class ClientFacade(Type):
                                                  'description',
                                                  'devices'],
                                     'type': 'object'},
-                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
-                     'MachineHardware': {'additionalProperties': False,
-                                         'properties': {'arch': {'type': 'string'},
-                                                        'availability-zone': {'type': 'string'},
-                                                        'cores': {'type': 'integer'},
-                                                        'cpu-power': {'type': 'integer'},
-                                                        'mem': {'type': 'integer'},
-                                                        'root-disk': {'type': 'integer'},
-                                                        'tags': {'items': {'type': 'string'},
-                                                                 'type': 'array'}},
-                                         'type': 'object'},
                      'MachineStatus': {'additionalProperties': False,
                                        'properties': {'agent-status': {'$ref': '#/definitions/DetailedStatus'},
                                                       'constraints': {'type': 'string'},
@@ -2154,90 +1958,6 @@ class ClientFacade(Type):
                                                     'message': {'type': 'string'}},
                                      'required': ['color', 'message'],
                                      'type': 'object'},
-                     'ModelConfigResults': {'additionalProperties': False,
-                                            'properties': {'config': {'patternProperties': {'.*': {'$ref': '#/definitions/ConfigValue'}},
-                                                                      'type': 'object'}},
-                                            'required': ['config'],
-                                            'type': 'object'},
-                     'ModelInfo': {'additionalProperties': False,
-                                   'properties': {'agent-version': {'$ref': '#/definitions/Number'},
-                                                  'cloud-credential-tag': {'type': 'string'},
-                                                  'cloud-credential-validity': {'type': 'boolean'},
-                                                  'cloud-region': {'type': 'string'},
-                                                  'cloud-tag': {'type': 'string'},
-                                                  'controller-uuid': {'type': 'string'},
-                                                  'default-series': {'type': 'string'},
-                                                  'is-controller': {'type': 'boolean'},
-                                                  'life': {'type': 'string'},
-                                                  'machines': {'items': {'$ref': '#/definitions/ModelMachineInfo'},
-                                                               'type': 'array'},
-                                                  'migration': {'$ref': '#/definitions/ModelMigrationStatus'},
-                                                  'name': {'type': 'string'},
-                                                  'owner-tag': {'type': 'string'},
-                                                  'provider-type': {'type': 'string'},
-                                                  'sla': {'$ref': '#/definitions/ModelSLAInfo'},
-                                                  'status': {'$ref': '#/definitions/EntityStatus'},
-                                                  'supported-features': {'items': {'$ref': '#/definitions/SupportedFeature'},
-                                                                         'type': 'array'},
-                                                  'type': {'type': 'string'},
-                                                  'users': {'items': {'$ref': '#/definitions/ModelUserInfo'},
-                                                            'type': 'array'},
-                                                  'uuid': {'type': 'string'}},
-                                   'required': ['name',
-                                                'type',
-                                                'uuid',
-                                                'controller-uuid',
-                                                'is-controller',
-                                                'cloud-tag',
-                                                'owner-tag',
-                                                'life',
-                                                'users',
-                                                'machines',
-                                                'sla',
-                                                'agent-version'],
-                                   'type': 'object'},
-                     'ModelMachineInfo': {'additionalProperties': False,
-                                          'properties': {'display-name': {'type': 'string'},
-                                                         'ha-primary': {'type': 'boolean'},
-                                                         'hardware': {'$ref': '#/definitions/MachineHardware'},
-                                                         'has-vote': {'type': 'boolean'},
-                                                         'id': {'type': 'string'},
-                                                         'instance-id': {'type': 'string'},
-                                                         'message': {'type': 'string'},
-                                                         'status': {'type': 'string'},
-                                                         'wants-vote': {'type': 'boolean'}},
-                                          'required': ['id'],
-                                          'type': 'object'},
-                     'ModelMigrationStatus': {'additionalProperties': False,
-                                              'properties': {'end': {'format': 'date-time',
-                                                                     'type': 'string'},
-                                                             'start': {'format': 'date-time',
-                                                                       'type': 'string'},
-                                                             'status': {'type': 'string'}},
-                                              'required': ['status', 'start'],
-                                              'type': 'object'},
-                     'ModelSLA': {'additionalProperties': False,
-                                  'properties': {'ModelSLAInfo': {'$ref': '#/definitions/ModelSLAInfo'},
-                                                 'creds': {'items': {'type': 'integer'},
-                                                           'type': 'array'},
-                                                 'level': {'type': 'string'},
-                                                 'owner': {'type': 'string'}},
-                                  'required': ['level',
-                                               'owner',
-                                               'ModelSLAInfo',
-                                               'creds'],
-                                  'type': 'object'},
-                     'ModelSLAInfo': {'additionalProperties': False,
-                                      'properties': {'level': {'type': 'string'},
-                                                     'owner': {'type': 'string'}},
-                                      'required': ['level', 'owner'],
-                                      'type': 'object'},
-                     'ModelSet': {'additionalProperties': False,
-                                  'properties': {'config': {'patternProperties': {'.*': {'additionalProperties': True,
-                                                                                         'type': 'object'}},
-                                                            'type': 'object'}},
-                                  'required': ['config'],
-                                  'type': 'object'},
                      'ModelStatusInfo': {'additionalProperties': False,
                                          'properties': {'available-version': {'type': 'string'},
                                                         'cloud-tag': {'type': 'string'},
@@ -2257,31 +1977,6 @@ class ClientFacade(Type):
                                                       'meter-status',
                                                       'sla'],
                                          'type': 'object'},
-                     'ModelUnset': {'additionalProperties': False,
-                                    'properties': {'keys': {'items': {'type': 'string'},
-                                                            'type': 'array'}},
-                                    'required': ['keys'],
-                                    'type': 'object'},
-                     'ModelUserInfo': {'additionalProperties': False,
-                                       'properties': {'access': {'type': 'string'},
-                                                      'display-name': {'type': 'string'},
-                                                      'last-connection': {'format': 'date-time',
-                                                                          'type': 'string'},
-                                                      'user': {'type': 'string'}},
-                                       'required': ['user',
-                                                    'display-name',
-                                                    'last-connection',
-                                                    'access'],
-                                       'type': 'object'},
-                     'ModelUserInfoResult': {'additionalProperties': False,
-                                             'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                            'result': {'$ref': '#/definitions/ModelUserInfo'}},
-                                             'type': 'object'},
-                     'ModelUserInfoResults': {'additionalProperties': False,
-                                              'properties': {'results': {'items': {'$ref': '#/definitions/ModelUserInfoResult'},
-                                                                         'type': 'array'}},
-                                              'required': ['results'],
-                                              'type': 'object'},
                      'NetworkInterface': {'additionalProperties': False,
                                           'properties': {'dns-nameservers': {'items': {'type': 'string'},
                                                                              'type': 'array'},
@@ -2307,41 +2002,6 @@ class ClientFacade(Type):
                                              'Patch',
                                              'Build'],
                                 'type': 'object'},
-                     'Placement': {'additionalProperties': False,
-                                   'properties': {'directive': {'type': 'string'},
-                                                  'scope': {'type': 'string'}},
-                                   'required': ['scope', 'directive'],
-                                   'type': 'object'},
-                     'PrivateAddress': {'additionalProperties': False,
-                                        'properties': {'target': {'type': 'string'}},
-                                        'required': ['target'],
-                                        'type': 'object'},
-                     'PrivateAddressResults': {'additionalProperties': False,
-                                               'properties': {'private-address': {'type': 'string'}},
-                                               'required': ['private-address'],
-                                               'type': 'object'},
-                     'ProvisioningScriptParams': {'additionalProperties': False,
-                                                  'properties': {'data-dir': {'type': 'string'},
-                                                                 'disable-package-commands': {'type': 'boolean'},
-                                                                 'machine-id': {'type': 'string'},
-                                                                 'nonce': {'type': 'string'}},
-                                                  'required': ['machine-id',
-                                                               'nonce',
-                                                               'data-dir',
-                                                               'disable-package-commands'],
-                                                  'type': 'object'},
-                     'ProvisioningScriptResult': {'additionalProperties': False,
-                                                  'properties': {'script': {'type': 'string'}},
-                                                  'required': ['script'],
-                                                  'type': 'object'},
-                     'PublicAddress': {'additionalProperties': False,
-                                       'properties': {'target': {'type': 'string'}},
-                                       'required': ['target'],
-                                       'type': 'object'},
-                     'PublicAddressResults': {'additionalProperties': False,
-                                              'properties': {'public-address': {'type': 'string'}},
-                                              'required': ['public-address'],
-                                              'type': 'object'},
                      'RelationStatus': {'additionalProperties': False,
                                         'properties': {'endpoints': {'items': {'$ref': '#/definitions/EndpointStatus'},
                                                                      'type': 'array'},
@@ -2385,36 +2045,6 @@ class ClientFacade(Type):
                                                      'interface',
                                                      'limit'],
                                         'type': 'object'},
-                     'ResolveCharmResult': {'additionalProperties': False,
-                                            'properties': {'error': {'type': 'string'},
-                                                           'url': {'type': 'string'}},
-                                            'type': 'object'},
-                     'ResolveCharmResults': {'additionalProperties': False,
-                                             'properties': {'urls': {'items': {'$ref': '#/definitions/ResolveCharmResult'},
-                                                                     'type': 'array'}},
-                                             'required': ['urls'],
-                                             'type': 'object'},
-                     'ResolveCharms': {'additionalProperties': False,
-                                       'properties': {'references': {'items': {'type': 'string'},
-                                                                     'type': 'array'}},
-                                       'required': ['references'],
-                                       'type': 'object'},
-                     'Resolved': {'additionalProperties': False,
-                                  'properties': {'retry': {'type': 'boolean'},
-                                                 'unit-name': {'type': 'string'}},
-                                  'required': ['unit-name', 'retry'],
-                                  'type': 'object'},
-                     'SetConstraints': {'additionalProperties': False,
-                                        'properties': {'application': {'type': 'string'},
-                                                       'constraints': {'$ref': '#/definitions/Value'}},
-                                        'required': ['application', 'constraints'],
-                                        'type': 'object'},
-                     'SetModelAgentVersion': {'additionalProperties': False,
-                                              'properties': {'agent-stream': {'type': 'string'},
-                                                             'force': {'type': 'boolean'},
-                                                             'version': {'$ref': '#/definitions/Number'}},
-                                              'required': ['version'],
-                                              'type': 'object'},
                      'StatusHistoryFilter': {'additionalProperties': False,
                                              'properties': {'date': {'format': 'date-time',
                                                                      'type': 'string'},
@@ -2457,17 +2087,6 @@ class ClientFacade(Type):
                                                                   'type': 'array'}},
                                       'required': ['patterns'],
                                       'type': 'object'},
-                     'StringResult': {'additionalProperties': False,
-                                      'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                     'result': {'type': 'string'}},
-                                      'required': ['result'],
-                                      'type': 'object'},
-                     'SupportedFeature': {'additionalProperties': False,
-                                          'properties': {'description': {'type': 'string'},
-                                                         'name': {'type': 'string'},
-                                                         'version': {'type': 'string'}},
-                                          'required': ['name', 'description'],
-                                          'type': 'object'},
                      'Tools': {'additionalProperties': False,
                                'properties': {'sha256': {'type': 'string'},
                                               'size': {'type': 'integer'},
@@ -2497,112 +2116,8 @@ class ClientFacade(Type):
                                                  'public-address',
                                                  'charm',
                                                  'subordinates'],
-                                    'type': 'object'},
-                     'Value': {'additionalProperties': False,
-                               'properties': {'allocate-public-ip': {'type': 'boolean'},
-                                              'arch': {'type': 'string'},
-                                              'container': {'type': 'string'},
-                                              'cores': {'type': 'integer'},
-                                              'cpu-power': {'type': 'integer'},
-                                              'instance-role': {'type': 'string'},
-                                              'instance-type': {'type': 'string'},
-                                              'mem': {'type': 'integer'},
-                                              'root-disk': {'type': 'integer'},
-                                              'root-disk-source': {'type': 'string'},
-                                              'spaces': {'items': {'type': 'string'},
-                                                         'type': 'array'},
-                                              'tags': {'items': {'type': 'string'},
-                                                       'type': 'array'},
-                                              'virt-type': {'type': 'string'},
-                                              'zones': {'items': {'type': 'string'},
-                                                        'type': 'array'}},
-                               'type': 'object'}},
-     'properties': {'APIHostPorts': {'description': 'APIHostPorts returns the API '
-                                                    'host/port addresses stored in '
-                                                    'state.',
-                                     'properties': {'Result': {'$ref': '#/definitions/APIHostPortsResult'}},
-                                     'type': 'object'},
-                    'AbortCurrentUpgrade': {'description': 'AbortCurrentUpgrade '
-                                                           'aborts and archives '
-                                                           'the current upgrade\n'
-                                                           'synchronisation '
-                                                           'record, if any.',
-                                            'type': 'object'},
-                    'AddCharm': {'description': 'NOTE: AddCharm is deprecated as '
-                                                'of juju 2.9 and charms facade '
-                                                'version 3.\n'
-                                                'Please discontinue use and move '
-                                                'to the charms facade version.\n'
-                                                '\n'
-                                                'TODO: remove in juju 3.0',
-                                 'properties': {'Params': {'$ref': '#/definitions/AddCharm'}},
-                                 'type': 'object'},
-                    'AddCharmWithAuthorization': {'description': 'AddCharmWithAuthorization '
-                                                                 'adds the given '
-                                                                 'charm URL (which '
-                                                                 'must include\n'
-                                                                 'revision) to the '
-                                                                 'model, if it '
-                                                                 'does not exist '
-                                                                 'yet. Local '
-                                                                 'charms are not\n'
-                                                                 'supported, only '
-                                                                 'charm store '
-                                                                 'URLs. See also '
-                                                                 'AddLocalCharm().\n'
-                                                                 '\n'
-                                                                 'The '
-                                                                 'authorization '
-                                                                 'macaroon, '
-                                                                 'args.CharmStoreMacaroon, '
-                                                                 'may be omitted, '
-                                                                 'in\n'
-                                                                 'which case this '
-                                                                 'call is '
-                                                                 'equivalent to '
-                                                                 'AddCharm.\n'
-                                                                 '\n'
-                                                                 'NOTE: '
-                                                                 'AddCharmWithAuthorization '
-                                                                 'is deprecated as '
-                                                                 'of juju 2.9 and '
-                                                                 'charms\n'
-                                                                 'facade version '
-                                                                 '3. Please '
-                                                                 'discontinue use '
-                                                                 'and move to the '
-                                                                 'charms facade\n'
-                                                                 'version.\n'
-                                                                 '\n'
-                                                                 'TODO: remove in '
-                                                                 'juju 3.0',
-                                                  'properties': {'Params': {'$ref': '#/definitions/AddCharmWithAuthorization'}},
-                                                  'type': 'object'},
-                    'AddMachines': {'description': 'AddMachines adds new machines '
-                                                   'with the supplied parameters.',
-                                    'properties': {'Params': {'$ref': '#/definitions/AddMachines'},
-                                                   'Result': {'$ref': '#/definitions/AddMachinesResults'}},
-                                    'type': 'object'},
-                    'AddMachinesV2': {'description': 'AddMachinesV2 adds new '
-                                                     'machines with the supplied '
-                                                     'parameters.',
-                                      'properties': {'Params': {'$ref': '#/definitions/AddMachines'},
-                                                     'Result': {'$ref': '#/definitions/AddMachinesResults'}},
-                                      'type': 'object'},
-                    'AgentVersion': {'description': 'AgentVersion returns the '
-                                                    'current version that the API '
-                                                    'server is running.',
-                                     'properties': {'Result': {'$ref': '#/definitions/AgentVersionResult'}},
-                                     'type': 'object'},
-                    'CACert': {'description': 'CACert returns the certificate used '
-                                              'to validate the state connection.',
-                               'properties': {'Result': {'$ref': '#/definitions/BytesResult'}},
-                               'type': 'object'},
-                    'DestroyMachines': {'description': 'DestroyMachines removes a '
-                                                       'given set of machines.',
-                                        'properties': {'Params': {'$ref': '#/definitions/DestroyMachines'}},
-                                        'type': 'object'},
-                    'FindTools': {'description': 'FindTools returns a List '
+                                    'type': 'object'}},
+     'properties': {'FindTools': {'description': 'FindTools returns a List '
                                                  'containing all tools matching '
                                                  'the given parameters.',
                                   'properties': {'Params': {'$ref': '#/definitions/FindToolsParams'},
@@ -2614,130 +2129,6 @@ class ClientFacade(Type):
                                    'properties': {'Params': {'$ref': '#/definitions/StatusParams'},
                                                   'Result': {'$ref': '#/definitions/FullStatus'}},
                                    'type': 'object'},
-                    'GetBundleChanges': {'description': 'GetBundleChanges returns '
-                                                        'the list of changes '
-                                                        'required to deploy the '
-                                                        'given\n'
-                                                        'bundle data. The changes '
-                                                        'are sorted by '
-                                                        'requirements, so that '
-                                                        'they can be\n'
-                                                        'applied in order.\n'
-                                                        'Deprecated: clients '
-                                                        'should use the GetChanges '
-                                                        'endpoint on the Bundle '
-                                                        'facade.\n'
-                                                        'Note: any new feature in '
-                                                        'the future like devices '
-                                                        'will never be supported '
-                                                        'here.',
-                                         'properties': {'Params': {'$ref': '#/definitions/BundleChangesParams'},
-                                                        'Result': {'$ref': '#/definitions/BundleChangesResults'}},
-                                         'type': 'object'},
-                    'GetModelConstraints': {'description': 'GetModelConstraints '
-                                                           'returns the '
-                                                           'constraints for the '
-                                                           'model.',
-                                            'properties': {'Result': {'$ref': '#/definitions/GetConstraintsResults'}},
-                                            'type': 'object'},
-                    'InjectMachines': {'description': 'InjectMachines injects a '
-                                                      'machine into state with '
-                                                      'provisioned status.',
-                                       'properties': {'Params': {'$ref': '#/definitions/AddMachines'},
-                                                      'Result': {'$ref': '#/definitions/AddMachinesResults'}},
-                                       'type': 'object'},
-                    'ModelGet': {'description': 'ModelGet implements the '
-                                                'server-side part of the\n'
-                                                'model-config CLI command.',
-                                 'properties': {'Result': {'$ref': '#/definitions/ModelConfigResults'}},
-                                 'type': 'object'},
-                    'ModelInfo': {'description': 'ModelInfo returns information '
-                                                 'about the current model.',
-                                  'properties': {'Result': {'$ref': '#/definitions/ModelInfo'}},
-                                  'type': 'object'},
-                    'ModelSet': {'description': 'ModelSet implements the '
-                                                'server-side part of the\n'
-                                                'set-model-config CLI command.',
-                                 'properties': {'Params': {'$ref': '#/definitions/ModelSet'}},
-                                 'type': 'object'},
-                    'ModelUnset': {'description': 'ModelUnset implements the '
-                                                  'server-side part of the\n'
-                                                  'set-model-config CLI command.',
-                                   'properties': {'Params': {'$ref': '#/definitions/ModelUnset'}},
-                                   'type': 'object'},
-                    'ModelUserInfo': {'description': 'ModelUserInfo returns '
-                                                     'information on all users in '
-                                                     'the model.',
-                                      'properties': {'Result': {'$ref': '#/definitions/ModelUserInfoResults'}},
-                                      'type': 'object'},
-                    'PrivateAddress': {'description': 'PrivateAddress implements '
-                                                      'the server side of '
-                                                      'Client.PrivateAddress.',
-                                       'properties': {'Params': {'$ref': '#/definitions/PrivateAddress'},
-                                                      'Result': {'$ref': '#/definitions/PrivateAddressResults'}},
-                                       'type': 'object'},
-                    'ProvisioningScript': {'description': 'ProvisioningScript '
-                                                          'returns a shell script '
-                                                          'that, when run,\n'
-                                                          'provisions a machine '
-                                                          'agent on the machine '
-                                                          'executing the script.',
-                                           'properties': {'Params': {'$ref': '#/definitions/ProvisioningScriptParams'},
-                                                          'Result': {'$ref': '#/definitions/ProvisioningScriptResult'}},
-                                           'type': 'object'},
-                    'PublicAddress': {'description': 'PublicAddress implements the '
-                                                     'server side of '
-                                                     'Client.PublicAddress.',
-                                      'properties': {'Params': {'$ref': '#/definitions/PublicAddress'},
-                                                     'Result': {'$ref': '#/definitions/PublicAddressResults'}},
-                                      'type': 'object'},
-                    'ResolveCharms': {'description': 'ResolveCharms resolves the '
-                                                     'best available charm URLs '
-                                                     'with series, for charm\n'
-                                                     'locations without a series '
-                                                     'specified.\n'
-                                                     '\n'
-                                                     'NOTE: ResolveCharms is '
-                                                     'deprecated as of juju 2.9 '
-                                                     'and charms facade version '
-                                                     '3.\n'
-                                                     'Please discontinue use and '
-                                                     'move to the charms facade '
-                                                     'version.\n'
-                                                     '\n'
-                                                     'TODO: remove in juju 3.0',
-                                      'properties': {'Params': {'$ref': '#/definitions/ResolveCharms'},
-                                                     'Result': {'$ref': '#/definitions/ResolveCharmResults'}},
-                                      'type': 'object'},
-                    'Resolved': {'description': 'Resolved implements the server '
-                                                'side of Client.Resolved.',
-                                 'properties': {'Params': {'$ref': '#/definitions/Resolved'}},
-                                 'type': 'object'},
-                    'RetryProvisioning': {'description': 'RetryProvisioning marks '
-                                                         'a provisioning error as '
-                                                         'transient on the '
-                                                         'machines.',
-                                          'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                         'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                          'type': 'object'},
-                    'SLALevel': {'description': 'SLALevel returns the current sla '
-                                                'level for the model.',
-                                 'properties': {'Result': {'$ref': '#/definitions/StringResult'}},
-                                 'type': 'object'},
-                    'SetModelAgentVersion': {'description': 'SetModelAgentVersion '
-                                                            'sets the model agent '
-                                                            'version.',
-                                             'properties': {'Params': {'$ref': '#/definitions/SetModelAgentVersion'}},
-                                             'type': 'object'},
-                    'SetModelConstraints': {'description': 'SetModelConstraints '
-                                                           'sets the constraints '
-                                                           'for the model.',
-                                            'properties': {'Params': {'$ref': '#/definitions/SetConstraints'}},
-                                            'type': 'object'},
-                    'SetSLALevel': {'description': 'SetSLALevel sets the sla level '
-                                                   'on the model.',
-                                    'properties': {'Params': {'$ref': '#/definitions/ModelSLA'}},
-                                    'type': 'object'},
                     'StatusHistory': {'description': 'StatusHistory returns a '
                                                      'slice of past statuses for '
                                                      'several entities.',
@@ -2751,252 +2142,8 @@ class ClientFacade(Type):
      'type': 'object'}
     
 
-    @ReturnMapping(APIHostPortsResult)
-    async def APIHostPorts(self):
-        '''
-        APIHostPorts returns the API host/port addresses stored in state.
-
-
-        Returns -> APIHostPortsResult
-        '''
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Client',
-                   request='APIHostPorts',
-                   version=5,
-                   params=_params)
-
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(None)
-    async def AbortCurrentUpgrade(self):
-        '''
-        AbortCurrentUpgrade aborts and archives the current upgrade
-        synchronisation record, if any.
-
-
-        Returns -> None
-        '''
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Client',
-                   request='AbortCurrentUpgrade',
-                   version=5,
-                   params=_params)
-
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(None)
-    async def AddCharm(self, channel=None, force=None, url=None):
-        '''
-        NOTE: AddCharm is deprecated as of juju 2.9 and charms facade version 3.
-        Please discontinue use and move to the charms facade version.
-
-        TODO: remove in juju 3.0
-
-        channel : str
-        force : bool
-        url : str
-        Returns -> None
-        '''
-        if channel is not None and not isinstance(channel, (bytes, str)):
-            raise Exception("Expected channel to be a str, received: {}".format(type(channel)))
-
-        if force is not None and not isinstance(force, bool):
-            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
-
-        if url is not None and not isinstance(url, (bytes, str)):
-            raise Exception("Expected url to be a str, received: {}".format(type(url)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Client',
-                   request='AddCharm',
-                   version=5,
-                   params=_params)
-        _params['channel'] = channel
-        _params['force'] = force
-        _params['url'] = url
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(None)
-    async def AddCharmWithAuthorization(self, channel=None, force=None, macaroon=None, url=None):
-        '''
-        AddCharmWithAuthorization adds the given charm URL (which must include
-        revision) to the model, if it does not exist yet. Local charms are not
-        supported, only charm store URLs. See also AddLocalCharm().
-
-        The authorization macaroon, args.CharmStoreMacaroon, may be omitted, in
-        which case this call is equivalent to AddCharm.
-
-        NOTE: AddCharmWithAuthorization is deprecated as of juju 2.9 and charms
-        facade version 3. Please discontinue use and move to the charms facade
-        version.
-
-        TODO: remove in juju 3.0
-
-        channel : str
-        force : bool
-        macaroon : Macaroon
-        url : str
-        Returns -> None
-        '''
-        if channel is not None and not isinstance(channel, (bytes, str)):
-            raise Exception("Expected channel to be a str, received: {}".format(type(channel)))
-
-        if force is not None and not isinstance(force, bool):
-            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
-
-        if macaroon is not None and not isinstance(macaroon, (dict, Macaroon)):
-            raise Exception("Expected macaroon to be a Macaroon, received: {}".format(type(macaroon)))
-
-        if url is not None and not isinstance(url, (bytes, str)):
-            raise Exception("Expected url to be a str, received: {}".format(type(url)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Client',
-                   request='AddCharmWithAuthorization',
-                   version=5,
-                   params=_params)
-        _params['channel'] = channel
-        _params['force'] = force
-        _params['macaroon'] = macaroon
-        _params['url'] = url
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(AddMachinesResults)
-    async def AddMachines(self, params=None):
-        '''
-        AddMachines adds new machines with the supplied parameters.
-
-        params : typing.Sequence[~AddMachineParams]
-        Returns -> AddMachinesResults
-        '''
-        if params is not None and not isinstance(params, (bytes, str, list)):
-            raise Exception("Expected params to be a Sequence, received: {}".format(type(params)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Client',
-                   request='AddMachines',
-                   version=5,
-                   params=_params)
-        _params['params'] = params
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(AddMachinesResults)
-    async def AddMachinesV2(self, params=None):
-        '''
-        AddMachinesV2 adds new machines with the supplied parameters.
-
-        params : typing.Sequence[~AddMachineParams]
-        Returns -> AddMachinesResults
-        '''
-        if params is not None and not isinstance(params, (bytes, str, list)):
-            raise Exception("Expected params to be a Sequence, received: {}".format(type(params)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Client',
-                   request='AddMachinesV2',
-                   version=5,
-                   params=_params)
-        _params['params'] = params
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(AgentVersionResult)
-    async def AgentVersion(self):
-        '''
-        AgentVersion returns the current version that the API server is running.
-
-
-        Returns -> AgentVersionResult
-        '''
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Client',
-                   request='AgentVersion',
-                   version=5,
-                   params=_params)
-
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(BytesResult)
-    async def CACert(self):
-        '''
-        CACert returns the certificate used to validate the state connection.
-
-
-        Returns -> BytesResult
-        '''
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Client',
-                   request='CACert',
-                   version=5,
-                   params=_params)
-
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(None)
-    async def DestroyMachines(self, force=None, machine_names=None):
-        '''
-        DestroyMachines removes a given set of machines.
-
-        force : bool
-        machine_names : typing.Sequence[str]
-        Returns -> None
-        '''
-        if force is not None and not isinstance(force, bool):
-            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
-
-        if machine_names is not None and not isinstance(machine_names, (bytes, str, list)):
-            raise Exception("Expected machine_names to be a Sequence, received: {}".format(type(machine_names)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Client',
-                   request='DestroyMachines',
-                   version=5,
-                   params=_params)
-        _params['force'] = force
-        _params['machine-names'] = machine_names
-        reply = await self.rpc(msg)
-        return reply
-
-
-
     @ReturnMapping(FindToolsResult)
-    async def FindTools(self, agentstream=None, arch=None, major=None, minor=None, number=None, os_type=None, series=None):
+    async def FindTools(self, agentstream=None, arch=None, major=None, minor=None, number=None, os_type=None):
         '''
         FindTools returns a List containing all tools matching the given parameters.
 
@@ -3006,7 +2153,6 @@ class ClientFacade(Type):
         minor : int
         number : Number
         os_type : str
-        series : str
         Returns -> FindToolsResult
         '''
         if agentstream is not None and not isinstance(agentstream, (bytes, str)):
@@ -3027,9 +2173,6 @@ class ClientFacade(Type):
         if os_type is not None and not isinstance(os_type, (bytes, str)):
             raise Exception("Expected os_type to be a str, received: {}".format(type(os_type)))
 
-        if series is not None and not isinstance(series, (bytes, str)):
-            raise Exception("Expected series to be a str, received: {}".format(type(series)))
-
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Client',
@@ -3042,7 +2185,6 @@ class ClientFacade(Type):
         _params['minor'] = minor
         _params['number'] = number
         _params['os-type'] = os_type
-        _params['series'] = series
         reply = await self.rpc(msg)
         return reply
 
@@ -3066,479 +2208,6 @@ class ClientFacade(Type):
                    version=5,
                    params=_params)
         _params['patterns'] = patterns
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(BundleChangesResults)
-    async def GetBundleChanges(self, bundleurl=None, yaml=None):
-        '''
-        GetBundleChanges returns the list of changes required to deploy the given
-        bundle data. The changes are sorted by requirements, so that they can be
-        applied in order.
-        Deprecated: clients should use the GetChanges endpoint on the Bundle facade.
-        Note: any new feature in the future like devices will never be supported here.
-
-        bundleurl : str
-        yaml : str
-        Returns -> BundleChangesResults
-        '''
-        if bundleurl is not None and not isinstance(bundleurl, (bytes, str)):
-            raise Exception("Expected bundleurl to be a str, received: {}".format(type(bundleurl)))
-
-        if yaml is not None and not isinstance(yaml, (bytes, str)):
-            raise Exception("Expected yaml to be a str, received: {}".format(type(yaml)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Client',
-                   request='GetBundleChanges',
-                   version=5,
-                   params=_params)
-        _params['bundleURL'] = bundleurl
-        _params['yaml'] = yaml
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(GetConstraintsResults)
-    async def GetModelConstraints(self):
-        '''
-        GetModelConstraints returns the constraints for the model.
-
-
-        Returns -> GetConstraintsResults
-        '''
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Client',
-                   request='GetModelConstraints',
-                   version=5,
-                   params=_params)
-
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(AddMachinesResults)
-    async def InjectMachines(self, params=None):
-        '''
-        InjectMachines injects a machine into state with provisioned status.
-
-        params : typing.Sequence[~AddMachineParams]
-        Returns -> AddMachinesResults
-        '''
-        if params is not None and not isinstance(params, (bytes, str, list)):
-            raise Exception("Expected params to be a Sequence, received: {}".format(type(params)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Client',
-                   request='InjectMachines',
-                   version=5,
-                   params=_params)
-        _params['params'] = params
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ModelConfigResults)
-    async def ModelGet(self):
-        '''
-        ModelGet implements the server-side part of the
-        model-config CLI command.
-
-
-        Returns -> ModelConfigResults
-        '''
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Client',
-                   request='ModelGet',
-                   version=5,
-                   params=_params)
-
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ModelInfo)
-    async def ModelInfo(self):
-        '''
-        ModelInfo returns information about the current model.
-
-
-        Returns -> ModelInfo
-        '''
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Client',
-                   request='ModelInfo',
-                   version=5,
-                   params=_params)
-
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(None)
-    async def ModelSet(self, config=None):
-        '''
-        ModelSet implements the server-side part of the
-        set-model-config CLI command.
-
-        config : typing.Mapping[str, typing.Any]
-        Returns -> None
-        '''
-        if config is not None and not isinstance(config, dict):
-            raise Exception("Expected config to be a Mapping, received: {}".format(type(config)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Client',
-                   request='ModelSet',
-                   version=5,
-                   params=_params)
-        _params['config'] = config
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(None)
-    async def ModelUnset(self, keys=None):
-        '''
-        ModelUnset implements the server-side part of the
-        set-model-config CLI command.
-
-        keys : typing.Sequence[str]
-        Returns -> None
-        '''
-        if keys is not None and not isinstance(keys, (bytes, str, list)):
-            raise Exception("Expected keys to be a Sequence, received: {}".format(type(keys)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Client',
-                   request='ModelUnset',
-                   version=5,
-                   params=_params)
-        _params['keys'] = keys
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ModelUserInfoResults)
-    async def ModelUserInfo(self):
-        '''
-        ModelUserInfo returns information on all users in the model.
-
-
-        Returns -> ModelUserInfoResults
-        '''
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Client',
-                   request='ModelUserInfo',
-                   version=5,
-                   params=_params)
-
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(PrivateAddressResults)
-    async def PrivateAddress(self, target=None):
-        '''
-        PrivateAddress implements the server side of Client.PrivateAddress.
-
-        target : str
-        Returns -> PrivateAddressResults
-        '''
-        if target is not None and not isinstance(target, (bytes, str)):
-            raise Exception("Expected target to be a str, received: {}".format(type(target)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Client',
-                   request='PrivateAddress',
-                   version=5,
-                   params=_params)
-        _params['target'] = target
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ProvisioningScriptResult)
-    async def ProvisioningScript(self, data_dir=None, disable_package_commands=None, machine_id=None, nonce=None):
-        '''
-        ProvisioningScript returns a shell script that, when run,
-        provisions a machine agent on the machine executing the script.
-
-        data_dir : str
-        disable_package_commands : bool
-        machine_id : str
-        nonce : str
-        Returns -> ProvisioningScriptResult
-        '''
-        if data_dir is not None and not isinstance(data_dir, (bytes, str)):
-            raise Exception("Expected data_dir to be a str, received: {}".format(type(data_dir)))
-
-        if disable_package_commands is not None and not isinstance(disable_package_commands, bool):
-            raise Exception("Expected disable_package_commands to be a bool, received: {}".format(type(disable_package_commands)))
-
-        if machine_id is not None and not isinstance(machine_id, (bytes, str)):
-            raise Exception("Expected machine_id to be a str, received: {}".format(type(machine_id)))
-
-        if nonce is not None and not isinstance(nonce, (bytes, str)):
-            raise Exception("Expected nonce to be a str, received: {}".format(type(nonce)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Client',
-                   request='ProvisioningScript',
-                   version=5,
-                   params=_params)
-        _params['data-dir'] = data_dir
-        _params['disable-package-commands'] = disable_package_commands
-        _params['machine-id'] = machine_id
-        _params['nonce'] = nonce
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(PublicAddressResults)
-    async def PublicAddress(self, target=None):
-        '''
-        PublicAddress implements the server side of Client.PublicAddress.
-
-        target : str
-        Returns -> PublicAddressResults
-        '''
-        if target is not None and not isinstance(target, (bytes, str)):
-            raise Exception("Expected target to be a str, received: {}".format(type(target)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Client',
-                   request='PublicAddress',
-                   version=5,
-                   params=_params)
-        _params['target'] = target
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ResolveCharmResults)
-    async def ResolveCharms(self, references=None):
-        '''
-        ResolveCharms resolves the best available charm URLs with series, for charm
-        locations without a series specified.
-
-        NOTE: ResolveCharms is deprecated as of juju 2.9 and charms facade version 3.
-        Please discontinue use and move to the charms facade version.
-
-        TODO: remove in juju 3.0
-
-        references : typing.Sequence[str]
-        Returns -> ResolveCharmResults
-        '''
-        if references is not None and not isinstance(references, (bytes, str, list)):
-            raise Exception("Expected references to be a Sequence, received: {}".format(type(references)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Client',
-                   request='ResolveCharms',
-                   version=5,
-                   params=_params)
-        _params['references'] = references
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(None)
-    async def Resolved(self, retry=None, unit_name=None):
-        '''
-        Resolved implements the server side of Client.Resolved.
-
-        retry : bool
-        unit_name : str
-        Returns -> None
-        '''
-        if retry is not None and not isinstance(retry, bool):
-            raise Exception("Expected retry to be a bool, received: {}".format(type(retry)))
-
-        if unit_name is not None and not isinstance(unit_name, (bytes, str)):
-            raise Exception("Expected unit_name to be a str, received: {}".format(type(unit_name)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Client',
-                   request='Resolved',
-                   version=5,
-                   params=_params)
-        _params['retry'] = retry
-        _params['unit-name'] = unit_name
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
-    async def RetryProvisioning(self, entities=None):
-        '''
-        RetryProvisioning marks a provisioning error as transient on the machines.
-
-        entities : typing.Sequence[~Entity]
-        Returns -> ErrorResults
-        '''
-        if entities is not None and not isinstance(entities, (bytes, str, list)):
-            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Client',
-                   request='RetryProvisioning',
-                   version=5,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(StringResult)
-    async def SLALevel(self):
-        '''
-        SLALevel returns the current sla level for the model.
-
-
-        Returns -> StringResult
-        '''
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Client',
-                   request='SLALevel',
-                   version=5,
-                   params=_params)
-
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(None)
-    async def SetModelAgentVersion(self, agent_stream=None, force=None, version=None):
-        '''
-        SetModelAgentVersion sets the model agent version.
-
-        agent_stream : str
-        force : bool
-        version : Number
-        Returns -> None
-        '''
-        if agent_stream is not None and not isinstance(agent_stream, (bytes, str)):
-            raise Exception("Expected agent_stream to be a str, received: {}".format(type(agent_stream)))
-
-        if force is not None and not isinstance(force, bool):
-            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
-
-        if version is not None and not isinstance(version, (dict, Number)):
-            raise Exception("Expected version to be a Number, received: {}".format(type(version)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Client',
-                   request='SetModelAgentVersion',
-                   version=5,
-                   params=_params)
-        _params['agent-stream'] = agent_stream
-        _params['force'] = force
-        _params['version'] = version
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(None)
-    async def SetModelConstraints(self, application=None, constraints=None):
-        '''
-        SetModelConstraints sets the constraints for the model.
-
-        application : str
-        constraints : Value
-        Returns -> None
-        '''
-        if application is not None and not isinstance(application, (bytes, str)):
-            raise Exception("Expected application to be a str, received: {}".format(type(application)))
-
-        if constraints is not None and not isinstance(constraints, (dict, Value)):
-            raise Exception("Expected constraints to be a Value, received: {}".format(type(constraints)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Client',
-                   request='SetModelConstraints',
-                   version=5,
-                   params=_params)
-        _params['application'] = application
-        _params['constraints'] = constraints
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(None)
-    async def SetSLALevel(self, modelslainfo=None, creds=None, level=None, owner=None):
-        '''
-        SetSLALevel sets the sla level on the model.
-
-        modelslainfo : ModelSLAInfo
-        creds : typing.Sequence[int]
-        level : str
-        owner : str
-        Returns -> None
-        '''
-        if modelslainfo is not None and not isinstance(modelslainfo, (dict, ModelSLAInfo)):
-            raise Exception("Expected modelslainfo to be a ModelSLAInfo, received: {}".format(type(modelslainfo)))
-
-        if creds is not None and not isinstance(creds, (bytes, str, list)):
-            raise Exception("Expected creds to be a Sequence, received: {}".format(type(creds)))
-
-        if level is not None and not isinstance(level, (bytes, str)):
-            raise Exception("Expected level to be a str, received: {}".format(type(level)))
-
-        if owner is not None and not isinstance(owner, (bytes, str)):
-            raise Exception("Expected owner to be a str, received: {}".format(type(owner)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Client',
-                   request='SetSLALevel',
-                   version=5,
-                   params=_params)
-        _params['ModelSLAInfo'] = modelslainfo
-        _params['creds'] = creds
-        _params['level'] = level
-        _params['owner'] = owner
         reply = await self.rpc(msg)
         return reply
 
@@ -6657,11 +5326,6 @@ class MachinerFacade(Type):
                                                                'type': 'array'}},
                                    'required': ['entities'],
                                    'type': 'object'},
-                     'StringResult': {'additionalProperties': False,
-                                      'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                     'result': {'type': 'string'}},
-                                      'required': ['result'],
-                                      'type': 'object'},
                      'StringsResult': {'additionalProperties': False,
                                        'properties': {'error': {'$ref': '#/definitions/Error'},
                                                       'result': {'items': {'type': 'string'},
@@ -6697,17 +5361,6 @@ class MachinerFacade(Type):
                              'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                             'Result': {'$ref': '#/definitions/LifeResults'}},
                              'type': 'object'},
-                    'ModelUUID': {'description': 'ModelUUID returns the model UUID '
-                                                 'that this machine resides in.\n'
-                                                 'It is implemented here directly '
-                                                 'as a result of removing it from\n'
-                                                 'embedded APIAddresser *without* '
-                                                 'bumping the facade version.\n'
-                                                 'It should be blanked when this '
-                                                 'facade version is next '
-                                                 'incremented.',
-                                  'properties': {'Result': {'$ref': '#/definitions/StringResult'}},
-                                  'type': 'object'},
                     'RecordAgentStartInformation': {'description': 'RecordAgentStartInformation '
                                                                    'syncs the '
                                                                    'machine model '
@@ -6872,30 +5525,6 @@ class MachinerFacade(Type):
                    version=5,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(StringResult)
-    async def ModelUUID(self):
-        '''
-        ModelUUID returns the model UUID that this machine resides in.
-        It is implemented here directly as a result of removing it from
-        embedded APIAddresser *without* bumping the facade version.
-        It should be blanked when this facade version is next incremented.
-
-
-        Returns -> StringResult
-        '''
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Machiner',
-                   request='ModelUUID',
-                   version=5,
-                   params=_params)
-
         reply = await self.rpc(msg)
         return reply
 
