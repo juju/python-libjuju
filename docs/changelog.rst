@@ -1,12 +1,23 @@
 Changelog
 ---------
 
+2.9.11
+^^^^^^
+
+Monday July 11 2022
+
+## What's Changed
+
+* Add REPL quickstart subsection by @sed-i in https://github.com/juju/python-libjuju/pull/676
+* Revision of test onos.charm by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/686
+* [JUJU-1353] Parse assume directives. by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/685
+* Replace deprecated juju.loop() calls from examples and documentation by @ittner in https://github.com/juju/python-libjuju/pull/687
+* Fixed the bundle run when the channel is None by @oEscal in https://github.com/juju/python-libjuju/pull/664
+
 2.9.10
 ^^^^^^
 
 Thursday June 9 2022
-
-## What's Changed
 
 * [JUJU-1155] Avoid incorrectly setting `series: kubernetes` for sidecar charms in k8s bundles by @cderici in https://github.com/juju/python-libjuju/pull/679
 * [JUJU-1172] Visiting the pylibjuju CI by @cderici in https://github.com/juju/python-libjuju/pull/681

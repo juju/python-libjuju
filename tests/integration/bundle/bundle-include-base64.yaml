@@ -1,10 +1,12 @@
 series: xenial
 applications:
   ghost:
-    charm: "cs:ghost-19"
+    charm: "ghost"
     num_units: 1
   mysql:
-    charm: "cs:trusty/mysql-57"
+    charm: "mysql"
+    channel: "candidate"
+    series: "trusty"
     num_units: 1
     options:
       max-connections: 2
