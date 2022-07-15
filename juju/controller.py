@@ -354,7 +354,6 @@ class Controller:
         model._info = model_info
         await model._connect_direct(**kwargs)
 
-
         return model
 
     async def destroy_models(self, *models, destroy_storage=False, force=False, max_wait=None):

@@ -1,10 +1,23 @@
 from .client import client
 from .errors import JujuError
 
+import requests
+import json
+
 
 class CharmHub:
     def __init__(self, model):
         self.model = model
+
+    def get_charm_id(self, charm_name):
+        conn, headers, path_prefix = self.model.connection().https_connection()
+
+        url = "http://api.snapcraft.io/v2/charms/info/{}".format(charm_name)
+        _response = requests.get(url)
+        if not _response.status_code == 200:
+            raise JujuError("Got {} from {}".format(_response.status_code, url))
+        response = json.loads(_response.text)
+        return response['id']
 
     async def info(self, name, channel=None):
         """info displays detailed information about a CharmHub charm. The charm
