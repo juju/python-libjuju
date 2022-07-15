@@ -2131,7 +2131,7 @@ class Model:
 
         :param dict config: Mapping of model constraints
         """
-        client_facade = client.ClientFacade.from_connection(self.connection())
+        client_facade = client.ModelConfigFacade.from_connection(self.connection())
         await client_facade.SetModelConstraints(
             application='',
             constraints=constraints)
