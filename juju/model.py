@@ -31,7 +31,7 @@ from .constraints import parse as parse_constraints
 from .controller import Controller, ConnectedController
 from .delta import get_entity_class, get_entity_delta
 from .errors import JujuAPIError, JujuError, JujuModelConfigError, JujuBackupError
-from .errors import JujuAppError, JujuUnitError, JujuAgentError, JujuMachineError
+from .errors import JujuAppError, JujuUnitError, JujuAgentError, JujuMachineError, PylibjujuError
 from .exceptions import DeadEntityException
 from .names import is_valid_application
 from .offerendpoints import ParseError as OfferParseError
@@ -755,9 +755,15 @@ class Model:
         await self._connect_direct(**conn_params)
 
     async def _connect_direct(self, **kwargs):
+        if self.info:
+            uuid = self.info.uuid
+        elif 'uuid' in kwargs:
+            uuid = kwargs['uuid']
+        else:
+            raise PylibjujuError("Unable to find uuid for the model")
         await self.disconnect()
         await self._connector.connect(**kwargs)
-        await self._after_connect()
+        await self._after_connect(model_uuid=uuid)
 
     async def _after_connect(self, model_name=None, model_uuid=None):
         self._watch()
