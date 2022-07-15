@@ -1307,7 +1307,7 @@ class Model:
             params.series = series
 
         # Submit the request.
-        client_facade = client.ClientFacade.from_connection(self.connection())
+        client_facade = client.MachineManagerFacade.from_connection(self.connection())
         results = await client_facade.AddMachines(params=[params])
         error = results.machines[0].error
         if error:

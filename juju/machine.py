@@ -22,12 +22,12 @@ class Machine(model.ModelEntity):
         Blocks until the machine is actually removed.
 
         """
-        facade = client.ClientFacade.from_connection(self.connection)
+        facade = client.MachineManagerFacade.from_connection(self.connection)
 
         log.debug(
             'Destroying machine %s', self.id)
 
-        await facade.DestroyMachines(force=force, machine_names=[self.id])
+        await facade.DestroyMachineWithParams(force=force, machine_tags=[tag.machine(self.id)])
         return await self.model._wait(
             'machine', self.id, 'remove')
     remove = destroy
