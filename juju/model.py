@@ -2012,7 +2012,7 @@ class Model:
         :returns: A ``dict`` of constraints.
         """
         constraints = {}
-        client_facade = client.ClientFacade.from_connection(self.connection())
+        client_facade = client.ModelConfigFacade.from_connection(self.connection())
         result = await client_facade.GetModelConstraints()
 
         # GetModelConstraints returns GetConstraintsResults which has a
