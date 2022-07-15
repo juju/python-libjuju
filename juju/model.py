@@ -689,6 +689,7 @@ class Model:
         is_debug_log_conn = 'debug_log_conn' in kwargs
         if not is_debug_log_conn:
             await self.disconnect()
+        model_name = model_uuid = None
         if 'endpoint' not in kwargs and len(args) < 2:
             if args and 'model_name' in kwargs:
                 raise TypeError('connect() got multiple values for model_name')
@@ -723,6 +724,7 @@ class Model:
             ]
             for i, arg in enumerate(args):
                 kwargs[arg_names[i]] = arg
+            model_uuid = kwargs['uuid']
             if not {'endpoint', 'uuid'}.issubset(kwargs):
                 raise ValueError('endpoint and uuid are required '
                                  'if model_name not given')
@@ -732,7 +734,7 @@ class Model:
                                  'if model_name not given')
             await self._connector.connect(**kwargs)
         if not is_debug_log_conn:
-            await self._after_connect()
+            await self._after_connect(model_name, model_uuid)
 
     async def connect_model(self, model_name, **kwargs):
         """
@@ -757,7 +759,7 @@ class Model:
         await self._connector.connect(**kwargs)
         await self._after_connect()
 
-    async def _after_connect(self):
+    async def _after_connect(self, model_name=None, model_uuid=None):
         self._watch()
 
         # Wait for the first packet of data from the AllWatcher,
@@ -768,7 +770,11 @@ class Model:
         # to do is make one RPC call.
         await self._watch_received.wait()
 
-        await self.get_info()
+        if self.info is None:
+            contr = await self.get_controller()
+            self._info = await contr.get_model_info(model_name, model_uuid)
+            log.debug('Got ModelInfo: %s', vars(self.info))
+
         self.uuid = self.info.uuid
 
     async def disconnect(self):
@@ -968,26 +974,6 @@ class Model:
     @property
     def charmstore(self):
         return self._charmstore
-
-    async def get_info(self):
-        """Return a client.ModelInfo object for this Model.
-
-        Retrieves latest info for this Model from the api server. The
-        return value is cached on the Model.info attribute so that the
-        valued may be accessed again without another api call, if
-        desired.
-
-        This method is called automatically when the Model is connected,
-        resulting in Model.info being initialized without requiring an
-        explicit call to this method.
-
-        """
-        facade = client.ClientFacade.from_connection(self.connection())
-
-        self._info = await facade.ModelInfo()
-        log.debug('Got ModelInfo: %s', vars(self.info))
-
-        return self.info
 
     @property
     def info(self):

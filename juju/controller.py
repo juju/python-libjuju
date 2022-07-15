@@ -351,7 +351,9 @@ class Controller:
         model = Model(jujudata=self._connector.jujudata)
         kwargs = self.connection().connect_params()
         kwargs['uuid'] = model_info.uuid
+        model._info = model_info
         await model._connect_direct(**kwargs)
+
 
         return model
 
@@ -478,6 +480,30 @@ class Controller:
             self.connection())
         entity = client.Entity(tag.user(username))
         return await user_facade.EnableUser(entities=[entity])
+
+    async def get_model_info(self, model_name=None, model_uuid=None):
+        """Return a client.ModelInfo object for a given Model.
+
+        Retrieves latest info for this Model from the api server. The
+        return value is cached on the Model.info attribute so that the
+        valued may be accessed again without another api call, if
+        desired.
+
+        This method is called automatically when the Model is connected,
+        resulting in Model.info being initialized without requiring an
+        explicit call to this method.
+
+        """
+        if model_uuid is None and model_name is None:
+            raise errors.JujuError("get_model_info requires either a name or a uuid for a model")
+
+        facade = client.ModelManagerFacade.from_connection(self.connection())
+        if model_uuid is None:
+            uuids = await self.model_uuids()
+            model_uuid = uuids[model_name]
+        entity = client.Entity(tag.model(model_uuid))
+        _model_info_results = await facade.ModelInfo(entities=[entity])
+        return _model_info_results.results[0].result
 
     async def cloud(self, name=None):
         """Get Cloud
