@@ -619,7 +619,7 @@ class Application(model.ModelEntity):
         if switch is not None and revision is not None:
             raise ValueError("switch and revision are mutually exclusive")
 
-        client_facade = client.ClientFacade.from_connection(self.connection)
+        charms_facade = client.CharmsFacade.from_connection(self.connection)
         resources_facade = client.ResourcesFacade.from_connection(
             self.connection)
         app_facade = self._facade()
@@ -644,11 +644,15 @@ class Application(model.ModelEntity):
         if charm_url == self.data['charm-url']:
             raise JujuError('already running charm "%s"' % charm_url)
 
+        # TODO (caner) : this needs to be revisited and updated with the charmhub stuff
+        origin = client.CharmOrigin(source="charm-store",
+                                    risk=channel,
+                                    )
         # Update charm
-        await client_facade.AddCharm(
+        await charms_facade.AddCharm(
             url=charm_url,
             force=force,
-            channel=channel
+            charm_origin=origin,
         )
 
         # Update resources
