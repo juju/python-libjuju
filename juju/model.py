@@ -31,7 +31,7 @@ from .constraints import parse as parse_constraints
 from .controller import Controller, ConnectedController
 from .delta import get_entity_class, get_entity_delta
 from .errors import JujuAPIError, JujuError, JujuModelConfigError, JujuBackupError
-from .errors import JujuAppError, JujuUnitError, JujuAgentError, JujuMachineError
+from .errors import JujuAppError, JujuUnitError, JujuAgentError, JujuMachineError, PylibjujuError
 from .exceptions import DeadEntityException
 from .names import is_valid_application
 from .offerendpoints import ParseError as OfferParseError
@@ -689,6 +689,7 @@ class Model:
         is_debug_log_conn = 'debug_log_conn' in kwargs
         if not is_debug_log_conn:
             await self.disconnect()
+        model_name = model_uuid = None
         if 'endpoint' not in kwargs and len(args) < 2:
             if args and 'model_name' in kwargs:
                 raise TypeError('connect() got multiple values for model_name')
@@ -723,6 +724,7 @@ class Model:
             ]
             for i, arg in enumerate(args):
                 kwargs[arg_names[i]] = arg
+            model_uuid = kwargs['uuid']
             if not {'endpoint', 'uuid'}.issubset(kwargs):
                 raise ValueError('endpoint and uuid are required '
                                  'if model_name not given')
@@ -732,7 +734,7 @@ class Model:
                                  'if model_name not given')
             await self._connector.connect(**kwargs)
         if not is_debug_log_conn:
-            await self._after_connect()
+            await self._after_connect(model_name, model_uuid)
 
     async def connect_model(self, model_name, **kwargs):
         """
@@ -753,11 +755,17 @@ class Model:
         await self._connect_direct(**conn_params)
 
     async def _connect_direct(self, **kwargs):
+        if self.info:
+            uuid = self.info.uuid
+        elif 'uuid' in kwargs:
+            uuid = kwargs['uuid']
+        else:
+            raise PylibjujuError("Unable to find uuid for the model")
         await self.disconnect()
         await self._connector.connect(**kwargs)
-        await self._after_connect()
+        await self._after_connect(model_uuid=uuid)
 
-    async def _after_connect(self):
+    async def _after_connect(self, model_name=None, model_uuid=None):
         self._watch()
 
         # Wait for the first packet of data from the AllWatcher,
@@ -768,7 +776,11 @@ class Model:
         # to do is make one RPC call.
         await self._watch_received.wait()
 
-        await self.get_info()
+        if self.info is None:
+            contr = await self.get_controller()
+            self._info = await contr.get_model_info(model_name, model_uuid)
+            log.debug('Got ModelInfo: %s', vars(self.info))
+
         self.uuid = self.info.uuid
 
     async def disconnect(self):
@@ -968,26 +980,6 @@ class Model:
     @property
     def charmstore(self):
         return self._charmstore
-
-    async def get_info(self):
-        """Return a client.ModelInfo object for this Model.
-
-        Retrieves latest info for this Model from the api server. The
-        return value is cached on the Model.info attribute so that the
-        valued may be accessed again without another api call, if
-        desired.
-
-        This method is called automatically when the Model is connected,
-        resulting in Model.info being initialized without requiring an
-        explicit call to this method.
-
-        """
-        facade = client.ClientFacade.from_connection(self.connection())
-
-        self._info = await facade.ModelInfo()
-        log.debug('Got ModelInfo: %s', vars(self.info))
-
-        return self.info
 
     @property
     def info(self):
@@ -1321,7 +1313,7 @@ class Model:
             params.series = series
 
         # Submit the request.
-        client_facade = client.ClientFacade.from_connection(self.connection())
+        client_facade = client.MachineManagerFacade.from_connection(self.connection())
         results = await client_facade.AddMachines(params=[params])
         error = results.machines[0].error
         if error:
@@ -1644,12 +1636,13 @@ class Model:
                     resources = await self._add_charmhub_resources(res.app_name,
                                                                    identifier,
                                                                    add_charm_res.charm_origin)
-                    charm_info = await self.charmhub.info(url.name)
+                    # TODO (cderici) : temporarily disable subordinate check for now
+                    # charm_info = await self.charmhub.info(url.name)
                     is_subordinate = False
-                    try:
-                        is_subordinate = charm_info.result.charm.subordinate
-                    except AttributeError:
-                        log.warning('CharmHub.Info : unable to retrieve the subordinate information')
+                    # try:
+                    #     is_subordinate = charm_info.result.charm.subordinate
+                    # except AttributeError:
+                    #     log.warning('CharmHub.Info : unable to retrieve the subordinate information')
                     if is_subordinate:
                         if num_units > 1:
                             raise JujuError("cannot use num_units with subordinate application")
@@ -2026,7 +2019,7 @@ class Model:
         :returns: A ``dict`` of constraints.
         """
         constraints = {}
-        client_facade = client.ClientFacade.from_connection(self.connection())
+        client_facade = client.ModelConfigFacade.from_connection(self.connection())
         result = await client_facade.GetModelConstraints()
 
         # GetModelConstraints returns GetConstraintsResults which has a
@@ -2144,7 +2137,7 @@ class Model:
 
         :param dict config: Mapping of model constraints
         """
-        client_facade = client.ClientFacade.from_connection(self.connection())
+        client_facade = client.ModelConfigFacade.from_connection(self.connection())
         await client_facade.SetModelConstraints(
             application='',
             constraints=constraints)

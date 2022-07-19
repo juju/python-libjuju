@@ -107,3 +107,7 @@ class JujuModelConfigError(JujuConfigError):
 
 class AbstractMethodError(Exception):
     pass
+
+
+class PylibjujuError(JujuError):
+    pass

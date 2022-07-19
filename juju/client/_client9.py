@@ -2851,8 +2851,10 @@ class ModelManagerFacade(Type):
                                                       'display-name': {'type': 'string'},
                                                       'last-connection': {'format': 'date-time',
                                                                           'type': 'string'},
+                                                      'model-tag': {'type': 'string'},
                                                       'user': {'type': 'string'}},
-                                       'required': ['user',
+                                       'required': ['model-tag',
+                                                    'user',
                                                     'display-name',
                                                     'last-connection',
                                                     'access'],
@@ -2934,17 +2936,7 @@ class ModelManagerFacade(Type):
                                        'properties': {'user-models': {'items': {'$ref': '#/definitions/UserModel'},
                                                                       'type': 'array'}},
                                        'required': ['user-models'],
-                                       'type': 'object'},
-                     'ValidateModelUpgradeParam': {'additionalProperties': False,
-                                                   'properties': {'model-tag': {'type': 'string'}},
-                                                   'required': ['model-tag'],
-                                                   'type': 'object'},
-                     'ValidateModelUpgradeParams': {'additionalProperties': False,
-                                                    'properties': {'force': {'type': 'boolean'},
-                                                                   'model': {'items': {'$ref': '#/definitions/ValidateModelUpgradeParam'},
-                                                                             'type': 'array'}},
-                                                    'required': ['model', 'force'],
-                                                    'type': 'object'}},
+                                       'type': 'object'}},
      'properties': {'ChangeModelCredential': {'description': 'ChangeModelCredential '
                                                              'changes cloud '
                                                              'credential reference '
@@ -3060,30 +3052,7 @@ class ModelManagerFacade(Type):
                                                           'default model settings.',
                                            'properties': {'Params': {'$ref': '#/definitions/UnsetModelDefaults'},
                                                           'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                           'type': 'object'},
-                    'ValidateModelUpgrades': {'description': 'ValidateModelUpgrades '
-                                                             'validates if a model '
-                                                             'is allowed to '
-                                                             'perform an upgrade.\n'
-                                                             'Examples of why you '
-                                                             'would want to block '
-                                                             'a model upgrade, '
-                                                             'would be situations\n'
-                                                             'like upgrade-series. '
-                                                             'If performing an '
-                                                             'upgrade-series we '
-                                                             "don't know the\n"
-                                                             'current status of '
-                                                             'the machine, so '
-                                                             'performing an '
-                                                             'upgrade-model can '
-                                                             'lead to\n'
-                                                             'bad unintended '
-                                                             'errors down the '
-                                                             'line.',
-                                              'properties': {'Params': {'$ref': '#/definitions/ValidateModelUpgradeParams'},
-                                                             'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                              'type': 'object'}},
+                                           'type': 'object'}},
      'type': 'object'}
     
 
@@ -3431,38 +3400,6 @@ class ModelManagerFacade(Type):
                    version=9,
                    params=_params)
         _params['keys'] = keys
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
-    async def ValidateModelUpgrades(self, force=None, model=None):
-        '''
-        ValidateModelUpgrades validates if a model is allowed to perform an upgrade.
-        Examples of why you would want to block a model upgrade, would be situations
-        like upgrade-series. If performing an upgrade-series we don't know the
-        current status of the machine, so performing an upgrade-model can lead to
-        bad unintended errors down the line.
-
-        force : bool
-        model : typing.Sequence[~ValidateModelUpgradeParam]
-        Returns -> ErrorResults
-        '''
-        if force is not None and not isinstance(force, bool):
-            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
-
-        if model is not None and not isinstance(model, (bytes, str, list)):
-            raise Exception("Expected model to be a Sequence, received: {}".format(type(model)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='ModelManager',
-                   request='ValidateModelUpgrades',
-                   version=9,
-                   params=_params)
-        _params['force'] = force
-        _params['model'] = model
         reply = await self.rpc(msg)
         return reply
 

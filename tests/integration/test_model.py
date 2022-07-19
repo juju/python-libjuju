@@ -337,7 +337,6 @@ async def test_add_machine(event_loop):
                 'mem': 256 * MB,
             },
             disks=[{
-                'pool': 'rootfs',
                 'size': 10 * GB,
                 'count': 1,
             }],

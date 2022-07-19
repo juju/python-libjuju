@@ -37,7 +37,13 @@ class ActionPrunerFacade(Type):
                                                    "current model's configuration.",
                                     'properties': {'Result': {'$ref': '#/definitions/ModelConfigResult'}},
                                     'type': 'object'},
-                    'Prune': {'properties': {'Params': {'$ref': '#/definitions/ActionPruneArgs'}},
+                    'Prune': {'description': 'Prune endpoint removes action '
+                                             'entries until\n'
+                                             'only the ones newer than now - '
+                                             'p.MaxHistoryTime remain and\n'
+                                             'the history is smaller than '
+                                             'p.MaxHistoryMB.',
+                              'properties': {'Params': {'$ref': '#/definitions/ActionPruneArgs'}},
                               'type': 'object'},
                     'WatchForModelConfigChanges': {'description': 'WatchForModelConfigChanges '
                                                                   'returns a '
@@ -88,6 +94,10 @@ class ActionPrunerFacade(Type):
     @ReturnMapping(None)
     async def Prune(self, max_history_mb=None, max_history_time=None):
         '''
+        Prune endpoint removes action entries until
+        only the ones newer than now - p.MaxHistoryTime remain and
+        the history is smaller than p.MaxHistoryMB.
+
         max_history_mb : int
         max_history_time : int
         Returns -> None
@@ -1324,7 +1334,6 @@ class CAASApplicationProvisionerFacade(Type):
                                                                         'error': {'$ref': '#/definitions/Error'},
                                                                         'filesystems': {'items': {'$ref': '#/definitions/KubernetesFilesystemParams'},
                                                                                         'type': 'array'},
-                                                                        'image-path': {'type': 'string'},
                                                                         'image-repo': {'$ref': '#/definitions/DockerImageInfo'},
                                                                         'scale': {'type': 'integer'},
                                                                         'series': {'type': 'string'},
@@ -1334,8 +1343,7 @@ class CAASApplicationProvisionerFacade(Type):
                                                                         'version': {'$ref': '#/definitions/Number'},
                                                                         'volumes': {'items': {'$ref': '#/definitions/KubernetesVolumeParams'},
                                                                                     'type': 'array'}},
-                                                         'required': ['image-path',
-                                                                      'version',
+                                                         'required': ['version',
                                                                       'api-addresses',
                                                                       'ca-cert',
                                                                       'constraints'],
@@ -1773,6 +1781,11 @@ class CAASApplicationProvisionerFacade(Type):
                                                            'watcher-id': {'type': 'string'}},
                                             'required': ['watcher-id'],
                                             'type': 'object'},
+                     'StringsWatchResults': {'additionalProperties': False,
+                                             'properties': {'results': {'items': {'$ref': '#/definitions/StringsWatchResult'},
+                                                                        'type': 'array'}},
+                                             'required': ['results'],
+                                             'type': 'object'},
                      'UnitStatus': {'additionalProperties': False,
                                     'properties': {'address': {'type': 'string'},
                                                    'agent-status': {'$ref': '#/definitions/DetailedStatus'},
@@ -1888,6 +1901,17 @@ class CAASApplicationProvisionerFacade(Type):
                                   'properties': {'Params': {'$ref': '#/definitions/CharmURL'},
                                                  'Result': {'$ref': '#/definitions/Charm'}},
                                   'type': 'object'},
+                    'ClearApplicationsResources': {'description': 'ClearApplicationsResources '
+                                                                  'clears the '
+                                                                  'flags which '
+                                                                  'indicate\n'
+                                                                  'applications '
+                                                                  'still have '
+                                                                  'resources in '
+                                                                  'the cluster.',
+                                                   'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                                  'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                                   'type': 'object'},
                     'Life': {'description': 'Life returns the life status of every '
                                             'supplied entity, where available.',
                              'properties': {'Params': {'$ref': '#/definitions/Entities'},
@@ -1900,6 +1924,13 @@ class CAASApplicationProvisionerFacade(Type):
                                          'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                         'Result': {'$ref': '#/definitions/CAASApplicationProvisioningInfoResults'}},
                                          'type': 'object'},
+                    'Remove': {'description': 'Remove removes every given entity '
+                                              'from state, calling EnsureDead\n'
+                                              'first, then Remove. It will fail if '
+                                              'the entity is not present.',
+                               'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                              'Result': {'$ref': '#/definitions/ErrorResults'}},
+                               'type': 'object'},
                     'SetOperatorStatus': {'description': 'SetOperatorStatus sets '
                                                          'the status of each given '
                                                          'entity.',
@@ -1937,7 +1968,16 @@ class CAASApplicationProvisionerFacade(Type):
                                                          'watch applications\n'
                                                          'deployed to this model.',
                                           'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
-                                          'type': 'object'}},
+                                          'type': 'object'},
+                    'WatchUnits': {'description': 'WatchUnits starts a '
+                                                  'StringsWatcher to watch changes '
+                                                  'to the\n'
+                                                  'lifecycle states of units for '
+                                                  'the specified applications in\n'
+                                                  'this model.',
+                                   'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                  'Result': {'$ref': '#/definitions/StringsWatchResults'}},
+                                   'type': 'object'}},
      'type': 'object'}
     
 
@@ -2035,6 +2075,30 @@ class CAASApplicationProvisionerFacade(Type):
 
 
 
+    @ReturnMapping(ErrorResults)
+    async def ClearApplicationsResources(self, entities=None):
+        '''
+        ClearApplicationsResources clears the flags which indicate
+        applications still have resources in the cluster.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASApplicationProvisioner',
+                   request='ClearApplicationsResources',
+                   version=1,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
     @ReturnMapping(LifeResults)
     async def Life(self, entities=None):
         '''
@@ -2073,6 +2137,30 @@ class CAASApplicationProvisionerFacade(Type):
         _params = dict()
         msg = dict(type='CAASApplicationProvisioner',
                    request='ProvisioningInfo',
+                   version=1,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def Remove(self, entities=None):
+        '''
+        Remove removes every given entity from state, calling EnsureDead
+        first, then Remove. It will fail if the entity is not present.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASApplicationProvisioner',
+                   request='Remove',
                    version=1,
                    params=_params)
         _params['entities'] = entities
@@ -2214,6 +2302,31 @@ class CAASApplicationProvisionerFacade(Type):
                    version=1,
                    params=_params)
 
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResults)
+    async def WatchUnits(self, entities=None):
+        '''
+        WatchUnits starts a StringsWatcher to watch changes to the
+        lifecycle states of units for the specified applications in
+        this model.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringsWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASApplicationProvisioner',
+                   request='WatchUnits',
+                   version=1,
+                   params=_params)
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
@@ -8812,6 +8925,268 @@ class DeployerFacade(Type):
 
 
 
+class EnvironUpgraderFacade(Type):
+    name = 'EnvironUpgrader'
+    version = 1
+    schema =     {'definitions': {'Entities': {'additionalProperties': False,
+                                  'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
+                                                              'type': 'array'}},
+                                  'required': ['entities'],
+                                  'type': 'object'},
+                     'Entity': {'additionalProperties': False,
+                                'properties': {'tag': {'type': 'string'}},
+                                'required': ['tag'],
+                                'type': 'object'},
+                     'EntityStatusArgs': {'additionalProperties': False,
+                                          'properties': {'data': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                               'type': 'object'}},
+                                                                  'type': 'object'},
+                                                         'info': {'type': 'string'},
+                                                         'status': {'type': 'string'},
+                                                         'tag': {'type': 'string'}},
+                                          'required': ['tag',
+                                                       'status',
+                                                       'info',
+                                                       'data'],
+                                          'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ErrorResult': {'additionalProperties': False,
+                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
+                                     'type': 'object'},
+                     'ErrorResults': {'additionalProperties': False,
+                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
+                                                                 'type': 'array'}},
+                                      'required': ['results'],
+                                      'type': 'object'},
+                     'IntResult': {'additionalProperties': False,
+                                   'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                  'result': {'type': 'integer'}},
+                                   'required': ['result'],
+                                   'type': 'object'},
+                     'IntResults': {'additionalProperties': False,
+                                    'properties': {'results': {'items': {'$ref': '#/definitions/IntResult'},
+                                                               'type': 'array'}},
+                                    'required': ['results'],
+                                    'type': 'object'},
+                     'NotifyWatchResult': {'additionalProperties': False,
+                                           'properties': {'NotifyWatcherId': {'type': 'string'},
+                                                          'error': {'$ref': '#/definitions/Error'}},
+                                           'required': ['NotifyWatcherId'],
+                                           'type': 'object'},
+                     'NotifyWatchResults': {'additionalProperties': False,
+                                            'properties': {'results': {'items': {'$ref': '#/definitions/NotifyWatchResult'},
+                                                                       'type': 'array'}},
+                                            'required': ['results'],
+                                            'type': 'object'},
+                     'SetModelEnvironVersion': {'additionalProperties': False,
+                                                'properties': {'model-tag': {'type': 'string'},
+                                                               'version': {'type': 'integer'}},
+                                                'required': ['model-tag',
+                                                             'version'],
+                                                'type': 'object'},
+                     'SetModelEnvironVersions': {'additionalProperties': False,
+                                                 'properties': {'models': {'items': {'$ref': '#/definitions/SetModelEnvironVersion'},
+                                                                           'type': 'array'}},
+                                                 'type': 'object'},
+                     'SetStatus': {'additionalProperties': False,
+                                   'properties': {'entities': {'items': {'$ref': '#/definitions/EntityStatusArgs'},
+                                                               'type': 'array'}},
+                                   'required': ['entities'],
+                                   'type': 'object'}},
+     'properties': {'ModelEnvironVersion': {'description': 'ModelEnvironVersion '
+                                                           'returns the current '
+                                                           'version of the environ '
+                                                           'corresponding\n'
+                                                           'to each specified '
+                                                           'model.',
+                                            'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                           'Result': {'$ref': '#/definitions/IntResults'}},
+                                            'type': 'object'},
+                    'ModelTargetEnvironVersion': {'description': 'ModelTargetEnvironVersion '
+                                                                 'returns the '
+                                                                 'target version '
+                                                                 'of the environ\n'
+                                                                 'corresponding to '
+                                                                 'each specified '
+                                                                 'model. The '
+                                                                 'target version '
+                                                                 'is the\n'
+                                                                 'environ '
+                                                                 "provider's "
+                                                                 'version.',
+                                                  'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                                 'Result': {'$ref': '#/definitions/IntResults'}},
+                                                  'type': 'object'},
+                    'SetModelEnvironVersion': {'description': 'SetModelEnvironVersion '
+                                                              'sets the current '
+                                                              'version of the '
+                                                              'environ '
+                                                              'corresponding\n'
+                                                              'to each specified '
+                                                              'model.',
+                                               'properties': {'Params': {'$ref': '#/definitions/SetModelEnvironVersions'},
+                                                              'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                               'type': 'object'},
+                    'SetModelStatus': {'description': 'SetModelStatus sets the '
+                                                      'status of each given model.',
+                                       'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
+                                                      'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                       'type': 'object'},
+                    'WatchModelEnvironVersion': {'description': 'WatchModelEnvironVersion '
+                                                                'watches for '
+                                                                'changes to the '
+                                                                'environ version '
+                                                                'of the\n'
+                                                                'specified '
+                                                                'models.\n'
+                                                                '\n'
+                                                                'NOTE(axw) this is '
+                                                                'currently '
+                                                                'implemented in '
+                                                                'terms of '
+                                                                'state.Model.Watch, '
+                                                                'so\n'
+                                                                'the client may be '
+                                                                'notified of '
+                                                                'changes unrelated '
+                                                                'to the environ '
+                                                                'version.',
+                                                 'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                                'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
+                                                 'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(IntResults)
+    async def ModelEnvironVersion(self, entities=None):
+        '''
+        ModelEnvironVersion returns the current version of the environ corresponding
+        to each specified model.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> IntResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='EnvironUpgrader',
+                   request='ModelEnvironVersion',
+                   version=1,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(IntResults)
+    async def ModelTargetEnvironVersion(self, entities=None):
+        '''
+        ModelTargetEnvironVersion returns the target version of the environ
+        corresponding to each specified model. The target version is the
+        environ provider's version.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> IntResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='EnvironUpgrader',
+                   request='ModelTargetEnvironVersion',
+                   version=1,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def SetModelEnvironVersion(self, models=None):
+        '''
+        SetModelEnvironVersion sets the current version of the environ corresponding
+        to each specified model.
+
+        models : typing.Sequence[~SetModelEnvironVersion]
+        Returns -> ErrorResults
+        '''
+        if models is not None and not isinstance(models, (bytes, str, list)):
+            raise Exception("Expected models to be a Sequence, received: {}".format(type(models)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='EnvironUpgrader',
+                   request='SetModelEnvironVersion',
+                   version=1,
+                   params=_params)
+        _params['models'] = models
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def SetModelStatus(self, entities=None):
+        '''
+        SetModelStatus sets the status of each given model.
+
+        entities : typing.Sequence[~EntityStatusArgs]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='EnvironUpgrader',
+                   request='SetModelStatus',
+                   version=1,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResults)
+    async def WatchModelEnvironVersion(self, entities=None):
+        '''
+        WatchModelEnvironVersion watches for changes to the environ version of the
+        specified models.
+
+        NOTE(axw) this is currently implemented in terms of state.Model.Watch, so
+        the client may be notified of changes unrelated to the environ version.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> NotifyWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='EnvironUpgrader',
+                   request='WatchModelEnvironVersion',
+                   version=1,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
 class ExternalControllerUpdaterFacade(Type):
     name = 'ExternalControllerUpdater'
     version = 1
@@ -10082,7 +10457,9 @@ class MachineActionsFacade(Type):
     name = 'MachineActions'
     version = 1
     schema =     {'definitions': {'Action': {'additionalProperties': False,
-                                'properties': {'name': {'type': 'string'},
+                                'properties': {'execution-group': {'type': 'string'},
+                                               'name': {'type': 'string'},
+                                               'parallel': {'type': 'boolean'},
                                                'parameters': {'patternProperties': {'.*': {'additionalProperties': True,
                                                                                            'type': 'object'}},
                                                               'type': 'object'},
@@ -12870,260 +13247,106 @@ class ModelSummaryWatcherFacade(Type):
 class ModelUpgraderFacade(Type):
     name = 'ModelUpgrader'
     version = 1
-    schema =     {'definitions': {'Entities': {'additionalProperties': False,
-                                  'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
-                                                              'type': 'array'}},
-                                  'required': ['entities'],
-                                  'type': 'object'},
-                     'Entity': {'additionalProperties': False,
-                                'properties': {'tag': {'type': 'string'}},
-                                'required': ['tag'],
-                                'type': 'object'},
-                     'EntityStatusArgs': {'additionalProperties': False,
-                                          'properties': {'data': {'patternProperties': {'.*': {'additionalProperties': True,
-                                                                                               'type': 'object'}},
-                                                                  'type': 'object'},
-                                                         'info': {'type': 'string'},
-                                                         'status': {'type': 'string'},
-                                                         'tag': {'type': 'string'}},
-                                          'required': ['tag',
-                                                       'status',
-                                                       'info',
-                                                       'data'],
-                                          'type': 'object'},
-                     'Error': {'additionalProperties': False,
-                               'properties': {'code': {'type': 'string'},
-                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
-                                                                                    'type': 'object'}},
-                                                       'type': 'object'},
-                                              'message': {'type': 'string'}},
-                               'required': ['message', 'code'],
-                               'type': 'object'},
-                     'ErrorResult': {'additionalProperties': False,
-                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
-                                     'type': 'object'},
-                     'ErrorResults': {'additionalProperties': False,
-                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
-                                                                 'type': 'array'}},
-                                      'required': ['results'],
-                                      'type': 'object'},
-                     'IntResult': {'additionalProperties': False,
-                                   'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                  'result': {'type': 'integer'}},
-                                   'required': ['result'],
-                                   'type': 'object'},
-                     'IntResults': {'additionalProperties': False,
-                                    'properties': {'results': {'items': {'$ref': '#/definitions/IntResult'},
-                                                               'type': 'array'}},
-                                    'required': ['results'],
+    schema =     {'definitions': {'ModelParam': {'additionalProperties': False,
+                                    'properties': {'model-tag': {'type': 'string'}},
+                                    'required': ['model-tag'],
                                     'type': 'object'},
-                     'NotifyWatchResult': {'additionalProperties': False,
-                                           'properties': {'NotifyWatcherId': {'type': 'string'},
-                                                          'error': {'$ref': '#/definitions/Error'}},
-                                           'required': ['NotifyWatcherId'],
-                                           'type': 'object'},
-                     'NotifyWatchResults': {'additionalProperties': False,
-                                            'properties': {'results': {'items': {'$ref': '#/definitions/NotifyWatchResult'},
-                                                                       'type': 'array'}},
-                                            'required': ['results'],
-                                            'type': 'object'},
-                     'SetModelEnvironVersion': {'additionalProperties': False,
-                                                'properties': {'model-tag': {'type': 'string'},
-                                                               'version': {'type': 'integer'}},
-                                                'required': ['model-tag',
-                                                             'version'],
-                                                'type': 'object'},
-                     'SetModelEnvironVersions': {'additionalProperties': False,
-                                                 'properties': {'models': {'items': {'$ref': '#/definitions/SetModelEnvironVersion'},
-                                                                           'type': 'array'}},
-                                                 'type': 'object'},
-                     'SetStatus': {'additionalProperties': False,
-                                   'properties': {'entities': {'items': {'$ref': '#/definitions/EntityStatusArgs'},
-                                                               'type': 'array'}},
-                                   'required': ['entities'],
-                                   'type': 'object'}},
-     'properties': {'ModelEnvironVersion': {'description': 'ModelEnvironVersion '
-                                                           'returns the current '
-                                                           'version of the environ '
-                                                           'corresponding\n'
-                                                           'to each specified '
-                                                           'model.',
-                                            'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                           'Result': {'$ref': '#/definitions/IntResults'}},
-                                            'type': 'object'},
-                    'ModelTargetEnvironVersion': {'description': 'ModelTargetEnvironVersion '
-                                                                 'returns the '
-                                                                 'target version '
-                                                                 'of the environ\n'
-                                                                 'corresponding to '
-                                                                 'each specified '
-                                                                 'model. The '
-                                                                 'target version '
-                                                                 'is the\n'
-                                                                 'environ '
-                                                                 "provider's "
-                                                                 'version.',
-                                                  'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                                 'Result': {'$ref': '#/definitions/IntResults'}},
-                                                  'type': 'object'},
-                    'SetModelEnvironVersion': {'description': 'SetModelEnvironVersion '
-                                                              'sets the current '
-                                                              'version of the '
-                                                              'environ '
-                                                              'corresponding\n'
-                                                              'to each specified '
-                                                              'model.',
-                                               'properties': {'Params': {'$ref': '#/definitions/SetModelEnvironVersions'},
-                                                              'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                               'type': 'object'},
-                    'SetModelStatus': {'description': 'SetModelStatus sets the '
-                                                      'status of each given model.',
-                                       'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
-                                                      'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                       'type': 'object'},
-                    'WatchModelEnvironVersion': {'description': 'WatchModelEnvironVersion '
-                                                                'watches for '
-                                                                'changes to the '
-                                                                'environ version '
-                                                                'of the\n'
-                                                                'specified '
-                                                                'models.\n'
-                                                                '\n'
-                                                                'NOTE(axw) this is '
-                                                                'currently '
-                                                                'implemented in '
-                                                                'terms of '
-                                                                'state.Model.Watch, '
-                                                                'so\n'
-                                                                'the client may be '
-                                                                'notified of '
-                                                                'changes unrelated '
-                                                                'to the environ '
-                                                                'version.',
-                                                 'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                                'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
-                                                 'type': 'object'}},
+                     'Number': {'additionalProperties': False,
+                                'properties': {'Build': {'type': 'integer'},
+                                               'Major': {'type': 'integer'},
+                                               'Minor': {'type': 'integer'},
+                                               'Patch': {'type': 'integer'},
+                                               'Tag': {'type': 'string'}},
+                                'required': ['Major',
+                                             'Minor',
+                                             'Tag',
+                                             'Patch',
+                                             'Build'],
+                                'type': 'object'},
+                     'UpgradeModel': {'additionalProperties': False,
+                                      'properties': {'agent-stream': {'type': 'string'},
+                                                     'dry-run': {'type': 'boolean'},
+                                                     'ignore-agent-versions': {'type': 'boolean'},
+                                                     'model-tag': {'type': 'string'},
+                                                     'to-version': {'$ref': '#/definitions/Number'}},
+                                      'required': ['model-tag', 'to-version'],
+                                      'type': 'object'}},
+     'properties': {'AbortModelUpgrade': {'description': 'AbortModelUpgrade aborts '
+                                                         'and archives the model '
+                                                         'upgrade\n'
+                                                         'synchronisation record, '
+                                                         'if any.',
+                                          'properties': {'Params': {'$ref': '#/definitions/ModelParam'}},
+                                          'type': 'object'},
+                    'UpgradeModel': {'description': 'UpgradeModel upgrades a '
+                                                    'model.',
+                                     'properties': {'Params': {'$ref': '#/definitions/UpgradeModel'}},
+                                     'type': 'object'}},
      'type': 'object'}
     
 
-    @ReturnMapping(IntResults)
-    async def ModelEnvironVersion(self, entities=None):
+    @ReturnMapping(None)
+    async def AbortModelUpgrade(self, model_tag=None):
         '''
-        ModelEnvironVersion returns the current version of the environ corresponding
-        to each specified model.
+        AbortModelUpgrade aborts and archives the model upgrade
+        synchronisation record, if any.
 
-        entities : typing.Sequence[~Entity]
-        Returns -> IntResults
+        model_tag : str
+        Returns -> None
         '''
-        if entities is not None and not isinstance(entities, (bytes, str, list)):
-            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+        if model_tag is not None and not isinstance(model_tag, (bytes, str)):
+            raise Exception("Expected model_tag to be a str, received: {}".format(type(model_tag)))
 
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='ModelUpgrader',
-                   request='ModelEnvironVersion',
+                   request='AbortModelUpgrade',
                    version=1,
                    params=_params)
-        _params['entities'] = entities
+        _params['model-tag'] = model_tag
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(IntResults)
-    async def ModelTargetEnvironVersion(self, entities=None):
+    @ReturnMapping(None)
+    async def UpgradeModel(self, agent_stream=None, dry_run=None, ignore_agent_versions=None, model_tag=None, to_version=None):
         '''
-        ModelTargetEnvironVersion returns the target version of the environ
-        corresponding to each specified model. The target version is the
-        environ provider's version.
+        UpgradeModel upgrades a model.
 
-        entities : typing.Sequence[~Entity]
-        Returns -> IntResults
+        agent_stream : str
+        dry_run : bool
+        ignore_agent_versions : bool
+        model_tag : str
+        to_version : Number
+        Returns -> None
         '''
-        if entities is not None and not isinstance(entities, (bytes, str, list)):
-            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+        if agent_stream is not None and not isinstance(agent_stream, (bytes, str)):
+            raise Exception("Expected agent_stream to be a str, received: {}".format(type(agent_stream)))
+
+        if dry_run is not None and not isinstance(dry_run, bool):
+            raise Exception("Expected dry_run to be a bool, received: {}".format(type(dry_run)))
+
+        if ignore_agent_versions is not None and not isinstance(ignore_agent_versions, bool):
+            raise Exception("Expected ignore_agent_versions to be a bool, received: {}".format(type(ignore_agent_versions)))
+
+        if model_tag is not None and not isinstance(model_tag, (bytes, str)):
+            raise Exception("Expected model_tag to be a str, received: {}".format(type(model_tag)))
+
+        if to_version is not None and not isinstance(to_version, (dict, Number)):
+            raise Exception("Expected to_version to be a Number, received: {}".format(type(to_version)))
 
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='ModelUpgrader',
-                   request='ModelTargetEnvironVersion',
+                   request='UpgradeModel',
                    version=1,
                    params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
-    async def SetModelEnvironVersion(self, models=None):
-        '''
-        SetModelEnvironVersion sets the current version of the environ corresponding
-        to each specified model.
-
-        models : typing.Sequence[~SetModelEnvironVersion]
-        Returns -> ErrorResults
-        '''
-        if models is not None and not isinstance(models, (bytes, str, list)):
-            raise Exception("Expected models to be a Sequence, received: {}".format(type(models)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='ModelUpgrader',
-                   request='SetModelEnvironVersion',
-                   version=1,
-                   params=_params)
-        _params['models'] = models
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
-    async def SetModelStatus(self, entities=None):
-        '''
-        SetModelStatus sets the status of each given model.
-
-        entities : typing.Sequence[~EntityStatusArgs]
-        Returns -> ErrorResults
-        '''
-        if entities is not None and not isinstance(entities, (bytes, str, list)):
-            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='ModelUpgrader',
-                   request='SetModelStatus',
-                   version=1,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(NotifyWatchResults)
-    async def WatchModelEnvironVersion(self, entities=None):
-        '''
-        WatchModelEnvironVersion watches for changes to the environ version of the
-        specified models.
-
-        NOTE(axw) this is currently implemented in terms of state.Model.Watch, so
-        the client may be notified of changes unrelated to the environ version.
-
-        entities : typing.Sequence[~Entity]
-        Returns -> NotifyWatchResults
-        '''
-        if entities is not None and not isinstance(entities, (bytes, str, list)):
-            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='ModelUpgrader',
-                   request='WatchModelEnvironVersion',
-                   version=1,
-                   params=_params)
-        _params['entities'] = entities
+        _params['agent-stream'] = agent_stream
+        _params['dry-run'] = dry_run
+        _params['ignore-agent-versions'] = ignore_agent_versions
+        _params['model-tag'] = model_tag
+        _params['to-version'] = to_version
         reply = await self.rpc(msg)
         return reply
 
@@ -14184,7 +14407,8 @@ class RemoteRelationWatcherFacade(Type):
                                                                   'unit-count': {'type': 'integer'}},
                                                    'required': ['relation-token',
                                                                 'application-token',
-                                                                'life'],
+                                                                'life',
+                                                                'unit-count'],
                                                    'type': 'object'},
                      'RemoteRelationUnitChange': {'additionalProperties': False,
                                                   'properties': {'settings': {'patternProperties': {'.*': {'additionalProperties': True,

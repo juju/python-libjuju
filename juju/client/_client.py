@@ -259,6 +259,10 @@ class EntityWatcherFacade(TypeFactory):
     pass
 
 
+class EnvironUpgraderFacade(TypeFactory):
+    pass
+
+
 class ExternalControllerUpdaterFacade(TypeFactory):
     pass
 
