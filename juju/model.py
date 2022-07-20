@@ -1636,14 +1636,7 @@ class Model:
                     resources = await self._add_charmhub_resources(res.app_name,
                                                                    identifier,
                                                                    add_charm_res.charm_origin)
-                    # TODO (cderici) : temporarily disable subordinate check for now
-                    # charm_info = await self.charmhub.info(url.name)
-                    is_subordinate = False
-                    # try:
-                    #     is_subordinate = charm_info.result.charm.subordinate
-                    # except AttributeError:
-                    #     log.warning('CharmHub.Info : unable to retrieve the subordinate information')
-                    if is_subordinate:
+                    if self.charmhub.is_subordinate(url.name):
                         if num_units > 1:
                             raise JujuError("cannot use num_units with subordinate application")
                         num_units = 0

@@ -17,7 +17,20 @@ class CharmHub:
         if not _response.status_code == 200:
             raise JujuError("Got {} from {}".format(_response.status_code, url))
         response = json.loads(_response.text)
-        return response['id']
+        return response['id'], response['name']
+
+    def is_subordinate(self, charm_name):
+        conn, headers, path_prefix = self.model.connection().https_connection()
+
+        url = "http://api.snapcraft.io/v2/charms/info/{}?fields=default-release.revision.subordinate".format(charm_name)
+        _response = requests.get(url)
+        if not _response.status_code == 200:
+            raise JujuError("Got {} from {}".format(_response.status_code, url))
+        response = json.loads(_response.text)
+        return 'subordinate' in response['default-release']['revision']
+
+    # TODO (caner) : we should be able to recreate the channel-map through the
+    #  api call without needing the CharmHub facade
 
     async def info(self, name, channel=None):
         """info displays detailed information about a CharmHub charm. The charm
