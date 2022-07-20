@@ -81,7 +81,7 @@ async def test_run(event_loop):
         for unit in app.units:
             action = await unit.run('unit-get public-address')
             assert isinstance(action, Action)
-            assert 'Stdout' in action.results
+            assert action.status == 'completed'
             break
 
         for unit in app.units:
