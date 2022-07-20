@@ -307,10 +307,7 @@ class TestAddApplicationChangeRun:
         context.trusted = False
         context.model = model
 
-        info = Mock()
-        info.result.id_ = "12345"
-        info.errors.error_list.code = ''
-        info_func = mock.Mock(return_value=info)
+        info_func = mock.Mock(return_value=["12345", "name"])
 
         with patch.object(charmhub.CharmHub, 'get_charm_id', info_func):
             result = await change.run(context)
@@ -359,10 +356,7 @@ class TestAddApplicationChangeRun:
         context.trusted = False
         context.model = model
 
-        info = Mock()
-        info.result.id_ = "12345"
-        info.errors.error_list.code = ''
-        info_func = mock.Mock(return_value=info)
+        info_func = mock.Mock(return_value=["12345", "name"])
 
         with patch.object(charmhub.CharmHub, 'get_charm_id', info_func):
             result = await change.run(context)
