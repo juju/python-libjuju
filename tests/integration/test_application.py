@@ -3,6 +3,7 @@ from pathlib import Path
 import pytest
 
 from .. import base
+from juju import jasyncio
 
 MB = 1
 
@@ -39,6 +40,8 @@ async def test_action(event_loop):
         await ubuntu_app.set_constraints({'mem': 512 * MB})
         constraints = await ubuntu_app.get_constraints()
         assert constraints['mem'] == 512 * MB
+
+        await jasyncio.sleep(5)
 
         # check action definitions
         actions = await ubuntu_app.get_actions()
