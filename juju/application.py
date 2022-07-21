@@ -431,10 +431,9 @@ class Application(model.ModelEntity):
         :return dict: The charms actions, empty dict if none are defined.
         """
         actions = {}
-        entity = [{"tag": self.tag}]
+        entity = {"tag": self.tag}
         action_facade = client.ActionFacade.from_connection(self.connection)
-        results = (
-            await action_facade.ApplicationsCharmsActions(entities=entity)).results
+        results = (await action_facade.ApplicationsCharmsActions(entities=[entity])).results
         for result in results:
             if result.application_tag == self.tag and result.actions:
                 actions = result.actions
@@ -563,7 +562,10 @@ class Application(model.ModelEntity):
             else:
                 raise JujuApplicationConfigError(config, [k, v])
 
-        await app_facade.Set(application=self.name, options=str_config)
+        return await app_facade.SetConfigs(args=[{
+            "application": self.name,
+            "config": str_config,
+        }])
 
     async def reset_config(self, to_default):
         """
@@ -577,7 +579,10 @@ class Application(model.ModelEntity):
         log.debug(
             'Restoring default config for %s: %s', self.name, to_default)
 
-        return await app_facade.Unset(application=self.name, options=to_default)
+        return await app_facade.UnsetApplicationsConfig(args=[{
+            "application": self.name,
+            "options": to_default,
+        }])
 
     async def set_constraints(self, constraints):
         """Set machine constraints for this application.
@@ -619,7 +624,7 @@ class Application(model.ModelEntity):
         if switch is not None and revision is not None:
             raise ValueError("switch and revision are mutually exclusive")
 
-        client_facade = client.ClientFacade.from_connection(self.connection)
+        charms_facade = client.CharmsFacade.from_connection(self.connection)
         resources_facade = client.ResourcesFacade.from_connection(
             self.connection)
         app_facade = self._facade()
@@ -644,11 +649,15 @@ class Application(model.ModelEntity):
         if charm_url == self.data['charm-url']:
             raise JujuError('already running charm "%s"' % charm_url)
 
+        # TODO (caner) : this needs to be revisited and updated with the charmhub stuff
+        origin = client.CharmOrigin(source="charm-store",
+                                    risk=channel,
+                                    )
         # Update charm
-        await client_facade.AddCharm(
+        await charms_facade.AddCharm(
             url=charm_url,
             force=force,
-            channel=channel
+            charm_origin=origin,
         )
 
         # Update resources

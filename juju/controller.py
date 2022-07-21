@@ -807,7 +807,7 @@ class Controller:
         model to consume the specified offers represented by the urls.
         """
         facade = client.ApplicationOffersFacade.from_connection(self.connection())
-        offers = await facade.GetConsumeDetails(offer_urls=[endpoint])
+        offers = await facade.GetConsumeDetails(offer_urls=client.OfferURLs(offer_urls=[endpoint]))
         if len(offers.results) != 1:
             raise JujuAPIError("expected to find one result")
         result = offers.results[0]

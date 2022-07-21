@@ -145,7 +145,7 @@ class Unit(model.ModelEntity):
             timeout=timeout,
             units=[self.name],
         )
-        return await self.model.wait_for_action(res.results[0].action.tag)
+        return await self.model.wait_for_action(res.actions[0].action.tag)
 
     async def run_action(self, action_name, **params):
         """Run an action on this unit.

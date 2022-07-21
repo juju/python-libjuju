@@ -619,7 +619,7 @@ class AddApplicationChange(ChangeInfo):
                 self.application, charm, overrides=self.resources)
         elif Schema.CHARM_HUB.matches(url.schema):
             c_hub = charmhub.CharmHub(context.model)
-            id_ = c_hub.get_charm_id(url.name)
+            id_, _ = c_hub.get_charm_id(url.name)
             origin.id_ = id_
             resources = await context.model._add_charmhub_resources(
                 self.application, charm, origin, overrides=self.resources)
