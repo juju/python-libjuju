@@ -306,8 +306,14 @@ class SSHProvisioner:
         # charms will fail to deploy
         disable_package_commands = False
 
-        client_facade = client.MachineManagerFacade.from_connection(connection)
-        results = await client_facade.ProvisioningScript(
+        facade_cls = client.MachineManagerFacade
+
+        if facade_cls.best_facade_version(connection) <= 6:
+            facade_cls = client.ClientFacade
+
+        facade = facade_cls.from_connection(connection)
+
+        results = await facade.ProvisioningScript(
             data_dir=data_dir,
             disable_package_commands=disable_package_commands,
             machine_id=machine_id,
