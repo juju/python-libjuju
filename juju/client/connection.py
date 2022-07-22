@@ -361,6 +361,12 @@ class Connection:
         return self.usertag[len('user-'):]
 
     @property
+    def is_using_old_client(self):
+        if self.info is None:
+            raise errors.JujuError("Not connected yet.")
+        return self.info['server-version'].startswith('2.')
+
+    @property
     def is_open(self):
         return self.monitor.status == Monitor.CONNECTED
 
