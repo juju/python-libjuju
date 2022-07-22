@@ -25,7 +25,6 @@ from .bundle import BundleHandler, get_charm_series, is_local_charm
 from .charmhub import CharmHub
 from .charmstore import CharmStore
 from .client import client, connector
-from .client.client import ConfigValue, Value
 from .client.overrides import Caveat, Macaroon
 from .constraints import parse as parse_constraints
 from .controller import Controller, ConnectedController
@@ -2003,7 +2002,7 @@ class Model:
         result = await config_facade.ModelGet()
         config = result.config
         for key, value in config.items():
-            config[key] = ConfigValue.from_json(value)
+            config[key] = client.ConfigValue.from_json(value)
         return config
 
     async def get_constraints(self):
@@ -2027,7 +2026,7 @@ class Model:
         # set.
         if result.constraints:
             constraint_types = [a for a in dir(result.constraints)
-                                if a in Value._toSchema.keys()]
+                                if a in client.Value._toSchema.keys()]
             for constraint in constraint_types:
                 value = getattr(result.constraints, constraint)
                 if value is not None:
@@ -2121,7 +2120,7 @@ class Model:
 
         new_conf = {}
         for key, value in config.items():
-            if isinstance(value, ConfigValue):
+            if isinstance(value, client.ConfigValue):
                 new_conf[key] = value.value
             elif isinstance(value, str):
                 new_conf[key] = value
@@ -2134,8 +2133,12 @@ class Model:
 
         :param dict config: Mapping of model constraints
         """
-        client_facade = client.ModelConfigFacade.from_connection(self.connection())
-        await client_facade.SetModelConstraints(
+        facade_cls = client.ModelConfigFacade
+        if facade_cls.best_facade_version(self.connection()) <= 2:
+            facade_cls = client.ClientFacade
+        facade = facade_cls.from_connection(self.connection())
+
+        await facade.SetModelConstraints(
             application='',
             constraints=constraints)
 
