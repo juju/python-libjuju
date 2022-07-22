@@ -13,7 +13,7 @@ import paramiko
 import pylxd
 import pytest
 from juju import jasyncio
-from juju.client.client import ApplicationFacade, ConfigValue
+from juju.client import client
 from juju.errors import JujuError, JujuUnitError, JujuConnectionError
 from juju.model import Model, ModelObserver
 from juju.utils import block_until, run_with_interrupt, wait_for_bundle
@@ -555,7 +555,7 @@ async def test_relate(event_loop):
 
         model.add_observer(TestObserver())
 
-        real_app_facade = ApplicationFacade.from_connection(model.connection())
+        real_app_facade = client.ApplicationFacade.from_connection(model.connection())
         mock_app_facade = mock.MagicMock()
 
         async def mock_AddRelation(*args, **kwargs):
@@ -567,7 +567,7 @@ async def test_relate(event_loop):
 
         mock_app_facade.AddRelation = mock_AddRelation
 
-        with mock.patch.object(ApplicationFacade, 'from_connection',
+        with mock.patch.object(client.ApplicationFacade, 'from_connection',
                                return_value=mock_app_facade):
             my_relation = await run_with_interrupt(model.relate(
                 'ubuntu',
@@ -846,7 +846,7 @@ async def test_config(event_loop):
         assert 'extra-info' not in result
         await model.set_config({
             'extra-info': 'booyah',
-            'test-mode': ConfigValue(value=True),
+            'test-mode': client.ConfigValue(value=True),
         })
         result = await model.get_config()
         assert 'extra-info' in result
@@ -865,7 +865,7 @@ async def test_config_with_json(event_loop):
         expected = ['foo', {'bar': 1}]
         await model.set_config({
             'extra-complex-info': json.dumps(expected),
-            'test-mode': ConfigValue(value=True),
+            'test-mode': client.ConfigValue(value=True),
         })
         result = await model.get_config()
         assert 'extra-complex-info' in result
