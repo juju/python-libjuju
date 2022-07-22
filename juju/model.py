@@ -2012,8 +2012,12 @@ class Model:
         :returns: A ``dict`` of constraints.
         """
         constraints = {}
-        client_facade = client.ModelConfigFacade.from_connection(self.connection())
-        result = await client_facade.GetModelConstraints()
+        facade_cls = client.ModelConfigFacade
+        if facade_cls.best_facade_version(self.connection()) <= 2:
+            facade_cls = client.ClientFacade
+
+        facade = facade_cls.from_connection(self.connection())
+        result = await facade.GetModelConstraints()
 
         # GetModelConstraints returns GetConstraintsResults which has a
         # 'constraints' attribute. If no constraints have been set
