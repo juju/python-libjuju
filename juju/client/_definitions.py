@@ -9408,6 +9408,30 @@ class EnqueuedActions(Type):
 
 
 
+class EnqueuedActionsV2(Type):
+    _toSchema = {'actions': 'actions', 'operation': 'operation'}
+    _toPy = {'actions': 'actions', 'operation': 'operation'}
+    def __init__(self, actions=None, operation=None, **unknown_fields):
+        '''
+        actions : typing.Sequence[~ActionResult]
+        operation : str
+        '''
+        actions_ = [ActionResult.from_json(o) for o in actions or []]
+        operation_ = operation
+
+        # Validate arguments against known Juju API types.
+        if actions_ is not None and not isinstance(actions_, (bytes, str, list)):
+            raise Exception("Expected actions_ to be a Sequence, received: {}".format(type(actions_)))
+
+        if operation_ is not None and not isinstance(operation_, (bytes, str)):
+            raise Exception("Expected operation_ to be a str, received: {}".format(type(operation_)))
+
+        self.actions = actions_
+        self.operation = operation_
+        self.unknown_fields = unknown_fields
+
+
+
 class Entities(Type):
     _toSchema = {'entities': 'entities'}
     _toPy = {'entities': 'entities'}
@@ -28161,10 +28185,10 @@ class ValidateModelUpgradeParams(Type):
     def __init__(self, force=None, model=None, **unknown_fields):
         '''
         force : bool
-        model : typing.Sequence[~ValidateModelUpgradeParam]
+        model : typing.Sequence[~ModelParam]
         '''
         force_ = force
-        model_ = [ValidateModelUpgradeParam.from_json(o) for o in model or []]
+        model_ = [ModelParam.from_json(o) for o in model or []]
 
         # Validate arguments against known Juju API types.
         if force_ is not None and not isinstance(force_, bool):
