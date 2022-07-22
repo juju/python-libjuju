@@ -17,6 +17,7 @@ def test_basics():
 def test_from_connection():
     connection = mock.Mock()
     connection.facades = {"Action": 2}
+    connection.info = {"server-version": '3.0'}
     action_facade = client.ActionFacade.from_connection(connection)
     assert action_facade
 

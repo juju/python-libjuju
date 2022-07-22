@@ -54,6 +54,7 @@ async def test_out_of_order(event_loop):
                     'juju.client.connection.Connection.login',
                     base.AsyncMock(return_value={'response': {
                         'facades': minimal_facades,
+                        'server-version': '3.0',
                     }}),
                 ), \
                 mock.patch('juju.client.connection.Connection._get_ssl'), \
@@ -150,7 +151,9 @@ SOMECERT
     wsForCont2 = WebsocketMock([
         {'request-id': 1},
         {'request-id': 2},
-        {'request-id': 3, 'response': {'result': minimal_facades}},
+        {'request-id': 3, 'response': {'result': minimal_facades,
+                                       'server-version': '3.0',
+                                       }},
     ])
 
     con = None
@@ -186,6 +189,7 @@ async def test_rpc_none_results(event_loop):
                     'juju.client.connection.Connection.login',
                     base.AsyncMock(return_value={'response': {
                         'facades': minimal_facades,
+                        'server-version': '3.0',
                     }}),
                 ), \
                 mock.patch('juju.client.connection.Connection._get_ssl'), \
