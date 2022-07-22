@@ -307,8 +307,7 @@ class SSHProvisioner:
         disable_package_commands = False
 
         facade_cls = client.MachineManagerFacade
-
-        if facade_cls.best_facade_version(connection) <= 6:
+        if connection.is_using_old_client:
             facade_cls = client.ClientFacade
 
         facade = facade_cls.from_connection(connection)

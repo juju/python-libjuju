@@ -22,7 +22,7 @@ class Machine(model.ModelEntity):
         Blocks until the machine is actually removed.
 
         """
-        if client.MachineManagerFacade.best_facade_version(self.connection) <= 6:
+        if self.connection.is_using_old_client:
             # Then we'll use the DestroyMachines from client.ClientFacade
             facade = client.ClientFacade.from_connection(self.connection)
             await facade.DestroyMachines(force=force, machine_names=[self.id])

@@ -2012,7 +2012,7 @@ class Model:
         """
         constraints = {}
         facade_cls = client.ModelConfigFacade
-        if facade_cls.best_facade_version(self.connection()) <= 2:
+        if self.connection().is_using_old_client:
             facade_cls = client.ClientFacade
 
         facade = facade_cls.from_connection(self.connection())
@@ -2134,7 +2134,7 @@ class Model:
         :param dict config: Mapping of model constraints
         """
         facade_cls = client.ModelConfigFacade
-        if facade_cls.best_facade_version(self.connection()) <= 2:
+        if self.connection().is_using_old_client:
             facade_cls = client.ClientFacade
         facade = facade_cls.from_connection(self.connection())
 
