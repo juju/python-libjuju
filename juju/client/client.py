@@ -49,6 +49,7 @@ for o in overrides.__patches__:
 
 from ._client import *  # noqa, isort:skip
 
+
 class ClientModuleClass:
     def __init__(self):
         """
@@ -72,6 +73,7 @@ class ClientModuleClass:
         if not self.new_client:
             self.defs = _2_9_definitions
             self.client_module = _2_9_client
+
 
 """
 This is basically a hack to turn this module into a dynamic
