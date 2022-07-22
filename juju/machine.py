@@ -22,14 +22,16 @@ class Machine(model.ModelEntity):
         Blocks until the machine is actually removed.
 
         """
-        facade = client.MachineManagerFacade.from_connection(self.connection)
+        if client.MachineManagerFacade.best_facade_version(self.connection) <= 6:
+            # Then we'll use the DestroyMachines from client.ClientFacade
+            facade = client.ClientFacade.from_connection(self.connection)
+            await facade.DestroyMachines(force=force, machine_names=[self.id])
+        else:
+            facade = client.MachineManagerFacade.from_connection(self.connection)
+            await facade.DestroyMachineWithParams(force=force, machine_tags=[tag.machine(self.id)])
 
-        log.debug(
-            'Destroying machine %s', self.id)
-
-        await facade.DestroyMachineWithParams(force=force, machine_tags=[tag.machine(self.id)])
-        return await self.model._wait(
-            'machine', self.id, 'remove')
+        log.debug('Destroying machine %s', self.id)
+        return await self.model._wait('machine', self.id, 'remove')
     remove = destroy
 
     async def get_annotations(self):
