@@ -1,5 +1,6 @@
 from .client import client
 from .errors import JujuError
+from juju import jasyncio
 
 import requests
 import json
@@ -9,13 +10,19 @@ class CharmHub:
     def __init__(self, model):
         self.model = model
 
+    def request_charmhub_with_retry(self, url, retries):
+        for attempt in range(retries):
+            _response = requests.get(url)
+            if _response.status_code == 200:
+                return _response
+            jasyncio.sleep(5)
+        raise JujuError("Got {} from {}".format(_response.status_code, url))
+
     def get_charm_id(self, charm_name):
         conn, headers, path_prefix = self.model.connection().https_connection()
 
         url = "http://api.snapcraft.io/v2/charms/info/{}".format(charm_name)
-        _response = requests.get(url)
-        if not _response.status_code == 200:
-            raise JujuError("Got {} from {}".format(_response.status_code, url))
+        _response = self.request_charmhub_with_retry(url, 5)
         response = json.loads(_response.text)
         return response['id'], response['name']
 
@@ -23,9 +30,7 @@ class CharmHub:
         conn, headers, path_prefix = self.model.connection().https_connection()
 
         url = "http://api.snapcraft.io/v2/charms/info/{}?fields=default-release.revision.subordinate".format(charm_name)
-        _response = requests.get(url)
-        if not _response.status_code == 200:
-            raise JujuError("Got {} from {}".format(_response.status_code, url))
+        _response = self.request_charmhub_with_retry(url, 5)
         response = json.loads(_response.text)
         return 'subordinate' in response['default-release']['revision']
 
