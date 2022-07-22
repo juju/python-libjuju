@@ -44,7 +44,7 @@ HEADER = """\
 
 # Classes and helper functions that we'll write to _client.py
 LOOKUP_FACADE = '''
-def lookup_facade(name, version, is_2_9=False):
+def lookup_facade(name, version):
     """
     Given a facade name and version, attempt to pull that facade out
     of the correct client<version>.py file.
@@ -52,8 +52,7 @@ def lookup_facade(name, version, is_2_9=False):
     """
     for _version in range(int(version), 0, -1):
         try:
-            client_directory = OLD_CLIENTS if is_2_9 else CLIENTS
-            facade = getattr(client_directory[str(_version)], name)
+            facade = getattr(CLIENTS[str(_version)], name)
             return facade
         except (KeyError, AttributeError):
             continue
@@ -84,8 +83,7 @@ class TypeFactory:
             raise Exception('No facade {} in facades {}'.format(facade_name,
                                                                 connection.facades))
 
-        server_version = connection.info['server-version']
-        c = lookup_facade(cls.__name__, version, server_version.startswith('2.9'))
+        c = lookup_facade(cls.__name__, version)
         c = c()
         c.connect(connection)
 
@@ -111,14 +109,6 @@ class TypeFactory:
 CLIENT_TABLE = '''
 CLIENTS = {{
     {clients}
-}}
-
-'''
-
-
-OLD_CLIENTS_TABLE = '''
-OLD_CLIENTS = {{
-    {old_clients}
 }}
 
 '''
@@ -882,18 +872,13 @@ def write_client(captures, options):
         f.write(HEADER)
         f.write("from juju.client._definitions import *\n\n")
         clients = ", ".join("_client{}".format(v) for v in captures)
-        # from juju.client.old_clients import _client{} as _2_9_client{}
-        for v in captures:
-            pre = "from juju.client.old_clients import "
-            f.write(pre + "_client{num} as _2_9_client{num}\n".format(num=v))
+
         # from juju.client import _client2, _client1, _client3 ...
         f.write("\nfrom juju.client import " + clients + "\n\n")
         # CLIENTS = { ....
         f.write(CLIENT_TABLE.format(clients=",\n    ".join(
             ['"{}": _client{}'.format(v, v) for v in captures])))
-        # OLD_CLIENTS = { ....
-        f.write(OLD_CLIENTS_TABLE.format(old_clients=",\n    ".join(
-            ['"{}": _2_9_client{}'.format(v, v) for v in captures])))
+
         f.write(LOOKUP_FACADE)
         f.write(TYPE_FACTORY)
         for key in sorted([k for k in factories.keys() if "Facade" in k]):

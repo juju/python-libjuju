@@ -35,7 +35,7 @@ for o in overrides.__patches__:
             if not a.startswith('_'):
                 setattr(c_type, a, getattr(o_type, a))
     # This unfortunately needs to be a separate loop
-    for old_client_version in _client.OLD_CLIENTS.values():
+    for old_client_version in _2_9_client.CLIENTS.values():
         try:
             c_type = getattr(old_client_version, o)
         except AttributeError:
@@ -56,20 +56,16 @@ class ClientModuleClass:
         new_client (bool): True if we're working with juju>3.0
         """
         self.new_client = None
-        self.defs = _definitions
         self.client_module = _client
 
     __all__ = list(set(vars().keys()) - {'__module__', '__qualname__'})
 
     def __getattr__(self, item):
-        if 'Facade' in item:
-            return getattr(self.client_module, item)
-        return getattr(self.defs, item)
+        return getattr(self.client_module, item)
 
     def set_new_client(self, server_version):
         self.new_client = server_version.startswith('3.')
         if not self.new_client:
-            self.defs = _2_9_definitions
             self.client_module = _2_9_client
 
 

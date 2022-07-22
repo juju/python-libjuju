@@ -3,24 +3,6 @@
 
 from juju.client._definitions import *
 
-from juju.client.old_clients import _client2 as _2_9_client2
-from juju.client.old_clients import _client1 as _2_9_client1
-from juju.client.old_clients import _client3 as _2_9_client3
-from juju.client.old_clients import _client4 as _2_9_client4
-from juju.client.old_clients import _client5 as _2_9_client5
-from juju.client.old_clients import _client8 as _2_9_client8
-from juju.client.old_clients import _client7 as _2_9_client7
-from juju.client.old_clients import _client9 as _2_9_client9
-from juju.client.old_clients import _client10 as _2_9_client10
-from juju.client.old_clients import _client6 as _2_9_client6
-from juju.client.old_clients import _client12 as _2_9_client12
-from juju.client.old_clients import _client11 as _2_9_client11
-from juju.client.old_clients import _client13 as _2_9_client13
-from juju.client.old_clients import _client15 as _2_9_client15
-from juju.client.old_clients import _client16 as _2_9_client16
-from juju.client.old_clients import _client17 as _2_9_client17
-from juju.client.old_clients import _client18 as _2_9_client18
-from juju.client.old_clients import _client14 as _2_9_client14
 
 from juju.client import _client2, _client1, _client3, _client4, _client5, _client8, _client7, _client9, _client10, _client6, _client12, _client11, _client13, _client15, _client16, _client17, _client18, _client14
 
@@ -47,29 +29,7 @@ CLIENTS = {
 }
 
 
-OLD_CLIENTS = {
-    "2": _2_9_client2,
-    "1": _2_9_client1,
-    "3": _2_9_client3,
-    "4": _2_9_client4,
-    "5": _2_9_client5,
-    "8": _2_9_client8,
-    "7": _2_9_client7,
-    "9": _2_9_client9,
-    "10": _2_9_client10,
-    "6": _2_9_client6,
-    "12": _2_9_client12,
-    "11": _2_9_client11,
-    "13": _2_9_client13,
-    "15": _2_9_client15,
-    "16": _2_9_client16,
-    "17": _2_9_client17,
-    "18": _2_9_client18,
-    "14": _2_9_client14
-}
-
-
-def lookup_facade(name, version, is_2_9=False):
+def lookup_facade(name, version):
     """
     Given a facade name and version, attempt to pull that facade out
     of the correct client<version>.py file.
@@ -77,8 +37,7 @@ def lookup_facade(name, version, is_2_9=False):
     """
     for _version in range(int(version), 0, -1):
         try:
-            client_directory = OLD_CLIENTS if is_2_9 else CLIENTS
-            facade = getattr(client_directory[str(_version)], name)
+            facade = getattr(CLIENTS[str(_version)], name)
             return facade
         except (KeyError, AttributeError):
             continue
@@ -107,8 +66,7 @@ class TypeFactory:
             raise Exception('No facade {} in facades {}'.format(facade_name,
                                                                 connection.facades))
 
-        server_version = connection.info['server-version']
-        c = lookup_facade(cls.__name__, version, server_version.startswith('2.9'))
+        c = lookup_facade(cls.__name__, version)
         c = c()
         c.connect(connection)
 
