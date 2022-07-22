@@ -145,7 +145,8 @@ class Unit(model.ModelEntity):
             timeout=timeout,
             units=[self.name],
         )
-        return await self.model.wait_for_action(res.actions[0].action.tag)
+        the_action = res.results[0] if self.connection.is_using_old_client else res.actions[0]
+        return await self.model.wait_for_action(the_action.action.tag)
 
     async def run_action(self, action_name, **params):
         """Run an action on this unit.
