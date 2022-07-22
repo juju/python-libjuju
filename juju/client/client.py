@@ -62,8 +62,6 @@ class ClientModuleClass:
     __all__ = list(set(vars().keys()) - {'__module__', '__qualname__'})
 
     def __getattr__(self, item):
-        if self.new_client is None:
-            raise RuntimeError("ClientModule version is not yet set. Is it 2.9? Or is it >3.0")
         if 'Facade' in item:
             return getattr(self.client_module, item)
         return getattr(self.defs, item)
