@@ -2,7 +2,7 @@
 # Changes will be overwritten/lost when the file is regenerated.
 
 from juju.client.facade import Type, ReturnMapping
-from juju.client._definitions import *
+from juju.client.old_clients._definitions import *
 
 
 class ActionFacade(Type):
@@ -3610,18 +3610,6 @@ class CAASUnitProvisionerFacade(Type):
                                                      'error': {'$ref': '#/definitions/Error'}},
                                       'required': ['config'],
                                       'type': 'object'},
-                     'DockerImageInfo': {'additionalProperties': False,
-                                         'properties': {'auth': {'type': 'string'},
-                                                        'email': {'type': 'string'},
-                                                        'identitytoken': {'type': 'string'},
-                                                        'image-name': {'type': 'string'},
-                                                        'password': {'type': 'string'},
-                                                        'registrytoken': {'type': 'string'},
-                                                        'repository': {'type': 'string'},
-                                                        'serveraddress': {'type': 'string'},
-                                                        'username': {'type': 'string'}},
-                                         'required': ['image-name'],
-                                         'type': 'object'},
                      'Entities': {'additionalProperties': False,
                                   'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
                                                               'type': 'array'}},
@@ -3748,7 +3736,7 @@ class CAASUnitProvisionerFacade(Type):
                                                                                'type': 'array'},
                                                                    'filesystems': {'items': {'$ref': '#/definitions/KubernetesFilesystemParams'},
                                                                                    'type': 'array'},
-                                                                   'image-repo': {'$ref': '#/definitions/DockerImageInfo'},
+                                                                   'operator-image-path': {'type': 'string'},
                                                                    'pod-spec': {'type': 'string'},
                                                                    'raw-k8s-spec': {'type': 'string'},
                                                                    'tags': {'patternProperties': {'.*': {'type': 'string'}},
@@ -7011,8 +6999,7 @@ class CrossModelRelationsFacade(Type):
                                                                   'unit-count': {'type': 'integer'}},
                                                    'required': ['relation-token',
                                                                 'application-token',
-                                                                'life',
-                                                                'unit-count'],
+                                                                'life'],
                                                    'type': 'object'},
                      'RemoteRelationDetails': {'additionalProperties': False,
                                                'properties': {'bakery-version': {'type': 'integer'},
@@ -11871,15 +11858,13 @@ class RemoteRelationsFacade(Type):
                                                        'remote-application-name': {'type': 'string'},
                                                        'remote-endpoint-name': {'type': 'string'},
                                                        'source-model-uuid': {'type': 'string'},
-                                                       'suspended': {'type': 'boolean'},
-                                                       'unit-count': {'type': 'integer'}},
+                                                       'suspended': {'type': 'boolean'}},
                                         'required': ['life',
                                                      'suspended',
                                                      'id',
                                                      'key',
                                                      'application-name',
                                                      'endpoint',
-                                                     'unit-count',
                                                      'remote-application-name',
                                                      'remote-endpoint-name',
                                                      'source-model-uuid'],
@@ -11904,8 +11889,7 @@ class RemoteRelationsFacade(Type):
                                                                   'unit-count': {'type': 'integer'}},
                                                    'required': ['relation-token',
                                                                 'application-token',
-                                                                'life',
-                                                                'unit-count'],
+                                                                'life'],
                                                    'type': 'object'},
                      'RemoteRelationResult': {'additionalProperties': False,
                                               'properties': {'error': {'$ref': '#/definitions/Error'},

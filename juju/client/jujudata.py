@@ -3,7 +3,7 @@ import io
 import os
 import pathlib
 
-import juju.client.client as jujuclient
+from juju.client import client as jujuclient
 import yaml
 from juju import tag
 from juju.client.gocookies import GoCookieJar

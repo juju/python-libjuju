@@ -9,13 +9,13 @@ from juju import jasyncio
 @pytest.mark.asyncio
 async def test_info(event_loop):
     async with base.CleanModel() as model:
-        result = await model.charmhub.info("hello-juju")
-
-        assert result.result.name == "hello-juju"
+        _, name = model.charmhub.get_charm_id("hello-juju")
+        assert name == "hello-juju"
 
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.skip('CharmHub facade no longer exists')
 async def test_info_with_channel(event_loop):
     async with base.CleanModel() as model:
         result = await model.charmhub.info("hello-juju", "latest/stable")
@@ -26,6 +26,7 @@ async def test_info_with_channel(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.skip('CharmHub facade no longer exists')
 async def test_info_not_found(event_loop):
     async with base.CleanModel() as model:
         try:
@@ -38,6 +39,7 @@ async def test_info_not_found(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.skip('CharmHub facade no longer exists')
 async def test_find(event_loop):
     async with base.CleanModel() as model:
         result = await model.charmhub.find("kube")
@@ -50,6 +52,7 @@ async def test_find(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.skip('CharmHub facade no longer exists')
 async def test_find_bundles(event_loop):
     async with base.CleanModel() as model:
         result = await model.charmhub.find("kube", charm_type="bundle")
@@ -62,6 +65,7 @@ async def test_find_bundles(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.skip('CharmHub facade no longer exists')
 async def test_find_all(event_loop):
     async with base.CleanModel() as model:
         result = await model.charmhub.find("")

@@ -2,7 +2,7 @@
 # Changes will be overwritten/lost when the file is regenerated.
 
 from juju.client.facade import Type, ReturnMapping
-from juju.client._definitions import *
+from juju.client.old_clients._definitions import *
 
 
 class ApplicationFacade(Type):
@@ -1333,8 +1333,8 @@ class ApplicationOffersFacade(Type):
                                                              'This call currently '
                                                              'has no client side '
                                                              'API, only there for '
-                                                             'the Dashboard at '
-                                                             'this stage.',
+                                                             'the GUI at this '
+                                                             'stage.',
                                               'properties': {'Params': {'$ref': '#/definitions/OfferURLs'},
                                                              'Result': {'$ref': '#/definitions/RemoteApplicationInfoResults'}},
                                               'type': 'object'}},
@@ -1523,7 +1523,7 @@ class ApplicationOffersFacade(Type):
     async def RemoteApplicationInfo(self, bakery_version=None, offer_urls=None):
         '''
         RemoteApplicationInfo returns information about the requested remote application.
-        This call currently has no client side API, only there for the Dashboard at this stage.
+        This call currently has no client side API, only there for the GUI at this stage.
 
         bakery_version : int
         offer_urls : typing.Sequence[str]

@@ -60,7 +60,6 @@ def lookup_facade(name, version):
         raise ImportError("No supported version for facade: "
                           "{}".format(name))
 
-
 '''
 
 TYPE_FACTORY = '''
@@ -111,7 +110,6 @@ CLIENT_TABLE = '''
 CLIENTS = {{
     {clients}
 }}
-
 
 '''
 
@@ -874,9 +872,13 @@ def write_client(captures, options):
         f.write(HEADER)
         f.write("from juju.client._definitions import *\n\n")
         clients = ", ".join("_client{}".format(v) for v in captures)
-        f.write("from juju.client import " + clients + "\n\n")
+
+        # from juju.client import _client2, _client1, _client3 ...
+        f.write("\nfrom juju.client import " + clients + "\n\n")
+        # CLIENTS = { ....
         f.write(CLIENT_TABLE.format(clients=",\n    ".join(
             ['"{}": _client{}'.format(v, v) for v in captures])))
+
         f.write(LOOKUP_FACADE)
         f.write(TYPE_FACTORY)
         for key in sorted([k for k in factories.keys() if "Facade" in k]):

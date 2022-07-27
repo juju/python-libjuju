@@ -15,7 +15,9 @@ class UniterFacade(Type):
                                             'required': ['servers'],
                                             'type': 'object'},
                      'Action': {'additionalProperties': False,
-                                'properties': {'name': {'type': 'string'},
+                                'properties': {'execution-group': {'type': 'string'},
+                                               'name': {'type': 'string'},
+                                               'parallel': {'type': 'boolean'},
                                                'parameters': {'patternProperties': {'.*': {'additionalProperties': True,
                                                                                            'type': 'object'}},
                                                               'type': 'object'},
@@ -348,25 +350,6 @@ class UniterFacade(Type):
                                                                 'type': 'array'}},
                                      'required': ['results'],
                                      'type': 'object'},
-                     'MachinePortRange': {'additionalProperties': False,
-                                          'properties': {'port-range': {'$ref': '#/definitions/PortRange'},
-                                                         'relation-tag': {'type': 'string'},
-                                                         'unit-tag': {'type': 'string'}},
-                                          'required': ['unit-tag',
-                                                       'relation-tag',
-                                                       'port-range'],
-                                          'type': 'object'},
-                     'MachinePortsResult': {'additionalProperties': False,
-                                            'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                           'ports': {'items': {'$ref': '#/definitions/MachinePortRange'},
-                                                                     'type': 'array'}},
-                                            'required': ['ports'],
-                                            'type': 'object'},
-                     'MachinePortsResults': {'additionalProperties': False,
-                                             'properties': {'results': {'items': {'$ref': '#/definitions/MachinePortsResult'},
-                                                                        'type': 'array'}},
-                                             'required': ['results'],
-                                             'type': 'object'},
                      'MergeLeadershipSettingsBulkParams': {'additionalProperties': False,
                                                            'properties': {'params': {'items': {'$ref': '#/definitions/MergeLeadershipSettingsParam'},
                                                                                      'type': 'array'}},
@@ -880,26 +863,6 @@ class UniterFacade(Type):
                                        'properties': {'Params': {'$ref': '#/definitions/StoragesAddParams'},
                                                       'Result': {'$ref': '#/definitions/ErrorResults'}},
                                        'type': 'object'},
-                    'AllMachinePorts': {'description': 'AllMachinePorts returns '
-                                                       'all opened port ranges for '
-                                                       'each given\n'
-                                                       'machine (on all '
-                                                       'networks).\n'
-                                                       '\n'
-                                                       'DEPRECATED: clients should '
-                                                       'switch to the '
-                                                       'OpenedMachinePortRanges '
-                                                       'API call\n'
-                                                       'when using the V17+ API.\n'
-                                                       '\n'
-                                                       'TODO(achilleasa): remove '
-                                                       'from V17 once all client '
-                                                       'references to this API\n'
-                                                       'have been changed to use '
-                                                       'the new API.',
-                                        'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                       'Result': {'$ref': '#/definitions/MachinePortsResults'}},
-                                        'type': 'object'},
                     'ApplicationStatus': {'description': 'ApplicationStatus '
                                                          'returns the status of '
                                                          'the Applications and its '
@@ -1819,36 +1782,6 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['storages'] = storages
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(MachinePortsResults)
-    async def AllMachinePorts(self, entities=None):
-        '''
-        AllMachinePorts returns all opened port ranges for each given
-        machine (on all networks).
-
-        DEPRECATED: clients should switch to the OpenedMachinePortRanges API call
-        when using the V17+ API.
-
-        TODO(achilleasa): remove from V17 once all client references to this API
-        have been changed to use the new API.
-
-        entities : typing.Sequence[~Entity]
-        Returns -> MachinePortsResults
-        '''
-        if entities is not None and not isinstance(entities, (bytes, str, list)):
-            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='AllMachinePorts',
-                   version=18,
-                   params=_params)
-        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 

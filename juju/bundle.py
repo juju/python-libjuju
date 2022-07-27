@@ -52,6 +52,8 @@ class BundleHandler:
             model.connection())
         self.ann_facade = client.AnnotationsFacade.from_connection(
             model.connection())
+        self.machine_manager_facade = client.MachineManagerFacade.from_connection(
+            model.connection())
 
         # Feature detect if we have the new charms facade, otherwise fallback
         # to the client facade, when making calls.
@@ -617,10 +619,8 @@ class AddApplicationChange(ChangeInfo):
                 self.application, charm, overrides=self.resources)
         elif Schema.CHARM_HUB.matches(url.schema):
             c_hub = charmhub.CharmHub(context.model)
-            info = await c_hub.info(url.name, channel=self.channel)
-            if info.errors.error_list.code:
-                raise JujuError("unable to resolve the charm {} with channel {}".format(url.name, channel))
-            origin.id_ = info.result.id_
+            id_, _ = c_hub.get_charm_id(url.name)
+            origin.id_ = id_
             resources = await context.model._add_charmhub_resources(
                 self.application, charm, origin, overrides=self.resources)
         else:
@@ -726,7 +726,7 @@ class AddCharmChange(ChangeInfo):
         if Schema.CHARM_STORE.matches(url.schema):
             entity_id = await context.charmstore.entityId(self.charm, channel=self.channel)
             log.debug('Adding %s', entity_id)
-            await context.client_facade.AddCharm(channel=self.channel, url=entity_id, force=False)
+            await context.charms_facade.AddCharm(channel=self.channel, url=entity_id, force=False)
             identifier = entity_id
             origin = client.CharmOrigin(source="charm-store", risk="stable")
 
@@ -837,7 +837,7 @@ class AddMachineChange(ChangeInfo):
 
         # Submit the request.
         params = client.AddMachineParams(**params)
-        results = await context.client_facade.AddMachines(params=[params])
+        results = await context.machine_manager_facade.AddMachines(params=[params])
         error = results.machines[0].error
         if error:
             raise ValueError("Error adding machine: %s" % error.message)

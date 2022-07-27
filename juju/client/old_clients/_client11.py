@@ -2,7 +2,7 @@
 # Changes will be overwritten/lost when the file is regenerated.
 
 from juju.client.facade import Type, ReturnMapping
-from juju.client._definitions import *
+from juju.client.old_clients._definitions import *
 
 
 class ApplicationFacade(Type):
@@ -1627,25 +1627,6 @@ class ControllerFacade(Type):
                                                   'required': ['version',
                                                                'git-commit'],
                                                   'type': 'object'},
-                     'DashboardConnectionInfo': {'additionalProperties': False,
-                                                 'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                                'proxy-connection': {'$ref': '#/definitions/DashboardConnectionProxy'},
-                                                                'ssh-connection': {'$ref': '#/definitions/DashboardConnectionSSHTunnel'}},
-                                                 'required': ['proxy-connection',
-                                                              'ssh-connection'],
-                                                 'type': 'object'},
-                     'DashboardConnectionProxy': {'additionalProperties': False,
-                                                  'properties': {'config': {'patternProperties': {'.*': {'additionalProperties': True,
-                                                                                                         'type': 'object'}},
-                                                                            'type': 'object'},
-                                                                 'type': {'type': 'string'}},
-                                                  'required': ['config', 'type'],
-                                                  'type': 'object'},
-                     'DashboardConnectionSSHTunnel': {'additionalProperties': False,
-                                                      'properties': {'host': {'type': 'string'},
-                                                                     'port': {'type': 'string'}},
-                                                      'required': ['host', 'port'],
-                                                      'type': 'object'},
                      'DestroyControllerArgs': {'additionalProperties': False,
                                                'properties': {'destroy-models': {'type': 'boolean'},
                                                               'destroy-storage': {'type': 'boolean'},
@@ -1935,18 +1916,6 @@ class ControllerFacade(Type):
                                                          'access.',
                                           'properties': {'Result': {'$ref': '#/definitions/ControllerVersionResults'}},
                                           'type': 'object'},
-                    'DashboardConnectionInfo': {'description': 'DashboardConnectionInfo '
-                                                               'returns the '
-                                                               'connection '
-                                                               'information for a '
-                                                               'client to\n'
-                                                               'connect to the '
-                                                               'Juju Dashboard '
-                                                               'including any '
-                                                               'proxying '
-                                                               'information.',
-                                                'properties': {'Result': {'$ref': '#/definitions/DashboardConnectionInfo'}},
-                                                'type': 'object'},
                     'DestroyController': {'description': 'DestroyController '
                                                          'destroys the '
                                                          'controller.\n'
@@ -2238,28 +2207,6 @@ class ControllerFacade(Type):
         _params = dict()
         msg = dict(type='Controller',
                    request='ControllerVersion',
-                   version=11,
-                   params=_params)
-
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(DashboardConnectionInfo)
-    async def DashboardConnectionInfo(self):
-        '''
-        DashboardConnectionInfo returns the connection information for a client to
-        connect to the Juju Dashboard including any proxying information.
-
-
-        Returns -> DashboardConnectionInfo
-        '''
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Controller',
-                   request='DashboardConnectionInfo',
                    version=11,
                    params=_params)
 
@@ -2900,11 +2847,13 @@ class ProvisionerFacade(Type):
                                                         'major': {'type': 'integer'},
                                                         'minor': {'type': 'integer'},
                                                         'number': {'$ref': '#/definitions/Number'},
-                                                        'os-type': {'type': 'string'}},
+                                                        'os-type': {'type': 'string'},
+                                                        'series': {'type': 'string'}},
                                          'required': ['number',
                                                       'major',
                                                       'minor',
                                                       'arch',
+                                                      'series',
                                                       'os-type',
                                                       'agentstream'],
                                          'type': 'object'},
@@ -3110,56 +3059,88 @@ class ProvisionerFacade(Type):
                                              'Patch',
                                              'Build'],
                                 'type': 'object'},
-                     'ProvisioningInfo': {'additionalProperties': False,
-                                          'properties': {'ProvisioningNetworkTopology': {'$ref': '#/definitions/ProvisioningNetworkTopology'},
-                                                         'charm-lxd-profiles': {'items': {'type': 'string'},
+                     'ProvisioningInfoBase': {'additionalProperties': False,
+                                              'properties': {'charm-lxd-profiles': {'items': {'type': 'string'},
+                                                                                    'type': 'array'},
+                                                             'cloudinit-userdata': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                                 'type': 'object'}},
+                                                                                    'type': 'object'},
+                                                             'constraints': {'$ref': '#/definitions/Value'},
+                                                             'controller-config': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                                'type': 'object'}},
+                                                                                   'type': 'object'},
+                                                             'endpoint-bindings': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                                   'type': 'object'},
+                                                             'image-metadata': {'items': {'$ref': '#/definitions/CloudImageMetadata'},
                                                                                 'type': 'array'},
-                                                         'cloudinit-userdata': {'patternProperties': {'.*': {'additionalProperties': True,
-                                                                                                             'type': 'object'}},
-                                                                                'type': 'object'},
-                                                         'constraints': {'$ref': '#/definitions/Value'},
-                                                         'controller-config': {'patternProperties': {'.*': {'additionalProperties': True,
-                                                                                                            'type': 'object'}},
-                                                                               'type': 'object'},
-                                                         'endpoint-bindings': {'patternProperties': {'.*': {'type': 'string'}},
-                                                                               'type': 'object'},
-                                                         'image-metadata': {'items': {'$ref': '#/definitions/CloudImageMetadata'},
-                                                                            'type': 'array'},
-                                                         'jobs': {'items': {'type': 'string'},
-                                                                  'type': 'array'},
-                                                         'placement': {'type': 'string'},
-                                                         'root-disk': {'$ref': '#/definitions/VolumeParams'},
-                                                         'series': {'type': 'string'},
-                                                         'space-subnets': {'patternProperties': {'.*': {'items': {'type': 'string'},
-                                                                                                        'type': 'array'}},
-                                                                           'type': 'object'},
-                                                         'subnet-zones': {'patternProperties': {'.*': {'items': {'type': 'string'},
-                                                                                                       'type': 'array'}},
-                                                                          'type': 'object'},
-                                                         'tags': {'patternProperties': {'.*': {'type': 'string'}},
-                                                                  'type': 'object'},
-                                                         'volume-attachments': {'items': {'$ref': '#/definitions/VolumeAttachmentParams'},
-                                                                                'type': 'array'},
-                                                         'volumes': {'items': {'$ref': '#/definitions/VolumeParams'},
-                                                                     'type': 'array'}},
-                                          'required': ['constraints',
-                                                       'series',
-                                                       'placement',
-                                                       'jobs',
-                                                       'subnet-zones',
-                                                       'space-subnets',
-                                                       'ProvisioningNetworkTopology'],
-                                          'type': 'object'},
-                     'ProvisioningInfoResult': {'additionalProperties': False,
-                                                'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                               'result': {'$ref': '#/definitions/ProvisioningInfo'}},
-                                                'required': ['result'],
-                                                'type': 'object'},
-                     'ProvisioningInfoResults': {'additionalProperties': False,
-                                                 'properties': {'results': {'items': {'$ref': '#/definitions/ProvisioningInfoResult'},
-                                                                            'type': 'array'}},
-                                                 'required': ['results'],
-                                                 'type': 'object'},
+                                                             'jobs': {'items': {'type': 'string'},
+                                                                      'type': 'array'},
+                                                             'placement': {'type': 'string'},
+                                                             'root-disk': {'$ref': '#/definitions/VolumeParams'},
+                                                             'series': {'type': 'string'},
+                                                             'tags': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                      'type': 'object'},
+                                                             'volume-attachments': {'items': {'$ref': '#/definitions/VolumeAttachmentParams'},
+                                                                                    'type': 'array'},
+                                                             'volumes': {'items': {'$ref': '#/definitions/VolumeParams'},
+                                                                         'type': 'array'}},
+                                              'required': ['constraints',
+                                                           'series',
+                                                           'placement',
+                                                           'jobs'],
+                                              'type': 'object'},
+                     'ProvisioningInfoResultV10': {'additionalProperties': False,
+                                                   'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                                  'result': {'$ref': '#/definitions/ProvisioningInfoV10'}},
+                                                   'required': ['result'],
+                                                   'type': 'object'},
+                     'ProvisioningInfoResultsV10': {'additionalProperties': False,
+                                                    'properties': {'results': {'items': {'$ref': '#/definitions/ProvisioningInfoResultV10'},
+                                                                               'type': 'array'}},
+                                                    'required': ['results'],
+                                                    'type': 'object'},
+                     'ProvisioningInfoV10': {'additionalProperties': False,
+                                             'properties': {'ProvisioningInfoBase': {'$ref': '#/definitions/ProvisioningInfoBase'},
+                                                            'ProvisioningNetworkTopology': {'$ref': '#/definitions/ProvisioningNetworkTopology'},
+                                                            'charm-lxd-profiles': {'items': {'type': 'string'},
+                                                                                   'type': 'array'},
+                                                            'cloudinit-userdata': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                                'type': 'object'}},
+                                                                                   'type': 'object'},
+                                                            'constraints': {'$ref': '#/definitions/Value'},
+                                                            'controller-config': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                               'type': 'object'}},
+                                                                                  'type': 'object'},
+                                                            'endpoint-bindings': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                                  'type': 'object'},
+                                                            'image-metadata': {'items': {'$ref': '#/definitions/CloudImageMetadata'},
+                                                                               'type': 'array'},
+                                                            'jobs': {'items': {'type': 'string'},
+                                                                     'type': 'array'},
+                                                            'placement': {'type': 'string'},
+                                                            'root-disk': {'$ref': '#/definitions/VolumeParams'},
+                                                            'series': {'type': 'string'},
+                                                            'space-subnets': {'patternProperties': {'.*': {'items': {'type': 'string'},
+                                                                                                           'type': 'array'}},
+                                                                              'type': 'object'},
+                                                            'subnet-zones': {'patternProperties': {'.*': {'items': {'type': 'string'},
+                                                                                                          'type': 'array'}},
+                                                                             'type': 'object'},
+                                                            'tags': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                     'type': 'object'},
+                                                            'volume-attachments': {'items': {'$ref': '#/definitions/VolumeAttachmentParams'},
+                                                                                   'type': 'array'},
+                                                            'volumes': {'items': {'$ref': '#/definitions/VolumeParams'},
+                                                                        'type': 'array'}},
+                                             'required': ['constraints',
+                                                          'series',
+                                                          'placement',
+                                                          'jobs',
+                                                          'ProvisioningInfoBase',
+                                                          'subnet-zones',
+                                                          'space-subnets',
+                                                          'ProvisioningNetworkTopology'],
+                                             'type': 'object'},
                      'ProvisioningNetworkTopology': {'additionalProperties': False,
                                                      'properties': {'space-subnets': {'patternProperties': {'.*': {'items': {'type': 'string'},
                                                                                                                    'type': 'array'}},
@@ -3609,7 +3590,7 @@ class ProvisionerFacade(Type):
                                                         'It supports all positive '
                                                         'space constraints.',
                                          'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                        'Result': {'$ref': '#/definitions/ProvisioningInfoResults'}},
+                                                        'Result': {'$ref': '#/definitions/ProvisioningInfoResultsV10'}},
                                          'type': 'object'},
                     'ReleaseContainerAddresses': {'description': 'ReleaseContainerAddresses '
                                                                  'finds addresses '
@@ -4107,7 +4088,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(FindToolsResult)
-    async def FindTools(self, agentstream=None, arch=None, major=None, minor=None, number=None, os_type=None):
+    async def FindTools(self, agentstream=None, arch=None, major=None, minor=None, number=None, os_type=None, series=None):
         '''
         FindTools returns a List containing all tools matching the given parameters.
 
@@ -4117,6 +4098,7 @@ class ProvisionerFacade(Type):
         minor : int
         number : Number
         os_type : str
+        series : str
         Returns -> FindToolsResult
         '''
         if agentstream is not None and not isinstance(agentstream, (bytes, str)):
@@ -4137,6 +4119,9 @@ class ProvisionerFacade(Type):
         if os_type is not None and not isinstance(os_type, (bytes, str)):
             raise Exception("Expected os_type to be a str, received: {}".format(type(os_type)))
 
+        if series is not None and not isinstance(series, (bytes, str)):
+            raise Exception("Expected series to be a str, received: {}".format(type(series)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Provisioner',
@@ -4149,6 +4134,7 @@ class ProvisionerFacade(Type):
         _params['minor'] = minor
         _params['number'] = number
         _params['os-type'] = os_type
+        _params['series'] = series
         reply = await self.rpc(msg)
         return reply
 
@@ -4436,14 +4422,14 @@ class ProvisionerFacade(Type):
 
 
 
-    @ReturnMapping(ProvisioningInfoResults)
+    @ReturnMapping(ProvisioningInfoResultsV10)
     async def ProvisioningInfo(self, entities=None):
         '''
         ProvisioningInfo returns the provisioning information for each given machine entity.
         It supports all positive space constraints.
 
         entities : typing.Sequence[~Entity]
-        Returns -> ProvisioningInfoResults
+        Returns -> ProvisioningInfoResultsV10
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
             raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))

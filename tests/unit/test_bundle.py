@@ -307,12 +307,9 @@ class TestAddApplicationChangeRun:
         context.trusted = False
         context.model = model
 
-        info = Mock()
-        info.result.id_ = "12345"
-        info.errors.error_list.code = ''
-        info_func = base.AsyncMock(return_value=info)
+        info_func = mock.Mock(return_value=["12345", "name"])
 
-        with patch.object(charmhub.CharmHub, 'info', info_func):
+        with patch.object(charmhub.CharmHub, 'get_charm_id', info_func):
             result = await change.run(context)
         assert result == "application"
 
@@ -359,12 +356,9 @@ class TestAddApplicationChangeRun:
         context.trusted = False
         context.model = model
 
-        info = Mock()
-        info.result.id_ = "12345"
-        info.errors.error_list.code = ''
-        info_func = base.AsyncMock(return_value=info)
+        info_func = mock.Mock(return_value=["12345", "name"])
 
-        with patch.object(charmhub.CharmHub, 'info', info_func):
+        with patch.object(charmhub.CharmHub, 'get_charm_id', info_func):
             result = await change.run(context)
         assert result == "application"
 
@@ -536,15 +530,15 @@ class TestAddCharmChangeRun:
         charmstore = mock.Mock()
         charmstore.entityId = base.AsyncMock(return_value="entity_id")
 
-        client_facade = mock.Mock()
-        client_facade.AddCharm = base.AsyncMock(return_value=None)
+        charms_facade = mock.Mock()
+        charms_facade.AddCharm = base.AsyncMock(return_value=None)
 
         model = mock.Mock()
         model._add_charm = base.AsyncMock(return_value=None)
 
         context = mock.Mock()
         context.charmstore = charmstore
-        context.client_facade = client_facade
+        context.charms_facade = charms_facade
         context.origins = {}
         context.model = model
 
@@ -554,8 +548,8 @@ class TestAddCharmChangeRun:
         charmstore.entityId.assert_called_once()
         charmstore.entityId.assert_called_with("cs:charm", channel="channel")
 
-        client_facade.AddCharm.assert_called_once()
-        client_facade.AddCharm.assert_called_with(channel="channel",
+        charms_facade.AddCharm.assert_called_once()
+        charms_facade.AddCharm.assert_called_with(channel="channel",
                                                   url="entity_id",
                                                   force=False)
 
@@ -612,22 +606,22 @@ class TestAddMachineChangeRun:
 
         machines = [client.AddMachinesResult(machine="machine1")]
 
-        client_facade = mock.Mock()
-        client_facade.AddMachines = base.AsyncMock(return_value=client.AddMachinesResults(machines))
+        machine_manager_facade = mock.Mock()
+        machine_manager_facade.AddMachines = base.AsyncMock(return_value=client.AddMachinesResults(machines))
 
         context = mock.Mock()
         context.resolve.return_value = "parent_id1"
-        context.client_facade = client_facade
+        context.machine_manager_facade = machine_manager_facade
 
         result = await change.run(context)
         assert result == "machine1"
 
-        client_facade.AddMachines.assert_called_once()
-        client_facade.AddMachines.assert_called_with(params=[client.AddMachineParams(series="series",
-                                                                                     constraints="{\"cores\":1}",
-                                                                                     container_type="container_type",
-                                                                                     parent_id="parent_id1",
-                                                                                     jobs=["JobHostUnits"])])
+        machine_manager_facade.AddMachines.assert_called_once()
+        machine_manager_facade.AddMachines.assert_called_with(params=[client.AddMachineParams(series="series",
+                                                                                              constraints="{\"cores\":1}",
+                                                                                              container_type="container_type",
+                                                                                              parent_id="parent_id1",
+                                                                                              jobs=["JobHostUnits"])])
 
 
 class TestAddRelationChange(unittest.TestCase):
@@ -1109,6 +1103,7 @@ class TestBundleHandler:
             "Client": 17,
             "Application": 17,
             "Annotations": 17,
+            "MachineManager": 17,
         }
         model = mock.Mock()
         model.units = {}
