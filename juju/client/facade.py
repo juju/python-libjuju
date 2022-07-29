@@ -678,7 +678,7 @@ class Type:
             # assumes are in the form of a list
             d = {}
             for entry in data:
-                if '>' or '>=' in entry:
+                if '>' in entry or '>=' in entry:
                     # something like juju >= 2.9.31
                     i = entry.index('>')
                     key = entry[:i].strip()
