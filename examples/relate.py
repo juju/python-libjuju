@@ -17,14 +17,14 @@ from juju import jasyncio
 class MyRemoveObserver(ModelObserver):
     async def on_change(self, delta, old, new, model):
         if delta.type == 'remove':
-            assert(new.latest() == new)
-            assert(new.next() is None)
-            assert(new.dead)
-            assert(new.current)
-            assert(new.connected)
-            assert(new.previous().dead)
-            assert(not new.previous().current)
-            assert(not new.previous().connected)
+            assert (new.latest() == new)
+            assert (new.next() is None)
+            assert (new.dead)
+            assert (new.current)
+            assert (new.connected)
+            assert (new.previous().dead)
+            assert (not new.previous().current)
+            assert (not new.previous().connected)
 
 
 class MyModelObserver(ModelObserver):

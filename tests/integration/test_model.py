@@ -445,7 +445,7 @@ async def add_manual_machine_ssh(event_loop, is_root=False):
         def wait_for_network(container, timeout=30):
             """Wait for eth0 to have an ipv4 address."""
             starttime = time.time()
-            while(time.time() < starttime + timeout):
+            while time.time() < starttime + timeout:
                 time.sleep(1)
                 if 'eth0' in container.state().network:
                     addresses = container.state().network['eth0']['addresses']

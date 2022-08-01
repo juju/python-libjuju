@@ -595,7 +595,7 @@ class Connection:
         '''
         self.__request_id__ += 1
         msg['request-id'] = self.__request_id__
-        if'params' not in msg:
+        if 'params' not in msg:
             msg['params'] = {}
         if "version" not in msg:
             msg['version'] = self.facades[msg['type']]
