@@ -1014,6 +1014,14 @@ async def test_connect_to_connection(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_connect_current(event_loop):
+    m = Model()
+    await m.connect_current()
+    assert m.is_connected()
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_model_cache_update(event_loop):
     """Connecting to a new model shouldn't fail because the cache is not
     updated yet

@@ -690,14 +690,16 @@ class Model:
             await self.disconnect()
         model_name = model_uuid = None
         if 'endpoint' not in kwargs and len(args) < 2:
+            # Then we're using the model_name to pick the model
             if args and 'model_name' in kwargs:
                 raise TypeError('connect() got multiple values for model_name')
             elif args:
                 model_name = args[0]
             else:
                 model_name = kwargs.pop('model_name', None)
-            await self._connector.connect_model(model_name, **kwargs)
+            _, model_uuid = await self._connector.connect_model(model_name, **kwargs)
         else:
+            # Then we're using the endpoint to pick the model
             if 'model_name' in kwargs:
                 raise TypeError('connect() got values for both '
                                 'model_name and endpoint')
