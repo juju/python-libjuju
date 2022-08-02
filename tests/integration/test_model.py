@@ -445,7 +445,7 @@ async def add_manual_machine_ssh(event_loop, is_root=False):
         def wait_for_network(container, timeout=30):
             """Wait for eth0 to have an ipv4 address."""
             starttime = time.time()
-            while(time.time() < starttime + timeout):
+            while time.time() < starttime + timeout:
                 time.sleep(1)
                 if 'eth0' in container.state().network:
                     addresses = container.state().network['eth0']['addresses']
@@ -1010,6 +1010,14 @@ async def test_connect_to_connection(event_loop):
 
         # cleanup
         await m.disconnect()
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_connect_current(event_loop):
+    m = Model()
+    await m.connect_current()
+    assert m.is_connected()
 
 
 @base.bootstrapped

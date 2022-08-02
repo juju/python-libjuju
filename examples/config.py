@@ -37,12 +37,12 @@ async def main():
     # update and check app config
     await ubuntu_app.set_config({'tuning-level': 'fast'})
     config = await ubuntu_app.get_config()
-    assert(config['tuning-level']['value'] == 'fast')
+    assert (config['tuning-level']['value'] == 'fast')
 
     # update and check app constraints
     await ubuntu_app.set_constraints({'mem': 512 * MB})
     constraints = await ubuntu_app.get_constraints()
-    assert(constraints['mem'] == 512 * MB)
+    assert (constraints['mem'] == 512 * MB)
 
     await model.disconnect()
 

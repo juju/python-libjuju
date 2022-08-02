@@ -113,7 +113,7 @@ class Connector:
         self.controller_name = controller_name
         self.controller_uuid = controller["uuid"]
 
-    async def connect_model(self, model_name=None, **kwargs):
+    async def connect_model(self, _model_name=None, **kwargs):
         """Connect to a model by name. If either controller or model
         parts of the name are empty, the current controller and/or model
         will be used.
@@ -122,7 +122,7 @@ class Connector:
         """
 
         try:
-            controller_name, model_name = self.jujudata.parse_model(model_name)
+            controller_name, _model_name = self.jujudata.parse_model(_model_name)
             controller = self.jujudata.controllers().get(controller_name)
         except JujuError as e:
             raise JujuConnectionError(e.message) from e
@@ -134,8 +134,8 @@ class Connector:
         models = self.jujudata.models().get(controller_name, {}).get('models',
                                                                      {})
         model_uuid = None
-        if model_name in models:
-            model_uuid = models[model_name]['uuid']
+        if _model_name in models:
+            model_uuid = models[_model_name]['uuid']
         else:
             # let's try to find it through the actual controller
             await self.connect_controller(controller_name=controller_name)
@@ -146,11 +146,11 @@ class Connector:
             response = await controller_facade.AllModels()
             # search the one that contains admin/model_name
             for user_model in response.user_models:
-                if 'admin/' + user_model.model.name == model_name:
+                if 'admin/' + user_model.model.name == _model_name:
                     model_uuid = user_model.model.uuid
 
         if model_uuid is None:
-            raise JujuConnectionError('Model not found: {}'.format(model_name))
+            raise JujuConnectionError('Model not found: {}'.format(_model_name))
 
         proxy = proxy_from_config(controller.get('proxy-config', None))
 
@@ -167,7 +167,8 @@ class Connector:
         # TODO this might be a good spot to trigger refreshing the
         # local cache (the connection to the model might help)
         self.controller_name = controller_name
-        self.model_name = controller_name + ':' + model_name
+        self.model_name = controller_name + ':' + _model_name
+        return self.controller_name, model_uuid
 
     def bakery_client_for_controller(self, controller_name):
         '''Make a copy of the bakery client with a the appropriate controller's

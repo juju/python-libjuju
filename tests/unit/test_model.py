@@ -170,6 +170,7 @@ class TestModelConnect(asynctest.TestCase):
     @pytest.mark.asyncio
     async def test_no_args(self, mock_connect_model, _):
         m = Model()
+        mock_connect_model.side_effect = [("_", "uuid")]
         await m.connect()
         mock_connect_model.assert_called_once_with(None)
 
@@ -177,6 +178,7 @@ class TestModelConnect(asynctest.TestCase):
     @pytest.mark.asyncio
     async def test_with_model_name(self, mock_connect_model, _):
         m = Model()
+        mock_connect_model.side_effect = [("_", "uuid")]
         await m.connect(model_name='foo')
         mock_connect_model.assert_called_once_with('foo')
 
@@ -184,6 +186,7 @@ class TestModelConnect(asynctest.TestCase):
     @pytest.mark.asyncio
     async def test_with_endpoint_but_no_uuid(self, mock_connect_model, _):
         m = Model()
+        mock_connect_model.side_effect = [("_", "uuid")]
         with self.assertRaises(TypeError):
             await m.connect(endpoint='0.1.2.3:4566')
         self.assertEqual(mock_connect_model.call_count, 0)
@@ -251,6 +254,7 @@ class TestModelConnect(asynctest.TestCase):
     @asynctest.patch('juju.client.connector.Connector.connect')
     async def test_with_posargs(self, mock_connect, mock_connect_model, _):
         m = Model()
+        mock_connect_model.side_effect = [("_", "uuid")]
         await m.connect('foo')
         mock_connect_model.assert_called_once_with('foo')
         with self.assertRaises(TypeError):

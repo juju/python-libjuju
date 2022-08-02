@@ -499,7 +499,10 @@ class Controller:
         facade = client.ModelManagerFacade.from_connection(self.connection())
         if model_uuid is None:
             uuids = await self.model_uuids()
-            model_uuid = uuids[model_name]
+            try:
+                model_uuid = uuids[model_name]
+            except KeyError:
+                raise errors.JujuError("{} is not among the models in the controller : {}".format(model_name, uuids))
         entity = client.Entity(tag.model(model_uuid))
         _model_info_results = await facade.ModelInfo(entities=[entity])
         return _model_info_results.results[0].result
