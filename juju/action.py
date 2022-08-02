@@ -7,4 +7,4 @@ class Action(model.ModelEntity):
         return self.data['status']
 
     async def wait(self):
-        return await self.model.wait_for_action(self.id)
+        return await self.model.get_action_output(self.id)

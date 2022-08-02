@@ -164,19 +164,19 @@ class Unit(model.ModelEntity):
 
         log.debug('Starting action `%s` on %s', action_name, self.name)
 
-        res = await action_facade.Enqueue(actions=[client.Action(
+        res = await action_facade.EnqueueOperation(actions=[client.Action(
             name=action_name,
             parameters=params,
             receiver=self.tag,
         )])
-        action = res.results[0].action
-        error = res.results[0].error
+        action = res.actions[0].result
+        error = res.actions[0].error
         if error and error.code == 'not found':
             raise ValueError('Action `%s` not found on %s' % (action_name,
                                                               self.name))
         elif error:
             raise Exception('Unknown action error: %s' % error.serialize())
-        action_id = action.tag[len('action-'):]
+        action_id = action[len('action-'):]
         log.debug('Action started as %s', action_id)
         # we mustn't use wait_for_action because that blocks until the
         # action is complete, rather than just being in the model
