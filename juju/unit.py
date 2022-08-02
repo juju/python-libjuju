@@ -120,6 +120,26 @@ class Unit(model.ModelEntity):
             retry=retry,
             tags={'entities': [{'tag': self.tag}]})
 
+    async def add_storage(self, storage_name, storage_constraint=""):
+        """Creates a storage and adds it to this unit.
+
+        :param: str storage_name: Name of the storage
+        :param: str storage_constraint: description of how Juju should provision storage instances for the unit.
+        The following three forms are accepted:
+        <storage-pool>[,<count>][,<size>]
+        <count>[,<size>]
+        <size>
+
+        :return:
+        """
+        # TODO (cderici) : storage_constraints
+
+        storage_facade = client.StorageFacade.from_connection(self.connection)
+        return await storage_facade.AddToUnit(storages=[client.StorageAddParams(
+            name=storage_name,
+            unit=tag.unit(self.name),
+        )])
+
     async def run(self, command, timeout=None):
         """Run command on this unit.
 
