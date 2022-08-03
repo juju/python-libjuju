@@ -104,6 +104,41 @@ class Unit(model.ModelEntity):
             raise JujuAPIError("expected one result")
         return defResult.results[0].result.get('public-address', None)
 
+    async def get_relation_data(self, endpoint: str, related_endpoint: str,
+                                remote: str):
+        """Return the relation data as seen from this unit.
+
+        Example:
+            >>> data = await get_relation_data('db', 'db', 'webserver')
+            >>> assert data.applicationdata == {'foo': 'bar'}
+            >>> assert data.unit_relation_data['webserver/0'] == {'foo': 'bar'}
+
+        :return RelationData | None
+        """
+        app_facade = client.ApplicationFacade.from_connection(self.connection)
+        defResult = await app_facade.UnitsInfo(entities=[client.Entity(self.tag)])
+        if defResult is not None and len(defResult.results) > 1:
+            raise JujuAPIError("expected one result")
+        elif defResult is None:
+            return None
+
+        relations_data = defResult.results[0].result.get('relation_data', [])
+
+        def search(relation):
+            return (relation.endpoint == endpoint and
+                    relation.related_endpoint == related_endpoint and
+                    list(relation.unit_relation_data.keys())[0].split('/')[0] == remote)
+
+        try:
+            relation_data = next(filter(search, relations_data))
+        except StopIteration:
+            log.error("no relation found with endpoint == {} "
+                      "and related_endpoint == {}"
+                      .format(endpoint, related_endpoint))
+            return None
+
+        return relation_data
+
     async def resolved(self, retry=False):
         """Mark unit errors resolved.
 

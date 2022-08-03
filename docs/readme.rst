@@ -59,7 +59,7 @@ ubuntu charm, then exits:
       model = Model()
 
       # Connect to the currently active Juju model
-      await model.connect_current()
+      await model.connect()
 
       try:
           # Deploy a single unit of the ubuntu charm, using the latest revision
@@ -119,7 +119,7 @@ and then, to connect to the current model and fetch status:
 
   >>> from juju.model import Model
   >>> model = Model()
-  >>> await model.connect_current()
+  >>> await model.connect()
   >>> status = await model.get_status()
 
 
