@@ -120,25 +120,32 @@ class Unit(model.ModelEntity):
             retry=retry,
             tags={'entities': [{'tag': self.tag}]})
 
-    async def add_storage(self, storage_name, storage_constraint=""):
+    async def add_storage(self, storage_name, pool=None, count=1, size=1024):
         """Creates a storage and adds it to this unit.
 
         :param: str storage_name: Name of the storage
-        :param: str storage_constraint: description of how Juju should provision storage instances for the unit.
-        The following three forms are accepted:
-        <storage-pool>[,<count>][,<size>]
-        <count>[,<size>]
-        <size>
+        :param: str pool: the storage pool to provision storage instances from. Must
+        be a name from 'juju storage-pools'.  The default pool is available via
+        executing 'juju model-config storage-default-block-source'.
+        :param: int count: the number of storage instances to provision from <storage-pool> of
+        <size>. Must be a positive integer. The default count is "1". May be restricted
+        by the charm, which can specify a maximum number of storage instances per unit.
+        :param: int size: the required size of the storage instance, in MiB.
 
         :return:
         """
-        # TODO (cderici) : storage_constraints
+        constraints = None
+        if pool:
+            constraints = client.StorageConstraints(pool=pool, count=count, size=size)
 
         storage_facade = client.StorageFacade.from_connection(self.connection)
-        return await storage_facade.AddToUnit(storages=[client.StorageAddParams(
+        res = await storage_facade.AddToUnit(storages=[client.StorageAddParams(
             name=storage_name,
             unit=tag.unit(self.name),
+            storage=constraints,
         )])
+        import pdb;pdb.set_trace()
+        return res
 
     async def run(self, command, timeout=None):
         """Run command on this unit.
