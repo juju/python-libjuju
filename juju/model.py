@@ -933,6 +933,24 @@ class Model:
             attrs=_attrs,
         )])
 
+    async def list_storage(self, filesystem=False, volume=False):
+        """Lists storage details.
+
+        :param bool filesystem: List filesystem storage
+        :param bool volume: List volume storage
+        :return:
+        """
+        storage_facade = client.StorageFacade.from_connection(self.connection)
+        if filesystem and volume:
+            raise JujuError("--filesystem and --volume can not be used together")
+        if filesystem:
+            res = await storage_facade.ListFilesystems(filters=[])
+        elif volume:
+            res = await storage_facade.ListVolumes(filters=[])
+        else:
+            res = await storage_facade.ListStorageDetails(filters=[])
+        return res.results
+
     async def list_storage_pools(self):
         """List storage pools.
 
