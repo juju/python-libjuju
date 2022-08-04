@@ -951,6 +951,19 @@ class Model:
             res = await storage_facade.ListStorageDetails(filters=[])
         return res.results
 
+    async def show_storage_details(self, *storage_ids):
+        """Shows storage instance information.
+
+        :param []str storage_ids:
+        :return:
+        """
+        if not storage_ids:
+            raise JujuError("Expected at least one storage ID")
+
+        storage_facade = client.StorageFacade.from_connection(self.connection)
+        res = await storage_facade.StorageDetails(entities=[client.Entity(tag.storage(s)) for s in storage_ids])
+        return res.results
+
     async def list_storage_pools(self):
         """List storage pools.
 
