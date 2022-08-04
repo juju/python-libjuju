@@ -907,12 +907,21 @@ class Model:
             attrs=dict(_attrs)
         )])
 
+    async def remove_storage_pool(self, name):
+        """Remove an existing storage pool.
+
+        :param str name:
+        :return:
+        """
+        storage_facade = client.StorageFacade.from_connection(self.connection)
+        return await storage_facade.RemovePool(pools=[name])
+
     async def remove_storage(self, force=False, destroy_storage=False, *storage_ids):
         """Removes storage from the model.
 
-        :param force: Remove storage even if it is currently attached
-        :param destroy_storage: Remove the storage and destroy it
-        :param storage_ids:
+        :param bool force: Remove storage even if it is currently attached
+        :param bool destroy_storage: Remove the storage and destroy it
+        :param []str storage_ids:
         :return:
         """
         if not storage_ids:
