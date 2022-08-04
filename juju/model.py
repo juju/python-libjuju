@@ -933,6 +933,16 @@ class Model:
             attrs=_attrs,
         )])
 
+    async def list_storage_pools(self):
+        """List storage pools.
+
+        :return:
+        """
+        # TODO (cderici): Filter on pool type, name.
+        storage_facade = client.StorageFacade.from_connection(self.connection)
+        res = await storage_facade.ListPools(filters=[])
+        return res.results
+
     async def remove_storage(self, force=False, destroy_storage=False, *storage_ids):
         """Removes storage from the model.
 
