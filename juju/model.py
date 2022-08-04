@@ -907,6 +907,24 @@ class Model:
             attrs=dict(_attrs)
         )])
 
+    async def remove_storage(self, force=False, destroy_storage=False, *storage_ids):
+        """Removes storage from the model.
+
+        :param force: Remove storage even if it is currently attached
+        :param destroy_storage: Remove the storage and destroy it
+        :param storage_ids:
+        :return:
+        """
+        if not storage_ids:
+            raise JujuError("Expected at least one storage ID")
+
+        storage_facade = client.StorageFacade.from_connection(self.connection)
+        return await storage_facade.Remove(storage=[client.RemoveStorageInstance(
+            destroy_storage=destroy_storage,
+            force=False,
+            tag=tag.storage(s)
+        ) for s in storage_ids])
+
     async def remove_application(self, app_name, block_until_done=False):
         """Removes the given application from the model.
 
