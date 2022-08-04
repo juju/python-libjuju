@@ -916,6 +916,23 @@ class Model:
         storage_facade = client.StorageFacade.from_connection(self.connection)
         return await storage_facade.RemovePool(pools=[name])
 
+    async def update_storage_pool(self, name, attributes=""):
+        """ Update storage pool attributes.
+
+        :param name:
+        :param attributes: "key=value key=value ..."
+        :return:
+        """
+        _attrs = dict([splt.split("=") for splt in attributes.split()])
+        if len(_attrs) == 0:
+            raise JujuError("Expected at least one attribute to update")
+
+        storage_facade = client.StorageFacade.from_connection(self.connection)
+        return await storage_facade.UpdatePool(pools=[client.StoragePool(
+            name=name,
+            attrs=_attrs,
+        )])
+
     async def remove_storage(self, force=False, destroy_storage=False, *storage_ids):
         """Removes storage from the model.
 
