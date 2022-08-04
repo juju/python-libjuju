@@ -888,6 +888,25 @@ class Model:
             lambda: len(self.machines) == 0
         )
 
+    async def create_storage_pool(self, name, provider_type, attributes=""):
+        """Create or define a storage pool.
+
+        :param str name: a pool name
+        :param str provider_type: provider type (defaults to "kubernetes" for
+        Kubernetes models)
+        :param str attributes: attributes for configuration as space-separated pairs,
+        e.g. tags, size, path, etc.
+        :return:
+        """
+        _attrs = [splt.split("=") for splt in attributes.split()]
+
+        storage_facade = client.StorageFacade.from_connection(self.connection)
+        return await storage_facade.CreatePool(pools=[client.StoragePool(
+            name=name,
+            provider=provider_type,
+            attrs=dict(_attrs)
+        )])
+
     async def remove_application(self, app_name, block_until_done=False):
         """Removes the given application from the model.
 

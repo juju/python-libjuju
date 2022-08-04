@@ -43,8 +43,10 @@ def user(username):
 def application(app_name):
     return _prefix('application-', app_name)
 
+
 def storage(app_name):
     return _prefix('storage-', app_name)
+
 
 def unit(unit_name):
     return _prefix('unit-', unit_name.replace('/', '-'))
