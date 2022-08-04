@@ -2,7 +2,7 @@ import logging
 
 import pyrfc3339
 
-from juju.errors import JujuAPIError
+from juju.errors import JujuAPIError, JujuError
 
 from . import model, tag
 from .annotationhelper import _get_annotations, _set_annotations
@@ -139,13 +139,26 @@ class Unit(model.ModelEntity):
             constraints = client.StorageConstraints(pool=pool, count=count, size=size)
 
         storage_facade = client.StorageFacade.from_connection(self.connection)
-        res = await storage_facade.AddToUnit(storages=[client.StorageAddParams(
+        return await storage_facade.AddToUnit(storages=[client.StorageAddParams(
             name=storage_name,
             unit=tag.unit(self.name),
             storage=constraints,
         )])
-        import pdb;pdb.set_trace()
-        return res
+
+    async def attach_storage(self, storage_ids=[]):
+        """Attaches existing storage to this unit.
+
+        :param [str] storage_ids: existing storage ids to attach to the unit
+        :return:
+        """
+        if not storage_ids:
+            raise JujuError("Expected a storage ID to be attached to unit {}".format(self.name))
+
+        storage_facade = client.StorageFacade.from_connection(self.connection)
+        return await storage_facade.Attach(ids=[client.StorageAttachmentId(
+            storage_tag=tag.storage(s_id),
+            unit_tag=self.tag,
+        ) for s_id in storage_ids])
 
     async def run(self, command, timeout=None):
         """Run command on this unit.
