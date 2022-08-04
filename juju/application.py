@@ -126,10 +126,12 @@ class Application(model.ModelEntity):
 
         return await self.model.relate(local_relation, remote_relation)
 
-    async def add_unit(self, count=1, to=None):
+    async def add_unit(self, count=1, to=None, attach_storage=[]):
         """Add one or more units to this application.
 
         :param int count: Number of units to add
+        :param [str] attach_storage: Existing storage to attach to the deployed unit
+        (not available on k8s models)
         :param str to: Placement directive, e.g.::
             '23' - machine 23
             'lxc:7' - new lxc container on machine 7
@@ -153,6 +155,7 @@ class Application(model.ModelEntity):
             application=self.name,
             placement=parse_placement(to) if to else None,
             num_units=count,
+            attach_storage=attach_storage,
         )
 
         return await jasyncio.gather(*[
