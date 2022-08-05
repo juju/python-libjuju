@@ -1077,3 +1077,15 @@ async def test_list_storage(event_loop):
         await model.list_storage(volume=True)
 
         assert any([tag.storage("pgdata") in s['storage-tag'] for s in storages])
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_storage_pools(event_loop):
+    async with base.CleanModel() as model:
+        await model.deploy('postgresql')
+        await model.wait_for_idle(status="active")
+
+        await model.create_storage_pool("test-pool", "lxd")
+        pools = await model.list_storage_pools()
+        assert "test-pool" in [p['name'] for p in pools]

@@ -900,7 +900,7 @@ class Model:
         """
         _attrs = [splt.split("=") for splt in attributes.split()]
 
-        storage_facade = client.StorageFacade.from_connection(self.connection)
+        storage_facade = client.StorageFacade.from_connection(self.connection())
         return await storage_facade.CreatePool(pools=[client.StoragePool(
             name=name,
             provider=provider_type,
@@ -913,7 +913,7 @@ class Model:
         :param str name:
         :return:
         """
-        storage_facade = client.StorageFacade.from_connection(self.connection)
+        storage_facade = client.StorageFacade.from_connection(self.connection())
         return await storage_facade.RemovePool(pools=[name])
 
     async def update_storage_pool(self, name, attributes=""):
@@ -927,7 +927,7 @@ class Model:
         if len(_attrs) == 0:
             raise JujuError("Expected at least one attribute to update")
 
-        storage_facade = client.StorageFacade.from_connection(self.connection)
+        storage_facade = client.StorageFacade.from_connection(self.connection())
         return await storage_facade.UpdatePool(pools=[client.StoragePool(
             name=name,
             attrs=_attrs,
@@ -968,7 +968,7 @@ class Model:
         if not storage_ids:
             raise JujuError("Expected at least one storage ID")
 
-        storage_facade = client.StorageFacade.from_connection(self.connection)
+        storage_facade = client.StorageFacade.from_connection(self.connection())
         res = await storage_facade.StorageDetails(entities=[client.Entity(tag.storage(s)) for s in storage_ids])
         return res.results
 
@@ -978,9 +978,12 @@ class Model:
         :return:
         """
         # TODO (cderici): Filter on pool type, name.
-        storage_facade = client.StorageFacade.from_connection(self.connection)
-        res = await storage_facade.ListPools(filters=[])
-        return res.results
+        storage_facade = client.StorageFacade.from_connection(self.connection())
+        res = await storage_facade.ListPools(filters=[client.StoragePoolFilter()])
+        err = res.results[0].error
+        if err:
+            raise JujuError(err.message)
+        return [p.serialize() for p in res.results[0].storage_pools]
 
     async def remove_storage(self, force=False, destroy_storage=False, *storage_ids):
         """Removes storage from the model.
@@ -993,7 +996,7 @@ class Model:
         if not storage_ids:
             raise JujuError("Expected at least one storage ID")
 
-        storage_facade = client.StorageFacade.from_connection(self.connection)
+        storage_facade = client.StorageFacade.from_connection(self.connection())
         return await storage_facade.Remove(storage=[client.RemoveStorageInstance(
             destroy_storage=destroy_storage,
             force=False,
