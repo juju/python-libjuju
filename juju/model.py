@@ -940,16 +940,24 @@ class Model:
         :param bool volume: List volume storage
         :return:
         """
-        storage_facade = client.StorageFacade.from_connection(self.connection)
+        storage_facade = client.StorageFacade.from_connection(self.connection())
+
         if filesystem and volume:
             raise JujuError("--filesystem and --volume can not be used together")
         if filesystem:
-            res = await storage_facade.ListFilesystems(filters=[])
+            _res = await storage_facade.ListFilesystems(filters=[client.FilesystemFilter()])
         elif volume:
-            res = await storage_facade.ListVolumes(filters=[])
+            _res = await storage_facade.ListVolumes(filters=[client.VolumeFilter()])
         else:
-            res = await storage_facade.ListStorageDetails(filters=[])
-        return res.results
+            _res = await storage_facade.ListStorageDetails(filters=[client.StorageFilter()])
+
+        err = _res.results[0].error
+        res = _res.results[0].result
+
+        if err is not None:
+            raise JujuError(err.message)
+
+        return [details.serialize() for details in res]
 
     async def show_storage_details(self, *storage_ids):
         """Shows storage instance information.

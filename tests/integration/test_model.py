@@ -1062,3 +1062,18 @@ async def test_add_storage(event_loop):
         unit = app.units[0]
         ret = await unit.add_storage("pgdata")
         assert any([tag.storage("pgdata") in s for s in ret])
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_list_storage(event_loop):
+    async with base.CleanModel() as model:
+        app = await model.deploy('postgresql')
+        await model.wait_for_idle(status="active")
+        unit = app.units[0]
+        await unit.add_storage("pgdata")
+        storages = await model.list_storage()
+        await model.list_storage(filesystem=True)
+        await model.list_storage(volume=True)
+
+        assert any([tag.storage("pgdata") in s['storage-tag'] for s in storages])
