@@ -12,7 +12,7 @@ import paramiko
 
 import pylxd
 import pytest
-from juju import jasyncio
+from juju import jasyncio, tag
 from juju.client import client
 from juju.errors import JujuError, JujuUnitError, JujuConnectionError
 from juju.model import Model, ModelObserver
@@ -1051,3 +1051,14 @@ async def test_model_cache_update(event_loop):
         await model.disconnect()
         await m.disconnect()
         await controller.destroy_models(model_name)
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_add_storage(event_loop):
+    async with base.CleanModel() as model:
+        app = await model.deploy('postgresql')
+        await model.wait_for_idle(status="active")
+        unit = app.units[0]
+        ret = await unit.add_storage("pgdata")
+        assert any([tag.storage("pgdata") in s for s in ret])

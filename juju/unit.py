@@ -132,18 +132,23 @@ class Unit(model.ModelEntity):
         by the charm, which can specify a maximum number of storage instances per unit.
         :param: int size: the required size of the storage instance, in MiB.
 
-        :return:
+        :return: []str storage_tags
         """
-        constraints = None
+        constraints = client.StorageConstraints(count=count)
         if pool:
             constraints = client.StorageConstraints(pool=pool, count=count, size=size)
 
         storage_facade = client.StorageFacade.from_connection(self.connection)
-        return await storage_facade.AddToUnit(storages=[client.StorageAddParams(
+        res = await storage_facade.AddToUnit(storages=[client.StorageAddParams(
             name=storage_name,
             unit=tag.unit(self.name),
             storage=constraints,
         )])
+        result = res.results[0]
+        if result.error is not None:
+            raise JujuError("{}".format(result.error))
+        storage_details = result.result
+        return storage_details.storage_tags
 
     async def attach_storage(self, storage_ids=[]):
         """Attaches existing storage to this unit.
