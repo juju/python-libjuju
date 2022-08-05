@@ -1089,3 +1089,8 @@ async def test_storage_pools(event_loop):
         await model.create_storage_pool("test-pool", "lxd")
         pools = await model.list_storage_pools()
         assert "test-pool" in [p['name'] for p in pools]
+
+        await model.remove_storage_pool("test-pool")
+        await jasyncio.sleep(5)
+        pools = await model.list_storage_pools()
+        assert "test-pool" not in [p['name'] for p in pools]

@@ -914,7 +914,7 @@ class Model:
         :return:
         """
         storage_facade = client.StorageFacade.from_connection(self.connection())
-        return await storage_facade.RemovePool(pools=[name])
+        return await storage_facade.RemovePool(pools=[client.StoragePoolDeleteArg(name)])
 
     async def update_storage_pool(self, name, attributes=""):
         """ Update storage pool attributes.
