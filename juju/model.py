@@ -985,7 +985,7 @@ class Model:
             raise JujuError(err.message)
         return [p.serialize() for p in res.results[0].storage_pools]
 
-    async def remove_storage(self,  *storage_ids, force=False, destroy_storage=False):
+    async def remove_storage(self, *storage_ids, force=False, destroy_storage=False):
         """Removes storage from the model.
 
         :param bool force: Remove storage even if it is currently attached
