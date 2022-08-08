@@ -1079,8 +1079,8 @@ async def test_detach_storage(event_loop):
         storage_details_1 = _storage_details_1[0]
         assert 'unit-postgresql-0' in storage_details_1['attachments']
 
-        await unit.detach_storage(storage_id)
-        await jasyncio.sleep(10)
+        await unit.detach_storage(storage_id, force=True)
+        await jasyncio.sleep(20)
 
         _storage_details_2 = await model.show_storage_details(storage_id)
         storage_details_2 = _storage_details_2[0]
@@ -1088,7 +1088,7 @@ async def test_detach_storage(event_loop):
             storage_details_2['attachments']['unit-postgresql-0'].life == 'dying'
 
         # remove_storage
-        await model.remove_storage(storage_id)
+        await model.remove_storage(storage_id, force=True)
         await jasyncio.sleep(10)
         storages = await model.list_storage()
         assert all([storage_id not in s['storage-tag'] for s in storages])
