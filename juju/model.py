@@ -970,7 +970,7 @@ class Model:
 
         storage_facade = client.StorageFacade.from_connection(self.connection())
         res = await storage_facade.StorageDetails(entities=[client.Entity(tag.storage(s)) for s in storage_ids])
-        return res.results
+        return [s.result.serialize() for s in res.results]
 
     async def list_storage_pools(self):
         """List storage pools.

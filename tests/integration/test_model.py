@@ -1066,6 +1066,29 @@ async def test_add_storage(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_detach_storage(event_loop):
+    async with base.CleanModel() as model:
+        app = await model.deploy('postgresql')
+        await model.wait_for_idle(status="active")
+        unit = app.units[0]
+        storage_ids = await unit.add_storage("pgdata")
+        storage_id = storage_ids[0]
+        await jasyncio.sleep(5)
+
+        _storage_details_1 = await model.show_storage_details(storage_id)
+        storage_details_1 = _storage_details_1[0]
+        assert 'unit-postgresql-0' in storage_details_1['attachments']
+
+        await unit.detach_storage(storage_id)
+        await jasyncio.sleep(10)
+
+        _storage_details_2 = await model.show_storage_details(storage_id)
+        storage_details_2 = _storage_details_2[0]
+        assert 'unit-postgresql-0' not in storage_details_2['attachments']
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_list_storage(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy('postgresql')

@@ -165,7 +165,7 @@ class Unit(model.ModelEntity):
             unit_tag=self.tag,
         ) for s_id in storage_ids])
 
-    async def detach_storage(self, force=False, *storage_ids):
+    async def detach_storage(self, *storage_ids, force=False):
         """Detaches storage from units.
 
         :param bool force: Forcefully detach storage
@@ -176,13 +176,15 @@ class Unit(model.ModelEntity):
             raise JujuError("Expected at least one storage ID")
 
         storage_facade = client.StorageFacade.from_connection(self.connection)
-        return await storage_facade.DetachStorage(
+        ret = await storage_facade.DetachStorage(
             force=force,
-            ids=[client.StorageAttachmentIds(ids=[client.StorageAttachmentId(
+            ids=client.StorageAttachmentIds(ids=[client.StorageAttachmentId(
                 storage_tag=tag.storage(s),
                 unit_tag=self.tag,
-            ) for s in storage_ids])]
+            ) for s in storage_ids])
         )
+        if ret.results[0].error:
+            raise JujuError(ret.results[0].error.message)
 
     async def run(self, command, timeout=None):
         """Run command on this unit.
