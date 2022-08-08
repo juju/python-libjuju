@@ -177,9 +177,9 @@ async def test_wait_local_charm_waiting_timeout(event_loop):
 @pytest.mark.asyncio
 async def test_deploy_bundle(event_loop):
     async with base.CleanModel() as model:
-        await model.deploy('ch:lma-light', channel='edge', trust=True)
+        await model.deploy('canonical-livepatch-onprem', channel='edge', trust=True)
 
-        for app in ('alertmanager', 'grafana', 'loki', 'prometheus'):
+        for app in ('haproxy', 'livepatch', 'postgresql', 'ubuntu-advantage'):
             assert app in model.applications
 
 
@@ -271,13 +271,13 @@ async def test_deploy_local_charm_folder_symlink(event_loop):
 @pytest.mark.asyncio
 async def test_deploy_trusted_bundle(event_loop):
     async with base.CleanModel() as model:
-        await model.deploy('ch:lma-light', channel='edge', trust=True)
+        await model.deploy('canonical-livepatch-onprem', channel='stable', trust=True)
 
-        for app in ('alertmanager', 'grafana', 'loki', 'prometheus'):
+        for app in ('haproxy', 'livepatch', 'postgresql', 'ubuntu-advantage'):
             assert app in model.applications
 
-        grafana_app = model.applications['grafana']
-        trusted = await grafana_app.get_trusted()
+        haproxy_app = model.applications['haproxy']
+        trusted = await haproxy_app.get_trusted()
         assert trusted is True
 
 
