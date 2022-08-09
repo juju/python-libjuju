@@ -1067,6 +1067,7 @@ async def test_add_storage(event_loop):
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_detach_storage(event_loop):
+    pytest.skip('detach/attach_storage inconsistent on Juju side, unable to test')
     async with base.CleanModel() as model:
         app = await model.deploy('postgresql')
         await model.wait_for_idle(status="active")
