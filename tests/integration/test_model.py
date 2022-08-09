@@ -12,7 +12,7 @@ import paramiko
 
 import pylxd
 import pytest
-from juju import jasyncio
+from juju import jasyncio, tag
 from juju.client import client
 from juju.errors import JujuError, JujuUnitError, JujuConnectionError
 from juju.model import Model, ModelObserver
@@ -1051,3 +1051,77 @@ async def test_model_cache_update(event_loop):
         await model.disconnect()
         await m.disconnect()
         await controller.destroy_models(model_name)
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_add_storage(event_loop):
+    async with base.CleanModel() as model:
+        app = await model.deploy('postgresql')
+        await model.wait_for_idle(status="active")
+        unit = app.units[0]
+        ret = await unit.add_storage("pgdata")
+        assert any([tag.storage("pgdata") in s for s in ret])
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_detach_storage(event_loop):
+    pytest.skip('detach/attach_storage inconsistent on Juju side, unable to test')
+    async with base.CleanModel() as model:
+        app = await model.deploy('postgresql')
+        await model.wait_for_idle(status="active")
+        unit = app.units[0]
+        storage_ids = await unit.add_storage("pgdata")
+        storage_id = storage_ids[0]
+        await jasyncio.sleep(5)
+
+        _storage_details_1 = await model.show_storage_details(storage_id)
+        storage_details_1 = _storage_details_1[0]
+        assert 'unit-postgresql-0' in storage_details_1['attachments']
+
+        await unit.detach_storage(storage_id, force=True)
+        await jasyncio.sleep(20)
+
+        _storage_details_2 = await model.show_storage_details(storage_id)
+        storage_details_2 = _storage_details_2[0]
+        assert ('unit-postgresql-0' not in storage_details_2['attachments']) or \
+            storage_details_2['attachments']['unit-postgresql-0'].life == 'dying'
+
+        # remove_storage
+        await model.remove_storage(storage_id, force=True)
+        await jasyncio.sleep(10)
+        storages = await model.list_storage()
+        assert all([storage_id not in s['storage-tag'] for s in storages])
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_list_storage(event_loop):
+    async with base.CleanModel() as model:
+        app = await model.deploy('postgresql')
+        await model.wait_for_idle(status="active")
+        unit = app.units[0]
+        await unit.add_storage("pgdata")
+        storages = await model.list_storage()
+        await model.list_storage(filesystem=True)
+        await model.list_storage(volume=True)
+
+        assert any([tag.storage("pgdata") in s['storage-tag'] for s in storages])
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_storage_pools(event_loop):
+    async with base.CleanModel() as model:
+        await model.deploy('postgresql')
+        await model.wait_for_idle(status="active")
+
+        await model.create_storage_pool("test-pool", "lxd")
+        pools = await model.list_storage_pools()
+        assert "test-pool" in [p['name'] for p in pools]
+
+        await model.remove_storage_pool("test-pool")
+        await jasyncio.sleep(5)
+        pools = await model.list_storage_pools()
+        assert "test-pool" not in [p['name'] for p in pools]
