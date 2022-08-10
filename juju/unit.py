@@ -227,22 +227,27 @@ class Unit(model.ModelEntity):
 
         """
         action_facade = client.ActionFacade.from_connection(self.connection)
-
         log.debug('Starting action `%s` on %s', action_name, self.name)
 
-        res = await action_facade.EnqueueOperation(actions=[client.Action(
+        old_client = self.connection.is_using_old_client
+
+        op = action_facade.Enqueue if old_client else action_facade.EnqueueOperation
+        res = await op(actions=[client.Action(
             name=action_name,
             parameters=params,
             receiver=self.tag,
         )])
-        action = res.actions[0].result
-        error = res.actions[0].error
+
+        _action = res.results[0] if old_client else res.actions[0]
+        action = _action.action
+        error = _action.error
+
         if error and error.code == 'not found':
             raise ValueError('Action `%s` not found on %s' % (action_name,
                                                               self.name))
         elif error:
             raise Exception('Unknown action error: %s' % error.serialize())
-        action_id = action[len('action-'):]
+        action_id = action.tag[len('action-'):]
         log.debug('Action started as %s', action_id)
         # we mustn't use wait_for_action because that blocks until the
         # action is complete, rather than just being in the model

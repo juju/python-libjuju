@@ -2262,7 +2262,19 @@ class Model:
             constraints=constraints)
 
     async def get_action_output(self, action_uuid, wait=None):
-        """Get the results of an action by ID.
+        """ Get the results of an action by ID.
+
+        :param str action_uuid: Id of the action
+        :param int wait: Time in seconds to wait for action to complete.
+        :return dict: Output from action
+        :raises: :class:`JujuError` if invalid action_uuid
+        """
+        action = await self._get_completed_action(action_uuid, wait=wait)
+        # ActionResult.output is None if the action produced no output
+        return {} if action.output is None else action.output
+
+    async def _get_completed_action(self, action_uuid, wait=None):
+        """Get the completed internal _definitions.Action object.
 
         :param str action_uuid: Id of the action
         :param int wait: Time in seconds to wait for action to complete.
@@ -2288,13 +2300,8 @@ class Model:
         await jasyncio.wait_for(
             _wait_for_action_status(),
             timeout=wait)
-        action_output = await action_facade.Actions(entities=entity)
-        # ActionResult.output is None if the action produced no output
-        if action_output.results[0].output is None:
-            output = {}
-        else:
-            output = action_output.results[0].output
-        return output
+        action_results = await action_facade.Actions(entities=entity)
+        return action_results.results[0]
 
     async def get_action_status(self, uuid_or_prefix=None, name=None):
         """Get the status of all actions, filtered by ID, ID prefix, or name.
