@@ -30,6 +30,7 @@ setup(
     version=version.read_text().strip(),
     packages=find_packages(
         exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
+    package_data={'juju': ['py.typed']},
     install_requires=[
         'macaroonbakery>=1.1,<2.0',
         'pyRFC3339>=1.0,<2.0',
