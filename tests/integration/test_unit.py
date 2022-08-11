@@ -78,23 +78,37 @@ async def test_run(event_loop):
             channel='stable',
         )
 
+        await model.wait_for_idle(status="active")
+
         for unit in app.units:
             action = await unit.run('unit-get public-address')
             assert isinstance(action, Action)
+            assert action.status == 'pending'
+            await action.wait()
             assert action.status == 'completed'
             break
 
         for unit in app.units:
             action = await unit.run('sleep 1', timeout=0.5)
             assert isinstance(action, Action)
+            await action.wait()
             assert action.status == 'failed'
             break
 
         for unit in app.units:
             action = await unit.run('sleep 0.5', timeout=2)
             assert isinstance(action, Action)
+            await action.wait()
             assert action.status == 'completed'
             break
+
+        unit = app.units[0]
+        action = await unit.run("df -h", timeout=None)
+        assert action.status == 'pending'
+        action = await action.wait()
+        assert action.status == 'completed'
+        assert action.results
+        assert action.results['return-code'] == 0
 
 
 @base.bootstrapped

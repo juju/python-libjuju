@@ -17,7 +17,7 @@ from juju.utils import IdQueue
 log = logging.getLogger('juju.client.connection')
 
 client_facades = {
-    'Action': {'versions': [2, 7]},
+    'Action': {'versions': [2, 6, 7]},
     'ActionPruner': {'versions': [1]},
     'Agent': {'versions': [2, 3]},
     'AgentTools': {'versions': [1]},
