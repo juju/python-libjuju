@@ -1,5 +1,12 @@
 Changelog
 ---------
+3.0.1
+^^^^^
+
+Thursday August 11 2022
+
+## What's Changed
+* [JUJU-1593] Fix `run_actions` and facade issues by @cderici in https://github.com/juju/python-libjuju/pull/706
 
 3.0.0
 ^^^^^
