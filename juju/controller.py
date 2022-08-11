@@ -244,7 +244,7 @@ class Controller:
         log.debug('Uploading credential %s', name)
         cloud_facade = client.CloudFacade.from_connection(self.connection())
         tagged_credentials = [
-            client.UpdateCloudCredential(
+            client.TaggedCredential(
                 tag=tag.credential(cloud, tag.untag('user-', owner), name),
                 credential=credential,
             )]
