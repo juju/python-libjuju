@@ -30,7 +30,7 @@ from .constraints import parse as parse_constraints
 from .controller import Controller, ConnectedController
 from .delta import get_entity_class, get_entity_delta
 from .errors import JujuAPIError, JujuError, JujuModelConfigError, JujuBackupError
-from .errors import JujuAppError, JujuUnitError, JujuAgentError, JujuMachineError, PylibjujuError
+from .errors import JujuModelError, JujuAppError, JujuUnitError, JujuAgentError, JujuMachineError, PylibjujuError
 from .exceptions import DeadEntityException
 from .names import is_valid_application
 from .offerendpoints import ParseError as OfferParseError
@@ -981,6 +981,15 @@ class Model:
     @property
     def charmstore(self):
         return self._charmstore
+
+    @property
+    def name(self):
+        """Return the name of this model
+
+        """
+        if self._info is None:
+            raise JujuModelError("Model is not connected")
+        return self._info.name
 
     @property
     def info(self):
@@ -2270,7 +2279,7 @@ class Model:
         shared and who is connected.
         """
         async with ConnectedController(self.connection()) as controller:
-            return await controller.list_offers(self.info.name)
+            return await controller.list_offers(self.name)
 
     async def remove_offer(self, endpoint, force=False):
         """

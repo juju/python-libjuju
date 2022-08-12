@@ -14,7 +14,7 @@ import pylxd
 import pytest
 from juju import jasyncio
 from juju.client import client
-from juju.errors import JujuError, JujuUnitError, JujuConnectionError
+from juju.errors import JujuError, JujuModelError, JujuUnitError, JujuConnectionError
 from juju.model import Model, ModelObserver
 from juju.utils import block_until, run_with_interrupt, wait_for_bundle
 
@@ -26,6 +26,19 @@ SSH_KEY = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCsYMJGNGG74HAJha3n2CFmWYsOOaORn
 HERE_DIR = Path(__file__).absolute().parent  # tests/integration
 TESTS_DIR = HERE_DIR.parent  # tests/
 OVERLAYS_DIR = HERE_DIR / 'bundle' / 'test-overlays'
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_model_name(event_loop):
+    model = Model()
+    with pytest.raises(JujuModelError):
+        model.name
+
+    async with base.CleanModel() as new_model:
+        await model.connect(new_model.name)
+        assert model.name == new_model.name
+        await model.disconnect()
 
 
 @base.bootstrapped
@@ -591,7 +604,7 @@ async def _deploy_in_loop(new_loop, model_name, jujudata):
 @pytest.mark.asyncio
 async def test_explicit_loop_threaded(event_loop):
     async with base.CleanModel() as model:
-        model_name = model.info.name
+        model_name = model.name
         new_loop = jasyncio.new_event_loop()
         with ThreadPoolExecutor(1) as executor:
             f = executor.submit(

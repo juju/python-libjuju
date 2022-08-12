@@ -63,6 +63,10 @@ class JujuEntityNotFoundError(JujuError):
         super().__init__("Entity not found: {}".format(entity_name))
 
 
+class JujuModelError(JujuError):
+    pass
+
+
 class JujuMachineError(JujuError):
     pass
 
