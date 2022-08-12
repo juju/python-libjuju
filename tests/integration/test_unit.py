@@ -81,34 +81,35 @@ async def test_run(event_loop):
         await model.wait_for_idle(status="active")
 
         for unit in app.units:
-            action = await unit.run('unit-get public-address')
-            assert isinstance(action, Action)
-            assert action.status == 'pending'
-            await action.wait()
-            assert action.status == 'completed'
+            action1 = await unit.run('unit-get public-address')
+            assert isinstance(action1, Action)
+            assert action1.status == 'pending'
+            await action1.wait()
+            assert action1.status == 'completed'
             break
 
         for unit in app.units:
-            action = await unit.run('sleep 1', timeout=0.5)
-            assert isinstance(action, Action)
-            await action.wait()
-            assert action.status == 'failed'
+            action2 = await unit.run('sleep 1', timeout=0.5)
+            assert isinstance(action2, Action)
+            await action2.wait()
+            assert action2.status == 'failed'
             break
 
         for unit in app.units:
-            action = await unit.run('sleep 0.5', timeout=2)
-            assert isinstance(action, Action)
-            await action.wait()
-            assert action.status == 'completed'
+            action3 = await unit.run('sleep 0.5', timeout=2)
+            assert isinstance(action3, Action)
+            await action3.wait()
+            assert action3.status == 'completed'
             break
 
         unit = app.units[0]
-        action = await unit.run("df -h", timeout=None)
-        assert action.status == 'pending'
-        action = await action.wait()
-        assert action.status == 'completed'
-        assert action.results
-        assert action.results['return-code'] == 0
+        action4 = await unit.run("df -h", timeout=None)
+        assert action4.status == 'pending'
+        action5 = await action4.wait()
+        assert action4 is action5
+        assert action5.status == 'completed'
+        assert action5.results
+        assert action5.results['return-code'] == 0
 
 
 @base.bootstrapped
