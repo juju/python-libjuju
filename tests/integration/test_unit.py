@@ -89,14 +89,14 @@ async def test_run(event_loop):
             break
 
         for unit in app.units:
-            action2 = await unit.run('sleep 1', timeout=0.5)
+            action2 = await unit.run('sleep 3', timeout=1)
             assert isinstance(action2, Action)
             await action2.wait()
             assert action2.status == 'failed'
             break
 
         for unit in app.units:
-            action3 = await unit.run('sleep 0.5', timeout=2)
+            action3 = await unit.run('sleep 1', timeout=3)
             assert isinstance(action3, Action)
             await action3.wait()
             assert action3.status == 'completed'
