@@ -1,6 +1,8 @@
 import logging
 
 import pyrfc3339
+import shlex
+from subprocess import CompletedProcess
 
 from juju.errors import JujuAPIError, JujuError
 
@@ -9,6 +11,18 @@ from .annotationhelper import _get_annotations, _set_annotations
 from .client import client
 
 log = logging.getLogger(__name__)
+
+
+def _wrapped_run_response(command:str, action):
+    """Wrap API results into a consistent CompletedProcess added to the action."""
+    results = action.results 
+    action.completed = CompletedProcess(
+        args=shlex.split(command),
+        returncode=int(results.get("Code") or results.get("return-code")),
+        stdout=str(results.get("Stdout") or results.get("stdout") or ""),
+        stderr=str(results.get("Stderr") or results.get("stderr") or ""),
+    )
+    return action
 
 
 class Unit(model.ModelEntity):
@@ -212,7 +226,9 @@ class Unit(model.ModelEntity):
             units=[self.name],
         )
         the_action = res.results[0] if self.connection.is_using_old_client else res.actions[0]
-        return await self.model.wait_for_action(the_action.action.tag)
+        action = await self.model.wait_for_action(the_action.action.tag)
+        await action.wait()
+        return _wrapped_run_response(command, action)
 
     async def run_action(self, action_name, **params):
         """Run an action on this unit.
