@@ -186,12 +186,15 @@ class Unit(model.ModelEntity):
         if ret.results[0].error:
             raise JujuError(ret.results[0].error.message)
 
-    async def run(self, command, timeout=None):
+    async def run(self, command, timeout=None, block=False):
         """Run command on this unit.
 
         :param str command: The command to run
         :param int timeout: Time, in seconds, to wait before command is
         considered failed
+        :param bool block: A flag to use this function in synchronized fashion.
+        Useful with older versions of juju, i.e. getting the result without
+        having to call ``action.wait()`` separately.
         :returns: A :class:`juju.action.Action` instance.
 
         Note that this is very similarly to unit.run_action only enqueues the action.
@@ -233,7 +236,10 @@ class Unit(model.ModelEntity):
         if error:
             raise JujuError("Action error - {} : {}".format(error.code, error.message))
 
-        return await self.model._wait_for_new('action', action_id)
+        action = await self.model._wait_for_new('action', action_id)
+        if block:
+            return await action.wait()
+        return action
 
     async def run_action(self, action_name, **params):
         """Run an action on this unit.
