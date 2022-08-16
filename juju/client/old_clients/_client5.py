@@ -2267,8 +2267,10 @@ class ClientFacade(Type):
                                                       'display-name': {'type': 'string'},
                                                       'last-connection': {'format': 'date-time',
                                                                           'type': 'string'},
+                                                      'model-tag': {'type': 'string'},
                                                       'user': {'type': 'string'}},
-                                       'required': ['user',
+                                       'required': ['model-tag',
+                                                    'user',
                                                     'display-name',
                                                     'last-connection',
                                                     'access'],
@@ -2519,7 +2521,8 @@ class ClientFacade(Type):
                                'type': 'object'}},
      'properties': {'APIHostPorts': {'description': 'APIHostPorts returns the API '
                                                     'host/port addresses stored in '
-                                                    'state.',
+                                                    'state.\n'
+                                                    'TODO(juju3) - remove',
                                      'properties': {'Result': {'$ref': '#/definitions/APIHostPortsResult'}},
                                      'type': 'object'},
                     'AbortCurrentUpgrade': {'description': 'AbortCurrentUpgrade '
@@ -2534,7 +2537,7 @@ class ClientFacade(Type):
                                                 'Please discontinue use and move '
                                                 'to the charms facade version.\n'
                                                 '\n'
-                                                'TODO: remove in juju 3.0',
+                                                'TODO(juju3) - remove',
                                  'properties': {'Params': {'$ref': '#/definitions/AddCharm'}},
                                  'type': 'object'},
                     'AddCharmWithAuthorization': {'description': 'AddCharmWithAuthorization '
@@ -2574,24 +2577,27 @@ class ClientFacade(Type):
                                                                  'charms facade\n'
                                                                  'version.\n'
                                                                  '\n'
-                                                                 'TODO: remove in '
-                                                                 'juju 3.0',
+                                                                 'TODO(juju3) - '
+                                                                 'remove',
                                                   'properties': {'Params': {'$ref': '#/definitions/AddCharmWithAuthorization'}},
                                                   'type': 'object'},
                     'AddMachines': {'description': 'AddMachines adds new machines '
-                                                   'with the supplied parameters.',
+                                                   'with the supplied parameters.\n'
+                                                   'TODO(juju3) - remove',
                                     'properties': {'Params': {'$ref': '#/definitions/AddMachines'},
                                                    'Result': {'$ref': '#/definitions/AddMachinesResults'}},
                                     'type': 'object'},
                     'AddMachinesV2': {'description': 'AddMachinesV2 adds new '
                                                      'machines with the supplied '
-                                                     'parameters.',
+                                                     'parameters.\n'
+                                                     'TODO(juju3) - remove',
                                       'properties': {'Params': {'$ref': '#/definitions/AddMachines'},
                                                      'Result': {'$ref': '#/definitions/AddMachinesResults'}},
                                       'type': 'object'},
                     'AgentVersion': {'description': 'AgentVersion returns the '
                                                     'current version that the API '
-                                                    'server is running.',
+                                                    'server is running.\n'
+                                                    'TODO(juju3) - remove',
                                      'properties': {'Result': {'$ref': '#/definitions/AgentVersionResult'}},
                                      'type': 'object'},
                     'CACert': {'description': 'CACert returns the certificate used '
@@ -2599,7 +2605,8 @@ class ClientFacade(Type):
                                'properties': {'Result': {'$ref': '#/definitions/BytesResult'}},
                                'type': 'object'},
                     'DestroyMachines': {'description': 'DestroyMachines removes a '
-                                                       'given set of machines.',
+                                                       'given set of machines.\n'
+                                                       'TODO(juju3) - remove',
                                         'properties': {'Params': {'$ref': '#/definitions/DestroyMachines'}},
                                         'type': 'object'},
                     'FindTools': {'description': 'FindTools returns a List '
@@ -2637,12 +2644,14 @@ class ClientFacade(Type):
                     'GetModelConstraints': {'description': 'GetModelConstraints '
                                                            'returns the '
                                                            'constraints for the '
-                                                           'model.',
+                                                           'model.\n'
+                                                           'TODO(juju3) - remove',
                                             'properties': {'Result': {'$ref': '#/definitions/GetConstraintsResults'}},
                                             'type': 'object'},
                     'InjectMachines': {'description': 'InjectMachines injects a '
                                                       'machine into state with '
-                                                      'provisioned status.',
+                                                      'provisioned status.\n'
+                                                      'TODO(juju3) - remove',
                                        'properties': {'Params': {'$ref': '#/definitions/AddMachines'},
                                                       'Result': {'$ref': '#/definitions/AddMachinesResults'}},
                                        'type': 'object'},
@@ -2652,7 +2661,8 @@ class ClientFacade(Type):
                                  'properties': {'Result': {'$ref': '#/definitions/ModelConfigResults'}},
                                  'type': 'object'},
                     'ModelInfo': {'description': 'ModelInfo returns information '
-                                                 'about the current model.',
+                                                 'about the current model.\n'
+                                                 'TODO(juju3) - remove',
                                   'properties': {'Result': {'$ref': '#/definitions/ModelInfo'}},
                                   'type': 'object'},
                     'ModelSet': {'description': 'ModelSet implements the '
@@ -2667,12 +2677,15 @@ class ClientFacade(Type):
                                    'type': 'object'},
                     'ModelUserInfo': {'description': 'ModelUserInfo returns '
                                                      'information on all users in '
-                                                     'the model.',
+                                                     'the model.\n'
+                                                     'TODO(juju3) - remove',
                                       'properties': {'Result': {'$ref': '#/definitions/ModelUserInfoResults'}},
                                       'type': 'object'},
                     'PrivateAddress': {'description': 'PrivateAddress implements '
                                                       'the server side of '
-                                                      'Client.PrivateAddress.',
+                                                      'Client.PrivateAddress.\n'
+                                                      'TODO(juju3) - remove as '
+                                                      'this is unused',
                                        'properties': {'Params': {'$ref': '#/definitions/PrivateAddress'},
                                                       'Result': {'$ref': '#/definitions/PrivateAddressResults'}},
                                        'type': 'object'},
@@ -2681,13 +2694,16 @@ class ClientFacade(Type):
                                                           'that, when run,\n'
                                                           'provisions a machine '
                                                           'agent on the machine '
-                                                          'executing the script.',
+                                                          'executing the script.\n'
+                                                          'TODO(juju3) - remove',
                                            'properties': {'Params': {'$ref': '#/definitions/ProvisioningScriptParams'},
                                                           'Result': {'$ref': '#/definitions/ProvisioningScriptResult'}},
                                            'type': 'object'},
                     'PublicAddress': {'description': 'PublicAddress implements the '
                                                      'server side of '
-                                                     'Client.PublicAddress.',
+                                                     'Client.PublicAddress.\n'
+                                                     'TODO(juju3) - remove as this '
+                                                     'is unused',
                                       'properties': {'Params': {'$ref': '#/definitions/PublicAddress'},
                                                      'Result': {'$ref': '#/definitions/PublicAddressResults'}},
                                       'type': 'object'},
@@ -2705,7 +2721,7 @@ class ClientFacade(Type):
                                                      'move to the charms facade '
                                                      'version.\n'
                                                      '\n'
-                                                     'TODO: remove in juju 3.0',
+                                                     'TODO(juju3) - remove',
                                       'properties': {'Params': {'$ref': '#/definitions/ResolveCharms'},
                                                      'Result': {'$ref': '#/definitions/ResolveCharmResults'}},
                                       'type': 'object'},
@@ -2716,7 +2732,8 @@ class ClientFacade(Type):
                     'RetryProvisioning': {'description': 'RetryProvisioning marks '
                                                          'a provisioning error as '
                                                          'transient on the '
-                                                         'machines.',
+                                                         'machines.\n'
+                                                         'TODO(juju3) - remove',
                                           'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                          'Result': {'$ref': '#/definitions/ErrorResults'}},
                                           'type': 'object'},
@@ -2731,7 +2748,8 @@ class ClientFacade(Type):
                                              'type': 'object'},
                     'SetModelConstraints': {'description': 'SetModelConstraints '
                                                            'sets the constraints '
-                                                           'for the model.',
+                                                           'for the model.\n'
+                                                           'TODO(juju3) - remove',
                                             'properties': {'Params': {'$ref': '#/definitions/SetConstraints'}},
                                             'type': 'object'},
                     'SetSLALevel': {'description': 'SetSLALevel sets the sla level '
@@ -2755,6 +2773,7 @@ class ClientFacade(Type):
     async def APIHostPorts(self):
         '''
         APIHostPorts returns the API host/port addresses stored in state.
+        TODO(juju3) - remove
 
 
         Returns -> APIHostPortsResult
@@ -2800,7 +2819,7 @@ class ClientFacade(Type):
         NOTE: AddCharm is deprecated as of juju 2.9 and charms facade version 3.
         Please discontinue use and move to the charms facade version.
 
-        TODO: remove in juju 3.0
+        TODO(juju3) - remove
 
         channel : str
         force : bool
@@ -2844,7 +2863,7 @@ class ClientFacade(Type):
         facade version 3. Please discontinue use and move to the charms facade
         version.
 
-        TODO: remove in juju 3.0
+        TODO(juju3) - remove
 
         channel : str
         force : bool
@@ -2883,6 +2902,7 @@ class ClientFacade(Type):
     async def AddMachines(self, params=None):
         '''
         AddMachines adds new machines with the supplied parameters.
+        TODO(juju3) - remove
 
         params : typing.Sequence[~AddMachineParams]
         Returns -> AddMachinesResults
@@ -2906,6 +2926,7 @@ class ClientFacade(Type):
     async def AddMachinesV2(self, params=None):
         '''
         AddMachinesV2 adds new machines with the supplied parameters.
+        TODO(juju3) - remove
 
         params : typing.Sequence[~AddMachineParams]
         Returns -> AddMachinesResults
@@ -2929,6 +2950,7 @@ class ClientFacade(Type):
     async def AgentVersion(self):
         '''
         AgentVersion returns the current version that the API server is running.
+        TODO(juju3) - remove
 
 
         Returns -> AgentVersionResult
@@ -2971,6 +2993,7 @@ class ClientFacade(Type):
     async def DestroyMachines(self, force=None, machine_names=None):
         '''
         DestroyMachines removes a given set of machines.
+        TODO(juju3) - remove
 
         force : bool
         machine_names : typing.Sequence[str]
@@ -3107,6 +3130,7 @@ class ClientFacade(Type):
     async def GetModelConstraints(self):
         '''
         GetModelConstraints returns the constraints for the model.
+        TODO(juju3) - remove
 
 
         Returns -> GetConstraintsResults
@@ -3128,6 +3152,7 @@ class ClientFacade(Type):
     async def InjectMachines(self, params=None):
         '''
         InjectMachines injects a machine into state with provisioned status.
+        TODO(juju3) - remove
 
         params : typing.Sequence[~AddMachineParams]
         Returns -> AddMachinesResults
@@ -3173,6 +3198,7 @@ class ClientFacade(Type):
     async def ModelInfo(self):
         '''
         ModelInfo returns information about the current model.
+        TODO(juju3) - remove
 
 
         Returns -> ModelInfo
@@ -3242,6 +3268,7 @@ class ClientFacade(Type):
     async def ModelUserInfo(self):
         '''
         ModelUserInfo returns information on all users in the model.
+        TODO(juju3) - remove
 
 
         Returns -> ModelUserInfoResults
@@ -3263,6 +3290,7 @@ class ClientFacade(Type):
     async def PrivateAddress(self, target=None):
         '''
         PrivateAddress implements the server side of Client.PrivateAddress.
+        TODO(juju3) - remove as this is unused
 
         target : str
         Returns -> PrivateAddressResults
@@ -3287,6 +3315,7 @@ class ClientFacade(Type):
         '''
         ProvisioningScript returns a shell script that, when run,
         provisions a machine agent on the machine executing the script.
+        TODO(juju3) - remove
 
         data_dir : str
         disable_package_commands : bool
@@ -3325,6 +3354,7 @@ class ClientFacade(Type):
     async def PublicAddress(self, target=None):
         '''
         PublicAddress implements the server side of Client.PublicAddress.
+        TODO(juju3) - remove as this is unused
 
         target : str
         Returns -> PublicAddressResults
@@ -3353,7 +3383,7 @@ class ClientFacade(Type):
         NOTE: ResolveCharms is deprecated as of juju 2.9 and charms facade version 3.
         Please discontinue use and move to the charms facade version.
 
-        TODO: remove in juju 3.0
+        TODO(juju3) - remove
 
         references : typing.Sequence[str]
         Returns -> ResolveCharmResults
@@ -3405,6 +3435,7 @@ class ClientFacade(Type):
     async def RetryProvisioning(self, entities=None):
         '''
         RetryProvisioning marks a provisioning error as transient on the machines.
+        TODO(juju3) - remove
 
         entities : typing.Sequence[~Entity]
         Returns -> ErrorResults
@@ -3482,6 +3513,7 @@ class ClientFacade(Type):
     async def SetModelConstraints(self, application=None, constraints=None):
         '''
         SetModelConstraints sets the constraints for the model.
+        TODO(juju3) - remove
 
         application : str
         constraints : Value

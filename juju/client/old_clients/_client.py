@@ -4,7 +4,7 @@
 from juju.client.old_clients._definitions import *
 
 
-from juju.client.old_clients import _client2, _client1, _client3, _client4, _client5, _client8, _client7, _client9, _client10, _client6, _client12, _client11, _client13, _client15, _client16, _client17, _client18
+from juju.client.old_clients import _client2, _client1, _client3, _client4, _client5, _client8, _client7, _client9, _client10, _client6, _client12, _client11, _client13, _client15, _client16, _client17, _client18, _client14
 
 
 CLIENTS = {
@@ -24,9 +24,9 @@ CLIENTS = {
     "15": _client15,
     "16": _client16,
     "17": _client17,
-    "18": _client18
+    "18": _client18,
+    "14": _client14
 }
-
 
 
 def lookup_facade(name, version):
@@ -44,7 +44,6 @@ def lookup_facade(name, version):
     else:
         raise ImportError("No supported version for facade: "
                           "{}".format(name))
-
 
 
 class TypeFactory:
@@ -257,6 +256,10 @@ class DiskManagerFacade(TypeFactory):
 
 
 class EntityWatcherFacade(TypeFactory):
+    pass
+
+
+class EnvironUpgraderFacade(TypeFactory):
     pass
 
 

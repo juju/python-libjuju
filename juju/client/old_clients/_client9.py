@@ -2756,6 +2756,10 @@ class ModelManagerFacade(Type):
                                                              'status': {'type': 'string'}},
                                               'required': ['status', 'start'],
                                               'type': 'object'},
+                     'ModelParam': {'additionalProperties': False,
+                                    'properties': {'model-tag': {'type': 'string'}},
+                                    'required': ['model-tag'],
+                                    'type': 'object'},
                      'ModelSLAInfo': {'additionalProperties': False,
                                       'properties': {'level': {'type': 'string'},
                                                      'owner': {'type': 'string'}},
@@ -2851,8 +2855,10 @@ class ModelManagerFacade(Type):
                                                       'display-name': {'type': 'string'},
                                                       'last-connection': {'format': 'date-time',
                                                                           'type': 'string'},
+                                                      'model-tag': {'type': 'string'},
                                                       'user': {'type': 'string'}},
-                                       'required': ['user',
+                                       'required': ['model-tag',
+                                                    'user',
                                                     'display-name',
                                                     'last-connection',
                                                     'access'],
@@ -2935,13 +2941,9 @@ class ModelManagerFacade(Type):
                                                                       'type': 'array'}},
                                        'required': ['user-models'],
                                        'type': 'object'},
-                     'ValidateModelUpgradeParam': {'additionalProperties': False,
-                                                   'properties': {'model-tag': {'type': 'string'}},
-                                                   'required': ['model-tag'],
-                                                   'type': 'object'},
                      'ValidateModelUpgradeParams': {'additionalProperties': False,
                                                     'properties': {'force': {'type': 'boolean'},
-                                                                   'model': {'items': {'$ref': '#/definitions/ValidateModelUpgradeParam'},
+                                                                   'model': {'items': {'$ref': '#/definitions/ModelParam'},
                                                                              'type': 'array'}},
                                                     'required': ['model', 'force'],
                                                     'type': 'object'}},
@@ -3446,7 +3448,7 @@ class ModelManagerFacade(Type):
         bad unintended errors down the line.
 
         force : bool
-        model : typing.Sequence[~ValidateModelUpgradeParam]
+        model : typing.Sequence[~ModelParam]
         Returns -> ErrorResults
         '''
         if force is not None and not isinstance(force, bool):
