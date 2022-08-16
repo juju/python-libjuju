@@ -1,12 +1,37 @@
 Changelog
 ---------
+3.0.1
+^^^^^
+
+Thursday August 11 2022
+
+## What's Changed
+* [JUJU-1593] Fix `run_actions` and facade issues by @cderici in https://github.com/juju/python-libjuju/pull/706
+
+3.0.0
+^^^^^
+
+Tuesday August 9 2022
+
+## What's Changed
+
+Switching to semantic versioning. From this release on, at least the major release number matches
+the most recent Juju supported. Hence the jump to `3.0.0` since this release supports `Juju 3.0`.
+(This also means that `python-libjuju <= 2.9.11` only support up to `Juju 2.x`)
+
+* [JUJU-1439] Initial fixes for `test_model` to pass with juju 3.0 by @cderici in https://github.com/juju/python-libjuju/pull/689
+* [JUJU-1464] More fixes for 3.0 compatibility by @cderici in https://github.com/juju/python-libjuju/pull/691
+* [JUJU-1457] Merge 3.0 compatibility branch onto master by @cderici in https://github.com/juju/python-libjuju/pull/692
+* Fix conditional by @sed-i in https://github.com/juju/python-libjuju/pull/696
+* [JUJU-1534] Fix `model.connect_current()` by @cderici in https://github.com/juju/python-libjuju/pull/697
+* [JUJU-1542] Fix run actions on units by @cderici in https://github.com/juju/python-libjuju/pull/698
+* [JUJU-1577] Replace k8s bundles with machine bundles for tests by @cderici in https://github.com/juju/python-libjuju/pull/703
+* [JUJU-1528] Add storage implementation by @cderici in https://github.com/juju/python-libjuju/pull/701
 
 2.9.11
 ^^^^^^
 
 Monday July 11 2022
-
-## What's Changed
 
 * Add REPL quickstart subsection by @sed-i in https://github.com/juju/python-libjuju/pull/676
 * Revision of test onos.charm by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/686

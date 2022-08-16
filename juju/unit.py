@@ -2,7 +2,7 @@ import logging
 
 import pyrfc3339
 
-from juju.errors import JujuAPIError
+from juju.errors import JujuAPIError, JujuError
 
 from . import model, tag
 from .annotationhelper import _get_annotations, _set_annotations
@@ -120,6 +120,72 @@ class Unit(model.ModelEntity):
             retry=retry,
             tags={'entities': [{'tag': self.tag}]})
 
+    async def add_storage(self, storage_name, pool=None, count=1, size=1024):
+        """Creates a storage and adds it to this unit.
+
+        :param: str storage_name: Name of the storage
+        :param: str pool: the storage pool to provision storage instances from. Must
+        be a name from 'juju storage-pools'.  The default pool is available via
+        executing 'juju model-config storage-default-block-source'.
+        :param: int count: the number of storage instances to provision from <storage-pool> of
+        <size>. Must be a positive integer. The default count is "1". May be restricted
+        by the charm, which can specify a maximum number of storage instances per unit.
+        :param: int size: the required size of the storage instance, in MiB.
+
+        :return: []str storage_tags
+        """
+        constraints = client.StorageConstraints(count=count)
+        if pool:
+            constraints = client.StorageConstraints(pool=pool, count=count, size=size)
+
+        storage_facade = client.StorageFacade.from_connection(self.connection)
+        res = await storage_facade.AddToUnit(storages=[client.StorageAddParams(
+            name=storage_name,
+            unit=tag.unit(self.name),
+            storage=constraints,
+        )])
+        result = res.results[0]
+        if result.error is not None:
+            raise JujuError("{}".format(result.error))
+        storage_details = result.result
+        return storage_details.storage_tags
+
+    async def attach_storage(self, storage_ids=[]):
+        """Attaches existing storage to this unit.
+
+        :param [str] storage_ids: existing storage ids to attach to the unit
+        :return:
+        """
+        if not storage_ids:
+            raise JujuError("Expected a storage ID to be attached to unit {}".format(self.name))
+
+        storage_facade = client.StorageFacade.from_connection(self.connection)
+        return await storage_facade.Attach(ids=[client.StorageAttachmentId(
+            storage_tag=tag.storage(s_id),
+            unit_tag=self.tag,
+        ) for s_id in storage_ids])
+
+    async def detach_storage(self, *storage_ids, force=False):
+        """Detaches storage from units.
+
+        :param bool force: Forcefully detach storage
+        :param [str] storage_ids:
+        :return:
+        """
+        if not storage_ids:
+            raise JujuError("Expected at least one storage ID")
+
+        storage_facade = client.StorageFacade.from_connection(self.connection)
+        ret = await storage_facade.DetachStorage(
+            force=force,
+            ids=client.StorageAttachmentIds(ids=[client.StorageAttachmentId(
+                storage_tag=tag.storage(s),
+                unit_tag=self.tag,
+            ) for s in storage_ids])
+        )
+        if ret.results[0].error:
+            raise JujuError(ret.results[0].error.message)
+
     async def run(self, command, timeout=None):
         """Run command on this unit.
 
@@ -161,22 +227,27 @@ class Unit(model.ModelEntity):
 
         """
         action_facade = client.ActionFacade.from_connection(self.connection)
-
         log.debug('Starting action `%s` on %s', action_name, self.name)
 
-        res = await action_facade.EnqueueOperation(actions=[client.Action(
+        old_client = self.connection.is_using_old_client
+
+        op = action_facade.Enqueue if old_client else action_facade.EnqueueOperation
+        res = await op(actions=[client.Action(
             name=action_name,
             parameters=params,
             receiver=self.tag,
         )])
-        action = res.actions[0].result
-        error = res.actions[0].error
+
+        _action = res.results[0] if old_client else res.actions[0]
+        action = _action.action
+        error = _action.error
+
         if error and error.code == 'not found':
             raise ValueError('Action `%s` not found on %s' % (action_name,
                                                               self.name))
         elif error:
             raise Exception('Unknown action error: %s' % error.serialize())
-        action_id = action[len('action-'):]
+        action_id = action.tag[len('action-'):]
         log.debug('Action started as %s', action_id)
         # we mustn't use wait_for_action because that blocks until the
         # action is complete, rather than just being in the model

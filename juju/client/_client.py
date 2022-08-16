@@ -4,28 +4,21 @@
 from juju.client._definitions import *
 
 
-from juju.client import _client2, _client1, _client3, _client4, _client5, _client8, _client7, _client9, _client10, _client6, _client12, _client11, _client13, _client15, _client16, _client17, _client18, _client14
+from juju.client import _client7, _client1, _client3, _client2, _client14, _client4, _client6, _client5, _client11, _client9, _client18
 
 
 CLIENTS = {
-    "2": _client2,
+    "7": _client7,
     "1": _client1,
     "3": _client3,
+    "2": _client2,
+    "14": _client14,
     "4": _client4,
-    "5": _client5,
-    "8": _client8,
-    "7": _client7,
-    "9": _client9,
-    "10": _client10,
     "6": _client6,
-    "12": _client12,
+    "5": _client5,
     "11": _client11,
-    "13": _client13,
-    "15": _client15,
-    "16": _client16,
-    "17": _client17,
-    "18": _client18,
-    "14": _client14
+    "9": _client9,
+    "18": _client18
 }
 
 
@@ -124,10 +117,6 @@ class ApplicationFacade(TypeFactory):
 
 
 class ApplicationOffersFacade(TypeFactory):
-    pass
-
-
-class ApplicationRelationsWatcherFacade(TypeFactory):
     pass
 
 
@@ -244,10 +233,6 @@ class CrossModelRelationsFacade(TypeFactory):
 
 
 class DeployerFacade(TypeFactory):
-    pass
-
-
-class DiscoverSpacesFacade(TypeFactory):
     pass
 
 
@@ -455,19 +440,11 @@ class RelationUnitsWatcherFacade(TypeFactory):
     pass
 
 
-class RemoteApplicationWatcherFacade(TypeFactory):
-    pass
-
-
 class RemoteRelationWatcherFacade(TypeFactory):
     pass
 
 
 class RemoteRelationsFacade(TypeFactory):
-    pass
-
-
-class RemoteRelationsWatcherFacade(TypeFactory):
     pass
 
 

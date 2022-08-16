@@ -888,6 +888,123 @@ class Model:
             lambda: len(self.machines) == 0
         )
 
+    async def create_storage_pool(self, name, provider_type, attributes=""):
+        """Create or define a storage pool.
+
+        :param str name: a pool name
+        :param str provider_type: provider type (defaults to "kubernetes" for
+        Kubernetes models)
+        :param str attributes: attributes for configuration as space-separated pairs,
+        e.g. tags, size, path, etc.
+        :return:
+        """
+        _attrs = [splt.split("=") for splt in attributes.split()]
+
+        storage_facade = client.StorageFacade.from_connection(self.connection())
+        return await storage_facade.CreatePool(pools=[client.StoragePool(
+            name=name,
+            provider=provider_type,
+            attrs=dict(_attrs)
+        )])
+
+    async def remove_storage_pool(self, name):
+        """Remove an existing storage pool.
+
+        :param str name:
+        :return:
+        """
+        storage_facade = client.StorageFacade.from_connection(self.connection())
+        return await storage_facade.RemovePool(pools=[client.StoragePoolDeleteArg(name)])
+
+    async def update_storage_pool(self, name, attributes=""):
+        """ Update storage pool attributes.
+
+        :param name:
+        :param attributes: "key=value key=value ..."
+        :return:
+        """
+        _attrs = dict([splt.split("=") for splt in attributes.split()])
+        if len(_attrs) == 0:
+            raise JujuError("Expected at least one attribute to update")
+
+        storage_facade = client.StorageFacade.from_connection(self.connection())
+        return await storage_facade.UpdatePool(pools=[client.StoragePool(
+            name=name,
+            attrs=_attrs,
+        )])
+
+    async def list_storage(self, filesystem=False, volume=False):
+        """Lists storage details.
+
+        :param bool filesystem: List filesystem storage
+        :param bool volume: List volume storage
+        :return:
+        """
+        storage_facade = client.StorageFacade.from_connection(self.connection())
+
+        if filesystem and volume:
+            raise JujuError("--filesystem and --volume can not be used together")
+        if filesystem:
+            _res = await storage_facade.ListFilesystems(filters=[client.FilesystemFilter()])
+        elif volume:
+            _res = await storage_facade.ListVolumes(filters=[client.VolumeFilter()])
+        else:
+            _res = await storage_facade.ListStorageDetails(filters=[client.StorageFilter()])
+
+        err = _res.results[0].error
+        res = _res.results[0].result
+
+        if err is not None:
+            raise JujuError(err.message)
+
+        return [details.serialize() for details in res]
+
+    async def show_storage_details(self, *storage_ids):
+        """Shows storage instance information.
+
+        :param []str storage_ids:
+        :return:
+        """
+        if not storage_ids:
+            raise JujuError("Expected at least one storage ID")
+
+        storage_facade = client.StorageFacade.from_connection(self.connection())
+        res = await storage_facade.StorageDetails(entities=[client.Entity(tag.storage(s)) for s in storage_ids])
+        return [s.result.serialize() for s in res.results]
+
+    async def list_storage_pools(self):
+        """List storage pools.
+
+        :return:
+        """
+        # TODO (cderici): Filter on pool type, name.
+        storage_facade = client.StorageFacade.from_connection(self.connection())
+        res = await storage_facade.ListPools(filters=[client.StoragePoolFilter()])
+        err = res.results[0].error
+        if err:
+            raise JujuError(err.message)
+        return [p.serialize() for p in res.results[0].storage_pools]
+
+    async def remove_storage(self, *storage_ids, force=False, destroy_storage=False):
+        """Removes storage from the model.
+
+        :param bool force: Remove storage even if it is currently attached
+        :param bool destroy_storage: Remove the storage and destroy it
+        :param []str storage_ids:
+        :return:
+        """
+        if not storage_ids:
+            raise JujuError("Expected at least one storage ID")
+
+        storage_facade = client.StorageFacade.from_connection(self.connection())
+        ret = await storage_facade.Remove(storage=[client.RemoveStorageInstance(
+            destroy_storage=destroy_storage,
+            force=force,
+            tag=s,
+        ) for s in storage_ids])
+        if ret.results[0].error:
+            raise JujuError(ret.results[0].error.message)
+
     async def remove_application(self, app_name, block_until_done=False):
         """Removes the given application from the model.
 
@@ -2154,7 +2271,19 @@ class Model:
             constraints=constraints)
 
     async def get_action_output(self, action_uuid, wait=None):
-        """Get the results of an action by ID.
+        """ Get the results of an action by ID.
+
+        :param str action_uuid: Id of the action
+        :param int wait: Time in seconds to wait for action to complete.
+        :return dict: Output from action
+        :raises: :class:`JujuError` if invalid action_uuid
+        """
+        action = await self._get_completed_action(action_uuid, wait=wait)
+        # ActionResult.output is None if the action produced no output
+        return {} if action.output is None else action.output
+
+    async def _get_completed_action(self, action_uuid, wait=None):
+        """Get the completed internal _definitions.Action object.
 
         :param str action_uuid: Id of the action
         :param int wait: Time in seconds to wait for action to complete.
@@ -2180,13 +2309,8 @@ class Model:
         await jasyncio.wait_for(
             _wait_for_action_status(),
             timeout=wait)
-        action_output = await action_facade.Actions(entities=entity)
-        # ActionResult.output is None if the action produced no output
-        if action_output.results[0].output is None:
-            output = {}
-        else:
-            output = action_output.results[0].output
-        return output
+        action_results = await action_facade.Actions(entities=entity)
+        return action_results.results[0]
 
     async def get_action_status(self, uuid_or_prefix=None, name=None):
         """Get the status of all actions, filtered by ID, ID prefix, or name.
