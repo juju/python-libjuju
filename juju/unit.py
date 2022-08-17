@@ -186,13 +186,20 @@ class Unit(model.ModelEntity):
         if ret.results[0].error:
             raise JujuError(ret.results[0].error.message)
 
-    async def run(self, command, timeout=None):
+    async def run(self, command, timeout=None, block=False):
         """Run command on this unit.
 
         :param str command: The command to run
         :param int timeout: Time, in seconds, to wait before command is
         considered failed
+        :param bool block: A flag to use this function in synchronized fashion.
+        Useful with older versions of juju, i.e. getting the result without
+        having to call ``action.wait()`` separately.
         :returns: A :class:`juju.action.Action` instance.
+
+        Note that this is very similarly to unit.run_action only enqueues the action.
+        You will need to call ``action.wait()`` on the resulting `Action` instance
+        if you wish to block until the action is complete.
 
         """
         action = client.ActionFacade.from_connection(self.connection)
@@ -204,6 +211,11 @@ class Unit(model.ModelEntity):
             # Convert seconds to nanoseconds
             timeout = int(timeout * 1000000000)
 
+        # It's not enough to only check for the old_client on the connection here
+        # The old client's ActionFacade is updated to version 7, so
+        # 2.9 track client may be using either ActionFacade v6 or v7 too
+        old_facade = client.ActionFacade.best_facade_version(self.connection) <= 6
+
         res = await action.Run(
             applications=[],
             commands=command,
@@ -211,8 +223,23 @@ class Unit(model.ModelEntity):
             timeout=timeout,
             units=[self.name],
         )
-        the_action = res.results[0] if self.connection.is_using_old_client else res.actions[0]
-        return await self.model.wait_for_action(the_action.action.tag)
+
+        action_result = res.results[0] if old_facade else res.actions[0]
+        action = action_result.action
+
+        action_id = action.tag
+        if action_id.startswith("action-"):
+            # strip the action- part of "action-<num>" tag
+            action_id = action_id[7:]
+
+        error = action_result.error
+        if error:
+            raise JujuError("Action error - {} : {}".format(error.code, error.message))
+
+        action = await self.model._wait_for_new('action', action_id)
+        if block:
+            return await action.wait()
+        return action
 
     async def run_action(self, action_name, **params):
         """Run an action on this unit.

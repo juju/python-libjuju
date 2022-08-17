@@ -130,7 +130,7 @@ async def test_list_models(event_loop):
     async with base.CleanController() as controller:
         async with base.CleanModel() as model:
             result = await controller.list_models()
-            assert model.info.name in result
+            assert model.name in result
 
 
 @base.bootstrapped
@@ -164,9 +164,9 @@ async def test_get_model(event_loop):
         try:
             by_name = await controller.get_model(model_name)
             by_uuid = await controller.get_model(model_uuid)
-            assert by_name.info.name == model_name
+            assert by_name.name == model_name
             assert by_name.info.uuid == model_uuid
-            assert by_uuid.info.name == model_name
+            assert by_uuid.name == model_name
             assert by_uuid.info.uuid == model_uuid
         finally:
             if by_name:

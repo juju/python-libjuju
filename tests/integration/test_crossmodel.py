@@ -25,7 +25,7 @@ async def test_offer(event_loop):
         await model.block_until(
             lambda: all(offer.application_name == 'ubuntu'
                         for offer in offers.results))
-        await model.remove_offer("admin/{}.ubuntu".format(model.info.name), force=True)
+        await model.remove_offer("admin/{}.ubuntu".format(model.name), force=True)
 
 
 @base.bootstrapped
@@ -49,13 +49,13 @@ async def test_consume(event_loop):
 
         # farm off a new model to test the consumption
         async with base.CleanModel() as model_2:
-            await model_2.consume("admin/{}.ubuntu".format(model_1.info.name))
+            await model_2.consume("admin/{}.ubuntu".format(model_1.name))
 
             status = await model_2.get_status()
             if 'ubuntu' not in status.remote_applications:
                 raise Exception("Expected ubuntu in saas")
 
-        await model_1.remove_offer("admin/{}.ubuntu".format(model_1.info.name), force=True)
+        await model_1.remove_offer("admin/{}.ubuntu".format(model_1.name), force=True)
 
 
 @base.bootstrapped
@@ -79,7 +79,7 @@ async def test_remove_saas(event_loop):
 
         # farm off a new model to test the consumption
         async with base.CleanModel() as model_2:
-            await model_2.consume("admin/{}.ubuntu".format(model_1.info.name))
+            await model_2.consume("admin/{}.ubuntu".format(model_1.name))
 
             await model_2.remove_saas('ubuntu')
             await jasyncio.sleep(5)
@@ -88,7 +88,7 @@ async def test_remove_saas(event_loop):
             if 'ubuntu' in status.remote_applications:
                 raise Exception("Expected ubuntu not to be in saas")
 
-        await model_1.remove_offer("admin/{}.ubuntu".format(model_1.info.name), force=True)
+        await model_1.remove_offer("admin/{}.ubuntu".format(model_1.name), force=True)
 
 
 @base.bootstrapped
@@ -123,7 +123,7 @@ async def test_relate_with_offer(event_loop):
                 lambda: all(unit.agent_status == 'idle'
                             for unit in application.units))
 
-            await model_2.relate("mediawiki:db", "admin/{}.mysql".format(model_1.info.name))
+            await model_2.relate("mediawiki:db", "admin/{}.mysql".format(model_1.name))
             status = await model_2.get_status()
             if 'mysql' not in status.remote_applications:
                 raise Exception("Expected mysql in saas")
@@ -135,7 +135,7 @@ async def test_relate_with_offer(event_loop):
             if 'mysql' in status.remote_applications:
                 raise Exception("Expected mysql not to be in saas")
 
-        await model_1.remove_offer("admin/{}.mysql".format(model_1.info.name), force=True)
+        await model_1.remove_offer("admin/{}.mysql".format(model_1.name), force=True)
 
 
 @base.bootstrapped
@@ -160,7 +160,7 @@ async def test_add_bundle(event_loop):
             try:
                 tmp_path = str(Path(dirpath) / 'bundle.yaml')
                 with open(tmp_path, "w") as file:
-                    file.write(file_contents.format(model_1.info.name))
+                    file.write(file_contents.format(model_1.name))
             except IOError:
                 raise
 
@@ -186,4 +186,4 @@ async def test_add_bundle(event_loop):
                 await model_2.deploy('local:{}'.format(tmp_path))
                 await model_2.wait_for_idle(status="active")
 
-            await model_1.remove_offer("admin/{}.influxdb".format(model_1.info.name), force=True)
+            await model_1.remove_offer("admin/{}.influxdb".format(model_1.name), force=True)
