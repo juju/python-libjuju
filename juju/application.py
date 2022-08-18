@@ -217,16 +217,31 @@ class Application(model.ModelEntity):
         return await self.model.destroy_units(*unit_names)
     destroy_units = destroy_unit
 
-    async def destroy(self):
+    async def destroy(self, destroy_storage=False, force=False, no_wait=False):
         """Remove this application from the model.
 
+        :param bool destroy_storage: Destroy storage attached to application unit. (=false)
+        :param bool force: Completely remove an application and all its dependencies. (=false)
+        :param bool no_wait: Rush through application removal without waiting for each individual step to complete (=false)
+        :param bool block: Blocks until the application is removed from the model
         """
+
+        if no_wait and not force:
+            log.warning("Invalid parameters. Automatically setting the --force parameter to True.")
+            force = True
+
         app_facade = self._facade()
 
-        log.debug(
-            'Destroying %s', self.name)
+        log.debug('Destroying {} with parameters -- destroy-storage : {} -- force : {} -- no-wait : {}'.format(
+            self.name, destroy_storage, force, no_wait))
 
-        return await app_facade.Destroy(application=self.name)
+        res = await app_facade.DestroyApplication(applications=[client.DestroyApplicationParams(
+            application_tag=self.tag,
+            destroy_storage=destroy_storage,
+            force=force,
+            max_wait=0 if no_wait else None,
+        )])
+        return res
     remove = destroy
 
     def supports_granular_expose_parameters(self):

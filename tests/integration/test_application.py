@@ -242,6 +242,19 @@ async def test_trusted(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_app_destroy(event_loop):
+    async with base.CleanModel() as model:
+        app = await model.deploy('ubuntu')
+        a_name = app.name  # accessing name is impossible after the app is destroyed
+        await model.wait_for_idle(status="active")
+        assert a_name in model.applications
+        await app.destroy(destroy_storage=True, force=True, no_wait=True)
+        await jasyncio.sleep(10)
+        assert a_name not in model.applications
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_app_remove_wait_flag(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy('ubuntu')
