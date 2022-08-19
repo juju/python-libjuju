@@ -227,8 +227,7 @@ class Application(model.ModelEntity):
         """
 
         if no_wait and not force:
-            log.warning("Invalid parameters. Automatically setting the --force parameter to True.")
-            force = True
+            raise JujuError("--no-wait without --force is not valid")
 
         app_facade = self._facade()
 
