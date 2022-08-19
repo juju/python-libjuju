@@ -11,20 +11,20 @@ import asyncio
 import logging
 
 from juju.model import Model, ModelObserver
-from juju import loop
+from juju import jasyncio
 
 
 class MyRemoveObserver(ModelObserver):
     async def on_change(self, delta, old, new, model):
         if delta.type == 'remove':
-            assert(new.latest() == new)
-            assert(new.next() is None)
-            assert(new.dead)
-            assert(new.current)
-            assert(new.connected)
-            assert(new.previous().dead)
-            assert(not new.previous().current)
-            assert(not new.previous().connected)
+            assert (new.latest() == new)
+            assert (new.next() is None)
+            assert (new.dead)
+            assert (new.current)
+            assert (new.connected)
+            assert (new.previous().dead)
+            assert (not new.previous().current)
+            assert (not new.previous().connected)
 
 
 class MyModelObserver(ModelObserver):
@@ -83,7 +83,7 @@ async def main():
             # subordinates must be deployed without units
             num_units=0,
         )
-        my_relation = await model.add_relation(
+        my_relation = await model.relate(
             'ubuntu',
             'nrpe',
         )
@@ -99,4 +99,4 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     ws_logger = logging.getLogger('websockets.protocol')
     ws_logger.setLevel(logging.INFO)
-    loop.run(main())
+    jasyncio.run(main())

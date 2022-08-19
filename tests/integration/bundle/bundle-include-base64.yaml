@@ -1,0 +1,17 @@
+series: xenial
+applications:
+  ghost:
+    charm: "ghost"
+    num_units: 1
+  mysql:
+    charm: "mysql"
+    channel: "candidate"
+    series: "trusty"
+    num_units: 1
+    options:
+      max-connections: 2
+      tuning-level: include-base64://config-base64.yaml
+  test:
+    charm: "../charm"
+relations:
+  - ["ghost", "mysql"]

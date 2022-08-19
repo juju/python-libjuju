@@ -1,4 +1,3 @@
-import asyncio
 import json
 import logging
 from concurrent.futures import CancelledError
@@ -6,7 +5,7 @@ from pathlib import Path
 
 import websockets
 
-from . import errors, tag, utils
+from . import errors, tag, utils, jasyncio
 from .client import client, connector
 from .errors import JujuAPIError
 from .offerendpoints import ParseError as OfferParseError
@@ -24,7 +23,6 @@ class RemoveError(Exception):
 class Controller:
     def __init__(
         self,
-        loop=None,
         max_frame_size=None,
         bakery_client=None,
         jujudata=None,
@@ -36,7 +34,6 @@ class Controller:
 
         If jujudata is None, jujudata.FileJujuData will be used.
 
-        :param loop: an asyncio event loop
         :param max_frame_size: See
             `juju.client.connection.Connection.MAX_FRAME_SIZE`
         :param bakery_client httpbakery.Client: The bakery client to use
@@ -45,7 +42,6 @@ class Controller:
         information.
         """
         self._connector = connector.Connector(
-            loop=loop,
             max_frame_size=max_frame_size,
             bakery_client=bakery_client,
             jujudata=jujudata,
@@ -57,10 +53,6 @@ class Controller:
 
     async def __aexit__(self, exc_type, exc, tb):
         await self.disconnect()
-
-    @property
-    def loop(self):
-        return self._connector.loop
 
     async def connect(self, *args, **kwargs):
         """Connect to a Juju controller.
@@ -96,8 +88,6 @@ class Controller:
             If this is None, a default bakery_client will be used.
         :param list macaroons: List of macaroons to load into the
             ``bakery_client``.
-        :param asyncio.BaseEventLoop loop: The event loop to use for async
-            operations.
         :param int max_frame_size: The maximum websocket frame size to allow.
         :param specified_facades: Overwrite the facades with a series of
             specified facades.
@@ -131,7 +121,6 @@ class Controller:
                 'cacert',
                 'bakery_client',
                 'macaroons',
-                'loop',
                 'max_frame_size',
             ]
             for i, arg in enumerate(args):
@@ -348,8 +337,7 @@ class Controller:
 
         if not config or 'authorized-keys' not in config:
             config = config or {}
-            config['authorized-keys'] = await utils.read_ssh_key(
-                loop=self._connector.loop)
+            config['authorized-keys'] = await utils.read_ssh_key()
 
         model_info = await model_facade.CreateModel(
             cloud_tag=tag.cloud(cloud_name),
@@ -491,13 +479,6 @@ class Controller:
         entity = client.Entity(tag.user(username))
         return await user_facade.EnableUser(entities=[entity])
 
-    def kill(self):
-        """Forcibly terminate all machines and other associated resources for
-        this controller.
-
-        """
-        raise NotImplementedError()
-
     async def cloud(self, name=None):
         """Get Cloud
 
@@ -536,79 +517,73 @@ class Controller:
         cloud = list(result.clouds.keys())[0]  # only lives on one cloud
         return tag.untag('cloud-', cloud)
 
-    async def get_models(self, all_=False, username=None):
+    async def get_models(self, all=False, username=None):
         """
         .. deprecated:: 0.7.0
            Use :meth:`.list_models` instead.
         """
-        controller_facade = client.ControllerFacade.from_connection(
-            self.connection())
-        for attempt in (1, 2, 3):
-            try:
-                return await controller_facade.AllModels()
-            except errors.JujuAPIError as e:
-                # retry concurrency error until resolved in Juju
-                # see: https://bugs.launchpad.net/juju/+bug/1721786
-                if 'has been removed' not in e.message or attempt == 3:
-                    raise
+        return await self.list_models(username, all)
 
-    async def model_uuids(self):
-        """Return a mapping of model names to UUIDs.
+    async def model_uuids(self, username=None, all=False):
+        """Return a mapping of model names to UUIDs the given user can access.
+
+        :param str username: Optional username argument, defaults to
+        current connected user.
+
+        :param bool all: Flag to list all models, regardless of
+        user accessibility (administrative users only)
+
+        :returns: {str name : str UUID}
         """
-        controller_facade = client.ControllerFacade.from_connection(
-            self.connection())
+
+        if all:
+            facade = client.ControllerFacade.from_connection(
+                self.connection())
+        else:
+            facade = client.ModelManagerFacade.from_connection(
+                self.connection())
+            u_name = username if username else self.get_current_username()
+            user = tag.user(u_name)
+
         for attempt in (1, 2, 3):
             try:
-                response = await controller_facade.AllModels()
+                if all:
+                    userModelList = await facade.AllModels()
+                else:
+                    userModelList = await facade.ListModels(tag=user)
+
                 return {um.model.name: um.model.uuid
-                        for um in response.user_models}
+                        for um in userModelList.user_models}
             except errors.JujuAPIError as e:
                 # retry concurrency error until resolved in Juju
                 # see: https://bugs.launchpad.net/juju/+bug/1721786
                 if 'has been removed' not in e.message or attempt == 3:
                     raise
-                await asyncio.sleep(attempt, loop=self._connector.loop)
+                await jasyncio.sleep(attempt)
 
-    async def list_models(self):
+    async def list_models(self, username=None, all=False):
         """Return list of names of the available models on this controller.
 
         Equivalent to ``sorted((await self.model_uuids()).keys())``
         """
-        uuids = await self.model_uuids()
+        uuids = await self.model_uuids(username, all)
         return sorted(uuids.keys())
 
-    def get_payloads(self, *patterns):
-        """Return list of known payloads.
+    async def get_current_user(self, secret_key=None):
+        """Returns the user object associated with the current connection.
+        :param str secret_key: Issued by juju when add or reset user
+            password
 
-        :param str *patterns: Patterns to match against
-
-        Each pattern will be checked against the following info in Juju::
-
-            - unit name
-            - machine id
-            - payload type
-            - payload class
-            - payload id
-            - payload tag
-            - payload status
-
+        :returns: A :class:`~juju.user.User` instance
         """
-        raise NotImplementedError()
+        return await self.get_user(self.connection().username)
 
-    def login(self):
-        """Log in to this controller.
+    def get_current_username(self):
+        """Returns the username associated with the current connection.
 
+        :returns: :str: username of the connected user
         """
-        raise NotImplementedError()
-
-    def logout(self, force=False):
-        """Log out of this controller.
-
-        :param bool force: Don't fail even if user not previously logged in
-            with a password
-
-        """
-        raise NotImplementedError()
+        return self.connection().username
 
     async def get_model(self, model):
         """Get a model by name or UUID.
@@ -699,7 +674,7 @@ class Controller:
         controller_facade = client.ControllerFacade.from_connection(
             self.connection())
         user = tag.user(username)
-        changes = client.ModifyControllerAccess('login', 'revoke', user)
+        changes = client.ModifyControllerAccess(acl, 'revoke', user)
         return await controller_facade.ModifyControllerAccess(changes=[changes])
 
     async def grant_model(self, username, model_uuid, acl='read'):
@@ -824,7 +799,7 @@ class Controller:
         all models in the controller. If the user isn't a superuser they
         will get a permission error.
         """
-        stop_event = asyncio.Event(loop=self._connector.loop)
+        stop_event = jasyncio.Event()
 
         async def _watcher(stop_event):
             try:
@@ -844,8 +819,7 @@ class Controller:
                     try:
                         results = await utils.run_with_interrupt(
                             watcher.Next(),
-                            stop_event,
-                            loop=self._connector.loop)
+                            stop_event)
                     except JujuAPIError as e:
                         if 'watcher was stopped' not in str(e):
                             raise
@@ -866,5 +840,29 @@ class Controller:
                 raise
 
         log.debug('Starting watcher task for model summaries')
-        self._connector.loop.create_task(_watcher(stop_event))
+        jasyncio.ensure_future(_watcher(stop_event))
         return stop_event
+
+
+class ConnectedController(Controller):
+    def __init__(
+        self,
+        connection,
+        max_frame_size=None,
+        bakery_client=None,
+        jujudata=None,
+    ):
+        super().__init__(
+            max_frame_size=max_frame_size,
+            bakery_client=bakery_client,
+            jujudata=jujudata)
+        self._conn = connection
+
+    async def __aenter__(self):
+        kwargs = self._conn.connect_params()
+        kwargs.pop('uuid')
+        await self._connect_direct(**kwargs)
+        return self
+
+    async def __aexit__(self, exc_type, exc, tb):
+        await self.disconnect()

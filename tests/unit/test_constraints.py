@@ -20,11 +20,13 @@ class TestConstraints(unittest.TestCase):
     def test_normalize_key(self):
         _ = constraints.normalize_key
 
-        self.assertEqual(_("test-key"), "test_key")
-        self.assertEqual(_("test-key  "), "test_key")
-        self.assertEqual(_("  test-key"), "test_key")
-        self.assertEqual(_("TestKey"), "test_key")
-        self.assertEqual(_("testKey"), "test_key")
+        self.assertEqual(_("root-disk"), "root_disk")
+        self.assertEqual(_("root-disk  "), "root_disk")
+        self.assertEqual(_("  root-disk"), "root_disk")
+        self.assertEqual(_("RootDisk"), "root_disk")
+        self.assertEqual(_("rootDisk"), "root_disk")
+
+        self.assertRaises(Exception, lambda: _("not-one-of-the-supported-keys"))
 
     def test_normalize_val(self):
         _ = constraints.normalize_value
@@ -33,6 +35,10 @@ class TestConstraints(unittest.TestCase):
         self.assertEqual(_("10M"), 10)
         self.assertEqual(_("10"), 10)
         self.assertEqual(_("foo,bar"), "foo,bar")
+        self.assertEqual(_("false"), False)
+        self.assertEqual(_("true"), True)
+        self.assertEqual(_("FALSE"), False)
+        self.assertEqual(_("TRUE"), True)
 
     def test_normalize_list_val(self):
         _ = constraints.normalize_list_value
@@ -49,12 +55,15 @@ class TestConstraints(unittest.TestCase):
         )
 
         self.assertEqual(
-            _("mem=10G foo=bar,baz tags=tag1 spaces=space1,space2"),
+            _("mem=10G zones=bar,baz tags=tag1 spaces=space1,space2"),
             {"mem": 10 * 1024,
-             "foo": "bar,baz",
+             "zones": "bar,baz",
              "tags": ["tag1"],
              "spaces": ["space1", "space2"]}
         )
+
+        self.assertRaises(Exception, lambda: _("root-disk>16G"))
+        self.assertRaises(Exception, lambda: _("root-disk>=16G"))
 
     def test_parse_storage_constraint(self):
         _ = constraints.parse_storage_constraint

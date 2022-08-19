@@ -1,17 +1,16 @@
-import asyncio
 import base64
 import json
 import logging
 import ssl
 import urllib.request
 import weakref
-from concurrent.futures import CancelledError
 from http.client import HTTPSConnection
+from dateutil.parser import parse
 
 import macaroonbakery.bakery as bakery
 import macaroonbakery.httpbakery as httpbakery
 import websockets
-from juju import errors, tag, utils
+from juju import errors, tag, utils, jasyncio
 from juju.client import client
 from juju.utils import IdQueue
 
@@ -28,9 +27,10 @@ client_facades = {
     'ApplicationScaler': {'versions': [1]},
     'Backups': {'versions': [1, 2]},
     'Block': {'versions': [2]},
-    'Bundle': {'versions': [1, 2, 3]},
+    'Bundle': {'versions': [1, 2, 3, 4, 5, 6]},
     'CharmHub': {'versions': [1]},
     'CharmRevisionUpdater': {'versions': [2]},
+    'CharmDownloader': {'versions': [1]},
     'Charms': {'versions': [2, 3, 4]},
     'Cleaner': {'versions': [2]},
     'Client': {'versions': [1, 2]},
@@ -46,6 +46,7 @@ client_facades = {
     'CAASUnitProvisioner': {'versions': [1, 2]},
     'CAASOperatorUpgrader': {'versions': [1]},
     'CAASModelOperator': {'versions': [1]},
+    'CAASModelConfigManager': {'versions': [1]},
     'Controller': {'versions': [3, 4, 5, 6, 7, 8, 9]},
     'CrossModelRelations': {'versions': [1]},
     'CrossController': {'versions': [1]},
@@ -91,12 +92,16 @@ client_facades = {
     'Pinger': {'versions': [1]},
     'Provisioner': {'versions': [3, 4, 5, 6]},
     'ProxyUpdater': {'versions': [1, 2]},
+    'RaftLease': {'versions': [1]},
     'Reboot': {'versions': [2]},
     'RemoteRelations': {'versions': [1]},
     'Resources': {'versions': [1]},
     'ResourcesHookContext': {'versions': [1]},
     'Resumer': {'versions': [2]},
     'RetryStrategy': {'versions': [1]},
+    'Secrets': {'versions': [1]},
+    'SecretsManager': {'versions': [1]},
+    'SecretsRotationWatcher': {'versions': [1]},
     'Singular': {'versions': [2]},
     'SSHClient': {'versions': [1, 2]},
     'Spaces': {'versions': [2, 3, 4, 5, 6]},
@@ -163,8 +168,8 @@ class Monitor:
 
     def __init__(self, connection):
         self.connection = weakref.ref(connection)
-        self.reconnecting = asyncio.Lock()
-        self.close_called = asyncio.Event()
+        self.reconnecting = jasyncio.Lock()
+        self.close_called = jasyncio.Event()
 
     @property
     def status(self):
@@ -186,7 +191,7 @@ class Monitor:
             return self.DISCONNECTED
 
         # connection cleanly disconnected or not yet opened
-        if not connection.ws:
+        if not connection._ws:
             return self.DISCONNECTED
 
         # close called but not yet complete
@@ -194,8 +199,12 @@ class Monitor:
             return self.DISCONNECTING
 
         # connection closed uncleanly (we didn't call connection.close)
-        stopped = connection._receiver_task.stopped.is_set()
-        if stopped or not connection.ws.open:
+        if connection.is_debug_log_connection:
+            stopped = connection._debug_log_task.cancelled()
+        else:
+            stopped = connection._receiver_task.cancelled()
+
+        if stopped or not connection._ws.open:
             return self.ERROR
 
         # everything is fine!
@@ -210,8 +219,6 @@ class Connection:
         client = await Connection.connect(
             api_endpoint, model_uuid, username, password, cacert)
 
-    Note: Any connection method or constructor can accept an optional `loop`
-    argument to override the default event loop from `asyncio.get_event_loop`.
     """
 
     MAX_FRAME_SIZE = 2**22
@@ -226,12 +233,13 @@ class Connection:
             password=None,
             cacert=None,
             bakery_client=None,
-            loop=None,
             max_frame_size=None,
             retries=3,
             retry_backoff=10,
             specified_facades=None,
             proxy=None,
+            debug_log_conn=None,
+            debug_log_params={}
     ):
         """Connect to the websocket.
 
@@ -250,8 +258,6 @@ class Connection:
             to use when performing macaroon-based login. Macaroon tokens
             acquired when logging will be saved to bakery_client.cookies.
             If this is None, a default bakery_client will be used.
-        :param asyncio.BaseEventLoop loop: The event loop to use for async
-            operations.
         :param int max_frame_size: The maximum websocket frame size to allow.
         :param int retries: When connecting or reconnecting, and all endpoints
             fail, how many times to retry the connection before giving up.
@@ -260,6 +266,8 @@ class Connection:
             would wait 10s, 20s, and 30s).
         :param specified_facades: Define a series of facade versions you wish to override
             to prevent using the conservative client pinning with in the client.
+        :param TextIOWrapper debug_log_conn: target if this is a debug log connection
+        :param dict debug_log_params: filtering parameters for the debug-log output
         """
         self = cls()
         if endpoint is None:
@@ -279,7 +287,6 @@ class Connection:
             username = None
         self.usertag = tag.user(username)
         self.password = password
-        self.loop = loop or asyncio.get_event_loop()
 
         self.__request_id__ = 0
 
@@ -287,15 +294,21 @@ class Connection:
         # _connect_with_redirect method, but create them here
         # as a reminder that they will exist.
         self.addr = None
-        self.ws = None
+        self._ws = None
         self.endpoint = None
         self.endpoints = None
         self.cacert = None
         self.info = None
 
+        self.debug_log_target = debug_log_conn
+        self.is_debug_log_connection = debug_log_conn is not None
+        self.debug_log_params = debug_log_params
+        self.debug_log_shown_lines = 0  # number of lines
+
         # Create that _Task objects but don't start the tasks yet.
-        self._pinger_task = _Task(self._pinger, self.loop)
-        self._receiver_task = _Task(self._receiver, self.loop)
+        self._pinger_task = None
+        self._receiver_task = None
+        self._debug_log_task = None
 
         self._retries = retries
         self._retry_backoff = retry_backoff
@@ -303,7 +316,7 @@ class Connection:
         self.facades = {}
         self.specified_facades = specified_facades or {}
 
-        self.messages = IdQueue(loop=self.loop)
+        self.messages = IdQueue()
         self.monitor = Monitor(connection=self)
         if max_frame_size is None:
             max_frame_size = self.MAX_FRAME_SIZE
@@ -317,7 +330,12 @@ class Connection:
         lastError = None
         for _ep in _endpoints:
             try:
-                await self._connect_with_redirect([_ep])
+                if self.is_debug_log_connection:
+                    # make a direct connection with basic auth if
+                    # debug-log (i.e. no redirection or login)
+                    await self._connect([_ep])
+                else:
+                    await self._connect_with_redirect([_ep])
                 return self
             except ssl.SSLError as e:
                 lastError = e
@@ -330,6 +348,11 @@ class Connection:
         if lastError is not None:
             raise lastError
         raise Exception("Unable to connect to websocket")
+
+    @property
+    def ws(self):
+        log.warning('Direct access to the websocket object may cause disruptions in asyncio event handling.')
+        return self._ws
 
     @property
     def username(self):
@@ -355,7 +378,12 @@ class Connection:
         return context
 
     async def _open(self, endpoint, cacert):
-        if self.uuid:
+
+        if self.is_debug_log_connection:
+            assert self.uuid
+            url = "wss://user-{}:{}@{}/model/{}/log".format(
+                self.username, self.password, endpoint, self.uuid)
+        elif self.uuid:
             url = "wss://{}/model/{}/api".format(endpoint, self.uuid)
         else:
             url = "wss://{}/api".format(endpoint)
@@ -372,20 +400,31 @@ class Connection:
         return (await websockets.connect(
             url,
             ssl=self._get_ssl(cacert),
-            loop=self.loop,
             max_size=self.max_frame_size,
             server_hostname=server_hostname,
             sock=sock,
         )), url, endpoint, cacert
 
-    async def close(self):
-        if not self.ws:
+    async def close(self, to_reconnect=False):
+        if not self._ws:
             return
         self.monitor.close_called.set()
-        await self._pinger_task.stopped.wait()
-        await self._receiver_task.stopped.wait()
-        await self.ws.close()
-        self.ws = None
+
+        if self._pinger_task:
+            self._pinger_task.cancel()
+            self._pinger_task = None
+        if self._receiver_task:
+            self._receiver_task.cancel()
+            self._receiver_task = None
+        if self._debug_log_task:
+            self._debug_log_task.cancel()
+            self._debug_log_task = None
+        #  Allow a second for tasks to be cancelled
+        await jasyncio.sleep(1)
+
+        if self._ws and not self._ws.closed:
+            await self._ws.close()
+        self._ws = None
 
         if self.proxy is not None:
             self.proxy.close()
@@ -393,29 +432,113 @@ class Connection:
     async def _recv(self, request_id):
         if not self.is_open:
             raise websockets.exceptions.ConnectionClosed(0, 'websocket closed')
-        return await self.messages.get(request_id)
+        try:
+            return await self.messages.get(request_id)
+        except GeneratorExit:
+            return {}
+
+    def debug_log_filter_write(self, result):
+
+        write_or_not = True
+
+        entity = result['tag']
+        msg_lev = result['sev']
+        mod = result['mod']
+        msg = result['msg']
+
+        excluded_entities = self.debug_log_params['exclude']
+        excluded_modules = self.debug_log_params['exclude_module']
+        write_or_not = write_or_not and \
+            (mod not in excluded_modules) and \
+            (entity not in excluded_entities)
+
+        included_entities = self.debug_log_params['include']
+        only_these_modules = self.debug_log_params['include_module']
+        write_or_not = write_or_not and \
+            (only_these_modules == [] or mod in only_these_modules) and \
+            (included_entities == [] or entity in included_entities)
+
+        LEVELS = ['TRACE', 'DEBUG', 'INFO', 'WARNING', 'ERROR']
+        log_level = self.debug_log_params['level']
+
+        if log_level != "" and log_level not in LEVELS:
+            log.warning("Debug Logger: level should be one of %s, given %s" % (LEVELS, log_level))
+        else:
+            write_or_not = write_or_not and \
+                (log_level == "" or (LEVELS.index(msg_lev) >= LEVELS.index(log_level)))
+
+        # TODO
+        # lines = self.debug_log_params['lines']
+        # no_tail = self.debug_log_params['no_tail']
+
+        if write_or_not:
+            ts = parse(result['ts'])
+
+            self.debug_log_target.write("%s %02d:%02d:%02d %s %s %s\n" % (entity, ts.hour, ts.minute, ts.second, msg_lev, mod, msg))
+            return 1
+        else:
+            return 0
+
+    async def _debug_logger(self):
+        try:
+            while self.is_open:
+                result = await utils.run_with_interrupt(
+                    self._ws.recv(),
+                    self.monitor.close_called,
+                    log=log)
+                if self.monitor.close_called.is_set():
+                    break
+                if result is not None and result != '{}\n':
+                    result = json.loads(result)
+
+                    number_of_lines_written = self.debug_log_filter_write(result)
+
+                    self.debug_log_shown_lines += number_of_lines_written
+
+                    if self.debug_log_shown_lines >= self.debug_log_params['limit']:
+                        jasyncio.create_task(self.close())
+                        return
+
+        except KeyError as e:
+            log.exception('Unexpected debug line -- %s' % e)
+            jasyncio.create_task(self.close())
+            raise
+        except jasyncio.CancelledError:
+            jasyncio.create_task(self.close())
+            raise
+        except websockets.exceptions.ConnectionClosed:
+            log.warning('Debug Logger: Connection closed, reconnecting')
+            # the reconnect has to be done as a task because the receiver will
+            # be cancelled by the reconnect and we don't want the reconnect
+            # to be aborted half-way through
+            jasyncio.ensure_future(self.reconnect())
+            return
+        except Exception as e:
+            log.exception("Error in debug logger : %s" % e)
+            jasyncio.create_task(self.close())
+            raise
 
     async def _receiver(self):
         try:
             while self.is_open:
                 result = await utils.run_with_interrupt(
-                    self.ws.recv(),
+                    self._ws.recv(),
                     self.monitor.close_called,
-                    loop=self.loop)
+                    log=log)
                 if self.monitor.close_called.is_set():
                     break
                 if result is not None:
                     result = json.loads(result)
                     await self.messages.put(result['request-id'], result)
-        except CancelledError:
-            pass
-        except websockets.ConnectionClosed as e:
+        except jasyncio.CancelledError:
+            raise
+        except websockets.exceptions.ConnectionClosed as e:
             log.warning('Receiver: Connection closed, reconnecting')
             await self.messages.put_all(e)
             # the reconnect has to be done as a task because the receiver will
             # be cancelled by the reconnect and we don't want the reconnect
             # to be aborted half-way through
-            self.loop.create_task(self.reconnect())
+            jasyncio.ensure_future(self.reconnect())
             return
         except Exception as e:
             log.exception("Error in receiver")
@@ -434,9 +557,8 @@ class Connection:
         async def _do_ping():
             try:
                 await pinger_facade.Ping()
-                await asyncio.sleep(10)
-            except CancelledError:
-                pass
+            except jasyncio.CancelledError:
+                raise
 
         pinger_facade = client.PingerFacade.from_connection(self)
         try:
@@ -444,9 +566,12 @@ class Connection:
                 await utils.run_with_interrupt(
                     _do_ping(),
                     self.monitor.close_called,
-                    loop=self.loop)
+                    log=log)
                 if self.monitor.close_called.is_set():
                     break
+                await jasyncio.sleep(10)
+        except jasyncio.CancelledError:
+            raise
         except websockets.exceptions.ConnectionClosed:
             # The connection has closed - we can't do anything
             # more until the connection is restarted.
@@ -464,7 +589,7 @@ class Connection:
         '''
         self.__request_id__ += 1
         msg['request-id'] = self.__request_id__
-        if'params' not in msg:
+        if 'params' not in msg:
             msg['params'] = {}
         if "version" not in msg:
             msg['version'] = self.facades[msg['type']]
@@ -476,7 +601,7 @@ class Connection:
                 raise websockets.exceptions.ConnectionClosed(
                     0, 'websocket closed')
             try:
-                await self.ws.send(outgoing)
+                await self._ws.send(outgoing)
                 break
             except websockets.ConnectionClosed:
                 if attempt == 2:
@@ -486,7 +611,7 @@ class Connection:
                 # if it is triggered by the pinger, then this RPC call will
                 # be cancelled when the pinger is cancelled by the reconnect,
                 # and we don't want the reconnect to be aborted halfway through
-                await asyncio.wait([self.reconnect()], loop=self.loop)
+                await jasyncio.wait([self.reconnect()])
                 if self.monitor.status != Monitor.CONNECTED:
                     # reconnect failed; abort and shutdown
                     log.error('RPC: Automatic reconnect failed')
@@ -588,7 +713,6 @@ class Connection:
             'password': self.password,
             'cacert': self.cacert,
             'bakery_client': self.bakery_client,
-            'loop': self.loop,
             'max_frame_size': self.max_frame_size,
             'proxy': self.proxy,
         }
@@ -602,7 +726,6 @@ class Connection:
             password=self.password,
             cacert=self.cacert,
             bakery_client=self.bakery_client,
-            loop=self.loop,
             max_frame_size=self.max_frame_size,
         )
 
@@ -613,12 +736,17 @@ class Connection:
         if monitor.reconnecting.locked() or monitor.close_called.is_set():
             return
         async with monitor.reconnecting:
-            await self.close()
-            await self._connect_with_login(
+            await self.close(to_reconnect=True)
+            connector = self._connect if self.is_debug_log_connection else self._connect_with_login
+            res = await connector(
                 [(self.endpoint, self.cacert)]
                 if not self.endpoints else
                 self.endpoints
             )
+            if not self.is_debug_log_connection:
+                self._build_facades(res.get('facades', {}))
+                if not self._pinger_task:
+                    self._pinger_task = jasyncio.create_task(self._pinger())
 
     async def _connect(self, endpoints):
         if len(endpoints) == 0:
@@ -626,17 +754,17 @@ class Connection:
 
         async def _try_endpoint(endpoint, cacert, delay):
             if delay:
-                await asyncio.sleep(delay)
+                await jasyncio.sleep(delay)
             return await self._open(endpoint, cacert)
 
         # Try all endpoints in parallel, with slight increasing delay (+100ms
         # for each subsequent endpoint); the delay allows us to prefer the
         # earlier endpoints over the latter. Use first successful connection.
-        tasks = [self.loop.create_task(_try_endpoint(endpoint, cacert,
-                                                     0.1 * i))
+        tasks = [jasyncio.ensure_future(_try_endpoint(endpoint, cacert,
+                                                      0.1 * i))
                  for i, (endpoint, cacert) in enumerate(endpoints)]
         for attempt in range(self._retries + 1):
-            for task in asyncio.as_completed(tasks):
+            for task in jasyncio.as_completed(tasks):
                 try:
                     result = await task
                     break
@@ -650,7 +778,7 @@ class Connection:
                               'attempt {} of {}'.format(_endpoints_str,
                                                         attempt + 1,
                                                         self._retries + 1))
-                    await asyncio.sleep((attempt + 1) * self._retry_backoff)
+                    await jasyncio.sleep((attempt + 1) * self._retry_backoff)
                     continue
                 else:
                     raise errors.JujuConnectionError(
@@ -661,11 +789,21 @@ class Connection:
             break
         for task in tasks:
             task.cancel()
-        self.ws = result[0]
+        self._ws = result[0]
         self.addr = result[1]
         self.endpoint = result[2]
         self.cacert = result[3]
-        self._receiver_task.start()
+
+        #  If this is a debug-log connection, and the _debug_log_task
+        #  is not created yet, then go ahead and schedule it
+        if self.is_debug_log_connection and not self._debug_log_task:
+            self._debug_log_task = jasyncio.create_task(self._debug_logger())
+
+        #  If this is regular connection, and we dont have a
+        #  receiver_task yet, then schedule a _receiver_task
+        elif not self.is_debug_log_connection and not self._receiver_task:
+            self._receiver_task = jasyncio.create_task(self._receiver())
+
         log.debug("Driver connected to juju %s", self.addr)
         self.monitor.close_called.clear()
 
@@ -708,8 +846,6 @@ class Connection:
         finally:
             if not success:
                 await self.close()
-            else:
-                self._pinger_task.start()
 
     async def _connect_with_redirect(self, endpoints):
         try:
@@ -720,7 +856,8 @@ class Connection:
                 raise
             login_result = await self._connect_with_login(e.endpoints)
         self._build_facades(login_result.get('facades', {}))
-        self._pinger_task.start()
+        if not self._pinger_task:
+            self._pinger_task = jasyncio.create_task(self._pinger())
 
     def _build_facades(self, facades):
         self.facades.clear()
@@ -801,23 +938,6 @@ class Connection:
                 "version": 3,
             }))['response']
             raise errors.JujuRedirectException(redirect_info, True) from e
-
-
-class _Task:
-    def __init__(self, task, loop):
-        self.stopped = asyncio.Event()
-        self.stopped.set()
-        self.task = task
-        self.loop = loop
-
-    def start(self):
-        async def run():
-            try:
-                return await self.task()
-            finally:
-                self.stopped.set()
-        self.stopped.clear()
-        self.loop.create_task(run())
 
 
 def _macaroons_for_domain(cookies, domain):

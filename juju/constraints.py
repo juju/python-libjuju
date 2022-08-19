@@ -32,6 +32,25 @@ FACTORS = {
     "Y": 1024 ** 6
 }
 
+# List of supported constraint keys, see
+# http://github.com/cderici/juju/blob/2.9/core/constraints/constraints.go#L20-L39
+SUPPORTED_KEYS = [
+    "arch",
+    "container",
+    "cpu_cores",
+    "cores",
+    "cpu_power",
+    "mem",
+    "root_disk",
+    "root_disk_source",
+    "tags",
+    "instance_role",
+    "instance_type",
+    "spaces",
+    "virt_type",
+    "zones",
+    "allocate_public_ip"]
+
 LIST_KEYS = {'tags', 'spaces'}
 
 SNAKE1 = re.compile(r'(.)([A-Z][a-z]+)')
@@ -51,17 +70,20 @@ def parse(constraints):
         # Fowards compatibilty: already parsed
         return constraints
 
-    constraints = {
-        normalize_key(k): (
-            normalize_list_value(v) if k in LIST_KEYS else
-            normalize_value(v)
-        ) for k, v in [s.split("=") for s in constraints.split(" ")]}
+    normalized_constraints = {}
+    for s in constraints.split(" "):
+        if "=" not in s:
+            raise Exception("malformed constraint %s" % s)
 
-    return constraints
+        k, v = s.split("=")
+        normalized_constraints[normalize_key(k)] = normalize_list_value(v) if\
+            k in LIST_KEYS else normalize_value(v)
+
+    return normalized_constraints
 
 
-def normalize_key(key):
-    key = key.strip()
+def normalize_key(orig_key):
+    key = orig_key.strip()
 
     key = key.replace("-", "_")  # Our _client lib wants "_" in place of "-"
 
@@ -69,6 +91,8 @@ def normalize_key(key):
     key = SNAKE1.sub(r'\1_\2', key)
     key = SNAKE2.sub(r'\1_\2', key).lower()
 
+    if key not in SUPPORTED_KEYS:
+        raise Exception("unknown constraint in %s" % orig_key)
     return key
 
 
@@ -81,6 +105,11 @@ def normalize_value(value):
 
     if value.isdigit():
         return int(value)
+
+    if value.lower() == 'true':
+        return True
+    if value.lower() == 'false':
+        return False
 
     return value
 

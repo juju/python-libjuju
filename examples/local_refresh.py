@@ -5,7 +5,7 @@ This example:
 2. Upgrades previously deployed ubuntu charm
 
 """
-from juju import loop
+from juju import jasyncio
 from juju.model import Model
 
 
@@ -27,4 +27,4 @@ async def main():
 
 
 if __name__ == '__main__':
-    loop.run(main())
+    jasyncio.run(main())

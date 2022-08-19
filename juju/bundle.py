@@ -1,9 +1,9 @@
-import asyncio
 import logging
 import io
 import os
 import zipfile
 import requests
+import base64
 from contextlib import closing
 from pathlib import Path
 
@@ -14,6 +14,7 @@ from toposort import toposort_flatten
 from .client import client
 from .constraints import parse as parse_constraints, parse_storage_constraint, parse_device_constraint
 from .errors import JujuError
+from . import utils, jasyncio, charmhub
 from .origin import Channel
 from .url import Schema, URL
 
@@ -29,6 +30,9 @@ class BundleHandler:
         self.model = model
         self.trusted = trusted
         self.forced = forced
+        self.bundle = None
+        self.overlays = []
+        self.overlay_removed_charms = set()
 
         self.charmstore = model.charmstore
         self.plan = []
@@ -51,7 +55,8 @@ class BundleHandler:
 
         # Feature detect if we have the new charms facade, otherwise fallback
         # to the client facade, when making calls.
-        if client.CharmsFacade.best_facade_version(model.connection()) > 2:
+        best_facade_version = client.CharmsFacade.best_facade_version(model.connection())
+        if best_facade_version is not None and best_facade_version > 2:
             self.charms_facade = client.CharmsFacade.from_connection(
                 model.connection())
         else:
@@ -76,7 +81,7 @@ class BundleHandler:
         """Validate the bundle for known issues, raises an error if it
         encounters a known problem
         """
-        apps_dict = bundle.get('applications', bundle.get('services', {}))
+        apps_dict = bundle.get('applications', {})
         for app_name in self.applications:
             app_dict = apps_dict[app_name]
             app_trusted = app_dict.get('trust')
@@ -102,7 +107,7 @@ class BundleHandler:
         apps, args = [], []
 
         default_series = bundle.get('series')
-        apps_dict = bundle.get('applications', bundle.get('services', {}))
+        apps_dict = bundle.get('applications', {})
         for app_name in self.applications:
             app_dict = apps_dict[app_name]
             charm_dir = app_dict['charm']
@@ -115,10 +120,12 @@ class BundleHandler:
                 charm_dir = str(charm_path)
             except ValueError:
                 pass
+            except FileNotFoundError:
+                continue
             series = (
                 app_dict.get('series') or
                 default_series or
-                get_charm_series(charm_dir)
+                await get_charm_series(charm_dir, self.model)
             )
             if not series:
                 raise JujuError(
@@ -133,17 +140,81 @@ class BundleHandler:
         if apps:
             # If we have apps to update, spawn all the coroutines concurrently
             # and wait for them to finish.
-            charm_urls = await asyncio.gather(*[
+            charm_urls = await jasyncio.gather(*[
                 self.model.add_local_charm_dir(*params)
                 for params in args
-            ], loop=self.model.loop)
+            ])
+
             # Update the 'charm:' entry for each app with the new 'local:' url.
-            for app_name, charm_url in zip(apps, charm_urls):
+            for app_name, charm_url, (charm_dir, _) in zip(apps, charm_urls, args):
+                resources = await self.model.add_local_resources(
+                    app_name,
+                    charm_url,
+                    utils.get_local_charm_metadata(charm_dir),
+                    resources=bundle.get('applications', {app_name: {}})[app_name].get("resources", {}),
+                )
                 apps_dict[app_name]['charm'] = charm_url
+                apps_dict[app_name]["resources"] = resources
 
         return bundle
 
-    async def fetch_plan(self, charm_url, origin):
+    def _resolve_include_file_config(self, bundle_dir):
+        """if any of the applications (including the ones in the overlays)
+        have "config: include-file:..." or "config:
+        include-base64:...", then we have to resolve and inline them
+        into the bundle here because they're all files with local
+        relative paths, so backend can't handle them.
+
+        """
+        bundle_apps = [self.bundle.get('applications', {})]
+        overlay_apps = [overlay.get('applications', {}) for overlay in self.overlays]
+
+        for apps in bundle_apps + overlay_apps:
+            for app_name, app in apps.items():
+
+                if app and 'options' in app:
+                    if 'config' in app['options'] and app['options']['config'].startswith('include-file'):
+                        # resolve the file
+                        if not bundle_dir:
+                            raise NotImplementedError('unable to resolve paths for config:include-file for non-local charms')
+                        try:
+                            config_path = (bundle_dir / Path(app['options']['config'].split('//')[1])).resolve()
+                        except IndexError:
+                            raise JujuError('the path for the included file should start with // and be relative to the bundle')
+                        if not config_path.exists():
+                            raise JujuError('unable to locate config file : %s for : %s' % (config_path, app_name))
+
+                        # get the contents of the file
+                        config_contents = yaml.safe_load(config_path.read_text())
+
+                        # inline the configurations for the current app into
+                        # the app['options']
+                        for key, val in config_contents[app_name].items():
+                            app['options'][key] = val
+
+                        # remove the 'include-file' config
+                        app['options'].pop('config')
+
+                    for option_key, option_val in app['options'].items():
+                        if isinstance(option_val, str) and option_val.startswith('include-base64'):
+                            # resolve the file
+                            if not bundle_dir:
+                                raise NotImplementedError('unable to resolve paths for config:include-base64 for non-local charms')
+                            try:
+                                base64_path = (bundle_dir / Path(option_val.split('//')[1])).resolve()
+                            except IndexError:
+                                raise JujuError('the path for the included base64 file should start with // and be relative to the bundle')
+
+                            if not base64_path.exists():
+                                raise JujuError('unable to locate the base64 file : %s for : %s' % (base64_path, app_name))
+
+                            # inline the base64 encoded config value
+                            base64_contents = base64.b64decode(base64_path.read_text())
+                            app['options'][option_key] = base64_contents
+
+        return self.bundle, self.overlays
+
+    async def fetch_plan(self, charm_url, origin, overlays=[]):
         entity_id = charm_url.path()
         is_local = Schema.LOCAL.matches(charm_url.schema)
         bundle_dir = None
@@ -165,14 +236,41 @@ class BundleHandler:
         if not bundle_yaml:
             raise JujuError('empty bundle, nothing to deploy')
 
-        self.bundle = yaml.safe_load(bundle_yaml)
+        _bundles = [b for b in yaml.safe_load_all(bundle_yaml)]
+        self.overlays = _bundles[1:]
+        self.bundle = _bundles[0]
+
+        if overlays != []:
+            for overlay_yaml_path in overlays:
+                try:
+                    overlay_contents = Path(overlay_yaml_path).read_text()
+                except (OSError, IOError) as e:
+                    raise JujuError('unable to open overlay %s \n %s' % (overlay_yaml_path, e))
+                self.overlays.extend(yaml.safe_load_all(overlay_contents))
+
+        # gather the names of the removed charms so model.deploy
+        # wouldn't wait for them to appear in the model
+        for overlay in self.overlays:
+            overlay_apps = overlay.get('applications', {})
+            for charm_name, val in overlay_apps.items():
+                if val is None:
+                    self.overlay_removed_charms.add(charm_name)
+
         self.bundle = await self._validate_bundle(self.bundle)
+
         if is_local:
             self.bundle = await self._handle_local_charms(self.bundle, bundle_dir)
 
+        self.bundle, self.overlays = self._resolve_include_file_config(bundle_dir)
+
+        _yaml_data = [yaml.dump(self.bundle)]
+        for overlay in self.overlays:
+            _yaml_data.append(yaml.dump(overlay).replace('null', ''))
+        yaml_data = "---\n".join(_yaml_data)
+
         self.plan = await self.bundle_facade.GetChanges(
             bundleurl=entity_id,
-            yaml=yaml.dump(self.bundle))
+            yaml=yaml_data)
 
         if self.plan.errors:
             raise JujuError(self.plan.errors)
@@ -219,6 +317,7 @@ class BundleHandler:
         deployed = dict()
 
         specs = self.applications_specs
+
         for name in self.applications:
             spec = specs[name]
             app = self.model.applications.get(name, None)
@@ -228,7 +327,7 @@ class BundleHandler:
                 deployed[name] = name
 
                 if is_local_charm(spec['charm']):
-                    spec.charm = self.model.applications[name]
+                    spec['charm'] = self.model.applications[name]
                     continue
                 if spec['charm'] == app.charm_url:
                     continue
@@ -254,7 +353,7 @@ class BundleHandler:
                                             architecture=architecture,
                                             risk=risk,
                                             track=track)
-                charm_url, charm_origin = await self.model._resolve_charm(charm_url, origin)
+                charm_url, charm_origin, _ = await self.model._resolve_charm(charm_url, origin)
 
                 spec['charm'] = str(charm_url)
             else:
@@ -282,14 +381,12 @@ class BundleHandler:
 
     @property
     def applications(self):
-        apps_dict = self.bundle.get('applications',
-                                    self.bundle.get('services', {}))
-        return list(apps_dict.keys())
+        apps_dict = self.bundle.get('applications', {})
+        return set(apps_dict.keys()) - self.overlay_removed_charms
 
     @property
     def applications_specs(self):
-        return self.bundle.get('applications',
-                               self.bundle.get('services', {}))
+        return self.bundle.get('applications', {})
 
     def resolve_relation(self, reference):
         parts = reference.split(":", maxsplit=1)
@@ -310,19 +407,23 @@ def is_local_charm(charm_url):
     return charm_url.startswith('.') or charm_url.startswith('local:') or os.path.isabs(charm_url)
 
 
-def get_charm_series(path):
+async def get_charm_series(path, model):
     """Inspects the charm directory at ``path`` and returns a default
     series from its metadata.yaml (the first item in the 'series' list).
 
+    Tries to extract the informiation from the given model if no
+    series is determined from the path.
     Returns None if no series can be determined.
+
     """
+    path = Path(path)
     try:
-        if path.endswith('.charm'):
+        if path.suffix == '.charm':
             md = "metadata.yaml in %s" % path
-            with zipfile.ZipFile(path, 'r') as charm_file:
+            with zipfile.ZipFile(str(path), 'r') as charm_file:
                 data = yaml.safe_load(charm_file.read('metadata.yaml'))
         else:
-            md = Path(path) / "metadata.yaml"
+            md = path / "metadata.yaml"
             if not md.exists():
                 return None
             data = yaml.safe_load(md.open())
@@ -331,8 +432,19 @@ def get_charm_series(path):
             mark = exc.problem_mark
             log.error("Error parsing YAML file {}, line {}, column: {}".format(md, mark.line, mark.column))
         raise
-    series = data.get('series')
-    return series[0] if series else None
+    _series = data.get('series')
+    series = _series[0] if _series else None
+
+    if series is None:
+        # get the ConfigValue for the 'default-series' from the model
+        model_config = await model.get_config()
+        _default_series = model_config.get("default-series")
+
+        if _default_series is not None:
+            # then update the series with its value
+            series = _default_series.value
+
+    return series
 
 
 class ChangeSet:
@@ -474,22 +586,45 @@ class AddApplicationChange(ChangeInfo):
             options["trust"] = "true"
 
         url = URL.parse(str(charm))
+
+        # set the channel to the default value if not specified
+        if not self.channel:
+            if Schema.CHARM_STORE.matches(url.schema):
+                self.channel = "stable"
+            elif Schema.CHARM_HUB.matches(url.schema):
+                self.channel = "latest/stable"
+            else:   # for local charms
+                self.channel = ""
+
+        channel = None
+        non_normalized_channel = None
+        if self.channel is not None and self.channel != "":
+            non_normalized_channel = Channel.parse(self.channel)
+            channel = non_normalized_channel.normalize()
+
+        origin = context.origins.get(str(url), {}).get(
+            str(channel),
+            context.origins.get(str(url), {}).get(str(non_normalized_channel), None),
+        )
+        if origin is None:
+            raise JujuError("expected origin to be valid for application {} and charm {} with channel {}".format(self.application, str(url), str(channel)))
+
+        if self.series is None or self.series == "":
+            self.series = context.bundle.get("series", None)
+
         if Schema.CHARM_STORE.matches(url.schema):
             resources = await context.model._add_store_resources(
                 self.application, charm, overrides=self.resources)
+        elif Schema.CHARM_HUB.matches(url.schema):
+            c_hub = charmhub.CharmHub(context.model)
+            info = await c_hub.info(url.name, channel=self.channel)
+            if info.errors.error_list.code:
+                raise JujuError("unable to resolve the charm {} with channel {}".format(url.name, channel))
+            origin.id_ = info.result.id_
+            resources = await context.model._add_charmhub_resources(
+                self.application, charm, origin, overrides=self.resources)
         else:
-            resources = {}
-
-        channel = None
-        if self.channel is not None and self.channel != "":
-            channel = Channel.parse(self.channel).normalize()
-
-        origin = context.origins.get(str(url), {}).get(str(channel), None)
-        if origin is None:
-            raise JujuError("expected origin to be valid for application {} and charm {} with channel {}".format(self.application, str(url), str(channel)))
-        if self.series is None or self.series == "":
-            self.series = context.bundle.get("bundle",
-                                             context.bundle.get("series", None))
+            resources = context.bundle.get("applications", {}).get(self.application, {}).get("resources", {})
 
         await context.model._deploy(
             charm_url=charm,
@@ -500,8 +635,10 @@ class AddApplicationChange(ChangeInfo):
             endpoint_bindings=self.endpoint_bindings,
             resources=resources,
             storage=self.storage,
+            channel=self.channel,
             devices=self.devices,
             num_units=self.num_units,
+            charm_origin=origin,
         )
         return self.application
 
@@ -604,7 +741,7 @@ class AddCharmChange(ChangeInfo):
                                         architecture=arch,
                                         risk=ch.risk,
                                         track=ch.track)
-            identifier, origin = await context.model._resolve_charm(url, origin)
+            identifier, origin, _ = await context.model._resolve_charm(url, origin)
 
         if identifier is None:
             raise JujuError('unknown charm {}'.format(self.charm))
@@ -773,7 +910,7 @@ class AddRelationChange(ChangeInfo):
             return existing[0]
 
         log.info('Relating %s <-> %s', ep1, ep2)
-        return await context.model.add_relation(ep1, ep2)
+        return await context.model.relate(ep1, ep2)
 
     def __str__(self):
         return "add relation {endpoint1} - {endpoint2}".format(endpoint1=self.endpoint1,

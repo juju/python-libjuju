@@ -1,10 +1,10 @@
-import asyncio
 import base64
 import collections
 import hashlib
 import json
 import logging
 import os
+import sys
 import re
 import stat
 import tempfile
@@ -19,7 +19,7 @@ from pathlib import Path
 import yaml
 import websockets
 
-from . import provisioner, tag, utils
+from . import provisioner, tag, utils, jasyncio
 from .annotationhelper import _get_annotations, _set_annotations
 from .bundle import BundleHandler, get_charm_series, is_local_charm
 from .charmhub import CharmHub
@@ -28,9 +28,9 @@ from .client import client, connector
 from .client.client import ConfigValue, Value
 from .client.overrides import Caveat, Macaroon
 from .constraints import parse as parse_constraints
-from .controller import Controller
+from .controller import Controller, ConnectedController
 from .delta import get_entity_class, get_entity_delta
-from .errors import JujuAPIError, JujuError
+from .errors import JujuAPIError, JujuError, JujuModelConfigError, JujuBackupError
 from .errors import JujuAppError, JujuUnitError, JujuAgentError, JujuMachineError
 from .exceptions import DeadEntityException
 from .names import is_valid_application
@@ -459,7 +459,7 @@ class LocalDeployType:
             raise JujuError('{} path not found'.format(entity_url))
 
         is_bundle = (
-            (entity_url.endswith(".yaml") and entity_path.exists()) or
+            (entity_path.suffix == ".yaml" and entity_path.exists()) or
             bundle_path.exists()
         )
 
@@ -469,8 +469,8 @@ class LocalDeployType:
             if not is_bundle:
                 entity_url = url.path()
                 entity_path = Path(entity_url)
-                if str(entity_path).endswith('.charm'):
-                    with zipfile.ZipFile(entity_path, 'r') as charm_file:
+                if entity_path.suffix == '.charm':
+                    with zipfile.ZipFile(str(entity_path), 'r') as charm_file:
                         metadata = yaml.load(charm_file.read('metadata.yaml'), Loader=yaml.FullLoader)
                 else:
                     metadata_path = entity_path / 'metadata.yaml'
@@ -495,6 +495,11 @@ class CharmStoreDeployType:
         self.charmstore = charmstore
         self.get_series = get_series
 
+    @staticmethod
+    def _default_app_name(meta):
+        suggested_name = meta.get('charm-metadata', {}).get('Name')
+        return suggested_name or meta.get('id', {}).get('Name')
+
     async def resolve(self, url, architecture, app_name=None, channel=None, series=None, entity_url=None):
         """resolve attempts to resolve charmstore charms or bundles. A request
         to the charmstore is required to get more information about the
@@ -504,13 +509,14 @@ class CharmStoreDeployType:
         result = await self.charmstore.entity(str(url),
                                               channel=channel,
                                               include_stats=False)
+
         identifier = result['Id']
-        is_bundle = url.series == "bundle"
+        is_bundle = url.series == "bundle" or url.parse(identifier).series == "bundle"
         if not series:
-            series = self.get_series(entity_url, result)
+            series = "bundle" if is_bundle else self.get_series(entity_url, result)
 
         if app_name is None and not is_bundle:
-            app_name = result['Meta']['charm-metadata']['Name']
+            app_name = self._default_app_name(result['Meta'])
 
         origin = client.CharmOrigin(source="charm-store",
                                     architecture=architecture,
@@ -542,17 +548,27 @@ class CharmhubDeployType:
         ch = Channel('latest', 'stable')
         if channel is not None:
             ch = Channel.parse(channel).normalize()
+
         origin = client.CharmOrigin(source="charm-hub",
                                     architecture=architecture,
                                     risk=ch.risk,
                                     track=ch.track)
-        charm_url, origin = await self.charm_resolver(url, origin)
+
+        charm_url_str, origin, supported_series = await self.charm_resolver(url, origin)
+        charm_url = URL.parse(charm_url_str)
 
         if app_name is None:
             app_name = url.name
 
+        if series:
+            if series in supported_series:
+                origin.series = series
+                charm_url.series = series
+            else:
+                raise JujuError("Series {} not supported for {}. Only {}".format(series, url, supported_series))
+
         return DeployTypeResult(
-            identifier=charm_url,
+            identifier=str(charm_url),
             app_name=app_name,
             origin=origin,
             is_bundle=origin.type_ == "bundle",
@@ -565,7 +581,6 @@ class Model:
     """
     def __init__(
         self,
-        loop=None,
         max_frame_size=None,
         bakery_client=None,
         jujudata=None,
@@ -577,7 +592,6 @@ class Model:
 
         If jujudata is None, jujudata.FileJujuData will be used.
 
-        :param loop: an asyncio event loop
         :param max_frame_size: See
             `juju.client.connection.Connection.MAX_FRAME_SIZE`
         :param bakery_client httpbakery.Client: The bakery client to use
@@ -585,7 +599,6 @@ class Model:
         :param jujudata JujuData: The source for current controller information
         """
         self._connector = connector.Connector(
-            loop=loop,
             max_frame_size=max_frame_size,
             bakery_client=bakery_client,
             jujudata=jujudata,
@@ -594,13 +607,13 @@ class Model:
         self.state = ModelState(self)
         self._info = None
         self._mode = None
-        self._watch_stopping = asyncio.Event()
-        self._watch_stopped = asyncio.Event()
-        self._watch_received = asyncio.Event()
+        self._watch_stopping = jasyncio.Event()
+        self._watch_stopped = jasyncio.Event()
+        self._watch_received = jasyncio.Event()
         self._watch_stopped.set()
 
         self._charmhub = CharmHub(self)
-        self._charmstore = CharmStore(self._connector.loop)
+        self._charmstore = CharmStore()
 
         self.deploy_types = {
             "local": LocalDeployType(),
@@ -611,10 +624,6 @@ class Model:
     def is_connected(self):
         """Reports whether the Model is currently connected."""
         return self._connector.is_connected()
-
-    @property
-    def loop(self):
-        return self._connector.loop
 
     def connection(self):
         """Return the current Connection object. It raises an exception
@@ -673,13 +682,13 @@ class Model:
             If this is None, a default bakery_client will be used.
         :param list macaroons: List of macaroons to load into the
             ``bakery_client``.
-        :param asyncio.BaseEventLoop loop: The event loop to use for async
-            operations.
         :param int max_frame_size: The maximum websocket frame size to allow.
         :param specified_facades: Overwrite the facades with a series of
             specified facades.
         """
-        await self.disconnect()
+        is_debug_log_conn = 'debug_log_conn' in kwargs
+        if not is_debug_log_conn:
+            await self.disconnect()
         if 'endpoint' not in kwargs and len(args) < 2:
             if args and 'model_name' in kwargs:
                 raise TypeError('connect() got multiple values for model_name')
@@ -710,7 +719,6 @@ class Model:
                 'cacert',
                 'bakery_client',
                 'macaroons',
-                'loop',
                 'max_frame_size',
             ]
             for i, arg in enumerate(args):
@@ -723,14 +731,15 @@ class Model:
                 raise ValueError('Authentication parameters are required '
                                  'if model_name not given')
             await self._connector.connect(**kwargs)
-        await self._after_connect()
+        if not is_debug_log_conn:
+            await self._after_connect()
 
-    async def connect_model(self, model_name):
+    async def connect_model(self, model_name, **kwargs):
         """
         .. deprecated:: 0.6.2
            Use ``connect(model_name=model_name)`` instead.
         """
-        return await self.connect(model_name=model_name)
+        return await self.connect(model_name=model_name, **kwargs)
 
     async def connect_current(self):
         """
@@ -738,6 +747,10 @@ class Model:
            Use ``connect()`` instead.
         """
         return await self.connect()
+
+    async def connect_to(self, connection):
+        conn_params = connection.connect_params()
+        await self._connect_direct(**conn_params)
 
     async def _connect_direct(self, **kwargs):
         await self.disconnect()
@@ -783,15 +796,17 @@ class Model:
         :param series: Charm series
 
         """
-        if charm_dir.endswith('.charm'):
+        charm_dir = Path(charm_dir)
+        if charm_dir.suffix == '.charm':
             fn = charm_dir
         else:
             fn = tempfile.NamedTemporaryFile().name
-            CharmArchiveGenerator(charm_dir).make_archive(fn)
-        with open(fn, 'rb') as fh:
+            CharmArchiveGenerator(str(charm_dir)).make_archive(fn)
+        with open(str(fn), 'rb') as fh:
             func = partial(
-                self.add_local_charm, fh, series, os.stat(fn).st_size)
-            charm_url = await self._connector.loop.run_in_executor(None, func)
+                self.add_local_charm, fh, series, os.stat(str(fn)).st_size)
+            loop = jasyncio.get_running_loop()
+            charm_url = await loop.run_in_executor(None, func)
 
         log.debug('Uploaded local charm: %s -> %s', charm_dir, charm_url)
         return charm_url
@@ -851,11 +866,29 @@ class Model:
         log.debug('Resetting model')
         for app in self.applications.values():
             await app.destroy()
+        await self.block_until(
+            lambda: len(self.applications) == 0
+        )
         for machine in self.machines.values():
             await machine.destroy(force=force)
         await self.block_until(
             lambda: len(self.machines) == 0
         )
+
+    async def remove_application(self, app_name, block_until_done=False):
+        """Removes the given application from the model.
+
+        :param str app_name: Name of the application
+        :param bool block_until_done: Ensure the app is removed from the
+        model when returned
+        """
+        if app_name not in self.applications:
+            raise JujuError("Given application doesn't seem to appear in the\
+             model: %s\nCurrent applications are: %s" %
+                            (app_name, self.applications))
+        await self.applications[app_name].remove()
+        if block_until_done:
+            await self.block_until(lambda: app_name not in self.applications)
 
     async def block_until(self, *conditions, timeout=None, wait_period=0.5):
         """Return only after all conditions are true.
@@ -870,8 +903,7 @@ class Model:
 
         await utils.block_until(done,
                                 timeout=timeout,
-                                wait_period=wait_period,
-                                loop=self.loop)
+                                wait_period=wait_period)
         if _disconnected():
             raise websockets.ConnectionClosed(1006, 'no reason')
 
@@ -1037,8 +1069,7 @@ class Model:
                     try:
                         results = await utils.run_with_interrupt(
                             allwatcher.Next(),
-                            self._watch_stopping,
-                            loop=self._connector.loop)
+                            self._watch_stopping)
                     except JujuAPIError as e:
                         if 'watcher was stopped' not in str(e):
                             raise
@@ -1105,7 +1136,7 @@ class Model:
         self._watch_received.clear()
         self._watch_stopping.clear()
         self._watch_stopped.clear()
-        self._connector.loop.create_task(_all_watcher())
+        jasyncio.ensure_future(_all_watcher())
 
     async def _notify_observers(self, delta, old_obj, new_obj):
         """Call observing callbacks, notifying them of a change in model state
@@ -1127,8 +1158,7 @@ class Model:
 
         for o in self._observers:
             if o.cares_about(delta):
-                asyncio.ensure_future(o(delta, old_obj, new_obj, self),
-                                      loop=self._connector.loop)
+                jasyncio.ensure_future(o(delta, old_obj, new_obj, self))
 
     async def _wait(self, entity_type, entity_id, action, predicate=None):
         """
@@ -1145,7 +1175,7 @@ class Model:
             has a 'completed' status. See the _Observer class for details.
 
         """
-        q = asyncio.Queue()
+        q = jasyncio.Queue()
 
         async def callback(delta, old, new, model):
             await q.put(delta.get_id())
@@ -1312,6 +1342,13 @@ class Model:
         return await self._wait_for_new('machine', machine_id)
 
     async def add_relation(self, relation1, relation2):
+        """
+        .. deprecated:: 2.9.9
+           Use ``relate()`` instead
+        """
+        return await self.relate(relation1, relation2)
+
+    async def relate(self, relation1, relation2):
         """Add a relation between two applications.
 
         :param str relation1: '<application>[:<relation_name>]'
@@ -1349,8 +1386,8 @@ class Model:
                 raise JujuError("cannot add relation to {}: remote endpoints not supported".format(remote_endpoint.string()))
 
             if remote_endpoint.has_empty_source():
-                current = await self.get_controller()
-                remote_endpoint.source = current.controller_name
+                async with ConnectedController(self.connection()) as current:
+                    remote_endpoint.source = current.controller_name
             # consume the remote endpoint
             await self.consume(remote_endpoint.string(),
                                application_alias=remote_endpoint.application,
@@ -1411,71 +1448,48 @@ class Model:
         return await key_facade.AddKeys(ssh_keys=[key], user=user)
     add_ssh_keys = add_ssh_key
 
-    def add_subnet(self, cidr_or_id, space, *zones):
-        """Add an existing subnet to this model.
-
-        :param str cidr_or_id: CIDR or provider ID of the existing subnet
-        :param str space: Network space with which to associate
-        :param str *zones: Zone(s) in which the subnet resides
-
-        """
-        raise NotImplementedError()
-
-    def get_backups(self):
+    async def get_backups(self):
         """Retrieve metadata for backups in this model.
 
+        :return [dict]: List of metadata for the stored backups
         """
-        raise NotImplementedError()
+        backups_facade = client.BackupsFacade.from_connection(self.connection())
+        _backups_metadata = await backups_facade.List()
+        backups_metadata = _backups_metadata.serialize()
+        if 'list' not in backups_metadata:
+            raise JujuAPIError("Unexpected response metadata : %s" % backups_metadata)
+        return backups_metadata['list']
 
-    def block(self, *commands):
-        """Add a new block to this model.
-
-        :param str *commands: The commands to block. Valid values are
-            'all-changes', 'destroy-model', 'remove-object'
-
-        """
-        raise NotImplementedError()
-
-    def get_blocks(self):
-        """List blocks for this model.
-
-        """
-        raise NotImplementedError()
-
-    def get_cached_images(self, arch=None, kind=None, series=None):
-        """Return a list of cached OS images.
-
-        :param str arch: Filter by image architecture
-        :param str kind: Filter by image kind, e.g. 'lxd'
-        :param str series: Filter by image series, e.g. 'xenial'
-
-        """
-        raise NotImplementedError()
-
-    def create_backup(self, note=None, no_download=False):
+    async def create_backup(self, notes=None):
         """Create a backup of this model.
 
         :param str note: A note to store with the backup
+        :param bool keep_copy: Keep a copy of the archive on the controller
         :param bool no_download: Do not download the backup archive
-        :return str: Path to downloaded archive
+        :return str, dict: Filename for the downloaded archive file, Extra metadata for the created backup
 
         """
-        raise NotImplementedError()
+        backups_facade = client.BackupsFacade.from_connection(self.connection())
+        results = await backups_facade.Create(notes=notes)
 
-    def create_storage_pool(self, name, provider_type, **pool_config):
-        """Create or define a storage pool.
+        if results is None:
+            raise JujuAPIError("unable to create a backup")
 
-        :param str name: Name to give the storage pool
-        :param str provider_type: Pool provider type
-        :param **pool_config: key/value pool configuration pairs
+        backup_metadata = results.serialize()
 
-        """
-        raise NotImplementedError()
+        if 'error' in backup_metadata:
+            raise JujuBackupError("unable to create a backup, got %s from Juju API" % backup_metadata)
 
-    def debug_log(
-            self, no_tail=False, exclude_module=None, include_module=None,
-            include=None, level=None, limit=0, lines=10, replay=False,
-            exclude=None):
+        backup_id = backup_metadata['filename']
+
+        file_name = self.download_backup(backup_id)
+
+        return file_name, backup_metadata
+
+    async def debug_log(
+            self, target=sys.stdout, no_tail=False, exclude_module=[],
+            include_module=[], include=[], level="", limit=sys.maxsize,
+            lines=10, exclude=[]):
         """Get log messages for this model.
 
         :param bool no_tail: Stop after returning existing log messages
@@ -1490,11 +1504,23 @@ class Model:
             filtered) lines are shown
         :param int lines: Yield this many of the most recent lines, and keep
             yielding
-        :param bool replay: Yield the entire log, and keep yielding
         :param list exclude: Do not show log messages for these entities
 
         """
-        raise NotImplementedError()
+        if not self.is_connected():
+            await self.connect()
+
+        params = {
+            'no_tail': no_tail,
+            'exclude_module': exclude_module,
+            'include_module': include_module,
+            'include': include,
+            'level': level,
+            'limit': limit,
+            'lines': lines,
+            'exclude': exclude,
+        }
+        await self.connect(debug_log_conn=target, debug_log_params=params)
 
     def _get_series(self, entity_url, entity):
         # try to get the series from the provided charm URL
@@ -1509,20 +1535,22 @@ class Model:
             return parts[0]
         # series was not supplied at all, so use the newest
         # supported series according to the charm store
-        ss = entity['Meta']['supported-series']
+        ss = entity['Meta'].get('supported-series')
+        if not ss:
+            log.error("Entity {} has no 'supported-series' in {}".format(entity_url, entity))
+            raise JujuError("Unable to determine series for {}".format(entity_url))
         return ss['SupportedSeries'][0]
 
     async def deploy(
-            self, entity_url, application_name=None, bind=None, budget=None,
+            self, entity_url, application_name=None, bind=None,
             channel=None, config=None, constraints=None, force=False,
-            num_units=1, plan=None, resources=None, series=None, storage=None,
-            to=None, devices=None, trust=False):
+            num_units=1, overlays=[], plan=None, resources=None, series=None,
+            storage=None, to=None, devices=None, trust=False):
         """Deploy a new service or bundle.
 
         :param str entity_url: Charm or bundle url
         :param str application_name: Name to give the service
         :param dict bind: <charm endpoint>:<network space> pairs
-        :param dict budget: <budget name>:<limit> pairs
         :param str channel: Charm store channel from which to retrieve
             the charm or bundle, e.g. 'edge'
         :param dict config: Charm configuration dictionary
@@ -1531,6 +1559,7 @@ class Model:
         :param bool force: Allow charm to be deployed to a machine running
             an unsupported series
         :param int num_units: Number of units to deploy
+        :param [] overlays: Bundles to overlay on the primary bundle, applied in order
         :param str plan: Plan under which to deploy charm
         :param dict resources: <resource name>:<file path> pairs
         :param str series: Series on which to deploy
@@ -1563,11 +1592,17 @@ class Model:
         entity_url = str(entity_url)
         if is_local_charm(entity_url) and not entity_url.startswith("local:"):
             entity_url = "local:{}".format(entity_url)
-        url = URL.parse(str(entity_url))
+
+        if client.CharmsFacade.best_facade_version(self.connection()) < 3:
+            url = URL.parse(str(entity_url), default_store=Schema.CHARM_STORE)
+        else:
+            url = URL.parse(str(entity_url))
+
         architecture = await self._resolve_architecture(url)
 
         if str(url.schema) not in self.deploy_types:
             raise JujuError("unknown deploy type {}, expected charmhub, charmstore or local".format(url.schema))
+
         res = await self.deploy_types[str(url.schema)].resolve(url, architecture, application_name, channel, series, entity_url)
 
         if res.identifier is None:
@@ -1577,32 +1612,48 @@ class Model:
         series = res.origin.series or series
         if res.is_bundle:
             handler = BundleHandler(self, trusted=trust, forced=force)
-            await handler.fetch_plan(url, res.origin)
+            await handler.fetch_plan(url, res.origin, overlays=overlays)
             await handler.execute_plan()
             extant_apps = {app for app in self.applications}
-            pending_apps = set(handler.applications) - extant_apps
+            pending_apps = handler.applications - extant_apps
             if pending_apps:
                 # new apps will usually be in the model by now, but if some
                 # haven't made it yet we'll need to wait on them to be added
-                await asyncio.gather(*[
-                    asyncio.ensure_future(
-                        self._wait_for_new('application', app_name),
-                        loop=self._connector.loop)
+                await jasyncio.gather(*[
+                    jasyncio.ensure_future(
+                        self._wait_for_new('application', app_name))
                     for app_name in pending_apps
-                ], loop=self._connector.loop)
+                ])
             return [app for name, app in self.applications.items()
                     if name in handler.applications]
         else:
+            if overlays:
+                raise JujuError("options provided but not supported when deploying a charm: overlays=%s" % overlays)
             # XXX: we're dropping local resources here, but we don't
             # actually support them yet anyway
             if not res.is_local:
                 add_charm_res = await self._add_charm(identifier, res.origin)
-                charm_origin = add_charm_res.charm_origin
+                if isinstance(add_charm_res, dict):
+                    # This is for backwards compatibility for older
+                    # versions where AddCharm returns a dictionary
+                    charm_origin = add_charm_res.get('charm_origin', res.origin)
+                else:
+                    charm_origin = add_charm_res.charm_origin
 
                 if Schema.CHARM_HUB.matches(url.schema):
                     resources = await self._add_charmhub_resources(res.app_name,
                                                                    identifier,
                                                                    add_charm_res.charm_origin)
+                    charm_info = await self.charmhub.info(url.name)
+                    is_subordinate = False
+                    try:
+                        is_subordinate = charm_info.result.charm.subordinate
+                    except AttributeError:
+                        log.warning('CharmHub.Info : unable to retrieve the subordinate information')
+                    if is_subordinate:
+                        if num_units > 1:
+                            raise JujuError("cannot use num_units with subordinate application")
+                        num_units = 0
 
                 if Schema.CHARM_STORE.matches(url.schema):
                     resources = await self._add_store_resources(res.app_name,
@@ -1615,7 +1666,7 @@ class Model:
                 metadata = utils.get_local_charm_metadata(charm_dir)
                 if not application_name:
                     application_name = metadata['name']
-                series = series or get_charm_series(charm_dir)
+                series = series or await get_charm_series(charm_dir, self)
                 if not series:
                     model_config = await self.get_config()
                     default_series = model_config.get("default-series")
@@ -1662,7 +1713,7 @@ class Model:
             return await charms_facade.AddCharm(charm_origin=origin, url=charm_url, force=False)
 
         client_facade = client.ClientFacade.from_connection(self.connection())
-        await client_facade.AddCharm(channel=str(origin.risk), url=charm_url, force=False)
+        return await client_facade.AddCharm(channel=str(origin.risk), url=charm_url, force=False)
 
     async def _resolve_charm(self, url, origin):
         charms_cls = client.CharmsFacade
@@ -1691,7 +1742,7 @@ class Model:
         if result.error:
             raise JujuError(result.error.message)
 
-        return (result.url, result.charm_origin)
+        return (result.url, result.charm_origin, result.supported_series)
 
     async def _resolve_architecture(self, url):
         if url.architecture:
@@ -1763,7 +1814,7 @@ class Model:
                 'size': resource['Size'],
                 'type_': resource['Type'],
                 'origin': 'store',
-            } for resource in entity['Meta']['resources']
+            } for resource in entity['Meta'].get('resources', [])
         ]
 
         if overrides:
@@ -1799,8 +1850,7 @@ class Model:
 
         for name, path in resources.items():
             resource_type = metadata["resources"][name]["type"]
-            if resource_type != "oci-image":
-                # For  now only oci-images are supported
+            if resource_type not in {"oci-image", "file"}:
                 log.info("Resource {} of type {} is not supported".format(name, resource_type))
                 continue
 
@@ -1808,10 +1858,10 @@ class Model:
                 'description': '',
                 'fingerprint': '',
                 'name': name,
-                'path': path,
+                'path': Path(path).name,
                 'revision': 0,
                 'size': 0,
-                'type_': 'oci-image',
+                'type_': resource_type,
                 'origin': 'upload',
             }
 
@@ -1824,35 +1874,44 @@ class Model:
             pending_id = response.pending_ids[0]
             resource_map[name] = pending_id
 
-            # TODO Docker Image validation and support for local images.
-            docker_image_details = {
-                'registrypath': path,
-                'username': '',
-                'password': '',
-            }
+            if resource_type == "oci-image":
+                # TODO Docker Image validation and support for local images.
+                docker_image_details = {
+                    'registrypath': path,
+                    'username': '',
+                    'password': '',
+                }
 
-            data = yaml.dump(docker_image_details)
+                data = yaml.dump(docker_image_details)
 
-            charmresource['fingerprint'] = hashlib.sha3_384(bytes(data, 'utf-8')).digest()
+                if sys.version_info[0:2] == (3, 5):
+                    hash_alg = hashlib.sha384
+                else:
+                    hash_alg = hashlib.sha3_384
 
-            conn, headers, path_prefix = self.connection().https_connection()
+                charmresource['fingerprint'] = hash_alg(bytes(data, 'utf-8')).digest()
 
-            query = "?pendingid={}".format(pending_id)
-            url = "{}/applications/{}/resources/{}{}".format(
-                path_prefix, application, name, query)
-            disp = "multipart/form-data; filename=\"{}\"".format(path)
+                conn, headers, path_prefix = self.connection().https_connection()
 
-            headers['Content-Type'] = 'application/octet-stream'
-            headers['Content-Length'] = len(data)
-            headers['Content-Sha384'] = charmresource['fingerprint'].hex()
-            headers['Content-Disposition'] = disp
+                query = "?pendingid={}".format(pending_id)
+                url = "{}/applications/{}/resources/{}{}".format(
+                    path_prefix, application, name, query)
+                if resource_type == "oci-image":
+                    disp = "multipart/form-data; filename=\"{}\"".format(path)
+                else:
+                    disp = "form-data; filename=\"{}\"".format(path)
 
-            conn.request('PUT', url, data, headers)
+                headers['Content-Type'] = 'application/octet-stream'
+                headers['Content-Length'] = len(data)
+                headers['Content-Sha384'] = charmresource['fingerprint'].hex()
+                headers['Content-Disposition'] = disp
 
-            response = conn.getresponse()
-            result = response.read().decode()
-            if not response.status == 200:
-                raise JujuError(result)
+                conn.request('PUT', url, data, headers)
+
+                response = conn.getresponse()
+                result = response.read().decode()
+                if not response.status == 200:
+                    raise JujuError(result)
 
         return resource_map
 
@@ -1893,12 +1952,6 @@ class Model:
             raise JujuError('\n'.join(errors))
         return await self._wait_for_new('application', application)
 
-    async def destroy(self):
-        """Terminate all machines and resources for this model.
-            Is already implemented in controller.py.
-        """
-        raise NotImplementedError()
-
     async def destroy_unit(self, *unit_names):
         """Destroy units by name.
 
@@ -1914,33 +1967,43 @@ class Model:
         return await app_facade.DestroyUnits(unit_names=list(unit_names))
     destroy_units = destroy_unit
 
-    def get_backup(self, archive_id):
+    def download_backup(self, archive_id, target_filename=None):
         """Download a backup archive file.
 
         :param str archive_id: The id of the archive to download
+        :param str (optional) target_filename: A custom name for the target file
         :return str: Path to the archive file
 
         """
-        raise NotImplementedError()
 
-    def enable_ha(
-            self, num_controllers=0, constraints=None, series=None, to=None):
-        """Ensure sufficient controllers exist to provide redundancy.
+        conn, headers, path_prefix = self.connection().https_connection()
+        path = "%s/backups" % path_prefix
+        headers['Content-Type'] = 'application/json'
+        args = {'id': archive_id}
+        conn.request("GET", path, json.dumps(args, indent=2), headers=headers)
+        response = conn.getresponse()
+        result = response.read()
+        if not response.status == 200:
+            raise JujuBackupError("unable to download the backup ID : %s -- got : %s from the JujuAPI with a HTTP response code : %s" % (archive_id, result, response.status))
 
-        :param int num_controllers: Number of controllers to make available
-        :param constraints: Constraints to apply to the controller machines
-        :type constraints: :class:`juju.Constraints`
-        :param str series: Series of the controller machines
-        :param list to: Placement directives for controller machines, e.g.::
+        if target_filename:
+            file_name = target_filename
+        else:
+            # check if archive_id is a filename
+            if re.match(r'.*\.tar\.gz', archive_id):
+                # if so, use the same ID generated & sent by the Juju API
+                archive_id = re.compile('[0-9]+').findall(archive_id)[0]
 
-            '23' - machine 23
-            'lxc:7' - new lxc container on machine 7
-            '24/lxc/3' - lxc container 3 or machine 24
+            file_name = "juju-backup-%s.tar.gz" % archive_id
 
-            If None, a new machine is provisioned.
+        with open(str(file_name), 'wb') as f:
+            try:
+                f.write(result)
+            except (OSError, IOError) as e:
+                raise JujuBackupError("backup ID : %s was fetched, but : %s" % (archive_id, e))
 
-        """
-        raise NotImplementedError()
+        log.info("Backup archive downloaded in : %s" % file_name)
+        return file_name
 
     async def get_config(self):
         """Return the configuration settings for this model.
@@ -1982,26 +2045,11 @@ class Model:
                                                       constraint)
         return constraints
 
-    def import_ssh_key(self, identity):
-        """Add a public SSH key from a trusted indentity source to this model.
-
-        :param str identity: User identity in the form <lp|gh>:<username>
-
-        """
-        raise NotImplementedError()
-    import_ssh_keys = import_ssh_key
-
     async def get_machines(self):
         """Return list of machines in this model.
 
         """
         return list(self.state.machines.keys())
-
-    def get_shares(self):
-        """Return list of all users with access to this model.
-
-        """
-        raise NotImplementedError()
 
     async def get_spaces(self):
         """Return list of all known spaces, including associated subnets.
@@ -2024,65 +2072,23 @@ class Model:
         return await key_facade.ListKeys(entities=entities, mode=raw_ssh)
     get_ssh_keys = get_ssh_key
 
-    def get_storage(self, filesystem=False, volume=False):
-        """Return details of storage instances.
-
-        :param bool filesystem: Include filesystem storage
-        :param bool volume: Include volume storage
-
-        """
-        raise NotImplementedError()
-
-    def get_storage_pools(self, names=None, providers=None):
-        """Return list of storage pools.
-
-        :param list names: Only include pools with these names
-        :param list providers: Only include pools for these providers
-
-        """
-        raise NotImplementedError()
-
-    def get_subnets(self, space=None, zone=None):
-        """Return list of known subnets.
-
-        :param str space: Only include subnets in this space
-        :param str zone: Only include subnets in this zone
-
-        """
-        raise NotImplementedError()
-
-    def remove_blocks(self):
-        """Remove all blocks from this model.
-
-        """
-        raise NotImplementedError()
-
-    def remove_backup(self, backup_id):
+    async def remove_backup(self, backup_id):
         """Delete a backup.
 
         :param str backup_id: The id of the backup to remove
 
         """
-        raise NotImplementedError()
+        backups_facade = client.BackupsFacade.from_connection(self.connection())
+        return await backups_facade.Remove([backup_id])
 
-    def remove_cached_images(self, arch=None, kind=None, series=None):
-        """Remove cached OS images.
+    async def remove_backups(self, backup_ids):
+        """Delete the given backups.
 
-        :param str arch: Architecture of the images to remove
-        :param str kind: Image kind to remove, e.g. 'lxd'
-        :param str series: Image series to remove, e.g. 'xenial'
-
-        """
-        raise NotImplementedError()
-
-    def remove_machine(self, *machine_ids):
-        """Remove a machine from this model.
-
-        :param str *machine_ids: Ids of the machines to remove
+        :param [str] backup_ids: The list of ids of the backups to remove
 
         """
-        raise NotImplementedError()
-    remove_machines = remove_machine
+        backups_facade = client.BackupsFacade.from_connection(self.connection())
+        return await backups_facade.Remove(backup_ids)
 
     async def remove_ssh_key(self, user, key):
         """Remove a public SSH key(s) from this model.
@@ -2099,34 +2105,19 @@ class Model:
     remove_ssh_keys = remove_ssh_key
 
     def restore_backup(
-            self, bootstrap=False, constraints=None, archive=None,
-            backup_id=None, upload_tools=False):
+            self, backup_id, bootstrap=False,
+            constraints=None, archive=None, upload_tools=False):
         """Restore a backup archive to a new controller.
 
+        :param str backup_id: Id of backup to restore
         :param bool bootstrap: Bootstrap a new state machine
         :param constraints: Model constraints
         :type constraints: :class:`juju.Constraints`
         :param str archive: Path to backup archive to restore
-        :param str backup_id: Id of backup to restore
         :param bool upload_tools: Upload tools if bootstrapping a new machine
 
         """
-        raise NotImplementedError()
-
-    def retry_provisioning(self):
-        """Retry provisioning for failed machines.
-
-        """
-        raise NotImplementedError()
-
-    def run(self, command, timeout=None):
-        """Run command on all machines in this model.
-
-        :param str command: The command to run
-        :param int timeout: Time to wait before command is considered failed
-
-        """
-        raise NotImplementedError()
+        raise DeprecationWarning("juju restore-backup is deprecated in favor of the stand-alone 'juju-restore' tool: https://github.com/juju/juju-restore")
 
     async def set_config(self, config):
         """Set configuration keys on this model.
@@ -2137,10 +2128,16 @@ class Model:
         config_facade = client.ModelConfigFacade.from_connection(
             self.connection()
         )
+
+        new_conf = {}
         for key, value in config.items():
             if isinstance(value, ConfigValue):
-                config[key] = value.value
-        await config_facade.ModelSet(config=config)
+                new_conf[key] = value.value
+            elif isinstance(value, str):
+                new_conf[key] = value
+            else:
+                raise JujuModelConfigError("Expected either a string or a ConfigValue as a config value, found : %s of type %s" % (value, type(value)))
+        await config_facade.ModelSet(config=new_conf)
 
     async def set_constraints(self, constraints):
         """Set machine constraints on this model.
@@ -2175,8 +2172,8 @@ class Model:
                 if action_output.results[0].status in ('completed', 'failed'):
                     return
                 else:
-                    await asyncio.sleep(1)
-        await asyncio.wait_for(
+                    await jasyncio.sleep(1)
+        await jasyncio.wait_for(
             _wait_for_action_status(),
             timeout=wait)
         action_output = await action_facade.Actions(entities=entity)
@@ -2216,14 +2213,6 @@ class Model:
             results[tag.untag('action-', a.action.tag)] = a.status
         return results
 
-    def get_budget(self, budget_name):
-        """Get budget usage info.
-
-        :param str budget_name: Name of budget
-
-        """
-        raise NotImplementedError()
-
     async def get_status(self, filters=None, utc=False):
         """Return the status of the model.
 
@@ -2234,68 +2223,6 @@ class Model:
         """
         client_facade = client.ClientFacade.from_connection(self.connection())
         return await client_facade.FullStatus(patterns=filters)
-
-    def sync_tools(
-            self, all_=False, destination=None, dry_run=False, public=False,
-            source=None, stream=None, version=None):
-        """Copy Juju tools into this model.
-
-        :param bool all_: Copy all versions, not just the latest
-        :param str destination: Path to local destination directory
-        :param bool dry_run: Don't do the actual copy
-        :param bool public: Tools are for a public cloud, so generate mirrors
-            information
-        :param str source: Path to local source directory
-        :param str stream: Simplestreams stream for which to sync metadata
-        :param str version: Copy a specific major.minor version
-
-        """
-        raise NotImplementedError()
-
-    def unblock(self, *commands):
-        """Unblock an operation that would alter this model.
-
-        :param str *commands: The commands to unblock. Valid values are
-            'all-changes', 'destroy-model', 'remove-object'
-
-        """
-        raise NotImplementedError()
-
-    def unset_config(self, *keys):
-        """Unset configuration on this model.
-
-        :param str *keys: The keys to unset
-
-        """
-        raise NotImplementedError()
-
-    def upgrade_gui(self):
-        """Upgrade the Juju GUI for this model.
-
-        """
-        raise NotImplementedError()
-
-    def upgrade_juju(
-            self, dry_run=False, reset_previous_upgrade=False,
-            upload_tools=False, version=None):
-        """Upgrade Juju on all machines in a model.
-
-        :param bool dry_run: Don't do the actual upgrade
-        :param bool reset_previous_upgrade: Clear the previous (incomplete)
-            upgrade status
-        :param bool upload_tools: Upload local version of tools
-        :param str version: Upgrade to a specific version
-
-        """
-        raise NotImplementedError()
-
-    def upload_backup(self, archive_path):
-        """Store a backup archive remotely in Juju.
-
-        :param str archive_path: Path to local archive
-
-        """
-        raise NotImplementedError()
 
     async def get_metrics(self, *tags):
         """Retrieve metrics.
@@ -2337,18 +2264,18 @@ class Model:
         @param endpoint: holds the application and endpoint you want to offer
         @param offer_name: over ride the offer name to help the consumer
         """
-        controller = await self.get_controller()
-        return await controller.create_offer(self.info.uuid, endpoint,
-                                             offer_name=offer_name,
-                                             application_name=application_name)
+        async with ConnectedController(self.connection()) as controller:
+            return await controller.create_offer(self.info.uuid, endpoint,
+                                                 offer_name=offer_name,
+                                                 application_name=application_name)
 
     async def list_offers(self):
         """
         Offers list information about applications' endpoints that have been
         shared and who is connected.
         """
-        controller = await self.get_controller()
-        return await controller.list_offers(self.info.name)
+        async with ConnectedController(self.connection()) as controller:
+            return await controller.list_offers(self.info.name)
 
     async def remove_offer(self, endpoint, force=False):
         """
@@ -2357,8 +2284,8 @@ class Model:
         Offers will also remove relations to those offers, use force to do
         so, without an error.
         """
-        controller = await self.get_controller()
-        return await controller.remove_offer(self.info.uuid, endpoint, force)
+        async with ConnectedController(self.connection()) as controller:
+            return await controller.remove_offer(self.info.uuid, endpoint, force)
 
     async def consume(self, endpoint, application_alias="", controller_name=None, controller=None):
         """
@@ -2448,7 +2375,7 @@ class Model:
             return result.result
 
         try:
-            with open(filename, "w") as file:
+            with open(str(filename), "w") as file:
                 file.write(result.result)
         except IOError:
             raise
@@ -2456,15 +2383,15 @@ class Model:
     async def _get_source_api(self, url, controller_name=None):
         controller = Controller()
         if url.has_empty_source():
-            current = await self.get_controller()
-            if current.controller_name is not None:
-                controller_name = current.controller_name
+            async with ConnectedController(self.connection()) as current:
+                if current.controller_name is not None:
+                    controller_name = current.controller_name
         await controller.connect(controller_name=controller_name)
         return controller
 
     async def wait_for_idle(self, apps=None, raise_on_error=True, raise_on_blocked=False,
                             wait_for_active=False, timeout=10 * 60, idle_period=15, check_freq=0.5,
-                            status=None):
+                            status=None, wait_for_units=1, wait_for_exact_units=-1):
         """Wait for applications in the model to settle into an idle state.
 
         :param apps (list[str]): Optional list of specific app names to wait on.
@@ -2499,6 +2426,15 @@ class Model:
 
         :param status (str): The status to wait for. If None, not waiting.
             The default is None (not waiting for any status).
+
+        :param wait_for_units (int): The least number of units to be expected before
+            going into the idle state.
+            The default is 1 unit.
+
+        :param wait_for_exact_units (int): The exact number of units to be expected before
+            going into the idle state. (e.g. useful for scaling down).
+            The default is -1 unit.
+            When positive, takes precedence over the `wait_for_units` parameter.
         """
         if wait_for_active:
             warnings.warn("wait_for_active is deprecated; use status", DeprecationWarning)
@@ -2533,15 +2469,24 @@ class Model:
             busy = []
             errors = {}
             blocks = {}
-            for app in apps:
-                if app not in self.applications:
-                    busy.append(app + " (missing)")
+            for app_name in apps:
+                if app_name not in self.applications:
+                    busy.append(app_name + " (missing)")
                     continue
-                app = self.applications[app]
+                app = self.applications[app_name]
                 if raise_on_error and app.status == "error":
                     errors.setdefault("App", []).append(app.name)
                 if raise_on_blocked and app.status == "blocked":
                     blocks.setdefault("App", []).append(app.name)
+                if wait_for_exact_units > 0:
+                    if len(app.units) != wait_for_exact_units:
+                        busy.append(app.name + " (waiting for exactly %s units, current : %s)" %
+                                    (wait_for_exact_units, len(app.units)))
+                        continue
+                elif len(app.units) < wait_for_units:
+                    busy.append(app.name + " (not enough units yet - %s/%s)" %
+                                (len(app.units), wait_for_units))
+                    continue
                 for unit in app.units:
                     if unit.machine is not None and unit.machine.status == "error":
                         errors.setdefault("Machine", []).append(unit.machine.id)
@@ -2576,11 +2521,11 @@ class Model:
                 break
             busy = "\n  ".join(busy)
             if timeout is not None and datetime.now() - start_time > timeout:
-                raise asyncio.TimeoutError("Timed out waiting for model:\n" + busy)
+                raise jasyncio.TimeoutError("Timed out waiting for model:\n" + busy)
             if last_log_time is None or datetime.now() - last_log_time > log_interval:
                 log.info("Waiting for model:\n  " + busy)
                 last_log_time = datetime.now()
-            await asyncio.sleep(check_freq)
+            await jasyncio.sleep(check_freq)
 
 
 def _create_consume_args(offer, macaroon, controller_info):
@@ -2655,7 +2600,7 @@ class CharmArchiveGenerator:
                           (.bzr, etc)
 
         """
-        zf = zipfile.ZipFile(path, 'w', zipfile.ZIP_DEFLATED)
+        zf = zipfile.ZipFile(str(path), 'w', zipfile.ZIP_DEFLATED)
         for dirpath, dirnames, filenames in os.walk(self.path):
             relative_path = dirpath[len(self.path) + 1:]
             if relative_path and not self._ignore(relative_path):
@@ -2683,7 +2628,7 @@ class CharmArchiveGenerator:
     def _check_type(self, path):
         """Check the path
         """
-        s = os.stat(path)
+        s = os.stat(str(path))
         if stat.S_ISDIR(s.st_mode) or stat.S_ISREG(s.st_mode):
             return path
         raise ValueError("Invalid Charm at %s %s" % (

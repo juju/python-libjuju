@@ -12,16 +12,16 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 
-import asyncio
+import hashlib
 import json
 import logging
-import os
+import pathlib
 
-from . import model, tag, utils
+from . import model, tag, utils, jasyncio
 from .status import derive_status
 from .annotationhelper import _get_annotations, _set_annotations
 from .client import client
-from .errors import JujuError
+from .errors import JujuError, JujuApplicationConfigError
 from .bundle import get_charm_series
 from .placement import parse as parse_placement
 
@@ -107,6 +107,13 @@ class Application(model.ModelEntity):
         return tag.application(self.name)
 
     async def add_relation(self, local_relation, remote_relation):
+        """
+        .. deprecated:: 2.9.9
+           Use ``relate()`` instead
+        """
+        return await self.relate(local_relation, remote_relation)
+
+    async def relate(self, local_relation, remote_relation):
         """Add a relation to another application.
 
         :param str local_relation: Name of relation on this application
@@ -117,7 +124,7 @@ class Application(model.ModelEntity):
         if ':' not in local_relation:
             local_relation = '{}:{}'.format(self.name, local_relation)
 
-        return await self.model.add_relation(local_relation, remote_relation)
+        return await self.model.relate(local_relation, remote_relation)
 
     async def add_unit(self, count=1, to=None):
         """Add one or more units to this application.
@@ -131,6 +138,11 @@ class Application(model.ModelEntity):
             If None, a new machine is provisioned.
 
         """
+
+        if self.model.info.type_ == 'caas':
+            log.warning('adding units to a container-based model not supported, auto-switching to scale')
+            return await self.scale(scale_change=count)
+
         app_facade = self._facade()
 
         log.debug(
@@ -143,8 +155,8 @@ class Application(model.ModelEntity):
             num_units=count,
         )
 
-        return await asyncio.gather(*[
-            asyncio.ensure_future(self.model._wait_for_new('unit', unit_id))
+        return await jasyncio.gather(*[
+            jasyncio.ensure_future(self.model._wait_for_new('unit', unit_id))
             for unit_id in result.units
         ])
 
@@ -174,30 +186,6 @@ class Application(model.ModelEntity):
                                           scale=scale,
                                           scale_change=scale_change)
         ])
-
-    def allocate(self, budget, value):
-        """Allocate budget to this application.
-
-        :param str budget: Name of budget
-        :param int value: Budget limit
-
-        """
-        raise NotImplementedError()
-
-    def attach(self, resource_name, file_path):
-        """Upload a file as a resource for this application.
-
-        :param str resource: Name of the resource
-        :param str file_path: Path to the file to upload
-
-        """
-        raise NotImplementedError()
-
-    def collect_metrics(self):
-        """Collect metrics on this application.
-
-        """
-        raise NotImplementedError()
 
     async def destroy_relation(self, local_relation, remote_relation):
         """Remove a relation to another application.
@@ -351,6 +339,18 @@ class Application(model.ModelEntity):
         log.debug("Unexposing %s", self.name)
         return await app_facade.Unexpose(application=self.name)
 
+    async def get_series(self):
+        """Return the series on which the application is deployed
+
+        :return: str series
+        """
+        app_facade = self._facade()
+
+        log.debug(
+            'Getting series for %s', self.name)
+
+        return (await app_facade.Get(application=self.name)).series
+
     async def get_config(self):
         """Return the configuration settings dict for this application.
         """
@@ -443,6 +443,41 @@ class Application(model.ModelEntity):
             actions = {k: v.description for k, v in actions.items()}
         return actions
 
+    def attach_resource(self, resource_name, file_name, file_obj):
+        """Updates the resource for an application by uploading file from
+        local disk to the Juju controller.
+
+        :param str resource_name: Name of the resource to be updated.
+        :param str file_name: Name of the local file to be uploaded.
+        :param TextIOWrapper file_obj: Actual object to be read for data.
+        """
+        conn, headers, path_prefix = self.connection.https_connection()
+
+        url = "{}/applications/{}/resources/{}".format(
+            path_prefix, self.name, resource_name)
+
+        data = file_obj.read()
+
+        headers['Content-Type'] = 'application/octet-stream'
+        headers['Content-Length'] = len(data)
+        data_bytes = data if isinstance(data, bytes) else bytes(data, 'utf-8')
+        headers['Content-Sha384'] = hashlib.sha384(data_bytes).hexdigest()
+
+        file_name = str(file_name)
+        if not file_name.startswith('./'):
+            file_name = './' + file_name
+
+        headers['Content-Disposition'] = "form-data; filename=\"{}\"".format(file_name)
+        headers['Accept-Encoding'] = 'gzip'
+        headers['Bakery-Protocol-Version'] = 3
+        headers['Connection'] = 'close'
+
+        conn.request('PUT', url, data, headers)
+        response = conn.getresponse()
+        result = response.read().decode()
+        if not response.status == 200:
+            raise JujuError(result)
+
     async def get_resources(self):
         """Return resources for this application.
 
@@ -517,7 +552,18 @@ class Application(model.ModelEntity):
         log.debug(
             'Setting config for %s: %s', self.name, config)
 
-        return await app_facade.Set(application=self.name, options=config)
+        str_config = {}
+        for k, v in config.items():
+            if isinstance(v, str):
+                str_config[k] = v
+            elif isinstance(v, dict):
+                # pairs with a value of None are ignored
+                if v.get('value', False):
+                    str_config[k] = str(v.get('value'))
+            else:
+                raise JujuApplicationConfigError(config, [k, v])
+
+        await app_facade.Set(application=self.name, options=str_config)
 
     async def reset_config(self, to_default):
         """
@@ -545,31 +591,6 @@ class Application(model.ModelEntity):
             'Setting constraints for %s: %s', self.name, constraints)
 
         return await app_facade.SetConstraints(application=self.name, constraints=constraints)
-
-    def set_meter_status(self, status, info=None):
-        """Set the meter status on this status.
-
-        :param str status: Meter status, e.g. 'RED', 'AMBER'
-        :param str info: Extra info message
-
-        """
-        raise NotImplementedError()
-
-    def set_plan(self, plan_name):
-        """Set the plan for this application, effective immediately.
-
-        :param str plan_name: Name of plan
-
-        """
-        raise NotImplementedError()
-
-    def update_allocation(self, allocation):
-        """Update existing allocation for this application.
-
-        :param int allocation: The allocation to set
-
-        """
-        raise NotImplementedError()
 
     async def refresh(
             self, channel=None, force=False, force_series=False, force_units=False,
@@ -714,13 +735,17 @@ class Application(model.ModelEntity):
         """
         app_facade = self._facade()
 
-        charm_dir = os.path.abspath(
-            os.path.expanduser(path))
+        if not isinstance(path, pathlib.Path):
+            path = pathlib.Path(path)
+        charm_dir = path.expanduser().resolve()
         model_config = await self.get_config()
 
-        series = get_charm_series(charm_dir)
+        series = (
+            await self.get_series() or
+            self.model.info.get('default-series', '') or
+            await get_charm_series(charm_dir, self.model)
+        )
         if not series:
-            model_config = await self.get_config()
             default_series = model_config.get("default-series")
             if default_series:
                 series = default_series.value

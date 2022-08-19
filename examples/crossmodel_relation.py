@@ -14,7 +14,7 @@ import tempfile
 import time
 from logging import getLogger
 
-from juju import loop
+from juju import jasyncio
 from juju.controller import Controller
 
 log = getLogger(__name__)
@@ -66,7 +66,7 @@ async def main():
             lambda: all(unit.agent_status == 'executing'
                         for unit in application_2.units))
 
-        await consuming_model.add_relation('wordpress', 'admin/test-cmr-1.mysql')
+        await consuming_model.relate('wordpress', 'admin/test-cmr-1.mysql')
 
         print('Exporting bundle')
         with tempfile.TemporaryDirectory() as dirpath:
@@ -94,4 +94,4 @@ async def main():
 
 
 if __name__ == '__main__':
-    loop.run(main())
+    jasyncio.run(main())

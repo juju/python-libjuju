@@ -16,7 +16,7 @@ clean:
 
 .PHONY: client
 client:
-	tox -r --notest -e lint,py38
+	tox -r --notest -e lint,py3
 	$(PY) -m juju.client.facade -s "juju/client/schemas*" -o juju/client/
 
 .PHONY: test
@@ -27,7 +27,7 @@ test: lint
 
 .PHONY: lint
 lint: 
-	tox -e lint --notest
+	tox -e lint
 
 .PHONY: docs
 docs: .tox

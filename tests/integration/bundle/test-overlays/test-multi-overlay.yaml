@@ -1,0 +1,15 @@
+description: An overlay for test multi-overlay
+applications:
+  ntp:
+  memcached:
+    charm: "memcached"
+    channel: stable
+    num_units: 1
+---
+description: Another overlay for test multi-overlay
+applications:
+  memcached:
+  mysql:
+    charm: "mysql"
+    channel: candidate
+    num_units: 1

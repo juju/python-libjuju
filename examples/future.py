@@ -5,7 +5,7 @@ This example doesn't work - it demonstrates features that don't exist yet.
 import logging
 
 from juju.model import Model
-from juju import loop
+from juju import jasyncio
 
 
 async def main():
@@ -29,7 +29,7 @@ async def main():
         channel='stable',
         num_units=0,
     )
-    await model.add_relation(
+    await model.relate(
         'ubuntu',
         'nrpe',
     )
@@ -44,4 +44,4 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     ws_logger = logging.getLogger('websockets.protocol')
     ws_logger.setLevel(logging.INFO)
-    loop.run(main())
+    jasyncio.run(main())

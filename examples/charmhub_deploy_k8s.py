@@ -6,7 +6,7 @@ This example:
 3. Destroys the unit and application
 
 """
-from juju import loop
+from juju import jasyncio
 from juju.model import Model
 
 
@@ -24,13 +24,16 @@ async def main():
         )
 
         print('Waiting for active')
-        await model.block_until(
-            lambda: all(unit.workload_status == 'active'
-                        for unit in application.units))
+        await model.wait_for_idle(status="active")
+
+        # when run on a container based model it should auto-switch to
+        # scale instead of failing with JujuError
+        await application.add_unit(count=2)
+        await application.destroy()
 
     finally:
         print('Disconnecting from model')
         await model.disconnect()
 
 if __name__ == '__main__':
-    loop.run(main())
+    jasyncio.run(main())

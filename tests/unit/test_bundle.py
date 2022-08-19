@@ -1,11 +1,26 @@
+from pathlib import Path
 import unittest
 from unittest import mock
+from mock import patch, Mock, ANY
+
+import yaml
 
 import pytest
-from juju.bundle import (AddApplicationChange, AddCharmChange,
-                         AddMachineChange, AddRelationChange, AddUnitChange,
-                         ChangeSet, ConsumeOfferChange, CreateOfferChange,
-                         ExposeChange, ScaleChange, SetAnnotationsChange)
+from juju.bundle import (
+    AddApplicationChange,
+    AddCharmChange,
+    AddMachineChange,
+    AddRelationChange,
+    AddUnitChange,
+    BundleHandler,
+    ChangeSet,
+    ConsumeOfferChange,
+    CreateOfferChange,
+    ExposeChange,
+    ScaleChange,
+    SetAnnotationsChange,
+)
+from juju import charmhub
 from juju.client import client
 from toposort import CircularDependencyError
 
@@ -198,6 +213,66 @@ class TestAddApplicationChangeRun:
                                          resources=["resource1"],
                                          storage="storage",
                                          devices="devices",
+                                         channel="channel",
+                                         charm_origin=ANY,
+                                         num_units="num_units")
+
+        # confirm that it's idempotent
+        model.applications = {"application": None}
+        result = await change.run(context)
+        assert result == "application"
+        model._add_store_resources.assert_called_once()
+        model._deploy.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_run_with_charmstore_charm_no_channel(self, event_loop):
+        """Test to verify if when the given channel is None, the channel defaults to "stable", which
+            is the default channel value for the Chart Store
+        """
+
+        change = AddApplicationChange(1, [], params={"charm": "cs:charm",
+                                                     "series": "series",
+                                                     "application": "application",
+                                                     "options": "options",
+                                                     "constraints": "constraints",
+                                                     "storage": "storage",
+                                                     "endpoint-bindings": "endpoint_bindings",
+                                                     "resources": "resources",
+                                                     "devices": "devices",
+                                                     "num-units": "num_units",
+                                                     "channel": None})
+
+        model = mock.Mock()
+        model._deploy = base.AsyncMock(return_value=None)
+        model._add_store_resources = base.AsyncMock(return_value=["resource1"])
+        model.applications = {}
+
+        context = mock.Mock()
+        context.resolve.return_value = "cs:charm1"
+        context.origins = {"cs:charm1": {"stable": {}}}
+        context.trusted = False
+        context.model = model
+
+        result = await change.run(context)
+        assert result == "application"
+
+        model._add_store_resources.assert_called_once()
+        model._add_store_resources.assert_called_with("application",
+                                                      "cs:charm1",
+                                                      overrides="resources")
+
+        model._deploy.assert_called_once()
+        model._deploy.assert_called_with(charm_url="cs:charm1",
+                                         application="application",
+                                         series="series",
+                                         config="options",
+                                         constraints="constraints",
+                                         endpoint_bindings="endpoint_bindings",
+                                         resources=["resource1"],
+                                         storage="storage",
+                                         devices="devices",
+                                         channel="stable",
+                                         charm_origin=ANY,
                                          num_units="num_units")
 
         # confirm that it's idempotent
@@ -221,18 +296,24 @@ class TestAddApplicationChangeRun:
                                                      "num-units": "num_units",
                                                      "channel": "channel"})
 
-        model = mock.Mock()
+        model = Mock()
         model._deploy = base.AsyncMock(return_value=None)
-        model._add_store_resources = base.AsyncMock(return_value=["resource1"])
+        model._add_charmhub_resources = base.AsyncMock(return_value=["resource1"])
         model.applications = {}
 
-        context = mock.Mock()
+        context = Mock()
         context.resolve.return_value = "ch:charm1"
-        context.origins = {"ch:charm1": {"channel/stable": {}}}
+        context.origins = {"ch:charm1": Mock()}
         context.trusted = False
         context.model = model
 
-        result = await change.run(context)
+        info = Mock()
+        info.result.id_ = "12345"
+        info.errors.error_list.code = ''
+        info_func = base.AsyncMock(return_value=info)
+
+        with patch.object(charmhub.CharmHub, 'info', info_func):
+            result = await change.run(context)
         assert result == "application"
 
         model._deploy.assert_called_once()
@@ -242,9 +323,63 @@ class TestAddApplicationChangeRun:
                                          config="options",
                                          constraints="constraints",
                                          endpoint_bindings="endpoint_bindings",
-                                         resources={},
+                                         resources=["resource1"],
                                          storage="storage",
                                          devices="devices",
+                                         channel="channel",
+                                         charm_origin=ANY,
+                                         num_units="num_units")
+
+    @pytest.mark.asyncio
+    async def test_run_with_charmhub_charm_no_channel(self, event_loop):
+        """Test to verify if when the given channel is None, the channel defaults to "local/stable", which
+            is the default channel value for the Charm Hub
+        """
+        change = AddApplicationChange(1, [], params={"charm": "charm",
+                                                     "series": "series",
+                                                     "application": "application",
+                                                     "options": "options",
+                                                     "constraints": "constraints",
+                                                     "storage": "storage",
+                                                     "endpoint-bindings": "endpoint_bindings",
+                                                     "resources": "resources",
+                                                     "devices": "devices",
+                                                     "num-units": "num_units",
+                                                     "channel": None
+                                                     })
+
+        model = Mock()
+        model._deploy = base.AsyncMock(return_value=None)
+        model._add_charmhub_resources = base.AsyncMock(return_value=["resource1"])
+        model.applications = {}
+
+        context = Mock()
+        context.resolve.return_value = "ch:charm1"
+        context.origins = {"ch:charm1": {"stable": Mock()}}
+        context.trusted = False
+        context.model = model
+
+        info = Mock()
+        info.result.id_ = "12345"
+        info.errors.error_list.code = ''
+        info_func = base.AsyncMock(return_value=info)
+
+        with patch.object(charmhub.CharmHub, 'info', info_func):
+            result = await change.run(context)
+        assert result == "application"
+
+        model._deploy.assert_called_once()
+        model._deploy.assert_called_with(charm_url="ch:charm1",
+                                         application="application",
+                                         series="series",
+                                         config="options",
+                                         constraints="constraints",
+                                         endpoint_bindings="endpoint_bindings",
+                                         resources=["resource1"],
+                                         storage="storage",
+                                         devices="devices",
+                                         channel="latest/stable",
+                                         charm_origin=ANY,
                                          num_units="num_units")
 
     @pytest.mark.asyncio
@@ -267,6 +402,7 @@ class TestAddApplicationChangeRun:
         context.resolve.return_value = "local:charm1"
         context.trusted = False
         context.model = model
+        context.bundle = {"applications": {}}
 
         result = await change.run(context)
         assert result == "application"
@@ -281,7 +417,9 @@ class TestAddApplicationChangeRun:
                                          resources={},
                                          storage="storage",
                                          devices="devices",
-                                         num_units="num_units")
+                                         num_units="num_units",
+                                         channel="",
+                                         charm_origin=ANY)
 
     @pytest.mark.asyncio
     async def test_run_no_series(self, event_loop):
@@ -294,7 +432,8 @@ class TestAddApplicationChangeRun:
                                                      "endpoint-bindings": "endpoint_bindings",
                                                      "resources": "resources",
                                                      "devices": "devices",
-                                                     "num-units": "num_units"})
+                                                     "num-units": "num_units",
+                                                     "channel": "channel"})
 
         model = mock.Mock()
         model._deploy = base.AsyncMock(return_value=None)
@@ -318,13 +457,15 @@ class TestAddApplicationChangeRun:
         model._deploy.assert_called_once()
         model._deploy.assert_called_with(charm_url="cs:charm1",
                                          application="application",
-                                         series="kubernetes",
+                                         series=None,
                                          config="options",
                                          constraints="constraints",
                                          endpoint_bindings="endpoint_bindings",
                                          resources=["resource1"],
                                          storage="storage",
                                          devices="devices",
+                                         channel="channel",
+                                         charm_origin=ANY,
                                          num_units="num_units")
 
         # confirm that it's idempotent
@@ -528,7 +669,7 @@ class TestAddRelationChangeRun:
         rel2 = mock.Mock(name="rel2", **{"matches.return_value": True})
 
         model = mock.Mock()
-        model.add_relation = base.AsyncMock(return_value=rel2)
+        model.relate = base.AsyncMock(return_value=rel2)
 
         context = mock.Mock()
         context.resolve_relation = mock.Mock(side_effect=['endpoint_1', 'endpoint_2'])
@@ -538,17 +679,17 @@ class TestAddRelationChangeRun:
         result = await change.run(context)
         assert result is rel2
 
-        model.add_relation.assert_called_once()
-        model.add_relation.assert_called_with("endpoint_1", "endpoint_2")
+        model.relate.assert_called_once()
+        model.relate.assert_called_with("endpoint_1", "endpoint_2")
 
         # confirm that it's idempotent
         context.resolve_relation = mock.Mock(side_effect=['endpoint_1', 'endpoint_2'])
-        model.add_relation.reset_mock()
-        model.add_relation.return_value = None
+        model.relate.reset_mock()
+        model.relate.return_value = None
         model.relations = [rel1, rel2]
         result = await change.run(context)
         assert result is rel2
-        assert not model.add_relation.called
+        assert not model.relate.called
 
 
 class TestAddUnitChange(unittest.TestCase):
@@ -930,3 +1071,101 @@ class TestSetAnnotationsChangeRun:
 
         entity.set_annotations.assert_called_once()
         entity.set_annotations.assert_called_with("annotations")
+
+
+class TestBundleHandler:
+    @pytest.mark.asyncio
+    async def test_fetch_plan_local_k8s_bundle(self, event_loop):
+        class AsyncMock(mock.MagicMock):
+            async def __call__(self, *args, **kwargs):
+                return super(AsyncMock, self).__call__(*args, **kwargs)
+
+        bundle_dir = Path("tests/bundle")
+        charm_dir_1 = "../integration/oci-image-charm"
+        charm_dir_2 = "../integration/oci-image-charm-no-series"
+        charm_path_1 = str((bundle_dir / charm_dir_1).resolve())
+        charm_path_2 = str((bundle_dir / charm_dir_2).resolve())
+        bundle = {
+            "bundle": "kubernetes",
+            "applications": {
+                "oci-image-charm": {
+                    "charm": charm_dir_1,
+                    "resources": {"oci-image": "ubuntu:latest"}
+                },
+                "oci-image-charm-2": {
+                    "charm": charm_dir_2,
+                    "resources": {"oci-image": "ubuntu:latest"}
+                },
+                "oci-image-charm-3": {
+                    "charm": charm_dir_2,
+                    "resources": {"oci-image": "ubuntu:latest"}
+                }
+            }
+        }
+
+        connection_mock = mock.Mock()
+        connection_mock.facades = {
+            "Bundle": 17,
+            "Client": 17,
+            "Application": 17,
+            "Annotations": 17,
+        }
+        model = mock.Mock()
+        model.units = {}
+        model.add_local_charm_dir = AsyncMock()
+        model.add_local_charm_dir.return_value = "charm_uri"
+        model.connection.return_value = connection_mock
+        model.get_config = AsyncMock()
+        default_series = mock.Mock()
+        default_series.value = "focal"
+        model_config = {"default-series": default_series}
+        model.get_config.return_value = model_config
+        model.add_local_resources = AsyncMock()
+        model.add_local_resources.return_value = {"oci-image": "id"}
+        handler = BundleHandler(model)
+        handler.bundle = bundle
+
+        bundle = await handler._handle_local_charms(bundle, bundle_dir)
+
+        # TODO: for some reason 'assert_has_calls' is failing in
+        # Python3.5, refactor this with 'assert_has_calls' when
+        # Python3.5 support is dropped
+
+        m1 = mock.call(
+            "oci-image-charm",
+            "charm_uri",
+            yaml.load(Path("tests/integration/oci-image-charm/metadata.yaml").read_text(), Loader=yaml.FullLoader),
+            resources={"oci-image": "ubuntu:latest"},
+        )
+
+        m2 = mock.call(
+            "oci-image-charm-2",
+            "charm_uri",
+            yaml.load(Path("tests/integration/oci-image-charm-no-series/metadata.yaml").read_text(), Loader=yaml.FullLoader),
+            resources={"oci-image": "ubuntu:latest"},
+        )
+
+        m3 = mock.call(
+            "oci-image-charm-3",
+            "charm_uri",
+            yaml.load(Path("tests/integration/oci-image-charm-no-series/metadata.yaml").read_text(), Loader=yaml.FullLoader),
+            resources={"oci-image": "ubuntu:latest"},
+        )
+
+        m_add_local_resources_calls = model.add_local_resources.mock_calls
+        assert len(m_add_local_resources_calls) == 3
+        assert m1 in m_add_local_resources_calls and \
+            m2 in m_add_local_resources_calls and \
+            m3 in m_add_local_resources_calls
+
+        mc_1 = mock.call(charm_path_1, "focal")
+        mc_2 = mock.call(charm_path_2, "focal")
+        mc_3 = mock.call(charm_path_2, "focal")
+
+        m_add_local_charm_dir_calls = model.add_local_charm_dir.mock_calls
+        assert len(m_add_local_charm_dir_calls) == 3
+        assert mc_1 in m_add_local_charm_dir_calls and \
+            mc_2 in m_add_local_charm_dir_calls and \
+            mc_3 in m_add_local_charm_dir_calls
+
+        assert bundle["applications"]["oci-image-charm"]["resources"]["oci-image"] == "id"

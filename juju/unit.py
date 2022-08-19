@@ -2,6 +2,8 @@ import logging
 
 import pyrfc3339
 
+from juju.errors import JujuAPIError
+
 from . import model, tag
 from .annotationhelper import _get_annotations, _set_annotations
 from .client import client
@@ -67,28 +69,13 @@ class Unit(model.ModelEntity):
     def public_address(self):
         """ Get the public address.
 
+        This property is deprecated, use get_public_address method.
         """
         return self.safe_data['public-address'] or None
 
     @property
     def tag(self):
         return tag.unit(self.name)
-
-    def add_storage(self, name, constraints=None):
-        """Add unit storage dynamically.
-
-        :param str name: Storage name, as specified by the charm
-        :param str constraints: Comma-separated list of constraints in the
-            form 'POOL,COUNT,SIZE'
-
-        """
-        raise NotImplementedError()
-
-    def collect_metrics(self):
-        """Collect metrics on this unit.
-
-        """
-        raise NotImplementedError()
 
     async def destroy(self):
         """Destroy this unit.
@@ -102,14 +89,20 @@ class Unit(model.ModelEntity):
         return await app_facade.DestroyUnits(unit_names=[self.name])
     remove = destroy
 
-    def get_resources(self, details=False):
-        """Return resources for this unit.
+    async def get_public_address(self):
+        """Return the public address of this unit.
 
-        :param bool details: Include detailed info about resources used by each
-            unit
-
+        :return int public-address
         """
-        raise NotImplementedError()
+        addr = self.safe_data['public-address'] or None
+        if addr is not None:
+            return addr
+
+        app_facade = client.ApplicationFacade.from_connection(self.connection)
+        defResult = await app_facade.UnitsInfo(entities=[client.Entity(self.tag)])
+        if defResult is not None and len(defResult.results) > 1:
+            raise JujuAPIError("expected one result")
+        return defResult.results[0].result.get('public-address', None)
 
     async def resolved(self, retry=False):
         """Mark unit errors resolved.
@@ -216,12 +209,6 @@ class Unit(model.ModelEntity):
         await self.machine.scp_from(source, destination, user=user,
                                     proxy=proxy, scp_opts=scp_opts)
 
-    def set_meter_status(self):
-        """Set the meter status on this unit.
-
-        """
-        raise NotImplementedError()
-
     async def ssh(
             self, command, user='ubuntu', proxy=False, ssh_opts=None):
         """Execute a command over SSH on this unit.
@@ -233,15 +220,6 @@ class Unit(model.ModelEntity):
 
         """
         return await self.machine.ssh(command, user, proxy, ssh_opts)
-
-    def status_history(self, num=20, utc=False):
-        """Get status history for this unit.
-
-        :param int num: Size of history backlog
-        :param bool utc: Display time as UTC in RFC3339 format
-
-        """
-        raise NotImplementedError()
 
     async def is_leader_from_status(self):
         """

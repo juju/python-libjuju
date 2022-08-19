@@ -99,7 +99,7 @@ class CleanModel():
 
     async def __aexit__(self, exc_type, exc, tb):
         await self._model.disconnect()
-        await self._controller.destroy_model(self._model_uuid)
+        await self._controller.destroy_model(self._model_uuid, force=True)
         await self._controller.disconnect()
 
 

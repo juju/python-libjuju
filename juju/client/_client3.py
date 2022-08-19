@@ -644,6 +644,599 @@ class AdminFacade(Type):
 
 
 
+class AgentFacade(Type):
+    name = 'Agent'
+    version = 3
+    schema =     {'definitions': {'AgentGetEntitiesResult': {'additionalProperties': False,
+                                                'properties': {'container-type': {'type': 'string'},
+                                                               'error': {'$ref': '#/definitions/Error'},
+                                                               'jobs': {'items': {'type': 'string'},
+                                                                        'type': 'array'},
+                                                               'life': {'type': 'string'}},
+                                                'required': ['life',
+                                                             'jobs',
+                                                             'container-type'],
+                                                'type': 'object'},
+                     'AgentGetEntitiesResults': {'additionalProperties': False,
+                                                 'properties': {'entities': {'items': {'$ref': '#/definitions/AgentGetEntitiesResult'},
+                                                                             'type': 'array'}},
+                                                 'required': ['entities'],
+                                                 'type': 'object'},
+                     'CloudCredential': {'additionalProperties': False,
+                                         'properties': {'attrs': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                  'type': 'object'},
+                                                        'auth-type': {'type': 'string'},
+                                                        'redacted': {'items': {'type': 'string'},
+                                                                     'type': 'array'}},
+                                         'required': ['auth-type'],
+                                         'type': 'object'},
+                     'CloudSpec': {'additionalProperties': False,
+                                   'properties': {'cacertificates': {'items': {'type': 'string'},
+                                                                     'type': 'array'},
+                                                  'credential': {'$ref': '#/definitions/CloudCredential'},
+                                                  'endpoint': {'type': 'string'},
+                                                  'identity-endpoint': {'type': 'string'},
+                                                  'is-controller-cloud': {'type': 'boolean'},
+                                                  'name': {'type': 'string'},
+                                                  'region': {'type': 'string'},
+                                                  'skip-tls-verify': {'type': 'boolean'},
+                                                  'storage-endpoint': {'type': 'string'},
+                                                  'type': {'type': 'string'}},
+                                   'required': ['type', 'name'],
+                                   'type': 'object'},
+                     'CloudSpecResult': {'additionalProperties': False,
+                                         'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                        'result': {'$ref': '#/definitions/CloudSpec'}},
+                                         'type': 'object'},
+                     'CloudSpecResults': {'additionalProperties': False,
+                                          'properties': {'results': {'items': {'$ref': '#/definitions/CloudSpecResult'},
+                                                                     'type': 'array'}},
+                                          'type': 'object'},
+                     'ControllerAPIInfoResult': {'additionalProperties': False,
+                                                 'properties': {'addresses': {'items': {'type': 'string'},
+                                                                              'type': 'array'},
+                                                                'cacert': {'type': 'string'},
+                                                                'error': {'$ref': '#/definitions/Error'}},
+                                                 'required': ['addresses',
+                                                              'cacert'],
+                                                 'type': 'object'},
+                     'ControllerAPIInfoResults': {'additionalProperties': False,
+                                                  'properties': {'results': {'items': {'$ref': '#/definitions/ControllerAPIInfoResult'},
+                                                                             'type': 'array'}},
+                                                  'required': ['results'],
+                                                  'type': 'object'},
+                     'ControllerConfigResult': {'additionalProperties': False,
+                                                'properties': {'config': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                       'type': 'object'}},
+                                                                          'type': 'object'}},
+                                                'required': ['config'],
+                                                'type': 'object'},
+                     'Entities': {'additionalProperties': False,
+                                  'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
+                                                              'type': 'array'}},
+                                  'required': ['entities'],
+                                  'type': 'object'},
+                     'Entity': {'additionalProperties': False,
+                                'properties': {'tag': {'type': 'string'}},
+                                'required': ['tag'],
+                                'type': 'object'},
+                     'EntityPassword': {'additionalProperties': False,
+                                        'properties': {'password': {'type': 'string'},
+                                                       'tag': {'type': 'string'}},
+                                        'required': ['tag', 'password'],
+                                        'type': 'object'},
+                     'EntityPasswords': {'additionalProperties': False,
+                                         'properties': {'changes': {'items': {'$ref': '#/definitions/EntityPassword'},
+                                                                    'type': 'array'}},
+                                         'required': ['changes'],
+                                         'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ErrorResult': {'additionalProperties': False,
+                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
+                                     'type': 'object'},
+                     'ErrorResults': {'additionalProperties': False,
+                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
+                                                                 'type': 'array'}},
+                                      'required': ['results'],
+                                      'type': 'object'},
+                     'IsMasterResult': {'additionalProperties': False,
+                                        'properties': {'master': {'type': 'boolean'}},
+                                        'required': ['master'],
+                                        'type': 'object'},
+                     'ModelConfigResult': {'additionalProperties': False,
+                                           'properties': {'config': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                  'type': 'object'}},
+                                                                     'type': 'object'}},
+                                           'required': ['config'],
+                                           'type': 'object'},
+                     'ModelTag': {'additionalProperties': False, 'type': 'object'},
+                     'NotifyWatchResult': {'additionalProperties': False,
+                                           'properties': {'NotifyWatcherId': {'type': 'string'},
+                                                          'error': {'$ref': '#/definitions/Error'}},
+                                           'required': ['NotifyWatcherId'],
+                                           'type': 'object'},
+                     'NotifyWatchResults': {'additionalProperties': False,
+                                            'properties': {'results': {'items': {'$ref': '#/definitions/NotifyWatchResult'},
+                                                                       'type': 'array'}},
+                                            'required': ['results'],
+                                            'type': 'object'},
+                     'StateServingInfo': {'additionalProperties': False,
+                                          'properties': {'api-port': {'type': 'integer'},
+                                                         'ca-private-key': {'type': 'string'},
+                                                         'cert': {'type': 'string'},
+                                                         'controller-api-port': {'type': 'integer'},
+                                                         'private-key': {'type': 'string'},
+                                                         'shared-secret': {'type': 'string'},
+                                                         'state-port': {'type': 'integer'},
+                                                         'system-identity': {'type': 'string'}},
+                                          'required': ['api-port',
+                                                       'state-port',
+                                                       'cert',
+                                                       'private-key',
+                                                       'ca-private-key',
+                                                       'shared-secret',
+                                                       'system-identity'],
+                                          'type': 'object'}},
+     'properties': {'ClearReboot': {'description': 'ClearReboot will clear the '
+                                                   'reboot flag on provided '
+                                                   'machines, if it exists.',
+                                    'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                   'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                    'type': 'object'},
+                    'CloudSpec': {'description': "CloudSpec returns the model's "
+                                                 'cloud spec.',
+                                  'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                 'Result': {'$ref': '#/definitions/CloudSpecResults'}},
+                                  'type': 'object'},
+                    'ControllerAPIInfoForModels': {'description': 'ControllerAPIInfoForModels '
+                                                                  'returns the '
+                                                                  'controller api '
+                                                                  'connection '
+                                                                  'details for the '
+                                                                  'specified '
+                                                                  'models.',
+                                                   'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                                  'Result': {'$ref': '#/definitions/ControllerAPIInfoResults'}},
+                                                   'type': 'object'},
+                    'ControllerConfig': {'description': 'ControllerConfig returns '
+                                                        "the controller's "
+                                                        'configuration.',
+                                         'properties': {'Result': {'$ref': '#/definitions/ControllerConfigResult'}},
+                                         'type': 'object'},
+                    'GetCloudSpec': {'description': 'GetCloudSpec constructs the '
+                                                    'CloudSpec for a validated and '
+                                                    'authorized model.',
+                                     'properties': {'Params': {'$ref': '#/definitions/ModelTag'},
+                                                    'Result': {'$ref': '#/definitions/CloudSpecResult'}},
+                                     'type': 'object'},
+                    'GetEntities': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                   'Result': {'$ref': '#/definitions/AgentGetEntitiesResults'}},
+                                    'type': 'object'},
+                    'IsMaster': {'properties': {'Result': {'$ref': '#/definitions/IsMasterResult'}},
+                                 'type': 'object'},
+                    'ModelConfig': {'description': 'ModelConfig returns the '
+                                                   "current model's configuration.",
+                                    'properties': {'Result': {'$ref': '#/definitions/ModelConfigResult'}},
+                                    'type': 'object'},
+                    'SetPasswords': {'description': 'SetPasswords sets the given '
+                                                    'password for each supplied '
+                                                    'entity, if possible.',
+                                     'properties': {'Params': {'$ref': '#/definitions/EntityPasswords'},
+                                                    'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                     'type': 'object'},
+                    'StateServingInfo': {'properties': {'Result': {'$ref': '#/definitions/StateServingInfo'}},
+                                         'type': 'object'},
+                    'WatchCloudSpecsChanges': {'description': 'WatchCloudSpecsChanges '
+                                                              'returns a watcher '
+                                                              'for cloud spec '
+                                                              'changes.',
+                                               'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                              'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
+                                               'type': 'object'},
+                    'WatchCredentials': {'description': 'WatchCredentials watches '
+                                                        'for changes to the '
+                                                        'specified credentials.',
+                                         'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                        'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
+                                         'type': 'object'},
+                    'WatchForModelConfigChanges': {'description': 'WatchForModelConfigChanges '
+                                                                  'returns a '
+                                                                  'NotifyWatcher '
+                                                                  'that observes\n'
+                                                                  'changes to the '
+                                                                  'model '
+                                                                  'configuration.\n'
+                                                                  'Note that '
+                                                                  'although the '
+                                                                  'NotifyWatchResult '
+                                                                  'contains an '
+                                                                  'Error field,\n'
+                                                                  "it's not used "
+                                                                  'because we are '
+                                                                  'only returning '
+                                                                  'a single '
+                                                                  'watcher,\n'
+                                                                  'so we use the '
+                                                                  'regular error '
+                                                                  'return.',
+                                                   'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
+                                                   'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(ErrorResults)
+    async def ClearReboot(self, entities=None):
+        '''
+        ClearReboot will clear the reboot flag on provided machines, if it exists.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Agent',
+                   request='ClearReboot',
+                   version=3,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CloudSpecResults)
+    async def CloudSpec(self, entities=None):
+        '''
+        CloudSpec returns the model's cloud spec.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> CloudSpecResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Agent',
+                   request='CloudSpec',
+                   version=3,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ControllerAPIInfoResults)
+    async def ControllerAPIInfoForModels(self, entities=None):
+        '''
+        ControllerAPIInfoForModels returns the controller api connection details for the specified models.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ControllerAPIInfoResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Agent',
+                   request='ControllerAPIInfoForModels',
+                   version=3,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ControllerConfigResult)
+    async def ControllerConfig(self):
+        '''
+        ControllerConfig returns the controller's configuration.
+
+
+        Returns -> ControllerConfigResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Agent',
+                   request='ControllerConfig',
+                   version=3,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CloudSpecResult)
+    async def GetCloudSpec(self):
+        '''
+        GetCloudSpec constructs the CloudSpec for a validated and authorized model.
+
+
+        Returns -> CloudSpecResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Agent',
+                   request='GetCloudSpec',
+                   version=3,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(AgentGetEntitiesResults)
+    async def GetEntities(self, entities=None):
+        '''
+        entities : typing.Sequence[~Entity]
+        Returns -> AgentGetEntitiesResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Agent',
+                   request='GetEntities',
+                   version=3,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(IsMasterResult)
+    async def IsMaster(self):
+        '''
+
+        Returns -> IsMasterResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Agent',
+                   request='IsMaster',
+                   version=3,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ModelConfigResult)
+    async def ModelConfig(self):
+        '''
+        ModelConfig returns the current model's configuration.
+
+
+        Returns -> ModelConfigResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Agent',
+                   request='ModelConfig',
+                   version=3,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def SetPasswords(self, changes=None):
+        '''
+        SetPasswords sets the given password for each supplied entity, if possible.
+
+        changes : typing.Sequence[~EntityPassword]
+        Returns -> ErrorResults
+        '''
+        if changes is not None and not isinstance(changes, (bytes, str, list)):
+            raise Exception("Expected changes to be a Sequence, received: {}".format(type(changes)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Agent',
+                   request='SetPasswords',
+                   version=3,
+                   params=_params)
+        _params['changes'] = changes
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StateServingInfo)
+    async def StateServingInfo(self):
+        '''
+
+        Returns -> StateServingInfo
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Agent',
+                   request='StateServingInfo',
+                   version=3,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResults)
+    async def WatchCloudSpecsChanges(self, entities=None):
+        '''
+        WatchCloudSpecsChanges returns a watcher for cloud spec changes.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> NotifyWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Agent',
+                   request='WatchCloudSpecsChanges',
+                   version=3,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResults)
+    async def WatchCredentials(self, entities=None):
+        '''
+        WatchCredentials watches for changes to the specified credentials.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> NotifyWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Agent',
+                   request='WatchCredentials',
+                   version=3,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResult)
+    async def WatchForModelConfigChanges(self):
+        '''
+        WatchForModelConfigChanges returns a NotifyWatcher that observes
+        changes to the model configuration.
+        Note that although the NotifyWatchResult contains an Error field,
+        it's not used because we are only returning a single watcher,
+        so we use the regular error return.
+
+
+        Returns -> NotifyWatchResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Agent',
+                   request='WatchForModelConfigChanges',
+                   version=3,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+class AllModelWatcherFacade(Type):
+    name = 'AllModelWatcher'
+    version = 3
+    schema =     {'definitions': {'AllWatcherNextResults': {'additionalProperties': False,
+                                               'properties': {'deltas': {'items': {'$ref': '#/definitions/Delta'},
+                                                                         'type': 'array'}},
+                                               'required': ['deltas'],
+                                               'type': 'object'},
+                     'Delta': {'additionalProperties': False,
+                               'properties': {'entity': {'additionalProperties': True,
+                                                         'type': 'object'},
+                                              'removed': {'type': 'boolean'}},
+                               'required': ['removed', 'entity'],
+                               'type': 'object'}},
+     'properties': {'Next': {'description': 'Next will return the current state of '
+                                            'everything on the first call\n'
+                                            'and subsequent calls will',
+                             'properties': {'Result': {'$ref': '#/definitions/AllWatcherNextResults'}},
+                             'type': 'object'},
+                    'Stop': {'description': 'Stop stops the watcher.',
+                             'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(AllWatcherNextResults)
+    async def Next(self):
+        '''
+        Next will return the current state of everything on the first call
+        and subsequent calls will
+
+
+        Returns -> AllWatcherNextResults
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='AllModelWatcher',
+                   request='Next',
+                   version=3,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def Stop(self):
+        '''
+        Stop stops the watcher.
+
+
+        Returns -> None
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='AllModelWatcher',
+                   request='Stop',
+                   version=3,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    async def rpc(self, msg):
+        '''
+        Patch rpc method to add Id.
+        '''
+        if not hasattr(self, 'Id'):
+            raise RuntimeError('Missing "Id" field')
+        msg['Id'] = id
+
+        from .facade import TypeEncoder
+        reply = await self.connection.rpc(msg, encoder=TypeEncoder)
+        return reply
+
+
+
 class ApplicationFacade(Type):
     name = 'Application'
     version = 3
@@ -3056,6 +3649,8 @@ class ClientFacade(Type):
                                                   'provider-type': {'type': 'string'},
                                                   'sla': {'$ref': '#/definitions/ModelSLAInfo'},
                                                   'status': {'$ref': '#/definitions/EntityStatus'},
+                                                  'supported-features': {'items': {'$ref': '#/definitions/SupportedFeature'},
+                                                                         'type': 'array'},
                                                   'type': {'type': 'string'},
                                                   'users': {'items': {'$ref': '#/definitions/ModelUserInfo'},
                                                             'type': 'array'},
@@ -3338,6 +3933,12 @@ class ClientFacade(Type):
                                                      'result': {'type': 'string'}},
                                       'required': ['result'],
                                       'type': 'object'},
+                     'SupportedFeature': {'additionalProperties': False,
+                                          'properties': {'description': {'type': 'string'},
+                                                         'name': {'type': 'string'},
+                                                         'version': {'type': 'string'}},
+                                          'required': ['name', 'description'],
+                                          'type': 'object'},
                      'Tools': {'additionalProperties': False,
                                'properties': {'sha256': {'type': 'string'},
                                               'size': {'type': 'integer'},
@@ -3374,6 +3975,7 @@ class ClientFacade(Type):
                                               'container': {'type': 'string'},
                                               'cores': {'type': 'integer'},
                                               'cpu-power': {'type': 'integer'},
+                                              'instance-role': {'type': 'string'},
                                               'instance-type': {'type': 'string'},
                                               'mem': {'type': 'integer'},
                                               'root-disk': {'type': 'integer'},
@@ -3492,11 +4094,10 @@ class ClientFacade(Type):
                                                         'requirements, so that '
                                                         'they can be\n'
                                                         'applied in order.\n'
-                                                        'This call is deprecated, '
-                                                        'clients should use the '
-                                                        'GetChanges endpoint on '
-                                                        'the\n'
-                                                        'Bundle facade.\n'
+                                                        'Deprecated: clients '
+                                                        'should use the GetChanges '
+                                                        'endpoint on the Bundle '
+                                                        'facade.\n'
                                                         'Note: any new feature in '
                                                         'the future like devices '
                                                         'will never be supported '
@@ -3561,7 +4162,7 @@ class ClientFacade(Type):
                                       'properties': {'Params': {'$ref': '#/definitions/PublicAddress'},
                                                      'Result': {'$ref': '#/definitions/PublicAddressResults'}},
                                       'type': 'object'},
-                    'ResolveCharms': {'description': 'ResolveCharm resolves the '
+                    'ResolveCharms': {'description': 'ResolveCharms resolves the '
                                                      'best available charm URLs '
                                                      'with series, for charm\n'
                                                      'locations without a series '
@@ -3947,8 +4548,7 @@ class ClientFacade(Type):
         GetBundleChanges returns the list of changes required to deploy the given
         bundle data. The changes are sorted by requirements, so that they can be
         applied in order.
-        This call is deprecated, clients should use the GetChanges endpoint on the
-        Bundle facade.
+        Deprecated: clients should use the GetChanges endpoint on the Bundle facade.
         Note: any new feature in the future like devices will never be supported here.
 
         bundleurl : str
@@ -4218,7 +4818,7 @@ class ClientFacade(Type):
     @ReturnMapping(ResolveCharmResults)
     async def ResolveCharms(self, references=None):
         '''
-        ResolveCharm resolves the best available charm URLs with series, for charm
+        ResolveCharms resolves the best available charm URLs with series, for charm
         locations without a series specified.
 
         NOTE: ResolveCharms is deprecated as of juju 2.9 and charms facade version 3.
@@ -9747,6 +10347,265 @@ class ProvisionerFacade(Type):
 
 
 
+class SSHClientFacade(Type):
+    name = 'SSHClient'
+    version = 3
+    schema =     {'definitions': {'Entities': {'additionalProperties': False,
+                                  'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
+                                                              'type': 'array'}},
+                                  'required': ['entities'],
+                                  'type': 'object'},
+                     'Entity': {'additionalProperties': False,
+                                'properties': {'tag': {'type': 'string'}},
+                                'required': ['tag'],
+                                'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'SSHAddressResult': {'additionalProperties': False,
+                                          'properties': {'address': {'type': 'string'},
+                                                         'error': {'$ref': '#/definitions/Error'}},
+                                          'type': 'object'},
+                     'SSHAddressResults': {'additionalProperties': False,
+                                           'properties': {'results': {'items': {'$ref': '#/definitions/SSHAddressResult'},
+                                                                      'type': 'array'}},
+                                           'required': ['results'],
+                                           'type': 'object'},
+                     'SSHAddressesResult': {'additionalProperties': False,
+                                            'properties': {'addresses': {'items': {'type': 'string'},
+                                                                         'type': 'array'},
+                                                           'error': {'$ref': '#/definitions/Error'}},
+                                            'required': ['addresses'],
+                                            'type': 'object'},
+                     'SSHAddressesResults': {'additionalProperties': False,
+                                             'properties': {'results': {'items': {'$ref': '#/definitions/SSHAddressesResult'},
+                                                                        'type': 'array'}},
+                                             'required': ['results'],
+                                             'type': 'object'},
+                     'SSHProxyResult': {'additionalProperties': False,
+                                        'properties': {'use-proxy': {'type': 'boolean'}},
+                                        'required': ['use-proxy'],
+                                        'type': 'object'},
+                     'SSHPublicKeysResult': {'additionalProperties': False,
+                                             'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                            'public-keys': {'items': {'type': 'string'},
+                                                                            'type': 'array'}},
+                                             'type': 'object'},
+                     'SSHPublicKeysResults': {'additionalProperties': False,
+                                              'properties': {'results': {'items': {'$ref': '#/definitions/SSHPublicKeysResult'},
+                                                                         'type': 'array'}},
+                                              'required': ['results'],
+                                              'type': 'object'},
+                     'StringResult': {'additionalProperties': False,
+                                      'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                     'result': {'type': 'string'}},
+                                      'required': ['result'],
+                                      'type': 'object'}},
+     'properties': {'AllAddresses': {'description': 'AllAddresses reports all '
+                                                    'addresses that might have SSH '
+                                                    'listening for each given\n'
+                                                    'entity in args. Machines and '
+                                                    'units are supported as entity '
+                                                    'types.\n'
+                                                    'TODO(wpk): 2017-05-17 This is '
+                                                    'a temporary solution, we '
+                                                    'should not fetch environ '
+                                                    'here\n'
+                                                    'but get the addresses from '
+                                                    'state. We will be changing it '
+                                                    'since we want to have '
+                                                    'space-aware\n'
+                                                    'SSH settings.',
+                                     'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                    'Result': {'$ref': '#/definitions/SSHAddressesResults'}},
+                                     'type': 'object'},
+                    'Leader': {'description': 'Leader returns the unit name of the '
+                                              'leader for the given application.',
+                               'properties': {'Params': {'$ref': '#/definitions/Entity'},
+                                              'Result': {'$ref': '#/definitions/StringResult'}},
+                               'type': 'object'},
+                    'PrivateAddress': {'description': 'PrivateAddress reports the '
+                                                      'preferred private network '
+                                                      'address for one or\n'
+                                                      'more entities. Machines and '
+                                                      'units are supported.',
+                                       'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                      'Result': {'$ref': '#/definitions/SSHAddressResults'}},
+                                       'type': 'object'},
+                    'Proxy': {'description': 'Proxy returns whether SSH '
+                                             'connections should be proxied '
+                                             'through the\n'
+                                             'controller hosts for the model '
+                                             'associated with the API connection.',
+                              'properties': {'Result': {'$ref': '#/definitions/SSHProxyResult'}},
+                              'type': 'object'},
+                    'PublicAddress': {'description': 'PublicAddress reports the '
+                                                     'preferred public network '
+                                                     'address for one\n'
+                                                     'or more entities. Machines '
+                                                     'and units are supported.',
+                                      'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                     'Result': {'$ref': '#/definitions/SSHAddressResults'}},
+                                      'type': 'object'},
+                    'PublicKeys': {'description': 'PublicKeys returns the public '
+                                                  'SSH hosts for one or more\n'
+                                                  'entities. Machines and units '
+                                                  'are supported.',
+                                   'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                  'Result': {'$ref': '#/definitions/SSHPublicKeysResults'}},
+                                   'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(SSHAddressesResults)
+    async def AllAddresses(self, entities=None):
+        '''
+        AllAddresses reports all addresses that might have SSH listening for each given
+        entity in args. Machines and units are supported as entity types.
+        TODO(wpk): 2017-05-17 This is a temporary solution, we should not fetch environ here
+        but get the addresses from state. We will be changing it since we want to have space-aware
+        SSH settings.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> SSHAddressesResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SSHClient',
+                   request='AllAddresses',
+                   version=3,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResult)
+    async def Leader(self, tag=None):
+        '''
+        Leader returns the unit name of the leader for the given application.
+
+        tag : str
+        Returns -> StringResult
+        '''
+        if tag is not None and not isinstance(tag, (bytes, str)):
+            raise Exception("Expected tag to be a str, received: {}".format(type(tag)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SSHClient',
+                   request='Leader',
+                   version=3,
+                   params=_params)
+        _params['tag'] = tag
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SSHAddressResults)
+    async def PrivateAddress(self, entities=None):
+        '''
+        PrivateAddress reports the preferred private network address for one or
+        more entities. Machines and units are supported.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> SSHAddressResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SSHClient',
+                   request='PrivateAddress',
+                   version=3,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SSHProxyResult)
+    async def Proxy(self):
+        '''
+        Proxy returns whether SSH connections should be proxied through the
+        controller hosts for the model associated with the API connection.
+
+
+        Returns -> SSHProxyResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SSHClient',
+                   request='Proxy',
+                   version=3,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SSHAddressResults)
+    async def PublicAddress(self, entities=None):
+        '''
+        PublicAddress reports the preferred public network address for one
+        or more entities. Machines and units are supported.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> SSHAddressResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SSHClient',
+                   request='PublicAddress',
+                   version=3,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SSHPublicKeysResults)
+    async def PublicKeys(self, entities=None):
+        '''
+        PublicKeys returns the public SSH hosts for one or more
+        entities. Machines and units are supported.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> SSHPublicKeysResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SSHClient',
+                   request='PublicKeys',
+                   version=3,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
 class SpacesFacade(Type):
     name = 'Spaces'
     version = 3
@@ -11667,7 +12526,8 @@ class UpgradeSeriesFacade(Type):
                                                    'type': 'object'},
                      'UpgradeSeriesStatusResult': {'additionalProperties': False,
                                                    'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                                  'status': {'type': 'string'}},
+                                                                  'status': {'type': 'string'},
+                                                                  'target': {'type': 'string'}},
                                                    'type': 'object'},
                      'UpgradeSeriesStatusResults': {'additionalProperties': False,
                                                     'properties': {'results': {'items': {'$ref': '#/definitions/UpgradeSeriesStatusResult'},

@@ -1,4 +1,3 @@
-import asyncio
 from pathlib import Path
 
 import pytest
@@ -48,6 +47,31 @@ async def test_action(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_get_set_config(event_loop):
+    async with base.CleanModel() as model:
+        ubuntu_app = await model.deploy(
+            'percona-cluster',
+            application_name='mysql',
+            series='xenial',
+            channel='stable',
+            config={
+                'tuning-level': 'safest',
+            },
+            constraints={
+                'arch': 'amd64',
+                'mem': 256 * MB,
+            },
+        )
+
+        config = await ubuntu_app.get_config()
+        await ubuntu_app.set_config(config)
+
+        config2 = await ubuntu_app.get_config()
+        assert config == config2
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_status_is_not_unset(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy(
@@ -71,7 +95,7 @@ async def test_status(event_loop):
                 return False
             return app.status == 'blocked'
 
-        await asyncio.wait_for(model.block_until(app_ready), timeout=480)
+        await model.block_until(app_ready, timeout=480)
         assert app.status == 'blocked'
 
 
@@ -184,24 +208,15 @@ async def test_upgrade_charm_resource(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy('cs:~juju-qa/bionic/upgrade-charm-resource-test-0')
 
-        def units_ready():
-            if not app.units:
-                return False
-            unit = app.units[0]
-            return unit.workload_status == 'active' and \
-                unit.agent_status == 'idle'
-
-        await asyncio.wait_for(model.block_until(units_ready), timeout=480)
+        await model.wait_for_idle(wait_for_units=1)
         unit = app.units[0]
         expected_message = 'I have no resource.'
         assert unit.workload_status_message == expected_message
 
         await app.upgrade_charm(revision=1)
-        await asyncio.wait_for(
-            model.block_until(
-                lambda: unit.workload_status_message != 'I have no resource.'
-            ),
-            timeout=60
+        await model.block_until(
+            lambda: unit.workload_status_message != 'I have no resource.',
+            timeout=60,
         )
         expected_message = 'My resource: I am the resource.'
         assert app.units[0].workload_status_message == expected_message
@@ -211,7 +226,7 @@ async def test_upgrade_charm_resource(event_loop):
 @pytest.mark.asyncio
 async def test_trusted(event_loop):
     async with base.CleanModel() as model:
-        await model.deploy('cs:~juju-qa/bundle/basic-trusted-1', trust=True)
+        await model.deploy('ubuntu', trust=True)
 
         ubuntu_app = model.applications['ubuntu']
         trusted = await ubuntu_app.get_trusted()
@@ -220,3 +235,15 @@ async def test_trusted(event_loop):
         await ubuntu_app.set_trusted(False)
         trusted = await ubuntu_app.get_trusted()
         assert trusted is False
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_app_remove_wait_flag(event_loop):
+    async with base.CleanModel() as model:
+        app = await model.deploy('ubuntu')
+        a_name = app.name
+        await model.wait_for_idle(status="active")
+
+        await model.remove_application(app.name, block_until_done=True)
+        assert a_name not in model.applications

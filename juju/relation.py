@@ -149,7 +149,3 @@ class Relation(model.ModelEntity):
         All applications involved in this relation.
         """
         return [ep.application for ep in self.endpoints]
-
-    async def destroy(self):
-        raise NotImplementedError()
-        # TODO: destroy a relation

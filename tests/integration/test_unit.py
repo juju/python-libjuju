@@ -1,10 +1,68 @@
 import asyncio
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-
 import pytest
 
+from juju import utils
+
 from .. import base
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_block_coroutine(event_loop):
+    async with base.CleanModel() as model:
+        app = await model.deploy(
+            'ch:ubuntu',
+            application_name='ubuntu',
+            series='bionic',
+            channel='stable',
+            num_units=3,
+        )
+
+        async def is_leader_elected():
+            # TODO: cleanup/refactor the code below when the py3.5
+            # support is dropped
+            for u in app.units:
+                if await u.is_leader_from_status():
+                    return True
+            return False
+
+        await utils.block_until_with_coroutine(is_leader_elected,
+                                               timeout=480)
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_unit_public_address(event_loop):
+    async with base.CleanModel() as model:
+        app = await model.deploy(
+            'ch:ubuntu',
+            application_name='ubuntu',
+            series='bionic',
+            channel='stable',
+            num_units=1,
+        )
+
+        # wait for the units to come up
+        await model.block_until(lambda: app.units, timeout=480)
+
+        # make sure we have some units to test with
+        assert len(app.units) >= 1
+        unit = app.units[0]
+
+        await asyncio.wait_for(
+            model.block_until(lambda: unit.machine),
+            timeout=60)
+        machine = unit.machine
+        await asyncio.wait_for(
+            model.block_until(lambda: (machine.status == 'running' and
+                                       machine.agent_status == 'started')),
+            timeout=480)
+
+        for unit in app.units:
+            addr = await unit.get_public_address()
+            assert addr is not None
 
 
 @base.bootstrapped
@@ -14,9 +72,9 @@ async def test_run(event_loop):
 
     async with base.CleanModel() as model:
         app = await model.deploy(
-            'cs:ubuntu-0',
+            'ubuntu',
             application_name='ubuntu',
-            series='trusty',
+            series='focal',
             channel='stable',
         )
 
@@ -50,7 +108,7 @@ async def test_run_action(event_loop):
 
     async with base.CleanModel() as model:
         app = await model.deploy(
-            'cs:git',
+            'git',
             application_name='git',
             series='trusty',
             channel='stable',
@@ -90,7 +148,7 @@ async def test_scp(event_loop):
     except RuntimeError:
         pytest.skip('test_scp will always fail outside of MainThread')
     async with base.CleanModel() as model:
-        app = await model.deploy('cs:ubuntu')
+        app = await model.deploy('ubuntu', channel='stable')
 
         await asyncio.wait_for(
             model.block_until(lambda: app.units),
@@ -124,7 +182,7 @@ async def test_ssh(event_loop):
     except RuntimeError:
         pytest.skip('test_ssh will always fail outside of MainThread')
     async with base.CleanModel() as model:
-        app = await model.deploy('cs:ubuntu')
+        app = await model.deploy('ubuntu', channel='stable')
 
         await asyncio.wait_for(
             model.block_until(lambda: app.units),
@@ -155,7 +213,7 @@ async def test_resolve_local(event_loop):
         )
 
         try:
-            await model.wait_for_idle(raise_on_error=False, idle_period=3)
+            await model.wait_for_idle(raise_on_error=False, idle_period=1)
             assert app.units[0].workload_status == 'error'
 
             await app.units[0].resolved()

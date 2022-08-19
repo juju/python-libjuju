@@ -7,11 +7,12 @@ import pprint
 import re
 import textwrap
 import typing
-import typing_inspect
 from collections import defaultdict
 from glob import glob
 from pathlib import Path
 from typing import Any, Mapping, Sequence, TypeVar
+
+import typing_inspect
 
 from . import codegen
 
@@ -256,6 +257,8 @@ class Args(list):
                     self.append((name, rtype))
 
     def do_explode(self, kind):
+        if kind is Any:
+            return False
         if kind in basic_types or type(kind) is typing.TypeVar:
             return False
         if typing_inspect.is_generic_type(kind) and issubclass(typing_inspect.get_origin(kind), Sequence):
@@ -555,6 +558,28 @@ def makeFunc(cls, name, description, params, result, _async=True):
     return func, fsource
 
 
+def makeRPCFunc(cls):
+    source = """
+
+async def rpc(self, msg):
+    '''
+    Patch rpc method to add Id.
+    '''
+    if not hasattr(self, 'Id'):
+        raise RuntimeError('Missing "Id" field')
+    msg['Id'] = id
+
+    from .facade import TypeEncoder
+    reply = await self.connection.rpc(msg, encoder=TypeEncoder)
+    return reply
+
+"""
+    ns = _getns(cls.schema)
+    exec(source, ns)
+    func = ns["rpc"]
+    return func, source
+
+
 def buildMethods(cls, capture):
     properties = cls.schema['properties']
     for methodname in sorted(properties):
@@ -582,6 +607,14 @@ def _buildMethod(cls, name):
             else:
                 result = SCHEMA_TO_PYTHON[spec['type']]
     return makeFunc(cls, name, description, params, result)
+
+
+def buildWatcherRPCMethods(cls, capture):
+    properties = cls.schema['properties']
+    if "Next" in properties and "Stop" in properties:
+        method, source = makeRPCFunc(cls)
+        setattr(cls, "rpc", method)
+        capture["{}Facade".format(cls.__name__)].write(source, depth=1)
 
 
 def buildFacade(schema):
@@ -632,14 +665,30 @@ class Type:
                 data = json.loads(data)
             except json.JSONDecodeError:
                 raise
-        d = {}
-        for k, v in (data or {}).items():
-            d[cls._toPy.get(k, k)] = v
-
-        try:
+        if isinstance(data, dict):
+            d = {}
+            for k, v in (data or {}).items():
+                d[cls._toPy.get(k, k)] = v
+            try:
+                return cls(**d)
+            except TypeError:
+                raise
+        if isinstance(data, list):
+            # check: https://juju.is/docs/sdk/assumes
+            # assumes are in the form of a list
+            d = {}
+            for entry in data:
+                if '>' in entry or '>=' in entry:
+                    # something like juju >= 2.9.31
+                    i = entry.index('>')
+                    key = entry[:i].strip()
+                    value = entry[i:].strip()
+                    d[key] = value
+                else:
+                    # something like k8s-api
+                    d[entry] = ''
             return cls(**d)
-        except TypeError:
-            raise
+        return None
 
     def serialize(self):
         d = {}
@@ -869,6 +918,8 @@ def generate_facades(schemas):
             captures[schema.version][cls_name].write(source)
             # Build the methods for each Facade class.
             buildMethods(cls, captures[schema.version])
+            # Build the override RPC method if the Facade is a watcher.
+            buildWatcherRPCMethods(cls, captures[schema.version])
             # Mark this Facade class as being done for this version --
             # helps mitigate some excessive looping.
             CLASSES[schema.name] = cls

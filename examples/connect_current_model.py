@@ -4,7 +4,7 @@ and prints the number of applications deployed to it.
 """
 import logging
 
-from juju import loop
+from juju import jasyncio
 from juju.model import Model
 
 log = logging.getLogger(__name__)
@@ -24,4 +24,4 @@ async def main():
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
-    loop.run(main())
+    jasyncio.run(main())

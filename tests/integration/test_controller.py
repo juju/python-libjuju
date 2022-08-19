@@ -1,11 +1,8 @@
 import asyncio
-import subprocess
 import uuid
 
 from juju.client.connection import Connection
 from juju.client import client
-from juju.client.jujudata import FileJujuData
-from juju.controller import Controller
 from juju.errors import JujuAPIError
 
 import pytest
@@ -102,7 +99,9 @@ async def test_reset_user_password(event_loop):
             pass
         finally:
             # No connection with old password
-            assert new_connection is None
+            if new_connection:
+                await new_connection.close()
+                raise AssertionError()
 
 
 @base.bootstrapped
@@ -136,6 +135,25 @@ async def test_list_models(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_list_models_user_access(event_loop):
+    async with base.CleanController() as controller:
+        username = 'test-grant{}'.format(uuid.uuid4())
+        user = await controller.add_user(username)
+        await user.grant(acl='superuser')
+        assert user.access == 'superuser'
+        models1 = await controller.list_models(username)
+        await user.revoke(acl='superuser')
+        models2 = await controller.list_models(username)
+        assert len(models1) > len(models2)
+
+        # testing all flag
+        await user.grant(acl='superuser')
+        models_all = await controller.list_models(username, all=True)
+        assert len(models_all) > len(models2)
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_get_model(event_loop):
     async with base.CleanController() as controller:
         by_name, by_uuid = None, None
@@ -160,12 +178,12 @@ async def test_get_model(event_loop):
 
 async def _wait_for_model(controller, model_name):
     while model_name not in await controller.list_models():
-        await asyncio.sleep(0.5, loop=controller.loop)
+        await asyncio.sleep(0.5)
 
 
 async def _wait_for_model_gone(controller, model_name):
     while model_name in await controller.list_models():
-        await asyncio.sleep(0.5, loop=controller.loop)
+        await asyncio.sleep(0.5)
 
 
 @base.bootstrapped
@@ -199,34 +217,6 @@ async def test_add_destroy_model_by_uuid(event_loop):
         await asyncio.wait_for(_wait_for_model_gone(controller,
                                                     model_name),
                                timeout=60)
-
-
-# this test must be run serially because it modifies the login password
-@pytest.mark.serial
-@base.bootstrapped
-@pytest.mark.asyncio
-async def test_macaroon_auth(event_loop):
-    jujudata = FileJujuData()
-    account = jujudata.accounts()[jujudata.current_controller()]
-    with base.patch_file('~/.local/share/juju/accounts.yaml'):
-        if 'password' in account:
-            # force macaroon auth by "changing" password to current password
-            result = subprocess.run(
-                ['juju', 'change-user-password'],
-                input='{0}\n{0}\n'.format(account['password']),
-                universal_newlines=True,
-                stderr=subprocess.PIPE)
-            assert result.returncode == 0, ('Failed to change password: '
-                                            '{}'.format(result.stderr))
-        controller = Controller()
-        try:
-            await controller.connect()
-            assert controller.is_connected()
-        finally:
-            if controller.is_connected():
-                await controller.disconnect()
-        async with base.CleanModel():
-            pass  # create and login to model works
 
 
 @base.bootstrapped

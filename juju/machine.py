@@ -1,14 +1,13 @@
-import asyncio
 import ipaddress
 import logging
-import os
 
 import pyrfc3339
 
-from . import model, tag
+from . import model, tag, jasyncio
 from .annotationhelper import _get_annotations, _set_annotations
 from .client import client
 from .errors import JujuError
+from juju.utils import juju_ssh_key_paths
 
 log = logging.getLogger(__name__)
 
@@ -32,15 +31,6 @@ class Machine(model.ModelEntity):
         return await self.model._wait(
             'machine', self.id, 'remove')
     remove = destroy
-
-    def run(self, command, timeout=None):
-        """Run command on this machine.
-
-        :param str command: The command to run
-        :param int timeout: Time to wait before command is considered failed
-
-        """
-        raise NotImplementedError()
 
     async def get_annotations(self):
         """Get annotations on this machine.
@@ -124,17 +114,17 @@ class Machine(model.ModelEntity):
         """ Execute an scp command. Requires a fully qualified source and
         destination.
         """
+        _, id_path = juju_ssh_key_paths()
         cmd = [
             'scp',
-            '-i', os.path.expanduser('~/.local/share/juju/ssh/juju_id_rsa'),
+            '-i', id_path,
             '-o', 'StrictHostKeyChecking=no',
             '-q',
             '-B'
         ]
         cmd.extend(scp_opts.split() if isinstance(scp_opts, str) else scp_opts)
         cmd.extend([source, destination])
-        loop = self.model.loop
-        process = await asyncio.create_subprocess_exec(*cmd, loop=loop)
+        process = await jasyncio.create_subprocess_exec(*cmd)
         await process.wait()
         if process.returncode != 0:
             raise JujuError("command failed: %s" % cmd)
@@ -153,9 +143,10 @@ class Machine(model.ModelEntity):
             raise NotImplementedError('proxy option is not implemented')
         address = self.dns_name
         destination = "{}@{}".format(user, address)
+        _, id_path = juju_ssh_key_paths()
         cmd = [
             'ssh',
-            '-i', os.path.expanduser('~/.local/share/juju/ssh/juju_id_rsa'),
+            '-i', id_path,
             '-o', 'StrictHostKeyChecking=no',
             '-q',
             destination
@@ -163,23 +154,13 @@ class Machine(model.ModelEntity):
         if ssh_opts:
             cmd.extend(ssh_opts.split() if isinstance(ssh_opts, str) else ssh_opts)
         cmd.extend([command])
-        loop = self.model.loop
-        process = await asyncio.create_subprocess_exec(
-            *cmd, loop=loop, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
+        process = await jasyncio.create_subprocess_exec(
+            *cmd, stdout=jasyncio.subprocess.PIPE, stderr=jasyncio.subprocess.PIPE)
         stdout, stderr = await process.communicate()
         if process.returncode != 0:
             raise JujuError("command failed: %s with %s" % (cmd, stderr.decode()))
         # stdout is a bytes-like object, returning a string might be more useful
         return stdout.decode()
-
-    def status_history(self, num=20, utc=False):
-        """Get status history for this machine.
-
-        :param int num: Size of history backlog
-        :param bool utc: Display time as UTC in RFC3339 format
-
-        """
-        raise NotImplementedError()
 
     @property
     def agent_status(self):
@@ -236,10 +217,17 @@ class Machine(model.ModelEntity):
         May return None if no suitable address is found.
         """
         addresses = self.safe_data['addresses'] or []
-        for address in addresses:
+        ordered_addresses = []
+        ordered_scopes = ['public', 'local-cloud', 'local-fan']
+        for scope in ordered_scopes:
+            for address in addresses:
+                if scope == address['scope']:
+                    ordered_addresses.append(address)
+        for address in ordered_addresses:
             scope = address['scope']
-            if scope == 'public' or scope == 'local-cloud':
-                return address['value']
+            for check_scope in ordered_scopes:
+                if scope == check_scope:
+                    return address['value']
         return None
 
     @property

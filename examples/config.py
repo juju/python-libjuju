@@ -9,7 +9,7 @@ This example:
 import logging
 
 from juju.model import Model
-from juju import loop
+from juju import jasyncio
 
 log = logging.getLogger(__name__)
 
@@ -37,12 +37,12 @@ async def main():
     # update and check app config
     await ubuntu_app.set_config({'tuning-level': 'fast'})
     config = await ubuntu_app.get_config()
-    assert(config['tuning-level']['value'] == 'fast')
+    assert (config['tuning-level']['value'] == 'fast')
 
     # update and check app constraints
     await ubuntu_app.set_constraints({'mem': 512 * MB})
     constraints = await ubuntu_app.get_constraints()
-    assert(constraints['mem'] == 512 * MB)
+    assert (constraints['mem'] == 512 * MB)
 
     await model.disconnect()
 
@@ -51,4 +51,4 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     ws_logger = logging.getLogger('websockets.protocol')
     ws_logger.setLevel(logging.INFO)
-    loop.run(main())
+    jasyncio.run(main())

@@ -1,4 +1,3 @@
-import asyncio
 import os
 import textwrap
 from collections import defaultdict
@@ -10,18 +9,19 @@ from pyasn1.codec.der.encoder import encode
 import yaml
 import zipfile
 
+from . import jasyncio
 
-async def execute_process(*cmd, log=None, loop=None):
+
+async def execute_process(*cmd, log=None):
     '''
     Wrapper around asyncio.create_subprocess_exec.
 
     '''
-    p = await asyncio.create_subprocess_exec(
+    p = await jasyncio.create_subprocess_exec(
         *cmd,
-        stdin=asyncio.subprocess.PIPE,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-        loop=loop)
+        stdin=jasyncio.subprocess.PIPE,
+        stdout=jasyncio.subprocess.PIPE,
+        stderr=jasyncio.subprocess.PIPE)
     stdout, stderr = await p.communicate()
     if log:
         log.debug("Exec %s -> %d", cmd, p.returncode)
@@ -32,27 +32,62 @@ async def execute_process(*cmd, log=None, loop=None):
     return p.returncode == 0
 
 
+def juju_config_dir():
+    """Resolves and returns the path string to the juju configuration
+    folder for the juju CLI tool. Of the following items, returns the
+    first option that works (top to bottom):
+
+    * $JUJU_DATA
+    * $XDG_DATA_HOME/juju
+    * ~/.local/share/juju
+
+    """
+    # Check $JUJU_DATA first
+    config_dir = os.environ.get('JUJU_DATA', None)
+
+    # Second option: $XDG_DATA_HOME for ~/.local/share
+    if not config_dir:
+        config_dir = os.environ.get('XDG_DATA_HOME', None)
+
+    # Third option: just set it to ~/.local/share/juju
+    if not config_dir:
+        config_dir = '~/.local/share/juju'
+
+    return os.path.abspath(os.path.expanduser(config_dir))
+
+
+def juju_ssh_key_paths():
+    """Resolves and returns the path strings for public and private ssh
+    keys for juju CLI.
+
+    """
+    config_dir = juju_config_dir()
+    public_key_path = os.path.join(config_dir, 'ssh', 'juju_id_rsa.pub')
+    private_key_path = os.path.join(config_dir, 'ssh', 'juju_id_rsa')
+
+    return public_key_path, private_key_path
+
+
 def _read_ssh_key():
     '''
     Inner function for read_ssh_key, suitable for passing to our
     Executor.
 
     '''
-    default_data_dir = Path(Path.home(), ".local", "share", "juju")
-    juju_data = os.environ.get("JUJU_DATA", default_data_dir)
-    ssh_key_path = Path(juju_data, 'ssh', 'juju_id_rsa.pub')
+    public_key_path_str, _ = juju_ssh_key_paths()
+    ssh_key_path = Path(public_key_path_str)
     with ssh_key_path.open('r') as ssh_key_file:
         ssh_key = ssh_key_file.readlines()[0].strip()
     return ssh_key
 
 
-async def read_ssh_key(loop):
+async def read_ssh_key():
     '''
     Attempt to read the local juju admin's public ssh key, so that it
     can be passed on to a model.
 
     '''
-    loop = loop or asyncio.get_event_loop()
+    loop = jasyncio.get_running_loop()
     return await loop.run_in_executor(None, _read_ssh_key)
 
 
@@ -60,8 +95,9 @@ class IdQueue:
     """
     Wrapper around asyncio.Queue that maintains a separate queue for each ID.
     """
-    def __init__(self, maxsize=0, *, loop=None):
-        self._queues = defaultdict(partial(asyncio.Queue, maxsize, loop=loop))
+
+    def __init__(self, maxsize=0):
+        self._queues = defaultdict(partial(jasyncio.Queue, maxsize))
 
     async def get(self, id):
         value = await self._queues[id].get()
@@ -78,14 +114,27 @@ class IdQueue:
             await queue.put(value)
 
 
-async def block_until(*conditions, timeout=None, wait_period=0.5, loop=None):
+async def block_until(*conditions, timeout=None, wait_period=0.5):
     """Return only after all conditions are true.
+    If a timeout occurs, it cancels the task and raises
+    asyncio.TimeoutError.
 
     """
     async def _block():
         while not all(c() for c in conditions):
-            await asyncio.sleep(wait_period, loop=loop)
-    await asyncio.wait_for(_block(), timeout, loop=loop)
+            await jasyncio.sleep(wait_period)
+    await jasyncio.wait_for(_block(), timeout)
+
+
+async def block_until_with_coroutine(condition_coroutine, timeout=None, wait_period=0.5):
+    """Return only after the given coroutine returns True.
+    If a timeout occurs, it cancels the task and raises
+    asyncio.TimeoutError.
+    """
+    async def _block():
+        while not await condition_coroutine():
+            await jasyncio.sleep(wait_period)
+    await jasyncio.wait_for(_block(), timeout=timeout)
 
 
 async def wait_for_bundle(model, bundle, **kwargs):
@@ -108,7 +157,7 @@ async def wait_for_bundle(model, bundle, **kwargs):
     await model.wait_for_idle(apps, **kwargs)
 
 
-async def run_with_interrupt(task, *events, loop=None):
+async def run_with_interrupt(task, *events, log=None):
     """
     Awaits a task while allowing it to be interrupted by one or more
     `asyncio.Event`s.
@@ -120,13 +169,11 @@ async def run_with_interrupt(task, *events, loop=None):
     :param task: Task to run
     :param events: One or more `asyncio.Event`s which, if set, will interrupt
         `task` and cause it to be cancelled.
-    :param loop: Optional event loop to use other than the default.
     """
-    loop = loop or asyncio.get_event_loop()
-    task = asyncio.ensure_future(task)
-    event_tasks = [loop.create_task(event.wait()) for event in events]
-    done, pending = await asyncio.wait([task] + event_tasks,
-                                       return_when=asyncio.FIRST_COMPLETED)
+    task = jasyncio.create_task_with_handler(task, 'tmp', log)
+    event_tasks = [jasyncio.ensure_future(event.wait()) for event in events]
+    done, pending = await jasyncio.wait([task] + event_tasks,
+                                        return_when=jasyncio.FIRST_COMPLETED)
     for f in pending:
         f.cancel()  # cancel unfinished tasks
     for f in done:
@@ -195,7 +242,7 @@ def get_local_charm_metadata(path):
     :return: Object of charm metadata
     """
     if str(path).endswith('.charm'):
-        with zipfile.ZipFile(path, 'r') as charm_file:
+        with zipfile.ZipFile(str(path), 'r') as charm_file:
             metadata = yaml.load(charm_file.read('metadata.yaml'), Loader=yaml.FullLoader)
     else:
         entity_path = Path(path)
