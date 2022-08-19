@@ -249,7 +249,10 @@ async def test_app_destroy(event_loop):
         await model.wait_for_idle(status="active")
         assert a_name in model.applications
         await app.destroy(destroy_storage=True, force=True, no_wait=True)
-        await jasyncio.sleep(10)
+        await model.block_until(
+            lambda: a_name not in model.applications,
+            timeout=60,
+        )
         assert a_name not in model.applications
 
 
