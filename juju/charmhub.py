@@ -21,7 +21,7 @@ class CharmHub:
     def get_charm_id(self, charm_name):
         conn, headers, path_prefix = self.model.connection().https_connection()
 
-        url = "http://api.snapcraft.io/v2/charms/info/{}".format(charm_name)
+        url = "https://api.snapcraft.io/v2/charms/info/{}".format(charm_name)
         _response = self.request_charmhub_with_retry(url, 5)
         response = json.loads(_response.text)
         return response['id'], response['name']
@@ -29,7 +29,7 @@ class CharmHub:
     def is_subordinate(self, charm_name):
         conn, headers, path_prefix = self.model.connection().https_connection()
 
-        url = "http://api.snapcraft.io/v2/charms/info/{}?fields=default-release.revision.subordinate".format(charm_name)
+        url = "https://api.snapcraft.io/v2/charms/info/{}?fields=default-release.revision.subordinate".format(charm_name)
         _response = self.request_charmhub_with_retry(url, 5)
         response = json.loads(_response.text)
         return 'subordinate' in response['default-release']['revision']
