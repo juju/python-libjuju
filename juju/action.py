@@ -16,4 +16,4 @@ class Action(model.ModelEntity):
 
     async def wait(self):
         self.results or await self.fetch_output()
-        return self
+        return self.latest()
