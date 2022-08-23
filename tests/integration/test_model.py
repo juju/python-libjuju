@@ -1079,6 +1079,48 @@ async def test_add_storage(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_model_attach_storage_at_deploy(event_loop):
+    pytest.skip('detach/attach_storage inconsistent on Juju side, unable to test')
+    async with base.CleanModel() as model:
+        # The attach_storage needs to be an existing storage,
+        # so the plan is to:
+        # - Deploy postgresql
+        # - Create and attach a storage
+        # - Detach storage
+        # - Remove app
+        # - Re-deploy with attach_storage parameter
+        # - Make sure the storage is there
+        app = await model.deploy('postgresql')
+        await model.wait_for_idle(status="active")
+
+        unit = app.units[0]
+        ret = await unit.add_storage("pgdata")
+        assert any([tag.storage("pgdata") in s for s in ret])
+        storage_id = ret[0]
+
+        await unit.detach_storage(storage_id, force=True)
+        await jasyncio.sleep(10)
+
+        storages1 = await model.list_storage()
+        assert any([storage_id in s['storage-tag'] for s in storages1])
+
+        # juju remove-application
+        # actually removes the storage even though the destroy_storage=false
+        await app.destroy(destroy_storage=False)
+        await jasyncio.sleep(10)
+
+        storages2 = await model.list_storage()
+        assert any([storage_id in s['storage-tag'] for s in storages2])
+
+        await model.deploy('postgresql', attach_storage=[storage_id])
+        await model.wait_for_idle(status="active")
+
+        storages3 = await model.list_storage()
+        assert any([storage_id in s['storage-tag'] for s in storages3])
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_detach_storage(event_loop):
     pytest.skip('detach/attach_storage inconsistent on Juju side, unable to test')
     async with base.CleanModel() as model:
