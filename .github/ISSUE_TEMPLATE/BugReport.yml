@@ -49,7 +49,7 @@ body:
     id: info
     attributes:
       label: "Reproduce / Test"
-      description: "Please add a valid Python code to reproduce the bug. This will be used as a test for QAing later on."
+      description: "Please add valid Python code to reproduce the bug. This will be used as a test for QAing later on."
       render: python
     validations:
       required: true
