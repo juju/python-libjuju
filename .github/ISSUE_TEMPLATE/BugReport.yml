@@ -1,0 +1,55 @@
+name: Bug Report
+description: Something's not working right in python-libjuju? Use this template.
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for pointing out this issue. Please provide info below so we could diagnose and fix it fast.
+  - type: textarea
+    id: Description
+    attributes:
+      label: Description
+      description: "Please describe the bug for us: "
+      placeholder: ex. "Client facade used to work for everything you need! Now I'm getting this error:"
+
+  - type: dropdown
+    id: Urgency
+    attributes:
+      label: Urgency
+      description: How urgent is this issue for you?
+      options:
+        - Casually reporting
+        - Annoying bug in our test suite
+        - Blocker for our release
+        - Client presentation, help now please!
+    validations:
+      required: true
+
+  - type: input
+    id: Libjuju-Version
+    attributes:
+      label: Python-libjuju version
+      description: What version of python-libjuju exhibits this issue?
+      placeholder: ex. edge, 2.9.10, 3.0.0
+    validations:
+      required: true
+
+  - type: input
+    id: Juju-Version
+    attributes:
+      label: Juju version
+      description: What version of Juju are we running against?
+      placeholder: ex. edge, 2.9.33, 3.0-beta3, 3.0-rc1-798b0ef
+    validations:
+      required: true
+
+  - type: textarea
+    id: info
+    attributes:
+      label: "Reproduce / Test"
+      description: "Please add a valid Python code to reproduce the bug. This will be used as a test for QAing later on."
+      render: python
+    validations:
+      required: true
