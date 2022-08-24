@@ -1122,10 +1122,6 @@ class TestBundleHandler:
 
         bundle = await handler._handle_local_charms(bundle, bundle_dir)
 
-        # TODO: for some reason 'assert_has_calls' is failing in
-        # Python3.5, refactor this with 'assert_has_calls' when
-        # Python3.5 support is dropped
-
         m1 = mock.call(
             "oci-image-charm",
             "charm_uri",

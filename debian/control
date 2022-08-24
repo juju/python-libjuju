@@ -33,14 +33,14 @@ Description:
     Requirements
     ------------
     .
-    * Python 3.5+
+    * Python 3.6+
     * Juju 2.0+
     .
     .
     Design Notes
     ------------
     .
-    * Asynchronous - uses asyncio and async/await features of python 3.5
+    * Asynchronous - Uses asyncio and async/await features of Python
     * Websocket-level bindings are programmatically generated (indirectly) from the
     Juju golang code, ensuring full api coverage
     * Provides an OO layer which encapsulates much of the websocket api and
