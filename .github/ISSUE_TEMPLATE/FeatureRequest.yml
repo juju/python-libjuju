@@ -1,0 +1,37 @@
+name: Feature Request
+description: You want something to be added to python-libjuju? Proceed with this one.
+title: "[Feature]: "
+labels: [wishlisted]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting this. Please provide info below so we can quickly add it to the python-libjuju.
+  - type: textarea
+    id: Description
+    attributes:
+      label: Description
+      description: "Please describe what you want to see: "
+      placeholder: ex. "It would be cool if python-libjuju was just a thin wrapper around Juju API!"
+
+  - type: dropdown
+    id: Urgency
+    attributes:
+      label: Urgency
+      description: How soon do you need to see this in python-libjuju?
+      options:
+        - Casually wishlisting
+        - It would save from a weird workaround
+        - Need this really badly for test suite
+        - Client presentation, add it now, please!
+    validations:
+      required: true
+
+  - type: textarea
+    id: info
+    attributes:
+      label: "Code I'd Like to Run"
+      description: "Please provide valid Python code that you'd like to be able to run with this new feature: "
+      render: python
+    validations:
+      required: true
