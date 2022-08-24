@@ -1670,7 +1670,7 @@ class Model:
             self, entity_url, application_name=None, bind=None,
             channel=None, config=None, constraints=None, force=False,
             num_units=1, overlays=[], plan=None, resources=None, series=None,
-            storage=None, to=None, devices=None, trust=False):
+            storage=None, to=None, devices=None, trust=False, attach_storage=[]):
         """Deploy a new service or bundle.
 
         :param str entity_url: Charm or bundle url
@@ -1700,6 +1700,8 @@ class Model:
             with access to trusted credentials. Hooks run by the charm can access
             cloud credentials and other trusted access credentials.
 
+        :param str[] attach_storage: Existing storage to attach to the deployed unit
+            (not available on k8s models)
         TODO::
 
             - support local file resources
@@ -1712,6 +1714,9 @@ class Model:
             }
         if trust and (self.info.agent_version < client.Number.from_json('2.4.0')):
             raise NotImplementedError("trusted is not supported on model version {}".format(self.info.agent_version))
+
+        if not all([type(st) == str for st in attach_storage]):
+            raise JujuError("Expected attach_storage to be a list of strings, given {}".format(attach_storage))
 
         # Ensure what we pass in, is a string.
         entity_url = str(entity_url)
@@ -1820,7 +1825,8 @@ class Model:
                 num_units=num_units,
                 placement=parse_placement(to),
                 devices=devices,
-                charm_origin=charm_origin
+                charm_origin=charm_origin,
+                attach_storage=attach_storage,
             )
 
     async def _add_charm(self, charm_url, origin):
@@ -2037,7 +2043,7 @@ class Model:
     async def _deploy(self, charm_url, application, series, config,
                       constraints, endpoint_bindings, resources, storage,
                       channel=None, num_units=None, placement=None,
-                      devices=None, charm_origin=None):
+                      devices=None, charm_origin=None, attach_storage=[]):
         """Logic shared between `Model.deploy` and `BundleHandler.deploy`.
         """
         log.info('Deploying %s', charm_url)
@@ -2064,6 +2070,7 @@ class Model:
             storage=storage,
             placement=placement,
             devices=devices,
+            attach_storage=attach_storage,
         )
         result = await app_facade.Deploy(applications=[app])
         errors = [r.error.message for r in result.results if r.error]
