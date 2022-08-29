@@ -835,11 +835,40 @@ async def test_wait_for_idle_with_exact_units_scale_down(event_loop):
         await app.destroy_units(*two_units_to_remove)
 
         # assert that the following wait is not returning instantaneously
-        starttime = time.time()
+        start_time = time.time()
         await model.wait_for_idle(timeout=5 * 60, wait_for_exact_units=1)
-        endtime = time.time()
+        end_time = time.time()
         # checking if waited more than 10ms
-        assert (endtime - starttime) > 0.001
+        assert (end_time - start_time) > 0.001
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_wait_for_idle_with_exact_units_scale_down_zero(event_loop):
+    """Deploys 3 units, waits for them to be idle, then removes 3 of them,
+    then waits for exactly 0 unit to be left.
+
+    """
+    async with base.CleanModel() as model:
+        app = await model.deploy(
+            'ubuntu',
+            application_name='ubuntu',
+            series='bionic',
+            channel='stable',
+            num_units=3,
+        )
+        await model.wait_for_idle(timeout=5 * 60, wait_for_exact_units=3)
+
+        units_to_remove = [u.name for u in app.units]
+        # Remove all the units
+        await app.destroy_units(*units_to_remove)
+
+        # assert that the following wait is not returning instantaneously
+        start_time = time.time()
+        await model.wait_for_idle(timeout=5 * 60, wait_for_exact_units=0)
+        end_time = time.time()
+        # checking if waited more than 10ms
+        assert (end_time - start_time) > 0.001
 
 
 @base.bootstrapped
