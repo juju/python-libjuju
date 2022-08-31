@@ -457,8 +457,8 @@ async def add_manual_machine_ssh(event_loop, is_root=False):
 
         def wait_for_network(container, timeout=30):
             """Wait for eth0 to have an ipv4 address."""
-            starttime = time.time()
-            while time.time() < starttime + timeout:
+            starttime = time.perf_counter()
+            while time.perf_counter() < starttime + timeout:
                 time.sleep(1)
                 if 'eth0' in container.state().network:
                     addresses = container.state().network['eth0']['addresses']
@@ -835,9 +835,9 @@ async def test_wait_for_idle_with_exact_units_scale_down(event_loop):
         await app.destroy_units(*two_units_to_remove)
 
         # assert that the following wait is not returning instantaneously
-        start_time = time.time()
+        start_time = time.perf_counter()
         await model.wait_for_idle(timeout=5 * 60, wait_for_exact_units=1)
-        end_time = time.time()
+        end_time = time.perf_counter()
         # checking if waited more than 10ms
         assert (end_time - start_time) > 0.001
 
@@ -864,9 +864,9 @@ async def test_wait_for_idle_with_exact_units_scale_down_zero(event_loop):
         await app.destroy_units(*units_to_remove)
 
         # assert that the following wait is not returning instantaneously
-        start_time = time.time()
+        start_time = time.perf_counter()
         await model.wait_for_idle(timeout=5 * 60, wait_for_exact_units=0)
-        end_time = time.time()
+        end_time = time.perf_counter()
         # checking if waited more than 10ms
         assert (end_time - start_time) > 0.001
 
