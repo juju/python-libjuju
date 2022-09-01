@@ -147,12 +147,6 @@ class RedirectServer:
         if hasattr(ssl, 'PROTOCOL_TLS_SERVER'):
             # python 3.6+
             protocol = ssl.PROTOCOL_TLS_SERVER
-        elif hasattr(ssl, 'PROTOCOL_TLS'):
-            # python 3.5.3+
-            protocol = ssl.PROTOCOL_TLS
-        else:
-            # python 3.5.2
-            protocol = ssl.PROTOCOL_TLSv1_2
         self.ssl_context = ssl.SSLContext(protocol)
         crt_file = Path(__file__).with_name('cert.pem')
         key_file = Path(__file__).with_name('key.pem')
