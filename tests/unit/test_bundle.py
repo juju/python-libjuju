@@ -307,7 +307,7 @@ class TestAddApplicationChangeRun:
         context.trusted = False
         context.model = model
 
-        info_func = mock.AsyncMock(return_value=["12345", "name"])
+        info_func = base.AsyncMock(return_value=["12345", "name"])
 
         with patch.object(charmhub.CharmHub, 'get_charm_id', info_func):
             result = await change.run(context)
@@ -356,7 +356,7 @@ class TestAddApplicationChangeRun:
         context.trusted = False
         context.model = model
 
-        info_func = mock.AsyncMock(return_value=["12345", "name"])
+        info_func = base.AsyncMock(return_value=["12345", "name"])
 
         with patch.object(charmhub.CharmHub, 'get_charm_id', info_func):
             result = await change.run(context)
