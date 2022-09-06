@@ -1774,7 +1774,8 @@ class Model:
                     resources = await self._add_charmhub_resources(res.app_name,
                                                                    identifier,
                                                                    add_charm_res.charm_origin)
-                    if self.charmhub.is_subordinate(url.name):
+                    is_sub = await self.charmhub.is_subordinate(url.name)
+                    if is_sub:
                         if num_units > 1:
                             raise JujuError("cannot use num_units with subordinate application")
                         num_units = 0

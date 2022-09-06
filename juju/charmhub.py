@@ -18,18 +18,22 @@ class CharmHub:
             jasyncio.sleep(5)
         raise JujuError("Got {} from {}".format(_response.status_code, url))
 
-    def get_charm_id(self, charm_name):
+    async def get_charm_id(self, charm_name):
         conn, headers, path_prefix = self.model.connection().https_connection()
 
-        url = "https://api.snapcraft.io/v2/charms/info/{}".format(charm_name)
+        model_conf = await self.model.get_config()
+        charmhub_url = model_conf['charmhub-url']
+        url = "{}/v2/charms/info/{}".format(charmhub_url.value, charm_name)
         _response = self.request_charmhub_with_retry(url, 5)
         response = json.loads(_response.text)
         return response['id'], response['name']
 
-    def is_subordinate(self, charm_name):
+    async def is_subordinate(self, charm_name):
         conn, headers, path_prefix = self.model.connection().https_connection()
 
-        url = "https://api.snapcraft.io/v2/charms/info/{}?fields=default-release.revision.subordinate".format(charm_name)
+        model_conf = await self.model.get_config()
+        charmhub_url = model_conf['charmhub-url']
+        url = "{}/v2/charms/info/{}?fields=default-release.revision.subordinate".format(charmhub_url.value, charm_name)
         _response = self.request_charmhub_with_retry(url, 5)
         response = json.loads(_response.text)
         return 'subordinate' in response['default-release']['revision']
