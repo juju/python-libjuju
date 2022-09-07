@@ -347,7 +347,7 @@ class TestModelWaitForIdle(asynctest.TestCase):
             m = Model()
 
             # pass "active" via `status` (str)
-            await m.wait_for_idle(apps=["dummy_app"], wait_for_app=True)
+            await m.wait_for_idle(apps=["dummy_app"], wait_for_app_status=True)
 
         mock_apps.assert_called_with()
 
@@ -373,6 +373,6 @@ class TestModelWaitForIdle(asynctest.TestCase):
             await m.wait_for_idle(apps=["dummy_app"])
             # pass "active" via `status` (str)
             with pytest.raises(jasyncio.TimeoutError):
-                await m.wait_for_idle(apps=["dummy_app"], wait_for_app=True)
+                await m.wait_for_idle(apps=["dummy_app"], wait_for_app_status=True)
 
         mock_apps.assert_called_with()
