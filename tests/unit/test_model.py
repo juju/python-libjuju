@@ -326,3 +326,53 @@ class TestModelWaitForIdle(asynctest.TestCase):
             await m.wait_for_idle(apps=["dummy_app"], wait_for_active=True, status="doesn't matter")
 
         mock_apps.assert_called_with()
+
+    @pytest.mark.asyncio
+    async def test_wait_for_idle_wait_for_app_status(self):
+        # create a custom apps mock
+        from types import SimpleNamespace
+        apps = {"dummy_app": SimpleNamespace(
+            status="active",
+            units=[SimpleNamespace(
+                name="mockunit/0",
+                workload_status="active",
+                workload_status_message="workload_status_message",
+                machine=None,
+                agent_status="idle",
+            )],
+        )}
+
+        with patch.object(Model, 'applications', new_callable=PropertyMock) as mock_apps:
+            mock_apps.return_value = apps
+            m = Model()
+
+            # pass "active" via `status` (str)
+            await m.wait_for_idle(apps=["dummy_app"], wait_for_app=True)
+
+        mock_apps.assert_called_with()
+
+    @pytest.mark.asyncio
+    async def test_wait_for_idle_wait_for_app_status_fail(self):
+        # create a custom apps mock
+        from types import SimpleNamespace
+        apps = {"dummy_app": SimpleNamespace(
+            status="waiting",
+            units=[SimpleNamespace(
+                name="mockunit/0",
+                workload_status="active",
+                workload_status_message="workload_status_message",
+                machine=None,
+                agent_status="idle",
+            )],
+        )}
+
+        with patch.object(Model, 'applications', new_callable=PropertyMock) as mock_apps:
+            mock_apps.return_value = apps
+            m = Model()
+
+            await m.wait_for_idle(apps=["dummy_app"])
+            # pass "active" via `status` (str)
+            with pytest.raises(jasyncio.TimeoutError):
+                await m.wait_for_idle(apps=["dummy_app"], wait_for_app=True)
+
+        mock_apps.assert_called_with()
