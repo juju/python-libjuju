@@ -18,6 +18,7 @@ import logging
 import pathlib
 
 from . import model, tag, utils, jasyncio
+from .url import URL
 from .status import derive_status
 from .annotationhelper import _get_annotations, _set_annotations
 from .client import client
@@ -619,7 +620,6 @@ class Application(model.ModelEntity):
         if switch is not None and revision is not None:
             raise ValueError("switch and revision are mutually exclusive")
 
-        client_facade = client.ClientFacade.from_connection(self.connection)
         resources_facade = client.ResourcesFacade.from_connection(
             self.connection)
         app_facade = self._facade()
@@ -650,12 +650,12 @@ class Application(model.ModelEntity):
             force=force,
             channel=channel
         )
+        charm_url = self.data['charm-url']
+        charm_name = URL.parse(charm_url).name
 
         # Update resources
-        if not charmstore_entity:
-            charmstore_entity = await charmstore.entity(charm_url,
-                                                        channel=channel)
-        store_resources = charmstore_entity['Meta']['resources']
+        charmhub = self.model.charmhub
+        charmhub_resources = await charmhub.list_resources(charm_name)
 
         request_data = [client.Entity(self.tag)]
         response = await resources_facade.ListResources(entities=request_data)
@@ -665,7 +665,7 @@ class Application(model.ModelEntity):
         }
 
         resources_to_update = [
-            resource for resource in store_resources
+            resource for resource in charmhub_resources
             if resource['Name'] not in existing_resources or
             existing_resources[resource['Name']].origin != 'upload'
         ]
