@@ -1,11 +1,15 @@
 from pathlib import Path
 
 import pytest
+import logging
 
 from .. import base
-from juju import jasyncio
+from juju import jasyncio, errors
+from juju.url import URL, Schema
 
 MB = 1
+
+logger = logging.getLogger(__name__)
 
 
 @base.bootstrapped
@@ -165,6 +169,41 @@ async def test_upgrade_charm_channel(event_loop):
         await app.upgrade_charm(channel='stable')
         assert app.data['charm-url'].startswith('cs:ubuntu-')
         assert app.data['charm-url'] != 'cs:ubuntu-0'
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_upgrade_charm_switch_channel(event_loop):
+    # Note for future:
+    # This test requires a charm that has different
+    # revisions in channels 'stable' and 'candidate'.
+    # Currently, we use mongodb, but eventually
+    # (when the 'candidate' moves to 'stable') this test
+    # will be testing nothing (if not failing).
+
+    async with base.CleanModel() as model:
+        app = await model.deploy('mongodb', channel='stable')
+        await model.wait_for_idle(status='active')
+
+        charm_url = URL.parse(app.data['charm-url'])
+        assert Schema.CHARM_HUB.matches(charm_url.schema)
+        still76 = False
+        try:
+            assert charm_url.revision == 76
+            still76 = True
+        except AssertionError:
+            logger.warning("Charm used in test_upgrade_charm_switch_channel "
+                           "seems to have been updated, revise the test")
+
+        await app.upgrade_charm(channel='candidate')
+        await model.wait_for_idle(status='active')
+
+        if still76:
+            try:
+                assert charm_url.revision == 75
+            except AssertionError:
+                raise errors.JujuError("Either the upgrade has failed, or the charm used moved "
+                                       "the candidate channel to stable, so no upgrade took place")
 
 
 @base.bootstrapped
