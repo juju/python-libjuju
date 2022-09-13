@@ -191,7 +191,7 @@ async def test_upgrade_charm_switch_channel(event_loop):
             still76 = True
         except AssertionError:
             logger.warning("Charm used in test_upgrade_charm_switch_channel "
-                           "seems to have been updated, revise the test")
+                           "seems to have been updated, the test needs to be revised")
 
         await app.upgrade_charm(channel='candidate')
         await model.wait_for_idle(status='active')
@@ -200,8 +200,15 @@ async def test_upgrade_charm_switch_channel(event_loop):
             try:
                 assert charm_url.revision == 75
             except AssertionError:
-                raise errors.JujuError("Either the upgrade has failed, or the charm used moved "
-                                       "the candidate channel to stable, so no upgrade took place")
+                raise errors.JujuError("Either the upgrade has failed, or the used charm moved "
+                                       "the candidate channel to stable, so no upgrade took place, "
+                                       "the test needs to be revised.")
+
+        # Try with another charm too, just in case, no need to check revisions etc
+        app = await model.deploy('ubuntu', channel='stable')
+        await model.wait_for_idle(status='active')
+        await app.upgrade_charm(channel='candidate')
+        await model.wait_for_idle(status='active')
 
 
 @base.bootstrapped
