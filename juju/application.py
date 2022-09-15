@@ -18,7 +18,7 @@ import logging
 import pathlib
 
 from . import model, tag, utils, jasyncio
-from .url import URL
+from .url import URL, Schema
 from .status import derive_status
 from .annotationhelper import _get_annotations, _set_annotations
 from .client import client
@@ -642,16 +642,51 @@ class Application(model.ModelEntity):
         if switch is not None and revision is not None:
             raise ValueError("switch and revision are mutually exclusive")
 
-        resources_facade = client.ResourcesFacade.from_connection(
-            self.connection)
+        resources_facade = client.ResourcesFacade.from_connection(self.connection)
         app_facade = self._facade()
 
         charm_url = self.data['charm-url']
-        charm_name = URL.parse(charm_url).name
+        parsed_url = URL.parse(charm_url)
+        charm_name = parsed_url.name
+
+        # First we need to make sure we have the resources for the charm that's
+        # coming
+
+        # Get the listof resources needed to deploy this charm
+        if Schema.CHARM_HUB.matches(parsed_url.schema):
+            # Charmhub charms
+            charmhub = self.model.charmhub
+            charm_resources = await charmhub.list_resources(charm_name)
+        else:
+            charms_facade = client.CharmsFacade.from_connection(self.connection)
+            charmstore = self.model.charmstore
+            charmstore_entity = None
+            if switch is not None:
+                charm_url = switch
+                if not charm_url.startswith('cs:'):
+                    charm_url = 'cs:' + charm_url
+            else:
+                charm_url = self.data['charm-url']
+                charm_url = charm_url.rpartition('-')[0]
+                if revision is not None:
+                    charm_url = "%s-%d" % (charm_url, revision)
+                else:
+                    charmstore_entity = await charmstore.entity(charm_url, channel=channel)
+                    charm_url = charmstore_entity['Id']
+
+            if charm_url == self.data['charm-url']:
+                raise JujuError('already running charm "%s"' % charm_url)
+
+            origin = client.CharmOrigin(source="charm-store", risk=channel)
+            # Update charm
+            await charms_facade.AddCharm(url=charm_url,
+                                         force=force,
+                                         charm_origin=origin)
+            if not charmstore_entity:
+                charmstore_entity = await charmstore.entity(charm_url, channel=channel)
+            charm_resources = charmstore_entity['Meta']['resources']
 
         # Update resources
-        charmhub = self.model.charmhub
-        charmhub_resources = await charmhub.list_resources(charm_name)
 
         request_data = [client.Entity(self.tag)]
         response = await resources_facade.ListResources(entities=request_data)
@@ -661,7 +696,7 @@ class Application(model.ModelEntity):
         }
 
         resources_to_update = [
-            resource for resource in charmhub_resources
+            resource for resource in charm_resources
             if resource['Name'] not in existing_resources or
             existing_resources[resource['Name']].origin != 'upload'
         ]
