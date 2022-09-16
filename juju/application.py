@@ -25,6 +25,7 @@ from .client import client
 from .errors import JujuError, JujuApplicationConfigError
 from .bundle import get_charm_series
 from .placement import parse as parse_placement
+from .origin import Channel
 
 log = logging.getLogger(__name__)
 
@@ -621,6 +622,7 @@ class Application(model.ModelEntity):
             raise ValueError("switch and revision are mutually exclusive")
 
         resources_facade = client.ResourcesFacade.from_connection(self.connection)
+
         app_facade = self._facade()
 
         charmstore = self.model.charmstore
@@ -661,6 +663,30 @@ class Application(model.ModelEntity):
             # Charmhub charms
             charmhub = self.model.charmhub
             charm_resources = await charmhub.list_resources(charm_name)
+
+            res = await app_facade.GetCharmURLOrigin(application=charm_name)
+            charm_url = res.url
+            origin = res.charm_origin
+
+            if channel:
+                ch = Channel.parse(channel).normalize()
+                origin.risk = ch.risk
+                origin.track = ch.track
+
+            charms_facade = client.CharmsFacade.from_connection(self.connection)
+            resolved_charm = await charms_facade.ResolveCharms(resolve=[client.ResolveCharmWithChannel(
+                charm_origin=origin,
+                switch_charm=False,
+                reference=charm_url,
+            )])
+            # TODO: error check here
+            dest_origin = resolved_charm.results[0].charm_origin
+            charm_url = resolved_charm.results[0].url
+
+            await charms_facade.AddCharm(url=charm_url,
+                                         force=force,
+                                         charm_origin=dest_origin)
+
         else:
             charms_facade = client.CharmsFacade.from_connection(self.connection)
             charmstore = self.model.charmstore
@@ -691,7 +717,6 @@ class Application(model.ModelEntity):
             charm_resources = charmstore_entity['Meta']['resources']
 
         # Update resources
-
         request_data = [client.Entity(self.tag)]
         response = await resources_facade.ListResources(entities=request_data)
         existing_resources = {
@@ -701,31 +726,33 @@ class Application(model.ModelEntity):
 
         resources_to_update = [
             resource for resource in charm_resources
-            if resource['Name'] not in existing_resources or
-            existing_resources[resource['Name']].origin != 'upload'
+            if resource.get('Name', resource.get('name')) not in existing_resources or
+            existing_resources[resource.get('Name', resource.get('name'))].origin != 'upload'
         ]
 
         if resources_to_update:
-            request_data = [
-                client.CharmResource(
-                    description=resource.get('Description'),
-                    fingerprint=resource['Fingerprint'],
-                    name=resource['Name'],
-                    path=resource['Path'],
-                    revision=resource['Revision'],
-                    size=resource['Size'],
-                    type_=resource['Type'],
+            request_data = []
+            for resource in resources_to_update:
+                request_data.append(client.CharmResource(
+                    description=resource.get('Description', resource.get('description')),
+                    fingerprint=resource.get('Fingerprint', resource.get('fingerprint')),
+                    name=resource.get('Name', resource.get('name')),
+                    path=resource.get('Path', resource.get('filename')),
+                    # revision=-1,
+                    revision=resource.get('Revision', resource.get('revision', -1)),
+                    size=resource.get('Size', resource.get('size')),
+                    type_=resource.get('Type', resource.get('type')),
                     origin='store',
-                ) for resource in resources_to_update
-            ]
+                ))
             response = await resources_facade.AddPendingResources(
                 application_tag=self.tag,
                 charm_url=charm_url,
-                resources=request_data
+                resources=request_data,
+                charm_origin=dest_origin,
             )
             pending_ids = response.pending_ids
             resource_ids = {
-                resource['Name']: id
+                resource.get('Name', resource.get('name')): id
                 for resource, id in zip(resources_to_update, pending_ids)
             }
         else:
@@ -734,8 +761,8 @@ class Application(model.ModelEntity):
         # Update application
         await app_facade.SetCharm(
             application=self.entity_id,
-            channel=channel,
             charm_url=charm_url,
+            charm_origin=dest_origin,
             config_settings=None,
             config_settings_yaml=None,
             force=force,
