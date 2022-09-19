@@ -654,13 +654,16 @@ class Application(model.ModelEntity):
         # First we need to make sure we have the resources for the charm that's
         # coming
 
-        # Get the listof resources needed to deploy this charm
+        # Get the list of resources needed to deploy this charm
         if Schema.CHARM_HUB.matches(parsed_url.schema):
             # Charmhub charms
             charmhub = self.model.charmhub
             charm_resources = await charmhub.list_resources(charm_name)
 
             res = await app_facade.GetCharmURLOrigin(application=charm_name)
+
+            if res.error is not None:
+                raise JujuError(f'{res.code} : {res.message}')
             charm_url = res.url
             origin = res.charm_origin
 
@@ -670,14 +673,17 @@ class Application(model.ModelEntity):
                 origin.track = ch.track
 
             charms_facade = client.CharmsFacade.from_connection(self.connection)
-            resolved_charm = await charms_facade.ResolveCharms(resolve=[client.ResolveCharmWithChannel(
+            resolved_charm_with_channel_results = await charms_facade.ResolveCharms(resolve=[client.ResolveCharmWithChannel(
                 charm_origin=origin,
                 switch_charm=False,
                 reference=charm_url,
             )])
-            # TODO: error check here
-            dest_origin = resolved_charm.results[0].charm_origin
-            charm_url = resolved_charm.results[0].url
+            resolved_charm = resolved_charm_with_channel_results.results[0]
+
+            if resolved_charm.error is not None:
+                raise JujuError(f'{res.code} : {res.message}')
+            dest_origin = resolved_charm.charm_origin
+            charm_url = resolved_charm.url
 
             await charms_facade.AddCharm(url=charm_url,
                                          force=force,
