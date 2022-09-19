@@ -664,12 +664,13 @@ class Application(model.ModelEntity):
             charmhub = self.model.charmhub
             charm_resources = await charmhub.list_resources(charm_name)
 
-            res = await app_facade.GetCharmURLOrigin(application=charm_name)
+            charm_url_origin_result = await app_facade.GetCharmURLOrigin(application=charm_name)
 
-            if res.error is not None:
-                raise JujuError(f'{res.code} : {res.message}')
-            charm_url = res.url
-            origin = res.charm_origin
+            if charm_url_origin_result.error is not None:
+                err = charm_url_origin_result.error
+                raise JujuError(f'{err.code} : {err.message}')
+            charm_url = charm_url_origin_result.url
+            origin = charm_url_origin_result.charm_origin
 
             if channel:
                 ch = Channel.parse(channel).normalize()
@@ -685,13 +686,10 @@ class Application(model.ModelEntity):
             resolved_charm = resolved_charm_with_channel_results.results[0]
 
             if resolved_charm.error is not None:
-                raise JujuError(f'{res.code} : {res.message}')
+                err = resolved_charm.error
+                raise JujuError(f'{err.code} : {err.message}')
             dest_origin = resolved_charm.charm_origin
             charm_url = resolved_charm.url
-
-            await charms_facade.AddCharm(url=charm_url,
-                                         force=force,
-                                         charm_origin=dest_origin)
 
         else:
             charms_facade = client.CharmsFacade.from_connection(self.connection)
@@ -714,13 +712,18 @@ class Application(model.ModelEntity):
                 raise JujuError('already running charm "%s"' % charm_url)
 
             dest_origin = client.CharmOrigin(source="charm-store", risk=channel)
-            # Update charm
-            await charms_facade.AddCharm(url=charm_url,
-                                         force=force,
-                                         charm_origin=dest_origin)
+
             if not charmstore_entity:
                 charmstore_entity = await charmstore.entity(charm_url, channel=channel)
             charm_resources = charmstore_entity['Meta']['resources']
+
+        # Add the charm with the new origin
+        charm_origin_result = await charms_facade.AddCharm(url=charm_url,
+                                                           force=force,
+                                                           charm_origin=dest_origin)
+        if charm_origin_result.error is not None:
+            err = charm_origin_result.error
+            raise JujuError(f'{err.code} : {err.message}')
 
         # Update resources
         request_data = [client.Entity(self.tag)]
@@ -744,7 +747,6 @@ class Application(model.ModelEntity):
                     fingerprint=resource.get('Fingerprint', resource.get('fingerprint')),
                     name=resource.get('Name', resource.get('name')),
                     path=resource.get('Path', resource.get('filename')),
-                    # revision=-1,
                     revision=resource.get('Revision', resource.get('revision', -1)),
                     size=resource.get('Size', resource.get('size')),
                     type_=resource.get('Type', resource.get('type')),
