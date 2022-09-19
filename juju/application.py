@@ -703,11 +703,11 @@ class Application(model.ModelEntity):
             if charm_url == self.data['charm-url']:
                 raise JujuError('already running charm "%s"' % charm_url)
 
-            origin = client.CharmOrigin(source="charm-store", risk=channel)
+            dest_origin = client.CharmOrigin(source="charm-store", risk=channel)
             # Update charm
             await charms_facade.AddCharm(url=charm_url,
                                          force=force,
-                                         charm_origin=origin)
+                                         charm_origin=dest_origin)
             if not charmstore_entity:
                 charmstore_entity = await charmstore.entity(charm_url, channel=channel)
             charm_resources = charmstore_entity['Meta']['resources']
