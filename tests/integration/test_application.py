@@ -176,10 +176,11 @@ async def test_upgrade_charm_channel(event_loop):
 async def test_upgrade_charm_switch_channel(event_loop):
     # Note for future:
     # This test requires a charm that has different
-    # revisions in channels 'stable' and 'candidate'.
-    # Currently, we use mongodb, but eventually
-    # (when the 'candidate' moves to 'stable') this test
+    # revisions for different channels/risks.
+    # Currently, we use juju-qa-test, but eventually
+    # (when the 'edge' moves to 'stable') this test
     # will be testing nothing (if not failing).
+    # So checks are in place for that.
 
     async with base.CleanModel() as model:
         app = await model.deploy('juju-qa-test', channel='2.0/stable')
@@ -189,7 +190,7 @@ async def test_upgrade_charm_switch_channel(event_loop):
         assert Schema.CHARM_HUB.matches(charm_url.schema)
         still22 = False
         try:
-            assert charm_url.revision == 76
+            assert charm_url.revision == 22
             still22 = True
         except AssertionError:
             logger.warning("Charm used in test_upgrade_charm_switch_channel "
@@ -200,6 +201,7 @@ async def test_upgrade_charm_switch_channel(event_loop):
 
         if still22:
             try:
+                charm_url = URL.parse(app.data['charm-url'])
                 assert charm_url.revision == 23
             except AssertionError:
                 raise errors.JujuError("Either the upgrade has failed, or the used charm moved "
