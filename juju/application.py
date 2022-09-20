@@ -647,12 +647,15 @@ class Application(model.ModelEntity):
 
         app_facade = self._facade()
 
-        charm_url = self.data['charm-url']
-        parsed_url = URL.parse(charm_url)
+        url = switch or self.data['charm-url']
+        parsed_url = URL.parse(url)
         charm_name = parsed_url.name
 
         # First we need to make sure we have the resources for the charm that's
         # coming
+
+        if parsed_url.schema is None:
+            raise JujuError(f'A ch: or cs: schema is required for application refresh, given : {str(parsed_url)}')
 
         # Get the list of resources needed to deploy this charm
         if Schema.CHARM_HUB.matches(parsed_url.schema):
@@ -660,13 +663,14 @@ class Application(model.ModelEntity):
             charmhub = self.model.charmhub
             charm_resources = await charmhub.list_resources(charm_name)
 
-            charm_url_origin_result = await app_facade.GetCharmURLOrigin(application=charm_name)
+            charm_url_origin_result = await app_facade.GetCharmURLOrigin(application=self.name)
 
             if charm_url_origin_result.error is not None:
                 err = charm_url_origin_result.error
                 raise JujuError(f'{err.code} : {err.message}')
-            charm_url = charm_url_origin_result.url
+            charm_url = switch or charm_url_origin_result.url
             origin = charm_url_origin_result.charm_origin
+            origin.source = 'charm-hub'
 
             if channel:
                 ch = Channel.parse(channel).normalize()
@@ -676,7 +680,7 @@ class Application(model.ModelEntity):
             charms_facade = client.CharmsFacade.from_connection(self.connection)
             resolved_charm_with_channel_results = await charms_facade.ResolveCharms(resolve=[client.ResolveCharmWithChannel(
                 charm_origin=origin,
-                switch_charm=False,
+                switch_charm=True if switch else False,  # rpc expects boolean type
                 reference=charm_url,
             )])
             resolved_charm = resolved_charm_with_channel_results.results[0]
