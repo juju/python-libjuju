@@ -233,7 +233,9 @@ async def test_upgrade_charm_switch(event_loop):
         await model.block_until(lambda: (len(app.units) > 0 and
                                          app.units[0].machine))
         assert app.data['charm-url'] == 'cs:ubuntu-0'
-        await app.upgrade_charm(switch='ubuntu-8')
+        with pytest.raises(errors.JujuError):
+            await app.upgrade_charm(switch='ubuntu-8')
+        await app.upgrade_charm(switch='cs:ubuntu-8')
         assert app.data['charm-url'] == 'cs:ubuntu-8'
 
 
@@ -249,6 +251,18 @@ async def test_upgrade_local_charm(event_loop):
         await app.upgrade_charm(path=charm_path)
         await model.wait_for_idle(status="waiting")
         assert app.data['charm-url'] == 'local:focal/ubuntu-0'
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_upgrade_switch_charmstore_to_charmhub(event_loop):
+    async with base.CleanModel() as model:
+        app = await model.deploy('cs:ubuntu', series='focal')
+        await model.wait_for_idle(status="active")
+        assert app.data['charm-url'].startswith('cs:ubuntu')
+        await app.upgrade_charm(channel='latest/stable', switch='ch:ubuntu-8')
+        await model.wait_for_idle(status="active")
+        assert app.data['charm-url'].startswith('ch:')
 
 
 @base.bootstrapped
