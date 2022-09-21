@@ -643,79 +643,72 @@ class Application(model.ModelEntity):
         if switch is not None and revision is not None:
             raise ValueError("switch and revision are mutually exclusive")
 
-        resources_facade = client.ResourcesFacade.from_connection(self.connection)
-
         app_facade = self._facade()
+        resources_facade = client.ResourcesFacade.from_connection(self.connection)
+        charms_facade = client.CharmsFacade.from_connection(self.connection)
 
-        url = switch or self.data['charm-url']
-        parsed_url = URL.parse(url)
+        # Get the charm URL and charm origin of the given application is running at present.
+        charm_url_origin_result = await app_facade.GetCharmURLOrigin(application=self.name)
+        if charm_url_origin_result.error is not None:
+            err = charm_url_origin_result.error
+            raise JujuError(f'{err.code} : {err.message}')
+        charm_url = switch or charm_url_origin_result.url
+        origin = charm_url_origin_result.charm_origin
+
+        parsed_url = URL.parse(charm_url)
         charm_name = parsed_url.name
-
-        # First we need to make sure we have the resources for the charm that's
-        # coming
 
         if parsed_url.schema is None:
             raise JujuError(f'A ch: or cs: schema is required for application refresh, given : {str(parsed_url)}')
 
-        # Get the list of resources needed to deploy this charm
+        if revision is not None:
+            origin.revision = revision
+
         if Schema.CHARM_HUB.matches(parsed_url.schema):
-            # Charmhub charms
-            charmhub = self.model.charmhub
-            charm_resources = await charmhub.list_resources(charm_name)
-
-            charm_url_origin_result = await app_facade.GetCharmURLOrigin(application=self.name)
-
-            if charm_url_origin_result.error is not None:
-                err = charm_url_origin_result.error
-                raise JujuError(f'{err.code} : {err.message}')
-            charm_url = switch or charm_url_origin_result.url
-            origin = charm_url_origin_result.charm_origin
             origin.source = 'charm-hub'
-
             if channel:
                 ch = Channel.parse(channel).normalize()
                 origin.risk = ch.risk
                 origin.track = ch.track
 
-            charms_facade = client.CharmsFacade.from_connection(self.connection)
-            resolved_charm_with_channel_results = await charms_facade.ResolveCharms(resolve=[client.ResolveCharmWithChannel(
-                charm_origin=origin,
-                switch_charm=True if switch else False,  # rpc expects boolean type
-                reference=charm_url,
-            )])
-            resolved_charm = resolved_charm_with_channel_results.results[0]
-
-            if resolved_charm.error is not None:
-                err = resolved_charm.error
-                raise JujuError(f'{err.code} : {err.message}')
-            dest_origin = resolved_charm.charm_origin
-            charm_url = resolved_charm.url
-
+            charmhub = self.model.charmhub
+            charm_resources = await charmhub.list_resources(charm_name)
         else:
-            charms_facade = client.CharmsFacade.from_connection(self.connection)
             charmstore = self.model.charmstore
-            charmstore_entity = None
-            if switch is not None:
-                charm_url = switch
-                if not charm_url.startswith('cs:'):
-                    charm_url = 'cs:' + charm_url
-            else:
-                charm_url = self.data['charm-url']
+            charmstore_entity = await charmstore.entity(charm_url, channel=channel)
+
+            if switch is None:
                 charm_url = charm_url.rpartition('-')[0]
                 if revision is not None:
                     charm_url = "%s-%d" % (charm_url, revision)
                 else:
-                    charmstore_entity = await charmstore.entity(charm_url, channel=channel)
                     charm_url = charmstore_entity['Id']
+            origin.source = 'charm-store'
+            if channel:
+                origin.risk = channel
 
-            if charm_url == self.data['charm-url']:
-                raise JujuError('already running charm "%s"' % charm_url)
-
-            dest_origin = client.CharmOrigin(source="charm-store", risk=channel)
-
-            if not charmstore_entity:
-                charmstore_entity = await charmstore.entity(charm_url, channel=channel)
             charm_resources = charmstore_entity['Meta']['resources']
+
+        # resolve the given charm URLs with an optionally specified preferred channel.
+        # Channel provided via CharmOrigin.
+        resolved_charm_with_channel_results = await charms_facade.ResolveCharms(
+            resolve=[client.ResolveCharmWithChannel(
+                charm_origin=origin,
+                switch_charm=True if switch else False,  # rpc expects boolean type
+                reference=charm_url,
+            )])
+        resolved_charm = resolved_charm_with_channel_results.results[0]
+
+        # Get the destination origin and destination charm_url
+        # from the resolved charm
+        if resolved_charm.error is not None:
+            err = resolved_charm.error
+            raise JujuError(f'{err.code} : {err.message}')
+        dest_origin = resolved_charm.charm_origin
+        charm_url = resolved_charm.url
+
+        # Then we need to take care of the resources:
+        # Get the list of resources needed to deploy this charm
 
         # Add the charm with the new origin
         charm_origin_result = await charms_facade.AddCharm(url=charm_url,
