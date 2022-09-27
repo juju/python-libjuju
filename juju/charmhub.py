@@ -41,6 +41,16 @@ class CharmHub:
     # TODO (caner) : we should be able to recreate the channel-map through the
     #  api call without needing the CharmHub facade
 
+    async def list_resources(self, charm_name):
+        conn, headers, path_prefix = self.model.connection().https_connection()
+
+        model_conf = await self.model.get_config()
+        charmhub_url = model_conf['charmhub-url']
+        url = "{}/v2/charms/info/{}?fields=default-release.resources".format(charmhub_url.value, charm_name)
+        _response = self.request_charmhub_with_retry(url, 5)
+        response = json.loads(_response.text)
+        return response['default-release']['resources']
+
     async def info(self, name, channel=None):
         """info displays detailed information about a CharmHub charm. The charm
         can be specified by the exact name.

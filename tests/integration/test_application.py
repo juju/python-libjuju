@@ -1,11 +1,15 @@
 from pathlib import Path
 
 import pytest
+import logging
 
 from .. import base
-from juju import jasyncio
+from juju import jasyncio, errors
+from juju.url import URL, Schema
 
 MB = 1
+
+logger = logging.getLogger(__name__)
 
 
 @base.bootstrapped
@@ -169,6 +173,50 @@ async def test_upgrade_charm_channel(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_upgrade_charm_switch_channel(event_loop):
+    # Note for future:
+    # This test requires a charm that has different
+    # revisions for different channels/risks.
+    # Currently, we use juju-qa-test, but eventually
+    # (when the 'edge' moves to 'stable') this test
+    # will be testing nothing (if not failing).
+    # So checks are in place for that.
+
+    async with base.CleanModel() as model:
+        app = await model.deploy('juju-qa-test', channel='2.0/stable')
+        await model.wait_for_idle(status='active')
+
+        charm_url = URL.parse(app.data['charm-url'])
+        assert Schema.CHARM_HUB.matches(charm_url.schema)
+        still22 = False
+        try:
+            assert charm_url.revision == 22
+            still22 = True
+        except AssertionError:
+            logger.warning("Charm used in test_upgrade_charm_switch_channel "
+                           "seems to have been updated, the test needs to be revised")
+
+        await app.upgrade_charm(channel='2.0/edge')
+        await model.wait_for_idle(status='active')
+
+        if still22:
+            try:
+                charm_url = URL.parse(app.data['charm-url'])
+                assert charm_url.revision == 23
+            except AssertionError:
+                raise errors.JujuError("Either the upgrade has failed, or the used charm moved "
+                                       "the candidate channel to stable, so no upgrade took place, "
+                                       "the test needs to be revised.")
+
+        # Try with another charm too, just in case, no need to check revisions etc
+        app = await model.deploy('ubuntu', channel='stable')
+        await model.wait_for_idle(status='active')
+        await app.upgrade_charm(channel='candidate')
+        await model.wait_for_idle(status='active')
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_upgrade_charm_revision(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy('cs:ubuntu-0')
@@ -187,7 +235,9 @@ async def test_upgrade_charm_switch(event_loop):
         await model.block_until(lambda: (len(app.units) > 0 and
                                          app.units[0].machine))
         assert app.data['charm-url'] == 'cs:ubuntu-0'
-        await app.upgrade_charm(switch='ubuntu-8')
+        with pytest.raises(errors.JujuError):
+            await app.upgrade_charm(switch='ubuntu-8')
+        await app.upgrade_charm(switch='cs:ubuntu-8')
         assert app.data['charm-url'] == 'cs:ubuntu-8'
 
 
@@ -203,6 +253,18 @@ async def test_upgrade_local_charm(event_loop):
         await app.upgrade_charm(path=charm_path)
         await model.wait_for_idle(status="waiting")
         assert app.data['charm-url'] == 'local:focal/ubuntu-0'
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_upgrade_switch_charmstore_to_charmhub(event_loop):
+    async with base.CleanModel() as model:
+        app = await model.deploy('cs:ubuntu', series='focal')
+        await model.wait_for_idle(status="active")
+        assert app.data['charm-url'].startswith('cs:ubuntu')
+        await app.upgrade_charm(channel='latest/stable', switch='ch:ubuntu-8')
+        await model.wait_for_idle(status="active")
+        assert app.data['charm-url'].startswith('ch:')
 
 
 @base.bootstrapped
