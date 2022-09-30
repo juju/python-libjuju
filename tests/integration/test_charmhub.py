@@ -29,13 +29,21 @@ async def test_info(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-@pytest.mark.skip('CharmHub facade no longer exists')
 async def test_info_with_channel(event_loop):
     async with base.CleanModel() as model:
-        result = await model.charmhub.info("hello-juju", "latest/stable")
+        charm_info = await model.charmhub.info("juju-qa-test", "2.0/stable")
+        assert charm_info['name'] == 'juju-qa-test'
+        assert '2.0/stable' in charm_info['channel-map']
+        assert 'latest/stable' not in charm_info['channel-map']
 
-        assert result.result.name == "hello-juju"
-        assert "latest/stable" in result.result.channel_map
+        try:
+            await model.charmhub.info("juju-qa-test", "non-existing-channel")
+        except JujuError as err:
+            assert err.message == 'Charmhub.info : channel ' \
+                                  'non-existing-channel not found for ' \
+                                  'juju-qa-test'
+        else:
+            assert False, "non-existing-channel didn't raise an error"
 
 
 @base.bootstrapped
