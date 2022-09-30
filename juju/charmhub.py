@@ -64,18 +64,21 @@ class CharmHub:
         if not name:
             raise JujuError("name expected")
 
-        if channel is None:
-            channel = ""
-
         if self.model.connection().is_using_old_client:
+            if channel is None:
+                channel = ""
             facade = self._facade()
-            res = await facade.Info(tag="application-{}".format(name), channel=channel)
+            res = await facade.Info(tag="application-{}".format(name),
+                                    channel=channel)
             err_code = res.errors.error_list.code
             if err_code:
-                raise JujuError(f'charmhub.info - {err_code} : {res.errors.error_list.message}')
+                raise JujuError(f'charmhub.info - {err_code} :'
+                                f' {res.errors.error_list.message}')
             result = res.result
             result.channel_map = CharmHub._channel_map_to_dict(
-                result.channel_map)
+                result.channel_map,
+                name,
+                channel=channel)
             result = result.serialize()
         else:
             charmhub_url = await self._charmhub_url()
@@ -83,11 +86,13 @@ class CharmHub:
                 charmhub_url.value, name)
             _response = self.request_charmhub_with_retry(url, 5)
             result = json.loads(_response.text)
-            result['channel-map'] = CharmHub._channel_list_to_map(result['channel-map'])
+            result['channel-map'] = CharmHub._channel_list_to_map(result['channel-map'],
+                                                                  name,
+                                                                  channel=channel)
         return result
 
     @staticmethod
-    def _channel_list_to_map(channel_list_map):
+    def _channel_list_to_map(channel_list_map, name, channel=""):
         """Charmhub API returns the channel map as a list of channel objects
         (with risk, track, revision, download etc). This turns that into a map
         that's keyed with the channel=track/risk for easy
@@ -105,12 +110,22 @@ class CharmHub:
         """
         channel_map = {}
         for ch in channel_list_map:
-            channel_map[f"{ch['channel']['track']}/{ch['channel']['risk']}"] \
-                = ch
+            ch_name = f"{ch['channel']['track']}/{ch['channel']['risk']}"
+            if channel and channel != ch_name:
+                # If channel is given, then filter out the rest
+                continue
+            channel_map[ch_name] = ch
+            if channel == ch_name:
+                # If we found the desired channel, no need to continue
+                break
+        # After loop is done, check for non-existent channel
+        if channel and channel not in channel_map:
+            raise JujuError(f'Charmhub.info : channel {channel} not found for'
+                            f' {name}')
         return channel_map
 
     @staticmethod
-    def _channel_map_to_dict(channel_map):
+    def _channel_map_to_dict(channel_map, name, channel=""):
         """Converts the client.definitions.Channel objects into python maps
         inside a channel map (for pylibjuju <3.0)
 
@@ -119,9 +134,14 @@ class CharmHub:
         """
         channel_dict = {}
         for ch_name, ch_obj in channel_map.items():
+            # No need to worry about filtering channel
+            # Charmhub facade will take care of that
             _ch = ch_obj.serialize()
             _ch['platforms'] = [p.serialize() for p in _ch['platforms']]
             channel_dict[ch_name] = _ch
+        if channel and channel not in channel_dict:
+            raise JujuError(f'Charmhub.info : channel {channel} not found for'
+                            f' {name}')
         return channel_dict
 
     async def find(self, query, category=None, channel=None,
