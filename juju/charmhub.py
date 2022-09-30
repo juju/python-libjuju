@@ -66,8 +66,33 @@ class CharmHub:
         if channel is None:
             channel = ""
 
-        facade = self._facade()
-        return await facade.Info(tag="application-{}".format(name), channel=channel)
+        if self.model.connection().is_using_old_client:
+            facade = self._facade()
+            res = await facade.Info(tag="application-{}".format(name), channel=channel)
+            err_code = res.errors.error_list.code
+            if err_code:
+                raise JujuError(f'charmhub.info - {err_code} : {res.errors.error_list.message}')
+            result = res.result
+            result.channel_map = self._channel_map_to_dict(result.channel_map)
+            result = result.serialize()
+            return result
+        else:
+            result = {}
+        return result
+
+    def _channel_map_to_dict(self, channel_map):
+        """Converts the client.definitions.Channel objects into python maps
+        inside a channel map
+
+        :param channel_map: map[str][Channel]
+        :return: map[str][map[str][any]]
+        """
+        channel_dict = {}
+        for ch_name, ch_obj in channel_map.items():
+            _ch = ch_obj.serialize()
+            _ch['platforms'] = [p.serialize() for p in _ch['platforms']]
+            channel_dict[ch_name] = _ch
+        return channel_dict
 
     async def find(self, query, category=None, channel=None,
                    charm_type=None, platforms=None, publisher=None,
