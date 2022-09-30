@@ -10,6 +10,10 @@ class CharmHub:
     def __init__(self, model):
         self.model = model
 
+    async def _charmhub_url(self):
+        model_conf = await self.model.get_config()
+        return model_conf['charmhub-url']
+
     def request_charmhub_with_retry(self, url, retries):
         for attempt in range(retries):
             _response = requests.get(url)
@@ -21,8 +25,7 @@ class CharmHub:
     async def get_charm_id(self, charm_name):
         conn, headers, path_prefix = self.model.connection().https_connection()
 
-        model_conf = await self.model.get_config()
-        charmhub_url = model_conf['charmhub-url']
+        charmhub_url = await self._charmhub_url()
         url = "{}/v2/charms/info/{}".format(charmhub_url.value, charm_name)
         _response = self.request_charmhub_with_retry(url, 5)
         response = json.loads(_response.text)
@@ -31,8 +34,7 @@ class CharmHub:
     async def is_subordinate(self, charm_name):
         conn, headers, path_prefix = self.model.connection().https_connection()
 
-        model_conf = await self.model.get_config()
-        charmhub_url = model_conf['charmhub-url']
+        charmhub_url = await self._charmhub_url()
         url = "{}/v2/charms/info/{}?fields=default-release.revision.subordinate".format(charmhub_url.value, charm_name)
         _response = self.request_charmhub_with_retry(url, 5)
         response = json.loads(_response.text)
@@ -44,8 +46,7 @@ class CharmHub:
     async def list_resources(self, charm_name):
         conn, headers, path_prefix = self.model.connection().https_connection()
 
-        model_conf = await self.model.get_config()
-        charmhub_url = model_conf['charmhub-url']
+        charmhub_url = await self._charmhub_url()
         url = "{}/v2/charms/info/{}?fields=default-release.resources".format(charmhub_url.value, charm_name)
         _response = self.request_charmhub_with_retry(url, 5)
         response = json.loads(_response.text)
