@@ -74,7 +74,8 @@ class CharmHub:
             if err_code:
                 raise JujuError(f'charmhub.info - {err_code} : {res.errors.error_list.message}')
             result = res.result
-            result.channel_map = self._channel_map_to_dict(result.channel_map)
+            result.channel_map = CharmHub._channel_map_to_dict(
+                result.channel_map)
             result = result.serialize()
         else:
             charmhub_url = await self._charmhub_url()
@@ -82,9 +83,11 @@ class CharmHub:
                 charmhub_url.value, name)
             _response = self.request_charmhub_with_retry(url, 5)
             result = json.loads(_response.text)
+            result['channel-map'] = CharmHub._channel_list_to_map(result['channel-map'])
         return result
 
-    def _channel_list_to_map(self, channel_list_map):
+    @staticmethod
+    def _channel_list_to_map(channel_list_map):
         """Charmhub API returns the channel map as a list of channel objects
         (with risk, track, revision, download etc). This turns that into a map
         that's keyed with the channel=track/risk for easy
@@ -106,7 +109,8 @@ class CharmHub:
                 = ch
         return channel_map
 
-    def _channel_map_to_dict(self, channel_map):
+    @staticmethod
+    def _channel_map_to_dict(channel_map):
         """Converts the client.definitions.Channel objects into python maps
         inside a channel map (for pylibjuju <3.0)
 

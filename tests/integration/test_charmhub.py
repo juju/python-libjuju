@@ -12,6 +12,20 @@ async def test_info(event_loop):
         _, name = await model.charmhub.get_charm_id("hello-juju")
         assert name == "hello-juju"
 
+        charm_name = 'juju-qa-test'
+        charm_info = await model.charmhub.info(charm_name)
+        assert charm_info['name'] == 'juju-qa-test'
+        assert charm_info['type'] == 'charm'
+        assert charm_info['id'] == 'Hw30RWzpUBnJLGtO71SX8VDWvd3WrjaJ'
+        assert '2.0/stable' in charm_info['channel-map']
+        cm_rev = charm_info['channel-map']['2.0/stable']['revision']
+        if type(cm_rev) == dict:
+            # New client (>= 3.0)
+            assert cm_rev['revision'] == 22
+        else:
+            # Old client (<= 2.9)
+            assert cm_rev == 22
+
 
 @base.bootstrapped
 @pytest.mark.asyncio
