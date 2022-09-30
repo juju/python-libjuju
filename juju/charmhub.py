@@ -14,12 +14,12 @@ class CharmHub:
         model_conf = await self.model.get_config()
         return model_conf['charmhub-url']
 
-    def request_charmhub_with_retry(self, url, retries):
+    async def request_charmhub_with_retry(self, url, retries):
         for attempt in range(retries):
             _response = requests.get(url)
             if _response.status_code == 200:
                 return _response
-            jasyncio.sleep(5)
+            await jasyncio.sleep(5)
         raise JujuError("Got {} from {}".format(_response.status_code, url))
 
     async def get_charm_id(self, charm_name):
@@ -27,7 +27,7 @@ class CharmHub:
 
         charmhub_url = await self._charmhub_url()
         url = "{}/v2/charms/info/{}".format(charmhub_url.value, charm_name)
-        _response = self.request_charmhub_with_retry(url, 5)
+        _response = await self.request_charmhub_with_retry(url, 5)
         response = json.loads(_response.text)
         return response['id'], response['name']
 
@@ -36,7 +36,7 @@ class CharmHub:
 
         charmhub_url = await self._charmhub_url()
         url = "{}/v2/charms/info/{}?fields=default-release.revision.subordinate".format(charmhub_url.value, charm_name)
-        _response = self.request_charmhub_with_retry(url, 5)
+        _response = await self.request_charmhub_with_retry(url, 5)
         response = json.loads(_response.text)
         return 'subordinate' in response['default-release']['revision']
 
@@ -48,7 +48,7 @@ class CharmHub:
 
         charmhub_url = await self._charmhub_url()
         url = "{}/v2/charms/info/{}?fields=default-release.resources".format(charmhub_url.value, charm_name)
-        _response = self.request_charmhub_with_retry(url, 5)
+        _response = await self.request_charmhub_with_retry(url, 5)
         response = json.loads(_response.text)
         return response['default-release']['resources']
 
