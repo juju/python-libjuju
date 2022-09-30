@@ -84,7 +84,11 @@ class CharmHub:
             charmhub_url = await self._charmhub_url()
             url = "{}/v2/charms/info/{}?fields=channel-map".format(
                 charmhub_url.value, name)
-            _response = self.request_charmhub_with_retry(url, 5)
+            try:
+                _response = await self.request_charmhub_with_retry(url, 5)
+            except JujuError as e:
+                if '404' in e.message:
+                    raise JujuError(f'{name} not found') from e
             result = json.loads(_response.text)
             result['channel-map'] = CharmHub._channel_list_to_map(result['channel-map'],
                                                                   name,

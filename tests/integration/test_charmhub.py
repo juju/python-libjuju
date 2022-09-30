@@ -1,7 +1,7 @@
 import pytest
 
 from .. import base
-from juju.errors import JujuAPIError, JujuError
+from juju.errors import JujuError
 from juju import jasyncio
 
 
@@ -48,15 +48,11 @@ async def test_info_with_channel(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-@pytest.mark.skip('CharmHub facade no longer exists')
 async def test_info_not_found(event_loop):
     async with base.CleanModel() as model:
-        try:
+        with pytest.raises(JujuError) as err:
             await model.charmhub.info("badnameforapp")
-        except JujuAPIError as e:
-            assert e.message == "badnameforapp not found"
-        else:
-            assert False
+            assert "badnameforapp not found" in str(err)
 
 
 @base.bootstrapped
