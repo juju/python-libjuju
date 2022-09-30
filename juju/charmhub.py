@@ -76,14 +76,39 @@ class CharmHub:
             result = res.result
             result.channel_map = self._channel_map_to_dict(result.channel_map)
             result = result.serialize()
-            return result
         else:
-            result = {}
+            charmhub_url = await self._charmhub_url()
+            url = "{}/v2/charms/info/{}?fields=channel-map".format(
+                charmhub_url.value, name)
+            _response = self.request_charmhub_with_retry(url, 5)
+            result = json.loads(_response.text)
         return result
+
+    def _channel_list_to_map(self, channel_list_map):
+        """Charmhub API returns the channel map as a list of channel objects
+        (with risk, track, revision, download etc). This turns that into a map
+        that's keyed with the channel=track/risk for easy
+        filtering/processing. This representation is also closer to the
+        result of the 2.9 facade call.
+
+        So basically,
+        [{'channel':{'risk':'stable', 'track':'latest'}, 'revision': 58}]
+          becomes:
+        {'latest/stable': {'channel':{'risk':'stable', 'track':'latest'},
+        'revision': 58}}
+
+        :param channel_list_map: [map[str][any]]
+        :return: map[str][map[str][any]]
+        """
+        channel_map = {}
+        for ch in channel_list_map:
+            channel_map[f"{ch['channel']['track']}/{ch['channel']['risk']}"] \
+                = ch
+        return channel_map
 
     def _channel_map_to_dict(self, channel_map):
         """Converts the client.definitions.Channel objects into python maps
-        inside a channel map
+        inside a channel map (for pylibjuju <3.0)
 
         :param channel_map: map[str][Channel]
         :return: map[str][map[str][any]]
