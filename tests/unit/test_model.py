@@ -11,7 +11,7 @@ from juju.client.jujudata import FileJujuData
 from juju.model import Model
 from juju.application import Application
 from juju import jasyncio
-from juju.errors import JujuConnectionError
+from juju.errors import JujuConnectionError, JujuError
 
 
 def _make_delta(entity, type_, data=None):
@@ -288,6 +288,21 @@ class TestModelWaitForIdle(asynctest.TestCase):
         with self.assertWarns(DeprecationWarning):
             # no apps so should return right away
             await m.wait_for_idle(wait_for_active=True)
+
+    @pytest.mark.asyncio
+    async def test_apps_no_lst(self):
+        m = Model()
+        with self.assertRaises(JujuError):
+            # apps arg has to be a List[str]
+            await m.wait_for_idle(apps="should-be-list")
+
+        with self.assertRaises(JujuError):
+            # apps arg has to be a List[str]
+            await m.wait_for_idle(apps=3)
+
+        with self.assertRaises(JujuError):
+            # apps arg has to be a List[str]
+            await m.wait_for_idle(apps=[3])
 
     @pytest.mark.asyncio
     async def test_timeout(self):
