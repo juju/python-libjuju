@@ -2581,6 +2581,12 @@ class Model:
         timeout = timedelta(seconds=timeout) if timeout is not None else None
         idle_period = timedelta(seconds=idle_period)
         start_time = datetime.now()
+        # Type check against the common error of passing a str for apps
+        if apps is not None and (not isinstance(apps, list) or
+                                 any(not isinstance(o, str)
+                                     for o in apps)):
+            raise JujuError(f'Expected a List[str] for apps, given {apps}')
+
         apps = apps or self.applications
         idle_times = {}
         last_log_time = None
