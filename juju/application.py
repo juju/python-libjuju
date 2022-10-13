@@ -611,10 +611,6 @@ class Application(model.ModelEntity):
         :param str switch: Crossgrade charm url
 
         """
-        if path is not None:
-            await self.local_refresh(channel, force, force_series, force_units,
-                                     path, resources)
-            return
         if resources is not None:
             raise NotImplementedError("resources option is not implemented")
 
@@ -636,6 +632,11 @@ class Application(model.ModelEntity):
             raise JujuError(f'{err.code} : {err.message}')
         charm_url = switch or charm_url_origin_result.url
         origin = charm_url_origin_result.charm_origin
+
+        if path is not None:
+            await self.local_refresh(origin, force, force_series,
+                                     force_units, path, resources)
+            return
 
         parsed_url = URL.parse(charm_url)
         charm_name = parsed_url.name
@@ -766,7 +767,8 @@ class Application(model.ModelEntity):
     upgrade_charm = refresh
 
     async def local_refresh(
-            self, channel=None, force=False, force_series=False, force_units=False,
+            self, charm_origin=None, force=False, force_series=False,
+            force_units=False,
             path=None, resources=None):
         """Refresh the charm for this application with a local charm.
 
@@ -809,7 +811,7 @@ class Application(model.ModelEntity):
         # Update application
         await app_facade.SetCharm(
             application=self.entity_id,
-            channel=channel,
+            charm_origin=charm_origin,
             charm_url=charm_url,
             config_settings=None,
             config_settings_yaml=None,
