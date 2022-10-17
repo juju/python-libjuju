@@ -689,7 +689,7 @@ class Application(model.ModelEntity):
         # Get the destination origin and destination charm_url from the resolved charm
         if resolved_charm.error is not None:
             err = resolved_charm.error
-            raise JujuError(f'{err.code} : {err.message}')
+            raise JujuError("%s : %s" % (err.code, err.message))
         dest_origin = resolved_charm.charm_origin
         charm_url = resolved_charm.url
 
@@ -699,7 +699,7 @@ class Application(model.ModelEntity):
                                                            charm_origin=dest_origin)
         if charm_origin_result.error is not None:
             err = charm_origin_result.error
-            raise JujuError(f'{err.code} : {err.message}')
+            raise JujuError("%s : %s" % (err.code, err.message))
 
         # Now take care of the resources:
 
