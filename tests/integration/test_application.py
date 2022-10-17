@@ -4,7 +4,7 @@ import pytest
 import logging
 
 from .. import base
-from juju import jasyncio, errors
+from juju import errors
 from juju.url import URL, Schema
 
 MB = 1
