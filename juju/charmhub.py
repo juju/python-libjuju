@@ -1,5 +1,9 @@
 from .client import client
 from .errors import JujuError
+from juju import jasyncio
+
+import requests
+import json
 
 
 class CharmHub:
