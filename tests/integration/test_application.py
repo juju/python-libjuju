@@ -247,9 +247,10 @@ async def test_upgrade_local_charm(event_loop):
     async with base.CleanModel() as model:
         tests_dir = Path(__file__).absolute().parent
         charm_path = tests_dir / 'upgrade-charm'
-        app = await model.deploy('cs:ubuntu', series='focal')
+        app = await model.deploy('ch:ubuntu', series='focal')
         await model.wait_for_idle(status="active")
-        assert app.data['charm-url'].startswith('cs:ubuntu')
+        assert app.data['charm-url'].startswith('ch:') and 'ubuntu' in \
+               app.data['charm-url']
         await app.upgrade_charm(path=charm_path)
         await model.wait_for_idle(status="waiting")
         assert app.data['charm-url'] == 'local:focal/ubuntu-0'
