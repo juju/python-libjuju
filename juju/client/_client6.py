@@ -195,6 +195,556 @@ class BundleFacade(Type):
 
 
 
+class ClientFacade(Type):
+    name = 'Client'
+    version = 6
+    schema =     {'definitions': {'AllWatcherId': {'additionalProperties': False,
+                                      'properties': {'watcher-id': {'type': 'string'}},
+                                      'required': ['watcher-id'],
+                                      'type': 'object'},
+                     'ApplicationOfferStatus': {'additionalProperties': False,
+                                                'properties': {'active-connected-count': {'type': 'integer'},
+                                                               'application-name': {'type': 'string'},
+                                                               'charm': {'type': 'string'},
+                                                               'endpoints': {'patternProperties': {'.*': {'$ref': '#/definitions/RemoteEndpoint'}},
+                                                                             'type': 'object'},
+                                                               'err': {'$ref': '#/definitions/Error'},
+                                                               'offer-name': {'type': 'string'},
+                                                               'total-connected-count': {'type': 'integer'}},
+                                                'required': ['offer-name',
+                                                             'application-name',
+                                                             'charm',
+                                                             'endpoints',
+                                                             'active-connected-count',
+                                                             'total-connected-count'],
+                                                'type': 'object'},
+                     'ApplicationStatus': {'additionalProperties': False,
+                                           'properties': {'base': {'$ref': '#/definitions/Base'},
+                                                          'can-upgrade-to': {'type': 'string'},
+                                                          'charm': {'type': 'string'},
+                                                          'charm-channel': {'type': 'string'},
+                                                          'charm-profile': {'type': 'string'},
+                                                          'charm-version': {'type': 'string'},
+                                                          'endpoint-bindings': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                                'type': 'object'},
+                                                          'err': {'$ref': '#/definitions/Error'},
+                                                          'exposed': {'type': 'boolean'},
+                                                          'exposed-endpoints': {'patternProperties': {'.*': {'$ref': '#/definitions/ExposedEndpoint'}},
+                                                                                'type': 'object'},
+                                                          'int': {'type': 'integer'},
+                                                          'life': {'type': 'string'},
+                                                          'meter-statuses': {'patternProperties': {'.*': {'$ref': '#/definitions/MeterStatus'}},
+                                                                             'type': 'object'},
+                                                          'provider-id': {'type': 'string'},
+                                                          'public-address': {'type': 'string'},
+                                                          'relations': {'patternProperties': {'.*': {'items': {'type': 'string'},
+                                                                                                     'type': 'array'}},
+                                                                        'type': 'object'},
+                                                          'status': {'$ref': '#/definitions/DetailedStatus'},
+                                                          'subordinate-to': {'items': {'type': 'string'},
+                                                                             'type': 'array'},
+                                                          'units': {'patternProperties': {'.*': {'$ref': '#/definitions/UnitStatus'}},
+                                                                    'type': 'object'},
+                                                          'workload-version': {'type': 'string'}},
+                                           'required': ['charm',
+                                                        'charm-version',
+                                                        'charm-profile',
+                                                        'base',
+                                                        'exposed',
+                                                        'life',
+                                                        'relations',
+                                                        'can-upgrade-to',
+                                                        'subordinate-to',
+                                                        'units',
+                                                        'meter-statuses',
+                                                        'status',
+                                                        'workload-version',
+                                                        'endpoint-bindings',
+                                                        'public-address'],
+                                           'type': 'object'},
+                     'Base': {'additionalProperties': False,
+                              'properties': {'channel': {'type': 'string'},
+                                             'name': {'type': 'string'}},
+                              'required': ['name', 'channel'],
+                              'type': 'object'},
+                     'Binary': {'additionalProperties': False,
+                                'properties': {'Arch': {'type': 'string'},
+                                               'Build': {'type': 'integer'},
+                                               'Major': {'type': 'integer'},
+                                               'Minor': {'type': 'integer'},
+                                               'Number': {'$ref': '#/definitions/Number'},
+                                               'Patch': {'type': 'integer'},
+                                               'Release': {'type': 'string'},
+                                               'Tag': {'type': 'string'}},
+                                'required': ['Major',
+                                             'Minor',
+                                             'Tag',
+                                             'Patch',
+                                             'Build',
+                                             'Number',
+                                             'Release',
+                                             'Arch'],
+                                'type': 'object'},
+                     'BranchStatus': {'additionalProperties': False,
+                                      'properties': {'assigned-units': {'patternProperties': {'.*': {'items': {'type': 'string'},
+                                                                                                     'type': 'array'}},
+                                                                        'type': 'object'},
+                                                     'created': {'type': 'integer'},
+                                                     'created-by': {'type': 'string'}},
+                                      'required': ['assigned-units',
+                                                   'created',
+                                                   'created-by'],
+                                      'type': 'object'},
+                     'DetailedStatus': {'additionalProperties': False,
+                                        'properties': {'data': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                             'type': 'object'}},
+                                                                'type': 'object'},
+                                                       'err': {'$ref': '#/definitions/Error'},
+                                                       'info': {'type': 'string'},
+                                                       'kind': {'type': 'string'},
+                                                       'life': {'type': 'string'},
+                                                       'since': {'format': 'date-time',
+                                                                 'type': 'string'},
+                                                       'status': {'type': 'string'},
+                                                       'version': {'type': 'string'}},
+                                        'required': ['status',
+                                                     'info',
+                                                     'data',
+                                                     'since',
+                                                     'kind',
+                                                     'version',
+                                                     'life'],
+                                        'type': 'object'},
+                     'EndpointStatus': {'additionalProperties': False,
+                                        'properties': {'application': {'type': 'string'},
+                                                       'name': {'type': 'string'},
+                                                       'role': {'type': 'string'},
+                                                       'subordinate': {'type': 'boolean'}},
+                                        'required': ['application',
+                                                     'name',
+                                                     'role',
+                                                     'subordinate'],
+                                        'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ExposedEndpoint': {'additionalProperties': False,
+                                         'properties': {'expose-to-cidrs': {'items': {'type': 'string'},
+                                                                            'type': 'array'},
+                                                        'expose-to-spaces': {'items': {'type': 'string'},
+                                                                             'type': 'array'}},
+                                         'type': 'object'},
+                     'FindToolsParams': {'additionalProperties': False,
+                                         'properties': {'agentstream': {'type': 'string'},
+                                                        'arch': {'type': 'string'},
+                                                        'major': {'type': 'integer'},
+                                                        'minor': {'type': 'integer'},
+                                                        'number': {'$ref': '#/definitions/Number'},
+                                                        'os-type': {'type': 'string'}},
+                                         'required': ['number',
+                                                      'major',
+                                                      'minor',
+                                                      'arch',
+                                                      'os-type',
+                                                      'agentstream'],
+                                         'type': 'object'},
+                     'FindToolsResult': {'additionalProperties': False,
+                                         'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                        'list': {'items': {'$ref': '#/definitions/Tools'},
+                                                                 'type': 'array'}},
+                                         'required': ['list'],
+                                         'type': 'object'},
+                     'FullStatus': {'additionalProperties': False,
+                                    'properties': {'applications': {'patternProperties': {'.*': {'$ref': '#/definitions/ApplicationStatus'}},
+                                                                    'type': 'object'},
+                                                   'branches': {'patternProperties': {'.*': {'$ref': '#/definitions/BranchStatus'}},
+                                                                'type': 'object'},
+                                                   'controller-timestamp': {'format': 'date-time',
+                                                                            'type': 'string'},
+                                                   'machines': {'patternProperties': {'.*': {'$ref': '#/definitions/MachineStatus'}},
+                                                                'type': 'object'},
+                                                   'model': {'$ref': '#/definitions/ModelStatusInfo'},
+                                                   'offers': {'patternProperties': {'.*': {'$ref': '#/definitions/ApplicationOfferStatus'}},
+                                                              'type': 'object'},
+                                                   'relations': {'items': {'$ref': '#/definitions/RelationStatus'},
+                                                                 'type': 'array'},
+                                                   'remote-applications': {'patternProperties': {'.*': {'$ref': '#/definitions/RemoteApplicationStatus'}},
+                                                                           'type': 'object'}},
+                                    'required': ['model',
+                                                 'machines',
+                                                 'applications',
+                                                 'remote-applications',
+                                                 'offers',
+                                                 'relations',
+                                                 'controller-timestamp',
+                                                 'branches'],
+                                    'type': 'object'},
+                     'History': {'additionalProperties': False,
+                                 'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                'statuses': {'items': {'$ref': '#/definitions/DetailedStatus'},
+                                                             'type': 'array'}},
+                                 'required': ['statuses'],
+                                 'type': 'object'},
+                     'LXDProfile': {'additionalProperties': False,
+                                    'properties': {'config': {'patternProperties': {'.*': {'type': 'string'}},
+                                                              'type': 'object'},
+                                                   'description': {'type': 'string'},
+                                                   'devices': {'patternProperties': {'.*': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                                            'type': 'object'}},
+                                                               'type': 'object'}},
+                                    'required': ['config',
+                                                 'description',
+                                                 'devices'],
+                                    'type': 'object'},
+                     'MachineStatus': {'additionalProperties': False,
+                                       'properties': {'agent-status': {'$ref': '#/definitions/DetailedStatus'},
+                                                      'base': {'$ref': '#/definitions/Base'},
+                                                      'constraints': {'type': 'string'},
+                                                      'containers': {'patternProperties': {'.*': {'$ref': '#/definitions/MachineStatus'}},
+                                                                     'type': 'object'},
+                                                      'display-name': {'type': 'string'},
+                                                      'dns-name': {'type': 'string'},
+                                                      'hardware': {'type': 'string'},
+                                                      'has-vote': {'type': 'boolean'},
+                                                      'hostname': {'type': 'string'},
+                                                      'id': {'type': 'string'},
+                                                      'instance-id': {'type': 'string'},
+                                                      'instance-status': {'$ref': '#/definitions/DetailedStatus'},
+                                                      'ip-addresses': {'items': {'type': 'string'},
+                                                                       'type': 'array'},
+                                                      'jobs': {'items': {'type': 'string'},
+                                                               'type': 'array'},
+                                                      'lxd-profiles': {'patternProperties': {'.*': {'$ref': '#/definitions/LXDProfile'}},
+                                                                       'type': 'object'},
+                                                      'modification-status': {'$ref': '#/definitions/DetailedStatus'},
+                                                      'network-interfaces': {'patternProperties': {'.*': {'$ref': '#/definitions/NetworkInterface'}},
+                                                                             'type': 'object'},
+                                                      'primary-controller-machine': {'type': 'boolean'},
+                                                      'wants-vote': {'type': 'boolean'}},
+                                       'required': ['agent-status',
+                                                    'instance-status',
+                                                    'modification-status',
+                                                    'dns-name',
+                                                    'instance-id',
+                                                    'display-name',
+                                                    'base',
+                                                    'id',
+                                                    'containers',
+                                                    'constraints',
+                                                    'hardware',
+                                                    'jobs',
+                                                    'has-vote',
+                                                    'wants-vote'],
+                                       'type': 'object'},
+                     'MeterStatus': {'additionalProperties': False,
+                                     'properties': {'color': {'type': 'string'},
+                                                    'message': {'type': 'string'}},
+                                     'required': ['color', 'message'],
+                                     'type': 'object'},
+                     'ModelStatusInfo': {'additionalProperties': False,
+                                         'properties': {'available-version': {'type': 'string'},
+                                                        'cloud-tag': {'type': 'string'},
+                                                        'meter-status': {'$ref': '#/definitions/MeterStatus'},
+                                                        'model-status': {'$ref': '#/definitions/DetailedStatus'},
+                                                        'name': {'type': 'string'},
+                                                        'region': {'type': 'string'},
+                                                        'sla': {'type': 'string'},
+                                                        'type': {'type': 'string'},
+                                                        'version': {'type': 'string'}},
+                                         'required': ['name',
+                                                      'type',
+                                                      'cloud-tag',
+                                                      'version',
+                                                      'available-version',
+                                                      'model-status',
+                                                      'meter-status',
+                                                      'sla'],
+                                         'type': 'object'},
+                     'NetworkInterface': {'additionalProperties': False,
+                                          'properties': {'dns-nameservers': {'items': {'type': 'string'},
+                                                                             'type': 'array'},
+                                                         'gateway': {'type': 'string'},
+                                                         'ip-addresses': {'items': {'type': 'string'},
+                                                                          'type': 'array'},
+                                                         'is-up': {'type': 'boolean'},
+                                                         'mac-address': {'type': 'string'},
+                                                         'space': {'type': 'string'}},
+                                          'required': ['ip-addresses',
+                                                       'mac-address',
+                                                       'is-up'],
+                                          'type': 'object'},
+                     'Number': {'additionalProperties': False,
+                                'properties': {'Build': {'type': 'integer'},
+                                               'Major': {'type': 'integer'},
+                                               'Minor': {'type': 'integer'},
+                                               'Patch': {'type': 'integer'},
+                                               'Tag': {'type': 'string'}},
+                                'required': ['Major',
+                                             'Minor',
+                                             'Tag',
+                                             'Patch',
+                                             'Build'],
+                                'type': 'object'},
+                     'RelationStatus': {'additionalProperties': False,
+                                        'properties': {'endpoints': {'items': {'$ref': '#/definitions/EndpointStatus'},
+                                                                     'type': 'array'},
+                                                       'id': {'type': 'integer'},
+                                                       'interface': {'type': 'string'},
+                                                       'key': {'type': 'string'},
+                                                       'scope': {'type': 'string'},
+                                                       'status': {'$ref': '#/definitions/DetailedStatus'}},
+                                        'required': ['id',
+                                                     'key',
+                                                     'interface',
+                                                     'scope',
+                                                     'endpoints',
+                                                     'status'],
+                                        'type': 'object'},
+                     'RemoteApplicationStatus': {'additionalProperties': False,
+                                                 'properties': {'endpoints': {'items': {'$ref': '#/definitions/RemoteEndpoint'},
+                                                                              'type': 'array'},
+                                                                'err': {'$ref': '#/definitions/Error'},
+                                                                'life': {'type': 'string'},
+                                                                'offer-name': {'type': 'string'},
+                                                                'offer-url': {'type': 'string'},
+                                                                'relations': {'patternProperties': {'.*': {'items': {'type': 'string'},
+                                                                                                           'type': 'array'}},
+                                                                              'type': 'object'},
+                                                                'status': {'$ref': '#/definitions/DetailedStatus'}},
+                                                 'required': ['offer-url',
+                                                              'offer-name',
+                                                              'endpoints',
+                                                              'life',
+                                                              'relations',
+                                                              'status'],
+                                                 'type': 'object'},
+                     'RemoteEndpoint': {'additionalProperties': False,
+                                        'properties': {'interface': {'type': 'string'},
+                                                       'limit': {'type': 'integer'},
+                                                       'name': {'type': 'string'},
+                                                       'role': {'type': 'string'}},
+                                        'required': ['name',
+                                                     'role',
+                                                     'interface',
+                                                     'limit'],
+                                        'type': 'object'},
+                     'StatusHistoryFilter': {'additionalProperties': False,
+                                             'properties': {'date': {'format': 'date-time',
+                                                                     'type': 'string'},
+                                                            'delta': {'type': 'integer'},
+                                                            'exclude': {'items': {'type': 'string'},
+                                                                        'type': 'array'},
+                                                            'size': {'type': 'integer'}},
+                                             'required': ['size',
+                                                          'date',
+                                                          'delta',
+                                                          'exclude'],
+                                             'type': 'object'},
+                     'StatusHistoryRequest': {'additionalProperties': False,
+                                              'properties': {'filter': {'$ref': '#/definitions/StatusHistoryFilter'},
+                                                             'historyKind': {'type': 'string'},
+                                                             'size': {'type': 'integer'},
+                                                             'tag': {'type': 'string'}},
+                                              'required': ['historyKind',
+                                                           'size',
+                                                           'filter',
+                                                           'tag'],
+                                              'type': 'object'},
+                     'StatusHistoryRequests': {'additionalProperties': False,
+                                               'properties': {'requests': {'items': {'$ref': '#/definitions/StatusHistoryRequest'},
+                                                                           'type': 'array'}},
+                                               'required': ['requests'],
+                                               'type': 'object'},
+                     'StatusHistoryResult': {'additionalProperties': False,
+                                             'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                            'history': {'$ref': '#/definitions/History'}},
+                                             'required': ['history'],
+                                             'type': 'object'},
+                     'StatusHistoryResults': {'additionalProperties': False,
+                                              'properties': {'results': {'items': {'$ref': '#/definitions/StatusHistoryResult'},
+                                                                         'type': 'array'}},
+                                              'required': ['results'],
+                                              'type': 'object'},
+                     'StatusParams': {'additionalProperties': False,
+                                      'properties': {'patterns': {'items': {'type': 'string'},
+                                                                  'type': 'array'}},
+                                      'required': ['patterns'],
+                                      'type': 'object'},
+                     'Tools': {'additionalProperties': False,
+                               'properties': {'sha256': {'type': 'string'},
+                                              'size': {'type': 'integer'},
+                                              'url': {'type': 'string'},
+                                              'version': {'$ref': '#/definitions/Binary'}},
+                               'required': ['version', 'url', 'size'],
+                               'type': 'object'},
+                     'UnitStatus': {'additionalProperties': False,
+                                    'properties': {'address': {'type': 'string'},
+                                                   'agent-status': {'$ref': '#/definitions/DetailedStatus'},
+                                                   'charm': {'type': 'string'},
+                                                   'leader': {'type': 'boolean'},
+                                                   'machine': {'type': 'string'},
+                                                   'opened-ports': {'items': {'type': 'string'},
+                                                                    'type': 'array'},
+                                                   'provider-id': {'type': 'string'},
+                                                   'public-address': {'type': 'string'},
+                                                   'subordinates': {'patternProperties': {'.*': {'$ref': '#/definitions/UnitStatus'}},
+                                                                    'type': 'object'},
+                                                   'workload-status': {'$ref': '#/definitions/DetailedStatus'},
+                                                   'workload-version': {'type': 'string'}},
+                                    'required': ['agent-status',
+                                                 'workload-status',
+                                                 'workload-version',
+                                                 'machine',
+                                                 'opened-ports',
+                                                 'public-address',
+                                                 'charm',
+                                                 'subordinates'],
+                                    'type': 'object'}},
+     'properties': {'FindTools': {'description': 'FindTools returns a List '
+                                                 'containing all tools matching '
+                                                 'the given parameters.',
+                                  'properties': {'Params': {'$ref': '#/definitions/FindToolsParams'},
+                                                 'Result': {'$ref': '#/definitions/FindToolsResult'}},
+                                  'type': 'object'},
+                    'FullStatus': {'description': 'FullStatus gives the '
+                                                  'information needed for juju '
+                                                  'status over the api',
+                                   'properties': {'Params': {'$ref': '#/definitions/StatusParams'},
+                                                  'Result': {'$ref': '#/definitions/FullStatus'}},
+                                   'type': 'object'},
+                    'StatusHistory': {'description': 'StatusHistory returns a '
+                                                     'slice of past statuses for '
+                                                     'several entities.',
+                                      'properties': {'Params': {'$ref': '#/definitions/StatusHistoryRequests'},
+                                                     'Result': {'$ref': '#/definitions/StatusHistoryResults'}},
+                                      'type': 'object'},
+                    'WatchAll': {'description': 'WatchAll initiates a watcher for '
+                                                'entities in the connected model.',
+                                 'properties': {'Result': {'$ref': '#/definitions/AllWatcherId'}},
+                                 'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(FindToolsResult)
+    async def FindTools(self, agentstream=None, arch=None, major=None, minor=None, number=None, os_type=None):
+        '''
+        FindTools returns a List containing all tools matching the given parameters.
+
+        agentstream : str
+        arch : str
+        major : int
+        minor : int
+        number : Number
+        os_type : str
+        Returns -> FindToolsResult
+        '''
+        if agentstream is not None and not isinstance(agentstream, (bytes, str)):
+            raise Exception("Expected agentstream to be a str, received: {}".format(type(agentstream)))
+
+        if arch is not None and not isinstance(arch, (bytes, str)):
+            raise Exception("Expected arch to be a str, received: {}".format(type(arch)))
+
+        if major is not None and not isinstance(major, int):
+            raise Exception("Expected major to be a int, received: {}".format(type(major)))
+
+        if minor is not None and not isinstance(minor, int):
+            raise Exception("Expected minor to be a int, received: {}".format(type(minor)))
+
+        if number is not None and not isinstance(number, (dict, Number)):
+            raise Exception("Expected number to be a Number, received: {}".format(type(number)))
+
+        if os_type is not None and not isinstance(os_type, (bytes, str)):
+            raise Exception("Expected os_type to be a str, received: {}".format(type(os_type)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client',
+                   request='FindTools',
+                   version=6,
+                   params=_params)
+        _params['agentstream'] = agentstream
+        _params['arch'] = arch
+        _params['major'] = major
+        _params['minor'] = minor
+        _params['number'] = number
+        _params['os-type'] = os_type
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(FullStatus)
+    async def FullStatus(self, patterns=None):
+        '''
+        FullStatus gives the information needed for juju status over the api
+
+        patterns : typing.Sequence[str]
+        Returns -> FullStatus
+        '''
+        if patterns is not None and not isinstance(patterns, (bytes, str, list)):
+            raise Exception("Expected patterns to be a Sequence, received: {}".format(type(patterns)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client',
+                   request='FullStatus',
+                   version=6,
+                   params=_params)
+        _params['patterns'] = patterns
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StatusHistoryResults)
+    async def StatusHistory(self, requests=None):
+        '''
+        StatusHistory returns a slice of past statuses for several entities.
+
+        requests : typing.Sequence[~StatusHistoryRequest]
+        Returns -> StatusHistoryResults
+        '''
+        if requests is not None and not isinstance(requests, (bytes, str, list)):
+            raise Exception("Expected requests to be a Sequence, received: {}".format(type(requests)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client',
+                   request='StatusHistory',
+                   version=6,
+                   params=_params)
+        _params['requests'] = requests
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(AllWatcherId)
+    async def WatchAll(self):
+        '''
+        WatchAll initiates a watcher for entities in the connected model.
+
+
+        Returns -> AllWatcherId
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client',
+                   request='WatchAll',
+                   version=6,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
 class SpacesFacade(Type):
     name = 'Spaces'
     version = 6

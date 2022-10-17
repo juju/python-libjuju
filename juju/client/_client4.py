@@ -5,6 +5,87 @@ from juju.client.facade import Type, ReturnMapping
 from juju.client._definitions import *
 
 
+class AllModelWatcherFacade(Type):
+    name = 'AllModelWatcher'
+    version = 4
+    schema =     {'definitions': {'AllWatcherNextResults': {'additionalProperties': False,
+                                               'properties': {'deltas': {'items': {'$ref': '#/definitions/Delta'},
+                                                                         'type': 'array'}},
+                                               'required': ['deltas'],
+                                               'type': 'object'},
+                     'Delta': {'additionalProperties': False,
+                               'properties': {'entity': {'additionalProperties': True,
+                                                         'type': 'object'},
+                                              'removed': {'type': 'boolean'}},
+                               'required': ['removed', 'entity'],
+                               'type': 'object'}},
+     'properties': {'Next': {'description': 'Next will return the current state of '
+                                            'everything on the first call\n'
+                                            'and subsequent calls will',
+                             'properties': {'Result': {'$ref': '#/definitions/AllWatcherNextResults'}},
+                             'type': 'object'},
+                    'Stop': {'description': 'Stop stops the watcher.',
+                             'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(AllWatcherNextResults)
+    async def Next(self):
+        '''
+        Next will return the current state of everything on the first call
+        and subsequent calls will
+
+
+        Returns -> AllWatcherNextResults
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='AllModelWatcher',
+                   request='Next',
+                   version=4,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def Stop(self):
+        '''
+        Stop stops the watcher.
+
+
+        Returns -> None
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='AllModelWatcher',
+                   request='Stop',
+                   version=4,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    async def rpc(self, msg):
+        '''
+        Patch rpc method to add Id.
+        '''
+        if not hasattr(self, 'Id'):
+            raise RuntimeError('Missing "Id" field')
+        msg['Id'] = id
+
+        from .facade import TypeEncoder
+        reply = await self.connection.rpc(msg, encoder=TypeEncoder)
+        return reply
+
+
+
 class ApplicationOffersFacade(Type):
     name = 'ApplicationOffers'
     version = 4
@@ -594,8 +675,7 @@ class CharmsFacade(Type):
                                           'required': ['url',
                                                        'charm-origin',
                                                        'macaroon',
-                                                       'force',
-                                                       'series'],
+                                                       'force'],
                                           'type': 'object'},
                      'AddCharmWithOrigin': {'additionalProperties': False,
                                             'properties': {'charm-origin': {'$ref': '#/definitions/CharmOrigin'},
@@ -604,8 +684,7 @@ class CharmsFacade(Type):
                                                            'url': {'type': 'string'}},
                                             'required': ['url',
                                                          'charm-origin',
-                                                         'force',
-                                                         'series'],
+                                                         'force'],
                                             'type': 'object'},
                      'ApplicationCharmPlacement': {'additionalProperties': False,
                                                    'properties': {'application': {'type': 'string'},
@@ -618,6 +697,11 @@ class CharmsFacade(Type):
                                                                                   'type': 'array'}},
                                                     'required': ['placements'],
                                                     'type': 'object'},
+                     'Base': {'additionalProperties': False,
+                              'properties': {'channel': {'type': 'string'},
+                                             'name': {'type': 'string'}},
+                              'required': ['name', 'channel'],
+                              'type': 'object'},
                      'Charm': {'additionalProperties': False,
                                'properties': {'actions': {'$ref': '#/definitions/CharmActions'},
                                               'config': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmOption'}},
@@ -752,7 +836,9 @@ class CharmsFacade(Type):
                                      'type': 'object'},
                      'CharmOrigin': {'additionalProperties': False,
                                      'properties': {'architecture': {'type': 'string'},
+                                                    'base': {'$ref': '#/definitions/Base'},
                                                     'branch': {'type': 'string'},
+                                                    'channel': {'type': 'string'},
                                                     'hash': {'type': 'string'},
                                                     'id': {'type': 'string'},
                                                     'instance-key': {'type': 'string'},
@@ -2368,6 +2454,279 @@ class ModelGenerationFacade(Type):
         _params['branch'] = branch
         _params['entities'] = entities
         _params['num-units'] = num_units
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+class SSHClientFacade(Type):
+    name = 'SSHClient'
+    version = 4
+    schema =     {'definitions': {'CloudCredential': {'additionalProperties': False,
+                                         'properties': {'attrs': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                  'type': 'object'},
+                                                        'auth-type': {'type': 'string'},
+                                                        'redacted': {'items': {'type': 'string'},
+                                                                     'type': 'array'}},
+                                         'required': ['auth-type'],
+                                         'type': 'object'},
+                     'CloudSpec': {'additionalProperties': False,
+                                   'properties': {'cacertificates': {'items': {'type': 'string'},
+                                                                     'type': 'array'},
+                                                  'credential': {'$ref': '#/definitions/CloudCredential'},
+                                                  'endpoint': {'type': 'string'},
+                                                  'identity-endpoint': {'type': 'string'},
+                                                  'is-controller-cloud': {'type': 'boolean'},
+                                                  'name': {'type': 'string'},
+                                                  'region': {'type': 'string'},
+                                                  'skip-tls-verify': {'type': 'boolean'},
+                                                  'storage-endpoint': {'type': 'string'},
+                                                  'type': {'type': 'string'}},
+                                   'required': ['type', 'name'],
+                                   'type': 'object'},
+                     'CloudSpecResult': {'additionalProperties': False,
+                                         'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                        'result': {'$ref': '#/definitions/CloudSpec'}},
+                                         'type': 'object'},
+                     'Entities': {'additionalProperties': False,
+                                  'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
+                                                              'type': 'array'}},
+                                  'required': ['entities'],
+                                  'type': 'object'},
+                     'Entity': {'additionalProperties': False,
+                                'properties': {'tag': {'type': 'string'}},
+                                'required': ['tag'],
+                                'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'SSHAddressResult': {'additionalProperties': False,
+                                          'properties': {'address': {'type': 'string'},
+                                                         'error': {'$ref': '#/definitions/Error'}},
+                                          'type': 'object'},
+                     'SSHAddressResults': {'additionalProperties': False,
+                                           'properties': {'results': {'items': {'$ref': '#/definitions/SSHAddressResult'},
+                                                                      'type': 'array'}},
+                                           'required': ['results'],
+                                           'type': 'object'},
+                     'SSHAddressesResult': {'additionalProperties': False,
+                                            'properties': {'addresses': {'items': {'type': 'string'},
+                                                                         'type': 'array'},
+                                                           'error': {'$ref': '#/definitions/Error'}},
+                                            'required': ['addresses'],
+                                            'type': 'object'},
+                     'SSHAddressesResults': {'additionalProperties': False,
+                                             'properties': {'results': {'items': {'$ref': '#/definitions/SSHAddressesResult'},
+                                                                        'type': 'array'}},
+                                             'required': ['results'],
+                                             'type': 'object'},
+                     'SSHProxyResult': {'additionalProperties': False,
+                                        'properties': {'use-proxy': {'type': 'boolean'}},
+                                        'required': ['use-proxy'],
+                                        'type': 'object'},
+                     'SSHPublicKeysResult': {'additionalProperties': False,
+                                             'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                            'public-keys': {'items': {'type': 'string'},
+                                                                            'type': 'array'}},
+                                             'type': 'object'},
+                     'SSHPublicKeysResults': {'additionalProperties': False,
+                                              'properties': {'results': {'items': {'$ref': '#/definitions/SSHPublicKeysResult'},
+                                                                         'type': 'array'}},
+                                              'required': ['results'],
+                                              'type': 'object'}},
+     'properties': {'AllAddresses': {'description': 'AllAddresses reports all '
+                                                    'addresses that might have SSH '
+                                                    'listening for each\n'
+                                                    'entity in args. The result is '
+                                                    'sorted with public addresses '
+                                                    'first.\n'
+                                                    'Machines and units are '
+                                                    'supported as entity types.',
+                                     'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                    'Result': {'$ref': '#/definitions/SSHAddressesResults'}},
+                                     'type': 'object'},
+                    'ModelCredentialForSSH': {'description': 'ModelCredentialForSSH '
+                                                             'returns a cloud spec '
+                                                             'for ssh purpose.\n'
+                                                             'This facade call is '
+                                                             'only used for k8s '
+                                                             'model.',
+                                              'properties': {'Result': {'$ref': '#/definitions/CloudSpecResult'}},
+                                              'type': 'object'},
+                    'PrivateAddress': {'description': 'PrivateAddress reports the '
+                                                      'preferred private network '
+                                                      'address for one or\n'
+                                                      'more entities. Machines and '
+                                                      'units are supported.',
+                                       'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                      'Result': {'$ref': '#/definitions/SSHAddressResults'}},
+                                       'type': 'object'},
+                    'Proxy': {'description': 'Proxy returns whether SSH '
+                                             'connections should be proxied '
+                                             'through the\n'
+                                             'controller hosts for the model '
+                                             'associated with the API connection.',
+                              'properties': {'Result': {'$ref': '#/definitions/SSHProxyResult'}},
+                              'type': 'object'},
+                    'PublicAddress': {'description': 'PublicAddress reports the '
+                                                     'preferred public network '
+                                                     'address for one\n'
+                                                     'or more entities. Machines '
+                                                     'and units are supported.',
+                                      'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                     'Result': {'$ref': '#/definitions/SSHAddressResults'}},
+                                      'type': 'object'},
+                    'PublicKeys': {'description': 'PublicKeys returns the public '
+                                                  'SSH hosts for one or more\n'
+                                                  'entities. Machines and units '
+                                                  'are supported.',
+                                   'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                  'Result': {'$ref': '#/definitions/SSHPublicKeysResults'}},
+                                   'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(SSHAddressesResults)
+    async def AllAddresses(self, entities=None):
+        '''
+        AllAddresses reports all addresses that might have SSH listening for each
+        entity in args. The result is sorted with public addresses first.
+        Machines and units are supported as entity types.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> SSHAddressesResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SSHClient',
+                   request='AllAddresses',
+                   version=4,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CloudSpecResult)
+    async def ModelCredentialForSSH(self):
+        '''
+        ModelCredentialForSSH returns a cloud spec for ssh purpose.
+        This facade call is only used for k8s model.
+
+
+        Returns -> CloudSpecResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SSHClient',
+                   request='ModelCredentialForSSH',
+                   version=4,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SSHAddressResults)
+    async def PrivateAddress(self, entities=None):
+        '''
+        PrivateAddress reports the preferred private network address for one or
+        more entities. Machines and units are supported.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> SSHAddressResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SSHClient',
+                   request='PrivateAddress',
+                   version=4,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SSHProxyResult)
+    async def Proxy(self):
+        '''
+        Proxy returns whether SSH connections should be proxied through the
+        controller hosts for the model associated with the API connection.
+
+
+        Returns -> SSHProxyResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SSHClient',
+                   request='Proxy',
+                   version=4,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SSHAddressResults)
+    async def PublicAddress(self, entities=None):
+        '''
+        PublicAddress reports the preferred public network address for one
+        or more entities. Machines and units are supported.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> SSHAddressResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SSHClient',
+                   request='PublicAddress',
+                   version=4,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SSHPublicKeysResults)
+    async def PublicKeys(self, entities=None):
+        '''
+        PublicKeys returns the public SSH hosts for one or more
+        entities. Machines and units are supported.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> SSHPublicKeysResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SSHClient',
+                   request='PublicKeys',
+                   version=4,
+                   params=_params)
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 

@@ -163,6 +163,16 @@ class UniterFacade(Type):
                                                              'pod-spec': {'$ref': '#/definitions/PodSpec'},
                                                              'relation-unit-settings': {'items': {'$ref': '#/definitions/RelationUnitSettings'},
                                                                                         'type': 'array'},
+                                                             'secret-creates': {'items': {'$ref': '#/definitions/CreateSecretArg'},
+                                                                                'type': 'array'},
+                                                             'secret-deletes': {'items': {'$ref': '#/definitions/DeleteSecretArg'},
+                                                                                'type': 'array'},
+                                                             'secret-grants': {'items': {'$ref': '#/definitions/GrantRevokeSecretArg'},
+                                                                               'type': 'array'},
+                                                             'secret-revokes': {'items': {'$ref': '#/definitions/GrantRevokeSecretArg'},
+                                                                                'type': 'array'},
+                                                             'secret-updates': {'items': {'$ref': '#/definitions/UpdateSecretArg'},
+                                                                                'type': 'array'},
                                                              'set-raw-k8s-spec': {'$ref': '#/definitions/PodSpec'},
                                                              'tag': {'type': 'string'},
                                                              'unit-state': {'$ref': '#/definitions/SetUnitStateArg'},
@@ -187,6 +197,42 @@ class UniterFacade(Type):
                                                                           'type': 'array'}},
                                                'required': ['results'],
                                                'type': 'object'},
+                     'CreateSecretArg': {'additionalProperties': False,
+                                         'properties': {'UpsertSecretArg': {'$ref': '#/definitions/UpsertSecretArg'},
+                                                        'content': {'$ref': '#/definitions/SecretContentParams'},
+                                                        'description': {'type': 'string'},
+                                                        'expire-time': {'format': 'date-time',
+                                                                        'type': 'string'},
+                                                        'label': {'type': 'string'},
+                                                        'owner-tag': {'type': 'string'},
+                                                        'params': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                'type': 'object'}},
+                                                                   'type': 'object'},
+                                                        'rotate-policy': {'type': 'string'},
+                                                        'uri': {'type': 'string'}},
+                                         'required': ['UpsertSecretArg',
+                                                      'owner-tag'],
+                                         'type': 'object'},
+                     'CreateSecretArgs': {'additionalProperties': False,
+                                          'properties': {'args': {'items': {'$ref': '#/definitions/CreateSecretArg'},
+                                                                  'type': 'array'}},
+                                          'required': ['args'],
+                                          'type': 'object'},
+                     'CreateSecretURIsArg': {'additionalProperties': False,
+                                             'properties': {'count': {'type': 'integer'}},
+                                             'required': ['count'],
+                                             'type': 'object'},
+                     'DeleteSecretArg': {'additionalProperties': False,
+                                         'properties': {'revisions': {'items': {'type': 'integer'},
+                                                                      'type': 'array'},
+                                                        'uri': {'type': 'string'}},
+                                         'required': ['uri'],
+                                         'type': 'object'},
+                     'DeleteSecretArgs': {'additionalProperties': False,
+                                          'properties': {'args': {'items': {'$ref': '#/definitions/DeleteSecretArg'},
+                                                                  'type': 'array'}},
+                                          'required': ['args'],
+                                          'type': 'object'},
                      'Endpoint': {'additionalProperties': False,
                                   'properties': {'application-name': {'type': 'string'},
                                                  'relation': {'$ref': '#/definitions/CharmRelation'}},
@@ -202,11 +248,6 @@ class UniterFacade(Type):
                                                                       'type': 'array'}},
                                           'required': ['entities'],
                                           'type': 'object'},
-                     'EntitiesPortRanges': {'additionalProperties': False,
-                                            'properties': {'entities': {'items': {'$ref': '#/definitions/EntityPortRange'},
-                                                                        'type': 'array'}},
-                                            'required': ['entities'],
-                                            'type': 'object'},
                      'Entity': {'additionalProperties': False,
                                 'properties': {'tag': {'type': 'string'}},
                                 'required': ['tag'],
@@ -283,6 +324,25 @@ class UniterFacade(Type):
                                                                                  'type': 'object'}},
                                                      'required': ['settings'],
                                                      'type': 'object'},
+                     'GetSecretConsumerInfoArgs': {'additionalProperties': False,
+                                                   'properties': {'consumer-tag': {'type': 'string'},
+                                                                  'uris': {'items': {'type': 'string'},
+                                                                           'type': 'array'}},
+                                                   'required': ['consumer-tag',
+                                                                'uris'],
+                                                   'type': 'object'},
+                     'GetSecretContentArg': {'additionalProperties': False,
+                                             'properties': {'label': {'type': 'string'},
+                                                            'peek': {'type': 'boolean'},
+                                                            'update': {'type': 'boolean'},
+                                                            'uri': {'type': 'string'}},
+                                             'required': ['uri'],
+                                             'type': 'object'},
+                     'GetSecretContentArgs': {'additionalProperties': False,
+                                              'properties': {'args': {'items': {'$ref': '#/definitions/GetSecretContentArg'},
+                                                                      'type': 'array'}},
+                                              'required': ['args'],
+                                              'type': 'object'},
                      'GoalState': {'additionalProperties': False,
                                    'properties': {'relations': {'patternProperties': {'.*': {'patternProperties': {'.*': {'$ref': '#/definitions/GoalStateStatus'}},
                                                                                              'type': 'object'}},
@@ -307,6 +367,22 @@ class UniterFacade(Type):
                                                         'status': {'type': 'string'}},
                                          'required': ['status', 'since'],
                                          'type': 'object'},
+                     'GrantRevokeSecretArg': {'additionalProperties': False,
+                                              'properties': {'role': {'type': 'string'},
+                                                             'scope-tag': {'type': 'string'},
+                                                             'subject-tags': {'items': {'type': 'string'},
+                                                                              'type': 'array'},
+                                                             'uri': {'type': 'string'}},
+                                              'required': ['uri',
+                                                           'scope-tag',
+                                                           'subject-tags',
+                                                           'role'],
+                                              'type': 'object'},
+                     'GrantRevokeSecretArgs': {'additionalProperties': False,
+                                               'properties': {'args': {'items': {'$ref': '#/definitions/GrantRevokeSecretArg'},
+                                                                       'type': 'array'}},
+                                               'required': ['args'],
+                                               'type': 'object'},
                      'HostPort': {'additionalProperties': False,
                                   'properties': {'Address': {'$ref': '#/definitions/Address'},
                                                  'cidr': {'type': 'string'},
@@ -350,6 +426,38 @@ class UniterFacade(Type):
                                                                 'type': 'array'}},
                                      'required': ['results'],
                                      'type': 'object'},
+                     'ListSecretResult': {'additionalProperties': False,
+                                          'properties': {'create-time': {'format': 'date-time',
+                                                                         'type': 'string'},
+                                                         'description': {'type': 'string'},
+                                                         'label': {'type': 'string'},
+                                                         'latest-expire-time': {'format': 'date-time',
+                                                                                'type': 'string'},
+                                                         'latest-revision': {'type': 'integer'},
+                                                         'next-rotate-time': {'format': 'date-time',
+                                                                              'type': 'string'},
+                                                         'owner-tag': {'type': 'string'},
+                                                         'revisions': {'items': {'$ref': '#/definitions/SecretRevision'},
+                                                                       'type': 'array'},
+                                                         'rotate-policy': {'type': 'string'},
+                                                         'update-time': {'format': 'date-time',
+                                                                         'type': 'string'},
+                                                         'uri': {'type': 'string'},
+                                                         'value': {'$ref': '#/definitions/SecretValueResult'},
+                                                         'version': {'type': 'integer'}},
+                                          'required': ['uri',
+                                                       'version',
+                                                       'owner-tag',
+                                                       'latest-revision',
+                                                       'create-time',
+                                                       'update-time',
+                                                       'revisions'],
+                                          'type': 'object'},
+                     'ListSecretResults': {'additionalProperties': False,
+                                           'properties': {'results': {'items': {'$ref': '#/definitions/ListSecretResult'},
+                                                                      'type': 'array'}},
+                                           'required': ['results'],
+                                           'type': 'object'},
                      'MergeLeadershipSettingsBulkParams': {'additionalProperties': False,
                                                            'properties': {'params': {'items': {'$ref': '#/definitions/MergeLeadershipSettingsParam'},
                                                                                      'type': 'array'}},
@@ -588,11 +696,6 @@ class UniterFacade(Type):
                                                                          'type': 'array'}},
                                              'required': ['changed'],
                                              'type': 'object'},
-                     'RelationUnitsSettings': {'additionalProperties': False,
-                                               'properties': {'relation-units': {'items': {'$ref': '#/definitions/RelationUnitSettings'},
-                                                                                 'type': 'array'}},
-                                               'required': ['relation-units'],
-                                               'type': 'object'},
                      'RelationUnitsWatchResult': {'additionalProperties': False,
                                                   'properties': {'changes': {'$ref': '#/definitions/RelationUnitsChange'},
                                                                  'error': {'$ref': '#/definitions/Error'},
@@ -615,6 +718,84 @@ class UniterFacade(Type):
                                                                         'type': 'array'}},
                                              'required': ['results'],
                                              'type': 'object'},
+                     'SecretConsumerInfoResult': {'additionalProperties': False,
+                                                  'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                                 'label': {'type': 'string'},
+                                                                 'revision': {'type': 'integer'}},
+                                                  'required': ['revision', 'label'],
+                                                  'type': 'object'},
+                     'SecretConsumerInfoResults': {'additionalProperties': False,
+                                                   'properties': {'results': {'items': {'$ref': '#/definitions/SecretConsumerInfoResult'},
+                                                                              'type': 'array'}},
+                                                   'required': ['results'],
+                                                   'type': 'object'},
+                     'SecretContentParams': {'additionalProperties': False,
+                                             'properties': {'data': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                     'type': 'object'},
+                                                            'provider-id': {'type': 'string'}},
+                                             'type': 'object'},
+                     'SecretContentResult': {'additionalProperties': False,
+                                             'properties': {'content': {'$ref': '#/definitions/SecretContentParams'},
+                                                            'error': {'$ref': '#/definitions/Error'}},
+                                             'required': ['content'],
+                                             'type': 'object'},
+                     'SecretContentResults': {'additionalProperties': False,
+                                              'properties': {'results': {'items': {'$ref': '#/definitions/SecretContentResult'},
+                                                                         'type': 'array'}},
+                                              'required': ['results'],
+                                              'type': 'object'},
+                     'SecretRevision': {'additionalProperties': False,
+                                        'properties': {'create-time': {'format': 'date-time',
+                                                                       'type': 'string'},
+                                                       'expire-time': {'format': 'date-time',
+                                                                       'type': 'string'},
+                                                       'provider-id': {'type': 'string'},
+                                                       'revision': {'type': 'integer'},
+                                                       'update-time': {'format': 'date-time',
+                                                                       'type': 'string'}},
+                                        'required': ['revision'],
+                                        'type': 'object'},
+                     'SecretRotatedArg': {'additionalProperties': False,
+                                          'properties': {'original-revision': {'type': 'integer'},
+                                                         'skip': {'type': 'boolean'},
+                                                         'uri': {'type': 'string'}},
+                                          'required': ['uri',
+                                                       'original-revision',
+                                                       'skip'],
+                                          'type': 'object'},
+                     'SecretRotatedArgs': {'additionalProperties': False,
+                                           'properties': {'args': {'items': {'$ref': '#/definitions/SecretRotatedArg'},
+                                                                   'type': 'array'}},
+                                           'required': ['args'],
+                                           'type': 'object'},
+                     'SecretStoreConfig': {'additionalProperties': False,
+                                           'properties': {'params': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                  'type': 'object'}},
+                                                                     'type': 'object'},
+                                                          'type': {'type': 'string'}},
+                                           'required': ['type'],
+                                           'type': 'object'},
+                     'SecretTriggerChange': {'additionalProperties': False,
+                                             'properties': {'next-trigger-time': {'format': 'date-time',
+                                                                                  'type': 'string'},
+                                                            'revision': {'type': 'integer'},
+                                                            'uri': {'type': 'string'}},
+                                             'required': ['uri',
+                                                          'next-trigger-time'],
+                                             'type': 'object'},
+                     'SecretTriggerWatchResult': {'additionalProperties': False,
+                                                  'properties': {'changes': {'items': {'$ref': '#/definitions/SecretTriggerChange'},
+                                                                             'type': 'array'},
+                                                                 'error': {'$ref': '#/definitions/Error'},
+                                                                 'watcher-id': {'type': 'string'}},
+                                                  'required': ['watcher-id',
+                                                               'changes'],
+                                                  'type': 'object'},
+                     'SecretValueResult': {'additionalProperties': False,
+                                           'properties': {'data': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                   'type': 'object'},
+                                                          'error': {'$ref': '#/definitions/Error'}},
+                                           'type': 'object'},
                      'SetStatus': {'additionalProperties': False,
                                    'properties': {'entities': {'items': {'$ref': '#/definitions/EntityStatusArgs'},
                                                                'type': 'array'}},
@@ -626,6 +807,7 @@ class UniterFacade(Type):
                                                         'meter-status-state': {'type': 'string'},
                                                         'relation-state': {'patternProperties': {'.*': {'type': 'string'}},
                                                                            'type': 'object'},
+                                                        'secret-state': {'type': 'string'},
                                                         'storage-state': {'type': 'string'},
                                                         'tag': {'type': 'string'},
                                                         'uniter-state': {'type': 'string'}},
@@ -724,11 +906,6 @@ class UniterFacade(Type):
                                                            'pool': {'type': 'string'},
                                                            'size': {'type': 'integer'}},
                                             'type': 'object'},
-                     'StoragesAddParams': {'additionalProperties': False,
-                                           'properties': {'storages': {'items': {'$ref': '#/definitions/StorageAddParams'},
-                                                                       'type': 'array'}},
-                                           'required': ['storages'],
-                                           'type': 'object'},
                      'StringBoolResult': {'additionalProperties': False,
                                           'properties': {'error': {'$ref': '#/definitions/Error'},
                                                          'ok': {'type': 'boolean'},
@@ -792,6 +969,7 @@ class UniterFacade(Type):
                                                         'meter-status-state': {'type': 'string'},
                                                         'relation-state': {'patternProperties': {'.*': {'type': 'string'}},
                                                                            'type': 'object'},
+                                                        'secret-state': {'type': 'string'},
                                                         'storage-state': {'type': 'string'},
                                                         'uniter-state': {'type': 'string'}},
                                          'type': 'object'},
@@ -799,6 +977,25 @@ class UniterFacade(Type):
                                           'properties': {'results': {'items': {'$ref': '#/definitions/UnitStateResult'},
                                                                      'type': 'array'}},
                                           'required': ['results'],
+                                          'type': 'object'},
+                     'UpdateSecretArg': {'additionalProperties': False,
+                                         'properties': {'UpsertSecretArg': {'$ref': '#/definitions/UpsertSecretArg'},
+                                                        'content': {'$ref': '#/definitions/SecretContentParams'},
+                                                        'description': {'type': 'string'},
+                                                        'expire-time': {'format': 'date-time',
+                                                                        'type': 'string'},
+                                                        'label': {'type': 'string'},
+                                                        'params': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                'type': 'object'}},
+                                                                   'type': 'object'},
+                                                        'rotate-policy': {'type': 'string'},
+                                                        'uri': {'type': 'string'}},
+                                         'required': ['UpsertSecretArg', 'uri'],
+                                         'type': 'object'},
+                     'UpdateSecretArgs': {'additionalProperties': False,
+                                          'properties': {'args': {'items': {'$ref': '#/definitions/UpdateSecretArg'},
+                                                                  'type': 'array'}},
+                                          'required': ['args'],
                                           'type': 'object'},
                      'UpgradeSeriesStatusParam': {'additionalProperties': False,
                                                   'properties': {'entity': {'$ref': '#/definitions/Entity'},
@@ -821,7 +1018,18 @@ class UniterFacade(Type):
                      'UpgradeSeriesStatusResults': {'additionalProperties': False,
                                                     'properties': {'results': {'items': {'$ref': '#/definitions/UpgradeSeriesStatusResult'},
                                                                                'type': 'array'}},
-                                                    'type': 'object'}},
+                                                    'type': 'object'},
+                     'UpsertSecretArg': {'additionalProperties': False,
+                                         'properties': {'content': {'$ref': '#/definitions/SecretContentParams'},
+                                                        'description': {'type': 'string'},
+                                                        'expire-time': {'format': 'date-time',
+                                                                        'type': 'string'},
+                                                        'label': {'type': 'string'},
+                                                        'params': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                'type': 'object'}},
+                                                                   'type': 'object'},
+                                                        'rotate-policy': {'type': 'string'}},
+                                         'type': 'object'}},
      'properties': {'APIAddresses': {'description': 'APIAddresses returns the list '
                                                     'of addresses used to connect '
                                                     'to the API.',
@@ -851,18 +1059,6 @@ class UniterFacade(Type):
                                          'properties': {'Params': {'$ref': '#/definitions/MetricBatchParams'},
                                                         'Result': {'$ref': '#/definitions/ErrorResults'}},
                                          'type': 'object'},
-                    'AddUnitStorage': {'description': 'AddUnitStorage validates '
-                                                      'and creates additional '
-                                                      'storage instances for '
-                                                      'units.\n'
-                                                      'Failures on an individual '
-                                                      'storage instance do not '
-                                                      'block remaining\n'
-                                                      'instances from being '
-                                                      'processed.',
-                                       'properties': {'Params': {'$ref': '#/definitions/StoragesAddParams'},
-                                                      'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                       'type': 'object'},
                     'ApplicationStatus': {'description': 'ApplicationStatus '
                                                          'returns the status of '
                                                          'the Applications and its '
@@ -933,13 +1129,6 @@ class UniterFacade(Type):
                                       'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                      'Result': {'$ref': '#/definitions/ErrorResults'}},
                                       'type': 'object'},
-                    'ClosePorts': {'description': 'ClosePorts sets the policy of '
-                                                  'the port range with protocol to '
-                                                  'be\n'
-                                                  'closed, for all given units.',
-                                   'properties': {'Params': {'$ref': '#/definitions/EntitiesPortRanges'},
-                                                  'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                   'type': 'object'},
                     'CloudAPIVersion': {'description': 'CloudAPIVersion returns '
                                                        'the cloud API version, if '
                                                        'available.',
@@ -976,6 +1165,16 @@ class UniterFacade(Type):
                                        'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                       'Result': {'$ref': '#/definitions/ConfigSettingsResults'}},
                                        'type': 'object'},
+                    'CreateSecretURIs': {'description': 'CreateSecretURIs creates '
+                                                        'new secret URIs.',
+                                         'properties': {'Params': {'$ref': '#/definitions/CreateSecretURIsArg'},
+                                                        'Result': {'$ref': '#/definitions/StringResults'}},
+                                         'type': 'object'},
+                    'CreateSecrets': {'description': 'CreateSecrets creates new '
+                                                     'secrets.',
+                                      'properties': {'Params': {'$ref': '#/definitions/CreateSecretArgs'},
+                                                     'Result': {'$ref': '#/definitions/StringResults'}},
+                                      'type': 'object'},
                     'CurrentModel': {'description': 'CurrentModel returns the name '
                                                     'and UUID for the current juju '
                                                     'model.',
@@ -1031,6 +1230,17 @@ class UniterFacade(Type):
                                       'properties': {'Params': {'$ref': '#/definitions/ActionExecutionResults'},
                                                      'Result': {'$ref': '#/definitions/ErrorResults'}},
                                       'type': 'object'},
+                    'GetConsumerSecretsRevisionInfo': {'description': 'GetConsumerSecretsRevisionInfo '
+                                                                      'returns the '
+                                                                      'latest '
+                                                                      'secret '
+                                                                      'revisions '
+                                                                      'for the '
+                                                                      'specified '
+                                                                      'secrets.',
+                                                       'properties': {'Params': {'$ref': '#/definitions/GetSecretConsumerInfoArgs'},
+                                                                      'Result': {'$ref': '#/definitions/SecretConsumerInfoResults'}},
+                                                       'type': 'object'},
                     'GetMeterStatus': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                       'Result': {'$ref': '#/definitions/MeterStatusResults'}},
                                        'type': 'object'},
@@ -1053,6 +1263,25 @@ class UniterFacade(Type):
                                       'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                      'Result': {'$ref': '#/definitions/StringResults'}},
                                       'type': 'object'},
+                    'GetSecretContentInfo': {'description': 'GetSecretContentInfo '
+                                                            'returns the secret '
+                                                            'values for the '
+                                                            'specified secrets.',
+                                             'properties': {'Params': {'$ref': '#/definitions/GetSecretContentArgs'},
+                                                            'Result': {'$ref': '#/definitions/SecretContentResults'}},
+                                             'type': 'object'},
+                    'GetSecretMetadata': {'description': 'GetSecretMetadata '
+                                                         'returns metadata for the '
+                                                         "caller's secrets.",
+                                          'properties': {'Result': {'$ref': '#/definitions/ListSecretResults'}},
+                                          'type': 'object'},
+                    'GetSecretStoreConfig': {'description': 'GetSecretStoreConfig '
+                                                            'gets the config '
+                                                            'needed to create a '
+                                                            "client to the model's "
+                                                            'secret store.',
+                                             'properties': {'Result': {'$ref': '#/definitions/SecretStoreConfig'}},
+                                             'type': 'object'},
                     'GoalStates': {'description': 'GoalStates returns information '
                                                   'of charm units and relations.',
                                    'properties': {'Params': {'$ref': '#/definitions/Entities'},
@@ -1127,9 +1356,6 @@ class UniterFacade(Type):
                                     'properties': {'Params': {'$ref': '#/definitions/NetworkInfoParams'},
                                                    'Result': {'$ref': '#/definitions/NetworkInfoResults'}},
                                     'type': 'object'},
-                    'OpenPorts': {'properties': {'Params': {'$ref': '#/definitions/EntitiesPortRanges'},
-                                                 'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                  'type': 'object'},
                     'OpenedMachinePortRangesByEndpoint': {'description': 'OpenedMachinePortRangesByEndpoint '
                                                                          'returns '
                                                                          'the port '
@@ -1252,6 +1478,11 @@ class UniterFacade(Type):
                                         'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                        'Result': {'$ref': '#/definitions/RelationUnitStatusResults'}},
                                         'type': 'object'},
+                    'RemoveSecrets': {'description': 'RemoveSecrets removes the '
+                                                     'specified secrets.',
+                                      'properties': {'Params': {'$ref': '#/definitions/DeleteSecretArgs'},
+                                                     'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                      'type': 'object'},
                     'RemoveStorageAttachments': {'description': 'RemoveStorageAttachments '
                                                                 'removes the '
                                                                 'specified '
@@ -1277,6 +1508,23 @@ class UniterFacade(Type):
                                                 'level.',
                                  'properties': {'Result': {'$ref': '#/definitions/StringResult'}},
                                  'type': 'object'},
+                    'SecretsGrant': {'description': 'SecretsGrant grants access to '
+                                                    'a secret for the specified '
+                                                    'subjects.',
+                                     'properties': {'Params': {'$ref': '#/definitions/GrantRevokeSecretArgs'},
+                                                    'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                     'type': 'object'},
+                    'SecretsRevoke': {'description': 'SecretsRevoke revokes access '
+                                                     'to a secret for the '
+                                                     'specified subjects.',
+                                      'properties': {'Params': {'$ref': '#/definitions/GrantRevokeSecretArgs'},
+                                                     'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                      'type': 'object'},
+                    'SecretsRotated': {'description': 'SecretsRotated records when '
+                                                      'secrets were last rotated.',
+                                       'properties': {'Params': {'$ref': '#/definitions/SecretRotatedArgs'},
+                                                      'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                       'type': 'object'},
                     'SetAgentStatus': {'description': 'SetAgentStatus will set '
                                                       'status for agents of Units '
                                                       'passed in args, if one\n'
@@ -1404,17 +1652,11 @@ class UniterFacade(Type):
                                           'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                          'Result': {'$ref': '#/definitions/ErrorResults'}},
                                           'type': 'object'},
-                    'UpdateSettings': {'description': 'UpdateSettings persists all '
-                                                      'changes made to the local '
-                                                      'settings of\n'
-                                                      'all given pairs of relation '
-                                                      'and unit. Keys with empty '
-                                                      'values are\n'
-                                                      'considered a signal to '
-                                                      'delete these values.',
-                                       'properties': {'Params': {'$ref': '#/definitions/RelationUnitsSettings'},
-                                                      'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                       'type': 'object'},
+                    'UpdateSecrets': {'description': 'UpdateSecrets updates the '
+                                                     'specified secrets.',
+                                      'properties': {'Params': {'$ref': '#/definitions/UpdateSecretArgs'},
+                                                     'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                      'type': 'object'},
                     'UpgradeSeriesUnitStatus': {'description': 'UpgradeSeriesUnitStatus '
                                                                'returns the '
                                                                'current '
@@ -1479,6 +1721,18 @@ class UniterFacade(Type):
                                                 'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                                'Result': {'$ref': '#/definitions/StringsWatchResults'}},
                                                 'type': 'object'},
+                    'WatchConsumedSecretsChanges': {'description': 'WatchConsumedSecretsChanges '
+                                                                   'sets up a '
+                                                                   'watcher to '
+                                                                   'notify of '
+                                                                   'changes to '
+                                                                   'secret '
+                                                                   'revisions for '
+                                                                   'the specified '
+                                                                   'consumers.',
+                                                    'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                                   'Result': {'$ref': '#/definitions/StringsWatchResults'}},
+                                                    'type': 'object'},
                     'WatchForModelConfigChanges': {'description': 'WatchForModelConfigChanges '
                                                                   'returns a '
                                                                   'NotifyWatcher '
@@ -1521,6 +1775,20 @@ class UniterFacade(Type):
                     'WatchMeterStatus': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                         'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
                                          'type': 'object'},
+                    'WatchObsolete': {'description': 'WatchObsolete returns a '
+                                                     'watcher for notifying when:\n'
+                                                     '  - a secret owned by the '
+                                                     'entity is deleted\n'
+                                                     '  - a secret revision owed '
+                                                     'by the entity no longer\n'
+                                                     '    has any consumers\n'
+                                                     '\n'
+                                                     'Obsolete revisions results '
+                                                     'are "uri/revno" and deleted\n'
+                                                     'secret results are "uri".',
+                                      'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                     'Result': {'$ref': '#/definitions/StringsWatchResult'}},
+                                      'type': 'object'},
                     'WatchRelationUnits': {'description': 'WatchRelationUnits '
                                                           'returns a '
                                                           'RelationUnitsWatcher '
@@ -1535,6 +1803,33 @@ class UniterFacade(Type):
                                            'properties': {'Params': {'$ref': '#/definitions/RelationUnits'},
                                                           'Result': {'$ref': '#/definitions/RelationUnitsWatchResults'}},
                                            'type': 'object'},
+                    'WatchSecretRevisionsExpiryChanges': {'description': 'WatchSecretRevisionsExpiryChanges '
+                                                                         'sets up '
+                                                                         'a '
+                                                                         'watcher '
+                                                                         'to '
+                                                                         'notify '
+                                                                         'of '
+                                                                         'changes '
+                                                                         'to '
+                                                                         'secret '
+                                                                         'revision '
+                                                                         'expiry '
+                                                                         'config.',
+                                                          'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                                         'Result': {'$ref': '#/definitions/SecretTriggerWatchResult'}},
+                                                          'type': 'object'},
+                    'WatchSecretsRotationChanges': {'description': 'WatchSecretsRotationChanges '
+                                                                   'sets up a '
+                                                                   'watcher to '
+                                                                   'notify of '
+                                                                   'changes to '
+                                                                   'secret '
+                                                                   'rotation '
+                                                                   'config.',
+                                                    'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                                   'Result': {'$ref': '#/definitions/SecretTriggerWatchResult'}},
+                                                    'type': 'object'},
                     'WatchStorageAttachments': {'description': 'WatchStorageAttachments '
                                                                'creates watchers '
                                                                'for a collection '
@@ -1762,31 +2057,6 @@ class UniterFacade(Type):
 
 
 
-    @ReturnMapping(ErrorResults)
-    async def AddUnitStorage(self, storages=None):
-        '''
-        AddUnitStorage validates and creates additional storage instances for units.
-        Failures on an individual storage instance do not block remaining
-        instances from being processed.
-
-        storages : typing.Sequence[~StorageAddParams]
-        Returns -> ErrorResults
-        '''
-        if storages is not None and not isinstance(storages, (bytes, str, list)):
-            raise Exception("Expected storages to be a Sequence, received: {}".format(type(storages)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='AddUnitStorage',
-                   version=18,
-                   params=_params)
-        _params['storages'] = storages
-        reply = await self.rpc(msg)
-        return reply
-
-
-
     @ReturnMapping(ApplicationStatusResults)
     async def ApplicationStatus(self, entities=None):
         '''
@@ -1999,30 +2269,6 @@ class UniterFacade(Type):
 
 
 
-    @ReturnMapping(ErrorResults)
-    async def ClosePorts(self, entities=None):
-        '''
-        ClosePorts sets the policy of the port range with protocol to be
-        closed, for all given units.
-
-        entities : typing.Sequence[~EntityPortRange]
-        Returns -> ErrorResults
-        '''
-        if entities is not None and not isinstance(entities, (bytes, str, list)):
-            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='ClosePorts',
-                   version=18,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
     @ReturnMapping(StringResult)
     async def CloudAPIVersion(self):
         '''
@@ -2112,6 +2358,52 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResults)
+    async def CreateSecretURIs(self, count=None):
+        '''
+        CreateSecretURIs creates new secret URIs.
+
+        count : int
+        Returns -> StringResults
+        '''
+        if count is not None and not isinstance(count, int):
+            raise Exception("Expected count to be a int, received: {}".format(type(count)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='CreateSecretURIs',
+                   version=18,
+                   params=_params)
+        _params['count'] = count
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResults)
+    async def CreateSecrets(self, args=None):
+        '''
+        CreateSecrets creates new secrets.
+
+        args : typing.Sequence[~CreateSecretArg]
+        Returns -> StringResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='CreateSecrets',
+                   version=18,
+                   params=_params)
+        _params['args'] = args
         reply = await self.rpc(msg)
         return reply
 
@@ -2282,6 +2574,34 @@ class UniterFacade(Type):
 
 
 
+    @ReturnMapping(SecretConsumerInfoResults)
+    async def GetConsumerSecretsRevisionInfo(self, consumer_tag=None, uris=None):
+        '''
+        GetConsumerSecretsRevisionInfo returns the latest secret revisions for the specified secrets.
+
+        consumer_tag : str
+        uris : typing.Sequence[str]
+        Returns -> SecretConsumerInfoResults
+        '''
+        if consumer_tag is not None and not isinstance(consumer_tag, (bytes, str)):
+            raise Exception("Expected consumer_tag to be a str, received: {}".format(type(consumer_tag)))
+
+        if uris is not None and not isinstance(uris, (bytes, str, list)):
+            raise Exception("Expected uris to be a Sequence, received: {}".format(type(uris)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='GetConsumerSecretsRevisionInfo',
+                   version=18,
+                   params=_params)
+        _params['consumer-tag'] = consumer_tag
+        _params['uris'] = uris
+        reply = await self.rpc(msg)
+        return reply
+
+
+
     @ReturnMapping(MeterStatusResults)
     async def GetMeterStatus(self, entities=None):
         '''
@@ -2368,6 +2688,71 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SecretContentResults)
+    async def GetSecretContentInfo(self, args=None):
+        '''
+        GetSecretContentInfo returns the secret values for the specified secrets.
+
+        args : typing.Sequence[~GetSecretContentArg]
+        Returns -> SecretContentResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='GetSecretContentInfo',
+                   version=18,
+                   params=_params)
+        _params['args'] = args
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ListSecretResults)
+    async def GetSecretMetadata(self):
+        '''
+        GetSecretMetadata returns metadata for the caller's secrets.
+
+
+        Returns -> ListSecretResults
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='GetSecretMetadata',
+                   version=18,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SecretStoreConfig)
+    async def GetSecretStoreConfig(self):
+        '''
+        GetSecretStoreConfig gets the config needed to create a client to the model's secret store.
+
+
+        Returns -> SecretStoreConfig
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='GetSecretStoreConfig',
+                   version=18,
+                   params=_params)
+
         reply = await self.rpc(msg)
         return reply
 
@@ -2633,27 +3018,6 @@ class UniterFacade(Type):
         _params['bindings'] = bindings
         _params['relation-id'] = relation_id
         _params['unit'] = unit
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
-    async def OpenPorts(self, entities=None):
-        '''
-        entities : typing.Sequence[~EntityPortRange]
-        Returns -> ErrorResults
-        '''
-        if entities is not None and not isinstance(entities, (bytes, str, list)):
-            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='OpenPorts',
-                   version=18,
-                   params=_params)
-        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
@@ -2956,6 +3320,29 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    async def RemoveSecrets(self, args=None):
+        '''
+        RemoveSecrets removes the specified secrets.
+
+        args : typing.Sequence[~DeleteSecretArg]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='RemoveSecrets',
+                   version=18,
+                   params=_params)
+        _params['args'] = args
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def RemoveStorageAttachments(self, ids=None):
         '''
         RemoveStorageAttachments removes the specified storage
@@ -3041,6 +3428,75 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
 
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def SecretsGrant(self, args=None):
+        '''
+        SecretsGrant grants access to a secret for the specified subjects.
+
+        args : typing.Sequence[~GrantRevokeSecretArg]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='SecretsGrant',
+                   version=18,
+                   params=_params)
+        _params['args'] = args
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def SecretsRevoke(self, args=None):
+        '''
+        SecretsRevoke revokes access to a secret for the specified subjects.
+
+        args : typing.Sequence[~GrantRevokeSecretArg]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='SecretsRevoke',
+                   version=18,
+                   params=_params)
+        _params['args'] = args
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def SecretsRotated(self, args=None):
+        '''
+        SecretsRotated records when secrets were last rotated.
+
+        args : typing.Sequence[~SecretRotatedArg]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='SecretsRotated',
+                   version=18,
+                   params=_params)
+        _params['args'] = args
         reply = await self.rpc(msg)
         return reply
 
@@ -3405,25 +3861,23 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def UpdateSettings(self, relation_units=None):
+    async def UpdateSecrets(self, args=None):
         '''
-        UpdateSettings persists all changes made to the local settings of
-        all given pairs of relation and unit. Keys with empty values are
-        considered a signal to delete these values.
+        UpdateSecrets updates the specified secrets.
 
-        relation_units : typing.Sequence[~RelationUnitSettings]
+        args : typing.Sequence[~UpdateSecretArg]
         Returns -> ErrorResults
         '''
-        if relation_units is not None and not isinstance(relation_units, (bytes, str, list)):
-            raise Exception("Expected relation_units to be a Sequence, received: {}".format(type(relation_units)))
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
 
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter',
-                   request='UpdateSettings',
+                   request='UpdateSecrets',
                    version=18,
                    params=_params)
-        _params['relation-units'] = relation_units
+        _params['args'] = args
         reply = await self.rpc(msg)
         return reply
 
@@ -3551,6 +4005,29 @@ class UniterFacade(Type):
 
 
 
+    @ReturnMapping(StringsWatchResults)
+    async def WatchConsumedSecretsChanges(self, entities=None):
+        '''
+        WatchConsumedSecretsChanges sets up a watcher to notify of changes to secret revisions for the specified consumers.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringsWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='WatchConsumedSecretsChanges',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
     @ReturnMapping(NotifyWatchResult)
     async def WatchForModelConfigChanges(self):
         '''
@@ -3644,6 +4121,35 @@ class UniterFacade(Type):
 
 
 
+    @ReturnMapping(StringsWatchResult)
+    async def WatchObsolete(self, entities=None):
+        '''
+        WatchObsolete returns a watcher for notifying when:
+          - a secret owned by the entity is deleted
+          - a secret revision owed by the entity no longer
+            has any consumers
+
+        Obsolete revisions results are "uri/revno" and deleted
+        secret results are "uri".
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringsWatchResult
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='WatchObsolete',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
     @ReturnMapping(RelationUnitsWatchResults)
     async def WatchRelationUnits(self, relation_units=None):
         '''
@@ -3664,6 +4170,52 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['relation-units'] = relation_units
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SecretTriggerWatchResult)
+    async def WatchSecretRevisionsExpiryChanges(self, entities=None):
+        '''
+        WatchSecretRevisionsExpiryChanges sets up a watcher to notify of changes to secret revision expiry config.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> SecretTriggerWatchResult
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='WatchSecretRevisionsExpiryChanges',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SecretTriggerWatchResult)
+    async def WatchSecretsRotationChanges(self, entities=None):
+        '''
+        WatchSecretsRotationChanges sets up a watcher to notify of changes to secret rotation config.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> SecretTriggerWatchResult
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='WatchSecretsRotationChanges',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
