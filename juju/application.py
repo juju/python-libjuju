@@ -629,7 +629,7 @@ class Application(model.ModelEntity):
         charm_url_origin_result = await app_facade.GetCharmURLOrigin(application=self.name)
         if charm_url_origin_result.error is not None:
             err = charm_url_origin_result.error
-            raise JujuError(f'{err.code} : {err.message}')
+            raise JujuError("%s : %s" % (err.code, err.message))
         charm_url = switch or charm_url_origin_result.url
         origin = charm_url_origin_result.charm_origin
 
@@ -642,7 +642,8 @@ class Application(model.ModelEntity):
         charm_name = parsed_url.name
 
         if parsed_url.schema is None:
-            raise JujuError(f'A ch: or cs: schema is required for application refresh, given : {str(parsed_url)}')
+            raise JujuError("A ch: or cs: schema is required for application "
+                            "refresh, given : %s " % str(parsed_url))
 
         if revision is not None:
             origin.revision = revision
