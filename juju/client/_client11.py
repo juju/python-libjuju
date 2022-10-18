@@ -1134,6 +1134,11 @@ class ProvisionerFacade(Type):
                                                 'value': {'type': 'string'}},
                                  'required': ['value', 'type', 'scope'],
                                  'type': 'object'},
+                     'Base': {'additionalProperties': False,
+                              'properties': {'channel': {'type': 'string'},
+                                             'name': {'type': 'string'}},
+                              'required': ['name', 'channel'],
+                              'type': 'object'},
                      'Binary': {'additionalProperties': False,
                                 'properties': {'Arch': {'type': 'string'},
                                                'Build': {'type': 'integer'},
@@ -1185,7 +1190,6 @@ class ProvisionerFacade(Type):
                                                            'region': {'type': 'string'},
                                                            'root-storage-size': {'type': 'integer'},
                                                            'root-storage-type': {'type': 'string'},
-                                                           'series': {'type': 'string'},
                                                            'source': {'type': 'string'},
                                                            'stream': {'type': 'string'},
                                                            'version': {'type': 'string'},
@@ -1193,7 +1197,6 @@ class ProvisionerFacade(Type):
                                             'required': ['image-id',
                                                          'region',
                                                          'version',
-                                                         'series',
                                                          'arch',
                                                          'source',
                                                          'priority'],
@@ -1564,6 +1567,7 @@ class ProvisionerFacade(Type):
                                 'type': 'object'},
                      'ProvisioningInfo': {'additionalProperties': False,
                                           'properties': {'ProvisioningNetworkTopology': {'$ref': '#/definitions/ProvisioningNetworkTopology'},
+                                                         'base': {'$ref': '#/definitions/Base'},
                                                          'charm-lxd-profiles': {'items': {'type': 'string'},
                                                                                 'type': 'array'},
                                                          'cloudinit-userdata': {'patternProperties': {'.*': {'additionalProperties': True,
@@ -1581,7 +1585,6 @@ class ProvisionerFacade(Type):
                                                                   'type': 'array'},
                                                          'placement': {'type': 'string'},
                                                          'root-disk': {'$ref': '#/definitions/VolumeParams'},
-                                                         'series': {'type': 'string'},
                                                          'space-subnets': {'patternProperties': {'.*': {'items': {'type': 'string'},
                                                                                                         'type': 'array'}},
                                                                            'type': 'object'},
@@ -1595,7 +1598,7 @@ class ProvisionerFacade(Type):
                                                          'volumes': {'items': {'$ref': '#/definitions/VolumeParams'},
                                                                      'type': 'array'}},
                                           'required': ['constraints',
-                                                       'series',
+                                                       'base',
                                                        'placement',
                                                        'jobs',
                                                        'subnet-zones',
@@ -2084,11 +2087,6 @@ class ProvisionerFacade(Type):
                                               'the entity is not present.',
                                'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                               'Result': {'$ref': '#/definitions/ErrorResults'}},
-                               'type': 'object'},
-                    'Series': {'description': 'Series returns the deployed series '
-                                              'for each given machine entity.',
-                               'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                              'Result': {'$ref': '#/definitions/StringResults'}},
                                'type': 'object'},
                     'SetCharmProfiles': {'description': 'SetCharmProfiles records '
                                                         'the given slice of charm '
@@ -2953,29 +2951,6 @@ class ProvisionerFacade(Type):
         _params = dict()
         msg = dict(type='Provisioner',
                    request='Remove',
-                   version=11,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(StringResults)
-    async def Series(self, entities=None):
-        '''
-        Series returns the deployed series for each given machine entity.
-
-        entities : typing.Sequence[~Entity]
-        Returns -> StringResults
-        '''
-        if entities is not None and not isinstance(entities, (bytes, str, list)):
-            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Provisioner',
-                   request='Series',
                    version=11,
                    params=_params)
         _params['entities'] = entities

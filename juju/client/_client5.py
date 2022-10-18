@@ -5,10 +5,807 @@ from juju.client.facade import Type, ReturnMapping
 from juju.client._definitions import *
 
 
+class CharmsFacade(Type):
+    name = 'Charms'
+    version = 5
+    schema =     {'definitions': {'AddCharmWithAuth': {'additionalProperties': False,
+                                          'properties': {'charm-origin': {'$ref': '#/definitions/CharmOrigin'},
+                                                         'force': {'type': 'boolean'},
+                                                         'macaroon': {'$ref': '#/definitions/Macaroon'},
+                                                         'url': {'type': 'string'}},
+                                          'required': ['url',
+                                                       'charm-origin',
+                                                       'macaroon',
+                                                       'force'],
+                                          'type': 'object'},
+                     'AddCharmWithOrigin': {'additionalProperties': False,
+                                            'properties': {'charm-origin': {'$ref': '#/definitions/CharmOrigin'},
+                                                           'force': {'type': 'boolean'},
+                                                           'url': {'type': 'string'}},
+                                            'required': ['url',
+                                                         'charm-origin',
+                                                         'force'],
+                                            'type': 'object'},
+                     'ApplicationCharmPlacement': {'additionalProperties': False,
+                                                   'properties': {'application': {'type': 'string'},
+                                                                  'charm-url': {'type': 'string'}},
+                                                   'required': ['application',
+                                                                'charm-url'],
+                                                   'type': 'object'},
+                     'ApplicationCharmPlacements': {'additionalProperties': False,
+                                                    'properties': {'placements': {'items': {'$ref': '#/definitions/ApplicationCharmPlacement'},
+                                                                                  'type': 'array'}},
+                                                    'required': ['placements'],
+                                                    'type': 'object'},
+                     'Base': {'additionalProperties': False,
+                              'properties': {'channel': {'type': 'string'},
+                                             'name': {'type': 'string'}},
+                              'required': ['name', 'channel'],
+                              'type': 'object'},
+                     'Charm': {'additionalProperties': False,
+                               'properties': {'actions': {'$ref': '#/definitions/CharmActions'},
+                                              'config': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmOption'}},
+                                                         'type': 'object'},
+                                              'lxd-profile': {'$ref': '#/definitions/CharmLXDProfile'},
+                                              'manifest': {'$ref': '#/definitions/CharmManifest'},
+                                              'meta': {'$ref': '#/definitions/CharmMeta'},
+                                              'metrics': {'$ref': '#/definitions/CharmMetrics'},
+                                              'revision': {'type': 'integer'},
+                                              'url': {'type': 'string'}},
+                               'required': ['revision', 'url', 'config'],
+                               'type': 'object'},
+                     'CharmActionSpec': {'additionalProperties': False,
+                                         'properties': {'description': {'type': 'string'},
+                                                        'params': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                'type': 'object'}},
+                                                                   'type': 'object'}},
+                                         'required': ['description', 'params'],
+                                         'type': 'object'},
+                     'CharmActions': {'additionalProperties': False,
+                                      'properties': {'specs': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmActionSpec'}},
+                                                               'type': 'object'}},
+                                      'type': 'object'},
+                     'CharmBase': {'additionalProperties': False,
+                                   'properties': {'architectures': {'items': {'type': 'string'},
+                                                                    'type': 'array'},
+                                                  'channel': {'type': 'string'},
+                                                  'name': {'type': 'string'}},
+                                   'type': 'object'},
+                     'CharmContainer': {'additionalProperties': False,
+                                        'properties': {'mounts': {'items': {'$ref': '#/definitions/CharmMount'},
+                                                                  'type': 'array'},
+                                                       'resource': {'type': 'string'}},
+                                        'type': 'object'},
+                     'CharmDeployment': {'additionalProperties': False,
+                                         'properties': {'min-version': {'type': 'string'},
+                                                        'mode': {'type': 'string'},
+                                                        'service': {'type': 'string'},
+                                                        'type': {'type': 'string'}},
+                                         'required': ['type',
+                                                      'mode',
+                                                      'service',
+                                                      'min-version'],
+                                         'type': 'object'},
+                     'CharmDevice': {'additionalProperties': False,
+                                     'properties': {'CountMax': {'type': 'integer'},
+                                                    'CountMin': {'type': 'integer'},
+                                                    'Description': {'type': 'string'},
+                                                    'Name': {'type': 'string'},
+                                                    'Type': {'type': 'string'}},
+                                     'required': ['Name',
+                                                  'Description',
+                                                  'Type',
+                                                  'CountMin',
+                                                  'CountMax'],
+                                     'type': 'object'},
+                     'CharmLXDProfile': {'additionalProperties': False,
+                                         'properties': {'config': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                   'type': 'object'},
+                                                        'description': {'type': 'string'},
+                                                        'devices': {'patternProperties': {'.*': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                                                 'type': 'object'}},
+                                                                    'type': 'object'}},
+                                         'required': ['config',
+                                                      'description',
+                                                      'devices'],
+                                         'type': 'object'},
+                     'CharmManifest': {'additionalProperties': False,
+                                       'properties': {'bases': {'items': {'$ref': '#/definitions/CharmBase'},
+                                                                'type': 'array'}},
+                                       'type': 'object'},
+                     'CharmMeta': {'additionalProperties': False,
+                                   'properties': {'assumes-expr': {'$ref': '#/definitions/ExpressionTree'},
+                                                  'categories': {'items': {'type': 'string'},
+                                                                 'type': 'array'},
+                                                  'containers': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmContainer'}},
+                                                                 'type': 'object'},
+                                                  'deployment': {'$ref': '#/definitions/CharmDeployment'},
+                                                  'description': {'type': 'string'},
+                                                  'devices': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmDevice'}},
+                                                              'type': 'object'},
+                                                  'extra-bindings': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                     'type': 'object'},
+                                                  'min-juju-version': {'type': 'string'},
+                                                  'name': {'type': 'string'},
+                                                  'payload-classes': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmPayloadClass'}},
+                                                                      'type': 'object'},
+                                                  'peers': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmRelation'}},
+                                                            'type': 'object'},
+                                                  'provides': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmRelation'}},
+                                                               'type': 'object'},
+                                                  'requires': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmRelation'}},
+                                                               'type': 'object'},
+                                                  'resources': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmResourceMeta'}},
+                                                                'type': 'object'},
+                                                  'series': {'items': {'type': 'string'},
+                                                             'type': 'array'},
+                                                  'storage': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmStorage'}},
+                                                              'type': 'object'},
+                                                  'subordinate': {'type': 'boolean'},
+                                                  'summary': {'type': 'string'},
+                                                  'tags': {'items': {'type': 'string'},
+                                                           'type': 'array'},
+                                                  'terms': {'items': {'type': 'string'},
+                                                            'type': 'array'}},
+                                   'required': ['name',
+                                                'summary',
+                                                'description',
+                                                'subordinate'],
+                                   'type': 'object'},
+                     'CharmMetric': {'additionalProperties': False,
+                                     'properties': {'description': {'type': 'string'},
+                                                    'type': {'type': 'string'}},
+                                     'required': ['type', 'description'],
+                                     'type': 'object'},
+                     'CharmMetrics': {'additionalProperties': False,
+                                      'properties': {'metrics': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmMetric'}},
+                                                                 'type': 'object'},
+                                                     'plan': {'$ref': '#/definitions/CharmPlan'}},
+                                      'required': ['metrics', 'plan'],
+                                      'type': 'object'},
+                     'CharmMount': {'additionalProperties': False,
+                                    'properties': {'location': {'type': 'string'},
+                                                   'storage': {'type': 'string'}},
+                                    'type': 'object'},
+                     'CharmOption': {'additionalProperties': False,
+                                     'properties': {'default': {'additionalProperties': True,
+                                                                'type': 'object'},
+                                                    'description': {'type': 'string'},
+                                                    'type': {'type': 'string'}},
+                                     'required': ['type'],
+                                     'type': 'object'},
+                     'CharmOrigin': {'additionalProperties': False,
+                                     'properties': {'architecture': {'type': 'string'},
+                                                    'base': {'$ref': '#/definitions/Base'},
+                                                    'branch': {'type': 'string'},
+                                                    'hash': {'type': 'string'},
+                                                    'id': {'type': 'string'},
+                                                    'instance-key': {'type': 'string'},
+                                                    'revision': {'type': 'integer'},
+                                                    'risk': {'type': 'string'},
+                                                    'source': {'type': 'string'},
+                                                    'track': {'type': 'string'},
+                                                    'type': {'type': 'string'}},
+                                     'required': ['source', 'type', 'id'],
+                                     'type': 'object'},
+                     'CharmOriginResult': {'additionalProperties': False,
+                                           'properties': {'charm-origin': {'$ref': '#/definitions/CharmOrigin'},
+                                                          'error': {'$ref': '#/definitions/Error'}},
+                                           'required': ['charm-origin'],
+                                           'type': 'object'},
+                     'CharmPayloadClass': {'additionalProperties': False,
+                                           'properties': {'name': {'type': 'string'},
+                                                          'type': {'type': 'string'}},
+                                           'required': ['name', 'type'],
+                                           'type': 'object'},
+                     'CharmPlan': {'additionalProperties': False,
+                                   'properties': {'required': {'type': 'boolean'}},
+                                   'required': ['required'],
+                                   'type': 'object'},
+                     'CharmRelation': {'additionalProperties': False,
+                                       'properties': {'interface': {'type': 'string'},
+                                                      'limit': {'type': 'integer'},
+                                                      'name': {'type': 'string'},
+                                                      'optional': {'type': 'boolean'},
+                                                      'role': {'type': 'string'},
+                                                      'scope': {'type': 'string'}},
+                                       'required': ['name',
+                                                    'role',
+                                                    'interface',
+                                                    'optional',
+                                                    'limit',
+                                                    'scope'],
+                                       'type': 'object'},
+                     'CharmResource': {'additionalProperties': False,
+                                       'properties': {'description': {'type': 'string'},
+                                                      'fingerprint': {'items': {'type': 'integer'},
+                                                                      'type': 'array'},
+                                                      'name': {'type': 'string'},
+                                                      'origin': {'type': 'string'},
+                                                      'path': {'type': 'string'},
+                                                      'revision': {'type': 'integer'},
+                                                      'size': {'type': 'integer'},
+                                                      'type': {'type': 'string'}},
+                                       'required': ['name',
+                                                    'type',
+                                                    'path',
+                                                    'origin',
+                                                    'revision',
+                                                    'fingerprint',
+                                                    'size'],
+                                       'type': 'object'},
+                     'CharmResourceMeta': {'additionalProperties': False,
+                                           'properties': {'description': {'type': 'string'},
+                                                          'name': {'type': 'string'},
+                                                          'path': {'type': 'string'},
+                                                          'type': {'type': 'string'}},
+                                           'required': ['name',
+                                                        'type',
+                                                        'path',
+                                                        'description'],
+                                           'type': 'object'},
+                     'CharmResourceResult': {'additionalProperties': False,
+                                             'properties': {'CharmResource': {'$ref': '#/definitions/CharmResource'},
+                                                            'ErrorResult': {'$ref': '#/definitions/ErrorResult'},
+                                                            'description': {'type': 'string'},
+                                                            'error': {'$ref': '#/definitions/Error'},
+                                                            'fingerprint': {'items': {'type': 'integer'},
+                                                                            'type': 'array'},
+                                                            'name': {'type': 'string'},
+                                                            'origin': {'type': 'string'},
+                                                            'path': {'type': 'string'},
+                                                            'revision': {'type': 'integer'},
+                                                            'size': {'type': 'integer'},
+                                                            'type': {'type': 'string'}},
+                                             'required': ['ErrorResult',
+                                                          'name',
+                                                          'type',
+                                                          'path',
+                                                          'origin',
+                                                          'revision',
+                                                          'fingerprint',
+                                                          'size',
+                                                          'CharmResource'],
+                                             'type': 'object'},
+                     'CharmResourcesResults': {'additionalProperties': False,
+                                               'properties': {'results': {'items': {'items': {'$ref': '#/definitions/CharmResourceResult'},
+                                                                                    'type': 'array'},
+                                                                          'type': 'array'}},
+                                               'required': ['results'],
+                                               'type': 'object'},
+                     'CharmStorage': {'additionalProperties': False,
+                                      'properties': {'count-max': {'type': 'integer'},
+                                                     'count-min': {'type': 'integer'},
+                                                     'description': {'type': 'string'},
+                                                     'location': {'type': 'string'},
+                                                     'minimum-size': {'type': 'integer'},
+                                                     'name': {'type': 'string'},
+                                                     'properties': {'items': {'type': 'string'},
+                                                                    'type': 'array'},
+                                                     'read-only': {'type': 'boolean'},
+                                                     'shared': {'type': 'boolean'},
+                                                     'type': {'type': 'string'}},
+                                      'required': ['name',
+                                                   'description',
+                                                   'type',
+                                                   'shared',
+                                                   'read-only',
+                                                   'count-min',
+                                                   'count-max',
+                                                   'minimum-size'],
+                                      'type': 'object'},
+                     'CharmURL': {'additionalProperties': False,
+                                  'properties': {'url': {'type': 'string'}},
+                                  'required': ['url'],
+                                  'type': 'object'},
+                     'CharmURLAndOrigin': {'additionalProperties': False,
+                                           'properties': {'charm-origin': {'$ref': '#/definitions/CharmOrigin'},
+                                                          'charm-url': {'type': 'string'},
+                                                          'macaroon': {'$ref': '#/definitions/Macaroon'}},
+                                           'required': ['charm-url',
+                                                        'charm-origin'],
+                                           'type': 'object'},
+                     'CharmURLAndOrigins': {'additionalProperties': False,
+                                            'properties': {'entities': {'items': {'$ref': '#/definitions/CharmURLAndOrigin'},
+                                                                        'type': 'array'}},
+                                            'required': ['entities'],
+                                            'type': 'object'},
+                     'CharmsList': {'additionalProperties': False,
+                                    'properties': {'names': {'items': {'type': 'string'},
+                                                             'type': 'array'}},
+                                    'required': ['names'],
+                                    'type': 'object'},
+                     'CharmsListResult': {'additionalProperties': False,
+                                          'properties': {'charm-urls': {'items': {'type': 'string'},
+                                                                        'type': 'array'}},
+                                          'required': ['charm-urls'],
+                                          'type': 'object'},
+                     'DownloadInfoResult': {'additionalProperties': False,
+                                            'properties': {'charm-origin': {'$ref': '#/definitions/CharmOrigin'},
+                                                           'url': {'type': 'string'}},
+                                            'required': ['url', 'charm-origin'],
+                                            'type': 'object'},
+                     'DownloadInfoResults': {'additionalProperties': False,
+                                             'properties': {'results': {'items': {'$ref': '#/definitions/DownloadInfoResult'},
+                                                                        'type': 'array'}},
+                                             'required': ['results'],
+                                             'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ErrorResult': {'additionalProperties': False,
+                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
+                                     'type': 'object'},
+                     'ErrorResults': {'additionalProperties': False,
+                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
+                                                                 'type': 'array'}},
+                                      'required': ['results'],
+                                      'type': 'object'},
+                     'ExpressionTree': {'additionalProperties': False,
+                                        'properties': {'Expression': {'additionalProperties': True,
+                                                                      'type': 'object'}},
+                                        'required': ['Expression'],
+                                        'type': 'object'},
+                     'IsMeteredResult': {'additionalProperties': False,
+                                         'properties': {'metered': {'type': 'boolean'}},
+                                         'required': ['metered'],
+                                         'type': 'object'},
+                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
+                     'ResolveCharmWithChannel': {'additionalProperties': False,
+                                                 'properties': {'charm-origin': {'$ref': '#/definitions/CharmOrigin'},
+                                                                'reference': {'type': 'string'},
+                                                                'switch-charm': {'type': 'boolean'}},
+                                                 'required': ['reference',
+                                                              'charm-origin'],
+                                                 'type': 'object'},
+                     'ResolveCharmWithChannelResult': {'additionalProperties': False,
+                                                       'properties': {'charm-origin': {'$ref': '#/definitions/CharmOrigin'},
+                                                                      'error': {'$ref': '#/definitions/Error'},
+                                                                      'supported-series': {'items': {'type': 'string'},
+                                                                                           'type': 'array'},
+                                                                      'url': {'type': 'string'}},
+                                                       'required': ['url',
+                                                                    'charm-origin',
+                                                                    'supported-series'],
+                                                       'type': 'object'},
+                     'ResolveCharmWithChannelResults': {'additionalProperties': False,
+                                                        'properties': {'Results': {'items': {'$ref': '#/definitions/ResolveCharmWithChannelResult'},
+                                                                                   'type': 'array'}},
+                                                        'required': ['Results'],
+                                                        'type': 'object'},
+                     'ResolveCharmsWithChannel': {'additionalProperties': False,
+                                                  'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
+                                                                 'resolve': {'items': {'$ref': '#/definitions/ResolveCharmWithChannel'},
+                                                                             'type': 'array'}},
+                                                  'required': ['resolve'],
+                                                  'type': 'object'}},
+     'properties': {'AddCharm': {'description': 'AddCharm adds the given charm URL '
+                                                '(which must include revision) to '
+                                                'the\n'
+                                                'environment, if it does not exist '
+                                                'yet. Local charms are not '
+                                                'supported,\n'
+                                                'only charm store and charm hub '
+                                                'URLs. See also AddLocalCharm().',
+                                 'properties': {'Params': {'$ref': '#/definitions/AddCharmWithOrigin'},
+                                                'Result': {'$ref': '#/definitions/CharmOriginResult'}},
+                                 'type': 'object'},
+                    'AddCharmWithAuthorization': {'description': 'AddCharmWithAuthorization '
+                                                                 'adds the given '
+                                                                 'charm URL (which '
+                                                                 'must include\n'
+                                                                 'revision) to the '
+                                                                 'environment, if '
+                                                                 'it does not '
+                                                                 'exist yet. Local '
+                                                                 'charms are\n'
+                                                                 'not supported, '
+                                                                 'only charm store '
+                                                                 'and charm hub '
+                                                                 'URLs. See also '
+                                                                 'AddLocalCharm().\n'
+                                                                 '\n'
+                                                                 'The '
+                                                                 'authorization '
+                                                                 'macaroon, '
+                                                                 'args.CharmStoreMacaroon, '
+                                                                 'may be\n'
+                                                                 'omitted, in '
+                                                                 'which case this '
+                                                                 'call is '
+                                                                 'equivalent to '
+                                                                 'AddCharm.',
+                                                  'properties': {'Params': {'$ref': '#/definitions/AddCharmWithAuth'},
+                                                                 'Result': {'$ref': '#/definitions/CharmOriginResult'}},
+                                                  'type': 'object'},
+                    'CharmInfo': {'description': 'CharmInfo returns information '
+                                                 'about the requested charm.',
+                                  'properties': {'Params': {'$ref': '#/definitions/CharmURL'},
+                                                 'Result': {'$ref': '#/definitions/Charm'}},
+                                  'type': 'object'},
+                    'CheckCharmPlacement': {'description': 'CheckCharmPlacement '
+                                                           'checks if a charm is '
+                                                           'allowed to be placed '
+                                                           'with in a\n'
+                                                           'given application.',
+                                            'properties': {'Params': {'$ref': '#/definitions/ApplicationCharmPlacements'},
+                                                           'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                            'type': 'object'},
+                    'GetDownloadInfos': {'description': 'GetDownloadInfos attempts '
+                                                        'to get the bundle '
+                                                        'corresponding to the '
+                                                        'charm url\n'
+                                                        'and origin.',
+                                         'properties': {'Params': {'$ref': '#/definitions/CharmURLAndOrigins'},
+                                                        'Result': {'$ref': '#/definitions/DownloadInfoResults'}},
+                                         'type': 'object'},
+                    'IsMetered': {'description': 'IsMetered returns whether or not '
+                                                 'the charm is metered.',
+                                  'properties': {'Params': {'$ref': '#/definitions/CharmURL'},
+                                                 'Result': {'$ref': '#/definitions/IsMeteredResult'}},
+                                  'type': 'object'},
+                    'List': {'description': 'List returns a list of charm URLs '
+                                            'currently in the state.\n'
+                                            'If supplied parameter contains any '
+                                            'names, the result will\n'
+                                            'be filtered to return only the charms '
+                                            'with supplied names.',
+                             'properties': {'Params': {'$ref': '#/definitions/CharmsList'},
+                                            'Result': {'$ref': '#/definitions/CharmsListResult'}},
+                             'type': 'object'},
+                    'ListCharmResources': {'description': 'ListCharmResources '
+                                                          'returns a series of '
+                                                          'resources for a given '
+                                                          'charm.',
+                                           'properties': {'Params': {'$ref': '#/definitions/CharmURLAndOrigins'},
+                                                          'Result': {'$ref': '#/definitions/CharmResourcesResults'}},
+                                           'type': 'object'},
+                    'ResolveCharms': {'description': 'ResolveCharms resolves the '
+                                                     'given charm URLs with an '
+                                                     'optionally specified\n'
+                                                     'preferred channel.  Channel '
+                                                     'provided via CharmOrigin.',
+                                      'properties': {'Params': {'$ref': '#/definitions/ResolveCharmsWithChannel'},
+                                                     'Result': {'$ref': '#/definitions/ResolveCharmWithChannelResults'}},
+                                      'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(CharmOriginResult)
+    async def AddCharm(self, charm_origin=None, force=None, url=None):
+        '''
+        AddCharm adds the given charm URL (which must include revision) to the
+        environment, if it does not exist yet. Local charms are not supported,
+        only charm store and charm hub URLs. See also AddLocalCharm().
+
+        charm_origin : CharmOrigin
+        force : bool
+        url : str
+        Returns -> CharmOriginResult
+        '''
+        if charm_origin is not None and not isinstance(charm_origin, (dict, CharmOrigin)):
+            raise Exception("Expected charm_origin to be a CharmOrigin, received: {}".format(type(charm_origin)))
+
+        if force is not None and not isinstance(force, bool):
+            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
+
+        if url is not None and not isinstance(url, (bytes, str)):
+            raise Exception("Expected url to be a str, received: {}".format(type(url)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Charms',
+                   request='AddCharm',
+                   version=5,
+                   params=_params)
+        _params['charm-origin'] = charm_origin
+        _params['force'] = force
+        _params['url'] = url
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CharmOriginResult)
+    async def AddCharmWithAuthorization(self, charm_origin=None, force=None, macaroon=None, url=None):
+        '''
+        AddCharmWithAuthorization adds the given charm URL (which must include
+        revision) to the environment, if it does not exist yet. Local charms are
+        not supported, only charm store and charm hub URLs. See also AddLocalCharm().
+
+        The authorization macaroon, args.CharmStoreMacaroon, may be
+        omitted, in which case this call is equivalent to AddCharm.
+
+        charm_origin : CharmOrigin
+        force : bool
+        macaroon : Macaroon
+        url : str
+        Returns -> CharmOriginResult
+        '''
+        if charm_origin is not None and not isinstance(charm_origin, (dict, CharmOrigin)):
+            raise Exception("Expected charm_origin to be a CharmOrigin, received: {}".format(type(charm_origin)))
+
+        if force is not None and not isinstance(force, bool):
+            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
+
+        if macaroon is not None and not isinstance(macaroon, (dict, Macaroon)):
+            raise Exception("Expected macaroon to be a Macaroon, received: {}".format(type(macaroon)))
+
+        if url is not None and not isinstance(url, (bytes, str)):
+            raise Exception("Expected url to be a str, received: {}".format(type(url)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Charms',
+                   request='AddCharmWithAuthorization',
+                   version=5,
+                   params=_params)
+        _params['charm-origin'] = charm_origin
+        _params['force'] = force
+        _params['macaroon'] = macaroon
+        _params['url'] = url
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(Charm)
+    async def CharmInfo(self, url=None):
+        '''
+        CharmInfo returns information about the requested charm.
+
+        url : str
+        Returns -> Charm
+        '''
+        if url is not None and not isinstance(url, (bytes, str)):
+            raise Exception("Expected url to be a str, received: {}".format(type(url)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Charms',
+                   request='CharmInfo',
+                   version=5,
+                   params=_params)
+        _params['url'] = url
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def CheckCharmPlacement(self, placements=None):
+        '''
+        CheckCharmPlacement checks if a charm is allowed to be placed with in a
+        given application.
+
+        placements : typing.Sequence[~ApplicationCharmPlacement]
+        Returns -> ErrorResults
+        '''
+        if placements is not None and not isinstance(placements, (bytes, str, list)):
+            raise Exception("Expected placements to be a Sequence, received: {}".format(type(placements)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Charms',
+                   request='CheckCharmPlacement',
+                   version=5,
+                   params=_params)
+        _params['placements'] = placements
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(DownloadInfoResults)
+    async def GetDownloadInfos(self, entities=None):
+        '''
+        GetDownloadInfos attempts to get the bundle corresponding to the charm url
+        and origin.
+
+        entities : typing.Sequence[~CharmURLAndOrigin]
+        Returns -> DownloadInfoResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Charms',
+                   request='GetDownloadInfos',
+                   version=5,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(IsMeteredResult)
+    async def IsMetered(self, url=None):
+        '''
+        IsMetered returns whether or not the charm is metered.
+
+        url : str
+        Returns -> IsMeteredResult
+        '''
+        if url is not None and not isinstance(url, (bytes, str)):
+            raise Exception("Expected url to be a str, received: {}".format(type(url)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Charms',
+                   request='IsMetered',
+                   version=5,
+                   params=_params)
+        _params['url'] = url
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CharmsListResult)
+    async def List(self, names=None):
+        '''
+        List returns a list of charm URLs currently in the state.
+        If supplied parameter contains any names, the result will
+        be filtered to return only the charms with supplied names.
+
+        names : typing.Sequence[str]
+        Returns -> CharmsListResult
+        '''
+        if names is not None and not isinstance(names, (bytes, str, list)):
+            raise Exception("Expected names to be a Sequence, received: {}".format(type(names)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Charms',
+                   request='List',
+                   version=5,
+                   params=_params)
+        _params['names'] = names
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CharmResourcesResults)
+    async def ListCharmResources(self, entities=None):
+        '''
+        ListCharmResources returns a series of resources for a given charm.
+
+        entities : typing.Sequence[~CharmURLAndOrigin]
+        Returns -> CharmResourcesResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Charms',
+                   request='ListCharmResources',
+                   version=5,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ResolveCharmWithChannelResults)
+    async def ResolveCharms(self, macaroon=None, resolve=None):
+        '''
+        ResolveCharms resolves the given charm URLs with an optionally specified
+        preferred channel.  Channel provided via CharmOrigin.
+
+        macaroon : Macaroon
+        resolve : typing.Sequence[~ResolveCharmWithChannel]
+        Returns -> ResolveCharmWithChannelResults
+        '''
+        if macaroon is not None and not isinstance(macaroon, (dict, Macaroon)):
+            raise Exception("Expected macaroon to be a Macaroon, received: {}".format(type(macaroon)))
+
+        if resolve is not None and not isinstance(resolve, (bytes, str, list)):
+            raise Exception("Expected resolve to be a Sequence, received: {}".format(type(resolve)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Charms',
+                   request='ResolveCharms',
+                   version=5,
+                   params=_params)
+        _params['macaroon'] = macaroon
+        _params['resolve'] = resolve
+        reply = await self.rpc(msg)
+        return reply
+
+
+
 class ClientFacade(Type):
     name = 'Client'
     version = 5
-    schema =     {'definitions': {'AllWatcherId': {'additionalProperties': False,
+    schema =     {'definitions': {'APIHostPortsResult': {'additionalProperties': False,
+                                            'properties': {'servers': {'items': {'items': {'$ref': '#/definitions/HostPort'},
+                                                                                 'type': 'array'},
+                                                                       'type': 'array'}},
+                                            'required': ['servers'],
+                                            'type': 'object'},
+                     'AddCharm': {'additionalProperties': False,
+                                  'properties': {'channel': {'type': 'string'},
+                                                 'force': {'type': 'boolean'},
+                                                 'url': {'type': 'string'}},
+                                  'required': ['url', 'channel', 'force'],
+                                  'type': 'object'},
+                     'AddCharmWithAuthorization': {'additionalProperties': False,
+                                                   'properties': {'channel': {'type': 'string'},
+                                                                  'force': {'type': 'boolean'},
+                                                                  'macaroon': {'$ref': '#/definitions/Macaroon'},
+                                                                  'url': {'type': 'string'}},
+                                                   'required': ['url',
+                                                                'channel',
+                                                                'macaroon',
+                                                                'force'],
+                                                   'type': 'object'},
+                     'AddMachineParams': {'additionalProperties': False,
+                                          'properties': {'addresses': {'items': {'$ref': '#/definitions/Address'},
+                                                                       'type': 'array'},
+                                                         'base': {'$ref': '#/definitions/Base'},
+                                                         'constraints': {'$ref': '#/definitions/Value'},
+                                                         'container-type': {'type': 'string'},
+                                                         'disks': {'items': {'$ref': '#/definitions/Constraints'},
+                                                                   'type': 'array'},
+                                                         'hardware-characteristics': {'$ref': '#/definitions/HardwareCharacteristics'},
+                                                         'instance-id': {'type': 'string'},
+                                                         'jobs': {'items': {'type': 'string'},
+                                                                  'type': 'array'},
+                                                         'nonce': {'type': 'string'},
+                                                         'parent-id': {'type': 'string'},
+                                                         'placement': {'$ref': '#/definitions/Placement'},
+                                                         'series': {'type': 'string'}},
+                                          'required': ['constraints',
+                                                       'jobs',
+                                                       'parent-id',
+                                                       'container-type',
+                                                       'instance-id',
+                                                       'nonce',
+                                                       'hardware-characteristics',
+                                                       'addresses'],
+                                          'type': 'object'},
+                     'AddMachines': {'additionalProperties': False,
+                                     'properties': {'params': {'items': {'$ref': '#/definitions/AddMachineParams'},
+                                                               'type': 'array'}},
+                                     'required': ['params'],
+                                     'type': 'object'},
+                     'AddMachinesResult': {'additionalProperties': False,
+                                           'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                          'machine': {'type': 'string'}},
+                                           'required': ['machine'],
+                                           'type': 'object'},
+                     'AddMachinesResults': {'additionalProperties': False,
+                                            'properties': {'machines': {'items': {'$ref': '#/definitions/AddMachinesResult'},
+                                                                        'type': 'array'}},
+                                            'required': ['machines'],
+                                            'type': 'object'},
+                     'Address': {'additionalProperties': False,
+                                 'properties': {'cidr': {'type': 'string'},
+                                                'config-type': {'type': 'string'},
+                                                'is-secondary': {'type': 'boolean'},
+                                                'scope': {'type': 'string'},
+                                                'space-id': {'type': 'string'},
+                                                'space-name': {'type': 'string'},
+                                                'type': {'type': 'string'},
+                                                'value': {'type': 'string'}},
+                                 'required': ['value', 'type', 'scope'],
+                                 'type': 'object'},
+                     'AgentVersionResult': {'additionalProperties': False,
+                                            'properties': {'version': {'$ref': '#/definitions/Number'}},
+                                            'required': ['version'],
+                                            'type': 'object'},
+                     'AllWatcherId': {'additionalProperties': False,
                                       'properties': {'watcher-id': {'type': 'string'}},
                                       'required': ['watcher-id'],
                                       'type': 'object'},
@@ -29,7 +826,8 @@ class ClientFacade(Type):
                                                              'total-connected-count'],
                                                 'type': 'object'},
                      'ApplicationStatus': {'additionalProperties': False,
-                                           'properties': {'can-upgrade-to': {'type': 'string'},
+                                           'properties': {'base': {'$ref': '#/definitions/Base'},
+                                                          'can-upgrade-to': {'type': 'string'},
                                                           'charm': {'type': 'string'},
                                                           'charm-channel': {'type': 'string'},
                                                           'charm-profile': {'type': 'string'},
@@ -60,6 +858,7 @@ class ClientFacade(Type):
                                                         'charm-version',
                                                         'charm-profile',
                                                         'series',
+                                                        'base',
                                                         'exposed',
                                                         'life',
                                                         'relations',
@@ -72,6 +871,11 @@ class ClientFacade(Type):
                                                         'endpoint-bindings',
                                                         'public-address'],
                                            'type': 'object'},
+                     'Base': {'additionalProperties': False,
+                              'properties': {'channel': {'type': 'string'},
+                                             'name': {'type': 'string'}},
+                              'required': ['name', 'channel'],
+                              'type': 'object'},
                      'Binary': {'additionalProperties': False,
                                 'properties': {'Arch': {'type': 'string'},
                                                'Build': {'type': 'integer'},
@@ -100,6 +904,53 @@ class ClientFacade(Type):
                                                    'created',
                                                    'created-by'],
                                       'type': 'object'},
+                     'BundleChange': {'additionalProperties': False,
+                                      'properties': {'args': {'items': {'additionalProperties': True,
+                                                                        'type': 'object'},
+                                                              'type': 'array'},
+                                                     'id': {'type': 'string'},
+                                                     'method': {'type': 'string'},
+                                                     'requires': {'items': {'type': 'string'},
+                                                                  'type': 'array'}},
+                                      'required': ['id',
+                                                   'method',
+                                                   'args',
+                                                   'requires'],
+                                      'type': 'object'},
+                     'BundleChangesParams': {'additionalProperties': False,
+                                             'properties': {'bundleURL': {'type': 'string'},
+                                                            'yaml': {'type': 'string'}},
+                                             'required': ['yaml', 'bundleURL'],
+                                             'type': 'object'},
+                     'BundleChangesResults': {'additionalProperties': False,
+                                              'properties': {'changes': {'items': {'$ref': '#/definitions/BundleChange'},
+                                                                         'type': 'array'},
+                                                             'errors': {'items': {'type': 'string'},
+                                                                        'type': 'array'}},
+                                              'type': 'object'},
+                     'BytesResult': {'additionalProperties': False,
+                                     'properties': {'result': {'items': {'type': 'integer'},
+                                                               'type': 'array'}},
+                                     'required': ['result'],
+                                     'type': 'object'},
+                     'ConfigValue': {'additionalProperties': False,
+                                     'properties': {'source': {'type': 'string'},
+                                                    'value': {'additionalProperties': True,
+                                                              'type': 'object'}},
+                                     'required': ['value', 'source'],
+                                     'type': 'object'},
+                     'Constraints': {'additionalProperties': False,
+                                     'properties': {'Count': {'type': 'integer'},
+                                                    'Pool': {'type': 'string'},
+                                                    'Size': {'type': 'integer'}},
+                                     'required': ['Pool', 'Size', 'Count'],
+                                     'type': 'object'},
+                     'DestroyMachines': {'additionalProperties': False,
+                                         'properties': {'force': {'type': 'boolean'},
+                                                        'machine-names': {'items': {'type': 'string'},
+                                                                          'type': 'array'}},
+                                         'required': ['machine-names', 'force'],
+                                         'type': 'object'},
                      'DetailedStatus': {'additionalProperties': False,
                                         'properties': {'data': {'patternProperties': {'.*': {'additionalProperties': True,
                                                                                              'type': 'object'}},
@@ -130,6 +981,25 @@ class ClientFacade(Type):
                                                      'role',
                                                      'subordinate'],
                                         'type': 'object'},
+                     'Entities': {'additionalProperties': False,
+                                  'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
+                                                              'type': 'array'}},
+                                  'required': ['entities'],
+                                  'type': 'object'},
+                     'Entity': {'additionalProperties': False,
+                                'properties': {'tag': {'type': 'string'}},
+                                'required': ['tag'],
+                                'type': 'object'},
+                     'EntityStatus': {'additionalProperties': False,
+                                      'properties': {'data': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                           'type': 'object'}},
+                                                              'type': 'object'},
+                                                     'info': {'type': 'string'},
+                                                     'since': {'format': 'date-time',
+                                                               'type': 'string'},
+                                                     'status': {'type': 'string'}},
+                                      'required': ['status', 'info', 'since'],
+                                      'type': 'object'},
                      'Error': {'additionalProperties': False,
                                'properties': {'code': {'type': 'string'},
                                               'info': {'patternProperties': {'.*': {'additionalProperties': True,
@@ -138,6 +1008,14 @@ class ClientFacade(Type):
                                               'message': {'type': 'string'}},
                                'required': ['message', 'code'],
                                'type': 'object'},
+                     'ErrorResult': {'additionalProperties': False,
+                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
+                                     'type': 'object'},
+                     'ErrorResults': {'additionalProperties': False,
+                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
+                                                                 'type': 'array'}},
+                                      'required': ['results'],
+                                      'type': 'object'},
                      'ExposedEndpoint': {'additionalProperties': False,
                                          'properties': {'expose-to-cidrs': {'items': {'type': 'string'},
                                                                             'type': 'array'},
@@ -150,11 +1028,13 @@ class ClientFacade(Type):
                                                         'major': {'type': 'integer'},
                                                         'minor': {'type': 'integer'},
                                                         'number': {'$ref': '#/definitions/Number'},
-                                                        'os-type': {'type': 'string'}},
+                                                        'os-type': {'type': 'string'},
+                                                        'series': {'type': 'string'}},
                                          'required': ['number',
                                                       'major',
                                                       'minor',
                                                       'arch',
+                                                      'series',
                                                       'os-type',
                                                       'agentstream'],
                                          'type': 'object'},
@@ -189,12 +1069,44 @@ class ClientFacade(Type):
                                                  'controller-timestamp',
                                                  'branches'],
                                     'type': 'object'},
+                     'GetConstraintsResults': {'additionalProperties': False,
+                                               'properties': {'constraints': {'$ref': '#/definitions/Value'}},
+                                               'required': ['constraints'],
+                                               'type': 'object'},
+                     'HardwareCharacteristics': {'additionalProperties': False,
+                                                 'properties': {'arch': {'type': 'string'},
+                                                                'availability-zone': {'type': 'string'},
+                                                                'cpu-cores': {'type': 'integer'},
+                                                                'cpu-power': {'type': 'integer'},
+                                                                'mem': {'type': 'integer'},
+                                                                'root-disk': {'type': 'integer'},
+                                                                'root-disk-source': {'type': 'string'},
+                                                                'tags': {'items': {'type': 'string'},
+                                                                         'type': 'array'}},
+                                                 'type': 'object'},
                      'History': {'additionalProperties': False,
                                  'properties': {'error': {'$ref': '#/definitions/Error'},
                                                 'statuses': {'items': {'$ref': '#/definitions/DetailedStatus'},
                                                              'type': 'array'}},
                                  'required': ['statuses'],
                                  'type': 'object'},
+                     'HostPort': {'additionalProperties': False,
+                                  'properties': {'Address': {'$ref': '#/definitions/Address'},
+                                                 'cidr': {'type': 'string'},
+                                                 'config-type': {'type': 'string'},
+                                                 'is-secondary': {'type': 'boolean'},
+                                                 'port': {'type': 'integer'},
+                                                 'scope': {'type': 'string'},
+                                                 'space-id': {'type': 'string'},
+                                                 'space-name': {'type': 'string'},
+                                                 'type': {'type': 'string'},
+                                                 'value': {'type': 'string'}},
+                                  'required': ['value',
+                                               'type',
+                                               'scope',
+                                               'Address',
+                                               'port'],
+                                  'type': 'object'},
                      'LXDProfile': {'additionalProperties': False,
                                     'properties': {'config': {'patternProperties': {'.*': {'type': 'string'}},
                                                               'type': 'object'},
@@ -206,8 +1118,20 @@ class ClientFacade(Type):
                                                  'description',
                                                  'devices'],
                                     'type': 'object'},
+                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
+                     'MachineHardware': {'additionalProperties': False,
+                                         'properties': {'arch': {'type': 'string'},
+                                                        'availability-zone': {'type': 'string'},
+                                                        'cores': {'type': 'integer'},
+                                                        'cpu-power': {'type': 'integer'},
+                                                        'mem': {'type': 'integer'},
+                                                        'root-disk': {'type': 'integer'},
+                                                        'tags': {'items': {'type': 'string'},
+                                                                 'type': 'array'}},
+                                         'type': 'object'},
                      'MachineStatus': {'additionalProperties': False,
                                        'properties': {'agent-status': {'$ref': '#/definitions/DetailedStatus'},
+                                                      'base': {'$ref': '#/definitions/Base'},
                                                       'constraints': {'type': 'string'},
                                                       'containers': {'patternProperties': {'.*': {'$ref': '#/definitions/MachineStatus'}},
                                                                      'type': 'object'},
@@ -238,6 +1162,7 @@ class ClientFacade(Type):
                                                     'instance-id',
                                                     'display-name',
                                                     'series',
+                                                    'base',
                                                     'id',
                                                     'containers',
                                                     'constraints',
@@ -251,6 +1176,90 @@ class ClientFacade(Type):
                                                     'message': {'type': 'string'}},
                                      'required': ['color', 'message'],
                                      'type': 'object'},
+                     'ModelConfigResults': {'additionalProperties': False,
+                                            'properties': {'config': {'patternProperties': {'.*': {'$ref': '#/definitions/ConfigValue'}},
+                                                                      'type': 'object'}},
+                                            'required': ['config'],
+                                            'type': 'object'},
+                     'ModelInfo': {'additionalProperties': False,
+                                   'properties': {'agent-version': {'$ref': '#/definitions/Number'},
+                                                  'cloud-credential-tag': {'type': 'string'},
+                                                  'cloud-credential-validity': {'type': 'boolean'},
+                                                  'cloud-region': {'type': 'string'},
+                                                  'cloud-tag': {'type': 'string'},
+                                                  'controller-uuid': {'type': 'string'},
+                                                  'default-series': {'type': 'string'},
+                                                  'is-controller': {'type': 'boolean'},
+                                                  'life': {'type': 'string'},
+                                                  'machines': {'items': {'$ref': '#/definitions/ModelMachineInfo'},
+                                                               'type': 'array'},
+                                                  'migration': {'$ref': '#/definitions/ModelMigrationStatus'},
+                                                  'name': {'type': 'string'},
+                                                  'owner-tag': {'type': 'string'},
+                                                  'provider-type': {'type': 'string'},
+                                                  'sla': {'$ref': '#/definitions/ModelSLAInfo'},
+                                                  'status': {'$ref': '#/definitions/EntityStatus'},
+                                                  'supported-features': {'items': {'$ref': '#/definitions/SupportedFeature'},
+                                                                         'type': 'array'},
+                                                  'type': {'type': 'string'},
+                                                  'users': {'items': {'$ref': '#/definitions/ModelUserInfo'},
+                                                            'type': 'array'},
+                                                  'uuid': {'type': 'string'}},
+                                   'required': ['name',
+                                                'type',
+                                                'uuid',
+                                                'controller-uuid',
+                                                'is-controller',
+                                                'cloud-tag',
+                                                'owner-tag',
+                                                'life',
+                                                'users',
+                                                'machines',
+                                                'sla',
+                                                'agent-version'],
+                                   'type': 'object'},
+                     'ModelMachineInfo': {'additionalProperties': False,
+                                          'properties': {'display-name': {'type': 'string'},
+                                                         'ha-primary': {'type': 'boolean'},
+                                                         'hardware': {'$ref': '#/definitions/MachineHardware'},
+                                                         'has-vote': {'type': 'boolean'},
+                                                         'id': {'type': 'string'},
+                                                         'instance-id': {'type': 'string'},
+                                                         'message': {'type': 'string'},
+                                                         'status': {'type': 'string'},
+                                                         'wants-vote': {'type': 'boolean'}},
+                                          'required': ['id'],
+                                          'type': 'object'},
+                     'ModelMigrationStatus': {'additionalProperties': False,
+                                              'properties': {'end': {'format': 'date-time',
+                                                                     'type': 'string'},
+                                                             'start': {'format': 'date-time',
+                                                                       'type': 'string'},
+                                                             'status': {'type': 'string'}},
+                                              'required': ['status', 'start'],
+                                              'type': 'object'},
+                     'ModelSLA': {'additionalProperties': False,
+                                  'properties': {'ModelSLAInfo': {'$ref': '#/definitions/ModelSLAInfo'},
+                                                 'creds': {'items': {'type': 'integer'},
+                                                           'type': 'array'},
+                                                 'level': {'type': 'string'},
+                                                 'owner': {'type': 'string'}},
+                                  'required': ['level',
+                                               'owner',
+                                               'ModelSLAInfo',
+                                               'creds'],
+                                  'type': 'object'},
+                     'ModelSLAInfo': {'additionalProperties': False,
+                                      'properties': {'level': {'type': 'string'},
+                                                     'owner': {'type': 'string'}},
+                                      'required': ['level', 'owner'],
+                                      'type': 'object'},
+                     'ModelSet': {'additionalProperties': False,
+                                  'properties': {'config': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                         'type': 'object'}},
+                                                            'type': 'object'}},
+                                  'required': ['config'],
+                                  'type': 'object'},
                      'ModelStatusInfo': {'additionalProperties': False,
                                          'properties': {'available-version': {'type': 'string'},
                                                         'cloud-tag': {'type': 'string'},
@@ -270,6 +1279,33 @@ class ClientFacade(Type):
                                                       'meter-status',
                                                       'sla'],
                                          'type': 'object'},
+                     'ModelUnset': {'additionalProperties': False,
+                                    'properties': {'keys': {'items': {'type': 'string'},
+                                                            'type': 'array'}},
+                                    'required': ['keys'],
+                                    'type': 'object'},
+                     'ModelUserInfo': {'additionalProperties': False,
+                                       'properties': {'access': {'type': 'string'},
+                                                      'display-name': {'type': 'string'},
+                                                      'last-connection': {'format': 'date-time',
+                                                                          'type': 'string'},
+                                                      'model-tag': {'type': 'string'},
+                                                      'user': {'type': 'string'}},
+                                       'required': ['model-tag',
+                                                    'user',
+                                                    'display-name',
+                                                    'last-connection',
+                                                    'access'],
+                                       'type': 'object'},
+                     'ModelUserInfoResult': {'additionalProperties': False,
+                                             'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                            'result': {'$ref': '#/definitions/ModelUserInfo'}},
+                                             'type': 'object'},
+                     'ModelUserInfoResults': {'additionalProperties': False,
+                                              'properties': {'results': {'items': {'$ref': '#/definitions/ModelUserInfoResult'},
+                                                                         'type': 'array'}},
+                                              'required': ['results'],
+                                              'type': 'object'},
                      'NetworkInterface': {'additionalProperties': False,
                                           'properties': {'dns-nameservers': {'items': {'type': 'string'},
                                                                              'type': 'array'},
@@ -295,6 +1331,41 @@ class ClientFacade(Type):
                                              'Patch',
                                              'Build'],
                                 'type': 'object'},
+                     'Placement': {'additionalProperties': False,
+                                   'properties': {'directive': {'type': 'string'},
+                                                  'scope': {'type': 'string'}},
+                                   'required': ['scope', 'directive'],
+                                   'type': 'object'},
+                     'PrivateAddress': {'additionalProperties': False,
+                                        'properties': {'target': {'type': 'string'}},
+                                        'required': ['target'],
+                                        'type': 'object'},
+                     'PrivateAddressResults': {'additionalProperties': False,
+                                               'properties': {'private-address': {'type': 'string'}},
+                                               'required': ['private-address'],
+                                               'type': 'object'},
+                     'ProvisioningScriptParams': {'additionalProperties': False,
+                                                  'properties': {'data-dir': {'type': 'string'},
+                                                                 'disable-package-commands': {'type': 'boolean'},
+                                                                 'machine-id': {'type': 'string'},
+                                                                 'nonce': {'type': 'string'}},
+                                                  'required': ['machine-id',
+                                                               'nonce',
+                                                               'data-dir',
+                                                               'disable-package-commands'],
+                                                  'type': 'object'},
+                     'ProvisioningScriptResult': {'additionalProperties': False,
+                                                  'properties': {'script': {'type': 'string'}},
+                                                  'required': ['script'],
+                                                  'type': 'object'},
+                     'PublicAddress': {'additionalProperties': False,
+                                       'properties': {'target': {'type': 'string'}},
+                                       'required': ['target'],
+                                       'type': 'object'},
+                     'PublicAddressResults': {'additionalProperties': False,
+                                              'properties': {'public-address': {'type': 'string'}},
+                                              'required': ['public-address'],
+                                              'type': 'object'},
                      'RelationStatus': {'additionalProperties': False,
                                         'properties': {'endpoints': {'items': {'$ref': '#/definitions/EndpointStatus'},
                                                                      'type': 'array'},
@@ -338,6 +1409,36 @@ class ClientFacade(Type):
                                                      'interface',
                                                      'limit'],
                                         'type': 'object'},
+                     'ResolveCharmResult': {'additionalProperties': False,
+                                            'properties': {'error': {'type': 'string'},
+                                                           'url': {'type': 'string'}},
+                                            'type': 'object'},
+                     'ResolveCharmResults': {'additionalProperties': False,
+                                             'properties': {'urls': {'items': {'$ref': '#/definitions/ResolveCharmResult'},
+                                                                     'type': 'array'}},
+                                             'required': ['urls'],
+                                             'type': 'object'},
+                     'ResolveCharms': {'additionalProperties': False,
+                                       'properties': {'references': {'items': {'type': 'string'},
+                                                                     'type': 'array'}},
+                                       'required': ['references'],
+                                       'type': 'object'},
+                     'Resolved': {'additionalProperties': False,
+                                  'properties': {'retry': {'type': 'boolean'},
+                                                 'unit-name': {'type': 'string'}},
+                                  'required': ['unit-name', 'retry'],
+                                  'type': 'object'},
+                     'SetConstraints': {'additionalProperties': False,
+                                        'properties': {'application': {'type': 'string'},
+                                                       'constraints': {'$ref': '#/definitions/Value'}},
+                                        'required': ['application', 'constraints'],
+                                        'type': 'object'},
+                     'SetModelAgentVersion': {'additionalProperties': False,
+                                              'properties': {'agent-stream': {'type': 'string'},
+                                                             'force': {'type': 'boolean'},
+                                                             'version': {'$ref': '#/definitions/Number'}},
+                                              'required': ['version'],
+                                              'type': 'object'},
                      'StatusHistoryFilter': {'additionalProperties': False,
                                              'properties': {'date': {'format': 'date-time',
                                                                      'type': 'string'},
@@ -380,6 +1481,17 @@ class ClientFacade(Type):
                                                                   'type': 'array'}},
                                       'required': ['patterns'],
                                       'type': 'object'},
+                     'StringResult': {'additionalProperties': False,
+                                      'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                     'result': {'type': 'string'}},
+                                      'required': ['result'],
+                                      'type': 'object'},
+                     'SupportedFeature': {'additionalProperties': False,
+                                          'properties': {'description': {'type': 'string'},
+                                                         'name': {'type': 'string'},
+                                                         'version': {'type': 'string'}},
+                                          'required': ['name', 'description'],
+                                          'type': 'object'},
                      'Tools': {'additionalProperties': False,
                                'properties': {'sha256': {'type': 'string'},
                                               'size': {'type': 'integer'},
@@ -409,8 +1521,117 @@ class ClientFacade(Type):
                                                  'public-address',
                                                  'charm',
                                                  'subordinates'],
-                                    'type': 'object'}},
-     'properties': {'FindTools': {'description': 'FindTools returns a List '
+                                    'type': 'object'},
+                     'Value': {'additionalProperties': False,
+                               'properties': {'allocate-public-ip': {'type': 'boolean'},
+                                              'arch': {'type': 'string'},
+                                              'container': {'type': 'string'},
+                                              'cores': {'type': 'integer'},
+                                              'cpu-power': {'type': 'integer'},
+                                              'instance-role': {'type': 'string'},
+                                              'instance-type': {'type': 'string'},
+                                              'mem': {'type': 'integer'},
+                                              'root-disk': {'type': 'integer'},
+                                              'root-disk-source': {'type': 'string'},
+                                              'spaces': {'items': {'type': 'string'},
+                                                         'type': 'array'},
+                                              'tags': {'items': {'type': 'string'},
+                                                       'type': 'array'},
+                                              'virt-type': {'type': 'string'},
+                                              'zones': {'items': {'type': 'string'},
+                                                        'type': 'array'}},
+                               'type': 'object'}},
+     'properties': {'APIHostPorts': {'description': 'APIHostPorts returns the API '
+                                                    'host/port addresses stored in '
+                                                    'state.\n'
+                                                    'TODO(juju3) - remove',
+                                     'properties': {'Result': {'$ref': '#/definitions/APIHostPortsResult'}},
+                                     'type': 'object'},
+                    'AbortCurrentUpgrade': {'description': 'AbortCurrentUpgrade '
+                                                           'aborts and archives '
+                                                           'the current upgrade\n'
+                                                           'synchronisation '
+                                                           'record, if any.',
+                                            'type': 'object'},
+                    'AddCharm': {'description': 'NOTE: AddCharm is deprecated as '
+                                                'of juju 2.9 and charms facade '
+                                                'version 3.\n'
+                                                'Please discontinue use and move '
+                                                'to the charms facade version.\n'
+                                                '\n'
+                                                'TODO(juju3) - remove',
+                                 'properties': {'Params': {'$ref': '#/definitions/AddCharm'}},
+                                 'type': 'object'},
+                    'AddCharmWithAuthorization': {'description': 'AddCharmWithAuthorization '
+                                                                 'adds the given '
+                                                                 'charm URL (which '
+                                                                 'must include\n'
+                                                                 'revision) to the '
+                                                                 'model, if it '
+                                                                 'does not exist '
+                                                                 'yet. Local '
+                                                                 'charms are not\n'
+                                                                 'supported, only '
+                                                                 'charm store '
+                                                                 'URLs. See also '
+                                                                 'AddLocalCharm().\n'
+                                                                 '\n'
+                                                                 'The '
+                                                                 'authorization '
+                                                                 'macaroon, '
+                                                                 'args.CharmStoreMacaroon, '
+                                                                 'may be omitted, '
+                                                                 'in\n'
+                                                                 'which case this '
+                                                                 'call is '
+                                                                 'equivalent to '
+                                                                 'AddCharm.\n'
+                                                                 '\n'
+                                                                 'NOTE: '
+                                                                 'AddCharmWithAuthorization '
+                                                                 'is deprecated as '
+                                                                 'of juju 2.9 and '
+                                                                 'charms\n'
+                                                                 'facade version '
+                                                                 '3. Please '
+                                                                 'discontinue use '
+                                                                 'and move to the '
+                                                                 'charms facade\n'
+                                                                 'version.\n'
+                                                                 '\n'
+                                                                 'TODO(juju3) - '
+                                                                 'remove',
+                                                  'properties': {'Params': {'$ref': '#/definitions/AddCharmWithAuthorization'}},
+                                                  'type': 'object'},
+                    'AddMachines': {'description': 'AddMachines adds new machines '
+                                                   'with the supplied parameters.\n'
+                                                   'TODO(juju3) - remove',
+                                    'properties': {'Params': {'$ref': '#/definitions/AddMachines'},
+                                                   'Result': {'$ref': '#/definitions/AddMachinesResults'}},
+                                    'type': 'object'},
+                    'AddMachinesV2': {'description': 'AddMachinesV2 adds new '
+                                                     'machines with the supplied '
+                                                     'parameters.\n'
+                                                     'TODO(juju3) - remove',
+                                      'properties': {'Params': {'$ref': '#/definitions/AddMachines'},
+                                                     'Result': {'$ref': '#/definitions/AddMachinesResults'}},
+                                      'type': 'object'},
+                    'AgentVersion': {'description': 'AgentVersion returns the '
+                                                    'current version that the API '
+                                                    'server is running.\n'
+                                                    'TODO(juju3) - remove',
+                                     'properties': {'Result': {'$ref': '#/definitions/AgentVersionResult'}},
+                                     'type': 'object'},
+                    'CACert': {'description': 'CACert returns the certificate used '
+                                              'to validate the state connection.',
+                               'properties': {'Result': {'$ref': '#/definitions/BytesResult'}},
+                               'type': 'object'},
+                    'DestroyMachines': {'description': 'DestroyMachines removes a '
+                                                       'given set of machines.\n'
+                                                       'TODO(juju3) - remove',
+                                        'properties': {'Params': {'$ref': '#/definitions/DestroyMachines'}},
+                                        'type': 'object'},
+                    'FindTools': {'description': 'FindTools returns a List '
                                                  'containing all tools matching '
                                                  'the given parameters.',
                                   'properties': {'Params': {'$ref': '#/definitions/FindToolsParams'},
@@ -422,6 +1643,141 @@ class ClientFacade(Type):
                                    'properties': {'Params': {'$ref': '#/definitions/StatusParams'},
                                                   'Result': {'$ref': '#/definitions/FullStatus'}},
                                    'type': 'object'},
+                    'GetBundleChanges': {'description': 'GetBundleChanges returns '
+                                                        'the list of changes '
+                                                        'required to deploy the '
+                                                        'given\n'
+                                                        'bundle data. The changes '
+                                                        'are sorted by '
+                                                        'requirements, so that '
+                                                        'they can be\n'
+                                                        'applied in order.\n'
+                                                        'Deprecated: clients '
+                                                        'should use the GetChanges '
+                                                        'endpoint on the Bundle '
+                                                        'facade.\n'
+                                                        'Note: any new feature in '
+                                                        'the future like devices '
+                                                        'will never be supported '
+                                                        'here.',
+                                         'properties': {'Params': {'$ref': '#/definitions/BundleChangesParams'},
+                                                        'Result': {'$ref': '#/definitions/BundleChangesResults'}},
+                                         'type': 'object'},
+                    'GetModelConstraints': {'description': 'GetModelConstraints '
+                                                           'returns the '
+                                                           'constraints for the '
+                                                           'model.\n'
+                                                           'TODO(juju3) - remove',
+                                            'properties': {'Result': {'$ref': '#/definitions/GetConstraintsResults'}},
+                                            'type': 'object'},
+                    'InjectMachines': {'description': 'InjectMachines injects a '
+                                                      'machine into state with '
+                                                      'provisioned status.\n'
+                                                      'TODO(juju3) - remove',
+                                       'properties': {'Params': {'$ref': '#/definitions/AddMachines'},
+                                                      'Result': {'$ref': '#/definitions/AddMachinesResults'}},
+                                       'type': 'object'},
+                    'ModelGet': {'description': 'ModelGet implements the '
+                                                'server-side part of the\n'
+                                                'model-config CLI command.',
+                                 'properties': {'Result': {'$ref': '#/definitions/ModelConfigResults'}},
+                                 'type': 'object'},
+                    'ModelInfo': {'description': 'ModelInfo returns information '
+                                                 'about the current model.\n'
+                                                 'TODO(juju3) - remove',
+                                  'properties': {'Result': {'$ref': '#/definitions/ModelInfo'}},
+                                  'type': 'object'},
+                    'ModelSet': {'description': 'ModelSet implements the '
+                                                'server-side part of the\n'
+                                                'set-model-config CLI command.',
+                                 'properties': {'Params': {'$ref': '#/definitions/ModelSet'}},
+                                 'type': 'object'},
+                    'ModelUnset': {'description': 'ModelUnset implements the '
+                                                  'server-side part of the\n'
+                                                  'set-model-config CLI command.',
+                                   'properties': {'Params': {'$ref': '#/definitions/ModelUnset'}},
+                                   'type': 'object'},
+                    'ModelUserInfo': {'description': 'ModelUserInfo returns '
+                                                     'information on all users in '
+                                                     'the model.\n'
+                                                     'TODO(juju3) - remove',
+                                      'properties': {'Result': {'$ref': '#/definitions/ModelUserInfoResults'}},
+                                      'type': 'object'},
+                    'PrivateAddress': {'description': 'PrivateAddress implements '
+                                                      'the server side of '
+                                                      'Client.PrivateAddress.\n'
+                                                      'TODO(juju3) - remove as '
+                                                      'this is unused',
+                                       'properties': {'Params': {'$ref': '#/definitions/PrivateAddress'},
+                                                      'Result': {'$ref': '#/definitions/PrivateAddressResults'}},
+                                       'type': 'object'},
+                    'ProvisioningScript': {'description': 'ProvisioningScript '
+                                                          'returns a shell script '
+                                                          'that, when run,\n'
+                                                          'provisions a machine '
+                                                          'agent on the machine '
+                                                          'executing the script.\n'
+                                                          'TODO(juju3) - remove',
+                                           'properties': {'Params': {'$ref': '#/definitions/ProvisioningScriptParams'},
+                                                          'Result': {'$ref': '#/definitions/ProvisioningScriptResult'}},
+                                           'type': 'object'},
+                    'PublicAddress': {'description': 'PublicAddress implements the '
+                                                     'server side of '
+                                                     'Client.PublicAddress.\n'
+                                                     'TODO(juju3) - remove as this '
+                                                     'is unused',
+                                      'properties': {'Params': {'$ref': '#/definitions/PublicAddress'},
+                                                     'Result': {'$ref': '#/definitions/PublicAddressResults'}},
+                                      'type': 'object'},
+                    'ResolveCharms': {'description': 'ResolveCharms resolves the '
+                                                     'best available charm URLs '
+                                                     'with series, for charm\n'
+                                                     'locations without a series '
+                                                     'specified.\n'
+                                                     '\n'
+                                                     'NOTE: ResolveCharms is '
+                                                     'deprecated as of juju 2.9 '
+                                                     'and charms facade version '
+                                                     '3.\n'
+                                                     'Please discontinue use and '
+                                                     'move to the charms facade '
+                                                     'version.\n'
+                                                     '\n'
+                                                     'TODO(juju3) - remove',
+                                      'properties': {'Params': {'$ref': '#/definitions/ResolveCharms'},
+                                                     'Result': {'$ref': '#/definitions/ResolveCharmResults'}},
+                                      'type': 'object'},
+                    'Resolved': {'description': 'Resolved implements the server '
+                                                'side of Client.Resolved.',
+                                 'properties': {'Params': {'$ref': '#/definitions/Resolved'}},
+                                 'type': 'object'},
+                    'RetryProvisioning': {'description': 'RetryProvisioning marks '
+                                                         'a provisioning error as '
+                                                         'transient on the '
+                                                         'machines.\n'
+                                                         'TODO(juju3) - remove',
+                                          'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                         'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                          'type': 'object'},
+                    'SLALevel': {'description': 'SLALevel returns the current sla '
+                                                'level for the model.',
+                                 'properties': {'Result': {'$ref': '#/definitions/StringResult'}},
+                                 'type': 'object'},
+                    'SetModelAgentVersion': {'description': 'SetModelAgentVersion '
+                                                            'sets the model agent '
+                                                            'version.',
+                                             'properties': {'Params': {'$ref': '#/definitions/SetModelAgentVersion'}},
+                                             'type': 'object'},
+                    'SetModelConstraints': {'description': 'SetModelConstraints '
+                                                           'sets the constraints '
+                                                           'for the model.\n'
+                                                           'TODO(juju3) - remove',
+                                            'properties': {'Params': {'$ref': '#/definitions/SetConstraints'}},
+                                            'type': 'object'},
+                    'SetSLALevel': {'description': 'SetSLALevel sets the sla level '
+                                                   'on the model.',
+                                    'properties': {'Params': {'$ref': '#/definitions/ModelSLA'}},
+                                    'type': 'object'},
                     'StatusHistory': {'description': 'StatusHistory returns a '
                                                      'slice of past statuses for '
                                                      'several entities.',
@@ -435,8 +1791,257 @@ class ClientFacade(Type):
      'type': 'object'}
     
 
+    @ReturnMapping(APIHostPortsResult)
+    async def APIHostPorts(self):
+        '''
+        APIHostPorts returns the API host/port addresses stored in state.
+        TODO(juju3) - remove
+
+
+        Returns -> APIHostPortsResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client',
+                   request='APIHostPorts',
+                   version=5,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def AbortCurrentUpgrade(self):
+        '''
+        AbortCurrentUpgrade aborts and archives the current upgrade
+        synchronisation record, if any.
+
+
+        Returns -> None
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client',
+                   request='AbortCurrentUpgrade',
+                   version=5,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def AddCharm(self, channel=None, force=None, url=None):
+        '''
+        NOTE: AddCharm is deprecated as of juju 2.9 and charms facade version 3.
+        Please discontinue use and move to the charms facade version.
+
+        TODO(juju3) - remove
+
+        channel : str
+        force : bool
+        url : str
+        Returns -> None
+        '''
+        if channel is not None and not isinstance(channel, (bytes, str)):
+            raise Exception("Expected channel to be a str, received: {}".format(type(channel)))
+
+        if force is not None and not isinstance(force, bool):
+            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
+
+        if url is not None and not isinstance(url, (bytes, str)):
+            raise Exception("Expected url to be a str, received: {}".format(type(url)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client',
+                   request='AddCharm',
+                   version=5,
+                   params=_params)
+        _params['channel'] = channel
+        _params['force'] = force
+        _params['url'] = url
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def AddCharmWithAuthorization(self, channel=None, force=None, macaroon=None, url=None):
+        '''
+        AddCharmWithAuthorization adds the given charm URL (which must include
+        revision) to the model, if it does not exist yet. Local charms are not
+        supported, only charm store URLs. See also AddLocalCharm().
+
+        The authorization macaroon, args.CharmStoreMacaroon, may be omitted, in
+        which case this call is equivalent to AddCharm.
+
+        NOTE: AddCharmWithAuthorization is deprecated as of juju 2.9 and charms
+        facade version 3. Please discontinue use and move to the charms facade
+        version.
+
+        TODO(juju3) - remove
+
+        channel : str
+        force : bool
+        macaroon : Macaroon
+        url : str
+        Returns -> None
+        '''
+        if channel is not None and not isinstance(channel, (bytes, str)):
+            raise Exception("Expected channel to be a str, received: {}".format(type(channel)))
+
+        if force is not None and not isinstance(force, bool):
+            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
+
+        if macaroon is not None and not isinstance(macaroon, (dict, Macaroon)):
+            raise Exception("Expected macaroon to be a Macaroon, received: {}".format(type(macaroon)))
+
+        if url is not None and not isinstance(url, (bytes, str)):
+            raise Exception("Expected url to be a str, received: {}".format(type(url)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client',
+                   request='AddCharmWithAuthorization',
+                   version=5,
+                   params=_params)
+        _params['channel'] = channel
+        _params['force'] = force
+        _params['macaroon'] = macaroon
+        _params['url'] = url
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(AddMachinesResults)
+    async def AddMachines(self, params=None):
+        '''
+        AddMachines adds new machines with the supplied parameters.
+        TODO(juju3) - remove
+
+        params : typing.Sequence[~AddMachineParams]
+        Returns -> AddMachinesResults
+        '''
+        if params is not None and not isinstance(params, (bytes, str, list)):
+            raise Exception("Expected params to be a Sequence, received: {}".format(type(params)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client',
+                   request='AddMachines',
+                   version=5,
+                   params=_params)
+        _params['params'] = params
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(AddMachinesResults)
+    async def AddMachinesV2(self, params=None):
+        '''
+        AddMachinesV2 adds new machines with the supplied parameters.
+        TODO(juju3) - remove
+
+        params : typing.Sequence[~AddMachineParams]
+        Returns -> AddMachinesResults
+        '''
+        if params is not None and not isinstance(params, (bytes, str, list)):
+            raise Exception("Expected params to be a Sequence, received: {}".format(type(params)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client',
+                   request='AddMachinesV2',
+                   version=5,
+                   params=_params)
+        _params['params'] = params
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(AgentVersionResult)
+    async def AgentVersion(self):
+        '''
+        AgentVersion returns the current version that the API server is running.
+        TODO(juju3) - remove
+
+
+        Returns -> AgentVersionResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client',
+                   request='AgentVersion',
+                   version=5,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(BytesResult)
+    async def CACert(self):
+        '''
+        CACert returns the certificate used to validate the state connection.
+
+
+        Returns -> BytesResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client',
+                   request='CACert',
+                   version=5,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def DestroyMachines(self, force=None, machine_names=None):
+        '''
+        DestroyMachines removes a given set of machines.
+        TODO(juju3) - remove
+
+        force : bool
+        machine_names : typing.Sequence[str]
+        Returns -> None
+        '''
+        if force is not None and not isinstance(force, bool):
+            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
+
+        if machine_names is not None and not isinstance(machine_names, (bytes, str, list)):
+            raise Exception("Expected machine_names to be a Sequence, received: {}".format(type(machine_names)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client',
+                   request='DestroyMachines',
+                   version=5,
+                   params=_params)
+        _params['force'] = force
+        _params['machine-names'] = machine_names
+        reply = await self.rpc(msg)
+        return reply
+
+
+
     @ReturnMapping(FindToolsResult)
-    async def FindTools(self, agentstream=None, arch=None, major=None, minor=None, number=None, os_type=None):
+    async def FindTools(self, agentstream=None, arch=None, major=None, minor=None, number=None, os_type=None, series=None):
         '''
         FindTools returns a List containing all tools matching the given parameters.
 
@@ -446,6 +2051,7 @@ class ClientFacade(Type):
         minor : int
         number : Number
         os_type : str
+        series : str
         Returns -> FindToolsResult
         '''
         if agentstream is not None and not isinstance(agentstream, (bytes, str)):
@@ -466,6 +2072,9 @@ class ClientFacade(Type):
         if os_type is not None and not isinstance(os_type, (bytes, str)):
             raise Exception("Expected os_type to be a str, received: {}".format(type(os_type)))
 
+        if series is not None and not isinstance(series, (bytes, str)):
+            raise Exception("Expected series to be a str, received: {}".format(type(series)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Client',
@@ -478,6 +2087,7 @@ class ClientFacade(Type):
         _params['minor'] = minor
         _params['number'] = number
         _params['os-type'] = os_type
+        _params['series'] = series
         reply = await self.rpc(msg)
         return reply
 
@@ -501,6 +2111,488 @@ class ClientFacade(Type):
                    version=5,
                    params=_params)
         _params['patterns'] = patterns
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(BundleChangesResults)
+    async def GetBundleChanges(self, bundleurl=None, yaml=None):
+        '''
+        GetBundleChanges returns the list of changes required to deploy the given
+        bundle data. The changes are sorted by requirements, so that they can be
+        applied in order.
+        Deprecated: clients should use the GetChanges endpoint on the Bundle facade.
+        Note: any new feature in the future like devices will never be supported here.
+
+        bundleurl : str
+        yaml : str
+        Returns -> BundleChangesResults
+        '''
+        if bundleurl is not None and not isinstance(bundleurl, (bytes, str)):
+            raise Exception("Expected bundleurl to be a str, received: {}".format(type(bundleurl)))
+
+        if yaml is not None and not isinstance(yaml, (bytes, str)):
+            raise Exception("Expected yaml to be a str, received: {}".format(type(yaml)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client',
+                   request='GetBundleChanges',
+                   version=5,
+                   params=_params)
+        _params['bundleURL'] = bundleurl
+        _params['yaml'] = yaml
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(GetConstraintsResults)
+    async def GetModelConstraints(self):
+        '''
+        GetModelConstraints returns the constraints for the model.
+        TODO(juju3) - remove
+
+
+        Returns -> GetConstraintsResults
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client',
+                   request='GetModelConstraints',
+                   version=5,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(AddMachinesResults)
+    async def InjectMachines(self, params=None):
+        '''
+        InjectMachines injects a machine into state with provisioned status.
+        TODO(juju3) - remove
+
+        params : typing.Sequence[~AddMachineParams]
+        Returns -> AddMachinesResults
+        '''
+        if params is not None and not isinstance(params, (bytes, str, list)):
+            raise Exception("Expected params to be a Sequence, received: {}".format(type(params)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client',
+                   request='InjectMachines',
+                   version=5,
+                   params=_params)
+        _params['params'] = params
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ModelConfigResults)
+    async def ModelGet(self):
+        '''
+        ModelGet implements the server-side part of the
+        model-config CLI command.
+
+
+        Returns -> ModelConfigResults
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client',
+                   request='ModelGet',
+                   version=5,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ModelInfo)
+    async def ModelInfo(self):
+        '''
+        ModelInfo returns information about the current model.
+        TODO(juju3) - remove
+
+
+        Returns -> ModelInfo
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client',
+                   request='ModelInfo',
+                   version=5,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def ModelSet(self, config=None):
+        '''
+        ModelSet implements the server-side part of the
+        set-model-config CLI command.
+
+        config : typing.Mapping[str, typing.Any]
+        Returns -> None
+        '''
+        if config is not None and not isinstance(config, dict):
+            raise Exception("Expected config to be a Mapping, received: {}".format(type(config)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client',
+                   request='ModelSet',
+                   version=5,
+                   params=_params)
+        _params['config'] = config
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def ModelUnset(self, keys=None):
+        '''
+        ModelUnset implements the server-side part of the
+        set-model-config CLI command.
+
+        keys : typing.Sequence[str]
+        Returns -> None
+        '''
+        if keys is not None and not isinstance(keys, (bytes, str, list)):
+            raise Exception("Expected keys to be a Sequence, received: {}".format(type(keys)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client',
+                   request='ModelUnset',
+                   version=5,
+                   params=_params)
+        _params['keys'] = keys
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ModelUserInfoResults)
+    async def ModelUserInfo(self):
+        '''
+        ModelUserInfo returns information on all users in the model.
+        TODO(juju3) - remove
+
+
+        Returns -> ModelUserInfoResults
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client',
+                   request='ModelUserInfo',
+                   version=5,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(PrivateAddressResults)
+    async def PrivateAddress(self, target=None):
+        '''
+        PrivateAddress implements the server side of Client.PrivateAddress.
+        TODO(juju3) - remove as this is unused
+
+        target : str
+        Returns -> PrivateAddressResults
+        '''
+        if target is not None and not isinstance(target, (bytes, str)):
+            raise Exception("Expected target to be a str, received: {}".format(type(target)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client',
+                   request='PrivateAddress',
+                   version=5,
+                   params=_params)
+        _params['target'] = target
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ProvisioningScriptResult)
+    async def ProvisioningScript(self, data_dir=None, disable_package_commands=None, machine_id=None, nonce=None):
+        '''
+        ProvisioningScript returns a shell script that, when run,
+        provisions a machine agent on the machine executing the script.
+        TODO(juju3) - remove
+
+        data_dir : str
+        disable_package_commands : bool
+        machine_id : str
+        nonce : str
+        Returns -> ProvisioningScriptResult
+        '''
+        if data_dir is not None and not isinstance(data_dir, (bytes, str)):
+            raise Exception("Expected data_dir to be a str, received: {}".format(type(data_dir)))
+
+        if disable_package_commands is not None and not isinstance(disable_package_commands, bool):
+            raise Exception("Expected disable_package_commands to be a bool, received: {}".format(type(disable_package_commands)))
+
+        if machine_id is not None and not isinstance(machine_id, (bytes, str)):
+            raise Exception("Expected machine_id to be a str, received: {}".format(type(machine_id)))
+
+        if nonce is not None and not isinstance(nonce, (bytes, str)):
+            raise Exception("Expected nonce to be a str, received: {}".format(type(nonce)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client',
+                   request='ProvisioningScript',
+                   version=5,
+                   params=_params)
+        _params['data-dir'] = data_dir
+        _params['disable-package-commands'] = disable_package_commands
+        _params['machine-id'] = machine_id
+        _params['nonce'] = nonce
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(PublicAddressResults)
+    async def PublicAddress(self, target=None):
+        '''
+        PublicAddress implements the server side of Client.PublicAddress.
+        TODO(juju3) - remove as this is unused
+
+        target : str
+        Returns -> PublicAddressResults
+        '''
+        if target is not None and not isinstance(target, (bytes, str)):
+            raise Exception("Expected target to be a str, received: {}".format(type(target)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client',
+                   request='PublicAddress',
+                   version=5,
+                   params=_params)
+        _params['target'] = target
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ResolveCharmResults)
+    async def ResolveCharms(self, references=None):
+        '''
+        ResolveCharms resolves the best available charm URLs with series, for charm
+        locations without a series specified.
+
+        NOTE: ResolveCharms is deprecated as of juju 2.9 and charms facade version 3.
+        Please discontinue use and move to the charms facade version.
+
+        TODO(juju3) - remove
+
+        references : typing.Sequence[str]
+        Returns -> ResolveCharmResults
+        '''
+        if references is not None and not isinstance(references, (bytes, str, list)):
+            raise Exception("Expected references to be a Sequence, received: {}".format(type(references)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client',
+                   request='ResolveCharms',
+                   version=5,
+                   params=_params)
+        _params['references'] = references
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def Resolved(self, retry=None, unit_name=None):
+        '''
+        Resolved implements the server side of Client.Resolved.
+
+        retry : bool
+        unit_name : str
+        Returns -> None
+        '''
+        if retry is not None and not isinstance(retry, bool):
+            raise Exception("Expected retry to be a bool, received: {}".format(type(retry)))
+
+        if unit_name is not None and not isinstance(unit_name, (bytes, str)):
+            raise Exception("Expected unit_name to be a str, received: {}".format(type(unit_name)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client',
+                   request='Resolved',
+                   version=5,
+                   params=_params)
+        _params['retry'] = retry
+        _params['unit-name'] = unit_name
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def RetryProvisioning(self, entities=None):
+        '''
+        RetryProvisioning marks a provisioning error as transient on the machines.
+        TODO(juju3) - remove
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client',
+                   request='RetryProvisioning',
+                   version=5,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResult)
+    async def SLALevel(self):
+        '''
+        SLALevel returns the current sla level for the model.
+
+
+        Returns -> StringResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client',
+                   request='SLALevel',
+                   version=5,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def SetModelAgentVersion(self, agent_stream=None, force=None, version=None):
+        '''
+        SetModelAgentVersion sets the model agent version.
+
+        agent_stream : str
+        force : bool
+        version : Number
+        Returns -> None
+        '''
+        if agent_stream is not None and not isinstance(agent_stream, (bytes, str)):
+            raise Exception("Expected agent_stream to be a str, received: {}".format(type(agent_stream)))
+
+        if force is not None and not isinstance(force, bool):
+            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
+
+        if version is not None and not isinstance(version, (dict, Number)):
+            raise Exception("Expected version to be a Number, received: {}".format(type(version)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client',
+                   request='SetModelAgentVersion',
+                   version=5,
+                   params=_params)
+        _params['agent-stream'] = agent_stream
+        _params['force'] = force
+        _params['version'] = version
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def SetModelConstraints(self, application=None, constraints=None):
+        '''
+        SetModelConstraints sets the constraints for the model.
+        TODO(juju3) - remove
+
+        application : str
+        constraints : Value
+        Returns -> None
+        '''
+        if application is not None and not isinstance(application, (bytes, str)):
+            raise Exception("Expected application to be a str, received: {}".format(type(application)))
+
+        if constraints is not None and not isinstance(constraints, (dict, Value)):
+            raise Exception("Expected constraints to be a Value, received: {}".format(type(constraints)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client',
+                   request='SetModelConstraints',
+                   version=5,
+                   params=_params)
+        _params['application'] = application
+        _params['constraints'] = constraints
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def SetSLALevel(self, modelslainfo=None, creds=None, level=None, owner=None):
+        '''
+        SetSLALevel sets the sla level on the model.
+
+        modelslainfo : ModelSLAInfo
+        creds : typing.Sequence[int]
+        level : str
+        owner : str
+        Returns -> None
+        '''
+        if modelslainfo is not None and not isinstance(modelslainfo, (dict, ModelSLAInfo)):
+            raise Exception("Expected modelslainfo to be a ModelSLAInfo, received: {}".format(type(modelslainfo)))
+
+        if creds is not None and not isinstance(creds, (bytes, str, list)):
+            raise Exception("Expected creds to be a Sequence, received: {}".format(type(creds)))
+
+        if level is not None and not isinstance(level, (bytes, str)):
+            raise Exception("Expected level to be a str, received: {}".format(type(level)))
+
+        if owner is not None and not isinstance(owner, (bytes, str)):
+            raise Exception("Expected owner to be a str, received: {}".format(type(owner)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client',
+                   request='SetSLALevel',
+                   version=5,
+                   params=_params)
+        _params['ModelSLAInfo'] = modelslainfo
+        _params['creds'] = creds
+        _params['level'] = level
+        _params['owner'] = owner
         reply = await self.rpc(msg)
         return reply
 
@@ -1109,6 +3201,188 @@ class MachinerFacade(Type):
                    version=5,
                    params=_params)
 
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+class SubnetsFacade(Type):
+    name = 'Subnets'
+    version = 5
+    schema =     {'definitions': {'CIDRParams': {'additionalProperties': False,
+                                    'properties': {'cidrs': {'items': {'type': 'string'},
+                                                             'type': 'array'}},
+                                    'required': ['cidrs'],
+                                    'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ListSubnetsResults': {'additionalProperties': False,
+                                            'properties': {'results': {'items': {'$ref': '#/definitions/Subnet'},
+                                                                       'type': 'array'}},
+                                            'required': ['results'],
+                                            'type': 'object'},
+                     'Subnet': {'additionalProperties': False,
+                                'properties': {'cidr': {'type': 'string'},
+                                               'life': {'type': 'string'},
+                                               'provider-id': {'type': 'string'},
+                                               'provider-network-id': {'type': 'string'},
+                                               'provider-space-id': {'type': 'string'},
+                                               'space-tag': {'type': 'string'},
+                                               'status': {'type': 'string'},
+                                               'vlan-tag': {'type': 'integer'},
+                                               'zones': {'items': {'type': 'string'},
+                                                         'type': 'array'}},
+                                'required': ['cidr',
+                                             'vlan-tag',
+                                             'life',
+                                             'space-tag',
+                                             'zones'],
+                                'type': 'object'},
+                     'SubnetV2': {'additionalProperties': False,
+                                  'properties': {'Subnet': {'$ref': '#/definitions/Subnet'},
+                                                 'cidr': {'type': 'string'},
+                                                 'id': {'type': 'string'},
+                                                 'life': {'type': 'string'},
+                                                 'provider-id': {'type': 'string'},
+                                                 'provider-network-id': {'type': 'string'},
+                                                 'provider-space-id': {'type': 'string'},
+                                                 'space-tag': {'type': 'string'},
+                                                 'status': {'type': 'string'},
+                                                 'vlan-tag': {'type': 'integer'},
+                                                 'zones': {'items': {'type': 'string'},
+                                                           'type': 'array'}},
+                                  'required': ['cidr',
+                                               'vlan-tag',
+                                               'life',
+                                               'space-tag',
+                                               'zones',
+                                               'Subnet'],
+                                  'type': 'object'},
+                     'SubnetsFilters': {'additionalProperties': False,
+                                        'properties': {'space-tag': {'type': 'string'},
+                                                       'zone': {'type': 'string'}},
+                                        'type': 'object'},
+                     'SubnetsResult': {'additionalProperties': False,
+                                       'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                      'subnets': {'items': {'$ref': '#/definitions/SubnetV2'},
+                                                                  'type': 'array'}},
+                                       'type': 'object'},
+                     'SubnetsResults': {'additionalProperties': False,
+                                        'properties': {'results': {'items': {'$ref': '#/definitions/SubnetsResult'},
+                                                                   'type': 'array'}},
+                                        'required': ['results'],
+                                        'type': 'object'},
+                     'ZoneResult': {'additionalProperties': False,
+                                    'properties': {'available': {'type': 'boolean'},
+                                                   'error': {'$ref': '#/definitions/Error'},
+                                                   'name': {'type': 'string'}},
+                                    'required': ['name', 'available'],
+                                    'type': 'object'},
+                     'ZoneResults': {'additionalProperties': False,
+                                     'properties': {'results': {'items': {'$ref': '#/definitions/ZoneResult'},
+                                                                'type': 'array'}},
+                                     'required': ['results'],
+                                     'type': 'object'}},
+     'properties': {'AllZones': {'description': 'AllZones returns all availability '
+                                                'zones known to Juju. If a\n'
+                                                'zone is unusable, unavailable, or '
+                                                'deprecated the Available\n'
+                                                'field will be false.',
+                                 'properties': {'Result': {'$ref': '#/definitions/ZoneResults'}},
+                                 'type': 'object'},
+                    'ListSubnets': {'description': 'ListSubnets returns the '
+                                                   'matching subnets after '
+                                                   'applying\n'
+                                                   'optional filters.',
+                                    'properties': {'Params': {'$ref': '#/definitions/SubnetsFilters'},
+                                                   'Result': {'$ref': '#/definitions/ListSubnetsResults'}},
+                                    'type': 'object'},
+                    'SubnetsByCIDR': {'description': 'SubnetsByCIDR returns the '
+                                                     'collection of subnets '
+                                                     'matching each CIDR in the '
+                                                     'input.',
+                                      'properties': {'Params': {'$ref': '#/definitions/CIDRParams'},
+                                                     'Result': {'$ref': '#/definitions/SubnetsResults'}},
+                                      'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(ZoneResults)
+    async def AllZones(self):
+        '''
+        AllZones returns all availability zones known to Juju. If a
+        zone is unusable, unavailable, or deprecated the Available
+        field will be false.
+
+
+        Returns -> ZoneResults
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Subnets',
+                   request='AllZones',
+                   version=5,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ListSubnetsResults)
+    async def ListSubnets(self, space_tag=None, zone=None):
+        '''
+        ListSubnets returns the matching subnets after applying
+        optional filters.
+
+        space_tag : str
+        zone : str
+        Returns -> ListSubnetsResults
+        '''
+        if space_tag is not None and not isinstance(space_tag, (bytes, str)):
+            raise Exception("Expected space_tag to be a str, received: {}".format(type(space_tag)))
+
+        if zone is not None and not isinstance(zone, (bytes, str)):
+            raise Exception("Expected zone to be a str, received: {}".format(type(zone)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Subnets',
+                   request='ListSubnets',
+                   version=5,
+                   params=_params)
+        _params['space-tag'] = space_tag
+        _params['zone'] = zone
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SubnetsResults)
+    async def SubnetsByCIDR(self, cidrs=None):
+        '''
+        SubnetsByCIDR returns the collection of subnets matching each CIDR in the input.
+
+        cidrs : typing.Sequence[str]
+        Returns -> SubnetsResults
+        '''
+        if cidrs is not None and not isinstance(cidrs, (bytes, str, list)):
+            raise Exception("Expected cidrs to be a Sequence, received: {}".format(type(cidrs)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Subnets',
+                   request='SubnetsByCIDR',
+                   version=5,
+                   params=_params)
+        _params['cidrs'] = cidrs
         reply = await self.rpc(msg)
         return reply
 

@@ -791,6 +791,87 @@ class AllModelWatcherFacade(Type):
 
 
 
+class AllWatcherFacade(Type):
+    name = 'AllWatcher'
+    version = 3
+    schema =     {'definitions': {'AllWatcherNextResults': {'additionalProperties': False,
+                                               'properties': {'deltas': {'items': {'$ref': '#/definitions/Delta'},
+                                                                         'type': 'array'}},
+                                               'required': ['deltas'],
+                                               'type': 'object'},
+                     'Delta': {'additionalProperties': False,
+                               'properties': {'entity': {'additionalProperties': True,
+                                                         'type': 'object'},
+                                              'removed': {'type': 'boolean'}},
+                               'required': ['removed', 'entity'],
+                               'type': 'object'}},
+     'properties': {'Next': {'description': 'Next will return the current state of '
+                                            'everything on the first call\n'
+                                            'and subsequent calls will',
+                             'properties': {'Result': {'$ref': '#/definitions/AllWatcherNextResults'}},
+                             'type': 'object'},
+                    'Stop': {'description': 'Stop stops the watcher.',
+                             'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(AllWatcherNextResults)
+    async def Next(self):
+        '''
+        Next will return the current state of everything on the first call
+        and subsequent calls will
+
+
+        Returns -> AllWatcherNextResults
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='AllWatcher',
+                   request='Next',
+                   version=3,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def Stop(self):
+        '''
+        Stop stops the watcher.
+
+
+        Returns -> None
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='AllWatcher',
+                   request='Stop',
+                   version=3,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    async def rpc(self, msg):
+        '''
+        Patch rpc method to add Id.
+        '''
+        if not hasattr(self, 'Id'):
+            raise RuntimeError('Missing "Id" field')
+        msg['Id'] = id
+
+        from .facade import TypeEncoder
+        reply = await self.connection.rpc(msg, encoder=TypeEncoder)
+        return reply
+
+
+
 class BackupsFacade(Type):
     name = 'Backups'
     version = 3
@@ -800,7 +881,8 @@ class BackupsFacade(Type):
                                            'required': ['notes', 'no-download'],
                                            'type': 'object'},
                      'BackupsMetadataResult': {'additionalProperties': False,
-                                               'properties': {'checksum': {'type': 'string'},
+                                               'properties': {'base': {'type': 'string'},
+                                                              'checksum': {'type': 'string'},
                                                               'checksum-format': {'type': 'string'},
                                                               'controller-machine-id': {'type': 'string'},
                                                               'controller-machine-inst-id': {'type': 'string'},
@@ -815,7 +897,6 @@ class BackupsFacade(Type):
                                                               'machine': {'type': 'string'},
                                                               'model': {'type': 'string'},
                                                               'notes': {'type': 'string'},
-                                                              'series': {'type': 'string'},
                                                               'size': {'type': 'integer'},
                                                               'started': {'format': 'date-time',
                                                                           'type': 'string'},
@@ -834,7 +915,7 @@ class BackupsFacade(Type):
                                                             'machine',
                                                             'hostname',
                                                             'version',
-                                                            'series',
+                                                            'base',
                                                             'filename',
                                                             'format-version',
                                                             'controller-uuid',
@@ -2219,6 +2300,248 @@ class ModelConfigFacade(Type):
 
 
 
+class ResourcesFacade(Type):
+    name = 'Resources'
+    version = 3
+    schema =     {'definitions': {'AddPendingResourcesArgsV2': {'additionalProperties': False,
+                                                   'properties': {'Entity': {'$ref': '#/definitions/Entity'},
+                                                                  'charm-origin': {'$ref': '#/definitions/CharmOrigin'},
+                                                                  'macaroon': {'$ref': '#/definitions/Macaroon'},
+                                                                  'resources': {'items': {'$ref': '#/definitions/CharmResource'},
+                                                                                'type': 'array'},
+                                                                  'tag': {'type': 'string'},
+                                                                  'url': {'type': 'string'}},
+                                                   'required': ['tag',
+                                                                'Entity',
+                                                                'url',
+                                                                'charm-origin',
+                                                                'macaroon',
+                                                                'resources'],
+                                                   'type': 'object'},
+                     'AddPendingResourcesResult': {'additionalProperties': False,
+                                                   'properties': {'ErrorResult': {'$ref': '#/definitions/ErrorResult'},
+                                                                  'error': {'$ref': '#/definitions/Error'},
+                                                                  'pending-ids': {'items': {'type': 'string'},
+                                                                                  'type': 'array'}},
+                                                   'required': ['ErrorResult',
+                                                                'pending-ids'],
+                                                   'type': 'object'},
+                     'Base': {'additionalProperties': False,
+                              'properties': {'channel': {'type': 'string'},
+                                             'name': {'type': 'string'}},
+                              'required': ['name', 'channel'],
+                              'type': 'object'},
+                     'CharmOrigin': {'additionalProperties': False,
+                                     'properties': {'architecture': {'type': 'string'},
+                                                    'base': {'$ref': '#/definitions/Base'},
+                                                    'branch': {'type': 'string'},
+                                                    'hash': {'type': 'string'},
+                                                    'id': {'type': 'string'},
+                                                    'instance-key': {'type': 'string'},
+                                                    'revision': {'type': 'integer'},
+                                                    'risk': {'type': 'string'},
+                                                    'source': {'type': 'string'},
+                                                    'track': {'type': 'string'},
+                                                    'type': {'type': 'string'}},
+                                     'required': ['source', 'type', 'id'],
+                                     'type': 'object'},
+                     'CharmResource': {'additionalProperties': False,
+                                       'properties': {'description': {'type': 'string'},
+                                                      'fingerprint': {'items': {'type': 'integer'},
+                                                                      'type': 'array'},
+                                                      'name': {'type': 'string'},
+                                                      'origin': {'type': 'string'},
+                                                      'path': {'type': 'string'},
+                                                      'revision': {'type': 'integer'},
+                                                      'size': {'type': 'integer'},
+                                                      'type': {'type': 'string'}},
+                                       'required': ['name',
+                                                    'type',
+                                                    'path',
+                                                    'origin',
+                                                    'revision',
+                                                    'fingerprint',
+                                                    'size'],
+                                       'type': 'object'},
+                     'Entity': {'additionalProperties': False,
+                                'properties': {'tag': {'type': 'string'}},
+                                'required': ['tag'],
+                                'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ErrorResult': {'additionalProperties': False,
+                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
+                                     'type': 'object'},
+                     'ListResourcesArgs': {'additionalProperties': False,
+                                           'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
+                                                                       'type': 'array'}},
+                                           'required': ['entities'],
+                                           'type': 'object'},
+                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
+                     'Resource': {'additionalProperties': False,
+                                  'properties': {'CharmResource': {'$ref': '#/definitions/CharmResource'},
+                                                 'application': {'type': 'string'},
+                                                 'description': {'type': 'string'},
+                                                 'fingerprint': {'items': {'type': 'integer'},
+                                                                 'type': 'array'},
+                                                 'id': {'type': 'string'},
+                                                 'name': {'type': 'string'},
+                                                 'origin': {'type': 'string'},
+                                                 'path': {'type': 'string'},
+                                                 'pending-id': {'type': 'string'},
+                                                 'revision': {'type': 'integer'},
+                                                 'size': {'type': 'integer'},
+                                                 'timestamp': {'format': 'date-time',
+                                                               'type': 'string'},
+                                                 'type': {'type': 'string'},
+                                                 'username': {'type': 'string'}},
+                                  'required': ['name',
+                                               'type',
+                                               'path',
+                                               'origin',
+                                               'revision',
+                                               'fingerprint',
+                                               'size',
+                                               'CharmResource',
+                                               'id',
+                                               'pending-id',
+                                               'application',
+                                               'username',
+                                               'timestamp'],
+                                  'type': 'object'},
+                     'ResourcesResult': {'additionalProperties': False,
+                                         'properties': {'ErrorResult': {'$ref': '#/definitions/ErrorResult'},
+                                                        'charm-store-resources': {'items': {'$ref': '#/definitions/CharmResource'},
+                                                                                  'type': 'array'},
+                                                        'error': {'$ref': '#/definitions/Error'},
+                                                        'resources': {'items': {'$ref': '#/definitions/Resource'},
+                                                                      'type': 'array'},
+                                                        'unit-resources': {'items': {'$ref': '#/definitions/UnitResources'},
+                                                                           'type': 'array'}},
+                                         'required': ['ErrorResult',
+                                                      'resources',
+                                                      'charm-store-resources',
+                                                      'unit-resources'],
+                                         'type': 'object'},
+                     'ResourcesResults': {'additionalProperties': False,
+                                          'properties': {'results': {'items': {'$ref': '#/definitions/ResourcesResult'},
+                                                                     'type': 'array'}},
+                                          'required': ['results'],
+                                          'type': 'object'},
+                     'UnitResources': {'additionalProperties': False,
+                                       'properties': {'Entity': {'$ref': '#/definitions/Entity'},
+                                                      'download-progress': {'patternProperties': {'.*': {'type': 'integer'}},
+                                                                            'type': 'object'},
+                                                      'resources': {'items': {'$ref': '#/definitions/Resource'},
+                                                                    'type': 'array'},
+                                                      'tag': {'type': 'string'}},
+                                       'required': ['tag',
+                                                    'Entity',
+                                                    'resources',
+                                                    'download-progress'],
+                                       'type': 'object'}},
+     'properties': {'AddPendingResources': {'description': 'AddPendingResources '
+                                                           'adds the provided '
+                                                           'resources (info) to '
+                                                           'the Juju\n'
+                                                           'model in a pending '
+                                                           'state, meaning they '
+                                                           'are not available '
+                                                           'until\n'
+                                                           'resolved. Handles '
+                                                           'CharmHub, CharmStore '
+                                                           'and Local charms.',
+                                            'properties': {'Params': {'$ref': '#/definitions/AddPendingResourcesArgsV2'},
+                                                           'Result': {'$ref': '#/definitions/AddPendingResourcesResult'}},
+                                            'type': 'object'},
+                    'ListResources': {'description': 'ListResources returns the '
+                                                     'list of resources for the '
+                                                     'given application.',
+                                      'properties': {'Params': {'$ref': '#/definitions/ListResourcesArgs'},
+                                                     'Result': {'$ref': '#/definitions/ResourcesResults'}},
+                                      'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(AddPendingResourcesResult)
+    async def AddPendingResources(self, entity=None, charm_origin=None, macaroon=None, resources=None, tag=None, url=None):
+        '''
+        AddPendingResources adds the provided resources (info) to the Juju
+        model in a pending state, meaning they are not available until
+        resolved. Handles CharmHub, CharmStore and Local charms.
+
+        entity : Entity
+        charm_origin : CharmOrigin
+        macaroon : Macaroon
+        resources : typing.Sequence[~CharmResource]
+        tag : str
+        url : str
+        Returns -> AddPendingResourcesResult
+        '''
+        if entity is not None and not isinstance(entity, (dict, Entity)):
+            raise Exception("Expected entity to be a Entity, received: {}".format(type(entity)))
+
+        if charm_origin is not None and not isinstance(charm_origin, (dict, CharmOrigin)):
+            raise Exception("Expected charm_origin to be a CharmOrigin, received: {}".format(type(charm_origin)))
+
+        if macaroon is not None and not isinstance(macaroon, (dict, Macaroon)):
+            raise Exception("Expected macaroon to be a Macaroon, received: {}".format(type(macaroon)))
+
+        if resources is not None and not isinstance(resources, (bytes, str, list)):
+            raise Exception("Expected resources to be a Sequence, received: {}".format(type(resources)))
+
+        if tag is not None and not isinstance(tag, (bytes, str)):
+            raise Exception("Expected tag to be a str, received: {}".format(type(tag)))
+
+        if url is not None and not isinstance(url, (bytes, str)):
+            raise Exception("Expected url to be a str, received: {}".format(type(url)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Resources',
+                   request='AddPendingResources',
+                   version=3,
+                   params=_params)
+        _params['Entity'] = entity
+        _params['charm-origin'] = charm_origin
+        _params['macaroon'] = macaroon
+        _params['resources'] = resources
+        _params['tag'] = tag
+        _params['url'] = url
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ResourcesResults)
+    async def ListResources(self, entities=None):
+        '''
+        ListResources returns the list of resources for the given application.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ResourcesResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Resources',
+                   request='ListResources',
+                   version=3,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
 class SSHClientFacade(Type):
     name = 'SSHClient'
     version = 3
@@ -2272,7 +2595,12 @@ class SSHClientFacade(Type):
                                               'properties': {'results': {'items': {'$ref': '#/definitions/SSHPublicKeysResult'},
                                                                          'type': 'array'}},
                                               'required': ['results'],
-                                              'type': 'object'}},
+                                              'type': 'object'},
+                     'StringResult': {'additionalProperties': False,
+                                      'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                     'result': {'type': 'string'}},
+                                      'required': ['result'],
+                                      'type': 'object'}},
      'properties': {'AllAddresses': {'description': 'AllAddresses reports all '
                                                     'addresses that might have SSH '
                                                     'listening for each\n'
@@ -2284,6 +2612,12 @@ class SSHClientFacade(Type):
                                      'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                     'Result': {'$ref': '#/definitions/SSHAddressesResults'}},
                                      'type': 'object'},
+                    'Leader': {'description': 'Leader returns the unit name of the '
+                                              'leader for the given application.\n'
+                                              'TODO(juju3) - remove',
+                               'properties': {'Params': {'$ref': '#/definitions/Entity'},
+                                              'Result': {'$ref': '#/definitions/StringResult'}},
+                               'type': 'object'},
                     'PrivateAddress': {'description': 'PrivateAddress reports the '
                                                       'preferred private network '
                                                       'address for one or\n'
@@ -2337,6 +2671,30 @@ class SSHClientFacade(Type):
                    version=3,
                    params=_params)
         _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResult)
+    async def Leader(self, tag=None):
+        '''
+        Leader returns the unit name of the leader for the given application.
+        TODO(juju3) - remove
+
+        tag : str
+        Returns -> StringResult
+        '''
+        if tag is not None and not isinstance(tag, (bytes, str)):
+            raise Exception("Expected tag to be a str, received: {}".format(type(tag)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SSHClient',
+                   request='Leader',
+                   version=3,
+                   params=_params)
+        _params['tag'] = tag
         reply = await self.rpc(msg)
         return reply
 
@@ -2527,17 +2885,17 @@ class UpgradeSeriesFacade(Type):
                                                                   'type': 'array'}},
                                        'required': ['results'],
                                        'type': 'object'},
-                     'UpdateSeriesArg': {'additionalProperties': False,
-                                         'properties': {'force': {'type': 'boolean'},
-                                                        'series': {'type': 'string'},
-                                                        'tag': {'$ref': '#/definitions/Entity'}},
-                                         'required': ['tag', 'force', 'series'],
-                                         'type': 'object'},
-                     'UpdateSeriesArgs': {'additionalProperties': False,
-                                          'properties': {'args': {'items': {'$ref': '#/definitions/UpdateSeriesArg'},
-                                                                  'type': 'array'}},
-                                          'required': ['args'],
+                     'UpdateChannelArg': {'additionalProperties': False,
+                                          'properties': {'channel': {'type': 'string'},
+                                                         'force': {'type': 'boolean'},
+                                                         'tag': {'$ref': '#/definitions/Entity'}},
+                                          'required': ['tag', 'force', 'channel'],
                                           'type': 'object'},
+                     'UpdateChannelArgs': {'additionalProperties': False,
+                                           'properties': {'args': {'items': {'$ref': '#/definitions/UpdateChannelArg'},
+                                                                   'type': 'array'}},
+                                           'required': ['args'],
+                                           'type': 'object'},
                      'UpgradeSeriesStartUnitCompletionParam': {'additionalProperties': False,
                                                                'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
                                                                                            'type': 'array'},
@@ -2574,7 +2932,7 @@ class UpgradeSeriesFacade(Type):
                                                      'have been upgraded '
                                                      'out-of-band by running\n'
                                                      'do-release-upgrade outside '
-                                                     'of the upgrade-series '
+                                                     'of the upgrade-machine '
                                                      'workflow,\n'
                                                      'making this value incorrect.',
                                       'properties': {'Params': {'$ref': '#/definitions/Entities'},
@@ -2593,12 +2951,12 @@ class UpgradeSeriesFacade(Type):
                                                            'completed upgrade, '
                                                            'then\n'
                                                            'removes the '
-                                                           'upgrade-series lock.',
-                                            'properties': {'Params': {'$ref': '#/definitions/UpdateSeriesArgs'},
+                                                           'upgrade-machine lock.',
+                                            'properties': {'Params': {'$ref': '#/definitions/UpdateChannelArgs'},
                                                            'Result': {'$ref': '#/definitions/ErrorResults'}},
                                             'type': 'object'},
                     'MachineStatus': {'description': 'MachineStatus gets the '
-                                                     'current upgrade-series '
+                                                     'current upgrade-machine '
                                                      'status of a machine.',
                                       'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                      'Result': {'$ref': '#/definitions/UpgradeSeriesStatusResults'}},
@@ -2627,7 +2985,7 @@ class UpgradeSeriesFacade(Type):
                                                          'Result': {'$ref': '#/definitions/ErrorResults'}},
                                           'type': 'object'},
                     'SetMachineStatus': {'description': 'SetMachineStatus sets the '
-                                                        'current upgrade-series '
+                                                        'current upgrade-machine '
                                                         'status of a machine.',
                                          'properties': {'Params': {'$ref': '#/definitions/UpgradeSeriesStatusParams'},
                                                         'Result': {'$ref': '#/definitions/ErrorResults'}},
@@ -2666,16 +3024,16 @@ class UpgradeSeriesFacade(Type):
                                                       'units running on this '
                                                       'machine that have '
                                                       'completed\n'
-                                                      'the upgrade-series workflow '
-                                                      'and are in their normal '
-                                                      'running state.',
+                                                      'the upgrade-machine '
+                                                      'workflow and are in their '
+                                                      'normal running state.',
                                        'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                       'Result': {'$ref': '#/definitions/EntitiesResults'}},
                                        'type': 'object'},
                     'UnitsPrepared': {'description': 'UnitsPrepared returns the '
                                                      'units running on this '
                                                      'machine that have completed\n'
-                                                     'their upgrade-series '
+                                                     'their upgrade-machine '
                                                      'preparation, and are ready '
                                                      'to be stopped and have '
                                                      'their\n'
@@ -2728,7 +3086,7 @@ class UpgradeSeriesFacade(Type):
         '''
         CurrentSeries returns what Juju thinks the current series of the machine is.
         Note that a machine could have been upgraded out-of-band by running
-        do-release-upgrade outside of the upgrade-series workflow,
+        do-release-upgrade outside of the upgrade-machine workflow,
         making this value incorrect.
 
         entities : typing.Sequence[~Entity]
@@ -2755,9 +3113,9 @@ class UpgradeSeriesFacade(Type):
         FinishUpgradeSeries is the last action in the upgrade workflow and is
         called after all machine and unit statuses are "completed".
         It updates the machine series to reflect the completed upgrade, then
-        removes the upgrade-series lock.
+        removes the upgrade-machine lock.
 
-        args : typing.Sequence[~UpdateSeriesArg]
+        args : typing.Sequence[~UpdateChannelArg]
         Returns -> ErrorResults
         '''
         if args is not None and not isinstance(args, (bytes, str, list)):
@@ -2778,7 +3136,7 @@ class UpgradeSeriesFacade(Type):
     @ReturnMapping(UpgradeSeriesStatusResults)
     async def MachineStatus(self, entities=None):
         '''
-        MachineStatus gets the current upgrade-series status of a machine.
+        MachineStatus gets the current upgrade-machine status of a machine.
 
         entities : typing.Sequence[~Entity]
         Returns -> UpgradeSeriesStatusResults
@@ -2868,7 +3226,7 @@ class UpgradeSeriesFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetMachineStatus(self, params=None):
         '''
-        SetMachineStatus sets the current upgrade-series status of a machine.
+        SetMachineStatus sets the current upgrade-machine status of a machine.
 
         params : typing.Sequence[~UpgradeSeriesStatusParam]
         Returns -> ErrorResults
@@ -2969,7 +3327,7 @@ class UpgradeSeriesFacade(Type):
     async def UnitsCompleted(self, entities=None):
         '''
         UnitsCompleted returns the units running on this machine that have completed
-        the upgrade-series workflow and are in their normal running state.
+        the upgrade-machine workflow and are in their normal running state.
 
         entities : typing.Sequence[~Entity]
         Returns -> EntitiesResults
@@ -2993,7 +3351,7 @@ class UpgradeSeriesFacade(Type):
     async def UnitsPrepared(self, entities=None):
         '''
         UnitsPrepared returns the units running on this machine that have completed
-        their upgrade-series preparation, and are ready to be stopped and have their
+        their upgrade-machine preparation, and are ready to be stopped and have their
         unit agent services converted for the target series.
 
         entities : typing.Sequence[~Entity]

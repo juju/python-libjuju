@@ -2881,6 +2881,13 @@ class MachineManagerFacade(Type):
                                     'properties': {'Params': {'$ref': '#/definitions/AddMachines'},
                                                    'Result': {'$ref': '#/definitions/AddMachinesResults'}},
                                     'type': 'object'},
+                    'DestroyMachine': {'description': 'DestroyMachine removes a '
+                                                      'set of machines from the '
+                                                      'model.\n'
+                                                      'TODO(juju3) - remove',
+                                       'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                      'Result': {'$ref': '#/definitions/DestroyMachineResults'}},
+                                       'type': 'object'},
                     'DestroyMachineWithParams': {'description': 'DestroyMachineWithParams '
                                                                 'removes a set of '
                                                                 'machines from the '
@@ -2888,6 +2895,19 @@ class MachineManagerFacade(Type):
                                                  'properties': {'Params': {'$ref': '#/definitions/DestroyMachinesParams'},
                                                                 'Result': {'$ref': '#/definitions/DestroyMachineResults'}},
                                                  'type': 'object'},
+                    'ForceDestroyMachine': {'description': 'ForceDestroyMachine '
+                                                           'forcibly removes a set '
+                                                           'of machines from the '
+                                                           'model.\n'
+                                                           'TODO(juju3) - remove\n'
+                                                           'Also from ModelManger '
+                                                           'v6 this call is less '
+                                                           'useful as it does not '
+                                                           'support MaxWait '
+                                                           'customisation.',
+                                            'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                           'Result': {'$ref': '#/definitions/DestroyMachineResults'}},
+                                            'type': 'object'},
                     'GetUpgradeSeriesMessages': {'description': 'GetUpgradeSeriesMessages '
                                                                 'returns all new '
                                                                 'messages '
@@ -2997,6 +3017,30 @@ class MachineManagerFacade(Type):
 
 
     @ReturnMapping(DestroyMachineResults)
+    async def DestroyMachine(self, entities=None):
+        '''
+        DestroyMachine removes a set of machines from the model.
+        TODO(juju3) - remove
+
+        entities : typing.Sequence[~Entity]
+        Returns -> DestroyMachineResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='MachineManager',
+                   request='DestroyMachine',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(DestroyMachineResults)
     async def DestroyMachineWithParams(self, force=None, keep=None, machine_tags=None, max_wait=None):
         '''
         DestroyMachineWithParams removes a set of machines from the model.
@@ -3029,6 +3073,31 @@ class MachineManagerFacade(Type):
         _params['keep'] = keep
         _params['machine-tags'] = machine_tags
         _params['max-wait'] = max_wait
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(DestroyMachineResults)
+    async def ForceDestroyMachine(self, entities=None):
+        '''
+        ForceDestroyMachine forcibly removes a set of machines from the model.
+        TODO(juju3) - remove
+        Also from ModelManger v6 this call is less useful as it does not support MaxWait customisation.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> DestroyMachineResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='MachineManager',
+                   request='ForceDestroyMachine',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 

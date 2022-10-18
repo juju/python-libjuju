@@ -4,7 +4,7 @@
 from juju.client._definitions import *
 
 
-from juju.client import _client7, _client1, _client3, _client2, _client14, _client4, _client6, _client5, _client11, _client9, _client18
+from juju.client import _client7, _client1, _client3, _client2, _client14, _client4, _client6, _client5, _client11, _client9, _client18, _client8, _client15
 
 
 CLIENTS = {
@@ -18,7 +18,9 @@ CLIENTS = {
     "5": _client5,
     "11": _client11,
     "9": _client9,
-    "18": _client18
+    "18": _client18,
+    "8": _client8,
+    "15": _client15
 }
 
 
@@ -157,6 +159,10 @@ class CAASFirewallerEmbeddedFacade(TypeFactory):
 
 
 class CAASFirewallerFacade(TypeFactory):
+    pass
+
+
+class CAASFirewallerSidecarFacade(TypeFactory):
     pass
 
 
@@ -477,6 +483,10 @@ class SecretsManagerFacade(TypeFactory):
 
 
 class SecretsRotationWatcherFacade(TypeFactory):
+    pass
+
+
+class SecretsTriggerWatcherFacade(TypeFactory):
     pass
 
 

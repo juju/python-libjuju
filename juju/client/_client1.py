@@ -521,6 +521,11 @@ class CAASApplicationProvisionerFacade(Type):
                                                             'status',
                                                             'info'],
                                                'type': 'object'},
+                     'Base': {'additionalProperties': False,
+                              'properties': {'channel': {'type': 'string'},
+                                             'name': {'type': 'string'}},
+                              'required': ['name', 'channel'],
+                              'type': 'object'},
                      'CAASApplicationGarbageCollectArg': {'additionalProperties': False,
                                                           'properties': {'active-pod-names': {'items': {'type': 'string'},
                                                                                               'type': 'array'},
@@ -556,6 +561,7 @@ class CAASApplicationProvisionerFacade(Type):
                      'CAASApplicationProvisioningInfo': {'additionalProperties': False,
                                                          'properties': {'api-addresses': {'items': {'type': 'string'},
                                                                                           'type': 'array'},
+                                                                        'base': {'$ref': '#/definitions/Base'},
                                                                         'ca-cert': {'type': 'string'},
                                                                         'charm-modified-version': {'type': 'integer'},
                                                                         'charm-url': {'type': 'string'},
@@ -567,7 +573,6 @@ class CAASApplicationProvisionerFacade(Type):
                                                                                         'type': 'array'},
                                                                         'image-repo': {'$ref': '#/definitions/DockerImageInfo'},
                                                                         'scale': {'type': 'integer'},
-                                                                        'series': {'type': 'string'},
                                                                         'tags': {'patternProperties': {'.*': {'type': 'string'}},
                                                                                  'type': 'object'},
                                                                         'trust': {'type': 'boolean'},
@@ -2535,6 +2540,510 @@ class CAASFirewallerFacade(Type):
 
 
 
+class CAASFirewallerSidecarFacade(Type):
+    name = 'CAASFirewallerSidecar'
+    version = 1
+    schema =     {'definitions': {'ApplicationGetConfigResults': {'additionalProperties': False,
+                                                     'properties': {'Results': {'items': {'$ref': '#/definitions/ConfigResult'},
+                                                                                'type': 'array'}},
+                                                     'required': ['Results'],
+                                                     'type': 'object'},
+                     'BoolResult': {'additionalProperties': False,
+                                    'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                   'result': {'type': 'boolean'}},
+                                    'required': ['result'],
+                                    'type': 'object'},
+                     'BoolResults': {'additionalProperties': False,
+                                     'properties': {'results': {'items': {'$ref': '#/definitions/BoolResult'},
+                                                                'type': 'array'}},
+                                     'required': ['results'],
+                                     'type': 'object'},
+                     'Charm': {'additionalProperties': False,
+                               'properties': {'actions': {'$ref': '#/definitions/CharmActions'},
+                                              'config': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmOption'}},
+                                                         'type': 'object'},
+                                              'lxd-profile': {'$ref': '#/definitions/CharmLXDProfile'},
+                                              'manifest': {'$ref': '#/definitions/CharmManifest'},
+                                              'meta': {'$ref': '#/definitions/CharmMeta'},
+                                              'metrics': {'$ref': '#/definitions/CharmMetrics'},
+                                              'revision': {'type': 'integer'},
+                                              'url': {'type': 'string'}},
+                               'required': ['revision', 'url', 'config'],
+                               'type': 'object'},
+                     'CharmActionSpec': {'additionalProperties': False,
+                                         'properties': {'description': {'type': 'string'},
+                                                        'params': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                'type': 'object'}},
+                                                                   'type': 'object'}},
+                                         'required': ['description', 'params'],
+                                         'type': 'object'},
+                     'CharmActions': {'additionalProperties': False,
+                                      'properties': {'specs': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmActionSpec'}},
+                                                               'type': 'object'}},
+                                      'type': 'object'},
+                     'CharmBase': {'additionalProperties': False,
+                                   'properties': {'architectures': {'items': {'type': 'string'},
+                                                                    'type': 'array'},
+                                                  'channel': {'type': 'string'},
+                                                  'name': {'type': 'string'}},
+                                   'type': 'object'},
+                     'CharmContainer': {'additionalProperties': False,
+                                        'properties': {'mounts': {'items': {'$ref': '#/definitions/CharmMount'},
+                                                                  'type': 'array'},
+                                                       'resource': {'type': 'string'}},
+                                        'type': 'object'},
+                     'CharmDeployment': {'additionalProperties': False,
+                                         'properties': {'min-version': {'type': 'string'},
+                                                        'mode': {'type': 'string'},
+                                                        'service': {'type': 'string'},
+                                                        'type': {'type': 'string'}},
+                                         'required': ['type',
+                                                      'mode',
+                                                      'service',
+                                                      'min-version'],
+                                         'type': 'object'},
+                     'CharmDevice': {'additionalProperties': False,
+                                     'properties': {'CountMax': {'type': 'integer'},
+                                                    'CountMin': {'type': 'integer'},
+                                                    'Description': {'type': 'string'},
+                                                    'Name': {'type': 'string'},
+                                                    'Type': {'type': 'string'}},
+                                     'required': ['Name',
+                                                  'Description',
+                                                  'Type',
+                                                  'CountMin',
+                                                  'CountMax'],
+                                     'type': 'object'},
+                     'CharmLXDProfile': {'additionalProperties': False,
+                                         'properties': {'config': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                   'type': 'object'},
+                                                        'description': {'type': 'string'},
+                                                        'devices': {'patternProperties': {'.*': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                                                 'type': 'object'}},
+                                                                    'type': 'object'}},
+                                         'required': ['config',
+                                                      'description',
+                                                      'devices'],
+                                         'type': 'object'},
+                     'CharmManifest': {'additionalProperties': False,
+                                       'properties': {'bases': {'items': {'$ref': '#/definitions/CharmBase'},
+                                                                'type': 'array'}},
+                                       'type': 'object'},
+                     'CharmMeta': {'additionalProperties': False,
+                                   'properties': {'assumes-expr': {'$ref': '#/definitions/ExpressionTree'},
+                                                  'categories': {'items': {'type': 'string'},
+                                                                 'type': 'array'},
+                                                  'containers': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmContainer'}},
+                                                                 'type': 'object'},
+                                                  'deployment': {'$ref': '#/definitions/CharmDeployment'},
+                                                  'description': {'type': 'string'},
+                                                  'devices': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmDevice'}},
+                                                              'type': 'object'},
+                                                  'extra-bindings': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                     'type': 'object'},
+                                                  'min-juju-version': {'type': 'string'},
+                                                  'name': {'type': 'string'},
+                                                  'payload-classes': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmPayloadClass'}},
+                                                                      'type': 'object'},
+                                                  'peers': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmRelation'}},
+                                                            'type': 'object'},
+                                                  'provides': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmRelation'}},
+                                                               'type': 'object'},
+                                                  'requires': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmRelation'}},
+                                                               'type': 'object'},
+                                                  'resources': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmResourceMeta'}},
+                                                                'type': 'object'},
+                                                  'series': {'items': {'type': 'string'},
+                                                             'type': 'array'},
+                                                  'storage': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmStorage'}},
+                                                              'type': 'object'},
+                                                  'subordinate': {'type': 'boolean'},
+                                                  'summary': {'type': 'string'},
+                                                  'tags': {'items': {'type': 'string'},
+                                                           'type': 'array'},
+                                                  'terms': {'items': {'type': 'string'},
+                                                            'type': 'array'}},
+                                   'required': ['name',
+                                                'summary',
+                                                'description',
+                                                'subordinate'],
+                                   'type': 'object'},
+                     'CharmMetric': {'additionalProperties': False,
+                                     'properties': {'description': {'type': 'string'},
+                                                    'type': {'type': 'string'}},
+                                     'required': ['type', 'description'],
+                                     'type': 'object'},
+                     'CharmMetrics': {'additionalProperties': False,
+                                      'properties': {'metrics': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmMetric'}},
+                                                                 'type': 'object'},
+                                                     'plan': {'$ref': '#/definitions/CharmPlan'}},
+                                      'required': ['metrics', 'plan'],
+                                      'type': 'object'},
+                     'CharmMount': {'additionalProperties': False,
+                                    'properties': {'location': {'type': 'string'},
+                                                   'storage': {'type': 'string'}},
+                                    'type': 'object'},
+                     'CharmOption': {'additionalProperties': False,
+                                     'properties': {'default': {'additionalProperties': True,
+                                                                'type': 'object'},
+                                                    'description': {'type': 'string'},
+                                                    'type': {'type': 'string'}},
+                                     'required': ['type'],
+                                     'type': 'object'},
+                     'CharmPayloadClass': {'additionalProperties': False,
+                                           'properties': {'name': {'type': 'string'},
+                                                          'type': {'type': 'string'}},
+                                           'required': ['name', 'type'],
+                                           'type': 'object'},
+                     'CharmPlan': {'additionalProperties': False,
+                                   'properties': {'required': {'type': 'boolean'}},
+                                   'required': ['required'],
+                                   'type': 'object'},
+                     'CharmRelation': {'additionalProperties': False,
+                                       'properties': {'interface': {'type': 'string'},
+                                                      'limit': {'type': 'integer'},
+                                                      'name': {'type': 'string'},
+                                                      'optional': {'type': 'boolean'},
+                                                      'role': {'type': 'string'},
+                                                      'scope': {'type': 'string'}},
+                                       'required': ['name',
+                                                    'role',
+                                                    'interface',
+                                                    'optional',
+                                                    'limit',
+                                                    'scope'],
+                                       'type': 'object'},
+                     'CharmResourceMeta': {'additionalProperties': False,
+                                           'properties': {'description': {'type': 'string'},
+                                                          'name': {'type': 'string'},
+                                                          'path': {'type': 'string'},
+                                                          'type': {'type': 'string'}},
+                                           'required': ['name',
+                                                        'type',
+                                                        'path',
+                                                        'description'],
+                                           'type': 'object'},
+                     'CharmStorage': {'additionalProperties': False,
+                                      'properties': {'count-max': {'type': 'integer'},
+                                                     'count-min': {'type': 'integer'},
+                                                     'description': {'type': 'string'},
+                                                     'location': {'type': 'string'},
+                                                     'minimum-size': {'type': 'integer'},
+                                                     'name': {'type': 'string'},
+                                                     'properties': {'items': {'type': 'string'},
+                                                                    'type': 'array'},
+                                                     'read-only': {'type': 'boolean'},
+                                                     'shared': {'type': 'boolean'},
+                                                     'type': {'type': 'string'}},
+                                      'required': ['name',
+                                                   'description',
+                                                   'type',
+                                                   'shared',
+                                                   'read-only',
+                                                   'count-min',
+                                                   'count-max',
+                                                   'minimum-size'],
+                                      'type': 'object'},
+                     'CharmURL': {'additionalProperties': False,
+                                  'properties': {'url': {'type': 'string'}},
+                                  'required': ['url'],
+                                  'type': 'object'},
+                     'ConfigResult': {'additionalProperties': False,
+                                      'properties': {'config': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                             'type': 'object'}},
+                                                                'type': 'object'},
+                                                     'error': {'$ref': '#/definitions/Error'}},
+                                      'required': ['config'],
+                                      'type': 'object'},
+                     'Entities': {'additionalProperties': False,
+                                  'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
+                                                              'type': 'array'}},
+                                  'required': ['entities'],
+                                  'type': 'object'},
+                     'Entity': {'additionalProperties': False,
+                                'properties': {'tag': {'type': 'string'}},
+                                'required': ['tag'],
+                                'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ExpressionTree': {'additionalProperties': False,
+                                        'properties': {'Expression': {'additionalProperties': True,
+                                                                      'type': 'object'}},
+                                        'required': ['Expression'],
+                                        'type': 'object'},
+                     'LifeResult': {'additionalProperties': False,
+                                    'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                   'life': {'type': 'string'}},
+                                    'required': ['life'],
+                                    'type': 'object'},
+                     'LifeResults': {'additionalProperties': False,
+                                     'properties': {'results': {'items': {'$ref': '#/definitions/LifeResult'},
+                                                                'type': 'array'}},
+                                     'required': ['results'],
+                                     'type': 'object'},
+                     'NotifyWatchResult': {'additionalProperties': False,
+                                           'properties': {'NotifyWatcherId': {'type': 'string'},
+                                                          'error': {'$ref': '#/definitions/Error'}},
+                                           'required': ['NotifyWatcherId'],
+                                           'type': 'object'},
+                     'NotifyWatchResults': {'additionalProperties': False,
+                                            'properties': {'results': {'items': {'$ref': '#/definitions/NotifyWatchResult'},
+                                                                       'type': 'array'}},
+                                            'required': ['results'],
+                                            'type': 'object'},
+                     'StringsWatchResult': {'additionalProperties': False,
+                                            'properties': {'changes': {'items': {'type': 'string'},
+                                                                       'type': 'array'},
+                                                           'error': {'$ref': '#/definitions/Error'},
+                                                           'watcher-id': {'type': 'string'}},
+                                            'required': ['watcher-id'],
+                                            'type': 'object'},
+                     'StringsWatchResults': {'additionalProperties': False,
+                                             'properties': {'results': {'items': {'$ref': '#/definitions/StringsWatchResult'},
+                                                                        'type': 'array'}},
+                                             'required': ['results'],
+                                             'type': 'object'}},
+     'properties': {'ApplicationCharmInfo': {'description': 'ApplicationCharmInfo '
+                                                            'returns information '
+                                                            'about an '
+                                                            "application's charm.",
+                                             'properties': {'Params': {'$ref': '#/definitions/Entity'},
+                                                            'Result': {'$ref': '#/definitions/Charm'}},
+                                             'type': 'object'},
+                    'ApplicationsConfig': {'description': 'ApplicationsConfig '
+                                                          'returns the config for '
+                                                          'the specified '
+                                                          'applications.',
+                                           'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                          'Result': {'$ref': '#/definitions/ApplicationGetConfigResults'}},
+                                           'type': 'object'},
+                    'CharmInfo': {'description': 'CharmInfo returns information '
+                                                 'about the requested charm.',
+                                  'properties': {'Params': {'$ref': '#/definitions/CharmURL'},
+                                                 'Result': {'$ref': '#/definitions/Charm'}},
+                                  'type': 'object'},
+                    'IsExposed': {'description': 'IsExposed returns whether the '
+                                                 'specified applications are '
+                                                 'exposed.',
+                                  'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                 'Result': {'$ref': '#/definitions/BoolResults'}},
+                                  'type': 'object'},
+                    'Life': {'description': 'Life returns the life status of every '
+                                            'supplied entity, where available.',
+                             'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                            'Result': {'$ref': '#/definitions/LifeResults'}},
+                             'type': 'object'},
+                    'Watch': {'description': 'Watch starts an NotifyWatcher for '
+                                             'each given entity.',
+                              'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                             'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
+                              'type': 'object'},
+                    'WatchApplications': {'description': 'WatchApplications starts '
+                                                         'a StringsWatcher to '
+                                                         'watch applications\n'
+                                                         'deployed to this model.',
+                                          'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
+                                          'type': 'object'},
+                    'WatchOpenedPorts': {'description': 'WatchOpenedPorts returns '
+                                                        'a new StringsWatcher for '
+                                                        'each given\n'
+                                                        'model tag.',
+                                         'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                        'Result': {'$ref': '#/definitions/StringsWatchResults'}},
+                                         'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(Charm)
+    async def ApplicationCharmInfo(self, tag=None):
+        '''
+        ApplicationCharmInfo returns information about an application's charm.
+
+        tag : str
+        Returns -> Charm
+        '''
+        if tag is not None and not isinstance(tag, (bytes, str)):
+            raise Exception("Expected tag to be a str, received: {}".format(type(tag)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASFirewallerSidecar',
+                   request='ApplicationCharmInfo',
+                   version=1,
+                   params=_params)
+        _params['tag'] = tag
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ApplicationGetConfigResults)
+    async def ApplicationsConfig(self, entities=None):
+        '''
+        ApplicationsConfig returns the config for the specified applications.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ApplicationGetConfigResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASFirewallerSidecar',
+                   request='ApplicationsConfig',
+                   version=1,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(Charm)
+    async def CharmInfo(self, url=None):
+        '''
+        CharmInfo returns information about the requested charm.
+
+        url : str
+        Returns -> Charm
+        '''
+        if url is not None and not isinstance(url, (bytes, str)):
+            raise Exception("Expected url to be a str, received: {}".format(type(url)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASFirewallerSidecar',
+                   request='CharmInfo',
+                   version=1,
+                   params=_params)
+        _params['url'] = url
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(BoolResults)
+    async def IsExposed(self, entities=None):
+        '''
+        IsExposed returns whether the specified applications are exposed.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> BoolResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASFirewallerSidecar',
+                   request='IsExposed',
+                   version=1,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(LifeResults)
+    async def Life(self, entities=None):
+        '''
+        Life returns the life status of every supplied entity, where available.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> LifeResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASFirewallerSidecar',
+                   request='Life',
+                   version=1,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResults)
+    async def Watch(self, entities=None):
+        '''
+        Watch starts an NotifyWatcher for each given entity.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> NotifyWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASFirewallerSidecar',
+                   request='Watch',
+                   version=1,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResult)
+    async def WatchApplications(self):
+        '''
+        WatchApplications starts a StringsWatcher to watch applications
+        deployed to this model.
+
+
+        Returns -> StringsWatchResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASFirewallerSidecar',
+                   request='WatchApplications',
+                   version=1,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResults)
+    async def WatchOpenedPorts(self, entities=None):
+        '''
+        WatchOpenedPorts returns a new StringsWatcher for each given
+        model tag.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringsWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASFirewallerSidecar',
+                   request='WatchOpenedPorts',
+                   version=1,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
 class CAASModelConfigManagerFacade(Type):
     name = 'CAASModelConfigManager'
     version = 1
@@ -3823,6 +4332,7 @@ class CAASOperatorProvisionerFacade(Type):
                      'OperatorProvisioningInfo': {'additionalProperties': False,
                                                   'properties': {'api-addresses': {'items': {'type': 'string'},
                                                                                    'type': 'array'},
+                                                                 'base-image-details': {'$ref': '#/definitions/DockerImageInfo'},
                                                                  'charm-storage': {'$ref': '#/definitions/KubernetesFilesystemParams'},
                                                                  'error': {'$ref': '#/definitions/Error'},
                                                                  'image-details': {'$ref': '#/definitions/DockerImageInfo'},
@@ -3830,6 +4340,7 @@ class CAASOperatorProvisionerFacade(Type):
                                                                           'type': 'object'},
                                                                  'version': {'$ref': '#/definitions/Number'}},
                                                   'required': ['image-details',
+                                                               'base-image-details',
                                                                'version',
                                                                'api-addresses'],
                                                   'type': 'object'},
@@ -4499,9 +5010,13 @@ class CharmHubFacade(Type):
                                       'type': 'object'},
                      'Platform': {'additionalProperties': False,
                                   'properties': {'architecture': {'type': 'string'},
+                                                 'channel': {'type': 'string'},
                                                  'os': {'type': 'string'},
                                                  'series': {'type': 'string'}},
-                                  'required': ['architecture', 'os', 'series'],
+                                  'required': ['architecture',
+                                               'os',
+                                               'channel',
+                                               'series'],
                                   'type': 'object'},
                      'Query': {'additionalProperties': False,
                                'properties': {'category': {'type': 'string'},
@@ -5875,7 +6390,6 @@ class ImageMetadataManagerFacade(Type):
                                                            'region': {'type': 'string'},
                                                            'root-storage-size': {'type': 'integer'},
                                                            'root-storage-type': {'type': 'string'},
-                                                           'series': {'type': 'string'},
                                                            'source': {'type': 'string'},
                                                            'stream': {'type': 'string'},
                                                            'version': {'type': 'string'},
@@ -5883,7 +6397,6 @@ class ImageMetadataManagerFacade(Type):
                                             'required': ['image-id',
                                                          'region',
                                                          'version',
-                                                         'series',
                                                          'arch',
                                                          'source',
                                                          'priority'],
@@ -5913,9 +6426,9 @@ class ImageMetadataManagerFacade(Type):
                                                                        'type': 'array'},
                                                             'region': {'type': 'string'},
                                                             'root-storage-type': {'type': 'string'},
-                                                            'series': {'items': {'type': 'string'},
-                                                                       'type': 'array'},
                                                             'stream': {'type': 'string'},
+                                                            'versions': {'items': {'type': 'string'},
+                                                                         'type': 'array'},
                                                             'virt-type': {'type': 'string'}},
                                              'type': 'object'},
                      'ListCloudImageMetadataResult': {'additionalProperties': False,
@@ -5980,7 +6493,7 @@ class ImageMetadataManagerFacade(Type):
 
 
     @ReturnMapping(ListCloudImageMetadataResult)
-    async def List(self, arches=None, region=None, root_storage_type=None, series=None, stream=None, virt_type=None):
+    async def List(self, arches=None, region=None, root_storage_type=None, stream=None, versions=None, virt_type=None):
         '''
         List returns all found cloud image metadata that satisfy
         given filter.
@@ -5989,8 +6502,8 @@ class ImageMetadataManagerFacade(Type):
         arches : typing.Sequence[str]
         region : str
         root_storage_type : str
-        series : typing.Sequence[str]
         stream : str
+        versions : typing.Sequence[str]
         virt_type : str
         Returns -> ListCloudImageMetadataResult
         '''
@@ -6003,11 +6516,11 @@ class ImageMetadataManagerFacade(Type):
         if root_storage_type is not None and not isinstance(root_storage_type, (bytes, str)):
             raise Exception("Expected root_storage_type to be a str, received: {}".format(type(root_storage_type)))
 
-        if series is not None and not isinstance(series, (bytes, str, list)):
-            raise Exception("Expected series to be a Sequence, received: {}".format(type(series)))
-
         if stream is not None and not isinstance(stream, (bytes, str)):
             raise Exception("Expected stream to be a str, received: {}".format(type(stream)))
+
+        if versions is not None and not isinstance(versions, (bytes, str, list)):
+            raise Exception("Expected versions to be a Sequence, received: {}".format(type(versions)))
 
         if virt_type is not None and not isinstance(virt_type, (bytes, str)):
             raise Exception("Expected virt_type to be a str, received: {}".format(type(virt_type)))
@@ -6021,8 +6534,8 @@ class ImageMetadataManagerFacade(Type):
         _params['arches'] = arches
         _params['region'] = region
         _params['root-storage-type'] = root_storage_type
-        _params['series'] = series
         _params['stream'] = stream
+        _params['versions'] = versions
         _params['virt-type'] = virt_type
         reply = await self.rpc(msg)
         return reply
@@ -9388,15 +9901,15 @@ class SecretsFacade(Type):
                                           'properties': {'create-time': {'format': 'date-time',
                                                                          'type': 'string'},
                                                          'description': {'type': 'string'},
-                                                         'expire-time': {'format': 'date-time',
-                                                                         'type': 'string'},
                                                          'label': {'type': 'string'},
+                                                         'latest-expire-time': {'format': 'date-time',
+                                                                                'type': 'string'},
+                                                         'latest-revision': {'type': 'integer'},
                                                          'next-rotate-time': {'format': 'date-time',
                                                                               'type': 'string'},
                                                          'owner-tag': {'type': 'string'},
-                                                         'provider': {'type': 'string'},
-                                                         'provider-id': {'type': 'string'},
-                                                         'revision': {'type': 'integer'},
+                                                         'revisions': {'items': {'$ref': '#/definitions/SecretRevision'},
+                                                                       'type': 'array'},
                                                          'rotate-policy': {'type': 'string'},
                                                          'update-time': {'format': 'date-time',
                                                                          'type': 'string'},
@@ -9406,10 +9919,10 @@ class SecretsFacade(Type):
                                           'required': ['uri',
                                                        'version',
                                                        'owner-tag',
-                                                       'provider',
-                                                       'revision',
+                                                       'latest-revision',
                                                        'create-time',
-                                                       'update-time'],
+                                                       'update-time',
+                                                       'revisions'],
                                           'type': 'object'},
                      'ListSecretResults': {'additionalProperties': False,
                                            'properties': {'results': {'items': {'$ref': '#/definitions/ListSecretResult'},
@@ -9417,14 +9930,31 @@ class SecretsFacade(Type):
                                            'required': ['results'],
                                            'type': 'object'},
                      'ListSecretsArgs': {'additionalProperties': False,
-                                         'properties': {'show-secrets': {'type': 'boolean'}},
-                                         'required': ['show-secrets'],
+                                         'properties': {'filter': {'$ref': '#/definitions/SecretsFilter'},
+                                                        'show-secrets': {'type': 'boolean'}},
+                                         'required': ['show-secrets', 'filter'],
                                          'type': 'object'},
+                     'SecretRevision': {'additionalProperties': False,
+                                        'properties': {'create-time': {'format': 'date-time',
+                                                                       'type': 'string'},
+                                                       'expire-time': {'format': 'date-time',
+                                                                       'type': 'string'},
+                                                       'provider-id': {'type': 'string'},
+                                                       'revision': {'type': 'integer'},
+                                                       'update-time': {'format': 'date-time',
+                                                                       'type': 'string'}},
+                                        'required': ['revision'],
+                                        'type': 'object'},
                      'SecretValueResult': {'additionalProperties': False,
                                            'properties': {'data': {'patternProperties': {'.*': {'type': 'string'}},
                                                                    'type': 'object'},
                                                           'error': {'$ref': '#/definitions/Error'}},
-                                           'type': 'object'}},
+                                           'type': 'object'},
+                     'SecretsFilter': {'additionalProperties': False,
+                                       'properties': {'owner-tag': {'type': 'string'},
+                                                      'revision': {'type': 'integer'},
+                                                      'uri': {'type': 'string'}},
+                                       'type': 'object'}},
      'properties': {'ListSecrets': {'description': 'ListSecrets lists available '
                                                    'secrets.',
                                     'properties': {'Params': {'$ref': '#/definitions/ListSecretsArgs'},
@@ -9434,13 +9964,17 @@ class SecretsFacade(Type):
     
 
     @ReturnMapping(ListSecretResults)
-    async def ListSecrets(self, show_secrets=None):
+    async def ListSecrets(self, filter_=None, show_secrets=None):
         '''
         ListSecrets lists available secrets.
 
+        filter_ : SecretsFilter
         show_secrets : bool
         Returns -> ListSecretResults
         '''
+        if filter_ is not None and not isinstance(filter_, (dict, SecretsFilter)):
+            raise Exception("Expected filter_ to be a SecretsFilter, received: {}".format(type(filter_)))
+
         if show_secrets is not None and not isinstance(show_secrets, bool):
             raise Exception("Expected show_secrets to be a bool, received: {}".format(type(show_secrets)))
 
@@ -9450,6 +9984,7 @@ class SecretsFacade(Type):
                    request='ListSecrets',
                    version=1,
                    params=_params)
+        _params['filter'] = filter_
         _params['show-secrets'] = show_secrets
         reply = await self.rpc(msg)
         return reply
@@ -9461,8 +9996,7 @@ class SecretsManagerFacade(Type):
     version = 1
     schema =     {'definitions': {'CreateSecretArg': {'additionalProperties': False,
                                          'properties': {'UpsertSecretArg': {'$ref': '#/definitions/UpsertSecretArg'},
-                                                        'data': {'patternProperties': {'.*': {'type': 'string'}},
-                                                                 'type': 'object'},
+                                                        'content': {'$ref': '#/definitions/SecretContentParams'},
                                                         'description': {'type': 'string'},
                                                         'expire-time': {'format': 'date-time',
                                                                         'type': 'string'},
@@ -9471,12 +10005,28 @@ class SecretsManagerFacade(Type):
                                                         'params': {'patternProperties': {'.*': {'additionalProperties': True,
                                                                                                 'type': 'object'}},
                                                                    'type': 'object'},
-                                                        'rotate-policy': {'type': 'string'}},
+                                                        'rotate-policy': {'type': 'string'},
+                                                        'uri': {'type': 'string'}},
                                          'required': ['UpsertSecretArg',
                                                       'owner-tag'],
                                          'type': 'object'},
                      'CreateSecretArgs': {'additionalProperties': False,
                                           'properties': {'args': {'items': {'$ref': '#/definitions/CreateSecretArg'},
+                                                                  'type': 'array'}},
+                                          'required': ['args'],
+                                          'type': 'object'},
+                     'CreateSecretURIsArg': {'additionalProperties': False,
+                                             'properties': {'count': {'type': 'integer'}},
+                                             'required': ['count'],
+                                             'type': 'object'},
+                     'DeleteSecretArg': {'additionalProperties': False,
+                                         'properties': {'revisions': {'items': {'type': 'integer'},
+                                                                      'type': 'array'},
+                                                        'uri': {'type': 'string'}},
+                                         'required': ['uri'],
+                                         'type': 'object'},
+                     'DeleteSecretArgs': {'additionalProperties': False,
+                                          'properties': {'args': {'items': {'$ref': '#/definitions/DeleteSecretArg'},
                                                                   'type': 'array'}},
                                           'required': ['args'],
                                           'type': 'object'},
@@ -9505,61 +10055,151 @@ class SecretsManagerFacade(Type):
                                                                  'type': 'array'}},
                                       'required': ['results'],
                                       'type': 'object'},
-                     'GetSecretArg': {'additionalProperties': False,
-                                      'properties': {'label': {'type': 'string'},
-                                                     'peek': {'type': 'boolean'},
-                                                     'update': {'type': 'boolean'},
-                                                     'uri': {'type': 'string'}},
-                                      'required': ['uri'],
-                                      'type': 'object'},
-                     'GetSecretArgs': {'additionalProperties': False,
-                                       'properties': {'args': {'items': {'$ref': '#/definitions/GetSecretArg'},
-                                                               'type': 'array'}},
-                                       'required': ['args'],
-                                       'type': 'object'},
+                     'GetSecretConsumerInfoArgs': {'additionalProperties': False,
+                                                   'properties': {'consumer-tag': {'type': 'string'},
+                                                                  'uris': {'items': {'type': 'string'},
+                                                                           'type': 'array'}},
+                                                   'required': ['consumer-tag',
+                                                                'uris'],
+                                                   'type': 'object'},
+                     'GetSecretContentArg': {'additionalProperties': False,
+                                             'properties': {'label': {'type': 'string'},
+                                                            'peek': {'type': 'boolean'},
+                                                            'update': {'type': 'boolean'},
+                                                            'uri': {'type': 'string'}},
+                                             'required': ['uri'],
+                                             'type': 'object'},
+                     'GetSecretContentArgs': {'additionalProperties': False,
+                                              'properties': {'args': {'items': {'$ref': '#/definitions/GetSecretContentArg'},
+                                                                      'type': 'array'}},
+                                              'required': ['args'],
+                                              'type': 'object'},
+                     'GrantRevokeSecretArg': {'additionalProperties': False,
+                                              'properties': {'role': {'type': 'string'},
+                                                             'scope-tag': {'type': 'string'},
+                                                             'subject-tags': {'items': {'type': 'string'},
+                                                                              'type': 'array'},
+                                                             'uri': {'type': 'string'}},
+                                              'required': ['uri',
+                                                           'scope-tag',
+                                                           'subject-tags',
+                                                           'role'],
+                                              'type': 'object'},
+                     'GrantRevokeSecretArgs': {'additionalProperties': False,
+                                               'properties': {'args': {'items': {'$ref': '#/definitions/GrantRevokeSecretArg'},
+                                                                       'type': 'array'}},
+                                               'required': ['args'],
+                                               'type': 'object'},
+                     'ListSecretResult': {'additionalProperties': False,
+                                          'properties': {'create-time': {'format': 'date-time',
+                                                                         'type': 'string'},
+                                                         'description': {'type': 'string'},
+                                                         'label': {'type': 'string'},
+                                                         'latest-expire-time': {'format': 'date-time',
+                                                                                'type': 'string'},
+                                                         'latest-revision': {'type': 'integer'},
+                                                         'next-rotate-time': {'format': 'date-time',
+                                                                              'type': 'string'},
+                                                         'owner-tag': {'type': 'string'},
+                                                         'revisions': {'items': {'$ref': '#/definitions/SecretRevision'},
+                                                                       'type': 'array'},
+                                                         'rotate-policy': {'type': 'string'},
+                                                         'update-time': {'format': 'date-time',
+                                                                         'type': 'string'},
+                                                         'uri': {'type': 'string'},
+                                                         'value': {'$ref': '#/definitions/SecretValueResult'},
+                                                         'version': {'type': 'integer'}},
+                                          'required': ['uri',
+                                                       'version',
+                                                       'owner-tag',
+                                                       'latest-revision',
+                                                       'create-time',
+                                                       'update-time',
+                                                       'revisions'],
+                                          'type': 'object'},
+                     'ListSecretResults': {'additionalProperties': False,
+                                           'properties': {'results': {'items': {'$ref': '#/definitions/ListSecretResult'},
+                                                                      'type': 'array'}},
+                                           'required': ['results'],
+                                           'type': 'object'},
+                     'SecretConsumerInfoResult': {'additionalProperties': False,
+                                                  'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                                 'label': {'type': 'string'},
+                                                                 'revision': {'type': 'integer'}},
+                                                  'required': ['revision', 'label'],
+                                                  'type': 'object'},
+                     'SecretConsumerInfoResults': {'additionalProperties': False,
+                                                   'properties': {'results': {'items': {'$ref': '#/definitions/SecretConsumerInfoResult'},
+                                                                              'type': 'array'}},
+                                                   'required': ['results'],
+                                                   'type': 'object'},
+                     'SecretContentParams': {'additionalProperties': False,
+                                             'properties': {'data': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                     'type': 'object'},
+                                                            'provider-id': {'type': 'string'}},
+                                             'type': 'object'},
+                     'SecretContentResult': {'additionalProperties': False,
+                                             'properties': {'content': {'$ref': '#/definitions/SecretContentParams'},
+                                                            'error': {'$ref': '#/definitions/Error'}},
+                                             'required': ['content'],
+                                             'type': 'object'},
+                     'SecretContentResults': {'additionalProperties': False,
+                                              'properties': {'results': {'items': {'$ref': '#/definitions/SecretContentResult'},
+                                                                         'type': 'array'}},
+                                              'required': ['results'],
+                                              'type': 'object'},
+                     'SecretRevision': {'additionalProperties': False,
+                                        'properties': {'create-time': {'format': 'date-time',
+                                                                       'type': 'string'},
+                                                       'expire-time': {'format': 'date-time',
+                                                                       'type': 'string'},
+                                                       'provider-id': {'type': 'string'},
+                                                       'revision': {'type': 'integer'},
+                                                       'update-time': {'format': 'date-time',
+                                                                       'type': 'string'}},
+                                        'required': ['revision'],
+                                        'type': 'object'},
                      'SecretRotatedArg': {'additionalProperties': False,
-                                          'properties': {'uri': {'type': 'string'},
-                                                         'when': {'format': 'date-time',
-                                                                  'type': 'string'}},
-                                          'required': ['uri', 'when'],
+                                          'properties': {'original-revision': {'type': 'integer'},
+                                                         'skip': {'type': 'boolean'},
+                                                         'uri': {'type': 'string'}},
+                                          'required': ['uri',
+                                                       'original-revision',
+                                                       'skip'],
                                           'type': 'object'},
                      'SecretRotatedArgs': {'additionalProperties': False,
                                            'properties': {'args': {'items': {'$ref': '#/definitions/SecretRotatedArg'},
                                                                    'type': 'array'}},
                                            'required': ['args'],
                                            'type': 'object'},
-                     'SecretRotationChange': {'additionalProperties': False,
-                                              'properties': {'last-rotate-time': {'format': 'date-time',
+                     'SecretStoreConfig': {'additionalProperties': False,
+                                           'properties': {'params': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                  'type': 'object'}},
+                                                                     'type': 'object'},
+                                                          'type': {'type': 'string'}},
+                                           'required': ['type'],
+                                           'type': 'object'},
+                     'SecretTriggerChange': {'additionalProperties': False,
+                                             'properties': {'next-trigger-time': {'format': 'date-time',
                                                                                   'type': 'string'},
-                                                             'rotate-interval': {'type': 'integer'},
-                                                             'uri': {'type': 'string'}},
-                                              'required': ['uri',
-                                                           'rotate-interval',
-                                                           'last-rotate-time'],
-                                              'type': 'object'},
-                     'SecretRotationWatchResult': {'additionalProperties': False,
-                                                   'properties': {'changes': {'items': {'$ref': '#/definitions/SecretRotationChange'},
-                                                                              'type': 'array'},
-                                                                  'error': {'$ref': '#/definitions/Error'},
-                                                                  'watcher-id': {'type': 'string'}},
-                                                   'required': ['watcher-id',
-                                                                'changes'],
-                                                   'type': 'object'},
-                     'SecretRotationWatchResults': {'additionalProperties': False,
-                                                    'properties': {'results': {'items': {'$ref': '#/definitions/SecretRotationWatchResult'},
-                                                                               'type': 'array'}},
-                                                    'required': ['results'],
-                                                    'type': 'object'},
+                                                            'revision': {'type': 'integer'},
+                                                            'uri': {'type': 'string'}},
+                                             'required': ['uri',
+                                                          'next-trigger-time'],
+                                             'type': 'object'},
+                     'SecretTriggerWatchResult': {'additionalProperties': False,
+                                                  'properties': {'changes': {'items': {'$ref': '#/definitions/SecretTriggerChange'},
+                                                                             'type': 'array'},
+                                                                 'error': {'$ref': '#/definitions/Error'},
+                                                                 'watcher-id': {'type': 'string'}},
+                                                  'required': ['watcher-id',
+                                                               'changes'],
+                                                  'type': 'object'},
                      'SecretValueResult': {'additionalProperties': False,
                                            'properties': {'data': {'patternProperties': {'.*': {'type': 'string'}},
                                                                    'type': 'object'},
                                                           'error': {'$ref': '#/definitions/Error'}},
                                            'type': 'object'},
-                     'SecretValueResults': {'additionalProperties': False,
-                                            'properties': {'results': {'items': {'$ref': '#/definitions/SecretValueResult'},
-                                                                       'type': 'array'}},
-                                            'required': ['results'],
-                                            'type': 'object'},
                      'StringResult': {'additionalProperties': False,
                                       'properties': {'error': {'$ref': '#/definitions/Error'},
                                                      'result': {'type': 'string'}},
@@ -9570,10 +10210,21 @@ class SecretsManagerFacade(Type):
                                                                   'type': 'array'}},
                                        'required': ['results'],
                                        'type': 'object'},
+                     'StringsWatchResult': {'additionalProperties': False,
+                                            'properties': {'changes': {'items': {'type': 'string'},
+                                                                       'type': 'array'},
+                                                           'error': {'$ref': '#/definitions/Error'},
+                                                           'watcher-id': {'type': 'string'}},
+                                            'required': ['watcher-id'],
+                                            'type': 'object'},
+                     'StringsWatchResults': {'additionalProperties': False,
+                                             'properties': {'results': {'items': {'$ref': '#/definitions/StringsWatchResult'},
+                                                                        'type': 'array'}},
+                                             'required': ['results'],
+                                             'type': 'object'},
                      'UpdateSecretArg': {'additionalProperties': False,
                                          'properties': {'UpsertSecretArg': {'$ref': '#/definitions/UpsertSecretArg'},
-                                                        'data': {'patternProperties': {'.*': {'type': 'string'}},
-                                                                 'type': 'object'},
+                                                        'content': {'$ref': '#/definitions/SecretContentParams'},
                                                         'description': {'type': 'string'},
                                                         'expire-time': {'format': 'date-time',
                                                                         'type': 'string'},
@@ -9591,8 +10242,7 @@ class SecretsManagerFacade(Type):
                                           'required': ['args'],
                                           'type': 'object'},
                      'UpsertSecretArg': {'additionalProperties': False,
-                                         'properties': {'data': {'patternProperties': {'.*': {'type': 'string'}},
-                                                                 'type': 'object'},
+                                         'properties': {'content': {'$ref': '#/definitions/SecretContentParams'},
                                                         'description': {'type': 'string'},
                                                         'expire-time': {'format': 'date-time',
                                                                         'type': 'string'},
@@ -9602,17 +10252,63 @@ class SecretsManagerFacade(Type):
                                                                    'type': 'object'},
                                                         'rotate-policy': {'type': 'string'}},
                                          'type': 'object'}},
-     'properties': {'CreateSecrets': {'description': 'CreateSecrets creates new '
+     'properties': {'CreateSecretURIs': {'description': 'CreateSecretURIs creates '
+                                                        'new secret URIs.',
+                                         'properties': {'Params': {'$ref': '#/definitions/CreateSecretURIsArg'},
+                                                        'Result': {'$ref': '#/definitions/StringResults'}},
+                                         'type': 'object'},
+                    'CreateSecrets': {'description': 'CreateSecrets creates new '
                                                      'secrets.',
                                       'properties': {'Params': {'$ref': '#/definitions/CreateSecretArgs'},
                                                      'Result': {'$ref': '#/definitions/StringResults'}},
                                       'type': 'object'},
-                    'GetSecretValues': {'description': 'GetSecretValues returns '
-                                                       'the secret values for the '
-                                                       'specified secrets.',
-                                        'properties': {'Params': {'$ref': '#/definitions/GetSecretArgs'},
-                                                       'Result': {'$ref': '#/definitions/SecretValueResults'}},
-                                        'type': 'object'},
+                    'GetConsumerSecretsRevisionInfo': {'description': 'GetConsumerSecretsRevisionInfo '
+                                                                      'returns the '
+                                                                      'latest '
+                                                                      'secret '
+                                                                      'revisions '
+                                                                      'for the '
+                                                                      'specified '
+                                                                      'secrets.',
+                                                       'properties': {'Params': {'$ref': '#/definitions/GetSecretConsumerInfoArgs'},
+                                                                      'Result': {'$ref': '#/definitions/SecretConsumerInfoResults'}},
+                                                       'type': 'object'},
+                    'GetSecretContentInfo': {'description': 'GetSecretContentInfo '
+                                                            'returns the secret '
+                                                            'values for the '
+                                                            'specified secrets.',
+                                             'properties': {'Params': {'$ref': '#/definitions/GetSecretContentArgs'},
+                                                            'Result': {'$ref': '#/definitions/SecretContentResults'}},
+                                             'type': 'object'},
+                    'GetSecretMetadata': {'description': 'GetSecretMetadata '
+                                                         'returns metadata for the '
+                                                         "caller's secrets.",
+                                          'properties': {'Result': {'$ref': '#/definitions/ListSecretResults'}},
+                                          'type': 'object'},
+                    'GetSecretStoreConfig': {'description': 'GetSecretStoreConfig '
+                                                            'gets the config '
+                                                            'needed to create a '
+                                                            "client to the model's "
+                                                            'secret store.',
+                                             'properties': {'Result': {'$ref': '#/definitions/SecretStoreConfig'}},
+                                             'type': 'object'},
+                    'RemoveSecrets': {'description': 'RemoveSecrets removes the '
+                                                     'specified secrets.',
+                                      'properties': {'Params': {'$ref': '#/definitions/DeleteSecretArgs'},
+                                                     'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                      'type': 'object'},
+                    'SecretsGrant': {'description': 'SecretsGrant grants access to '
+                                                    'a secret for the specified '
+                                                    'subjects.',
+                                     'properties': {'Params': {'$ref': '#/definitions/GrantRevokeSecretArgs'},
+                                                    'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                     'type': 'object'},
+                    'SecretsRevoke': {'description': 'SecretsRevoke revokes access '
+                                                     'to a secret for the '
+                                                     'specified subjects.',
+                                      'properties': {'Params': {'$ref': '#/definitions/GrantRevokeSecretArgs'},
+                                                     'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                      'type': 'object'},
                     'SecretsRotated': {'description': 'SecretsRotated records when '
                                                       'secrets were last rotated.',
                                        'properties': {'Params': {'$ref': '#/definitions/SecretRotatedArgs'},
@@ -9623,6 +10319,48 @@ class SecretsManagerFacade(Type):
                                       'properties': {'Params': {'$ref': '#/definitions/UpdateSecretArgs'},
                                                      'Result': {'$ref': '#/definitions/ErrorResults'}},
                                       'type': 'object'},
+                    'WatchConsumedSecretsChanges': {'description': 'WatchConsumedSecretsChanges '
+                                                                   'sets up a '
+                                                                   'watcher to '
+                                                                   'notify of '
+                                                                   'changes to '
+                                                                   'secret '
+                                                                   'revisions for '
+                                                                   'the specified '
+                                                                   'consumers.',
+                                                    'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                                   'Result': {'$ref': '#/definitions/StringsWatchResults'}},
+                                                    'type': 'object'},
+                    'WatchObsolete': {'description': 'WatchObsolete returns a '
+                                                     'watcher for notifying when:\n'
+                                                     '  - a secret owned by the '
+                                                     'entity is deleted\n'
+                                                     '  - a secret revision owed '
+                                                     'by the entity no longer\n'
+                                                     '    has any consumers\n'
+                                                     '\n'
+                                                     'Obsolete revisions results '
+                                                     'are "uri/revno" and deleted\n'
+                                                     'secret results are "uri".',
+                                      'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                     'Result': {'$ref': '#/definitions/StringsWatchResult'}},
+                                      'type': 'object'},
+                    'WatchSecretRevisionsExpiryChanges': {'description': 'WatchSecretRevisionsExpiryChanges '
+                                                                         'sets up '
+                                                                         'a '
+                                                                         'watcher '
+                                                                         'to '
+                                                                         'notify '
+                                                                         'of '
+                                                                         'changes '
+                                                                         'to '
+                                                                         'secret '
+                                                                         'revision '
+                                                                         'expiry '
+                                                                         'config.',
+                                                          'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                                         'Result': {'$ref': '#/definitions/SecretTriggerWatchResult'}},
+                                                          'type': 'object'},
                     'WatchSecretsRotationChanges': {'description': 'WatchSecretsRotationChanges '
                                                                    'sets up a '
                                                                    'watcher to '
@@ -9632,10 +10370,33 @@ class SecretsManagerFacade(Type):
                                                                    'rotation '
                                                                    'config.',
                                                     'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                                   'Result': {'$ref': '#/definitions/SecretRotationWatchResults'}},
+                                                                   'Result': {'$ref': '#/definitions/SecretTriggerWatchResult'}},
                                                     'type': 'object'}},
      'type': 'object'}
     
+
+    @ReturnMapping(StringResults)
+    async def CreateSecretURIs(self, count=None):
+        '''
+        CreateSecretURIs creates new secret URIs.
+
+        count : int
+        Returns -> StringResults
+        '''
+        if count is not None and not isinstance(count, int):
+            raise Exception("Expected count to be a int, received: {}".format(type(count)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SecretsManager',
+                   request='CreateSecretURIs',
+                   version=1,
+                   params=_params)
+        _params['count'] = count
+        reply = await self.rpc(msg)
+        return reply
+
+
 
     @ReturnMapping(StringResults)
     async def CreateSecrets(self, args=None):
@@ -9660,13 +10421,41 @@ class SecretsManagerFacade(Type):
 
 
 
-    @ReturnMapping(SecretValueResults)
-    async def GetSecretValues(self, args=None):
+    @ReturnMapping(SecretConsumerInfoResults)
+    async def GetConsumerSecretsRevisionInfo(self, consumer_tag=None, uris=None):
         '''
-        GetSecretValues returns the secret values for the specified secrets.
+        GetConsumerSecretsRevisionInfo returns the latest secret revisions for the specified secrets.
 
-        args : typing.Sequence[~GetSecretArg]
-        Returns -> SecretValueResults
+        consumer_tag : str
+        uris : typing.Sequence[str]
+        Returns -> SecretConsumerInfoResults
+        '''
+        if consumer_tag is not None and not isinstance(consumer_tag, (bytes, str)):
+            raise Exception("Expected consumer_tag to be a str, received: {}".format(type(consumer_tag)))
+
+        if uris is not None and not isinstance(uris, (bytes, str, list)):
+            raise Exception("Expected uris to be a Sequence, received: {}".format(type(uris)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SecretsManager',
+                   request='GetConsumerSecretsRevisionInfo',
+                   version=1,
+                   params=_params)
+        _params['consumer-tag'] = consumer_tag
+        _params['uris'] = uris
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SecretContentResults)
+    async def GetSecretContentInfo(self, args=None):
+        '''
+        GetSecretContentInfo returns the secret values for the specified secrets.
+
+        args : typing.Sequence[~GetSecretContentArg]
+        Returns -> SecretContentResults
         '''
         if args is not None and not isinstance(args, (bytes, str, list)):
             raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
@@ -9674,7 +10463,118 @@ class SecretsManagerFacade(Type):
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='SecretsManager',
-                   request='GetSecretValues',
+                   request='GetSecretContentInfo',
+                   version=1,
+                   params=_params)
+        _params['args'] = args
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ListSecretResults)
+    async def GetSecretMetadata(self):
+        '''
+        GetSecretMetadata returns metadata for the caller's secrets.
+
+
+        Returns -> ListSecretResults
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SecretsManager',
+                   request='GetSecretMetadata',
+                   version=1,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SecretStoreConfig)
+    async def GetSecretStoreConfig(self):
+        '''
+        GetSecretStoreConfig gets the config needed to create a client to the model's secret store.
+
+
+        Returns -> SecretStoreConfig
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SecretsManager',
+                   request='GetSecretStoreConfig',
+                   version=1,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def RemoveSecrets(self, args=None):
+        '''
+        RemoveSecrets removes the specified secrets.
+
+        args : typing.Sequence[~DeleteSecretArg]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SecretsManager',
+                   request='RemoveSecrets',
+                   version=1,
+                   params=_params)
+        _params['args'] = args
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def SecretsGrant(self, args=None):
+        '''
+        SecretsGrant grants access to a secret for the specified subjects.
+
+        args : typing.Sequence[~GrantRevokeSecretArg]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SecretsManager',
+                   request='SecretsGrant',
+                   version=1,
+                   params=_params)
+        _params['args'] = args
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def SecretsRevoke(self, args=None):
+        '''
+        SecretsRevoke revokes access to a secret for the specified subjects.
+
+        args : typing.Sequence[~GrantRevokeSecretArg]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SecretsManager',
+                   request='SecretsRevoke',
                    version=1,
                    params=_params)
         _params['args'] = args
@@ -9729,13 +10629,88 @@ class SecretsManagerFacade(Type):
 
 
 
-    @ReturnMapping(SecretRotationWatchResults)
+    @ReturnMapping(StringsWatchResults)
+    async def WatchConsumedSecretsChanges(self, entities=None):
+        '''
+        WatchConsumedSecretsChanges sets up a watcher to notify of changes to secret revisions for the specified consumers.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringsWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SecretsManager',
+                   request='WatchConsumedSecretsChanges',
+                   version=1,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResult)
+    async def WatchObsolete(self, entities=None):
+        '''
+        WatchObsolete returns a watcher for notifying when:
+          - a secret owned by the entity is deleted
+          - a secret revision owed by the entity no longer
+            has any consumers
+
+        Obsolete revisions results are "uri/revno" and deleted
+        secret results are "uri".
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringsWatchResult
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SecretsManager',
+                   request='WatchObsolete',
+                   version=1,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SecretTriggerWatchResult)
+    async def WatchSecretRevisionsExpiryChanges(self, entities=None):
+        '''
+        WatchSecretRevisionsExpiryChanges sets up a watcher to notify of changes to secret revision expiry config.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> SecretTriggerWatchResult
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SecretsManager',
+                   request='WatchSecretRevisionsExpiryChanges',
+                   version=1,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SecretTriggerWatchResult)
     async def WatchSecretsRotationChanges(self, entities=None):
         '''
         WatchSecretsRotationChanges sets up a watcher to notify of changes to secret rotation config.
 
         entities : typing.Sequence[~Entity]
-        Returns -> SecretRotationWatchResults
+        Returns -> SecretTriggerWatchResult
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
             raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
@@ -9767,8 +10742,10 @@ class SecretsRotationWatcherFacade(Type):
                                               'properties': {'last-rotate-time': {'format': 'date-time',
                                                                                   'type': 'string'},
                                                              'rotate-interval': {'type': 'integer'},
-                                                             'uri': {'type': 'string'}},
-                                              'required': ['uri',
+                                                             'secret-id': {'type': 'integer'},
+                                                             'url': {'type': 'string'}},
+                                              'required': ['secret-id',
+                                                           'url',
                                                            'rotate-interval',
                                                            'last-rotate-time'],
                                               'type': 'object'},
@@ -9828,6 +10805,104 @@ class SecretsRotationWatcherFacade(Type):
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='SecretsRotationWatcher',
+                   request='Stop',
+                   version=1,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    async def rpc(self, msg):
+        '''
+        Patch rpc method to add Id.
+        '''
+        if not hasattr(self, 'Id'):
+            raise RuntimeError('Missing "Id" field')
+        msg['Id'] = id
+
+        from .facade import TypeEncoder
+        reply = await self.connection.rpc(msg, encoder=TypeEncoder)
+        return reply
+
+
+
+class SecretsTriggerWatcherFacade(Type):
+    name = 'SecretsTriggerWatcher'
+    version = 1
+    schema =     {'definitions': {'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'SecretTriggerChange': {'additionalProperties': False,
+                                             'properties': {'next-trigger-time': {'format': 'date-time',
+                                                                                  'type': 'string'},
+                                                            'revision': {'type': 'integer'},
+                                                            'uri': {'type': 'string'}},
+                                             'required': ['uri',
+                                                          'next-trigger-time'],
+                                             'type': 'object'},
+                     'SecretTriggerWatchResult': {'additionalProperties': False,
+                                                  'properties': {'changes': {'items': {'$ref': '#/definitions/SecretTriggerChange'},
+                                                                             'type': 'array'},
+                                                                 'error': {'$ref': '#/definitions/Error'},
+                                                                 'watcher-id': {'type': 'string'}},
+                                                  'required': ['watcher-id',
+                                                               'changes'],
+                                                  'type': 'object'}},
+     'properties': {'Next': {'description': 'Next returns when a change has '
+                                            'occurred to an entity of the\n'
+                                            'collection being watched since the '
+                                            'most recent call to Next\n'
+                                            'or the Watch call that created the '
+                                            'srvSecretRotationWatcher.',
+                             'properties': {'Result': {'$ref': '#/definitions/SecretTriggerWatchResult'}},
+                             'type': 'object'},
+                    'Stop': {'description': 'Stop stops the watcher.',
+                             'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(SecretTriggerWatchResult)
+    async def Next(self):
+        '''
+        Next returns when a change has occurred to an entity of the
+        collection being watched since the most recent call to Next
+        or the Watch call that created the srvSecretRotationWatcher.
+
+
+        Returns -> SecretTriggerWatchResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SecretsTriggerWatcher',
+                   request='Next',
+                   version=1,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def Stop(self):
+        '''
+        Stop stops the watcher.
+
+
+        Returns -> None
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SecretsTriggerWatcher',
                    request='Stop',
                    version=1,
                    params=_params)
@@ -10234,7 +11309,7 @@ class UnitAssignerFacade(Type):
      'properties': {'AssignUnits': {'description': 'AssignUnits assigns the units '
                                                    'with the given ids to the '
                                                    'correct machine. The\n'
-                                                   ' error results are returned in '
+                                                   'error results are returned in '
                                                    'the same order as the given '
                                                    'entities.',
                                     'properties': {'Params': {'$ref': '#/definitions/Entities'},
@@ -10264,7 +11339,7 @@ class UnitAssignerFacade(Type):
     async def AssignUnits(self, entities=None):
         '''
         AssignUnits assigns the units with the given ids to the correct machine. The
-         error results are returned in the same order as the given entities.
+        error results are returned in the same order as the given entities.
 
         entities : typing.Sequence[~Entity]
         Returns -> ErrorResults
