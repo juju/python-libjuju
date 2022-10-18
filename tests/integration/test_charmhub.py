@@ -97,3 +97,11 @@ async def test_subordinate_charm_zero_units(event_loop):
         app2 = await model.deploy('rsyslog-forwarder-ha', num_units=1)
         await jasyncio.sleep(5)
         assert len(app2.units) == 0
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_list_resources(event_loop):
+    async with base.CleanModel() as model:
+        resources = await model.charmhub.list_resources('postgresql')
+        assert type(resources) == list and len(resources) > 0
