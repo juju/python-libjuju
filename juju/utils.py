@@ -9,7 +9,7 @@ from pyasn1.codec.der.encoder import encode
 import yaml
 import zipfile
 
-from . import jasyncio
+from . import jasyncio, origin, errors
 
 
 async def execute_process(*cmd, log=None):
@@ -234,19 +234,91 @@ def generate_user_controller_access_token(username, controller_endpoints, secret
     return base64.urlsafe_b64encode(registration_string)
 
 
-def get_local_charm_metadata(path):
+def get_local_charm_data(path, yaml_file):
     """Retrieve Metadata of a Charm from its path
 
     :patam str path: Path of charm directory or .charm file
+    :patam str yaml_file: name of the yaml file, can be either
+    "metadata.yaml", or "manifest.yaml"
 
     :return: Object of charm metadata
     """
     if str(path).endswith('.charm'):
         with zipfile.ZipFile(str(path), 'r') as charm_file:
-            metadata = yaml.load(charm_file.read('metadata.yaml'), Loader=yaml.FullLoader)
+            metadata = yaml.load(charm_file.read(yaml_file), Loader=yaml.FullLoader)
     else:
         entity_path = Path(path)
-        metadata_path = entity_path / 'metadata.yaml'
+        metadata_path = entity_path / yaml_file
         metadata = yaml.load(metadata_path.read_text(), Loader=yaml.FullLoader)
 
     return metadata
+
+
+def get_local_charm_metadata(path):
+    return get_local_charm_data(path, 'metadata.yaml')
+
+
+def get_local_charm_manifest(path):
+    return get_local_charm_data(path, 'manifest.yaml')
+
+
+PRECISE = "precise"
+QUANTAL = "quantal"
+RARING = "raring"
+SAUCY = "saucy"
+TRUSTY = "trusty"
+UTOPIC = "utopic"
+VIVID = "vivid"
+WILY = "wily"
+XENIAL = "xenial"
+YAKKETY = "yakkety"
+ZESTY = "zesty"
+ARTFUL = "artful"
+BIONIC = "bionic"
+COSMIC = "cosmic"
+DISCO = "disco"
+EOAN = "eoan"
+FOCAL = "focal"
+GROOVY = "groovy"
+HIRSUTE = "hirsute"
+IMPISH = "impish"
+JAMMY = "jammy"
+KINETIC = "kinetic"
+
+UBUNTU_SERIES = {
+    PRECISE: "12.04",
+    QUANTAL: "12.10",
+    RARING: "13.04",
+    SAUCY: "13.10",
+    TRUSTY: "14.04",
+    UTOPIC: "14.10",
+    VIVID: "15.04",
+    WILY: "15.10",
+    XENIAL: "16.04",
+    YAKKETY: "16.10",
+    ZESTY: "17.04",
+    ARTFUL: "17.10",
+    BIONIC: "18.04",
+    COSMIC: "18.10",
+    DISCO: "19.04",
+    EOAN: "19.10",
+    FOCAL: "20.04",
+    GROOVY: "20.10",
+    HIRSUTE: "21.04",
+    IMPISH: "21.10",
+    JAMMY: "22.04",
+    KINETIC: "22.10",
+}
+
+
+def get_series_version(series_name):
+    if series_name not in UBUNTU_SERIES:
+        raise errors.JujuError("Unknown series : %s", series_name)
+    return UBUNTU_SERIES[series_name]
+
+
+def get_version_series(version):
+    if version not in UBUNTU_SERIES.values():
+        raise errors.JujuError("Unknown version : %s", version)
+    return list(UBUNTU_SERIES.keys())[list(UBUNTU_SERIES.values()).index(version)]
+
