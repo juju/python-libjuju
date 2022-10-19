@@ -14,7 +14,7 @@ from toposort import toposort_flatten
 from .client import client
 from .constraints import parse as parse_constraints, parse_storage_constraint, parse_device_constraint
 from .errors import JujuError
-from . import utils, jasyncio, charmhub
+from . import utils, jasyncio
 from .origin import Channel
 from .url import Schema, URL
 
@@ -148,8 +148,7 @@ class BundleHandler:
             ])
 
             # Update the 'charm:' entry for each app with the new 'local:' url.
-            for app_name, charm_url, (charm_dir, series) in zip(apps,
-                                                               charm_urls, args):
+            for app_name, charm_url, (charm_dir, series) in zip(apps, charm_urls, args):
                 metadata = utils.get_local_charm_metadata(charm_dir)
                 resources = await self.model.add_local_resources(
                     app_name,
@@ -372,7 +371,6 @@ class BundleHandler:
                                             risk=risk,
                                             track=track)
                 charm_url, charm_origin, _ = await self.model._resolve_charm(charm_url, origin)
-                # import pdb;pdb.set_trace()
                 spec['charm'] = str(charm_url)
             else:
                 results = await self.model.charmstore.entity(str(charm_url))
@@ -638,7 +636,7 @@ class AddApplicationChange(ChangeInfo):
                 self.application, charm, origin, overrides=self.resources)
         else:
             resources = context.bundle.get("applications", {}).get(self.application, {}).get("resources", {})
-        import pdb;pdb.set_trace()
+
         await context.model._deploy(
             charm_url=charm,
             application=self.application,
@@ -732,9 +730,6 @@ class AddCharmChange(ChangeInfo):
         ch = None
         identifier = None
         if Schema.LOCAL.matches(url.schema):
-            # origin = client.CharmOrigin(source="local", risk="stable")
-            import pdb;pdb.set_trace()
-            # context.origins[self.charm] = {str(None): origin}
             return self.charm
 
         if Schema.CHARM_STORE.matches(url.schema):
