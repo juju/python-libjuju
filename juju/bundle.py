@@ -129,7 +129,7 @@ class BundleHandler:
                 default_series or
                 await get_charm_series(charm_dir, self.model)
             )
-            if not series:
+            if not self.model.connection().is_using_old_client and not series:
                 raise JujuError(
                     "Couldn't determine series for charm at {}. "
                     "Add a 'series' key to the bundle.".format(charm_dir))
@@ -148,15 +148,24 @@ class BundleHandler:
             ])
 
             # Update the 'charm:' entry for each app with the new 'local:' url.
-            for app_name, charm_url, (charm_dir, _) in zip(apps, charm_urls, args):
+            for app_name, charm_url, (charm_dir, series) in zip(apps,
+                                                               charm_urls, args):
+                metadata = utils.get_local_charm_metadata(charm_dir)
                 resources = await self.model.add_local_resources(
                     app_name,
                     charm_url,
-                    utils.get_local_charm_metadata(charm_dir),
+                    metadata,
                     resources=bundle.get('applications', {app_name: {}})[app_name].get("resources", {}),
                 )
                 apps_dict[app_name]['charm'] = charm_url
                 apps_dict[app_name]["resources"] = resources
+                origin = client.CharmOrigin(source="local", risk="stable")
+                if not self.model.connection().is_using_old_client:
+                    origin.base = utils.get_local_charm_base(series, '',
+                                                             metadata,
+                                                             charm_dir,
+                                                             client.Base)
+                self.origins[charm_url] = {str(None): origin}
 
         return bundle
 
@@ -629,7 +638,7 @@ class AddApplicationChange(ChangeInfo):
                 self.application, charm, origin, overrides=self.resources)
         else:
             resources = context.bundle.get("applications", {}).get(self.application, {}).get("resources", {})
-
+        import pdb;pdb.set_trace()
         await context.model._deploy(
             charm_url=charm,
             application=self.application,
@@ -723,8 +732,9 @@ class AddCharmChange(ChangeInfo):
         ch = None
         identifier = None
         if Schema.LOCAL.matches(url.schema):
-            origin = client.CharmOrigin(source="local", risk="stable")
-            context.origins[self.charm] = {str(None): origin}
+            # origin = client.CharmOrigin(source="local", risk="stable")
+            import pdb;pdb.set_trace()
+            # context.origins[self.charm] = {str(None): origin}
             return self.charm
 
         if Schema.CHARM_STORE.matches(url.schema):
