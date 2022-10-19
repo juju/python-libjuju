@@ -322,3 +322,63 @@ def get_version_series(version):
         raise errors.JujuError("Unknown version : %s", version)
     return list(UBUNTU_SERIES.keys())[list(UBUNTU_SERIES.values()).index(version)]
 
+
+def get_local_charm_base(series, channel_from_arg, charm_metadata,
+                         charm_path, baseCls):
+    """Deduce the base [channel/osname] of a local charm based on what we
+    know already
+
+    :param str series: This may come from the argument or the metadata.yaml
+    :param str channel_from_arg: This is channel passed as argument, if any.
+    :param dict charm_metadata: metadata.yaml
+    :param str charm_path: Path of charm directory/.charm file
+    :param class baseCls:
+    :return: Instance of the baseCls with channel/osname informaiton
+    """
+
+    channel_for_base = ''
+    os_name_for_base = ''
+    # If user passed a channel_arg, then check the supported series against
+    # the channel's track
+    chnl_check = origin.Channel.parse(channel_from_arg) if channel_from_arg \
+        else None
+    if chnl_check:
+        not_supported_error = errors.JujuError(
+            "Given channel [track/risk] is not supported --"
+            "\n - Given channel : %s"
+            "\n - Series in Charm Metadata : %s" %
+            (channel_from_arg, charm_metadata['series']))
+        channel_for_base = chnl_check.track
+        intented_series = get_version_series(channel_for_base)
+        if intented_series not in charm_metadata['series']:
+            raise not_supported_error
+        # Also check the manifest if there's one
+        charm_manifest = get_local_charm_manifest(charm_path)
+        if 'bases' in charm_manifest:
+            for base in charm_manifest['bases']:
+                if channel_for_base == base['channel']:
+                    break
+            else:
+                raise not_supported_error
+
+    # If we know the series, use it to get a channel
+    if channel_for_base == '':
+        channel_for_base = get_series_version(series) if series else ''
+        if channel_for_base:
+            # we currently only support ubuntu series (statically)
+            # TODO (cderici) : go juju/core/series/supported.go and get the
+            #  others here too
+            os_name_for_base = 'ubuntu'
+
+    # Check the charm manifest
+    if channel_for_base == '':
+        charm_manifest = get_local_charm_manifest(charm_path)
+        if 'bases' in charm_manifest:
+            channel_for_base = charm_manifest['bases'][0]['channel']
+            os_name_for_base = charm_manifest['bases'][0]['name']
+
+    if channel_for_base == '':
+        raise errors.JujuError("Unable to determine base for charm : %s" %
+                               charm_path)
+
+    return baseCls(channel_for_base, os_name_for_base)
