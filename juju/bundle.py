@@ -281,20 +281,27 @@ class BundleHandler:
         if self.charms_facade is None:
             raise JujuError('unable to download bundle for {} using the new charms facade. Upgrade controller to proceed.'.format(charm_url))
 
+        id = origin.id_ if origin.id_ else ''
+        hash = origin.hash_ if origin.hash_ else ''
+        charm_origin = {
+            'source': origin.source,
+            'type': origin.type_,
+            'id': id,
+            'hash': hash,
+            'revision': origin.revision,
+            'risk': origin.risk,
+            'track': origin.track,
+            'architecture': origin.architecture,
+        }
+        if self.model.connection().is_using_old_client:
+            charm_origin['os'] = origin.os
+            charm_origin['series'] = origin.series
+        else:
+            charm_origin['base'] = origin.base
+
         resp = await self.charms_facade.GetDownloadInfos(entities=[{
             'charm-url': str(charm_url),
-            'charm-origin': {
-                'source': origin.source,
-                'type': origin.type_,
-                'id': origin.id_,
-                'hash': origin.hash_,
-                'revision': origin.revision,
-                'risk': origin.risk,
-                'track': origin.track,
-                'architecture': origin.architecture,
-                'os': origin.os,
-                'series': origin.series,
-            }
+            'charm-origin': charm_origin
         }])
         if len(resp.results) != 1:
             raise JujuError("expected one result, received {}".format(resp.results))
@@ -356,7 +363,7 @@ class BundleHandler:
                                             risk=risk,
                                             track=track)
                 charm_url, charm_origin, _ = await self.model._resolve_charm(charm_url, origin)
-
+                # import pdb;pdb.set_trace()
                 spec['charm'] = str(charm_url)
             else:
                 results = await self.model.charmstore.entity(str(charm_url))
