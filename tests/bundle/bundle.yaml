@@ -1,19 +1,19 @@
 series: xenial
 applications:
-  wordpress:
-    charm: "wordpress"
-    series: "xenial"
-    channel: "candidate"
+  keystone:
+    charm: "keystone"
+    series: "focal"
+    channel: "stable"
     num_units: 1
     annotations:
       "gui-x": "339.5"
       "gui-y": "-171"
     to:
       - "0"
-  mysql:
-    charm: "mysql"
-    series: "trusty"
-    channel: "candidate"
+  mysql-innodb:
+    charm: "mysql-innodb-cluster"
+    series: "jammy"
+    channel: "stable"
     num_units: 1
     annotations:
       "gui-x": "79.5"
@@ -21,12 +21,12 @@ applications:
     to:
       - "1"
 relations:
-  - - "wordpress:db"
-    - "mysql:db"
+  - - "keystone:shared-db"
+    - "mysql-innodb:shared-db"
 machines:
   "0":
-    series: xenial
+    series: focal
     constraints: "arch=amd64 cores=1 cpu-power=100 mem=1740 root-disk=8192"
   "1":
-    series: trusty
+    series: jammy
     constraints: "arch=amd64 cores=1 cpu-power=100 mem=1740 root-disk=8192"
