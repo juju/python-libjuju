@@ -356,10 +356,14 @@ class BundleHandler:
 
             charm_url = URL.parse(spec['charm'])
             channel = None
+            series = spec.get('series', None)
             track, risk = '', ''
             if 'channel' in spec:
                 channel = Channel.parse(spec['channel'])
                 track, risk = channel.track, channel.risk
+
+                # if not track and series:
+                #     track = utils.get_series_version(series)
             if self.charms_facade is not None:
                 if cons is not None and cons['arch'] != '':
                     architecture = cons['arch']
@@ -370,6 +374,9 @@ class BundleHandler:
                                             architecture=architecture,
                                             risk=risk,
                                             track=track)
+                if not self.model.connection().is_using_old_client and series:
+                    origin.base = client.Base(
+                        channel=utils.get_series_version(series), name='ubuntu')
                 charm_url, charm_origin, _ = await self.model._resolve_charm(charm_url, origin)
                 spec['charm'] = str(charm_url)
             else:
@@ -750,6 +757,10 @@ class AddCharmChange(ChangeInfo):
                                         architecture=arch,
                                         risk=ch.risk,
                                         track=ch.track)
+            if not context.model.connection().is_using_old_client and self.series:
+                origin.base = client.Base(
+                    channel=utils.get_series_version(self.series),
+                    name='ubuntu')
             identifier, origin, _ = await context.model._resolve_charm(url, origin)
 
         if identifier is None:
@@ -835,7 +846,12 @@ class AddMachineChange(ChangeInfo):
 
         params['constraints'] = parse_constraints(self.constraints)
         params['jobs'] = params.get('jobs', ['JobHostUnits'])
-        params['series'] = self.series
+        if not context.model.connection().is_using_old_client:
+            params['base'] = client.Base(
+                channel=utils.get_series_version(self.series),
+                name='ubuntu')
+        else:
+            params['series'] = self.series
 
         if self.container_type == 'lxc':
             log.warning('Juju 2.0 does not support lxc containers. '

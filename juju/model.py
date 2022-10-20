@@ -1860,14 +1860,19 @@ class Model:
             source = "charm-store"
         else:
             source = "charm-hub"
+
+        resolve_origin = {
+            'source': source,
+            'architecture': origin.architecture,
+            'track': origin.track,
+            'risk': origin.risk,
+        }
+
+        if not self.connection().is_using_old_client:
+            resolve_origin['base'] = origin.base
         resp = await charms_facade.ResolveCharms(resolve=[{
             'reference': str(url),
-            'charm-origin': {
-                'source': source,
-                'architecture': origin.architecture,
-                'track': origin.track,
-                'risk': origin.risk,
-            }
+            'charm-origin': resolve_origin
         }])
         if len(resp.results) != 1:
             raise JujuError("expected one result, received {}".format(resp.results))
