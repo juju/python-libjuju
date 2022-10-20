@@ -49,10 +49,10 @@ async def test_deploy_local_bundle_dir(event_loop):
     async with base.CleanModel() as model:
         await model.deploy(str(bundle_path))
 
-        wordpress = model.applications.get('wordpress')
-        mysql = model.applications.get('mysql')
-        assert wordpress and mysql
-        await model.block_until(lambda: (len(wordpress.units) == 1 and
+        keystone = model.applications.get('keystone')
+        mysql = model.applications.get('mysql-innodb')
+        assert keystone and mysql
+        await model.block_until(lambda: (len(keystone.units) == 1 and
                                 len(mysql.units) == 1),
                                 timeout=60 * 4)
 
