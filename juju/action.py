@@ -14,8 +14,7 @@ class Action(model.ModelEntity):
 
     async def fetch_output(self):
         completed_action = await self.model._get_completed_action(self.id)
-        self.results = {} if completed_action.output is None else \
-            completed_action.output
+        self.results = completed_action.output or {}
         self._status = completed_action.status
 
     async def wait(self):
