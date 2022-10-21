@@ -371,8 +371,7 @@ class Application(model.ModelEntity):
         appGetResults = (await app_facade.Get(application=self.name))
         if self._facade_version() >= 15:
             base_channel = appGetResults.base.channel
-            track = Channel.parse(base_channel).track
-            return utils.get_version_series(track)
+            return utils.base_channel_to_series(base_channel)
         return appGetResults.series
 
     async def get_config(self):
