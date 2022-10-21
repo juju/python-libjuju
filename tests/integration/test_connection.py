@@ -55,6 +55,7 @@ async def test_monitor_catches_error(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.skip('Update charm')
 async def test_full_status(event_loop):
     async with base.CleanModel() as model:
         await model.deploy(

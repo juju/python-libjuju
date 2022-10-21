@@ -1000,6 +1000,7 @@ async def test_unit_annotations(event_loop):
 
     async with base.CleanModel() as model:
         app = await model.deploy('ubuntu', channel="stable")
+        await model.wait_for_idle()
         unit = app.units[0]
 
         annotations = await unit.get_annotations()
