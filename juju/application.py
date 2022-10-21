@@ -773,19 +773,22 @@ class Application(model.ModelEntity):
         else:
             resource_ids = None
 
+        set_charm_args = {
+            'application': self.entity_id,
+            'charm_url': charm_url,
+            'charm_origin': dest_origin,
+            'config_settings': None,
+            'config_settings_yaml': None,
+            'force': force,
+            'force_units': force_units,
+            'resource_ids': resource_ids,
+            'storage_constraints': None,
+        }
+        if self.connection.is_using_old_client:
+            set_charm_args['force_series'] = force_series
+
         # Update the application
-        await app_facade.SetCharm(
-            application=self.entity_id,
-            charm_url=charm_url,
-            charm_origin=dest_origin,
-            config_settings=None,
-            config_settings_yaml=None,
-            force=force,
-            force_series=force_series,
-            force_units=force_units,
-            resource_ids=resource_ids,
-            storage_constraints=None,
-        )
+        await app_facade.SetCharm(**set_charm_args)
 
         await self.model.block_until(
             lambda: self.data['charm-url'] == charm_url
@@ -835,19 +838,23 @@ class Application(model.ModelEntity):
                                                              metadata,
                                                              resources=resources)
 
+        set_charm_args = {
+            'application': self.entity_id,
+            'charm_origin': charm_origin,
+            'charm_url': charm_url,
+            'config_settings': None,
+            'config_settings_yaml': None,
+            'force': force,
+            'force_units': force_units,
+            'resource_ids': resources,
+            'storage_constraints': None,
+        }
+
+        if self.connection.is_using_old_client:
+            set_charm_args['force_series'] = force_series
+
         # Update application
-        await app_facade.SetCharm(
-            application=self.entity_id,
-            charm_origin=charm_origin,
-            charm_url=charm_url,
-            config_settings=None,
-            config_settings_yaml=None,
-            force=force,
-            force_series=force_series,
-            force_units=force_units,
-            resource_ids=resources,
-            storage_constraints=None,
-        )
+        await app_facade.SetCharm(**set_charm_args)
 
         await self.model.block_until(
             lambda: self.data['charm-url'] == charm_url
