@@ -382,3 +382,12 @@ def get_local_charm_base(series, channel_from_arg, charm_metadata,
                                charm_path)
 
     return baseCls(channel_for_base, os_name_for_base)
+
+
+def base_channel_to_series(channel):
+    """Returns the series string using the track inside the base channel
+
+    :param str channel: is track/risk (e.g. 20.04/stable)
+    :return: str series (e.g. focal)
+    """
+    return get_version_series(origin.Channel.parse(channel).track)

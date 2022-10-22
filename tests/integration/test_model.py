@@ -16,7 +16,7 @@ from juju import jasyncio, tag
 from juju.client import client
 from juju.errors import JujuError, JujuModelError, JujuUnitError, JujuConnectionError
 from juju.model import Model, ModelObserver
-from juju.utils import block_until, run_with_interrupt, wait_for_bundle
+from juju.utils import block_until, run_with_interrupt, wait_for_bundle, base_channel_to_series
 
 from .. import base
 
@@ -315,11 +315,19 @@ async def test_deploy_channels_revs(event_loop):
 @pytest.mark.asyncio
 async def test_deploy_from_ch_with_series(event_loop):
     charm = 'ch:ubuntu'
-    for series in ['xenial', 'bionic', 'focal']:
+    for series in ['focal']:
         async with base.CleanModel() as model:
             app_name = "ubuntu-{}".format(series)
             await model.deploy(charm, application_name=app_name, series=series)
-            assert (await model.get_status())["applications"][app_name]["series"] == series
+            status = (await model.get_status())
+            app_status = status["applications"][app_name]
+
+            if 'series' in app_status.serialize():
+                s = app_status['series']
+            else:
+                # If there's no series, we should have a base
+                s = base_channel_to_series(app_status.base.channel)
+            assert s == series
 
 
 @base.bootstrapped
@@ -992,6 +1000,7 @@ async def test_unit_annotations(event_loop):
 
     async with base.CleanModel() as model:
         app = await model.deploy('ubuntu', channel="stable")
+        await model.wait_for_idle()
         unit = app.units[0]
 
         annotations = await unit.get_annotations()
