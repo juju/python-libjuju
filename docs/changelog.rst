@@ -1,6 +1,25 @@
 Changelog
 ---------
 
+3.0.3
+^^^^^
+
+Saturay October 22 2022
+
+## What's Changed
+
+* Wait for idle arg type check by @cderici in https://github.com/juju/python-libjuju/pull/741
+* [JUJU-1970] Revise local refresh by @cderici in https://github.com/juju/python-libjuju/pull/742
+* [JUJU-1984] Update facade schemas for juju 3.0-rc1-2 by @cderici in https://github.com/juju/python-libjuju/pull/745
+* [JUJU-1992] Fix charmhub series deploy 3.0 by @cderici in https://github.com/juju/python-libjuju/pull/746
+* [JUJU-2001] Fix base for local charms and bundles for CharmOrigin 3.0 by @cderici in https://github.com/juju/python-libjuju/pull/749
+* [JUJU-2017] Check subordinate field value instead of existence by @cderici in https://github.com/juju/python-libjuju/pull/751
+* [JUJU-2018] Update 2.9.36 facades & clients by @cderici in https://github.com/juju/python-libjuju/pull/752
+* [JUJU-1705] Make sure the action status is correctly set by @cderici in https://github.com/juju/python-libjuju/pull/753
+* [JUJU-2019] Small fixes for 3.0 by @cderici in https://github.com/juju/python-libjuju/pull/754
+
+
+**Full Changelog**: https://github.com/juju/python-libjuju/compare/3.0.2...3.0.3
 
 3.0.2
 ^^^^^
