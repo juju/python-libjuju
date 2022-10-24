@@ -637,14 +637,11 @@ class Application(model.ModelEntity):
         :param str switch: Crossgrade charm url
 
         """
-        if resources is not None:
-            raise NotImplementedError("resources option is not implemented")
 
         if switch is not None and revision is not None:
             raise ValueError("switch and revision are mutually exclusive")
 
         app_facade = self._facade()
-        resources_facade = client.ResourcesFacade.from_connection(self.connection)
         charms_facade = client.CharmsFacade.from_connection(self.connection)
 
         # 1 - Figure out the destination origin and destination charm_url
@@ -663,6 +660,9 @@ class Application(model.ModelEntity):
             await self.local_refresh(origin, force, force_series,
                                      force_units, path, resources)
             return
+
+        if resources is not None:
+            raise NotImplementedError("resources option is not implemented")
 
         parsed_url = URL.parse(charm_url)
         charm_name = parsed_url.name
@@ -731,6 +731,7 @@ class Application(model.ModelEntity):
         # Already prepped the charm_resources
         # Now get the existing resources from the ResourcesFacade
         request_data = [client.Entity(self.tag)]
+        resources_facade = client.ResourcesFacade.from_connection(self.connection)
         response = await resources_facade.ListResources(entities=request_data)
         existing_resources = {
             resource.name: resource

@@ -266,6 +266,26 @@ async def test_upgrade_local_charm(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_upgrade_local_charm_resource(event_loop):
+    async with base.CleanModel() as model:
+        tests_dir = Path(__file__).absolute().parent
+        charm_path = tests_dir / 'file-resource-charm'
+        resources = {"file-res": "test.file"}
+
+        app = await model.deploy(str(charm_path), resources=resources)
+        assert 'file-resource-charm' in model.applications
+        await model.wait_for_idle()
+        assert app.units[0].agent_status == 'idle'
+
+        await app.upgrade_charm(path=charm_path, resources=resources)
+        await model.wait_for_idle()
+        ress = await app.get_resources()
+        assert 'file-res' in ress
+        assert ress['file-res']
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 @pytest.mark.skip('Update charm')
 async def test_upgrade_switch_charmstore_to_charmhub(event_loop):
     async with base.CleanModel() as model:
