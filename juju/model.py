@@ -548,10 +548,16 @@ class CharmhubDeployType:
         if channel is not None:
             ch = Channel.parse(channel).normalize()
 
+        base = client.Base()
+        if series:
+            base.channel = ch.normalize().compute_base_channel(series=series)
+            base.name = 'ubuntu'
         origin = client.CharmOrigin(source="charm-hub",
                                     architecture=architecture,
                                     risk=ch.risk,
-                                    track=ch.track)
+                                    track=ch.track,
+                                    base=base,
+                                    )
 
         charm_url_str, origin, supported_series = await self.charm_resolver(url, origin)
         charm_url = URL.parse(charm_url_str)
@@ -1856,12 +1862,28 @@ class Model:
         return await client_facade.AddCharm(channel=str(origin.risk), url=charm_url, force=False)
 
     async def _resolve_charm(self, url, origin):
+        """Calls Charms.ResolveCharms to resolve all the fields of the
+        charm_origin and also the url and the supported_series
+
+        :param str url: The url of the charm
+        :param client.CharmOrigin origin: The manually constructed origin
+        based on what we know about the charm and the deployment so far
+
+        Returns the confirmed origin returned by the Juju API to be used in
+        calls like ApplicationFacade.Deploy
+
+        :returns str, client.CharmOrigin, [str]
+        """
         charms_cls = client.CharmsFacade
         if charms_cls.best_facade_version(self.connection()) < 3:
             raise JujuError("resolve charm")
 
         charms_facade = charms_cls.from_connection(self.connection())
 
+        # TODO (cderici): following part can be refactored out, since the
+        #  origin should be set (including the base) before calling this,
+        #  though all tests need to run (in earlier versions too) before
+        #  committing to make sure there's no regression
         if Schema.CHARM_STORE.matches(url.schema):
             source = "charm-store"
         else:
