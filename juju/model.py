@@ -548,10 +548,16 @@ class CharmhubDeployType:
         if channel is not None:
             ch = Channel.parse(channel).normalize()
 
+        base = client.Base()
+        if series:
+            base.channel = ch.normalize().compute_base_channel(series=series)
+            base.name = 'ubuntu'
         origin = client.CharmOrigin(source="charm-hub",
                                     architecture=architecture,
                                     risk=ch.risk,
-                                    track=ch.track)
+                                    track=ch.track,
+                                    base=base,
+                                    )
 
         charm_url_str, origin, supported_series = await self.charm_resolver(url, origin)
         charm_url = URL.parse(charm_url_str)
@@ -1739,8 +1745,12 @@ class Model:
             raise JujuError('unknown charm or bundle {}'.format(entity_url))
         identifier = res.identifier
 
-        series = res.origin.series if self.connection().is_using_old_client \
-            else series
+        charm_series = series
+
+        if self.connection().is_using_old_client and charm_series is None:
+            # Also try
+            charm_series = res.origin.series
+
         if res.is_bundle:
             handler = BundleHandler(self, trusted=trust, forced=force)
             await handler.fetch_plan(url, res.origin, overlays=overlays)
@@ -1792,12 +1802,13 @@ class Model:
                 metadata = utils.get_local_charm_metadata(charm_dir)
                 # TODO (cderici) : pass the metadata into get_charm_series, as
                 #  it also reads that file redundantly
-                series = series or await get_charm_series(charm_dir, self)
+                charm_series = charm_series or await get_charm_series(charm_dir,
+                                                                      self)
 
                 # If we're using a newer client, then the CharmOrigin needs a
                 # base
                 if not self.connection().is_using_old_client:
-                    charm_origin.base = utils.get_local_charm_base(series,
+                    charm_origin.base = utils.get_local_charm_base(charm_series,
                                                                    channel,
                                                                    metadata,
                                                                    charm_dir,
@@ -1805,12 +1816,13 @@ class Model:
 
                 if not application_name:
                     application_name = metadata['name']
-                if self.connection().is_using_old_client and not series:
+                if self.connection().is_using_old_client and not charm_series:
                     raise JujuError(
                         "Couldn't determine series for charm at {}. "
                         "Pass a 'series' kwarg to Model.deploy().".format(
                             charm_dir))
-                identifier = await self.add_local_charm_dir(charm_dir, series)
+                identifier = await self.add_local_charm_dir(charm_dir,
+                                                            charm_series)
                 resources = await self.add_local_resources(application_name,
                                                            identifier,
                                                            metadata,
@@ -1824,7 +1836,7 @@ class Model:
             return await self._deploy(
                 charm_url=identifier,
                 application=res.app_name,
-                series=series,
+                series=charm_series,
                 config=config,
                 constraints=constraints,
                 endpoint_bindings=bind,
@@ -1850,12 +1862,28 @@ class Model:
         return await client_facade.AddCharm(channel=str(origin.risk), url=charm_url, force=False)
 
     async def _resolve_charm(self, url, origin):
+        """Calls Charms.ResolveCharms to resolve all the fields of the
+        charm_origin and also the url and the supported_series
+
+        :param str url: The url of the charm
+        :param client.CharmOrigin origin: The manually constructed origin
+        based on what we know about the charm and the deployment so far
+
+        Returns the confirmed origin returned by the Juju API to be used in
+        calls like ApplicationFacade.Deploy
+
+        :returns str, client.CharmOrigin, [str]
+        """
         charms_cls = client.CharmsFacade
         if charms_cls.best_facade_version(self.connection()) < 3:
             raise JujuError("resolve charm")
 
         charms_facade = charms_cls.from_connection(self.connection())
 
+        # TODO (cderici): following part can be refactored out, since the
+        #  origin should be set (including the base) before calling this,
+        #  though all tests need to run (in earlier versions too) before
+        #  committing to make sure there's no regression
         if Schema.CHARM_STORE.matches(url.schema):
             source = "charm-store"
         else:
@@ -1867,9 +1895,9 @@ class Model:
             'track': origin.track,
             'risk': origin.risk,
         }
-
         if not self.connection().is_using_old_client:
             resolve_origin['base'] = origin.base
+
         resp = await charms_facade.ResolveCharms(resolve=[{
             'reference': str(url),
             'charm-origin': resolve_origin
