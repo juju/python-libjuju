@@ -1739,8 +1739,12 @@ class Model:
             raise JujuError('unknown charm or bundle {}'.format(entity_url))
         identifier = res.identifier
 
-        series = res.origin.series if self.connection().is_using_old_client \
-            else series
+        charm_series = series
+
+        if self.connection().is_using_old_client and charm_series is None:
+            # Also try
+            charm_series = res.origin.series
+
         if res.is_bundle:
             handler = BundleHandler(self, trusted=trust, forced=force)
             await handler.fetch_plan(url, res.origin, overlays=overlays)
@@ -1792,12 +1796,13 @@ class Model:
                 metadata = utils.get_local_charm_metadata(charm_dir)
                 # TODO (cderici) : pass the metadata into get_charm_series, as
                 #  it also reads that file redundantly
-                series = series or await get_charm_series(charm_dir, self)
+                charm_series = charm_series or await get_charm_series(charm_dir,
+                                                                      self)
 
                 # If we're using a newer client, then the CharmOrigin needs a
                 # base
                 if not self.connection().is_using_old_client:
-                    charm_origin.base = utils.get_local_charm_base(series,
+                    charm_origin.base = utils.get_local_charm_base(charm_series,
                                                                    channel,
                                                                    metadata,
                                                                    charm_dir,
@@ -1805,12 +1810,13 @@ class Model:
 
                 if not application_name:
                     application_name = metadata['name']
-                if self.connection().is_using_old_client and not series:
+                if self.connection().is_using_old_client and not charm_series:
                     raise JujuError(
                         "Couldn't determine series for charm at {}. "
                         "Pass a 'series' kwarg to Model.deploy().".format(
                             charm_dir))
-                identifier = await self.add_local_charm_dir(charm_dir, series)
+                identifier = await self.add_local_charm_dir(charm_dir,
+                                                            charm_series)
                 resources = await self.add_local_resources(application_name,
                                                            identifier,
                                                            metadata,
@@ -1824,7 +1830,7 @@ class Model:
             return await self._deploy(
                 charm_url=identifier,
                 application=res.app_name,
-                series=series,
+                series=charm_series,
                 config=config,
                 constraints=constraints,
                 endpoint_bindings=bind,
@@ -1867,9 +1873,9 @@ class Model:
             'track': origin.track,
             'risk': origin.risk,
         }
-
         if not self.connection().is_using_old_client:
             resolve_origin['base'] = origin.base
+
         resp = await charms_facade.ResolveCharms(resolve=[{
             'reference': str(url),
             'charm-origin': resolve_origin
