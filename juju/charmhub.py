@@ -38,7 +38,8 @@ class CharmHub:
         url = "{}/v2/charms/info/{}?fields=default-release.revision.subordinate".format(charmhub_url.value, charm_name)
         _response = await self.request_charmhub_with_retry(url, 5)
         response = json.loads(_response.text)
-        return 'subordinate' in response['default-release']['revision']
+        rev_response = response['default-release']['revision']
+        return 'subordinate' in rev_response and rev_response['subordinate']
 
     # TODO (caner) : we should be able to recreate the channel-map through the
     #  api call without needing the CharmHub facade

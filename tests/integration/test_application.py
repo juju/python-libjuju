@@ -79,6 +79,7 @@ async def test_get_set_config(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.skip('Update charm')
 async def test_status_is_not_unset(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy(
@@ -93,6 +94,7 @@ async def test_status_is_not_unset(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.skip('Update charm')
 async def test_status(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy('cs:~juju-qa/blocked-0')
@@ -108,6 +110,7 @@ async def test_status(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.skip('Update charm')
 async def test_add_units(event_loop):
     from juju.unit import Unit
 
@@ -127,6 +130,7 @@ async def test_add_units(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.skip('Update charm')
 async def test_deploy_charmstore_charm(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy('cs:ubuntu-0')
@@ -147,6 +151,7 @@ async def test_deploy_charmhub_charm(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.skip('Update charm')
 async def test_upgrade_charm(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy('cs:ubuntu-0')
@@ -160,6 +165,7 @@ async def test_upgrade_charm(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.skip('Update charm')
 async def test_upgrade_charm_channel(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy('cs:ubuntu-0')
@@ -217,6 +223,7 @@ async def test_upgrade_charm_switch_channel(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.skip('Update charm')
 async def test_upgrade_charm_revision(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy('cs:ubuntu-0')
@@ -229,6 +236,7 @@ async def test_upgrade_charm_revision(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.skip('Update charm')
 async def test_upgrade_charm_switch(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy('cs:ubuntu-0')
@@ -258,6 +266,27 @@ async def test_upgrade_local_charm(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_upgrade_local_charm_resource(event_loop):
+    async with base.CleanModel() as model:
+        tests_dir = Path(__file__).absolute().parent
+        charm_path = tests_dir / 'file-resource-charm'
+        resources = {"file-res": "test.file"}
+
+        app = await model.deploy(str(charm_path), resources=resources)
+        assert 'file-resource-charm' in model.applications
+        await model.wait_for_idle()
+        assert app.units[0].agent_status == 'idle'
+
+        await app.upgrade_charm(path=charm_path, resources=resources)
+        await model.wait_for_idle()
+        ress = await app.get_resources()
+        assert 'file-res' in ress
+        assert ress['file-res']
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+@pytest.mark.skip('Update charm')
 async def test_upgrade_switch_charmstore_to_charmhub(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy('cs:ubuntu', series='focal')
@@ -270,6 +299,7 @@ async def test_upgrade_switch_charmstore_to_charmhub(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.skip('Update charm')
 async def test_upgrade_charm_resource(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy('cs:~juju-qa/bionic/upgrade-charm-resource-test-0')

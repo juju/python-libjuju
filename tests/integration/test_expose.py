@@ -7,6 +7,7 @@ from .. import base
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.skip('Update charm')
 async def test_expose_unexpose(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy(

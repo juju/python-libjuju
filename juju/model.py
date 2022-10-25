@@ -824,7 +824,7 @@ class Model:
         log.debug('Uploaded local charm: %s -> %s', charm_dir, charm_url)
         return charm_url
 
-    def add_local_charm(self, charm_file, series, size=None):
+    def add_local_charm(self, charm_file, series="", size=None):
         """Upload a local charm archive to the model.
 
         Returns the 'local:...' url that should be used to deploy the charm.
@@ -1770,7 +1770,6 @@ class Model:
                     charm_origin = add_charm_res.get('charm_origin', res.origin)
                 else:
                     charm_origin = add_charm_res.charm_origin
-
                 if Schema.CHARM_HUB.matches(url.schema):
                     resources = await self._add_charmhub_resources(res.app_name,
                                                                    identifier,
@@ -1789,16 +1788,24 @@ class Model:
                 charm_dir = os.path.abspath(
                     os.path.expanduser(identifier))
                 charm_origin = res.origin
+
                 metadata = utils.get_local_charm_metadata(charm_dir)
+                # TODO (cderici) : pass the metadata into get_charm_series, as
+                #  it also reads that file redundantly
+                series = series or await get_charm_series(charm_dir, self)
+
+                # If we're using a newer client, then the CharmOrigin needs a
+                # base
+                if not self.connection().is_using_old_client:
+                    charm_origin.base = utils.get_local_charm_base(series,
+                                                                   channel,
+                                                                   metadata,
+                                                                   charm_dir,
+                                                                   client.Base)
+
                 if not application_name:
                     application_name = metadata['name']
-                series = series or await get_charm_series(charm_dir, self)
-                if not series:
-                    model_config = await self.get_config()
-                    default_series = model_config.get("default-series")
-                    if default_series:
-                        series = default_series.value
-                if not series:
+                if self.connection().is_using_old_client and not series:
                     raise JujuError(
                         "Couldn't determine series for charm at {}. "
                         "Pass a 'series' kwarg to Model.deploy().".format(
@@ -1853,14 +1860,19 @@ class Model:
             source = "charm-store"
         else:
             source = "charm-hub"
+
+        resolve_origin = {
+            'source': source,
+            'architecture': origin.architecture,
+            'track': origin.track,
+            'risk': origin.risk,
+        }
+
+        if not self.connection().is_using_old_client:
+            resolve_origin['base'] = origin.base
         resp = await charms_facade.ResolveCharms(resolve=[{
             'reference': str(url),
-            'charm-origin': {
-                'source': source,
-                'architecture': origin.architecture,
-                'track': origin.track,
-                'risk': origin.risk,
-            }
+            'charm-origin': resolve_origin
         }])
         if len(resp.results) != 1:
             raise JujuError("expected one result, received {}".format(resp.results))

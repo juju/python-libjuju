@@ -123,6 +123,14 @@ async def test_subordinate_charm_zero_units(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_subordinate_false_field_exists(event_loop):
+    async with base.CleanModel() as model:
+        assert await model.charmhub.is_subordinate("rsyslog-forwarder-ha")
+        assert not await model.charmhub.is_subordinate("mysql-innodb-cluster")
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_list_resources(event_loop):
     async with base.CleanModel() as model:
         resources = await model.charmhub.list_resources('postgresql')

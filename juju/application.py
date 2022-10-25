@@ -368,7 +368,11 @@ class Application(model.ModelEntity):
         log.debug(
             'Getting series for %s', self.name)
 
-        return (await app_facade.Get(application=self.name)).series
+        appGetResults = (await app_facade.Get(application=self.name))
+        if self._facade_version() >= 15:
+            base_channel = appGetResults.base.channel
+            return utils.base_channel_to_series(base_channel)
+        return appGetResults.series
 
     async def get_config(self):
         """Return the configuration settings dict for this application.
@@ -633,14 +637,11 @@ class Application(model.ModelEntity):
         :param str switch: Crossgrade charm url
 
         """
-        if resources is not None:
-            raise NotImplementedError("resources option is not implemented")
 
         if switch is not None and revision is not None:
             raise ValueError("switch and revision are mutually exclusive")
 
         app_facade = self._facade()
-        resources_facade = client.ResourcesFacade.from_connection(self.connection)
         charms_facade = client.CharmsFacade.from_connection(self.connection)
 
         # 1 - Figure out the destination origin and destination charm_url
@@ -659,6 +660,9 @@ class Application(model.ModelEntity):
             await self.local_refresh(origin, force, force_series,
                                      force_units, path, resources)
             return
+
+        if resources is not None:
+            raise NotImplementedError("resources option is not implemented")
 
         parsed_url = URL.parse(charm_url)
         charm_name = parsed_url.name
@@ -727,6 +731,7 @@ class Application(model.ModelEntity):
         # Already prepped the charm_resources
         # Now get the existing resources from the ResourcesFacade
         request_data = [client.Entity(self.tag)]
+        resources_facade = client.ResourcesFacade.from_connection(self.connection)
         response = await resources_facade.ListResources(entities=request_data)
         existing_resources = {
             resource.name: resource
@@ -768,19 +773,22 @@ class Application(model.ModelEntity):
         else:
             resource_ids = None
 
+        set_charm_args = {
+            'application': self.entity_id,
+            'charm_url': charm_url,
+            'charm_origin': dest_origin,
+            'config_settings': None,
+            'config_settings_yaml': None,
+            'force': force,
+            'force_units': force_units,
+            'resource_ids': resource_ids,
+            'storage_constraints': None,
+        }
+        if self.connection.is_using_old_client:
+            set_charm_args['force_series'] = force_series
+
         # Update the application
-        await app_facade.SetCharm(
-            application=self.entity_id,
-            charm_url=charm_url,
-            charm_origin=dest_origin,
-            config_settings=None,
-            config_settings_yaml=None,
-            force=force,
-            force_series=force_series,
-            force_units=force_units,
-            resource_ids=resource_ids,
-            storage_constraints=None,
-        )
+        await app_facade.SetCharm(**set_charm_args)
 
         await self.model.block_until(
             lambda: self.data['charm-url'] == charm_url
@@ -830,19 +838,23 @@ class Application(model.ModelEntity):
                                                              metadata,
                                                              resources=resources)
 
+        set_charm_args = {
+            'application': self.entity_id,
+            'charm_origin': charm_origin,
+            'charm_url': charm_url,
+            'config_settings': None,
+            'config_settings_yaml': None,
+            'force': force,
+            'force_units': force_units,
+            'resource_ids': resources,
+            'storage_constraints': None,
+        }
+
+        if self.connection.is_using_old_client:
+            set_charm_args['force_series'] = force_series
+
         # Update application
-        await app_facade.SetCharm(
-            application=self.entity_id,
-            charm_origin=charm_origin,
-            charm_url=charm_url,
-            config_settings=None,
-            config_settings_yaml=None,
-            force=force,
-            force_series=force_series,
-            force_units=force_units,
-            resource_ids=resources,
-            storage_constraints=None,
-        )
+        await app_facade.SetCharm(**set_charm_args)
 
         await self.model.block_until(
             lambda: self.data['charm-url'] == charm_url
