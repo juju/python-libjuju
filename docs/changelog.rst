@@ -1,6 +1,21 @@
 Changelog
 ---------
 
+3.0.4
+^^^^^
+
+Wednesday 26th October
+
+## What's Changed
+* [JUJU-2027] Local refresh with resoruces by @cderici in https://github.com/juju/python-libjuju/pull/757
+* [JUJU-2026] Improve resolve charm by @cderici in https://github.com/juju/python-libjuju/pull/761
+* Add owner and data to license file by @arturo-seijas in https://github.com/juju/python-libjuju/pull/760
+
+## New Contributors
+* @arturo-seijas made their first contribution in https://github.com/juju/python-libjuju/pull/760
+
+**Full Changelog**: https://github.com/juju/python-libjuju/compare/3.0.3...3.0.4
+
 3.0.3
 ^^^^^
 
