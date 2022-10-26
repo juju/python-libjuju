@@ -1,6 +1,8 @@
 from enum import Enum
 from .errors import JujuError
 
+from . import utils
+
 
 class Source(Enum):
     """Source defines a origin source. Providing a hint to the controller about
@@ -111,6 +113,19 @@ class Channel:
         if self.track != "":
             path = "{}/{}".format(self.track, path)
         return path
+
+    def compute_base_channel(self, series=None):
+        """Determines the channel for a client.Base
+        A base channel is a track/risk/branch
+
+        """
+        _ch = [self.risk]
+        tr = self.track
+        if series:
+            tr = utils.get_series_version(series)
+        if tr:
+            _ch = [tr] + _ch
+        return "/".join(_ch)
 
 
 class Platform:

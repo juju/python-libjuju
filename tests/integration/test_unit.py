@@ -239,3 +239,17 @@ async def test_resolve_local(event_loop):
             # Errored units won't get cleaned up unless we force them.
             await asyncio.gather(*(machine.destroy(force=True)
                                    for machine in model.machines.values()))
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_unit_introspect(event_loop):
+    async with base.CleanModel() as model:
+        await model.deploy('ubuntu', series='jammy')
+        await model.wait_for_idle(status="active")
+
+        await model.deploy('juju-introspect',
+                           channel='edge',
+                           series='jammy',
+                           to='0',
+                           )
