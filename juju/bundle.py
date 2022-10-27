@@ -14,7 +14,7 @@ from toposort import toposort_flatten
 from .client import client
 from .constraints import parse as parse_constraints, parse_storage_constraint, parse_device_constraint
 from .errors import JujuError
-from . import utils, jasyncio, charmhub
+from . import utils, jasyncio
 from .origin import Channel
 from .url import Schema, URL
 
@@ -129,7 +129,7 @@ class BundleHandler:
                 default_series or
                 await get_charm_series(charm_dir, self.model)
             )
-            if not series:
+            if not self.model.connection().is_using_old_client and not series:
                 raise JujuError(
                     "Couldn't determine series for charm at {}. "
                     "Add a 'series' key to the bundle.".format(charm_dir))
@@ -148,15 +148,23 @@ class BundleHandler:
             ])
 
             # Update the 'charm:' entry for each app with the new 'local:' url.
-            for app_name, charm_url, (charm_dir, _) in zip(apps, charm_urls, args):
+            for app_name, charm_url, (charm_dir, series) in zip(apps, charm_urls, args):
+                metadata = utils.get_local_charm_metadata(charm_dir)
                 resources = await self.model.add_local_resources(
                     app_name,
                     charm_url,
-                    utils.get_local_charm_metadata(charm_dir),
+                    metadata,
                     resources=bundle.get('applications', {app_name: {}})[app_name].get("resources", {}),
                 )
                 apps_dict[app_name]['charm'] = charm_url
                 apps_dict[app_name]["resources"] = resources
+                origin = client.CharmOrigin(source="local", risk="stable")
+                if not self.model.connection().is_using_old_client:
+                    origin.base = utils.get_local_charm_base(series, '',
+                                                             metadata,
+                                                             charm_dir,
+                                                             client.Base)
+                self.origins[charm_url] = {str(None): origin}
 
         return bundle
 
@@ -281,20 +289,27 @@ class BundleHandler:
         if self.charms_facade is None:
             raise JujuError('unable to download bundle for {} using the new charms facade. Upgrade controller to proceed.'.format(charm_url))
 
+        id = origin.id_ if origin.id_ else ''
+        hash = origin.hash_ if origin.hash_ else ''
+        charm_origin = {
+            'source': origin.source,
+            'type': origin.type_,
+            'id': id,
+            'hash': hash,
+            'revision': origin.revision,
+            'risk': origin.risk,
+            'track': origin.track,
+            'architecture': origin.architecture,
+        }
+        if self.model.connection().is_using_old_client:
+            charm_origin['os'] = origin.os
+            charm_origin['series'] = origin.series
+        else:
+            charm_origin['base'] = origin.base
+
         resp = await self.charms_facade.GetDownloadInfos(entities=[{
             'charm-url': str(charm_url),
-            'charm-origin': {
-                'source': origin.source,
-                'type': origin.type_,
-                'id': origin.id_,
-                'hash': origin.hash_,
-                'revision': origin.revision,
-                'risk': origin.risk,
-                'track': origin.track,
-                'architecture': origin.architecture,
-                'os': origin.os,
-                'series': origin.series,
-            }
+            'charm-origin': charm_origin
         }])
         if len(resp.results) != 1:
             raise JujuError("expected one result, received {}".format(resp.results))
@@ -341,10 +356,14 @@ class BundleHandler:
 
             charm_url = URL.parse(spec['charm'])
             channel = None
+            series = spec.get('series', None)
             track, risk = '', ''
             if 'channel' in spec:
                 channel = Channel.parse(spec['channel'])
                 track, risk = channel.track, channel.risk
+
+                # if not track and series:
+                #     track = utils.get_series_version(series)
             if self.charms_facade is not None:
                 if cons is not None and cons['arch'] != '':
                     architecture = cons['arch']
@@ -355,8 +374,10 @@ class BundleHandler:
                                             architecture=architecture,
                                             risk=risk,
                                             track=track)
+                if not self.model.connection().is_using_old_client and series:
+                    origin.base = client.Base(
+                        channel=utils.get_series_version(series), name='ubuntu')
                 charm_url, charm_origin, _ = await self.model._resolve_charm(charm_url, origin)
-
                 spec['charm'] = str(charm_url)
             else:
                 results = await self.model.charmstore.entity(str(charm_url))
@@ -618,9 +639,6 @@ class AddApplicationChange(ChangeInfo):
             resources = await context.model._add_store_resources(
                 self.application, charm, overrides=self.resources)
         elif Schema.CHARM_HUB.matches(url.schema):
-            c_hub = charmhub.CharmHub(context.model)
-            id_, _ = await c_hub.get_charm_id(url.name)
-            origin.id_ = id_
             resources = await context.model._add_charmhub_resources(
                 self.application, charm, origin, overrides=self.resources)
         else:
@@ -719,8 +737,6 @@ class AddCharmChange(ChangeInfo):
         ch = None
         identifier = None
         if Schema.LOCAL.matches(url.schema):
-            origin = client.CharmOrigin(source="local", risk="stable")
-            context.origins[self.charm] = {str(None): origin}
             return self.charm
 
         if Schema.CHARM_STORE.matches(url.schema):
@@ -741,6 +757,10 @@ class AddCharmChange(ChangeInfo):
                                         architecture=arch,
                                         risk=ch.risk,
                                         track=ch.track)
+            if not context.model.connection().is_using_old_client and self.series:
+                origin.base = client.Base(
+                    channel=utils.get_series_version(self.series),
+                    name='ubuntu')
             identifier, origin, _ = await context.model._resolve_charm(url, origin)
 
         if identifier is None:
@@ -826,7 +846,12 @@ class AddMachineChange(ChangeInfo):
 
         params['constraints'] = parse_constraints(self.constraints)
         params['jobs'] = params.get('jobs', ['JobHostUnits'])
-        params['series'] = self.series
+        if not context.model.connection().is_using_old_client:
+            params['base'] = client.Base(
+                channel=utils.get_series_version(self.series),
+                name='ubuntu')
+        else:
+            params['series'] = self.series
 
         if self.container_type == 'lxc':
             log.warning('Juju 2.0 does not support lxc containers. '

@@ -80,11 +80,12 @@ class ResourcesFacade(Type):
         Returns -> typing.Union[_ForwardRef('ErrorResult'),
                                 typing.Sequence<+T_co>[str]]
         """
+        version = _client.ResourcesFacade.best_facade_version(self.connection)
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Resources',
                    request='AddPendingResources',
-                   version=2,
+                   version=version,
                    params=_params)
         _params['tag'] = application_tag
         _params['url'] = charm_url

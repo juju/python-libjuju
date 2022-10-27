@@ -116,6 +116,21 @@ async def test_run_action(event_loop):
         # wait for the action to complete
         return await action.wait()
 
+    def check_results(results, out):
+        assert 'dir' in results
+        assert 'stdout' in results or 'Stdout' in results
+        assert 'Code' in results or 'return-code' in results
+        if 'Code' in results:
+            assert results['Code'] == 0
+        else:
+            assert results['return-code'] == 0
+
+        if 'stdout' in results:
+            assert results['stdout'] == out
+        else:
+            assert results['Stdout'] == out
+        assert results['dir'] == '/var/git/myrepo.git'
+
     async with base.CleanModel() as model:
         app = await model.deploy(
             'git',
@@ -126,23 +141,13 @@ async def test_run_action(event_loop):
 
         for unit in app.units:
             action = await run_action(unit)
-            assert action.results == {
-                'Code': '0',
-                'Stdout': "Adding group `myrepo' (GID 1001) ...\n"
-                          'Done.\n'
-                          'Initialized empty Git repository in '
-                          '/var/git/myrepo.git/\n',
-                'dir': '/var/git/myrepo.git',
-            }
-            out = await model.get_action_output(action.entity_id, wait=5)
-            assert out == {
-                'Code': '0',
-                'Stdout': "Adding group `myrepo' (GID 1001) ...\n"
-                          'Done.\n'
-                          'Initialized empty Git repository in '
-                          '/var/git/myrepo.git/\n',
-                'dir': '/var/git/myrepo.git',
-            }
+            out = "Adding group `myrepo' (GID 1001) ...\n" \
+                  'Done.\n' \
+                  'Initialized empty Git repository in ' \
+                  '/var/git/myrepo.git/\n'
+            check_results(action.results, out)
+            output = await model.get_action_output(action.entity_id, wait=5)
+            check_results(output, out)
             status = await model.get_action_status(
                 uuid_or_prefix=action.entity_id)
             assert status[action.entity_id] == 'completed'
@@ -234,3 +239,17 @@ async def test_resolve_local(event_loop):
             # Errored units won't get cleaned up unless we force them.
             await asyncio.gather(*(machine.destroy(force=True)
                                    for machine in model.machines.values()))
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_unit_introspect(event_loop):
+    async with base.CleanModel() as model:
+        await model.deploy('ubuntu', series='jammy')
+        await model.wait_for_idle(status="active")
+
+        await model.deploy('juju-introspect',
+                           channel='edge',
+                           series='jammy',
+                           to='0',
+                           )

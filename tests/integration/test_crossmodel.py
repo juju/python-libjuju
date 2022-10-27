@@ -9,6 +9,7 @@ from juju import jasyncio
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.skip('Update charm')
 async def test_offer(event_loop):
     async with base.CleanModel() as model:
         await model.deploy(
@@ -30,6 +31,7 @@ async def test_offer(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.skip('Update charm')
 async def test_consume(event_loop):
     async with base.CleanModel() as model_1:
         await model_1.deploy(
@@ -60,6 +62,7 @@ async def test_consume(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.skip('Update charm')
 async def test_remove_saas(event_loop):
     async with base.CleanModel() as model_1:
         await model_1.deploy(

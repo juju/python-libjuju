@@ -1,19 +1,73 @@
 Changelog
 ---------
+
+3.0.4
+^^^^^
+
+Wednesday 26th October
+
+## What's Changed
+* [JUJU-2027] Local refresh with resoruces by @cderici in https://github.com/juju/python-libjuju/pull/757
+* [JUJU-2026] Improve resolve charm by @cderici in https://github.com/juju/python-libjuju/pull/761
+* Add owner and data to license file by @arturo-seijas in https://github.com/juju/python-libjuju/pull/760
+
+## New Contributors
+* @arturo-seijas made their first contribution in https://github.com/juju/python-libjuju/pull/760
+
+**Full Changelog**: https://github.com/juju/python-libjuju/compare/3.0.3...3.0.4
+
+3.0.3
+^^^^^
+
+Saturay October 22 2022
+
+## What's Changed
+
+* Wait for idle arg type check by @cderici in https://github.com/juju/python-libjuju/pull/741
+* [JUJU-1970] Revise local refresh by @cderici in https://github.com/juju/python-libjuju/pull/742
+* [JUJU-1984] Update facade schemas for juju 3.0-rc1-2 by @cderici in https://github.com/juju/python-libjuju/pull/745
+* [JUJU-1992] Fix charmhub series deploy 3.0 by @cderici in https://github.com/juju/python-libjuju/pull/746
+* [JUJU-2001] Fix base for local charms and bundles for CharmOrigin 3.0 by @cderici in https://github.com/juju/python-libjuju/pull/749
+* [JUJU-2017] Check subordinate field value instead of existence by @cderici in https://github.com/juju/python-libjuju/pull/751
+* [JUJU-2018] Update 2.9.36 facades & clients by @cderici in https://github.com/juju/python-libjuju/pull/752
+* [JUJU-1705] Make sure the action status is correctly set by @cderici in https://github.com/juju/python-libjuju/pull/753
+* [JUJU-2019] Small fixes for 3.0 by @cderici in https://github.com/juju/python-libjuju/pull/754
+
+
+**Full Changelog**: https://github.com/juju/python-libjuju/compare/3.0.2...3.0.3
+
+3.0.2
+^^^^^
+
+Wednesday October 5 2022
+
+## What's Changed
+
+* Model name can now be accessed through model.name by @jack-w-shaw in https://github.com/juju/python-libjuju/pull/702
+* [JUJU-1593] Fix `unit.run()` and update the old client codes by @cderici in https://github.com/juju/python-libjuju/pull/710
+* Add py.typed marker by @sed-i in https://github.com/juju/python-libjuju/pull/709
+* [JUJU-1664] Add force, no-wait, destroy-storage params to app.destroy by @cderici in https://github.com/juju/python-libjuju/pull/714
+* snapcraft.io access should use https requests by @addyess in https://github.com/juju/python-libjuju/pull/715
+* [JUJU-1680] Add issue and PR templates by @cderici in https://github.com/juju/python-libjuju/pull/718
+* [JUJU-1681] Add --attach-storage parameter to model.deploy by @cderici in https://github.com/juju/python-libjuju/pull/720
+* [JUJU-1706] Allow waiting for `wait_for_exact_units=0` by @cderici in https://github.com/juju/python-libjuju/pull/723
+* [JUJU-1663] Drop Python 3.5 support from python-libjuju by @cderici in https://github.com/juju/python-libjuju/pull/722
+* [JUJU-1671] Charmhub url from model config by @cderici in https://github.com/juju/python-libjuju/pull/724
+* [JUJU-1733] Revisit unitrun example by @cderici in https://github.com/juju/python-libjuju/pull/725
+* [JUJU-1800] Revise the `application.upgrade_charm()` (refresh) by @cderici in https://github.com/juju/python-libjuju/pull/729
+* [JUJU-1893] Revisit `charmhub.info()` by @cderici in https://github.com/juju/python-libjuju/pull/737
+
 3.0.1
 ^^^^^
 
 Thursday August 11 2022
 
-## What's Changed
 * [JUJU-1593] Fix `run_actions` and facade issues by @cderici in https://github.com/juju/python-libjuju/pull/706
 
 3.0.0
 ^^^^^
 
 Tuesday August 9 2022
-
-## What's Changed
 
 Switching to semantic versioning. From this release on, at least the major release number matches
 the most recent Juju supported. Hence the jump to `3.0.0` since this release supports `Juju 3.0`.

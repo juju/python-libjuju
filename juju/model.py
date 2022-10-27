@@ -548,10 +548,16 @@ class CharmhubDeployType:
         if channel is not None:
             ch = Channel.parse(channel).normalize()
 
+        base = client.Base()
+        if series:
+            base.channel = ch.normalize().compute_base_channel(series=series)
+            base.name = 'ubuntu'
         origin = client.CharmOrigin(source="charm-hub",
                                     architecture=architecture,
                                     risk=ch.risk,
-                                    track=ch.track)
+                                    track=ch.track,
+                                    base=base,
+                                    )
 
         charm_url_str, origin, supported_series = await self.charm_resolver(url, origin)
         charm_url = URL.parse(charm_url_str)
@@ -824,7 +830,7 @@ class Model:
         log.debug('Uploaded local charm: %s -> %s', charm_dir, charm_url)
         return charm_url
 
-    def add_local_charm(self, charm_file, series, size=None):
+    def add_local_charm(self, charm_file, series="", size=None):
         """Upload a local charm archive to the model.
 
         Returns the 'local:...' url that should be used to deploy the charm.
@@ -1739,7 +1745,12 @@ class Model:
             raise JujuError('unknown charm or bundle {}'.format(entity_url))
         identifier = res.identifier
 
-        series = res.origin.series or series
+        charm_series = series
+
+        if self.connection().is_using_old_client and charm_series is None:
+            # Also try
+            charm_series = res.origin.series
+
         if res.is_bundle:
             handler = BundleHandler(self, trusted=trust, forced=force)
             await handler.fetch_plan(url, res.origin, overlays=overlays)
@@ -1769,7 +1780,6 @@ class Model:
                     charm_origin = add_charm_res.get('charm_origin', res.origin)
                 else:
                     charm_origin = add_charm_res.charm_origin
-
                 if Schema.CHARM_HUB.matches(url.schema):
                     resources = await self._add_charmhub_resources(res.app_name,
                                                                    identifier,
@@ -1788,21 +1798,31 @@ class Model:
                 charm_dir = os.path.abspath(
                     os.path.expanduser(identifier))
                 charm_origin = res.origin
+
                 metadata = utils.get_local_charm_metadata(charm_dir)
+                # TODO (cderici) : pass the metadata into get_charm_series, as
+                #  it also reads that file redundantly
+                charm_series = charm_series or await get_charm_series(charm_dir,
+                                                                      self)
+
+                # If we're using a newer client, then the CharmOrigin needs a
+                # base
+                if not self.connection().is_using_old_client:
+                    charm_origin.base = utils.get_local_charm_base(charm_series,
+                                                                   channel,
+                                                                   metadata,
+                                                                   charm_dir,
+                                                                   client.Base)
+
                 if not application_name:
                     application_name = metadata['name']
-                series = series or await get_charm_series(charm_dir, self)
-                if not series:
-                    model_config = await self.get_config()
-                    default_series = model_config.get("default-series")
-                    if default_series:
-                        series = default_series.value
-                if not series:
+                if self.connection().is_using_old_client and not charm_series:
                     raise JujuError(
                         "Couldn't determine series for charm at {}. "
                         "Pass a 'series' kwarg to Model.deploy().".format(
                             charm_dir))
-                identifier = await self.add_local_charm_dir(charm_dir, series)
+                identifier = await self.add_local_charm_dir(charm_dir,
+                                                            charm_series)
                 resources = await self.add_local_resources(application_name,
                                                            identifier,
                                                            metadata,
@@ -1816,7 +1836,7 @@ class Model:
             return await self._deploy(
                 charm_url=identifier,
                 application=res.app_name,
-                series=series,
+                series=charm_series,
                 config=config,
                 constraints=constraints,
                 endpoint_bindings=bind,
@@ -1842,24 +1862,45 @@ class Model:
         return await client_facade.AddCharm(channel=str(origin.risk), url=charm_url, force=False)
 
     async def _resolve_charm(self, url, origin):
+        """Calls Charms.ResolveCharms to resolve all the fields of the
+        charm_origin and also the url and the supported_series
+
+        :param str url: The url of the charm
+        :param client.CharmOrigin origin: The manually constructed origin
+        based on what we know about the charm and the deployment so far
+
+        Returns the confirmed origin returned by the Juju API to be used in
+        calls like ApplicationFacade.Deploy
+
+        :returns str, client.CharmOrigin, [str]
+        """
         charms_cls = client.CharmsFacade
         if charms_cls.best_facade_version(self.connection()) < 3:
             raise JujuError("resolve charm")
 
         charms_facade = charms_cls.from_connection(self.connection())
 
+        # TODO (cderici): following part can be refactored out, since the
+        #  origin should be set (including the base) before calling this,
+        #  though all tests need to run (in earlier versions too) before
+        #  committing to make sure there's no regression
         if Schema.CHARM_STORE.matches(url.schema):
             source = "charm-store"
         else:
             source = "charm-hub"
+
+        resolve_origin = {
+            'source': source,
+            'architecture': origin.architecture,
+            'track': origin.track,
+            'risk': origin.risk,
+        }
+        if not self.connection().is_using_old_client:
+            resolve_origin['base'] = origin.base
+
         resp = await charms_facade.ResolveCharms(resolve=[{
             'reference': str(url),
-            'charm-origin': {
-                'source': source,
-                'architecture': origin.architecture,
-                'track': origin.track,
-                'risk': origin.risk,
-            }
+            'charm-origin': resolve_origin
         }])
         if len(resp.results) != 1:
             raise JujuError("expected one result, received {}".format(resp.results))
@@ -2581,6 +2622,12 @@ class Model:
         timeout = timedelta(seconds=timeout) if timeout is not None else None
         idle_period = timedelta(seconds=idle_period)
         start_time = datetime.now()
+        # Type check against the common error of passing a str for apps
+        if apps is not None and (not isinstance(apps, list) or
+                                 any(not isinstance(o, str)
+                                     for o in apps)):
+            raise JujuError(f'Expected a List[str] for apps, given {apps}')
+
         apps = apps or self.applications
         idle_times = {}
         last_log_time = None

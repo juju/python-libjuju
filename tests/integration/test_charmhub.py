@@ -1,7 +1,7 @@
 import pytest
 
 from .. import base
-from juju.errors import JujuAPIError, JujuError
+from juju.errors import JujuError
 from juju import jasyncio
 
 
@@ -12,29 +12,47 @@ async def test_info(event_loop):
         _, name = await model.charmhub.get_charm_id("hello-juju")
         assert name == "hello-juju"
 
+        charm_name = 'juju-qa-test'
+        charm_info = await model.charmhub.info(charm_name)
+        assert charm_info['name'] == 'juju-qa-test'
+        assert charm_info['type'] == 'charm'
+        assert charm_info['id'] == 'Hw30RWzpUBnJLGtO71SX8VDWvd3WrjaJ'
+        assert '2.0/stable' in charm_info['channel-map']
+        cm_rev = charm_info['channel-map']['2.0/stable']['revision']
+        if type(cm_rev) == dict:
+            # New client (>= 3.0)
+            assert cm_rev['revision'] == 22
+        else:
+            # Old client (<= 2.9)
+            assert cm_rev == 22
+
 
 @base.bootstrapped
 @pytest.mark.asyncio
-@pytest.mark.skip('CharmHub facade no longer exists')
 async def test_info_with_channel(event_loop):
     async with base.CleanModel() as model:
-        result = await model.charmhub.info("hello-juju", "latest/stable")
+        charm_info = await model.charmhub.info("juju-qa-test", "2.0/stable")
+        assert charm_info['name'] == 'juju-qa-test'
+        assert '2.0/stable' in charm_info['channel-map']
+        assert 'latest/stable' not in charm_info['channel-map']
 
-        assert result.result.name == "hello-juju"
-        assert "latest/stable" in result.result.channel_map
+        try:
+            await model.charmhub.info("juju-qa-test", "non-existing-channel")
+        except JujuError as err:
+            assert err.message == 'Charmhub.info : channel ' \
+                                  'non-existing-channel not found for ' \
+                                  'juju-qa-test'
+        else:
+            assert False, "non-existing-channel didn't raise an error"
 
 
 @base.bootstrapped
 @pytest.mark.asyncio
-@pytest.mark.skip('CharmHub facade no longer exists')
 async def test_info_not_found(event_loop):
     async with base.CleanModel() as model:
-        try:
+        with pytest.raises(JujuError) as err:
             await model.charmhub.info("badnameforapp")
-        except JujuAPIError as e:
-            assert e.message == "badnameforapp not found"
-        else:
-            assert False
+            assert "badnameforapp not found" in str(err)
 
 
 @base.bootstrapped
@@ -101,3 +119,19 @@ async def test_subordinate_charm_zero_units(event_loop):
         app2 = await model.deploy('rsyslog-forwarder-ha', num_units=1)
         await jasyncio.sleep(5)
         assert len(app2.units) == 0
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_subordinate_false_field_exists(event_loop):
+    async with base.CleanModel() as model:
+        assert await model.charmhub.is_subordinate("rsyslog-forwarder-ha")
+        assert not await model.charmhub.is_subordinate("mysql-innodb-cluster")
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_list_resources(event_loop):
+    async with base.CleanModel() as model:
+        resources = await model.charmhub.list_resources('postgresql')
+        assert type(resources) == list and len(resources) > 0
