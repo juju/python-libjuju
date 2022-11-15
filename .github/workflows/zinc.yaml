@@ -1,0 +1,58 @@
+name: Zinc Charm Integration Tests
+
+on: [push, pull_request]
+
+jobs:
+  zinc:
+    name: Zinc Charm Integration Tests
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out python-libjuju
+      uses: actions/checkout@v3
+      with:
+        path: python-libjuju
+
+    - name: Check out zinc-k8s-operator
+      uses: actions/checkout@v3
+      with:
+        repository: jnsgruk/zinc-k8s-operator
+        path: zinc-k8s-operator
+
+    - name: Setup Microk8s
+      run: |
+        sudo snap install microk8s --channel=1.25-strict/stable
+        sudo usermod -a -G snap_microk8s $USER
+        newgrp snap_microk8s
+        sg snap_microk8s "microk8s status --wait-ready"
+        sudo microk8s enable dns hostpath-storage
+        mkdir ~/.kube
+        sg snap_microk8s "microk8s config > ~/.kube/config"
+
+    - name: Install dependencies
+      run: |
+        if snap info lxd | grep "installed"; then
+          sudo snap refresh lxd --channel=latest/stable
+        else
+          sudo snap install lxd --channel=latest/stable
+        fi
+        sudo lxd waitready
+        sudo lxd init --auto
+        sudo chmod a+wr /var/snap/lxd/common/lxd/unix.socket
+        sudo usermod -a -G lxd $USER
+
+        # Consider changing to latest/stable once that channel catches up to 3.0
+        sudo snap install juju --channel=3.0/stable
+        mkdir -p ~/.local/share
+        sudo snap install charmcraft --classic
+        pip install tox
+
+    - name: Bootstrap Juju
+      run: sg snap_microk8s "juju bootstrap microk8s microk8s"
+
+    - name: Run integration tests
+      working-directory: ./zinc-k8s-operator
+      run: |
+        tox -e integration --notest
+        source .tox/integration/bin/activate
+        pip install -I ../python-libjuju
+        tox -e integration -- --channel latest/stable
