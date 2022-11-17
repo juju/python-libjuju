@@ -476,9 +476,9 @@ def ReturnMapping(cls):
     # so the value can be cast
     def decorator(f):
         @functools.wraps(f)
-        async def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs):
             nonlocal cls
-            reply = await f(*args, **kwargs)
+            reply = f(*args, **kwargs)
             if cls is None:
                 return reply
             if 'error' in reply:
@@ -518,7 +518,7 @@ def makeFunc(cls, name, description, params, result, _async=True):
     source = """
 
 @ReturnMapping({rettype})
-{_async}def {name}(self{argsep}{args}):
+def {name}(self{argsep}{args}):
     '''
 {docstring}
     Returns -> {res}
@@ -531,7 +531,7 @@ def makeFunc(cls, name, description, params, result, _async=True):
                version={cls.version},
                params=_params)
 {assignments}
-    reply = {_await}self.rpc(msg)
+    reply = self.rpc(msg)
     return reply
 
 """
@@ -549,7 +549,8 @@ def makeFunc(cls, name, description, params, result, _async=True):
                             docstring=textwrap.indent(doc_string, INDENT),
                             cls=cls,
                             assignments=assignments,
-                            _await="await " if _async else "")
+    )
+                            #_await="await " if _async else "")
     ns = _getns(cls.schema)
     exec(fsource, ns)
     func = ns[name]
@@ -559,7 +560,7 @@ def makeFunc(cls, name, description, params, result, _async=True):
 def makeRPCFunc(cls):
     source = """
 
-async def rpc(self, msg):
+def rpc(self, msg):
     '''
     Patch rpc method to add Id.
     '''
@@ -568,7 +569,7 @@ async def rpc(self, msg):
     msg['Id'] = id
 
     from .facade import TypeEncoder
-    reply = await self.connection.rpc(msg, encoder=TypeEncoder)
+    reply = self.connection.rpc(msg, encoder=TypeEncoder)
     return reply
 
 """
@@ -650,8 +651,8 @@ class Type:
 
         return self.__dict__ == other.__dict__
 
-    async def rpc(self, msg):
-        result = await self.connection.rpc(msg, encoder=TypeEncoder)
+    def rpc(self, msg):
+        result = self.connection.rpc(msg, encoder=TypeEncoder)
         return result
 
     @classmethod

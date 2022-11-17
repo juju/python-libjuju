@@ -2,7 +2,7 @@
 # Changes will be overwritten/lost when the file is regenerated.
 
 from juju.client.facade import Type, ReturnMapping
-from juju.client.old_clients._definitions import *
+from juju.client._definitions import *
 
 
 class BundleFacade(Type):
@@ -109,7 +109,7 @@ class BundleFacade(Type):
     
 
     @ReturnMapping(StringResult)
-    async def ExportBundle(self, include_charm_defaults=None):
+    def ExportBundle(self, include_charm_defaults=None):
         '''
         ExportBundle exports the current model configuration as bundle.
 
@@ -126,13 +126,13 @@ class BundleFacade(Type):
                    version=6,
                    params=_params)
         _params['include-charm-defaults'] = include_charm_defaults
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(BundleChangesResults)
-    async def GetChanges(self, bundleurl=None, yaml=None):
+    def GetChanges(self, bundleurl=None, yaml=None):
         '''
         GetChanges returns the list of changes required to deploy the given bundle
         data. The changes are sorted by requirements, so that they can be applied in
@@ -159,13 +159,13 @@ class BundleFacade(Type):
                    params=_params)
         _params['bundleURL'] = bundleurl
         _params['yaml'] = yaml
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(BundleChangesMapArgsResults)
-    async def GetChangesMapArgs(self, bundleurl=None, yaml=None):
+    def GetChangesMapArgs(self, bundleurl=None, yaml=None):
         '''
         GetChangesMapArgs returns the list of changes required to deploy the given
         bundle data. The changes are sorted by requirements, so that they can be
@@ -190,7 +190,7 @@ class BundleFacade(Type):
                    params=_params)
         _params['bundleURL'] = bundleurl
         _params['yaml'] = yaml
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
@@ -1262,7 +1262,7 @@ class ClientFacade(Type):
     
 
     @ReturnMapping(APIHostPortsResult)
-    async def APIHostPorts(self):
+    def APIHostPorts(self):
         '''
         APIHostPorts returns the API host/port addresses stored in state.
         TODO(juju3) - remove
@@ -1278,13 +1278,13 @@ class ClientFacade(Type):
                    version=6,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(None)
-    async def AbortCurrentUpgrade(self):
+    def AbortCurrentUpgrade(self):
         '''
         AbortCurrentUpgrade aborts and archives the current upgrade
         synchronisation record, if any.
@@ -1300,13 +1300,13 @@ class ClientFacade(Type):
                    version=6,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(None)
-    async def AddCharm(self, channel=None, force=None, url=None):
+    def AddCharm(self, channel=None, force=None, url=None):
         '''
         NOTE: AddCharm is deprecated as of juju 2.9 and charms facade version 3.
         Please discontinue use and move to the charms facade version.
@@ -1336,13 +1336,13 @@ class ClientFacade(Type):
         _params['channel'] = channel
         _params['force'] = force
         _params['url'] = url
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(None)
-    async def AddCharmWithAuthorization(self, channel=None, force=None, macaroon=None, url=None):
+    def AddCharmWithAuthorization(self, channel=None, force=None, macaroon=None, url=None):
         '''
         AddCharmWithAuthorization adds the given charm URL (which must include
         revision) to the model, if it does not exist yet. Local charms are not
@@ -1385,13 +1385,13 @@ class ClientFacade(Type):
         _params['force'] = force
         _params['macaroon'] = macaroon
         _params['url'] = url
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(AddMachinesResults)
-    async def AddMachines(self, params=None):
+    def AddMachines(self, params=None):
         '''
         AddMachines adds new machines with the supplied parameters.
         TODO(juju3) - remove
@@ -1409,13 +1409,13 @@ class ClientFacade(Type):
                    version=6,
                    params=_params)
         _params['params'] = params
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(AddMachinesResults)
-    async def AddMachinesV2(self, params=None):
+    def AddMachinesV2(self, params=None):
         '''
         AddMachinesV2 adds new machines with the supplied parameters.
         TODO(juju3) - remove
@@ -1433,13 +1433,13 @@ class ClientFacade(Type):
                    version=6,
                    params=_params)
         _params['params'] = params
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(AgentVersionResult)
-    async def AgentVersion(self):
+    def AgentVersion(self):
         '''
         AgentVersion returns the current version that the API server is running.
         TODO(juju3) - remove
@@ -1455,13 +1455,13 @@ class ClientFacade(Type):
                    version=6,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(BytesResult)
-    async def CACert(self):
+    def CACert(self):
         '''
         CACert returns the certificate used to validate the state connection.
 
@@ -1476,13 +1476,13 @@ class ClientFacade(Type):
                    version=6,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(None)
-    async def DestroyMachines(self, force=None, machine_names=None):
+    def DestroyMachines(self, force=None, machine_names=None):
         '''
         DestroyMachines removes a given set of machines.
         TODO(juju3) - remove
@@ -1505,13 +1505,13 @@ class ClientFacade(Type):
                    params=_params)
         _params['force'] = force
         _params['machine-names'] = machine_names
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(FindToolsResult)
-    async def FindTools(self, agentstream=None, arch=None, major=None, minor=None, number=None, os_type=None, series=None):
+    def FindTools(self, agentstream=None, arch=None, major=None, minor=None, number=None, os_type=None, series=None):
         '''
         FindTools returns a List containing all tools matching the given parameters.
 
@@ -1558,13 +1558,13 @@ class ClientFacade(Type):
         _params['number'] = number
         _params['os-type'] = os_type
         _params['series'] = series
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(FullStatus)
-    async def FullStatus(self, patterns=None):
+    def FullStatus(self, patterns=None):
         '''
         FullStatus gives the information needed for juju status over the api
 
@@ -1581,13 +1581,13 @@ class ClientFacade(Type):
                    version=6,
                    params=_params)
         _params['patterns'] = patterns
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(BundleChangesResults)
-    async def GetBundleChanges(self, bundleurl=None, yaml=None):
+    def GetBundleChanges(self, bundleurl=None, yaml=None):
         '''
         GetBundleChanges returns the list of changes required to deploy the given
         bundle data. The changes are sorted by requirements, so that they can be
@@ -1613,13 +1613,13 @@ class ClientFacade(Type):
                    params=_params)
         _params['bundleURL'] = bundleurl
         _params['yaml'] = yaml
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(GetConstraintsResults)
-    async def GetModelConstraints(self):
+    def GetModelConstraints(self):
         '''
         GetModelConstraints returns the constraints for the model.
         TODO(juju3) - remove
@@ -1635,13 +1635,13 @@ class ClientFacade(Type):
                    version=6,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(AddMachinesResults)
-    async def InjectMachines(self, params=None):
+    def InjectMachines(self, params=None):
         '''
         InjectMachines injects a machine into state with provisioned status.
         TODO(juju3) - remove
@@ -1659,13 +1659,13 @@ class ClientFacade(Type):
                    version=6,
                    params=_params)
         _params['params'] = params
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ModelConfigResults)
-    async def ModelGet(self):
+    def ModelGet(self):
         '''
         ModelGet implements the server-side part of the
         model-config CLI command.
@@ -1681,13 +1681,13 @@ class ClientFacade(Type):
                    version=6,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ModelInfo)
-    async def ModelInfo(self):
+    def ModelInfo(self):
         '''
         ModelInfo returns information about the current model.
         TODO(juju3) - remove
@@ -1703,13 +1703,13 @@ class ClientFacade(Type):
                    version=6,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(None)
-    async def ModelSet(self, config=None):
+    def ModelSet(self, config=None):
         '''
         ModelSet implements the server-side part of the
         set-model-config CLI command.
@@ -1727,13 +1727,13 @@ class ClientFacade(Type):
                    version=6,
                    params=_params)
         _params['config'] = config
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(None)
-    async def ModelUnset(self, keys=None):
+    def ModelUnset(self, keys=None):
         '''
         ModelUnset implements the server-side part of the
         set-model-config CLI command.
@@ -1751,13 +1751,13 @@ class ClientFacade(Type):
                    version=6,
                    params=_params)
         _params['keys'] = keys
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ModelUserInfoResults)
-    async def ModelUserInfo(self):
+    def ModelUserInfo(self):
         '''
         ModelUserInfo returns information on all users in the model.
         TODO(juju3) - remove
@@ -1773,13 +1773,13 @@ class ClientFacade(Type):
                    version=6,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(PrivateAddressResults)
-    async def PrivateAddress(self, target=None):
+    def PrivateAddress(self, target=None):
         '''
         PrivateAddress implements the server side of Client.PrivateAddress.
         TODO(juju3) - remove as this is unused
@@ -1797,13 +1797,13 @@ class ClientFacade(Type):
                    version=6,
                    params=_params)
         _params['target'] = target
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ProvisioningScriptResult)
-    async def ProvisioningScript(self, data_dir=None, disable_package_commands=None, machine_id=None, nonce=None):
+    def ProvisioningScript(self, data_dir=None, disable_package_commands=None, machine_id=None, nonce=None):
         '''
         ProvisioningScript returns a shell script that, when run,
         provisions a machine agent on the machine executing the script.
@@ -1837,13 +1837,13 @@ class ClientFacade(Type):
         _params['disable-package-commands'] = disable_package_commands
         _params['machine-id'] = machine_id
         _params['nonce'] = nonce
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(PublicAddressResults)
-    async def PublicAddress(self, target=None):
+    def PublicAddress(self, target=None):
         '''
         PublicAddress implements the server side of Client.PublicAddress.
         TODO(juju3) - remove as this is unused
@@ -1861,13 +1861,13 @@ class ClientFacade(Type):
                    version=6,
                    params=_params)
         _params['target'] = target
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ResolveCharmResults)
-    async def ResolveCharms(self, references=None):
+    def ResolveCharms(self, references=None):
         '''
         ResolveCharms resolves the best available charm URLs with series, for charm
         locations without a series specified.
@@ -1890,13 +1890,13 @@ class ClientFacade(Type):
                    version=6,
                    params=_params)
         _params['references'] = references
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(None)
-    async def Resolved(self, retry=None, unit_name=None):
+    def Resolved(self, retry=None, unit_name=None):
         '''
         Resolved implements the server side of Client.Resolved.
 
@@ -1918,13 +1918,13 @@ class ClientFacade(Type):
                    params=_params)
         _params['retry'] = retry
         _params['unit-name'] = unit_name
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def RetryProvisioning(self, entities=None):
+    def RetryProvisioning(self, entities=None):
         '''
         RetryProvisioning marks a provisioning error as transient on the machines.
         TODO(juju3) - remove
@@ -1942,13 +1942,13 @@ class ClientFacade(Type):
                    version=6,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringResult)
-    async def SLALevel(self):
+    def SLALevel(self):
         '''
         SLALevel returns the current sla level for the model.
 
@@ -1963,13 +1963,13 @@ class ClientFacade(Type):
                    version=6,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(None)
-    async def SetModelAgentVersion(self, agent_stream=None, force=None, version=None):
+    def SetModelAgentVersion(self, agent_stream=None, force=None, version=None):
         '''
         SetModelAgentVersion sets the model agent version.
 
@@ -1996,13 +1996,13 @@ class ClientFacade(Type):
         _params['agent-stream'] = agent_stream
         _params['force'] = force
         _params['version'] = version
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(None)
-    async def SetModelConstraints(self, application=None, constraints=None):
+    def SetModelConstraints(self, application=None, constraints=None):
         '''
         SetModelConstraints sets the constraints for the model.
         TODO(juju3) - remove
@@ -2025,13 +2025,13 @@ class ClientFacade(Type):
                    params=_params)
         _params['application'] = application
         _params['constraints'] = constraints
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(None)
-    async def SetSLALevel(self, modelslainfo=None, creds=None, level=None, owner=None):
+    def SetSLALevel(self, modelslainfo=None, creds=None, level=None, owner=None):
         '''
         SetSLALevel sets the sla level on the model.
 
@@ -2063,13 +2063,13 @@ class ClientFacade(Type):
         _params['creds'] = creds
         _params['level'] = level
         _params['owner'] = owner
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StatusHistoryResults)
-    async def StatusHistory(self, requests=None):
+    def StatusHistory(self, requests=None):
         '''
         StatusHistory returns a slice of past statuses for several entities.
 
@@ -2086,13 +2086,13 @@ class ClientFacade(Type):
                    version=6,
                    params=_params)
         _params['requests'] = requests
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(AllWatcherId)
-    async def WatchAll(self):
+    def WatchAll(self):
         '''
         WatchAll initiates a watcher for entities in the connected model.
 
@@ -2107,7 +2107,7 @@ class ClientFacade(Type):
                    version=6,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
@@ -2311,7 +2311,7 @@ class SpacesFacade(Type):
     
 
     @ReturnMapping(ErrorResults)
-    async def CreateSpaces(self, spaces=None):
+    def CreateSpaces(self, spaces=None):
         '''
         CreateSpaces creates a new Juju network space, associating the
         specified subnets with it (optional; can be empty).
@@ -2329,13 +2329,13 @@ class SpacesFacade(Type):
                    version=6,
                    params=_params)
         _params['spaces'] = spaces
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ListSpacesResults)
-    async def ListSpaces(self):
+    def ListSpaces(self):
         '''
         ListSpaces lists all the available spaces and their associated subnets.
 
@@ -2350,13 +2350,13 @@ class SpacesFacade(Type):
                    version=6,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(MoveSubnetsResults)
-    async def MoveSubnets(self, args=None):
+    def MoveSubnets(self, args=None):
         '''
         MoveSubnets ensures that the input subnets are in the input space.
 
@@ -2373,13 +2373,13 @@ class SpacesFacade(Type):
                    version=6,
                    params=_params)
         _params['args'] = args
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(None)
-    async def ReloadSpaces(self):
+    def ReloadSpaces(self):
         '''
         ReloadSpaces refreshes spaces from substrate
 
@@ -2394,13 +2394,13 @@ class SpacesFacade(Type):
                    version=6,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(RemoveSpaceResults)
-    async def RemoveSpace(self, space_param=None):
+    def RemoveSpace(self, space_param=None):
         '''
         RemoveSpace removes a space.
         Returns SpaceResults if entities/settings are found which makes the deletion not possible.
@@ -2418,13 +2418,13 @@ class SpacesFacade(Type):
                    version=6,
                    params=_params)
         _params['space-param'] = space_param
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def RenameSpace(self, changes=None):
+    def RenameSpace(self, changes=None):
         '''
         RenameSpace renames a space.
 
@@ -2441,13 +2441,13 @@ class SpacesFacade(Type):
                    version=6,
                    params=_params)
         _params['changes'] = changes
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ShowSpaceResults)
-    async def ShowSpace(self, entities=None):
+    def ShowSpace(self, entities=None):
         '''
         ShowSpace shows the spaces for a set of given entities.
 
@@ -2464,7 +2464,7 @@ class SpacesFacade(Type):
                    version=6,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
@@ -2923,7 +2923,7 @@ class StorageFacade(Type):
     
 
     @ReturnMapping(AddStorageResults)
-    async def AddToUnit(self, storages=None):
+    def AddToUnit(self, storages=None):
         '''
         AddToUnit validates and creates additional storage instances for units.
         A "CHANGE" block can block this operation.
@@ -2941,13 +2941,13 @@ class StorageFacade(Type):
                    version=6,
                    params=_params)
         _params['storages'] = storages
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def Attach(self, ids=None):
+    def Attach(self, ids=None):
         '''
         Attach attaches existing storage instances to units.
         A "CHANGE" block can block this operation.
@@ -2965,13 +2965,13 @@ class StorageFacade(Type):
                    version=6,
                    params=_params)
         _params['ids'] = ids
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def CreatePool(self, pools=None):
+    def CreatePool(self, pools=None):
         '''
         CreatePool creates a new pool with specified parameters.
 
@@ -2988,13 +2988,13 @@ class StorageFacade(Type):
                    version=6,
                    params=_params)
         _params['pools'] = pools
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def DetachStorage(self, force=None, ids=None, max_wait=None):
+    def DetachStorage(self, force=None, ids=None, max_wait=None):
         '''
         DetachStorage sets the specified storage attachments to Dying, unless they are
         already Dying or Dead. Any associated, persistent storage will remain
@@ -3023,13 +3023,13 @@ class StorageFacade(Type):
         _params['force'] = force
         _params['ids'] = ids
         _params['max-wait'] = max_wait
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ImportStorageResults)
-    async def Import(self, storage=None):
+    def Import(self, storage=None):
         '''
         Import imports existing storage into the model.
         A "CHANGE" block can block this operation.
@@ -3047,13 +3047,13 @@ class StorageFacade(Type):
                    version=6,
                    params=_params)
         _params['storage'] = storage
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(FilesystemDetailsListResults)
-    async def ListFilesystems(self, filters=None):
+    def ListFilesystems(self, filters=None):
         '''
         ListFilesystems returns a list of filesystems in the environment matching
         the provided filter. Each result describes a filesystem in detail, including
@@ -3072,13 +3072,13 @@ class StorageFacade(Type):
                    version=6,
                    params=_params)
         _params['filters'] = filters
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StoragePoolsResults)
-    async def ListPools(self, filters=None):
+    def ListPools(self, filters=None):
         '''
         ListPools returns a list of pools.
         If filter is provided, returned list only contains pools that match
@@ -3102,13 +3102,13 @@ class StorageFacade(Type):
                    version=6,
                    params=_params)
         _params['filters'] = filters
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StorageDetailsListResults)
-    async def ListStorageDetails(self, filters=None):
+    def ListStorageDetails(self, filters=None):
         '''
         ListStorageDetails returns storage matching a filter.
 
@@ -3125,13 +3125,13 @@ class StorageFacade(Type):
                    version=6,
                    params=_params)
         _params['filters'] = filters
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(VolumeDetailsListResults)
-    async def ListVolumes(self, filters=None):
+    def ListVolumes(self, filters=None):
         '''
         ListVolumes lists volumes with the given filters. Each filter produces
         an independent list of volumes, or an error if the filter is invalid
@@ -3150,13 +3150,13 @@ class StorageFacade(Type):
                    version=6,
                    params=_params)
         _params['filters'] = filters
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def Remove(self, storage=None):
+    def Remove(self, storage=None):
         '''
         Remove sets the specified storage entities to Dying, unless they are
         already Dying or Dead, such that the storage will eventually be removed
@@ -3177,13 +3177,13 @@ class StorageFacade(Type):
                    version=6,
                    params=_params)
         _params['storage'] = storage
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def RemovePool(self, pools=None):
+    def RemovePool(self, pools=None):
         '''
         RemovePool deletes the named pool
 
@@ -3200,13 +3200,13 @@ class StorageFacade(Type):
                    version=6,
                    params=_params)
         _params['pools'] = pools
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StorageDetailsResults)
-    async def StorageDetails(self, entities=None):
+    def StorageDetails(self, entities=None):
         '''
         StorageDetails retrieves and returns detailed information about desired
         storage identified by supplied tags. If specified storage cannot be
@@ -3225,13 +3225,13 @@ class StorageFacade(Type):
                    version=6,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def UpdatePool(self, pools=None):
+    def UpdatePool(self, pools=None):
         '''
         UpdatePool deletes the named pool
 
@@ -3248,7 +3248,7 @@ class StorageFacade(Type):
                    version=6,
                    params=_params)
         _params['pools'] = pools
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 

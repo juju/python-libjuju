@@ -109,7 +109,7 @@ class BundleFacade(Type):
     
 
     @ReturnMapping(StringResult)
-    async def ExportBundle(self, include_charm_defaults=None):
+    def ExportBundle(self, include_charm_defaults=None):
         '''
         ExportBundle exports the current model configuration as bundle.
 
@@ -126,13 +126,13 @@ class BundleFacade(Type):
                    version=6,
                    params=_params)
         _params['include-charm-defaults'] = include_charm_defaults
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(BundleChangesResults)
-    async def GetChanges(self, bundleurl=None, yaml=None):
+    def GetChanges(self, bundleurl=None, yaml=None):
         '''
         GetChanges returns the list of changes required to deploy the given bundle
         data. The changes are sorted by requirements, so that they can be applied in
@@ -159,13 +159,13 @@ class BundleFacade(Type):
                    params=_params)
         _params['bundleURL'] = bundleurl
         _params['yaml'] = yaml
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(BundleChangesMapArgsResults)
-    async def GetChangesMapArgs(self, bundleurl=None, yaml=None):
+    def GetChangesMapArgs(self, bundleurl=None, yaml=None):
         '''
         GetChangesMapArgs returns the list of changes required to deploy the given
         bundle data. The changes are sorted by requirements, so that they can be
@@ -190,7 +190,7 @@ class BundleFacade(Type):
                    params=_params)
         _params['bundleURL'] = bundleurl
         _params['yaml'] = yaml
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
@@ -631,7 +631,7 @@ class ClientFacade(Type):
     
 
     @ReturnMapping(FindToolsResult)
-    async def FindTools(self, agentstream=None, arch=None, major=None, minor=None, number=None, os_type=None):
+    def FindTools(self, agentstream=None, arch=None, major=None, minor=None, number=None, os_type=None):
         '''
         FindTools returns a List containing all tools matching the given parameters.
 
@@ -673,13 +673,13 @@ class ClientFacade(Type):
         _params['minor'] = minor
         _params['number'] = number
         _params['os-type'] = os_type
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(FullStatus)
-    async def FullStatus(self, patterns=None):
+    def FullStatus(self, patterns=None):
         '''
         FullStatus gives the information needed for juju status over the api
 
@@ -696,13 +696,13 @@ class ClientFacade(Type):
                    version=6,
                    params=_params)
         _params['patterns'] = patterns
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StatusHistoryResults)
-    async def StatusHistory(self, requests=None):
+    def StatusHistory(self, requests=None):
         '''
         StatusHistory returns a slice of past statuses for several entities.
 
@@ -719,13 +719,13 @@ class ClientFacade(Type):
                    version=6,
                    params=_params)
         _params['requests'] = requests
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(AllWatcherId)
-    async def WatchAll(self):
+    def WatchAll(self):
         '''
         WatchAll initiates a watcher for entities in the connected model.
 
@@ -740,7 +740,7 @@ class ClientFacade(Type):
                    version=6,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
@@ -944,7 +944,7 @@ class SpacesFacade(Type):
     
 
     @ReturnMapping(ErrorResults)
-    async def CreateSpaces(self, spaces=None):
+    def CreateSpaces(self, spaces=None):
         '''
         CreateSpaces creates a new Juju network space, associating the
         specified subnets with it (optional; can be empty).
@@ -962,13 +962,13 @@ class SpacesFacade(Type):
                    version=6,
                    params=_params)
         _params['spaces'] = spaces
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ListSpacesResults)
-    async def ListSpaces(self):
+    def ListSpaces(self):
         '''
         ListSpaces lists all the available spaces and their associated subnets.
 
@@ -983,13 +983,13 @@ class SpacesFacade(Type):
                    version=6,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(MoveSubnetsResults)
-    async def MoveSubnets(self, args=None):
+    def MoveSubnets(self, args=None):
         '''
         MoveSubnets ensures that the input subnets are in the input space.
 
@@ -1006,13 +1006,13 @@ class SpacesFacade(Type):
                    version=6,
                    params=_params)
         _params['args'] = args
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(None)
-    async def ReloadSpaces(self):
+    def ReloadSpaces(self):
         '''
         ReloadSpaces refreshes spaces from substrate
 
@@ -1027,13 +1027,13 @@ class SpacesFacade(Type):
                    version=6,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(RemoveSpaceResults)
-    async def RemoveSpace(self, space_param=None):
+    def RemoveSpace(self, space_param=None):
         '''
         RemoveSpace removes a space.
         Returns SpaceResults if entities/settings are found which makes the deletion not possible.
@@ -1051,13 +1051,13 @@ class SpacesFacade(Type):
                    version=6,
                    params=_params)
         _params['space-param'] = space_param
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def RenameSpace(self, changes=None):
+    def RenameSpace(self, changes=None):
         '''
         RenameSpace renames a space.
 
@@ -1074,13 +1074,13 @@ class SpacesFacade(Type):
                    version=6,
                    params=_params)
         _params['changes'] = changes
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ShowSpaceResults)
-    async def ShowSpace(self, entities=None):
+    def ShowSpace(self, entities=None):
         '''
         ShowSpace shows the spaces for a set of given entities.
 
@@ -1097,7 +1097,7 @@ class SpacesFacade(Type):
                    version=6,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
@@ -1556,7 +1556,7 @@ class StorageFacade(Type):
     
 
     @ReturnMapping(AddStorageResults)
-    async def AddToUnit(self, storages=None):
+    def AddToUnit(self, storages=None):
         '''
         AddToUnit validates and creates additional storage instances for units.
         A "CHANGE" block can block this operation.
@@ -1574,13 +1574,13 @@ class StorageFacade(Type):
                    version=6,
                    params=_params)
         _params['storages'] = storages
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def Attach(self, ids=None):
+    def Attach(self, ids=None):
         '''
         Attach attaches existing storage instances to units.
         A "CHANGE" block can block this operation.
@@ -1598,13 +1598,13 @@ class StorageFacade(Type):
                    version=6,
                    params=_params)
         _params['ids'] = ids
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def CreatePool(self, pools=None):
+    def CreatePool(self, pools=None):
         '''
         CreatePool creates a new pool with specified parameters.
 
@@ -1621,13 +1621,13 @@ class StorageFacade(Type):
                    version=6,
                    params=_params)
         _params['pools'] = pools
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def DetachStorage(self, force=None, ids=None, max_wait=None):
+    def DetachStorage(self, force=None, ids=None, max_wait=None):
         '''
         DetachStorage sets the specified storage attachments to Dying, unless they are
         already Dying or Dead. Any associated, persistent storage will remain
@@ -1656,13 +1656,13 @@ class StorageFacade(Type):
         _params['force'] = force
         _params['ids'] = ids
         _params['max-wait'] = max_wait
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ImportStorageResults)
-    async def Import(self, storage=None):
+    def Import(self, storage=None):
         '''
         Import imports existing storage into the model.
         A "CHANGE" block can block this operation.
@@ -1680,13 +1680,13 @@ class StorageFacade(Type):
                    version=6,
                    params=_params)
         _params['storage'] = storage
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(FilesystemDetailsListResults)
-    async def ListFilesystems(self, filters=None):
+    def ListFilesystems(self, filters=None):
         '''
         ListFilesystems returns a list of filesystems in the environment matching
         the provided filter. Each result describes a filesystem in detail, including
@@ -1705,13 +1705,13 @@ class StorageFacade(Type):
                    version=6,
                    params=_params)
         _params['filters'] = filters
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StoragePoolsResults)
-    async def ListPools(self, filters=None):
+    def ListPools(self, filters=None):
         '''
         ListPools returns a list of pools.
         If filter is provided, returned list only contains pools that match
@@ -1735,13 +1735,13 @@ class StorageFacade(Type):
                    version=6,
                    params=_params)
         _params['filters'] = filters
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StorageDetailsListResults)
-    async def ListStorageDetails(self, filters=None):
+    def ListStorageDetails(self, filters=None):
         '''
         ListStorageDetails returns storage matching a filter.
 
@@ -1758,13 +1758,13 @@ class StorageFacade(Type):
                    version=6,
                    params=_params)
         _params['filters'] = filters
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(VolumeDetailsListResults)
-    async def ListVolumes(self, filters=None):
+    def ListVolumes(self, filters=None):
         '''
         ListVolumes lists volumes with the given filters. Each filter produces
         an independent list of volumes, or an error if the filter is invalid
@@ -1783,13 +1783,13 @@ class StorageFacade(Type):
                    version=6,
                    params=_params)
         _params['filters'] = filters
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def Remove(self, storage=None):
+    def Remove(self, storage=None):
         '''
         Remove sets the specified storage entities to Dying, unless they are
         already Dying or Dead, such that the storage will eventually be removed
@@ -1810,13 +1810,13 @@ class StorageFacade(Type):
                    version=6,
                    params=_params)
         _params['storage'] = storage
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def RemovePool(self, pools=None):
+    def RemovePool(self, pools=None):
         '''
         RemovePool deletes the named pool
 
@@ -1833,13 +1833,13 @@ class StorageFacade(Type):
                    version=6,
                    params=_params)
         _params['pools'] = pools
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StorageDetailsResults)
-    async def StorageDetails(self, entities=None):
+    def StorageDetails(self, entities=None):
         '''
         StorageDetails retrieves and returns detailed information about desired
         storage identified by supplied tags. If specified storage cannot be
@@ -1858,13 +1858,13 @@ class StorageFacade(Type):
                    version=6,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def UpdatePool(self, pools=None):
+    def UpdatePool(self, pools=None):
         '''
         UpdatePool deletes the named pool
 
@@ -1881,7 +1881,7 @@ class StorageFacade(Type):
                    version=6,
                    params=_params)
         _params['pools'] = pools
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 

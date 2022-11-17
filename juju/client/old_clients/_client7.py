@@ -2,7 +2,7 @@
 # Changes will be overwritten/lost when the file is regenerated.
 
 from juju.client.facade import Type, ReturnMapping
-from juju.client.old_clients._definitions import *
+from juju.client._definitions import *
 
 
 class ActionFacade(Type):
@@ -321,7 +321,7 @@ class ActionFacade(Type):
     
 
     @ReturnMapping(ActionResults)
-    async def Actions(self, entities=None):
+    def Actions(self, entities=None):
         '''
         Actions takes a list of ActionTags, and returns the full Action for
         each ID.
@@ -339,13 +339,13 @@ class ActionFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ApplicationsCharmActionsResults)
-    async def ApplicationsCharmsActions(self, entities=None):
+    def ApplicationsCharmsActions(self, entities=None):
         '''
         ApplicationsCharmsActions returns a slice of charm Actions for a slice of
         services.
@@ -363,13 +363,13 @@ class ActionFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ActionResults)
-    async def Cancel(self, entities=None):
+    def Cancel(self, entities=None):
         '''
         Cancel attempts to cancel enqueued Actions from running.
 
@@ -386,13 +386,13 @@ class ActionFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ActionResults)
-    async def Enqueue(self, actions=None):
+    def Enqueue(self, actions=None):
         '''
         Enqueue takes a list of Actions and queues them up to be executed by
         the designated ActionReceiver, returning the params.Action for each
@@ -412,13 +412,13 @@ class ActionFacade(Type):
                    version=7,
                    params=_params)
         _params['actions'] = actions
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(EnqueuedActionsV2)
-    async def EnqueueOperation(self, actions=None):
+    def EnqueueOperation(self, actions=None):
         '''
         EnqueueOperation takes a list of Actions and queues them up to be executed as
         an operation, each action running as a task on the designated ActionReceiver.
@@ -437,13 +437,13 @@ class ActionFacade(Type):
                    version=7,
                    params=_params)
         _params['actions'] = actions
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(FindTagsResults)
-    async def FindActionTagsByPrefix(self, prefixes=None):
+    def FindActionTagsByPrefix(self, prefixes=None):
         '''
         FindActionTagsByPrefix takes a list of string prefixes and finds
         corresponding ActionTags that match that prefix.
@@ -462,13 +462,13 @@ class ActionFacade(Type):
                    version=7,
                    params=_params)
         _params['prefixes'] = prefixes
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ActionsByNames)
-    async def FindActionsByNames(self, names=None):
+    def FindActionsByNames(self, names=None):
         '''
         names : typing.Sequence[str]
         Returns -> ActionsByNames
@@ -483,13 +483,13 @@ class ActionFacade(Type):
                    version=7,
                    params=_params)
         _params['names'] = names
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ActionsByReceivers)
-    async def ListAll(self, entities=None):
+    def ListAll(self, entities=None):
         '''
         ListAll takes a list of Entities representing ActionReceivers and
         returns all of the Actions that have been enqueued or run by each of
@@ -508,13 +508,13 @@ class ActionFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ActionsByReceivers)
-    async def ListCompleted(self, entities=None):
+    def ListCompleted(self, entities=None):
         '''
         ListCompleted takes a list of Entities representing ActionReceivers
         and returns all of the Actions that have been run on each of those
@@ -533,13 +533,13 @@ class ActionFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(OperationResults)
-    async def ListOperations(self, actions=None, applications=None, limit=None, machines=None, offset=None, status=None, units=None):
+    def ListOperations(self, actions=None, applications=None, limit=None, machines=None, offset=None, status=None, units=None):
         '''
         ListOperations fetches the called actions for specified apps/units.
 
@@ -586,13 +586,13 @@ class ActionFacade(Type):
         _params['offset'] = offset
         _params['status'] = status
         _params['units'] = units
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ActionsByReceivers)
-    async def ListPending(self, entities=None):
+    def ListPending(self, entities=None):
         '''
         ListPending takes a list of Entities representing ActionReceivers
         and returns all of the Actions that are enqueued for each of those
@@ -611,13 +611,13 @@ class ActionFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ActionsByReceivers)
-    async def ListRunning(self, entities=None):
+    def ListRunning(self, entities=None):
         '''
         ListRunning takes a list of Entities representing ActionReceivers and
         returns all of the Actions that have are running on each of those
@@ -636,13 +636,13 @@ class ActionFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(OperationResults)
-    async def Operations(self, entities=None):
+    def Operations(self, entities=None):
         '''
         Operations fetches the specified operation ids.
 
@@ -659,13 +659,13 @@ class ActionFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(EnqueuedActionsV2)
-    async def Run(self, applications=None, commands=None, machines=None, timeout=None, units=None, workload_context=None):
+    def Run(self, applications=None, commands=None, machines=None, timeout=None, units=None, workload_context=None):
         '''
         Run the commands specified on the machines identified through the
         list of machines, units and services.
@@ -708,13 +708,13 @@ class ActionFacade(Type):
         _params['timeout'] = timeout
         _params['units'] = units
         _params['workload-context'] = workload_context
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(EnqueuedActionsV2)
-    async def RunOnAllMachines(self, applications=None, commands=None, machines=None, timeout=None, units=None, workload_context=None):
+    def RunOnAllMachines(self, applications=None, commands=None, machines=None, timeout=None, units=None, workload_context=None):
         '''
         RunOnAllMachines attempts to run the specified command on all the machines.
 
@@ -756,13 +756,13 @@ class ActionFacade(Type):
         _params['timeout'] = timeout
         _params['units'] = units
         _params['workload-context'] = workload_context
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsWatchResults)
-    async def WatchActionsProgress(self, entities=None):
+    def WatchActionsProgress(self, entities=None):
         '''
         WatchActionsProgress creates a watcher that reports on action log messages.
 
@@ -779,7 +779,7 @@ class ActionFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
@@ -1311,7 +1311,7 @@ class CloudFacade(Type):
     
 
     @ReturnMapping(None)
-    async def AddCloud(self, cloud=None, force=None, name=None):
+    def AddCloud(self, cloud=None, force=None, name=None):
         '''
         AddCloud adds a new cloud, different from the one managed by the controller.
 
@@ -1338,13 +1338,13 @@ class CloudFacade(Type):
         _params['cloud'] = cloud
         _params['force'] = force
         _params['name'] = name
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def AddCredentials(self, credentials=None):
+    def AddCredentials(self, credentials=None):
         '''
         AddCredentials adds new credentials.
         In contrast to UpdateCredentials() below, the new credentials can be
@@ -1364,13 +1364,13 @@ class CloudFacade(Type):
                    version=7,
                    params=_params)
         _params['credentials'] = credentials
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(UpdateCredentialResults)
-    async def CheckCredentialsModels(self, credentials=None):
+    def CheckCredentialsModels(self, credentials=None):
         '''
         CheckCredentialsModels validates supplied cloud credentials' content against
         models that currently use these credentials.
@@ -1392,13 +1392,13 @@ class CloudFacade(Type):
                    version=7,
                    params=_params)
         _params['credentials'] = credentials
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(CloudResults)
-    async def Cloud(self, entities=None):
+    def Cloud(self, entities=None):
         '''
         Cloud returns the cloud definitions for the specified clouds.
 
@@ -1415,13 +1415,13 @@ class CloudFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(CloudInfoResults)
-    async def CloudInfo(self, entities=None):
+    def CloudInfo(self, entities=None):
         '''
         CloudInfo returns information about the specified clouds.
 
@@ -1438,13 +1438,13 @@ class CloudFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(CloudsResult)
-    async def Clouds(self):
+    def Clouds(self):
         '''
         Clouds returns the definitions of all clouds supported by the controller
         that the logged in user can see.
@@ -1460,13 +1460,13 @@ class CloudFacade(Type):
                    version=7,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(CloudCredentialResults)
-    async def Credential(self, entities=None):
+    def Credential(self, entities=None):
         '''
         Credential returns the specified cloud credential for each tag, minus secrets.
 
@@ -1483,13 +1483,13 @@ class CloudFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(CredentialContentResults)
-    async def CredentialContents(self, credentials=None, include_secrets=None):
+    def CredentialContents(self, credentials=None, include_secrets=None):
         '''
         CredentialContents returns the specified cloud credentials,
         including the secrets if requested.
@@ -1516,13 +1516,13 @@ class CloudFacade(Type):
                    params=_params)
         _params['credentials'] = credentials
         _params['include-secrets'] = include_secrets
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(InstanceTypesResults)
-    async def InstanceTypes(self, constraints=None):
+    def InstanceTypes(self, constraints=None):
         '''
         InstanceTypes returns instance type information for the cloud and region
         in which the current model is deployed.
@@ -1540,13 +1540,13 @@ class CloudFacade(Type):
                    version=7,
                    params=_params)
         _params['constraints'] = constraints
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ListCloudInfoResults)
-    async def ListCloudInfo(self, all_=None, user_tag=None):
+    def ListCloudInfo(self, all_=None, user_tag=None):
         '''
         ListCloudInfo returns clouds that the specified user has access to.
         Controller admins (superuser) can list clouds for any user.
@@ -1570,13 +1570,13 @@ class CloudFacade(Type):
                    params=_params)
         _params['all'] = all_
         _params['user-tag'] = user_tag
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def ModifyCloudAccess(self, changes=None):
+    def ModifyCloudAccess(self, changes=None):
         '''
         ModifyCloudAccess changes the model access granted to users.
 
@@ -1593,13 +1593,13 @@ class CloudFacade(Type):
                    version=7,
                    params=_params)
         _params['changes'] = changes
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def RemoveClouds(self, entities=None):
+    def RemoveClouds(self, entities=None):
         '''
         RemoveClouds removes the specified clouds from the controller.
         If a cloud is in use (has models deployed to it), the removal will fail.
@@ -1617,13 +1617,13 @@ class CloudFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def RevokeCredentialsCheckModels(self, credentials=None):
+    def RevokeCredentialsCheckModels(self, credentials=None):
         '''
         RevokeCredentialsCheckModels revokes a set of cloud credentials.
         If the credentials are used by any of the models, the credential deletion will be aborted.
@@ -1642,13 +1642,13 @@ class CloudFacade(Type):
                    version=7,
                    params=_params)
         _params['credentials'] = credentials
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def UpdateCloud(self, clouds=None):
+    def UpdateCloud(self, clouds=None):
         '''
         UpdateCloud updates an existing cloud that the controller knows about.
 
@@ -1665,13 +1665,13 @@ class CloudFacade(Type):
                    version=7,
                    params=_params)
         _params['clouds'] = clouds
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(UpdateCredentialResults)
-    async def UpdateCredentialsCheckModels(self, credentials=None, force=None):
+    def UpdateCredentialsCheckModels(self, credentials=None, force=None):
         '''
         UpdateCredentialsCheckModels updates a set of cloud credentials' content.
         If there are any models that are using a credential and these models
@@ -1699,13 +1699,13 @@ class CloudFacade(Type):
                    params=_params)
         _params['credentials'] = credentials
         _params['force'] = force
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsResults)
-    async def UserCredentials(self, user_clouds=None):
+    def UserCredentials(self, user_clouds=None):
         '''
         UserCredentials returns the cloud credentials for a set of users.
 
@@ -1722,7 +1722,7 @@ class CloudFacade(Type):
                    version=7,
                    params=_params)
         _params['user-clouds'] = user_clouds
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
@@ -2292,7 +2292,7 @@ class FirewallerFacade(Type):
     
 
     @ReturnMapping(BoolResults)
-    async def AreManuallyProvisioned(self, entities=None):
+    def AreManuallyProvisioned(self, entities=None):
         '''
         AreManuallyProvisioned returns whether each given entity is
         manually provisioned or not. Only machine tags are accepted.
@@ -2310,13 +2310,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(CloudSpecResults)
-    async def CloudSpec(self, entities=None):
+    def CloudSpec(self, entities=None):
         '''
         CloudSpec returns the model's cloud spec.
 
@@ -2333,13 +2333,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ControllerAPIInfoResults)
-    async def ControllerAPIInfoForModels(self, entities=None):
+    def ControllerAPIInfoForModels(self, entities=None):
         '''
         ControllerAPIInfoForModels returns the controller api connection details for the specified models.
 
@@ -2356,13 +2356,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ControllerConfigResult)
-    async def ControllerConfig(self):
+    def ControllerConfig(self):
         '''
         ControllerConfig returns the controller's configuration.
 
@@ -2377,13 +2377,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ListFirewallRulesResults)
-    async def FirewallRules(self, known_services=None):
+    def FirewallRules(self, known_services=None):
         '''
         FirewallRules returns the firewall rules for the specified well known service types.
 
@@ -2400,13 +2400,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['known-services'] = known_services
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringResults)
-    async def GetAssignedMachine(self, entities=None):
+    def GetAssignedMachine(self, entities=None):
         '''
         GetAssignedMachine returns the assigned machine tag (if any) for
         each given unit.
@@ -2424,13 +2424,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(CloudSpecResult)
-    async def GetCloudSpec(self):
+    def GetCloudSpec(self):
         '''
         GetCloudSpec constructs the CloudSpec for a validated and authorized model.
 
@@ -2445,13 +2445,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ExposeInfoResults)
-    async def GetExposeInfo(self, entities=None):
+    def GetExposeInfo(self, entities=None):
         '''
         GetExposeInfo returns the expose flag and per-endpoint expose settings
         for the specified applications.
@@ -2469,13 +2469,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringResults)
-    async def InstanceId(self, entities=None):
+    def InstanceId(self, entities=None):
         '''
         InstanceId returns the provider specific instance id for each given
         machine or an CodeNotProvisioned error, if not set.
@@ -2493,13 +2493,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(LifeResults)
-    async def Life(self, entities=None):
+    def Life(self, entities=None):
         '''
         Life returns the life status of every supplied entity, where available.
 
@@ -2516,13 +2516,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(MacaroonResults)
-    async def MacaroonForRelations(self, entities=None):
+    def MacaroonForRelations(self, entities=None):
         '''
         MacaroonForRelations returns the macaroon for the specified relations.
 
@@ -2539,13 +2539,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ModelConfigResult)
-    async def ModelConfig(self):
+    def ModelConfig(self):
         '''
         ModelConfig returns the current model's configuration.
 
@@ -2560,13 +2560,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(OpenMachinePortRangesResults)
-    async def OpenedMachinePortRanges(self, entities=None):
+    def OpenedMachinePortRanges(self, entities=None):
         '''
         OpenedMachinePortRanges returns a list of the opened port ranges for the
         specified machines where each result is broken down by unit. The list of
@@ -2586,13 +2586,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetRelationsStatus(self, entities=None):
+    def SetRelationsStatus(self, entities=None):
         '''
         SetRelationsStatus sets the status for the specified relations.
 
@@ -2609,13 +2609,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(SpaceInfos)
-    async def SpaceInfos(self, space_ids=None):
+    def SpaceInfos(self, space_ids=None):
         '''
         SpaceInfos returns a comprehensive representation of either all spaces or
         a filtered subset of the known spaces and their associated subnet details.
@@ -2633,13 +2633,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['space-ids'] = space_ids
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(NotifyWatchResults)
-    async def Watch(self, entities=None):
+    def Watch(self, entities=None):
         '''
         Watch starts an NotifyWatcher for each given entity.
 
@@ -2656,13 +2656,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(NotifyWatchResults)
-    async def WatchCloudSpecsChanges(self, entities=None):
+    def WatchCloudSpecsChanges(self, entities=None):
         '''
         WatchCloudSpecsChanges returns a watcher for cloud spec changes.
 
@@ -2679,13 +2679,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsWatchResults)
-    async def WatchEgressAddressesForRelations(self, entities=None):
+    def WatchEgressAddressesForRelations(self, entities=None):
         '''
         WatchEgressAddressesForRelations creates a watcher that notifies when addresses, from which
         connections will originate for the relation, change.
@@ -2704,13 +2704,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(NotifyWatchResult)
-    async def WatchForModelConfigChanges(self):
+    def WatchForModelConfigChanges(self):
         '''
         WatchForModelConfigChanges returns a NotifyWatcher that observes
         changes to the model configuration.
@@ -2729,13 +2729,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsWatchResults)
-    async def WatchIngressAddressesForRelations(self, entities=None):
+    def WatchIngressAddressesForRelations(self, entities=None):
         '''
         WatchIngressAddressesForRelations creates a watcher that returns the ingress networks
         that have been recorded against the specified relations.
@@ -2753,13 +2753,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsWatchResult)
-    async def WatchModelMachineStartTimes(self):
+    def WatchModelMachineStartTimes(self):
         '''
         WatchModelMachineStartTimes watches the non-container machines in the model
         for changes to the Life or AgentStartTime fields and reports them as a batch.
@@ -2775,13 +2775,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsWatchResult)
-    async def WatchModelMachines(self):
+    def WatchModelMachines(self):
         '''
         WatchModelMachines returns a StringsWatcher that notifies of
         changes to the life cycles of the top level machines in the current
@@ -2798,13 +2798,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsWatchResults)
-    async def WatchOpenedPorts(self, entities=None):
+    def WatchOpenedPorts(self, entities=None):
         '''
         WatchOpenedPorts returns a new StringsWatcher for each given
         model tag.
@@ -2822,13 +2822,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsWatchResult)
-    async def WatchSubnets(self, entities=None):
+    def WatchSubnets(self, entities=None):
         '''
         WatchSubnets returns a new StringsWatcher that watches the specified
         subnet tags or all tags if no entities are specified.
@@ -2846,13 +2846,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsWatchResults)
-    async def WatchUnits(self, entities=None):
+    def WatchUnits(self, entities=None):
         '''
         WatchUnits starts a StringsWatcher to watch all units belonging to
         to any entity (machine or service) passed in args.
@@ -2870,721 +2870,7 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-class MachineManagerFacade(Type):
-    name = 'MachineManager'
-    version = 7
-    schema =     {'definitions': {'AddMachineParams': {'additionalProperties': False,
-                                          'properties': {'addresses': {'items': {'$ref': '#/definitions/Address'},
-                                                                       'type': 'array'},
-                                                         'constraints': {'$ref': '#/definitions/Value'},
-                                                         'container-type': {'type': 'string'},
-                                                         'disks': {'items': {'$ref': '#/definitions/Constraints'},
-                                                                   'type': 'array'},
-                                                         'hardware-characteristics': {'$ref': '#/definitions/HardwareCharacteristics'},
-                                                         'instance-id': {'type': 'string'},
-                                                         'jobs': {'items': {'type': 'string'},
-                                                                  'type': 'array'},
-                                                         'nonce': {'type': 'string'},
-                                                         'parent-id': {'type': 'string'},
-                                                         'placement': {'$ref': '#/definitions/Placement'},
-                                                         'series': {'type': 'string'}},
-                                          'required': ['series',
-                                                       'constraints',
-                                                       'jobs',
-                                                       'parent-id',
-                                                       'container-type',
-                                                       'instance-id',
-                                                       'nonce',
-                                                       'hardware-characteristics',
-                                                       'addresses'],
-                                          'type': 'object'},
-                     'AddMachines': {'additionalProperties': False,
-                                     'properties': {'params': {'items': {'$ref': '#/definitions/AddMachineParams'},
-                                                               'type': 'array'}},
-                                     'required': ['params'],
-                                     'type': 'object'},
-                     'AddMachinesResult': {'additionalProperties': False,
-                                           'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                          'machine': {'type': 'string'}},
-                                           'required': ['machine'],
-                                           'type': 'object'},
-                     'AddMachinesResults': {'additionalProperties': False,
-                                            'properties': {'machines': {'items': {'$ref': '#/definitions/AddMachinesResult'},
-                                                                        'type': 'array'}},
-                                            'required': ['machines'],
-                                            'type': 'object'},
-                     'Address': {'additionalProperties': False,
-                                 'properties': {'cidr': {'type': 'string'},
-                                                'config-type': {'type': 'string'},
-                                                'is-secondary': {'type': 'boolean'},
-                                                'scope': {'type': 'string'},
-                                                'space-id': {'type': 'string'},
-                                                'space-name': {'type': 'string'},
-                                                'type': {'type': 'string'},
-                                                'value': {'type': 'string'}},
-                                 'required': ['value', 'type', 'scope'],
-                                 'type': 'object'},
-                     'Constraints': {'additionalProperties': False,
-                                     'properties': {'Count': {'type': 'integer'},
-                                                    'Pool': {'type': 'string'},
-                                                    'Size': {'type': 'integer'}},
-                                     'required': ['Pool', 'Size', 'Count'],
-                                     'type': 'object'},
-                     'DestroyMachineInfo': {'additionalProperties': False,
-                                            'properties': {'destroyed-containers': {'items': {'$ref': '#/definitions/DestroyMachineResult'},
-                                                                                    'type': 'array'},
-                                                           'destroyed-storage': {'items': {'$ref': '#/definitions/Entity'},
-                                                                                 'type': 'array'},
-                                                           'destroyed-units': {'items': {'$ref': '#/definitions/Entity'},
-                                                                               'type': 'array'},
-                                                           'detached-storage': {'items': {'$ref': '#/definitions/Entity'},
-                                                                                'type': 'array'},
-                                                           'machine-id': {'type': 'string'}},
-                                            'required': ['machine-id'],
-                                            'type': 'object'},
-                     'DestroyMachineResult': {'additionalProperties': False,
-                                              'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                             'info': {'$ref': '#/definitions/DestroyMachineInfo'}},
-                                              'type': 'object'},
-                     'DestroyMachineResults': {'additionalProperties': False,
-                                               'properties': {'results': {'items': {'$ref': '#/definitions/DestroyMachineResult'},
-                                                                          'type': 'array'}},
-                                               'type': 'object'},
-                     'DestroyMachinesParams': {'additionalProperties': False,
-                                               'properties': {'force': {'type': 'boolean'},
-                                                              'keep': {'type': 'boolean'},
-                                                              'machine-tags': {'items': {'type': 'string'},
-                                                                               'type': 'array'},
-                                                              'max-wait': {'type': 'integer'}},
-                                               'required': ['machine-tags'],
-                                               'type': 'object'},
-                     'Entities': {'additionalProperties': False,
-                                  'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
-                                                              'type': 'array'}},
-                                  'required': ['entities'],
-                                  'type': 'object'},
-                     'Entity': {'additionalProperties': False,
-                                'properties': {'tag': {'type': 'string'}},
-                                'required': ['tag'],
-                                'type': 'object'},
-                     'Error': {'additionalProperties': False,
-                               'properties': {'code': {'type': 'string'},
-                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
-                                                                                    'type': 'object'}},
-                                                       'type': 'object'},
-                                              'message': {'type': 'string'}},
-                               'required': ['message', 'code'],
-                               'type': 'object'},
-                     'ErrorResult': {'additionalProperties': False,
-                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
-                                     'type': 'object'},
-                     'ErrorResults': {'additionalProperties': False,
-                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
-                                                                 'type': 'array'}},
-                                      'required': ['results'],
-                                      'type': 'object'},
-                     'HardwareCharacteristics': {'additionalProperties': False,
-                                                 'properties': {'arch': {'type': 'string'},
-                                                                'availability-zone': {'type': 'string'},
-                                                                'cpu-cores': {'type': 'integer'},
-                                                                'cpu-power': {'type': 'integer'},
-                                                                'mem': {'type': 'integer'},
-                                                                'root-disk': {'type': 'integer'},
-                                                                'root-disk-source': {'type': 'string'},
-                                                                'tags': {'items': {'type': 'string'},
-                                                                         'type': 'array'}},
-                                                 'type': 'object'},
-                     'InstanceType': {'additionalProperties': False,
-                                      'properties': {'arches': {'items': {'type': 'string'},
-                                                                'type': 'array'},
-                                                     'cost': {'type': 'integer'},
-                                                     'cpu-cores': {'type': 'integer'},
-                                                     'deprecated': {'type': 'boolean'},
-                                                     'memory': {'type': 'integer'},
-                                                     'name': {'type': 'string'},
-                                                     'root-disk': {'type': 'integer'},
-                                                     'virt-type': {'type': 'string'}},
-                                      'required': ['arches', 'cpu-cores', 'memory'],
-                                      'type': 'object'},
-                     'InstanceTypesResult': {'additionalProperties': False,
-                                             'properties': {'cost-currency': {'type': 'string'},
-                                                            'cost-divisor': {'type': 'integer'},
-                                                            'cost-unit': {'type': 'string'},
-                                                            'error': {'$ref': '#/definitions/Error'},
-                                                            'instance-types': {'items': {'$ref': '#/definitions/InstanceType'},
-                                                                               'type': 'array'}},
-                                             'type': 'object'},
-                     'InstanceTypesResults': {'additionalProperties': False,
-                                              'properties': {'results': {'items': {'$ref': '#/definitions/InstanceTypesResult'},
-                                                                         'type': 'array'}},
-                                              'required': ['results'],
-                                              'type': 'object'},
-                     'ModelInstanceTypesConstraint': {'additionalProperties': False,
-                                                      'properties': {'value': {'$ref': '#/definitions/Value'}},
-                                                      'type': 'object'},
-                     'ModelInstanceTypesConstraints': {'additionalProperties': False,
-                                                       'properties': {'constraints': {'items': {'$ref': '#/definitions/ModelInstanceTypesConstraint'},
-                                                                                      'type': 'array'}},
-                                                       'required': ['constraints'],
-                                                       'type': 'object'},
-                     'NotifyWatchResult': {'additionalProperties': False,
-                                           'properties': {'NotifyWatcherId': {'type': 'string'},
-                                                          'error': {'$ref': '#/definitions/Error'}},
-                                           'required': ['NotifyWatcherId'],
-                                           'type': 'object'},
-                     'NotifyWatchResults': {'additionalProperties': False,
-                                            'properties': {'results': {'items': {'$ref': '#/definitions/NotifyWatchResult'},
-                                                                       'type': 'array'}},
-                                            'required': ['results'],
-                                            'type': 'object'},
-                     'Placement': {'additionalProperties': False,
-                                   'properties': {'directive': {'type': 'string'},
-                                                  'scope': {'type': 'string'}},
-                                   'required': ['scope', 'directive'],
-                                   'type': 'object'},
-                     'ProvisioningScriptParams': {'additionalProperties': False,
-                                                  'properties': {'data-dir': {'type': 'string'},
-                                                                 'disable-package-commands': {'type': 'boolean'},
-                                                                 'machine-id': {'type': 'string'},
-                                                                 'nonce': {'type': 'string'}},
-                                                  'required': ['machine-id',
-                                                               'nonce',
-                                                               'data-dir',
-                                                               'disable-package-commands'],
-                                                  'type': 'object'},
-                     'ProvisioningScriptResult': {'additionalProperties': False,
-                                                  'properties': {'script': {'type': 'string'}},
-                                                  'required': ['script'],
-                                                  'type': 'object'},
-                     'RetryProvisioningArgs': {'additionalProperties': False,
-                                               'properties': {'all': {'type': 'boolean'},
-                                                              'machines': {'items': {'type': 'string'},
-                                                                           'type': 'array'}},
-                                               'required': ['all'],
-                                               'type': 'object'},
-                     'StringsResult': {'additionalProperties': False,
-                                       'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                      'result': {'items': {'type': 'string'},
-                                                                 'type': 'array'}},
-                                       'type': 'object'},
-                     'StringsResults': {'additionalProperties': False,
-                                        'properties': {'results': {'items': {'$ref': '#/definitions/StringsResult'},
-                                                                   'type': 'array'}},
-                                        'required': ['results'],
-                                        'type': 'object'},
-                     'UpdateSeriesArg': {'additionalProperties': False,
-                                         'properties': {'force': {'type': 'boolean'},
-                                                        'series': {'type': 'string'},
-                                                        'tag': {'$ref': '#/definitions/Entity'}},
-                                         'required': ['tag', 'force', 'series'],
-                                         'type': 'object'},
-                     'UpdateSeriesArgs': {'additionalProperties': False,
-                                          'properties': {'args': {'items': {'$ref': '#/definitions/UpdateSeriesArg'},
-                                                                  'type': 'array'}},
-                                          'required': ['args'],
-                                          'type': 'object'},
-                     'UpgradeSeriesNotificationParam': {'additionalProperties': False,
-                                                        'properties': {'entity': {'$ref': '#/definitions/Entity'},
-                                                                       'watcher-id': {'type': 'string'}},
-                                                        'required': ['entity',
-                                                                     'watcher-id'],
-                                                        'type': 'object'},
-                     'UpgradeSeriesNotificationParams': {'additionalProperties': False,
-                                                         'properties': {'params': {'items': {'$ref': '#/definitions/UpgradeSeriesNotificationParam'},
-                                                                                   'type': 'array'}},
-                                                         'required': ['params'],
-                                                         'type': 'object'},
-                     'UpgradeSeriesUnitsResult': {'additionalProperties': False,
-                                                  'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                                 'unit-names': {'items': {'type': 'string'},
-                                                                                'type': 'array'}},
-                                                  'required': ['unit-names'],
-                                                  'type': 'object'},
-                     'UpgradeSeriesUnitsResults': {'additionalProperties': False,
-                                                   'properties': {'Results': {'items': {'$ref': '#/definitions/UpgradeSeriesUnitsResult'},
-                                                                              'type': 'array'}},
-                                                   'required': ['Results'],
-                                                   'type': 'object'},
-                     'Value': {'additionalProperties': False,
-                               'properties': {'allocate-public-ip': {'type': 'boolean'},
-                                              'arch': {'type': 'string'},
-                                              'container': {'type': 'string'},
-                                              'cores': {'type': 'integer'},
-                                              'cpu-power': {'type': 'integer'},
-                                              'instance-role': {'type': 'string'},
-                                              'instance-type': {'type': 'string'},
-                                              'mem': {'type': 'integer'},
-                                              'root-disk': {'type': 'integer'},
-                                              'root-disk-source': {'type': 'string'},
-                                              'spaces': {'items': {'type': 'string'},
-                                                         'type': 'array'},
-                                              'tags': {'items': {'type': 'string'},
-                                                       'type': 'array'},
-                                              'virt-type': {'type': 'string'},
-                                              'zones': {'items': {'type': 'string'},
-                                                        'type': 'array'}},
-                               'type': 'object'}},
-     'properties': {'AddMachines': {'description': 'AddMachines adds new machines '
-                                                   'with the supplied parameters.',
-                                    'properties': {'Params': {'$ref': '#/definitions/AddMachines'},
-                                                   'Result': {'$ref': '#/definitions/AddMachinesResults'}},
-                                    'type': 'object'},
-                    'DestroyMachine': {'description': 'DestroyMachine removes a '
-                                                      'set of machines from the '
-                                                      'model.\n'
-                                                      'TODO(juju3) - remove',
-                                       'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                      'Result': {'$ref': '#/definitions/DestroyMachineResults'}},
-                                       'type': 'object'},
-                    'DestroyMachineWithParams': {'description': 'DestroyMachineWithParams '
-                                                                'removes a set of '
-                                                                'machines from the '
-                                                                'model.',
-                                                 'properties': {'Params': {'$ref': '#/definitions/DestroyMachinesParams'},
-                                                                'Result': {'$ref': '#/definitions/DestroyMachineResults'}},
-                                                 'type': 'object'},
-                    'ForceDestroyMachine': {'description': 'ForceDestroyMachine '
-                                                           'forcibly removes a set '
-                                                           'of machines from the '
-                                                           'model.\n'
-                                                           'TODO(juju3) - remove\n'
-                                                           'Also from ModelManger '
-                                                           'v6 this call is less '
-                                                           'useful as it does not '
-                                                           'support MaxWait '
-                                                           'customisation.',
-                                            'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                           'Result': {'$ref': '#/definitions/DestroyMachineResults'}},
-                                            'type': 'object'},
-                    'GetUpgradeSeriesMessages': {'description': 'GetUpgradeSeriesMessages '
-                                                                'returns all new '
-                                                                'messages '
-                                                                'associated with '
-                                                                'upgrade\n'
-                                                                'series events. '
-                                                                'Messages that '
-                                                                'have already been '
-                                                                'retrieved once '
-                                                                'are not\n'
-                                                                'returned by this '
-                                                                'method.',
-                                                 'properties': {'Params': {'$ref': '#/definitions/UpgradeSeriesNotificationParams'},
-                                                                'Result': {'$ref': '#/definitions/StringsResults'}},
-                                                 'type': 'object'},
-                    'InstanceTypes': {'description': 'InstanceTypes returns '
-                                                     'instance type information '
-                                                     'for the cloud and region\n'
-                                                     'in which the current model '
-                                                     'is deployed.',
-                                      'properties': {'Params': {'$ref': '#/definitions/ModelInstanceTypesConstraints'},
-                                                     'Result': {'$ref': '#/definitions/InstanceTypesResults'}},
-                                      'type': 'object'},
-                    'ProvisioningScript': {'description': 'ProvisioningScript '
-                                                          'returns a shell script '
-                                                          'that, when run,\n'
-                                                          'provisions a machine '
-                                                          'agent on the machine '
-                                                          'executing the script.',
-                                           'properties': {'Params': {'$ref': '#/definitions/ProvisioningScriptParams'},
-                                                          'Result': {'$ref': '#/definitions/ProvisioningScriptResult'}},
-                                           'type': 'object'},
-                    'RetryProvisioning': {'description': 'RetryProvisioning marks '
-                                                         'a provisioning error as '
-                                                         'transient on the '
-                                                         'machines.',
-                                          'properties': {'Params': {'$ref': '#/definitions/RetryProvisioningArgs'},
-                                                         'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                          'type': 'object'},
-                    'UpgradeSeriesComplete': {'description': 'UpgradeSeriesComplete '
-                                                             'marks a machine as '
-                                                             'having completed a '
-                                                             'managed series\n'
-                                                             'upgrade.',
-                                              'properties': {'Params': {'$ref': '#/definitions/UpdateSeriesArg'},
-                                                             'Result': {'$ref': '#/definitions/ErrorResult'}},
-                                              'type': 'object'},
-                    'UpgradeSeriesPrepare': {'description': 'UpgradeSeriesPrepare '
-                                                            'prepares a machine '
-                                                            'for a OS series '
-                                                            'upgrade.',
-                                             'properties': {'Params': {'$ref': '#/definitions/UpdateSeriesArg'},
-                                                            'Result': {'$ref': '#/definitions/ErrorResult'}},
-                                             'type': 'object'},
-                    'UpgradeSeriesValidate': {'description': 'UpgradeSeriesValidate '
-                                                             'validates that the '
-                                                             'incoming arguments '
-                                                             'correspond to a\n'
-                                                             'valid series upgrade '
-                                                             'for the target '
-                                                             'machine.\n'
-                                                             'If they do, a list '
-                                                             "of the machine's "
-                                                             'current units is '
-                                                             'returned for use in\n'
-                                                             'soliciting user '
-                                                             'confirmation of the '
-                                                             'command.',
-                                              'properties': {'Params': {'$ref': '#/definitions/UpdateSeriesArgs'},
-                                                             'Result': {'$ref': '#/definitions/UpgradeSeriesUnitsResults'}},
-                                              'type': 'object'},
-                    'WatchUpgradeSeriesNotifications': {'description': 'WatchUpgradeSeriesNotifications '
-                                                                       'returns a '
-                                                                       'watcher '
-                                                                       'that fires '
-                                                                       'on '
-                                                                       'upgrade\n'
-                                                                       'series '
-                                                                       'events.',
-                                                        'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                                       'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
-                                                        'type': 'object'}},
-     'type': 'object'}
-    
-
-    @ReturnMapping(AddMachinesResults)
-    async def AddMachines(self, params=None):
-        '''
-        AddMachines adds new machines with the supplied parameters.
-
-        params : typing.Sequence[~AddMachineParams]
-        Returns -> AddMachinesResults
-        '''
-        if params is not None and not isinstance(params, (bytes, str, list)):
-            raise Exception("Expected params to be a Sequence, received: {}".format(type(params)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='MachineManager',
-                   request='AddMachines',
-                   version=7,
-                   params=_params)
-        _params['params'] = params
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(DestroyMachineResults)
-    async def DestroyMachine(self, entities=None):
-        '''
-        DestroyMachine removes a set of machines from the model.
-        TODO(juju3) - remove
-
-        entities : typing.Sequence[~Entity]
-        Returns -> DestroyMachineResults
-        '''
-        if entities is not None and not isinstance(entities, (bytes, str, list)):
-            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='MachineManager',
-                   request='DestroyMachine',
-                   version=7,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(DestroyMachineResults)
-    async def DestroyMachineWithParams(self, force=None, keep=None, machine_tags=None, max_wait=None):
-        '''
-        DestroyMachineWithParams removes a set of machines from the model.
-
-        force : bool
-        keep : bool
-        machine_tags : typing.Sequence[str]
-        max_wait : int
-        Returns -> DestroyMachineResults
-        '''
-        if force is not None and not isinstance(force, bool):
-            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
-
-        if keep is not None and not isinstance(keep, bool):
-            raise Exception("Expected keep to be a bool, received: {}".format(type(keep)))
-
-        if machine_tags is not None and not isinstance(machine_tags, (bytes, str, list)):
-            raise Exception("Expected machine_tags to be a Sequence, received: {}".format(type(machine_tags)))
-
-        if max_wait is not None and not isinstance(max_wait, int):
-            raise Exception("Expected max_wait to be a int, received: {}".format(type(max_wait)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='MachineManager',
-                   request='DestroyMachineWithParams',
-                   version=7,
-                   params=_params)
-        _params['force'] = force
-        _params['keep'] = keep
-        _params['machine-tags'] = machine_tags
-        _params['max-wait'] = max_wait
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(DestroyMachineResults)
-    async def ForceDestroyMachine(self, entities=None):
-        '''
-        ForceDestroyMachine forcibly removes a set of machines from the model.
-        TODO(juju3) - remove
-        Also from ModelManger v6 this call is less useful as it does not support MaxWait customisation.
-
-        entities : typing.Sequence[~Entity]
-        Returns -> DestroyMachineResults
-        '''
-        if entities is not None and not isinstance(entities, (bytes, str, list)):
-            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='MachineManager',
-                   request='ForceDestroyMachine',
-                   version=7,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(StringsResults)
-    async def GetUpgradeSeriesMessages(self, params=None):
-        '''
-        GetUpgradeSeriesMessages returns all new messages associated with upgrade
-        series events. Messages that have already been retrieved once are not
-        returned by this method.
-
-        params : typing.Sequence[~UpgradeSeriesNotificationParam]
-        Returns -> StringsResults
-        '''
-        if params is not None and not isinstance(params, (bytes, str, list)):
-            raise Exception("Expected params to be a Sequence, received: {}".format(type(params)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='MachineManager',
-                   request='GetUpgradeSeriesMessages',
-                   version=7,
-                   params=_params)
-        _params['params'] = params
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(InstanceTypesResults)
-    async def InstanceTypes(self, constraints=None):
-        '''
-        InstanceTypes returns instance type information for the cloud and region
-        in which the current model is deployed.
-
-        constraints : typing.Sequence[~ModelInstanceTypesConstraint]
-        Returns -> InstanceTypesResults
-        '''
-        if constraints is not None and not isinstance(constraints, (bytes, str, list)):
-            raise Exception("Expected constraints to be a Sequence, received: {}".format(type(constraints)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='MachineManager',
-                   request='InstanceTypes',
-                   version=7,
-                   params=_params)
-        _params['constraints'] = constraints
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ProvisioningScriptResult)
-    async def ProvisioningScript(self, data_dir=None, disable_package_commands=None, machine_id=None, nonce=None):
-        '''
-        ProvisioningScript returns a shell script that, when run,
-        provisions a machine agent on the machine executing the script.
-
-        data_dir : str
-        disable_package_commands : bool
-        machine_id : str
-        nonce : str
-        Returns -> ProvisioningScriptResult
-        '''
-        if data_dir is not None and not isinstance(data_dir, (bytes, str)):
-            raise Exception("Expected data_dir to be a str, received: {}".format(type(data_dir)))
-
-        if disable_package_commands is not None and not isinstance(disable_package_commands, bool):
-            raise Exception("Expected disable_package_commands to be a bool, received: {}".format(type(disable_package_commands)))
-
-        if machine_id is not None and not isinstance(machine_id, (bytes, str)):
-            raise Exception("Expected machine_id to be a str, received: {}".format(type(machine_id)))
-
-        if nonce is not None and not isinstance(nonce, (bytes, str)):
-            raise Exception("Expected nonce to be a str, received: {}".format(type(nonce)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='MachineManager',
-                   request='ProvisioningScript',
-                   version=7,
-                   params=_params)
-        _params['data-dir'] = data_dir
-        _params['disable-package-commands'] = disable_package_commands
-        _params['machine-id'] = machine_id
-        _params['nonce'] = nonce
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
-    async def RetryProvisioning(self, all_=None, machines=None):
-        '''
-        RetryProvisioning marks a provisioning error as transient on the machines.
-
-        all_ : bool
-        machines : typing.Sequence[str]
-        Returns -> ErrorResults
-        '''
-        if all_ is not None and not isinstance(all_, bool):
-            raise Exception("Expected all_ to be a bool, received: {}".format(type(all_)))
-
-        if machines is not None and not isinstance(machines, (bytes, str, list)):
-            raise Exception("Expected machines to be a Sequence, received: {}".format(type(machines)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='MachineManager',
-                   request='RetryProvisioning',
-                   version=7,
-                   params=_params)
-        _params['all'] = all_
-        _params['machines'] = machines
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResult)
-    async def UpgradeSeriesComplete(self, force=None, series=None, tag=None):
-        '''
-        UpgradeSeriesComplete marks a machine as having completed a managed series
-        upgrade.
-
-        force : bool
-        series : str
-        tag : Entity
-        Returns -> ErrorResult
-        '''
-        if force is not None and not isinstance(force, bool):
-            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
-
-        if series is not None and not isinstance(series, (bytes, str)):
-            raise Exception("Expected series to be a str, received: {}".format(type(series)))
-
-        if tag is not None and not isinstance(tag, (dict, Entity)):
-            raise Exception("Expected tag to be a Entity, received: {}".format(type(tag)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='MachineManager',
-                   request='UpgradeSeriesComplete',
-                   version=7,
-                   params=_params)
-        _params['force'] = force
-        _params['series'] = series
-        _params['tag'] = tag
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResult)
-    async def UpgradeSeriesPrepare(self, force=None, series=None, tag=None):
-        '''
-        UpgradeSeriesPrepare prepares a machine for a OS series upgrade.
-
-        force : bool
-        series : str
-        tag : Entity
-        Returns -> ErrorResult
-        '''
-        if force is not None and not isinstance(force, bool):
-            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
-
-        if series is not None and not isinstance(series, (bytes, str)):
-            raise Exception("Expected series to be a str, received: {}".format(type(series)))
-
-        if tag is not None and not isinstance(tag, (dict, Entity)):
-            raise Exception("Expected tag to be a Entity, received: {}".format(type(tag)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='MachineManager',
-                   request='UpgradeSeriesPrepare',
-                   version=7,
-                   params=_params)
-        _params['force'] = force
-        _params['series'] = series
-        _params['tag'] = tag
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(UpgradeSeriesUnitsResults)
-    async def UpgradeSeriesValidate(self, args=None):
-        '''
-        UpgradeSeriesValidate validates that the incoming arguments correspond to a
-        valid series upgrade for the target machine.
-        If they do, a list of the machine's current units is returned for use in
-        soliciting user confirmation of the command.
-
-        args : typing.Sequence[~UpdateSeriesArg]
-        Returns -> UpgradeSeriesUnitsResults
-        '''
-        if args is not None and not isinstance(args, (bytes, str, list)):
-            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='MachineManager',
-                   request='UpgradeSeriesValidate',
-                   version=7,
-                   params=_params)
-        _params['args'] = args
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(NotifyWatchResults)
-    async def WatchUpgradeSeriesNotifications(self, entities=None):
-        '''
-        WatchUpgradeSeriesNotifications returns a watcher that fires on upgrade
-        series events.
-
-        entities : typing.Sequence[~Entity]
-        Returns -> NotifyWatchResults
-        '''
-        if entities is not None and not isinstance(entities, (bytes, str, list)):
-            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='MachineManager',
-                   request='WatchUpgradeSeriesNotifications',
-                   version=7,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 

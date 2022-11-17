@@ -9,7 +9,7 @@ from dateutil.parser import parse
 
 import macaroonbakery.bakery as bakery
 import macaroonbakery.httpbakery as httpbakery
-import websockets
+import websocket
 from juju import errors, tag, utils, jasyncio
 from juju.client import client
 from juju.utils import IdQueue
@@ -209,8 +209,8 @@ class Monitor:
         else:
             stopped = connection._receiver_task.cancelled()
 
-        if stopped or not connection._ws.open:
-            return self.ERROR
+        # if stopped or not connection._ws.open:
+        #     return self.ERROR
 
         # everything is fine!
         return self.CONNECTED
@@ -230,7 +230,7 @@ class Connection:
     "Maximum size for a single frame.  Defaults to 4MB."
 
     @classmethod
-    async def connect(
+    def connect(
             cls,
             endpoint=None,
             uuid=None,
@@ -338,9 +338,9 @@ class Connection:
                 if self.is_debug_log_connection:
                     # make a direct connection with basic auth if
                     # debug-log (i.e. no redirection or login)
-                    await self._connect([_ep])
+                    self._connect([_ep])
                 else:
-                    await self._connect_with_redirect([_ep])
+                    self._connect_with_redirect([_ep])
                 return self
             except ssl.SSLError as e:
                 lastError = e
@@ -388,7 +388,7 @@ class Connection:
             context.check_hostname = False
         return context
 
-    async def _open(self, endpoint, cacert):
+    def _open(self, endpoint, cacert):
 
         if self.is_debug_log_connection:
             assert self.uuid
@@ -408,17 +408,21 @@ class Connection:
             sock = self.proxy.socket()
             server_hostname = "juju-app"
 
-        return (await websockets.connect(
+        return (websocket.create_connection(
             url,
-            ssl=self._get_ssl(cacert),
+            context=self._get_ssl(cacert),
+            sslopt={
+                "check_hostname": False,
+                "cert_reqs": ssl.CERT_NONE},
             max_size=self.max_frame_size,
             server_hostname=server_hostname,
-            sock=sock,
+            #sock=sock,
         )), url, endpoint, cacert
 
-    async def close(self, to_reconnect=False):
+    def close(self, to_reconnect=False):
         if not self._ws:
             return
+        self._ws.close()
         self.monitor.close_called.set()
 
         if self._pinger_task:
@@ -431,20 +435,20 @@ class Connection:
             self._debug_log_task.cancel()
             self._debug_log_task = None
         #  Allow a second for tasks to be cancelled
-        await jasyncio.sleep(1)
+        # await jasyncio.sleep(1)
 
-        if self._ws and not self._ws.closed:
-            await self._ws.close()
+        # if self._ws and not self._ws.closed:
+        #     await self._ws.close()
         self._ws = None
 
         if self.proxy is not None:
             self.proxy.close()
 
-    async def _recv(self, request_id):
+    def _recv(self, request_id):
         if not self.is_open:
-            raise websockets.exceptions.ConnectionClosed(0, 'websocket closed')
+            raise websocket.exceptions.ConnectionClosed(0, 'websocket closed')
         try:
-            return await self.messages.get(request_id)
+            return self.messages.get(request_id)
         except GeneratorExit:
             return {}
 
@@ -517,7 +521,7 @@ class Connection:
         except jasyncio.CancelledError:
             jasyncio.create_task(self.close())
             raise
-        except websockets.exceptions.ConnectionClosed:
+        except websocket.exceptions.ConnectionClosed:
             log.warning('Debug Logger: Connection closed, reconnecting')
             # the reconnect has to be done as a task because the receiver will
             # be cancelled by the reconnect and we don't want the reconnect
@@ -543,7 +547,7 @@ class Connection:
                     await self.messages.put(result['request-id'], result)
         except jasyncio.CancelledError:
             raise
-        except websockets.exceptions.ConnectionClosed as e:
+        except websocket.exceptions.ConnectionClosed as e:
             log.warning('Receiver: Connection closed, reconnecting')
             await self.messages.put_all(e)
             # the reconnect has to be done as a task because the receiver will
@@ -583,13 +587,13 @@ class Connection:
                 await jasyncio.sleep(10)
         except jasyncio.CancelledError:
             raise
-        except websockets.exceptions.ConnectionClosed:
+        except websocket.exceptions.ConnectionClosed:
             # The connection has closed - we can't do anything
             # more until the connection is restarted.
             log.debug('ping failed because of closed connection')
             pass
 
-    async def rpc(self, msg, encoder=None):
+    def rpc(self, msg, encoder=None):
         '''Make an RPC to the API. The message is encoded as JSON
         using the given encoder if any.
         :param msg: Parameters for the call (will be encoded as JSON).
@@ -606,28 +610,31 @@ class Connection:
             msg['version'] = self.facades[msg['type']]
         outgoing = json.dumps(msg, indent=2, cls=encoder)
         log.debug('connection {} -> {}'.format(id(self), outgoing))
-        for attempt in range(3):
-            if self.monitor.status == Monitor.DISCONNECTED:
-                # closed cleanly; shouldn't try to reconnect
-                raise websockets.exceptions.ConnectionClosed(
-                    0, 'websocket closed')
-            try:
-                await self._ws.send(outgoing)
-                break
-            except websockets.ConnectionClosed:
-                if attempt == 2:
-                    raise
-                log.warning('RPC: Connection closed, reconnecting')
-                # the reconnect has to be done in a separate task because,
-                # if it is triggered by the pinger, then this RPC call will
-                # be cancelled when the pinger is cancelled by the reconnect,
-                # and we don't want the reconnect to be aborted halfway through
-                await jasyncio.wait([self.reconnect()])
-                if self.monitor.status != Monitor.CONNECTED:
-                    # reconnect failed; abort and shutdown
-                    log.error('RPC: Automatic reconnect failed')
-                    raise
-        result = await self._recv(msg['request-id'])
+        self._ws.send(outgoing)
+        # for attempt in range(3):
+        #     if self.monitor.status == Monitor.DISCONNECTED:
+        #         # closed cleanly; shouldn't try to reconnect
+        #         raise websocket.exceptions.ConnectionClosed(
+        #             0, 'websocket closed')
+        #     try:
+        #         self._ws.send(outgoing)
+        #         break
+        #     except websocket.ConnectionClosed:
+        #         if attempt == 2:
+        #             raise
+        #         log.warning('RPC: Connection closed, reconnecting')
+        #         # the reconnect has to be done in a separate task because,
+        #         # if it is triggered by the pinger, then this RPC call will
+        #         # be cancelled when the pinger is cancelled by the reconnect,
+        #         # and we don't want the reconnect to be aborted halfway through
+        #         #await jasyncio.wait([self.reconnect()])
+        #         if self.monitor.status != Monitor.CONNECTED:
+        #             # reconnect failed; abort and shutdown
+        #             log.error('RPC: Automatic reconnect failed')
+        #             raise
+        #result = self._recv(msg['request-id'])
+        result = json.loads(self._ws.recv())
+       
         log.debug('connection {} <- {}'.format(id(self), result))
 
         if not result:
@@ -640,7 +647,7 @@ class Connection:
         if 'response' not in result:
             # This may never happen
             return result
-
+    
         if 'results' in result['response']:
             # Check for errors in a result list.
             # TODO This loses the results that might have succeeded.
@@ -740,16 +747,16 @@ class Connection:
             max_frame_size=self.max_frame_size,
         )
 
-    async def reconnect(self):
+    def reconnect(self):
         """ Force a reconnection.
         """
         monitor = self.monitor
         if monitor.reconnecting.locked() or monitor.close_called.is_set():
             return
-        async with monitor.reconnecting:
-            await self.close(to_reconnect=True)
+        with monitor.reconnecting:
+            self.close(to_reconnect=True)
             connector = self._connect if self.is_debug_log_connection else self._connect_with_login
-            res = await connector(
+            res = connector(
                 [(self.endpoint, self.cacert)]
                 if not self.endpoints else
                 self.endpoints
@@ -759,66 +766,85 @@ class Connection:
                 if not self._pinger_task:
                     self._pinger_task = jasyncio.create_task(self._pinger())
 
-    async def _connect(self, endpoints):
+    def _connect(self, endpoints):
         if len(endpoints) == 0:
             raise errors.JujuConnectionError('no endpoints to connect to')
+        done = False
+        result = None
+        # try sequentially the existing endpoints
+        retries = 0
+        while not done and retries < 3:
+            for _, (endpoint, cacert) in enumerate(endpoints):
+                try:
+                    result = self._open(endpoint, cacert)
+                    # connection done, no need to continue
+                    done = True
+                    break
+                except ConnectionError:
+                    continue # ignore; try another endpoint
+                retries+=1
+        if done:
+            self._ws = result[0]
+            self.addr = result[1]
+            self.endpoint = result[2]
+            self.cacert = result[3]
 
-        async def _try_endpoint(endpoint, cacert, delay):
-            if delay:
-                await jasyncio.sleep(delay)
-            return await self._open(endpoint, cacert)
+        # def _try_endpoint(endpoint, cacert, delay):
+        #     if delay:
+        #         await jasyncio.sleep(delay)
+        #     return await self._open(endpoint, cacert)
 
         # Try all endpoints in parallel, with slight increasing delay (+100ms
         # for each subsequent endpoint); the delay allows us to prefer the
         # earlier endpoints over the latter. Use first successful connection.
-        tasks = [jasyncio.ensure_future(_try_endpoint(endpoint, cacert,
-                                                      0.1 * i))
-                 for i, (endpoint, cacert) in enumerate(endpoints)]
-        for attempt in range(self._retries + 1):
-            for task in jasyncio.as_completed(tasks):
-                try:
-                    result = await task
-                    break
-                except ConnectionError:
-                    continue  # ignore; try another endpoint
-            else:
-                _endpoints_str = ', '.join([endpoint
-                                            for endpoint, cacert in endpoints])
-                if attempt < self._retries:
-                    log.debug('Retrying connection to endpoints: {}; '
-                              'attempt {} of {}'.format(_endpoints_str,
-                                                        attempt + 1,
-                                                        self._retries + 1))
-                    await jasyncio.sleep((attempt + 1) * self._retry_backoff)
-                    continue
-                else:
-                    raise errors.JujuConnectionError(
-                        'Unable to connect to any endpoint: '
-                        '{}'.format(_endpoints_str))
-            # only executed if inner loop's else did not continue
-            # (i.e., inner loop did break due to successful connection)
-            break
-        for task in tasks:
-            task.cancel()
-        self._ws = result[0]
-        self.addr = result[1]
-        self.endpoint = result[2]
-        self.cacert = result[3]
+        # tasks = [jasyncio.ensure_future(_try_endpoint(endpoint, cacert,
+        #                                               0.1 * i))
+        #          for i, (endpoint, cacert) in enumerate(endpoints)]
+        # for attempt in range(self._retries + 1):
+        #     for task in jasyncio.as_completed(tasks):
+        #         try:
+        #             result = await task
+        #             break
+        #         except ConnectionError:
+        #             continue  # ignore; try another endpoint
+        #     else:
+        #         _endpoints_str = ', '.join([endpoint
+        #                                     for endpoint, cacert in endpoints])
+        #         if attempt < self._retries:
+        #             log.debug('Retrying connection to endpoints: {}; '
+        #                       'attempt {} of {}'.format(_endpoints_str,
+        #                                                 attempt + 1,
+        #                                                 self._retries + 1))
+        #             await jasyncio.sleep((attempt + 1) * self._retry_backoff)
+        #             continue
+        #         else:
+        #             raise errors.JujuConnectionError(
+        #                 'Unable to connect to any endpoint: '
+        #                 '{}'.format(_endpoints_str))
+        #     # only executed if inner loop's else did not continue
+        #     # (i.e., inner loop did break due to successful connection)
+        #     break
+        # for task in tasks:
+        #     task.cancel()
+        # self._ws = result[0]
+        # self.addr = result[1]
+        # self.endpoint = result[2]
+        # self.cacert = result[3]
 
-        #  If this is a debug-log connection, and the _debug_log_task
-        #  is not created yet, then go ahead and schedule it
-        if self.is_debug_log_connection and not self._debug_log_task:
-            self._debug_log_task = jasyncio.create_task(self._debug_logger())
+        # #  If this is a debug-log connection, and the _debug_log_task
+        # #  is not created yet, then go ahead and schedule it
+        # if self.is_debug_log_connection and not self._debug_log_task:
+        #     self._debug_log_task = jasyncio.create_task(self._debug_logger())
 
-        #  If this is regular connection, and we dont have a
-        #  receiver_task yet, then schedule a _receiver_task
-        elif not self.is_debug_log_connection and not self._receiver_task:
-            self._receiver_task = jasyncio.create_task(self._receiver())
+        # #  If this is regular connection, and we dont have a
+        # #  receiver_task yet, then schedule a _receiver_task
+        # elif not self.is_debug_log_connection and not self._receiver_task:
+        #     self._receiver_task = jasyncio.create_task(self._receiver())
 
-        log.debug("Driver connected to juju %s", self.addr)
-        self.monitor.close_called.clear()
+        # log.debug("Driver connected to juju %s", self.addr)
+        # self.monitor.close_called.clear()
 
-    async def _connect_with_login(self, endpoints):
+    def _connect_with_login(self, endpoints):
         """Connect to the websocket.
 
         If uuid is None, the connection will be to the controller. Otherwise it
@@ -827,12 +853,12 @@ class Connection:
         """
         success = False
         try:
-            await self._connect(endpoints)
+            self._connect(endpoints)
             # It's possible that we may get several discharge-required errors,
             # corresponding to different levels of authentication, so retry
             # a few times.
             for i in range(0, 2):
-                result = (await self.login())['response']
+                result = (self.login())['response']
                 macaroonJSON = result.get('discharge-required')
                 if macaroonJSON is None:
                     self.info = result
@@ -859,19 +885,19 @@ class Connection:
                                        'after several attempts')
         finally:
             if not success:
-                await self.close()
+                self.close()
 
-    async def _connect_with_redirect(self, endpoints):
+    def _connect_with_redirect(self, endpoints):
         try:
-            login_result = await self._connect_with_login(endpoints)
+            login_result = self._connect_with_login(endpoints)
         except errors.JujuRedirectException as e:
             # Bubble up exception if the client should not follow the redirect
             if e.follow_redirect is False:
                 raise
-            login_result = await self._connect_with_login(e.endpoints)
+            login_result = self._connect_with_login(e.endpoints)
         self._build_facades(login_result.get('facades', {}))
-        if not self._pinger_task:
-            self._pinger_task = jasyncio.create_task(self._pinger())
+        # if not self._pinger_task:
+        #     self._pinger_task = jasyncio.create_task(self._pinger())
 
     def _build_facades(self, facades):
         self.facades.clear()
@@ -912,7 +938,7 @@ class Connection:
             else:
                 self.facades[name] = version
 
-    async def login(self):
+    def login(self):
         params = {}
         params['auth-tag'] = self.usertag
         if self.password:
@@ -924,7 +950,7 @@ class Connection:
                                    for ms in macaroons]
 
         try:
-            return await self.rpc({
+            return self.rpc({
                 "type": "Admin",
                 "request": "Login",
                 "version": 3,
@@ -946,7 +972,7 @@ class Connection:
             # Fetch additional redirection information now so that
             # we can safely close the connection after login
             # fails.
-            redirect_info = (await self.rpc({
+            redirect_info = (self.rpc({
                 "type": "Admin",
                 "request": "RedirectInfo",
                 "version": 3,

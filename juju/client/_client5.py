@@ -477,7 +477,7 @@ class CharmsFacade(Type):
     
 
     @ReturnMapping(CharmOriginResult)
-    async def AddCharm(self, charm_origin=None, force=None, url=None):
+    def AddCharm(self, charm_origin=None, force=None, url=None):
         '''
         AddCharm adds the given charm URL (which must include revision) to the
         environment, if it does not exist yet. Local charms are not supported,
@@ -506,13 +506,13 @@ class CharmsFacade(Type):
         _params['charm-origin'] = charm_origin
         _params['force'] = force
         _params['url'] = url
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(CharmOriginResult)
-    async def AddCharmWithAuthorization(self, charm_origin=None, force=None, macaroon=None, url=None):
+    def AddCharmWithAuthorization(self, charm_origin=None, force=None, macaroon=None, url=None):
         '''
         AddCharmWithAuthorization adds the given charm URL (which must include
         revision) to the environment, if it does not exist yet. Local charms are
@@ -549,13 +549,13 @@ class CharmsFacade(Type):
         _params['force'] = force
         _params['macaroon'] = macaroon
         _params['url'] = url
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(Charm)
-    async def CharmInfo(self, url=None):
+    def CharmInfo(self, url=None):
         '''
         CharmInfo returns information about the requested charm.
 
@@ -572,13 +572,13 @@ class CharmsFacade(Type):
                    version=5,
                    params=_params)
         _params['url'] = url
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def CheckCharmPlacement(self, placements=None):
+    def CheckCharmPlacement(self, placements=None):
         '''
         CheckCharmPlacement checks if a charm is allowed to be placed with in a
         given application.
@@ -596,13 +596,13 @@ class CharmsFacade(Type):
                    version=5,
                    params=_params)
         _params['placements'] = placements
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(DownloadInfoResults)
-    async def GetDownloadInfos(self, entities=None):
+    def GetDownloadInfos(self, entities=None):
         '''
         GetDownloadInfos attempts to get the bundle corresponding to the charm url
         and origin.
@@ -620,13 +620,13 @@ class CharmsFacade(Type):
                    version=5,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(IsMeteredResult)
-    async def IsMetered(self, url=None):
+    def IsMetered(self, url=None):
         '''
         IsMetered returns whether or not the charm is metered.
 
@@ -643,13 +643,13 @@ class CharmsFacade(Type):
                    version=5,
                    params=_params)
         _params['url'] = url
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(CharmsListResult)
-    async def List(self, names=None):
+    def List(self, names=None):
         '''
         List returns a list of charm URLs currently in the state.
         If supplied parameter contains any names, the result will
@@ -668,13 +668,13 @@ class CharmsFacade(Type):
                    version=5,
                    params=_params)
         _params['names'] = names
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(CharmResourcesResults)
-    async def ListCharmResources(self, entities=None):
+    def ListCharmResources(self, entities=None):
         '''
         ListCharmResources returns a series of resources for a given charm.
 
@@ -691,13 +691,13 @@ class CharmsFacade(Type):
                    version=5,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ResolveCharmWithChannelResults)
-    async def ResolveCharms(self, macaroon=None, resolve=None):
+    def ResolveCharms(self, macaroon=None, resolve=None):
         '''
         ResolveCharms resolves the given charm URLs with an optionally specified
         preferred channel.  Channel provided via CharmOrigin.
@@ -720,7 +720,7 @@ class CharmsFacade(Type):
                    params=_params)
         _params['macaroon'] = macaroon
         _params['resolve'] = resolve
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
@@ -753,7 +753,6 @@ class ClientFacade(Type):
                      'AddMachineParams': {'additionalProperties': False,
                                           'properties': {'addresses': {'items': {'$ref': '#/definitions/Address'},
                                                                        'type': 'array'},
-                                                         'base': {'$ref': '#/definitions/Base'},
                                                          'constraints': {'$ref': '#/definitions/Value'},
                                                          'container-type': {'type': 'string'},
                                                          'disks': {'items': {'$ref': '#/definitions/Constraints'},
@@ -766,7 +765,8 @@ class ClientFacade(Type):
                                                          'parent-id': {'type': 'string'},
                                                          'placement': {'$ref': '#/definitions/Placement'},
                                                          'series': {'type': 'string'}},
-                                          'required': ['constraints',
+                                          'required': ['series',
+                                                       'constraints',
                                                        'jobs',
                                                        'parent-id',
                                                        'container-type',
@@ -826,8 +826,7 @@ class ClientFacade(Type):
                                                              'total-connected-count'],
                                                 'type': 'object'},
                      'ApplicationStatus': {'additionalProperties': False,
-                                           'properties': {'base': {'$ref': '#/definitions/Base'},
-                                                          'can-upgrade-to': {'type': 'string'},
+                                           'properties': {'can-upgrade-to': {'type': 'string'},
                                                           'charm': {'type': 'string'},
                                                           'charm-channel': {'type': 'string'},
                                                           'charm-profile': {'type': 'string'},
@@ -858,7 +857,6 @@ class ClientFacade(Type):
                                                         'charm-version',
                                                         'charm-profile',
                                                         'series',
-                                                        'base',
                                                         'exposed',
                                                         'life',
                                                         'relations',
@@ -871,11 +869,6 @@ class ClientFacade(Type):
                                                         'endpoint-bindings',
                                                         'public-address'],
                                            'type': 'object'},
-                     'Base': {'additionalProperties': False,
-                              'properties': {'channel': {'type': 'string'},
-                                             'name': {'type': 'string'}},
-                              'required': ['name', 'channel'],
-                              'type': 'object'},
                      'Binary': {'additionalProperties': False,
                                 'properties': {'Arch': {'type': 'string'},
                                                'Build': {'type': 'integer'},
@@ -1131,7 +1124,6 @@ class ClientFacade(Type):
                                          'type': 'object'},
                      'MachineStatus': {'additionalProperties': False,
                                        'properties': {'agent-status': {'$ref': '#/definitions/DetailedStatus'},
-                                                      'base': {'$ref': '#/definitions/Base'},
                                                       'constraints': {'type': 'string'},
                                                       'containers': {'patternProperties': {'.*': {'$ref': '#/definitions/MachineStatus'}},
                                                                      'type': 'object'},
@@ -1162,7 +1154,6 @@ class ClientFacade(Type):
                                                     'instance-id',
                                                     'display-name',
                                                     'series',
-                                                    'base',
                                                     'id',
                                                     'containers',
                                                     'constraints',
@@ -1792,7 +1783,7 @@ class ClientFacade(Type):
     
 
     @ReturnMapping(APIHostPortsResult)
-    async def APIHostPorts(self):
+    def APIHostPorts(self):
         '''
         APIHostPorts returns the API host/port addresses stored in state.
         TODO(juju3) - remove
@@ -1808,13 +1799,13 @@ class ClientFacade(Type):
                    version=5,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(None)
-    async def AbortCurrentUpgrade(self):
+    def AbortCurrentUpgrade(self):
         '''
         AbortCurrentUpgrade aborts and archives the current upgrade
         synchronisation record, if any.
@@ -1830,13 +1821,13 @@ class ClientFacade(Type):
                    version=5,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(None)
-    async def AddCharm(self, channel=None, force=None, url=None):
+    def AddCharm(self, channel=None, force=None, url=None):
         '''
         NOTE: AddCharm is deprecated as of juju 2.9 and charms facade version 3.
         Please discontinue use and move to the charms facade version.
@@ -1866,13 +1857,13 @@ class ClientFacade(Type):
         _params['channel'] = channel
         _params['force'] = force
         _params['url'] = url
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(None)
-    async def AddCharmWithAuthorization(self, channel=None, force=None, macaroon=None, url=None):
+    def AddCharmWithAuthorization(self, channel=None, force=None, macaroon=None, url=None):
         '''
         AddCharmWithAuthorization adds the given charm URL (which must include
         revision) to the model, if it does not exist yet. Local charms are not
@@ -1915,13 +1906,13 @@ class ClientFacade(Type):
         _params['force'] = force
         _params['macaroon'] = macaroon
         _params['url'] = url
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(AddMachinesResults)
-    async def AddMachines(self, params=None):
+    def AddMachines(self, params=None):
         '''
         AddMachines adds new machines with the supplied parameters.
         TODO(juju3) - remove
@@ -1939,13 +1930,13 @@ class ClientFacade(Type):
                    version=5,
                    params=_params)
         _params['params'] = params
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(AddMachinesResults)
-    async def AddMachinesV2(self, params=None):
+    def AddMachinesV2(self, params=None):
         '''
         AddMachinesV2 adds new machines with the supplied parameters.
         TODO(juju3) - remove
@@ -1963,13 +1954,13 @@ class ClientFacade(Type):
                    version=5,
                    params=_params)
         _params['params'] = params
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(AgentVersionResult)
-    async def AgentVersion(self):
+    def AgentVersion(self):
         '''
         AgentVersion returns the current version that the API server is running.
         TODO(juju3) - remove
@@ -1985,13 +1976,13 @@ class ClientFacade(Type):
                    version=5,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(BytesResult)
-    async def CACert(self):
+    def CACert(self):
         '''
         CACert returns the certificate used to validate the state connection.
 
@@ -2006,13 +1997,13 @@ class ClientFacade(Type):
                    version=5,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(None)
-    async def DestroyMachines(self, force=None, machine_names=None):
+    def DestroyMachines(self, force=None, machine_names=None):
         '''
         DestroyMachines removes a given set of machines.
         TODO(juju3) - remove
@@ -2035,13 +2026,13 @@ class ClientFacade(Type):
                    params=_params)
         _params['force'] = force
         _params['machine-names'] = machine_names
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(FindToolsResult)
-    async def FindTools(self, agentstream=None, arch=None, major=None, minor=None, number=None, os_type=None, series=None):
+    def FindTools(self, agentstream=None, arch=None, major=None, minor=None, number=None, os_type=None, series=None):
         '''
         FindTools returns a List containing all tools matching the given parameters.
 
@@ -2088,13 +2079,13 @@ class ClientFacade(Type):
         _params['number'] = number
         _params['os-type'] = os_type
         _params['series'] = series
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(FullStatus)
-    async def FullStatus(self, patterns=None):
+    def FullStatus(self, patterns=None):
         '''
         FullStatus gives the information needed for juju status over the api
 
@@ -2111,13 +2102,13 @@ class ClientFacade(Type):
                    version=5,
                    params=_params)
         _params['patterns'] = patterns
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(BundleChangesResults)
-    async def GetBundleChanges(self, bundleurl=None, yaml=None):
+    def GetBundleChanges(self, bundleurl=None, yaml=None):
         '''
         GetBundleChanges returns the list of changes required to deploy the given
         bundle data. The changes are sorted by requirements, so that they can be
@@ -2143,13 +2134,13 @@ class ClientFacade(Type):
                    params=_params)
         _params['bundleURL'] = bundleurl
         _params['yaml'] = yaml
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(GetConstraintsResults)
-    async def GetModelConstraints(self):
+    def GetModelConstraints(self):
         '''
         GetModelConstraints returns the constraints for the model.
         TODO(juju3) - remove
@@ -2165,13 +2156,13 @@ class ClientFacade(Type):
                    version=5,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(AddMachinesResults)
-    async def InjectMachines(self, params=None):
+    def InjectMachines(self, params=None):
         '''
         InjectMachines injects a machine into state with provisioned status.
         TODO(juju3) - remove
@@ -2189,13 +2180,13 @@ class ClientFacade(Type):
                    version=5,
                    params=_params)
         _params['params'] = params
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ModelConfigResults)
-    async def ModelGet(self):
+    def ModelGet(self):
         '''
         ModelGet implements the server-side part of the
         model-config CLI command.
@@ -2211,13 +2202,13 @@ class ClientFacade(Type):
                    version=5,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ModelInfo)
-    async def ModelInfo(self):
+    def ModelInfo(self):
         '''
         ModelInfo returns information about the current model.
         TODO(juju3) - remove
@@ -2233,13 +2224,13 @@ class ClientFacade(Type):
                    version=5,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(None)
-    async def ModelSet(self, config=None):
+    def ModelSet(self, config=None):
         '''
         ModelSet implements the server-side part of the
         set-model-config CLI command.
@@ -2257,13 +2248,13 @@ class ClientFacade(Type):
                    version=5,
                    params=_params)
         _params['config'] = config
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(None)
-    async def ModelUnset(self, keys=None):
+    def ModelUnset(self, keys=None):
         '''
         ModelUnset implements the server-side part of the
         set-model-config CLI command.
@@ -2281,13 +2272,13 @@ class ClientFacade(Type):
                    version=5,
                    params=_params)
         _params['keys'] = keys
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ModelUserInfoResults)
-    async def ModelUserInfo(self):
+    def ModelUserInfo(self):
         '''
         ModelUserInfo returns information on all users in the model.
         TODO(juju3) - remove
@@ -2303,13 +2294,13 @@ class ClientFacade(Type):
                    version=5,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(PrivateAddressResults)
-    async def PrivateAddress(self, target=None):
+    def PrivateAddress(self, target=None):
         '''
         PrivateAddress implements the server side of Client.PrivateAddress.
         TODO(juju3) - remove as this is unused
@@ -2327,13 +2318,13 @@ class ClientFacade(Type):
                    version=5,
                    params=_params)
         _params['target'] = target
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ProvisioningScriptResult)
-    async def ProvisioningScript(self, data_dir=None, disable_package_commands=None, machine_id=None, nonce=None):
+    def ProvisioningScript(self, data_dir=None, disable_package_commands=None, machine_id=None, nonce=None):
         '''
         ProvisioningScript returns a shell script that, when run,
         provisions a machine agent on the machine executing the script.
@@ -2367,13 +2358,13 @@ class ClientFacade(Type):
         _params['disable-package-commands'] = disable_package_commands
         _params['machine-id'] = machine_id
         _params['nonce'] = nonce
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(PublicAddressResults)
-    async def PublicAddress(self, target=None):
+    def PublicAddress(self, target=None):
         '''
         PublicAddress implements the server side of Client.PublicAddress.
         TODO(juju3) - remove as this is unused
@@ -2391,13 +2382,13 @@ class ClientFacade(Type):
                    version=5,
                    params=_params)
         _params['target'] = target
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ResolveCharmResults)
-    async def ResolveCharms(self, references=None):
+    def ResolveCharms(self, references=None):
         '''
         ResolveCharms resolves the best available charm URLs with series, for charm
         locations without a series specified.
@@ -2420,13 +2411,13 @@ class ClientFacade(Type):
                    version=5,
                    params=_params)
         _params['references'] = references
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(None)
-    async def Resolved(self, retry=None, unit_name=None):
+    def Resolved(self, retry=None, unit_name=None):
         '''
         Resolved implements the server side of Client.Resolved.
 
@@ -2448,13 +2439,13 @@ class ClientFacade(Type):
                    params=_params)
         _params['retry'] = retry
         _params['unit-name'] = unit_name
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def RetryProvisioning(self, entities=None):
+    def RetryProvisioning(self, entities=None):
         '''
         RetryProvisioning marks a provisioning error as transient on the machines.
         TODO(juju3) - remove
@@ -2472,13 +2463,13 @@ class ClientFacade(Type):
                    version=5,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringResult)
-    async def SLALevel(self):
+    def SLALevel(self):
         '''
         SLALevel returns the current sla level for the model.
 
@@ -2493,13 +2484,13 @@ class ClientFacade(Type):
                    version=5,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(None)
-    async def SetModelAgentVersion(self, agent_stream=None, force=None, version=None):
+    def SetModelAgentVersion(self, agent_stream=None, force=None, version=None):
         '''
         SetModelAgentVersion sets the model agent version.
 
@@ -2526,13 +2517,13 @@ class ClientFacade(Type):
         _params['agent-stream'] = agent_stream
         _params['force'] = force
         _params['version'] = version
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(None)
-    async def SetModelConstraints(self, application=None, constraints=None):
+    def SetModelConstraints(self, application=None, constraints=None):
         '''
         SetModelConstraints sets the constraints for the model.
         TODO(juju3) - remove
@@ -2555,13 +2546,13 @@ class ClientFacade(Type):
                    params=_params)
         _params['application'] = application
         _params['constraints'] = constraints
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(None)
-    async def SetSLALevel(self, modelslainfo=None, creds=None, level=None, owner=None):
+    def SetSLALevel(self, modelslainfo=None, creds=None, level=None, owner=None):
         '''
         SetSLALevel sets the sla level on the model.
 
@@ -2593,13 +2584,13 @@ class ClientFacade(Type):
         _params['creds'] = creds
         _params['level'] = level
         _params['owner'] = owner
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StatusHistoryResults)
-    async def StatusHistory(self, requests=None):
+    def StatusHistory(self, requests=None):
         '''
         StatusHistory returns a slice of past statuses for several entities.
 
@@ -2616,13 +2607,13 @@ class ClientFacade(Type):
                    version=5,
                    params=_params)
         _params['requests'] = requests
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(AllWatcherId)
-    async def WatchAll(self):
+    def WatchAll(self):
         '''
         WatchAll initiates a watcher for entities in the connected model.
 
@@ -2637,7 +2628,7 @@ class ClientFacade(Type):
                    version=5,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
@@ -2928,7 +2919,7 @@ class MachinerFacade(Type):
     
 
     @ReturnMapping(StringsResult)
-    async def APIAddresses(self):
+    def APIAddresses(self):
         '''
         APIAddresses returns the list of addresses used to connect to the API.
 
@@ -2943,13 +2934,13 @@ class MachinerFacade(Type):
                    version=5,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(APIHostPortsResult)
-    async def APIHostPorts(self):
+    def APIHostPorts(self):
         '''
         APIHostPorts returns the API server addresses.
 
@@ -2964,13 +2955,13 @@ class MachinerFacade(Type):
                    version=5,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def EnsureDead(self, entities=None):
+    def EnsureDead(self, entities=None):
         '''
         EnsureDead calls EnsureDead on each given entity from state. It
         will fail if the entity is not present. If it's Alive, nothing will
@@ -2989,13 +2980,13 @@ class MachinerFacade(Type):
                    version=5,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(JobsResults)
-    async def Jobs(self, entities=None):
+    def Jobs(self, entities=None):
         '''
         Jobs returns the jobs assigned to the given entities.
 
@@ -3012,13 +3003,13 @@ class MachinerFacade(Type):
                    version=5,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(LifeResults)
-    async def Life(self, entities=None):
+    def Life(self, entities=None):
         '''
         Life returns the life status of every supplied entity, where available.
 
@@ -3035,13 +3026,13 @@ class MachinerFacade(Type):
                    version=5,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def RecordAgentStartInformation(self, args=None):
+    def RecordAgentStartInformation(self, args=None):
         '''
         RecordAgentStartInformation syncs the machine model with information
         reported by a machine agent when it starts.
@@ -3059,13 +3050,13 @@ class MachinerFacade(Type):
                    version=5,
                    params=_params)
         _params['args'] = args
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def RecordAgentStartTime(self, entities=None):
+    def RecordAgentStartTime(self, entities=None):
         '''
         RecordAgentStartTime updates the agent start time field in the machine doc.
 
@@ -3082,13 +3073,13 @@ class MachinerFacade(Type):
                    version=5,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetMachineAddresses(self, machine_addresses=None):
+    def SetMachineAddresses(self, machine_addresses=None):
         '''
         machine_addresses : typing.Sequence[~MachineAddresses]
         Returns -> ErrorResults
@@ -3103,13 +3094,13 @@ class MachinerFacade(Type):
                    version=5,
                    params=_params)
         _params['machine-addresses'] = machine_addresses
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(None)
-    async def SetObservedNetworkConfig(self, config=None, tag=None):
+    def SetObservedNetworkConfig(self, config=None, tag=None):
         '''
         SetObservedNetworkConfig reads the network config for the machine
         identified by the input args.
@@ -3134,13 +3125,13 @@ class MachinerFacade(Type):
                    params=_params)
         _params['config'] = config
         _params['tag'] = tag
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetStatus(self, entities=None):
+    def SetStatus(self, entities=None):
         '''
         SetStatus sets the status of each given entity.
 
@@ -3157,13 +3148,13 @@ class MachinerFacade(Type):
                    version=5,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(NotifyWatchResults)
-    async def Watch(self, entities=None):
+    def Watch(self, entities=None):
         '''
         Watch starts an NotifyWatcher for each given entity.
 
@@ -3180,13 +3171,13 @@ class MachinerFacade(Type):
                    version=5,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(NotifyWatchResult)
-    async def WatchAPIHostPorts(self):
+    def WatchAPIHostPorts(self):
         '''
         WatchAPIHostPorts watches the API server addresses.
 
@@ -3201,7 +3192,7 @@ class MachinerFacade(Type):
                    version=5,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
@@ -3314,7 +3305,7 @@ class SubnetsFacade(Type):
     
 
     @ReturnMapping(ZoneResults)
-    async def AllZones(self):
+    def AllZones(self):
         '''
         AllZones returns all availability zones known to Juju. If a
         zone is unusable, unavailable, or deprecated the Available
@@ -3331,13 +3322,13 @@ class SubnetsFacade(Type):
                    version=5,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ListSubnetsResults)
-    async def ListSubnets(self, space_tag=None, zone=None):
+    def ListSubnets(self, space_tag=None, zone=None):
         '''
         ListSubnets returns the matching subnets after applying
         optional filters.
@@ -3360,13 +3351,13 @@ class SubnetsFacade(Type):
                    params=_params)
         _params['space-tag'] = space_tag
         _params['zone'] = zone
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(SubnetsResults)
-    async def SubnetsByCIDR(self, cidrs=None):
+    def SubnetsByCIDR(self, cidrs=None):
         '''
         SubnetsByCIDR returns the collection of subnets matching each CIDR in the input.
 
@@ -3383,7 +3374,7 @@ class SubnetsFacade(Type):
                    version=5,
                    params=_params)
         _params['cidrs'] = cidrs
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 

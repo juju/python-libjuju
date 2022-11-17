@@ -1946,7 +1946,7 @@ class UniterFacade(Type):
     
 
     @ReturnMapping(StringsResult)
-    async def APIAddresses(self):
+    def APIAddresses(self):
         '''
         APIAddresses returns the list of addresses used to connect to the API.
 
@@ -1961,13 +1961,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(APIHostPortsResult)
-    async def APIHostPorts(self):
+    def APIHostPorts(self):
         '''
         APIHostPorts returns the API server addresses.
 
@@ -1982,13 +1982,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringResults)
-    async def ActionStatus(self, entities=None):
+    def ActionStatus(self, entities=None):
         '''
         ActionStatus returns the status of Actions by Tags passed in.
 
@@ -2005,13 +2005,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ActionResults)
-    async def Actions(self, entities=None):
+    def Actions(self, entities=None):
         '''
         Actions returns the Actions by Tags passed and ensures that the Unit asking
         for them is the same Unit that has the Actions.
@@ -2029,13 +2029,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def AddMetricBatches(self, batches=None):
+    def AddMetricBatches(self, batches=None):
         '''
         AddMetricBatches adds the metrics for the specified unit.
 
@@ -2052,13 +2052,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['batches'] = batches
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ApplicationStatusResults)
-    async def ApplicationStatus(self, entities=None):
+    def ApplicationStatus(self, entities=None):
         '''
         ApplicationStatus returns the status of the Applications and its workloads
         if the given unit is the leader.
@@ -2076,13 +2076,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringResults)
-    async def AssignedMachine(self, entities=None):
+    def AssignedMachine(self, entities=None):
         '''
         AssignedMachine returns the machine tag for each given unit tag, or
         an error satisfying params.IsCodeNotAssigned when a unit has no
@@ -2101,13 +2101,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringResults)
-    async def AvailabilityZone(self, entities=None):
+    def AvailabilityZone(self, entities=None):
         '''
         AvailabilityZone returns the availability zone for each given unit, if applicable.
 
@@ -2124,13 +2124,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def BeginActions(self, entities=None):
+    def BeginActions(self, entities=None):
         '''
         BeginActions marks the actions represented by the passed in Tags as running.
 
@@ -2147,13 +2147,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(BoolResults)
-    async def CanApplyLXDProfile(self, entities=None):
+    def CanApplyLXDProfile(self, entities=None):
         '''
         CanApplyLXDProfile is a shim to call the LXDProfileAPIv2 version of this method.
 
@@ -2170,13 +2170,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringResults)
-    async def CharmArchiveSha256(self, urls=None):
+    def CharmArchiveSha256(self, urls=None):
         '''
         CharmArchiveSha256 returns the SHA256 digest of the charm archive
         (bundle) data for each charm url in the given parameters.
@@ -2194,13 +2194,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['urls'] = urls
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(IntResults)
-    async def CharmModifiedVersion(self, entities=None):
+    def CharmModifiedVersion(self, entities=None):
         '''
         CharmModifiedVersion returns the most CharmModifiedVersion for all given
         units or applications.
@@ -2218,13 +2218,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringBoolResults)
-    async def CharmURL(self, entities=None):
+    def CharmURL(self, entities=None):
         '''
         CharmURL returns the charm URL for all given units or applications.
 
@@ -2241,13 +2241,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def ClearResolved(self, entities=None):
+    def ClearResolved(self, entities=None):
         '''
         ClearResolved removes any resolved setting from each given unit.
 
@@ -2264,13 +2264,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringResult)
-    async def CloudAPIVersion(self):
+    def CloudAPIVersion(self):
         '''
         CloudAPIVersion returns the cloud API version, if available.
 
@@ -2285,13 +2285,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(CloudSpecResult)
-    async def CloudSpec(self):
+    def CloudSpec(self):
         '''
         CloudSpec returns the cloud spec used by the model in which the
         authenticated unit or application resides.
@@ -2309,13 +2309,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def CommitHookChanges(self, args=None):
+    def CommitHookChanges(self, args=None):
         '''
         CommitHookChanges batches together all required API calls for applying
         a set of changes after a hook successfully completes and executes them in a
@@ -2334,13 +2334,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['args'] = args
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ConfigSettingsResults)
-    async def ConfigSettings(self, entities=None):
+    def ConfigSettings(self, entities=None):
         '''
         ConfigSettings returns the complete set of application charm config
         settings available to each given unit.
@@ -2358,13 +2358,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringResults)
-    async def CreateSecretURIs(self, count=None):
+    def CreateSecretURIs(self, count=None):
         '''
         CreateSecretURIs creates new secret URIs.
 
@@ -2381,13 +2381,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['count'] = count
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringResults)
-    async def CreateSecrets(self, args=None):
+    def CreateSecrets(self, args=None):
         '''
         CreateSecrets creates new secrets.
 
@@ -2404,13 +2404,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['args'] = args
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ModelResult)
-    async def CurrentModel(self):
+    def CurrentModel(self):
         '''
         CurrentModel returns the name and UUID for the current juju model.
 
@@ -2425,13 +2425,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def Destroy(self, entities=None):
+    def Destroy(self, entities=None):
         '''
         Destroy advances all given Alive units' lifecycles as far as
         possible. See state/Unit.Destroy().
@@ -2449,13 +2449,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def DestroyAllSubordinates(self, entities=None):
+    def DestroyAllSubordinates(self, entities=None):
         '''
         DestroyAllSubordinates destroys all subordinates of each given unit.
 
@@ -2472,13 +2472,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def DestroyUnitStorageAttachments(self, entities=None):
+    def DestroyUnitStorageAttachments(self, entities=None):
         '''
         DestroyUnitStorageAttachments marks each storage attachment of the
         specified units as Dying.
@@ -2496,13 +2496,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def EnsureDead(self, entities=None):
+    def EnsureDead(self, entities=None):
         '''
         EnsureDead calls EnsureDead on each given entity from state. It
         will fail if the entity is not present. If it's Alive, nothing will
@@ -2521,13 +2521,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def EnterScope(self, relation_units=None):
+    def EnterScope(self, relation_units=None):
         '''
         EnterScope ensures each unit has entered its scope in the relation,
         for all of the given relation/unit pairs. See also
@@ -2546,13 +2546,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['relation-units'] = relation_units
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def FinishActions(self, results=None):
+    def FinishActions(self, results=None):
         '''
         FinishActions saves the result of a completed Action
 
@@ -2569,13 +2569,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['results'] = results
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(SecretConsumerInfoResults)
-    async def GetConsumerSecretsRevisionInfo(self, consumer_tag=None, uris=None):
+    def GetConsumerSecretsRevisionInfo(self, consumer_tag=None, uris=None):
         '''
         GetConsumerSecretsRevisionInfo returns the latest secret revisions for the specified secrets.
 
@@ -2597,13 +2597,13 @@ class UniterFacade(Type):
                    params=_params)
         _params['consumer-tag'] = consumer_tag
         _params['uris'] = uris
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(MeterStatusResults)
-    async def GetMeterStatus(self, entities=None):
+    def GetMeterStatus(self, entities=None):
         '''
         entities : typing.Sequence[~Entity]
         Returns -> MeterStatusResults
@@ -2618,13 +2618,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringResults)
-    async def GetPodSpec(self, entities=None):
+    def GetPodSpec(self, entities=None):
         '''
         GetPodSpec gets the pod specs for a set of applications.
 
@@ -2641,13 +2641,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringBoolResults)
-    async def GetPrincipal(self, entities=None):
+    def GetPrincipal(self, entities=None):
         '''
         GetPrincipal returns the result of calling PrincipalName() and
         converting it to a tag, on each given unit.
@@ -2665,13 +2665,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringResults)
-    async def GetRawK8sSpec(self, entities=None):
+    def GetRawK8sSpec(self, entities=None):
         '''
         GetRawK8sSpec gets the raw k8s specs for a set of applications.
 
@@ -2688,13 +2688,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(SecretContentResults)
-    async def GetSecretContentInfo(self, args=None):
+    def GetSecretContentInfo(self, args=None):
         '''
         GetSecretContentInfo returns the secret values for the specified secrets.
 
@@ -2711,13 +2711,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['args'] = args
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ListSecretResults)
-    async def GetSecretMetadata(self):
+    def GetSecretMetadata(self):
         '''
         GetSecretMetadata returns metadata for the caller's secrets.
 
@@ -2732,13 +2732,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(SecretStoreConfig)
-    async def GetSecretStoreConfig(self):
+    def GetSecretStoreConfig(self):
         '''
         GetSecretStoreConfig gets the config needed to create a client to the model's secret store.
 
@@ -2753,13 +2753,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(GoalStateResults)
-    async def GoalStates(self, entities=None):
+    def GoalStates(self, entities=None):
         '''
         GoalStates returns information of charm units and relations.
 
@@ -2776,13 +2776,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(BoolResults)
-    async def HasSubordinates(self, entities=None):
+    def HasSubordinates(self, entities=None):
         '''
         HasSubordinates returns the whether each given unit has any subordinates.
 
@@ -2799,13 +2799,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringResults)
-    async def LXDProfileName(self, entities=None):
+    def LXDProfileName(self, entities=None):
         '''
         LXDProfileName is a shim to call the LXDProfileAPIv2 version of this method.
 
@@ -2822,13 +2822,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(BoolResults)
-    async def LXDProfileRequired(self, urls=None):
+    def LXDProfileRequired(self, urls=None):
         '''
         LXDProfileRequired is a shim to call the LXDProfileAPIv2 version of this method.
 
@@ -2845,13 +2845,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['urls'] = urls
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def LeaveScope(self, relation_units=None):
+    def LeaveScope(self, relation_units=None):
         '''
         LeaveScope signals each unit has left its scope in the relation,
         for all of the given relation/unit pairs. See also
@@ -2870,13 +2870,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['relation-units'] = relation_units
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(LifeResults)
-    async def Life(self, entities=None):
+    def Life(self, entities=None):
         '''
         Life returns the life status of every supplied entity, where available.
 
@@ -2893,13 +2893,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def LogActionsMessages(self, messages=None):
+    def LogActionsMessages(self, messages=None):
         '''
         LogActionsMessages records the log messages against the specified actions.
 
@@ -2916,13 +2916,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['messages'] = messages
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def Merge(self, params=None):
+    def Merge(self, params=None):
         '''
         Merge merges in the provided leadership settings. Only leaders for
         the given service may perform this operation.
@@ -2940,13 +2940,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['params'] = params
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ModelConfigResult)
-    async def ModelConfig(self):
+    def ModelConfig(self):
         '''
         ModelConfig returns the current model's configuration.
 
@@ -2961,13 +2961,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringResult)
-    async def ModelUUID(self):
+    def ModelUUID(self):
         '''
         ModelUUID returns the model UUID that this unit resides in.
         It is implemented here directly as a result of removing it from
@@ -2985,13 +2985,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(NetworkInfoResults)
-    async def NetworkInfo(self, bindings=None, relation_id=None, unit=None):
+    def NetworkInfo(self, bindings=None, relation_id=None, unit=None):
         '''
         NetworkInfo returns network interfaces/addresses for specified bindings.
 
@@ -3018,13 +3018,13 @@ class UniterFacade(Type):
         _params['bindings'] = bindings
         _params['relation-id'] = relation_id
         _params['unit'] = unit
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(OpenMachinePortRangesByEndpointResults)
-    async def OpenedMachinePortRangesByEndpoint(self, entities=None):
+    def OpenedMachinePortRangesByEndpoint(self, entities=None):
         '''
         OpenedMachinePortRangesByEndpoint returns the port ranges opened by each
         unit on the provided machines grouped by application endpoint.
@@ -3042,13 +3042,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringResults)
-    async def PrivateAddress(self, entities=None):
+    def PrivateAddress(self, entities=None):
         '''
         PrivateAddress returns the private address for each given unit, if set.
 
@@ -3065,13 +3065,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringResult)
-    async def ProviderType(self):
+    def ProviderType(self):
         '''
         ProviderType returns the provider type used by the current juju
         model.
@@ -3091,13 +3091,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringResults)
-    async def PublicAddress(self, entities=None):
+    def PublicAddress(self, entities=None):
         '''
         PublicAddress returns the public address for each given unit, if set.
 
@@ -3114,13 +3114,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(GetLeadershipSettingsBulkResults)
-    async def Read(self, entities=None):
+    def Read(self, entities=None):
         '''
         Read reads leadership settings for the provided service ID. Any
         unit of the service may perform this operation.
@@ -3138,13 +3138,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(SettingsResult)
-    async def ReadLocalApplicationSettings(self, relation=None, unit=None):
+    def ReadLocalApplicationSettings(self, relation=None, unit=None):
         '''
         ReadLocalApplicationSettings returns the local application settings for a
         particular relation when invoked by the leader unit.
@@ -3167,13 +3167,13 @@ class UniterFacade(Type):
                    params=_params)
         _params['relation'] = relation
         _params['unit'] = unit
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(SettingsResults)
-    async def ReadRemoteSettings(self, relation_unit_pairs=None):
+    def ReadRemoteSettings(self, relation_unit_pairs=None):
         '''
         ReadRemoteSettings returns the remote settings of each given set of
         relation/local unit/remote unit.
@@ -3191,13 +3191,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['relation-unit-pairs'] = relation_unit_pairs
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(SettingsResults)
-    async def ReadSettings(self, relation_units=None):
+    def ReadSettings(self, relation_units=None):
         '''
         ReadSettings returns the local settings of each given set of
         relation/unit.
@@ -3219,13 +3219,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['relation-units'] = relation_units
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(UnitRefreshResults)
-    async def Refresh(self, entities=None):
+    def Refresh(self, entities=None):
         '''
         Refresh retrieves the latest values for attributes on this unit.
 
@@ -3242,13 +3242,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(RelationResults)
-    async def Relation(self, relation_units=None):
+    def Relation(self, relation_units=None):
         '''
         Relation returns information about all given relation/unit pairs,
         including their id, key and the local endpoint.
@@ -3266,13 +3266,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['relation-units'] = relation_units
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(RelationResults)
-    async def RelationById(self, relation_ids=None):
+    def RelationById(self, relation_ids=None):
         '''
         RelationById returns information about all given relations,
         specified by their ids, including their key and the local
@@ -3291,13 +3291,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['relation-ids'] = relation_ids
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(RelationUnitStatusResults)
-    async def RelationsStatus(self, entities=None):
+    def RelationsStatus(self, entities=None):
         '''
         RelationsStatus returns for each unit the corresponding relation and status information.
 
@@ -3314,13 +3314,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def RemoveSecrets(self, args=None):
+    def RemoveSecrets(self, args=None):
         '''
         RemoveSecrets removes the specified secrets.
 
@@ -3337,13 +3337,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['args'] = args
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def RemoveStorageAttachments(self, ids=None):
+    def RemoveStorageAttachments(self, ids=None):
         '''
         RemoveStorageAttachments removes the specified storage
         attachments from state.
@@ -3361,13 +3361,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['ids'] = ids
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def RequestReboot(self, entities=None):
+    def RequestReboot(self, entities=None):
         '''
         RequestReboot sets the reboot flag on the provided machines
 
@@ -3384,13 +3384,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ResolvedModeResults)
-    async def Resolved(self, entities=None):
+    def Resolved(self, entities=None):
         '''
         Resolved returns the current resolved setting for each given unit.
 
@@ -3407,13 +3407,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringResult)
-    async def SLALevel(self):
+    def SLALevel(self):
         '''
         SLALevel returns the model's SLA level.
 
@@ -3428,13 +3428,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SecretsGrant(self, args=None):
+    def SecretsGrant(self, args=None):
         '''
         SecretsGrant grants access to a secret for the specified subjects.
 
@@ -3451,13 +3451,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['args'] = args
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SecretsRevoke(self, args=None):
+    def SecretsRevoke(self, args=None):
         '''
         SecretsRevoke revokes access to a secret for the specified subjects.
 
@@ -3474,13 +3474,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['args'] = args
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SecretsRotated(self, args=None):
+    def SecretsRotated(self, args=None):
         '''
         SecretsRotated records when secrets were last rotated.
 
@@ -3497,13 +3497,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['args'] = args
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetAgentStatus(self, entities=None):
+    def SetAgentStatus(self, entities=None):
         '''
         SetAgentStatus will set status for agents of Units passed in args, if one
         of the args is not an Unit it will fail.
@@ -3521,13 +3521,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetApplicationStatus(self, entities=None):
+    def SetApplicationStatus(self, entities=None):
         '''
         SetApplicationStatus sets the status for all the Applications in args if the given Unit is
         the leader.
@@ -3545,13 +3545,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetCharmURL(self, entities=None):
+    def SetCharmURL(self, entities=None):
         '''
         SetCharmURL sets the charm URL for each given unit. An error will
         be returned if a unit is dead, or the charm URL is not known.
@@ -3569,13 +3569,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetRelationStatus(self, args=None):
+    def SetRelationStatus(self, args=None):
         '''
         SetRelationStatus updates the status of the specified relations.
 
@@ -3592,13 +3592,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['args'] = args
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetState(self, args=None):
+    def SetState(self, args=None):
         '''
         SetState sets the state persisted by the charm running in this unit
         and the state internal to the uniter for this unit.
@@ -3616,13 +3616,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['args'] = args
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetStatus(self, entities=None):
+    def SetStatus(self, entities=None):
         '''
         SetStatus will set status for a entities passed in args. If the entity is
         a Unit it will instead set status to its agent, to emulate backwards
@@ -3641,13 +3641,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetUnitStatus(self, entities=None):
+    def SetUnitStatus(self, entities=None):
         '''
         SetUnitStatus sets status for all elements passed in args, the difference
         with SetStatus is that if an entity is a Unit it will set its status instead
@@ -3666,13 +3666,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetUpgradeSeriesUnitStatus(self, params=None):
+    def SetUpgradeSeriesUnitStatus(self, params=None):
         '''
         SetUpgradeSeriesUnitStatus sets the upgrade series status of the unit.
         If no upgrade is in progress an error is returned instead.
@@ -3690,13 +3690,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['params'] = params
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetWorkloadVersion(self, entities=None):
+    def SetWorkloadVersion(self, entities=None):
         '''
         SetWorkloadVersion sets the workload version for each given unit. An error will
         be returned if a unit is dead.
@@ -3714,13 +3714,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(UnitStateResults)
-    async def State(self, entities=None):
+    def State(self, entities=None):
         '''
         State returns the state persisted by the charm running in this unit
         and the state internal to the uniter for this unit.
@@ -3738,13 +3738,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(LifeResults)
-    async def StorageAttachmentLife(self, ids=None):
+    def StorageAttachmentLife(self, ids=None):
         '''
         StorageAttachmentLife returns the lifecycle state of the storage attachments
         with the specified tags.
@@ -3762,13 +3762,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['ids'] = ids
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StorageAttachmentResults)
-    async def StorageAttachments(self, ids=None):
+    def StorageAttachments(self, ids=None):
         '''
         StorageAttachments returns the storage attachments with the specified tags.
 
@@ -3785,13 +3785,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['ids'] = ids
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StatusResults)
-    async def UnitStatus(self, entities=None):
+    def UnitStatus(self, entities=None):
         '''
         UnitStatus returns the workload status information for the unit.
 
@@ -3808,13 +3808,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StorageAttachmentIdsResults)
-    async def UnitStorageAttachments(self, entities=None):
+    def UnitStorageAttachments(self, entities=None):
         '''
         UnitStorageAttachments returns the IDs of storage attachments for a collection of units.
 
@@ -3831,13 +3831,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def UpdateNetworkInfo(self, entities=None):
+    def UpdateNetworkInfo(self, entities=None):
         '''
         UpdateNetworkInfo refreshes the network settings for a unit's bound
         endpoints.
@@ -3855,13 +3855,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def UpdateSecrets(self, args=None):
+    def UpdateSecrets(self, args=None):
         '''
         UpdateSecrets updates the specified secrets.
 
@@ -3878,13 +3878,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['args'] = args
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(UpgradeSeriesStatusResults)
-    async def UpgradeSeriesUnitStatus(self, entities=None):
+    def UpgradeSeriesUnitStatus(self, entities=None):
         '''
         UpgradeSeriesUnitStatus returns the current preparation status of an
         upgrading unit.
@@ -3903,13 +3903,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(NotifyWatchResults)
-    async def Watch(self, entities=None):
+    def Watch(self, entities=None):
         '''
         Watch starts an NotifyWatcher for each given entity.
 
@@ -3926,13 +3926,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(NotifyWatchResult)
-    async def WatchAPIHostPorts(self):
+    def WatchAPIHostPorts(self):
         '''
         WatchAPIHostPorts watches the API server addresses.
 
@@ -3947,13 +3947,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsWatchResults)
-    async def WatchActionNotifications(self, entities=None):
+    def WatchActionNotifications(self, entities=None):
         '''
         WatchActionNotifications returns a StringsWatcher for observing
         incoming action calls to a unit. See also state/watcher.go
@@ -3973,13 +3973,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsWatchResults)
-    async def WatchConfigSettingsHash(self, entities=None):
+    def WatchConfigSettingsHash(self, entities=None):
         '''
         WatchConfigSettingsHash returns a StringsWatcher that yields a hash
         of the config values every time the config changes. The uniter can
@@ -4000,13 +4000,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsWatchResults)
-    async def WatchConsumedSecretsChanges(self, entities=None):
+    def WatchConsumedSecretsChanges(self, entities=None):
         '''
         WatchConsumedSecretsChanges sets up a watcher to notify of changes to secret revisions for the specified consumers.
 
@@ -4023,13 +4023,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(NotifyWatchResult)
-    async def WatchForModelConfigChanges(self):
+    def WatchForModelConfigChanges(self):
         '''
         WatchForModelConfigChanges returns a NotifyWatcher that observes
         changes to the model configuration.
@@ -4048,13 +4048,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(NotifyWatchResults)
-    async def WatchInstanceData(self, entities=None):
+    def WatchInstanceData(self, entities=None):
         '''
         WatchInstanceData is a shim to call the LXDProfileAPIv2 version of this method.
 
@@ -4071,13 +4071,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(NotifyWatchResults)
-    async def WatchLeadershipSettings(self, entities=None):
+    def WatchLeadershipSettings(self, entities=None):
         '''
         WatchLeadershipSettings will block the caller until leadership settings
         for the given service ID change.
@@ -4095,13 +4095,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(NotifyWatchResults)
-    async def WatchMeterStatus(self, entities=None):
+    def WatchMeterStatus(self, entities=None):
         '''
         entities : typing.Sequence[~Entity]
         Returns -> NotifyWatchResults
@@ -4116,13 +4116,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsWatchResult)
-    async def WatchObsolete(self, entities=None):
+    def WatchObsolete(self, entities=None):
         '''
         WatchObsolete returns a watcher for notifying when:
           - a secret owned by the entity is deleted
@@ -4145,13 +4145,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(RelationUnitsWatchResults)
-    async def WatchRelationUnits(self, relation_units=None):
+    def WatchRelationUnits(self, relation_units=None):
         '''
         WatchRelationUnits returns a RelationUnitsWatcher for observing
         changes to every unit in the supplied relation that is visible to
@@ -4170,13 +4170,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['relation-units'] = relation_units
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(SecretTriggerWatchResult)
-    async def WatchSecretRevisionsExpiryChanges(self, entities=None):
+    def WatchSecretRevisionsExpiryChanges(self, entities=None):
         '''
         WatchSecretRevisionsExpiryChanges sets up a watcher to notify of changes to secret revision expiry config.
 
@@ -4193,13 +4193,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(SecretTriggerWatchResult)
-    async def WatchSecretsRotationChanges(self, entities=None):
+    def WatchSecretsRotationChanges(self, entities=None):
         '''
         WatchSecretsRotationChanges sets up a watcher to notify of changes to secret rotation config.
 
@@ -4216,13 +4216,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(NotifyWatchResults)
-    async def WatchStorageAttachments(self, ids=None):
+    def WatchStorageAttachments(self, ids=None):
         '''
         WatchStorageAttachments creates watchers for a collection of storage
         attachments, each of which can be used to watch changes to storage
@@ -4241,13 +4241,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['ids'] = ids
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsWatchResults)
-    async def WatchTrustConfigSettingsHash(self, entities=None):
+    def WatchTrustConfigSettingsHash(self, entities=None):
         '''
         WatchTrustConfigSettingsHash returns a StringsWatcher that yields a
         hash of the application config values whenever they change. The
@@ -4267,13 +4267,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsWatchResults)
-    async def WatchUnitAddressesHash(self, entities=None):
+    def WatchUnitAddressesHash(self, entities=None):
         '''
         WatchUnitAddressesHash returns a StringsWatcher that yields the
         hashes of the addresses for the unit whenever the addresses
@@ -4293,13 +4293,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsWatchResults)
-    async def WatchUnitRelations(self, entities=None):
+    def WatchUnitRelations(self, entities=None):
         '''
         WatchUnitRelations returns a StringsWatcher, for each given
         unit, that notifies of changes to the lifecycles of relations
@@ -4320,13 +4320,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsWatchResults)
-    async def WatchUnitStorageAttachments(self, entities=None):
+    def WatchUnitStorageAttachments(self, entities=None):
         '''
         WatchUnitStorageAttachments creates watchers for a collection of units,
         each of which can be used to watch for lifecycle changes to the corresponding
@@ -4345,13 +4345,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(NotifyWatchResults)
-    async def WatchUpgradeSeriesNotifications(self, entities=None):
+    def WatchUpgradeSeriesNotifications(self, entities=None):
         '''
         WatchUpgradeSeriesNotifications returns a NotifyWatcher for observing changes to upgrade series locks.
 
@@ -4368,13 +4368,13 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringResults)
-    async def WorkloadVersion(self, entities=None):
+    def WorkloadVersion(self, entities=None):
         '''
         WorkloadVersion returns the workload version for all given units or applications.
 
@@ -4391,7 +4391,7 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 

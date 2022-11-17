@@ -50,7 +50,7 @@ class Connector:
             raise NoConnectionException('not connected')
         return self._connection
 
-    async def connect(self, **kwargs):
+    def connect(self, **kwargs):
         """Connect to an arbitrary Juju model.
 
         kwargs are passed through to Connection.connect()
@@ -66,23 +66,23 @@ class Connector:
             for macaroon in kwargs.pop('macaroons'):
                 jar.set_cookie(go_to_py_cookie(macaroon))
         if 'debug_log_conn' in kwargs:
-            assert self._connection
-            self._log_connection = await Connection.connect(**kwargs)
+            self._connection
+            self._log_connection = Connection.connect(**kwargs)
         else:
             if self._connection:
-                await self._connection.close()
-            self._connection = await Connection.connect(**kwargs)
+                self._connection.close()
+            self._connection = Connection.connect(**kwargs)
 
-    async def disconnect(self):
+    def disconnect(self):
         """Shut down the watcher task and close websockets.
         """
         if self._connection:
             log.debug('Closing model connection')
-            await self._connection.close()
+            self._connection.close()
             self._connection = None
         if self._log_connection:
             log.debug('Also closing debug-log connection')
-            await self._log_connection.close()
+            #await self._log_connection.close()
             self._log_connection = None
 
     async def connect_controller(self, controller_name=None, specified_facades=None):
@@ -113,7 +113,7 @@ class Connector:
         self.controller_name = controller_name
         self.controller_uuid = controller["uuid"]
 
-    async def connect_model(self, _model_name=None, **kwargs):
+    def connect_model(self, _model_name=None, **kwargs):
         """Connect to a model by name. If either controller or model
         parts of the name are empty, the current controller and/or model
         will be used.
@@ -138,12 +138,12 @@ class Connector:
             model_uuid = models[_model_name]['uuid']
         else:
             # let's try to find it through the actual controller
-            await self.connect_controller(controller_name=controller_name)
+            self.connect_controller(controller_name=controller_name)
             # get the facade
             controller_facade = client.ControllerFacade.from_connection(
                 self.connection())
             # get all the user models from the api
-            response = await controller_facade.AllModels()
+            response = controller_facade.AllModels()
             # search the one that contains admin/model_name
             for user_model in response.user_models:
                 if 'admin/' + user_model.model.name == _model_name:
@@ -163,7 +163,7 @@ class Connector:
                       cacert=controller.get('ca-cert'),
                       bakery_client=self.bakery_client_for_controller(controller_name),
                       proxy=proxy)
-        await self.connect(**kwargs)
+        self.connect(**kwargs)
         # TODO this might be a good spot to trigger refreshing the
         # local cache (the connection to the model might help)
         self.controller_name = controller_name

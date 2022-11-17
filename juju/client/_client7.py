@@ -220,7 +220,7 @@ class ActionFacade(Type):
     
 
     @ReturnMapping(ActionResults)
-    async def Actions(self, entities=None):
+    def Actions(self, entities=None):
         '''
         Actions takes a list of ActionTags, and returns the full Action for
         each ID.
@@ -238,13 +238,13 @@ class ActionFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ApplicationsCharmActionsResults)
-    async def ApplicationsCharmsActions(self, entities=None):
+    def ApplicationsCharmsActions(self, entities=None):
         '''
         ApplicationsCharmsActions returns a slice of charm Actions for a slice of
         services.
@@ -262,13 +262,13 @@ class ActionFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ActionResults)
-    async def Cancel(self, entities=None):
+    def Cancel(self, entities=None):
         '''
         Cancel attempts to cancel enqueued Actions from running.
 
@@ -285,13 +285,13 @@ class ActionFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(EnqueuedActions)
-    async def EnqueueOperation(self, actions=None):
+    def EnqueueOperation(self, actions=None):
         '''
         EnqueueOperation takes a list of Actions and queues them up to be executed as
         an operation, each action running as a task on the designated ActionReceiver.
@@ -310,13 +310,13 @@ class ActionFacade(Type):
                    version=7,
                    params=_params)
         _params['actions'] = actions
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(OperationResults)
-    async def ListOperations(self, actions=None, applications=None, limit=None, machines=None, offset=None, status=None, units=None):
+    def ListOperations(self, actions=None, applications=None, limit=None, machines=None, offset=None, status=None, units=None):
         '''
         ListOperations fetches the called actions for specified apps/units.
 
@@ -363,13 +363,13 @@ class ActionFacade(Type):
         _params['offset'] = offset
         _params['status'] = status
         _params['units'] = units
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(OperationResults)
-    async def Operations(self, entities=None):
+    def Operations(self, entities=None):
         '''
         Operations fetches the specified operation ids.
 
@@ -386,13 +386,13 @@ class ActionFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(EnqueuedActions)
-    async def Run(self, applications=None, commands=None, execution_group=None, machines=None, parallel=None, timeout=None, units=None, workload_context=None):
+    def Run(self, applications=None, commands=None, execution_group=None, machines=None, parallel=None, timeout=None, units=None, workload_context=None):
         '''
         Run the commands specified on the machines identified through the
         list of machines, units and services.
@@ -445,13 +445,13 @@ class ActionFacade(Type):
         _params['timeout'] = timeout
         _params['units'] = units
         _params['workload-context'] = workload_context
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(EnqueuedActions)
-    async def RunOnAllMachines(self, applications=None, commands=None, execution_group=None, machines=None, parallel=None, timeout=None, units=None, workload_context=None):
+    def RunOnAllMachines(self, applications=None, commands=None, execution_group=None, machines=None, parallel=None, timeout=None, units=None, workload_context=None):
         '''
         RunOnAllMachines attempts to run the specified command on all the machines.
 
@@ -503,13 +503,13 @@ class ActionFacade(Type):
         _params['timeout'] = timeout
         _params['units'] = units
         _params['workload-context'] = workload_context
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsWatchResults)
-    async def WatchActionsProgress(self, entities=None):
+    def WatchActionsProgress(self, entities=None):
         '''
         WatchActionsProgress creates a watcher that reports on action log messages.
 
@@ -526,7 +526,7 @@ class ActionFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
@@ -1058,7 +1058,7 @@ class CloudFacade(Type):
     
 
     @ReturnMapping(None)
-    async def AddCloud(self, cloud=None, force=None, name=None):
+    def AddCloud(self, cloud=None, force=None, name=None):
         '''
         AddCloud adds a new cloud, different from the one managed by the controller.
 
@@ -1085,13 +1085,13 @@ class CloudFacade(Type):
         _params['cloud'] = cloud
         _params['force'] = force
         _params['name'] = name
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def AddCredentials(self, credentials=None):
+    def AddCredentials(self, credentials=None):
         '''
         AddCredentials adds new credentials.
         In contrast to UpdateCredentials() below, the new credentials can be
@@ -1111,13 +1111,13 @@ class CloudFacade(Type):
                    version=7,
                    params=_params)
         _params['credentials'] = credentials
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(UpdateCredentialResults)
-    async def CheckCredentialsModels(self, credentials=None):
+    def CheckCredentialsModels(self, credentials=None):
         '''
         CheckCredentialsModels validates supplied cloud credentials' content against
         models that currently use these credentials.
@@ -1139,13 +1139,13 @@ class CloudFacade(Type):
                    version=7,
                    params=_params)
         _params['credentials'] = credentials
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(CloudResults)
-    async def Cloud(self, entities=None):
+    def Cloud(self, entities=None):
         '''
         Cloud returns the cloud definitions for the specified clouds.
 
@@ -1162,13 +1162,13 @@ class CloudFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(CloudInfoResults)
-    async def CloudInfo(self, entities=None):
+    def CloudInfo(self, entities=None):
         '''
         CloudInfo returns information about the specified clouds.
 
@@ -1185,13 +1185,13 @@ class CloudFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(CloudsResult)
-    async def Clouds(self):
+    def Clouds(self):
         '''
         Clouds returns the definitions of all clouds supported by the controller
         that the logged in user can see.
@@ -1207,13 +1207,13 @@ class CloudFacade(Type):
                    version=7,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(CloudCredentialResults)
-    async def Credential(self, entities=None):
+    def Credential(self, entities=None):
         '''
         Credential returns the specified cloud credential for each tag, minus secrets.
 
@@ -1230,13 +1230,13 @@ class CloudFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(CredentialContentResults)
-    async def CredentialContents(self, credentials=None, include_secrets=None):
+    def CredentialContents(self, credentials=None, include_secrets=None):
         '''
         CredentialContents returns the specified cloud credentials,
         including the secrets if requested.
@@ -1263,13 +1263,13 @@ class CloudFacade(Type):
                    params=_params)
         _params['credentials'] = credentials
         _params['include-secrets'] = include_secrets
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(InstanceTypesResults)
-    async def InstanceTypes(self, constraints=None):
+    def InstanceTypes(self, constraints=None):
         '''
         InstanceTypes returns instance type information for the cloud and region
         in which the current model is deployed.
@@ -1287,13 +1287,13 @@ class CloudFacade(Type):
                    version=7,
                    params=_params)
         _params['constraints'] = constraints
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ListCloudInfoResults)
-    async def ListCloudInfo(self, all_=None, user_tag=None):
+    def ListCloudInfo(self, all_=None, user_tag=None):
         '''
         ListCloudInfo returns clouds that the specified user has access to.
         Controller admins (superuser) can list clouds for any user.
@@ -1317,13 +1317,13 @@ class CloudFacade(Type):
                    params=_params)
         _params['all'] = all_
         _params['user-tag'] = user_tag
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def ModifyCloudAccess(self, changes=None):
+    def ModifyCloudAccess(self, changes=None):
         '''
         ModifyCloudAccess changes the model access granted to users.
 
@@ -1340,13 +1340,13 @@ class CloudFacade(Type):
                    version=7,
                    params=_params)
         _params['changes'] = changes
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def RemoveClouds(self, entities=None):
+    def RemoveClouds(self, entities=None):
         '''
         RemoveClouds removes the specified clouds from the controller.
         If a cloud is in use (has models deployed to it), the removal will fail.
@@ -1364,13 +1364,13 @@ class CloudFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def RevokeCredentialsCheckModels(self, credentials=None):
+    def RevokeCredentialsCheckModels(self, credentials=None):
         '''
         RevokeCredentialsCheckModels revokes a set of cloud credentials.
         If the credentials are used by any of the models, the credential deletion will be aborted.
@@ -1389,13 +1389,13 @@ class CloudFacade(Type):
                    version=7,
                    params=_params)
         _params['credentials'] = credentials
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def UpdateCloud(self, clouds=None):
+    def UpdateCloud(self, clouds=None):
         '''
         UpdateCloud updates an existing cloud that the controller knows about.
 
@@ -1412,13 +1412,13 @@ class CloudFacade(Type):
                    version=7,
                    params=_params)
         _params['clouds'] = clouds
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(UpdateCredentialResults)
-    async def UpdateCredentialsCheckModels(self, credentials=None, force=None):
+    def UpdateCredentialsCheckModels(self, credentials=None, force=None):
         '''
         UpdateCredentialsCheckModels updates a set of cloud credentials' content.
         If there are any models that are using a credential and these models
@@ -1446,13 +1446,13 @@ class CloudFacade(Type):
                    params=_params)
         _params['credentials'] = credentials
         _params['force'] = force
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsResults)
-    async def UserCredentials(self, user_clouds=None):
+    def UserCredentials(self, user_clouds=None):
         '''
         UserCredentials returns the cloud credentials for a set of users.
 
@@ -1469,7 +1469,7 @@ class CloudFacade(Type):
                    version=7,
                    params=_params)
         _params['user-clouds'] = user_clouds
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
@@ -2039,7 +2039,7 @@ class FirewallerFacade(Type):
     
 
     @ReturnMapping(BoolResults)
-    async def AreManuallyProvisioned(self, entities=None):
+    def AreManuallyProvisioned(self, entities=None):
         '''
         AreManuallyProvisioned returns whether each given entity is
         manually provisioned or not. Only machine tags are accepted.
@@ -2057,13 +2057,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(CloudSpecResults)
-    async def CloudSpec(self, entities=None):
+    def CloudSpec(self, entities=None):
         '''
         CloudSpec returns the model's cloud spec.
 
@@ -2080,13 +2080,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ControllerAPIInfoResults)
-    async def ControllerAPIInfoForModels(self, entities=None):
+    def ControllerAPIInfoForModels(self, entities=None):
         '''
         ControllerAPIInfoForModels returns the controller api connection details for the specified models.
 
@@ -2103,13 +2103,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ControllerConfigResult)
-    async def ControllerConfig(self):
+    def ControllerConfig(self):
         '''
         ControllerConfig returns the controller's configuration.
 
@@ -2124,13 +2124,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ListFirewallRulesResults)
-    async def FirewallRules(self, known_services=None):
+    def FirewallRules(self, known_services=None):
         '''
         FirewallRules returns the firewall rules for the specified well known service types.
 
@@ -2147,13 +2147,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['known-services'] = known_services
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringResults)
-    async def GetAssignedMachine(self, entities=None):
+    def GetAssignedMachine(self, entities=None):
         '''
         GetAssignedMachine returns the assigned machine tag (if any) for
         each given unit.
@@ -2171,13 +2171,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(CloudSpecResult)
-    async def GetCloudSpec(self):
+    def GetCloudSpec(self):
         '''
         GetCloudSpec constructs the CloudSpec for a validated and authorized model.
 
@@ -2192,13 +2192,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ExposeInfoResults)
-    async def GetExposeInfo(self, entities=None):
+    def GetExposeInfo(self, entities=None):
         '''
         GetExposeInfo returns the expose flag and per-endpoint expose settings
         for the specified applications.
@@ -2216,13 +2216,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringResults)
-    async def InstanceId(self, entities=None):
+    def InstanceId(self, entities=None):
         '''
         InstanceId returns the provider specific instance id for each given
         machine or an CodeNotProvisioned error, if not set.
@@ -2240,13 +2240,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(LifeResults)
-    async def Life(self, entities=None):
+    def Life(self, entities=None):
         '''
         Life returns the life status of every supplied entity, where available.
 
@@ -2263,13 +2263,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(MacaroonResults)
-    async def MacaroonForRelations(self, entities=None):
+    def MacaroonForRelations(self, entities=None):
         '''
         MacaroonForRelations returns the macaroon for the specified relations.
 
@@ -2286,13 +2286,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ModelConfigResult)
-    async def ModelConfig(self):
+    def ModelConfig(self):
         '''
         ModelConfig returns the current model's configuration.
 
@@ -2307,13 +2307,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(OpenMachinePortRangesResults)
-    async def OpenedMachinePortRanges(self, entities=None):
+    def OpenedMachinePortRanges(self, entities=None):
         '''
         OpenedMachinePortRanges returns a list of the opened port ranges for the
         specified machines where each result is broken down by unit. The list of
@@ -2333,13 +2333,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetRelationsStatus(self, entities=None):
+    def SetRelationsStatus(self, entities=None):
         '''
         SetRelationsStatus sets the status for the specified relations.
 
@@ -2356,13 +2356,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(SpaceInfos)
-    async def SpaceInfos(self, space_ids=None):
+    def SpaceInfos(self, space_ids=None):
         '''
         SpaceInfos returns a comprehensive representation of either all spaces or
         a filtered subset of the known spaces and their associated subnet details.
@@ -2380,13 +2380,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['space-ids'] = space_ids
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(NotifyWatchResults)
-    async def Watch(self, entities=None):
+    def Watch(self, entities=None):
         '''
         Watch starts an NotifyWatcher for each given entity.
 
@@ -2403,13 +2403,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(NotifyWatchResults)
-    async def WatchCloudSpecsChanges(self, entities=None):
+    def WatchCloudSpecsChanges(self, entities=None):
         '''
         WatchCloudSpecsChanges returns a watcher for cloud spec changes.
 
@@ -2426,13 +2426,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsWatchResults)
-    async def WatchEgressAddressesForRelations(self, entities=None):
+    def WatchEgressAddressesForRelations(self, entities=None):
         '''
         WatchEgressAddressesForRelations creates a watcher that notifies when addresses, from which
         connections will originate for the relation, change.
@@ -2451,13 +2451,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(NotifyWatchResult)
-    async def WatchForModelConfigChanges(self):
+    def WatchForModelConfigChanges(self):
         '''
         WatchForModelConfigChanges returns a NotifyWatcher that observes
         changes to the model configuration.
@@ -2476,13 +2476,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsWatchResults)
-    async def WatchIngressAddressesForRelations(self, entities=None):
+    def WatchIngressAddressesForRelations(self, entities=None):
         '''
         WatchIngressAddressesForRelations creates a watcher that returns the ingress networks
         that have been recorded against the specified relations.
@@ -2500,13 +2500,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsWatchResult)
-    async def WatchModelMachineStartTimes(self):
+    def WatchModelMachineStartTimes(self):
         '''
         WatchModelMachineStartTimes watches the non-container machines in the model
         for changes to the Life or AgentStartTime fields and reports them as a batch.
@@ -2522,13 +2522,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsWatchResult)
-    async def WatchModelMachines(self):
+    def WatchModelMachines(self):
         '''
         WatchModelMachines returns a StringsWatcher that notifies of
         changes to the life cycles of the top level machines in the current
@@ -2545,13 +2545,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsWatchResults)
-    async def WatchOpenedPorts(self, entities=None):
+    def WatchOpenedPorts(self, entities=None):
         '''
         WatchOpenedPorts returns a new StringsWatcher for each given
         model tag.
@@ -2569,13 +2569,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsWatchResult)
-    async def WatchSubnets(self, entities=None):
+    def WatchSubnets(self, entities=None):
         '''
         WatchSubnets returns a new StringsWatcher that watches the specified
         subnet tags or all tags if no entities are specified.
@@ -2593,13 +2593,13 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsWatchResults)
-    async def WatchUnits(self, entities=None):
+    def WatchUnits(self, entities=None):
         '''
         WatchUnits starts a StringsWatcher to watch all units belonging to
         to any entity (machine or service) passed in args.
@@ -2617,7 +2617,7 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
@@ -2994,7 +2994,7 @@ class MachineManagerFacade(Type):
     
 
     @ReturnMapping(AddMachinesResults)
-    async def AddMachines(self, params=None):
+    def AddMachines(self, params=None):
         '''
         AddMachines adds new machines with the supplied parameters.
 
@@ -3011,13 +3011,13 @@ class MachineManagerFacade(Type):
                    version=7,
                    params=_params)
         _params['params'] = params
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(DestroyMachineResults)
-    async def DestroyMachine(self, entities=None):
+    def DestroyMachine(self, entities=None):
         '''
         DestroyMachine removes a set of machines from the model.
         TODO(juju3) - remove
@@ -3035,13 +3035,13 @@ class MachineManagerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(DestroyMachineResults)
-    async def DestroyMachineWithParams(self, force=None, keep=None, machine_tags=None, max_wait=None):
+    def DestroyMachineWithParams(self, force=None, keep=None, machine_tags=None, max_wait=None):
         '''
         DestroyMachineWithParams removes a set of machines from the model.
 
@@ -3073,13 +3073,13 @@ class MachineManagerFacade(Type):
         _params['keep'] = keep
         _params['machine-tags'] = machine_tags
         _params['max-wait'] = max_wait
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(DestroyMachineResults)
-    async def ForceDestroyMachine(self, entities=None):
+    def ForceDestroyMachine(self, entities=None):
         '''
         ForceDestroyMachine forcibly removes a set of machines from the model.
         TODO(juju3) - remove
@@ -3098,13 +3098,13 @@ class MachineManagerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsResults)
-    async def GetUpgradeSeriesMessages(self, params=None):
+    def GetUpgradeSeriesMessages(self, params=None):
         '''
         GetUpgradeSeriesMessages returns all new messages associated with upgrade
         series events. Messages that have already been retrieved once are not
@@ -3123,13 +3123,13 @@ class MachineManagerFacade(Type):
                    version=7,
                    params=_params)
         _params['params'] = params
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(InstanceTypesResults)
-    async def InstanceTypes(self, constraints=None):
+    def InstanceTypes(self, constraints=None):
         '''
         InstanceTypes returns instance type information for the cloud and region
         in which the current model is deployed.
@@ -3147,13 +3147,13 @@ class MachineManagerFacade(Type):
                    version=7,
                    params=_params)
         _params['constraints'] = constraints
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ProvisioningScriptResult)
-    async def ProvisioningScript(self, data_dir=None, disable_package_commands=None, machine_id=None, nonce=None):
+    def ProvisioningScript(self, data_dir=None, disable_package_commands=None, machine_id=None, nonce=None):
         '''
         ProvisioningScript returns a shell script that, when run,
         provisions a machine agent on the machine executing the script.
@@ -3186,13 +3186,13 @@ class MachineManagerFacade(Type):
         _params['disable-package-commands'] = disable_package_commands
         _params['machine-id'] = machine_id
         _params['nonce'] = nonce
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def RetryProvisioning(self, all_=None, machines=None):
+    def RetryProvisioning(self, all_=None, machines=None):
         '''
         RetryProvisioning marks a provisioning error as transient on the machines.
 
@@ -3214,13 +3214,13 @@ class MachineManagerFacade(Type):
                    params=_params)
         _params['all'] = all_
         _params['machines'] = machines
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResult)
-    async def UpgradeSeriesComplete(self, force=None, series=None, tag=None):
+    def UpgradeSeriesComplete(self, force=None, series=None, tag=None):
         '''
         UpgradeSeriesComplete marks a machine as having completed a managed series
         upgrade.
@@ -3248,13 +3248,13 @@ class MachineManagerFacade(Type):
         _params['force'] = force
         _params['series'] = series
         _params['tag'] = tag
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResult)
-    async def UpgradeSeriesPrepare(self, force=None, series=None, tag=None):
+    def UpgradeSeriesPrepare(self, force=None, series=None, tag=None):
         '''
         UpgradeSeriesPrepare prepares a machine for a OS series upgrade.
 
@@ -3281,13 +3281,13 @@ class MachineManagerFacade(Type):
         _params['force'] = force
         _params['series'] = series
         _params['tag'] = tag
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(UpgradeSeriesUnitsResults)
-    async def UpgradeSeriesValidate(self, args=None):
+    def UpgradeSeriesValidate(self, args=None):
         '''
         UpgradeSeriesValidate validates that the incoming arguments correspond to a
         valid series upgrade for the target machine.
@@ -3307,13 +3307,13 @@ class MachineManagerFacade(Type):
                    version=7,
                    params=_params)
         _params['args'] = args
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(NotifyWatchResults)
-    async def WatchUpgradeSeriesNotifications(self, entities=None):
+    def WatchUpgradeSeriesNotifications(self, entities=None):
         '''
         WatchUpgradeSeriesNotifications returns a watcher that fires on upgrade
         series events.
@@ -3331,7 +3331,7 @@ class MachineManagerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 

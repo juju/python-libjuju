@@ -2,7 +2,7 @@
 # Changes will be overwritten/lost when the file is regenerated.
 
 from juju.client.facade import Type, ReturnMapping
-from juju.client.old_clients._definitions import *
+from juju.client._definitions import *
 
 
 class AllModelWatcherFacade(Type):
@@ -30,7 +30,7 @@ class AllModelWatcherFacade(Type):
     
 
     @ReturnMapping(AllWatcherNextResults)
-    async def Next(self):
+    def Next(self):
         '''
         Next will return the current state of everything on the first call
         and subsequent calls will
@@ -46,13 +46,13 @@ class AllModelWatcherFacade(Type):
                    version=4,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(None)
-    async def Stop(self):
+    def Stop(self):
         '''
         Stop stops the watcher.
 
@@ -67,12 +67,12 @@ class AllModelWatcherFacade(Type):
                    version=4,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
-    async def rpc(self, msg):
+    def rpc(self, msg):
         '''
         Patch rpc method to add Id.
         '''
@@ -81,7 +81,7 @@ class AllModelWatcherFacade(Type):
         msg['Id'] = id
 
         from .facade import TypeEncoder
-        reply = await self.connection.rpc(msg, encoder=TypeEncoder)
+        reply = self.connection.rpc(msg, encoder=TypeEncoder)
         return reply
 
 
@@ -457,7 +457,7 @@ class ApplicationOffersFacade(Type):
     
 
     @ReturnMapping(ApplicationOffersResults)
-    async def ApplicationOffers(self, bakery_version=None, offer_urls=None):
+    def ApplicationOffers(self, bakery_version=None, offer_urls=None):
         '''
         ApplicationOffers gets details about remote applications that match given URLs.
 
@@ -479,13 +479,13 @@ class ApplicationOffersFacade(Type):
                    params=_params)
         _params['bakery-version'] = bakery_version
         _params['offer-urls'] = offer_urls
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def DestroyOffers(self, force=None, offer_urls=None):
+    def DestroyOffers(self, force=None, offer_urls=None):
         '''
         DestroyOffers removes the offers specified by the given URLs, forcing if necessary.
 
@@ -507,13 +507,13 @@ class ApplicationOffersFacade(Type):
                    params=_params)
         _params['force'] = force
         _params['offer-urls'] = offer_urls
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(QueryApplicationOffersResults)
-    async def FindApplicationOffers(self, filters=None):
+    def FindApplicationOffers(self, filters=None):
         '''
         FindApplicationOffers gets details about remote applications that match given filter.
 
@@ -530,13 +530,13 @@ class ApplicationOffersFacade(Type):
                    version=4,
                    params=_params)
         _params['Filters'] = filters
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ConsumeOfferDetailsResults)
-    async def GetConsumeDetails(self, offer_urls=None, user_tag=None):
+    def GetConsumeDetails(self, offer_urls=None, user_tag=None):
         '''
         GetConsumeDetails returns the details necessary to pass to another model
         to allow the specified args user to consume the offers represented by the args URLs.
@@ -559,13 +559,13 @@ class ApplicationOffersFacade(Type):
                    params=_params)
         _params['offer-urls'] = offer_urls
         _params['user-tag'] = user_tag
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(QueryApplicationOffersResults)
-    async def ListApplicationOffers(self, filters=None):
+    def ListApplicationOffers(self, filters=None):
         '''
         ListApplicationOffers gets deployed details about application offers that match given filter.
         The results contain details about the deployed applications such as connection count.
@@ -583,13 +583,13 @@ class ApplicationOffersFacade(Type):
                    version=4,
                    params=_params)
         _params['Filters'] = filters
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def ModifyOfferAccess(self, changes=None):
+    def ModifyOfferAccess(self, changes=None):
         '''
         ModifyOfferAccess changes the application offer access granted to users.
 
@@ -606,13 +606,13 @@ class ApplicationOffersFacade(Type):
                    version=4,
                    params=_params)
         _params['changes'] = changes
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def Offer(self, offers=None):
+    def Offer(self, offers=None):
         '''
         Offer makes application endpoints available for consumption at a specified URL.
 
@@ -629,13 +629,13 @@ class ApplicationOffersFacade(Type):
                    version=4,
                    params=_params)
         _params['Offers'] = offers
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(RemoteApplicationInfoResults)
-    async def RemoteApplicationInfo(self, bakery_version=None, offer_urls=None):
+    def RemoteApplicationInfo(self, bakery_version=None, offer_urls=None):
         '''
         RemoteApplicationInfo returns information about the requested remote application.
         This call currently has no client side API, only there for the GUI at this stage.
@@ -658,742 +658,7 @@ class ApplicationOffersFacade(Type):
                    params=_params)
         _params['bakery-version'] = bakery_version
         _params['offer-urls'] = offer_urls
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-class CharmsFacade(Type):
-    name = 'Charms'
-    version = 4
-    schema =     {'definitions': {'AddCharmWithAuth': {'additionalProperties': False,
-                                          'properties': {'charm-origin': {'$ref': '#/definitions/CharmOrigin'},
-                                                         'force': {'type': 'boolean'},
-                                                         'macaroon': {'$ref': '#/definitions/Macaroon'},
-                                                         'series': {'type': 'string'},
-                                                         'url': {'type': 'string'}},
-                                          'required': ['url',
-                                                       'charm-origin',
-                                                       'macaroon',
-                                                       'force'],
-                                          'type': 'object'},
-                     'AddCharmWithOrigin': {'additionalProperties': False,
-                                            'properties': {'charm-origin': {'$ref': '#/definitions/CharmOrigin'},
-                                                           'force': {'type': 'boolean'},
-                                                           'series': {'type': 'string'},
-                                                           'url': {'type': 'string'}},
-                                            'required': ['url',
-                                                         'charm-origin',
-                                                         'force'],
-                                            'type': 'object'},
-                     'ApplicationCharmPlacement': {'additionalProperties': False,
-                                                   'properties': {'application': {'type': 'string'},
-                                                                  'charm-url': {'type': 'string'}},
-                                                   'required': ['application',
-                                                                'charm-url'],
-                                                   'type': 'object'},
-                     'ApplicationCharmPlacements': {'additionalProperties': False,
-                                                    'properties': {'placements': {'items': {'$ref': '#/definitions/ApplicationCharmPlacement'},
-                                                                                  'type': 'array'}},
-                                                    'required': ['placements'],
-                                                    'type': 'object'},
-                     'Base': {'additionalProperties': False,
-                              'properties': {'channel': {'type': 'string'},
-                                             'name': {'type': 'string'}},
-                              'required': ['name', 'channel'],
-                              'type': 'object'},
-                     'Charm': {'additionalProperties': False,
-                               'properties': {'actions': {'$ref': '#/definitions/CharmActions'},
-                                              'config': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmOption'}},
-                                                         'type': 'object'},
-                                              'lxd-profile': {'$ref': '#/definitions/CharmLXDProfile'},
-                                              'manifest': {'$ref': '#/definitions/CharmManifest'},
-                                              'meta': {'$ref': '#/definitions/CharmMeta'},
-                                              'metrics': {'$ref': '#/definitions/CharmMetrics'},
-                                              'revision': {'type': 'integer'},
-                                              'url': {'type': 'string'}},
-                               'required': ['revision', 'url', 'config'],
-                               'type': 'object'},
-                     'CharmActionSpec': {'additionalProperties': False,
-                                         'properties': {'description': {'type': 'string'},
-                                                        'params': {'patternProperties': {'.*': {'additionalProperties': True,
-                                                                                                'type': 'object'}},
-                                                                   'type': 'object'}},
-                                         'required': ['description', 'params'],
-                                         'type': 'object'},
-                     'CharmActions': {'additionalProperties': False,
-                                      'properties': {'specs': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmActionSpec'}},
-                                                               'type': 'object'}},
-                                      'type': 'object'},
-                     'CharmBase': {'additionalProperties': False,
-                                   'properties': {'architectures': {'items': {'type': 'string'},
-                                                                    'type': 'array'},
-                                                  'channel': {'type': 'string'},
-                                                  'name': {'type': 'string'}},
-                                   'type': 'object'},
-                     'CharmContainer': {'additionalProperties': False,
-                                        'properties': {'mounts': {'items': {'$ref': '#/definitions/CharmMount'},
-                                                                  'type': 'array'},
-                                                       'resource': {'type': 'string'}},
-                                        'type': 'object'},
-                     'CharmDeployment': {'additionalProperties': False,
-                                         'properties': {'min-version': {'type': 'string'},
-                                                        'mode': {'type': 'string'},
-                                                        'service': {'type': 'string'},
-                                                        'type': {'type': 'string'}},
-                                         'required': ['type',
-                                                      'mode',
-                                                      'service',
-                                                      'min-version'],
-                                         'type': 'object'},
-                     'CharmDevice': {'additionalProperties': False,
-                                     'properties': {'CountMax': {'type': 'integer'},
-                                                    'CountMin': {'type': 'integer'},
-                                                    'Description': {'type': 'string'},
-                                                    'Name': {'type': 'string'},
-                                                    'Type': {'type': 'string'}},
-                                     'required': ['Name',
-                                                  'Description',
-                                                  'Type',
-                                                  'CountMin',
-                                                  'CountMax'],
-                                     'type': 'object'},
-                     'CharmLXDProfile': {'additionalProperties': False,
-                                         'properties': {'config': {'patternProperties': {'.*': {'type': 'string'}},
-                                                                   'type': 'object'},
-                                                        'description': {'type': 'string'},
-                                                        'devices': {'patternProperties': {'.*': {'patternProperties': {'.*': {'type': 'string'}},
-                                                                                                 'type': 'object'}},
-                                                                    'type': 'object'}},
-                                         'required': ['config',
-                                                      'description',
-                                                      'devices'],
-                                         'type': 'object'},
-                     'CharmManifest': {'additionalProperties': False,
-                                       'properties': {'bases': {'items': {'$ref': '#/definitions/CharmBase'},
-                                                                'type': 'array'}},
-                                       'type': 'object'},
-                     'CharmMeta': {'additionalProperties': False,
-                                   'properties': {'assumes-expr': {'$ref': '#/definitions/ExpressionTree'},
-                                                  'categories': {'items': {'type': 'string'},
-                                                                 'type': 'array'},
-                                                  'containers': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmContainer'}},
-                                                                 'type': 'object'},
-                                                  'deployment': {'$ref': '#/definitions/CharmDeployment'},
-                                                  'description': {'type': 'string'},
-                                                  'devices': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmDevice'}},
-                                                              'type': 'object'},
-                                                  'extra-bindings': {'patternProperties': {'.*': {'type': 'string'}},
-                                                                     'type': 'object'},
-                                                  'min-juju-version': {'type': 'string'},
-                                                  'name': {'type': 'string'},
-                                                  'payload-classes': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmPayloadClass'}},
-                                                                      'type': 'object'},
-                                                  'peers': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmRelation'}},
-                                                            'type': 'object'},
-                                                  'provides': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmRelation'}},
-                                                               'type': 'object'},
-                                                  'requires': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmRelation'}},
-                                                               'type': 'object'},
-                                                  'resources': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmResourceMeta'}},
-                                                                'type': 'object'},
-                                                  'series': {'items': {'type': 'string'},
-                                                             'type': 'array'},
-                                                  'storage': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmStorage'}},
-                                                              'type': 'object'},
-                                                  'subordinate': {'type': 'boolean'},
-                                                  'summary': {'type': 'string'},
-                                                  'tags': {'items': {'type': 'string'},
-                                                           'type': 'array'},
-                                                  'terms': {'items': {'type': 'string'},
-                                                            'type': 'array'}},
-                                   'required': ['name',
-                                                'summary',
-                                                'description',
-                                                'subordinate'],
-                                   'type': 'object'},
-                     'CharmMetric': {'additionalProperties': False,
-                                     'properties': {'description': {'type': 'string'},
-                                                    'type': {'type': 'string'}},
-                                     'required': ['type', 'description'],
-                                     'type': 'object'},
-                     'CharmMetrics': {'additionalProperties': False,
-                                      'properties': {'metrics': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmMetric'}},
-                                                                 'type': 'object'},
-                                                     'plan': {'$ref': '#/definitions/CharmPlan'}},
-                                      'required': ['metrics', 'plan'],
-                                      'type': 'object'},
-                     'CharmMount': {'additionalProperties': False,
-                                    'properties': {'location': {'type': 'string'},
-                                                   'storage': {'type': 'string'}},
-                                    'type': 'object'},
-                     'CharmOption': {'additionalProperties': False,
-                                     'properties': {'default': {'additionalProperties': True,
-                                                                'type': 'object'},
-                                                    'description': {'type': 'string'},
-                                                    'type': {'type': 'string'}},
-                                     'required': ['type'],
-                                     'type': 'object'},
-                     'CharmOrigin': {'additionalProperties': False,
-                                     'properties': {'architecture': {'type': 'string'},
-                                                    'base': {'$ref': '#/definitions/Base'},
-                                                    'branch': {'type': 'string'},
-                                                    'channel': {'type': 'string'},
-                                                    'hash': {'type': 'string'},
-                                                    'id': {'type': 'string'},
-                                                    'instance-key': {'type': 'string'},
-                                                    'os': {'type': 'string'},
-                                                    'revision': {'type': 'integer'},
-                                                    'risk': {'type': 'string'},
-                                                    'series': {'type': 'string'},
-                                                    'source': {'type': 'string'},
-                                                    'track': {'type': 'string'},
-                                                    'type': {'type': 'string'}},
-                                     'required': ['source', 'type', 'id'],
-                                     'type': 'object'},
-                     'CharmOriginResult': {'additionalProperties': False,
-                                           'properties': {'charm-origin': {'$ref': '#/definitions/CharmOrigin'},
-                                                          'error': {'$ref': '#/definitions/Error'}},
-                                           'required': ['charm-origin'],
-                                           'type': 'object'},
-                     'CharmPayloadClass': {'additionalProperties': False,
-                                           'properties': {'name': {'type': 'string'},
-                                                          'type': {'type': 'string'}},
-                                           'required': ['name', 'type'],
-                                           'type': 'object'},
-                     'CharmPlan': {'additionalProperties': False,
-                                   'properties': {'required': {'type': 'boolean'}},
-                                   'required': ['required'],
-                                   'type': 'object'},
-                     'CharmRelation': {'additionalProperties': False,
-                                       'properties': {'interface': {'type': 'string'},
-                                                      'limit': {'type': 'integer'},
-                                                      'name': {'type': 'string'},
-                                                      'optional': {'type': 'boolean'},
-                                                      'role': {'type': 'string'},
-                                                      'scope': {'type': 'string'}},
-                                       'required': ['name',
-                                                    'role',
-                                                    'interface',
-                                                    'optional',
-                                                    'limit',
-                                                    'scope'],
-                                       'type': 'object'},
-                     'CharmResource': {'additionalProperties': False,
-                                       'properties': {'description': {'type': 'string'},
-                                                      'fingerprint': {'items': {'type': 'integer'},
-                                                                      'type': 'array'},
-                                                      'name': {'type': 'string'},
-                                                      'origin': {'type': 'string'},
-                                                      'path': {'type': 'string'},
-                                                      'revision': {'type': 'integer'},
-                                                      'size': {'type': 'integer'},
-                                                      'type': {'type': 'string'}},
-                                       'required': ['name',
-                                                    'type',
-                                                    'path',
-                                                    'origin',
-                                                    'revision',
-                                                    'fingerprint',
-                                                    'size'],
-                                       'type': 'object'},
-                     'CharmResourceMeta': {'additionalProperties': False,
-                                           'properties': {'description': {'type': 'string'},
-                                                          'name': {'type': 'string'},
-                                                          'path': {'type': 'string'},
-                                                          'type': {'type': 'string'}},
-                                           'required': ['name',
-                                                        'type',
-                                                        'path',
-                                                        'description'],
-                                           'type': 'object'},
-                     'CharmResourceResult': {'additionalProperties': False,
-                                             'properties': {'CharmResource': {'$ref': '#/definitions/CharmResource'},
-                                                            'ErrorResult': {'$ref': '#/definitions/ErrorResult'},
-                                                            'description': {'type': 'string'},
-                                                            'error': {'$ref': '#/definitions/Error'},
-                                                            'fingerprint': {'items': {'type': 'integer'},
-                                                                            'type': 'array'},
-                                                            'name': {'type': 'string'},
-                                                            'origin': {'type': 'string'},
-                                                            'path': {'type': 'string'},
-                                                            'revision': {'type': 'integer'},
-                                                            'size': {'type': 'integer'},
-                                                            'type': {'type': 'string'}},
-                                             'required': ['ErrorResult',
-                                                          'name',
-                                                          'type',
-                                                          'path',
-                                                          'origin',
-                                                          'revision',
-                                                          'fingerprint',
-                                                          'size',
-                                                          'CharmResource'],
-                                             'type': 'object'},
-                     'CharmResourcesResults': {'additionalProperties': False,
-                                               'properties': {'results': {'items': {'items': {'$ref': '#/definitions/CharmResourceResult'},
-                                                                                    'type': 'array'},
-                                                                          'type': 'array'}},
-                                               'required': ['results'],
-                                               'type': 'object'},
-                     'CharmStorage': {'additionalProperties': False,
-                                      'properties': {'count-max': {'type': 'integer'},
-                                                     'count-min': {'type': 'integer'},
-                                                     'description': {'type': 'string'},
-                                                     'location': {'type': 'string'},
-                                                     'minimum-size': {'type': 'integer'},
-                                                     'name': {'type': 'string'},
-                                                     'properties': {'items': {'type': 'string'},
-                                                                    'type': 'array'},
-                                                     'read-only': {'type': 'boolean'},
-                                                     'shared': {'type': 'boolean'},
-                                                     'type': {'type': 'string'}},
-                                      'required': ['name',
-                                                   'description',
-                                                   'type',
-                                                   'shared',
-                                                   'read-only',
-                                                   'count-min',
-                                                   'count-max',
-                                                   'minimum-size'],
-                                      'type': 'object'},
-                     'CharmURL': {'additionalProperties': False,
-                                  'properties': {'url': {'type': 'string'}},
-                                  'required': ['url'],
-                                  'type': 'object'},
-                     'CharmURLAndOrigin': {'additionalProperties': False,
-                                           'properties': {'charm-origin': {'$ref': '#/definitions/CharmOrigin'},
-                                                          'charm-url': {'type': 'string'},
-                                                          'macaroon': {'$ref': '#/definitions/Macaroon'}},
-                                           'required': ['charm-url',
-                                                        'charm-origin'],
-                                           'type': 'object'},
-                     'CharmURLAndOrigins': {'additionalProperties': False,
-                                            'properties': {'entities': {'items': {'$ref': '#/definitions/CharmURLAndOrigin'},
-                                                                        'type': 'array'}},
-                                            'required': ['entities'],
-                                            'type': 'object'},
-                     'CharmsList': {'additionalProperties': False,
-                                    'properties': {'names': {'items': {'type': 'string'},
-                                                             'type': 'array'}},
-                                    'required': ['names'],
-                                    'type': 'object'},
-                     'CharmsListResult': {'additionalProperties': False,
-                                          'properties': {'charm-urls': {'items': {'type': 'string'},
-                                                                        'type': 'array'}},
-                                          'required': ['charm-urls'],
-                                          'type': 'object'},
-                     'DownloadInfoResult': {'additionalProperties': False,
-                                            'properties': {'charm-origin': {'$ref': '#/definitions/CharmOrigin'},
-                                                           'url': {'type': 'string'}},
-                                            'required': ['url', 'charm-origin'],
-                                            'type': 'object'},
-                     'DownloadInfoResults': {'additionalProperties': False,
-                                             'properties': {'results': {'items': {'$ref': '#/definitions/DownloadInfoResult'},
-                                                                        'type': 'array'}},
-                                             'required': ['results'],
-                                             'type': 'object'},
-                     'Error': {'additionalProperties': False,
-                               'properties': {'code': {'type': 'string'},
-                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
-                                                                                    'type': 'object'}},
-                                                       'type': 'object'},
-                                              'message': {'type': 'string'}},
-                               'required': ['message', 'code'],
-                               'type': 'object'},
-                     'ErrorResult': {'additionalProperties': False,
-                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
-                                     'type': 'object'},
-                     'ErrorResults': {'additionalProperties': False,
-                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
-                                                                 'type': 'array'}},
-                                      'required': ['results'],
-                                      'type': 'object'},
-                     'ExpressionTree': {'additionalProperties': False,
-                                        'properties': {'Expression': {'additionalProperties': True,
-                                                                      'type': 'object'}},
-                                        'required': ['Expression'],
-                                        'type': 'object'},
-                     'IsMeteredResult': {'additionalProperties': False,
-                                         'properties': {'metered': {'type': 'boolean'}},
-                                         'required': ['metered'],
-                                         'type': 'object'},
-                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
-                     'ResolveCharmWithChannel': {'additionalProperties': False,
-                                                 'properties': {'charm-origin': {'$ref': '#/definitions/CharmOrigin'},
-                                                                'reference': {'type': 'string'},
-                                                                'switch-charm': {'type': 'boolean'}},
-                                                 'required': ['reference',
-                                                              'charm-origin'],
-                                                 'type': 'object'},
-                     'ResolveCharmWithChannelResult': {'additionalProperties': False,
-                                                       'properties': {'charm-origin': {'$ref': '#/definitions/CharmOrigin'},
-                                                                      'error': {'$ref': '#/definitions/Error'},
-                                                                      'supported-series': {'items': {'type': 'string'},
-                                                                                           'type': 'array'},
-                                                                      'url': {'type': 'string'}},
-                                                       'required': ['url',
-                                                                    'charm-origin',
-                                                                    'supported-series'],
-                                                       'type': 'object'},
-                     'ResolveCharmWithChannelResults': {'additionalProperties': False,
-                                                        'properties': {'Results': {'items': {'$ref': '#/definitions/ResolveCharmWithChannelResult'},
-                                                                                   'type': 'array'}},
-                                                        'required': ['Results'],
-                                                        'type': 'object'},
-                     'ResolveCharmsWithChannel': {'additionalProperties': False,
-                                                  'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
-                                                                 'resolve': {'items': {'$ref': '#/definitions/ResolveCharmWithChannel'},
-                                                                             'type': 'array'}},
-                                                  'required': ['resolve'],
-                                                  'type': 'object'}},
-     'properties': {'AddCharm': {'description': 'AddCharm adds the given charm URL '
-                                                '(which must include revision) to '
-                                                'the\n'
-                                                'environment, if it does not exist '
-                                                'yet. Local charms are not '
-                                                'supported,\n'
-                                                'only charm store and charm hub '
-                                                'URLs. See also AddLocalCharm().',
-                                 'properties': {'Params': {'$ref': '#/definitions/AddCharmWithOrigin'},
-                                                'Result': {'$ref': '#/definitions/CharmOriginResult'}},
-                                 'type': 'object'},
-                    'AddCharmWithAuthorization': {'description': 'AddCharmWithAuthorization '
-                                                                 'adds the given '
-                                                                 'charm URL (which '
-                                                                 'must include\n'
-                                                                 'revision) to the '
-                                                                 'environment, if '
-                                                                 'it does not '
-                                                                 'exist yet. Local '
-                                                                 'charms are\n'
-                                                                 'not supported, '
-                                                                 'only charm store '
-                                                                 'and charm hub '
-                                                                 'URLs. See also '
-                                                                 'AddLocalCharm().\n'
-                                                                 '\n'
-                                                                 'The '
-                                                                 'authorization '
-                                                                 'macaroon, '
-                                                                 'args.CharmStoreMacaroon, '
-                                                                 'may be\n'
-                                                                 'omitted, in '
-                                                                 'which case this '
-                                                                 'call is '
-                                                                 'equivalent to '
-                                                                 'AddCharm.',
-                                                  'properties': {'Params': {'$ref': '#/definitions/AddCharmWithAuth'},
-                                                                 'Result': {'$ref': '#/definitions/CharmOriginResult'}},
-                                                  'type': 'object'},
-                    'CharmInfo': {'description': 'CharmInfo returns information '
-                                                 'about the requested charm.',
-                                  'properties': {'Params': {'$ref': '#/definitions/CharmURL'},
-                                                 'Result': {'$ref': '#/definitions/Charm'}},
-                                  'type': 'object'},
-                    'CheckCharmPlacement': {'description': 'CheckCharmPlacement '
-                                                           'checks if a charm is '
-                                                           'allowed to be placed '
-                                                           'with in a\n'
-                                                           'given application.',
-                                            'properties': {'Params': {'$ref': '#/definitions/ApplicationCharmPlacements'},
-                                                           'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                            'type': 'object'},
-                    'GetDownloadInfos': {'description': 'GetDownloadInfos attempts '
-                                                        'to get the bundle '
-                                                        'corresponding to the '
-                                                        'charm url\n'
-                                                        'and origin.',
-                                         'properties': {'Params': {'$ref': '#/definitions/CharmURLAndOrigins'},
-                                                        'Result': {'$ref': '#/definitions/DownloadInfoResults'}},
-                                         'type': 'object'},
-                    'IsMetered': {'description': 'IsMetered returns whether or not '
-                                                 'the charm is metered.',
-                                  'properties': {'Params': {'$ref': '#/definitions/CharmURL'},
-                                                 'Result': {'$ref': '#/definitions/IsMeteredResult'}},
-                                  'type': 'object'},
-                    'List': {'description': 'List returns a list of charm URLs '
-                                            'currently in the state.\n'
-                                            'If supplied parameter contains any '
-                                            'names, the result will\n'
-                                            'be filtered to return only the charms '
-                                            'with supplied names.',
-                             'properties': {'Params': {'$ref': '#/definitions/CharmsList'},
-                                            'Result': {'$ref': '#/definitions/CharmsListResult'}},
-                             'type': 'object'},
-                    'ListCharmResources': {'description': 'ListCharmResources '
-                                                          'returns a series of '
-                                                          'resources for a given '
-                                                          'charm.',
-                                           'properties': {'Params': {'$ref': '#/definitions/CharmURLAndOrigins'},
-                                                          'Result': {'$ref': '#/definitions/CharmResourcesResults'}},
-                                           'type': 'object'},
-                    'ResolveCharms': {'description': 'ResolveCharms resolves the '
-                                                     'given charm URLs with an '
-                                                     'optionally specified\n'
-                                                     'preferred channel.  Channel '
-                                                     'provided via CharmOrigin.',
-                                      'properties': {'Params': {'$ref': '#/definitions/ResolveCharmsWithChannel'},
-                                                     'Result': {'$ref': '#/definitions/ResolveCharmWithChannelResults'}},
-                                      'type': 'object'}},
-     'type': 'object'}
-    
-
-    @ReturnMapping(CharmOriginResult)
-    async def AddCharm(self, charm_origin=None, force=None, series=None, url=None):
-        '''
-        AddCharm adds the given charm URL (which must include revision) to the
-        environment, if it does not exist yet. Local charms are not supported,
-        only charm store and charm hub URLs. See also AddLocalCharm().
-
-        charm_origin : CharmOrigin
-        force : bool
-        series : str
-        url : str
-        Returns -> CharmOriginResult
-        '''
-        if charm_origin is not None and not isinstance(charm_origin, (dict, CharmOrigin)):
-            raise Exception("Expected charm_origin to be a CharmOrigin, received: {}".format(type(charm_origin)))
-
-        if force is not None and not isinstance(force, bool):
-            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
-
-        if series is not None and not isinstance(series, (bytes, str)):
-            raise Exception("Expected series to be a str, received: {}".format(type(series)))
-
-        if url is not None and not isinstance(url, (bytes, str)):
-            raise Exception("Expected url to be a str, received: {}".format(type(url)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Charms',
-                   request='AddCharm',
-                   version=4,
-                   params=_params)
-        _params['charm-origin'] = charm_origin
-        _params['force'] = force
-        _params['series'] = series
-        _params['url'] = url
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(CharmOriginResult)
-    async def AddCharmWithAuthorization(self, charm_origin=None, force=None, macaroon=None, series=None, url=None):
-        '''
-        AddCharmWithAuthorization adds the given charm URL (which must include
-        revision) to the environment, if it does not exist yet. Local charms are
-        not supported, only charm store and charm hub URLs. See also AddLocalCharm().
-
-        The authorization macaroon, args.CharmStoreMacaroon, may be
-        omitted, in which case this call is equivalent to AddCharm.
-
-        charm_origin : CharmOrigin
-        force : bool
-        macaroon : Macaroon
-        series : str
-        url : str
-        Returns -> CharmOriginResult
-        '''
-        if charm_origin is not None and not isinstance(charm_origin, (dict, CharmOrigin)):
-            raise Exception("Expected charm_origin to be a CharmOrigin, received: {}".format(type(charm_origin)))
-
-        if force is not None and not isinstance(force, bool):
-            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
-
-        if macaroon is not None and not isinstance(macaroon, (dict, Macaroon)):
-            raise Exception("Expected macaroon to be a Macaroon, received: {}".format(type(macaroon)))
-
-        if series is not None and not isinstance(series, (bytes, str)):
-            raise Exception("Expected series to be a str, received: {}".format(type(series)))
-
-        if url is not None and not isinstance(url, (bytes, str)):
-            raise Exception("Expected url to be a str, received: {}".format(type(url)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Charms',
-                   request='AddCharmWithAuthorization',
-                   version=4,
-                   params=_params)
-        _params['charm-origin'] = charm_origin
-        _params['force'] = force
-        _params['macaroon'] = macaroon
-        _params['series'] = series
-        _params['url'] = url
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(Charm)
-    async def CharmInfo(self, url=None):
-        '''
-        CharmInfo returns information about the requested charm.
-
-        url : str
-        Returns -> Charm
-        '''
-        if url is not None and not isinstance(url, (bytes, str)):
-            raise Exception("Expected url to be a str, received: {}".format(type(url)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Charms',
-                   request='CharmInfo',
-                   version=4,
-                   params=_params)
-        _params['url'] = url
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
-    async def CheckCharmPlacement(self, placements=None):
-        '''
-        CheckCharmPlacement checks if a charm is allowed to be placed with in a
-        given application.
-
-        placements : typing.Sequence[~ApplicationCharmPlacement]
-        Returns -> ErrorResults
-        '''
-        if placements is not None and not isinstance(placements, (bytes, str, list)):
-            raise Exception("Expected placements to be a Sequence, received: {}".format(type(placements)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Charms',
-                   request='CheckCharmPlacement',
-                   version=4,
-                   params=_params)
-        _params['placements'] = placements
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(DownloadInfoResults)
-    async def GetDownloadInfos(self, entities=None):
-        '''
-        GetDownloadInfos attempts to get the bundle corresponding to the charm url
-        and origin.
-
-        entities : typing.Sequence[~CharmURLAndOrigin]
-        Returns -> DownloadInfoResults
-        '''
-        if entities is not None and not isinstance(entities, (bytes, str, list)):
-            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Charms',
-                   request='GetDownloadInfos',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(IsMeteredResult)
-    async def IsMetered(self, url=None):
-        '''
-        IsMetered returns whether or not the charm is metered.
-
-        url : str
-        Returns -> IsMeteredResult
-        '''
-        if url is not None and not isinstance(url, (bytes, str)):
-            raise Exception("Expected url to be a str, received: {}".format(type(url)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Charms',
-                   request='IsMetered',
-                   version=4,
-                   params=_params)
-        _params['url'] = url
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(CharmsListResult)
-    async def List(self, names=None):
-        '''
-        List returns a list of charm URLs currently in the state.
-        If supplied parameter contains any names, the result will
-        be filtered to return only the charms with supplied names.
-
-        names : typing.Sequence[str]
-        Returns -> CharmsListResult
-        '''
-        if names is not None and not isinstance(names, (bytes, str, list)):
-            raise Exception("Expected names to be a Sequence, received: {}".format(type(names)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Charms',
-                   request='List',
-                   version=4,
-                   params=_params)
-        _params['names'] = names
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(CharmResourcesResults)
-    async def ListCharmResources(self, entities=None):
-        '''
-        ListCharmResources returns a series of resources for a given charm.
-
-        entities : typing.Sequence[~CharmURLAndOrigin]
-        Returns -> CharmResourcesResults
-        '''
-        if entities is not None and not isinstance(entities, (bytes, str, list)):
-            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Charms',
-                   request='ListCharmResources',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ResolveCharmWithChannelResults)
-    async def ResolveCharms(self, macaroon=None, resolve=None):
-        '''
-        ResolveCharms resolves the given charm URLs with an optionally specified
-        preferred channel.  Channel provided via CharmOrigin.
-
-        macaroon : Macaroon
-        resolve : typing.Sequence[~ResolveCharmWithChannel]
-        Returns -> ResolveCharmWithChannelResults
-        '''
-        if macaroon is not None and not isinstance(macaroon, (dict, Macaroon)):
-            raise Exception("Expected macaroon to be a Macaroon, received: {}".format(type(macaroon)))
-
-        if resolve is not None and not isinstance(resolve, (bytes, str, list)):
-            raise Exception("Expected resolve to be a Sequence, received: {}".format(type(resolve)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Charms',
-                   request='ResolveCharms',
-                   version=4,
-                   params=_params)
-        _params['macaroon'] = macaroon
-        _params['resolve'] = resolve
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
@@ -1776,7 +1041,7 @@ class InstancePollerFacade(Type):
     
 
     @ReturnMapping(BoolResults)
-    async def AreManuallyProvisioned(self, entities=None):
+    def AreManuallyProvisioned(self, entities=None):
         '''
         AreManuallyProvisioned returns whether each given entity is
         manually provisioned or not. Only machine tags are accepted.
@@ -1794,13 +1059,13 @@ class InstancePollerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringResults)
-    async def InstanceId(self, entities=None):
+    def InstanceId(self, entities=None):
         '''
         InstanceId returns the provider specific instance id for each given
         machine or an CodeNotProvisioned error, if not set.
@@ -1818,13 +1083,13 @@ class InstancePollerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StatusResults)
-    async def InstanceStatus(self, entities=None):
+    def InstanceStatus(self, entities=None):
         '''
         InstanceStatus returns the instance status for each given entity.
         Only machine tags are accepted.
@@ -1842,13 +1107,13 @@ class InstancePollerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(LifeResults)
-    async def Life(self, entities=None):
+    def Life(self, entities=None):
         '''
         Life returns the life status of every supplied entity, where available.
 
@@ -1865,13 +1130,13 @@ class InstancePollerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ModelConfigResult)
-    async def ModelConfig(self):
+    def ModelConfig(self):
         '''
         ModelConfig returns the current model's configuration.
 
@@ -1886,13 +1151,13 @@ class InstancePollerFacade(Type):
                    version=4,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(MachineAddressesResults)
-    async def ProviderAddresses(self, entities=None):
+    def ProviderAddresses(self, entities=None):
         '''
         ProviderAddresses returns the list of all known provider addresses
         for each given entity. Only machine tags are accepted.
@@ -1910,13 +1175,13 @@ class InstancePollerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetInstanceStatus(self, entities=None):
+    def SetInstanceStatus(self, entities=None):
         '''
         SetInstanceStatus updates the instance status for each given entity.
         Only machine tags are accepted.
@@ -1934,13 +1199,13 @@ class InstancePollerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetProviderAddresses(self, machine_addresses=None):
+    def SetProviderAddresses(self, machine_addresses=None):
         '''
         SetProviderAddresses updates the list of known provider addresses
         for each given entity. Only machine tags are accepted.
@@ -1958,13 +1223,13 @@ class InstancePollerFacade(Type):
                    version=4,
                    params=_params)
         _params['machine-addresses'] = machine_addresses
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(SetProviderNetworkConfigResults)
-    async def SetProviderNetworkConfig(self, args=None):
+    def SetProviderNetworkConfig(self, args=None):
         '''
         SetProviderNetworkConfig updates the provider addresses for one or more
         machines.
@@ -1987,13 +1252,13 @@ class InstancePollerFacade(Type):
                    version=4,
                    params=_params)
         _params['args'] = args
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StatusResults)
-    async def Status(self, entities=None):
+    def Status(self, entities=None):
         '''
         Status returns the status of each given entity.
 
@@ -2010,13 +1275,13 @@ class InstancePollerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(NotifyWatchResult)
-    async def WatchForModelConfigChanges(self):
+    def WatchForModelConfigChanges(self):
         '''
         WatchForModelConfigChanges returns a NotifyWatcher that observes
         changes to the model configuration.
@@ -2035,13 +1300,13 @@ class InstancePollerFacade(Type):
                    version=4,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsWatchResult)
-    async def WatchModelMachineStartTimes(self):
+    def WatchModelMachineStartTimes(self):
         '''
         WatchModelMachineStartTimes watches the non-container machines in the model
         for changes to the Life or AgentStartTime fields and reports them as a batch.
@@ -2057,13 +1322,13 @@ class InstancePollerFacade(Type):
                    version=4,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsWatchResult)
-    async def WatchModelMachines(self):
+    def WatchModelMachines(self):
         '''
         WatchModelMachines returns a StringsWatcher that notifies of
         changes to the life cycles of the top level machines in the current
@@ -2080,7 +1345,7 @@ class InstancePollerFacade(Type):
                    version=4,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
@@ -2253,7 +1518,7 @@ class ModelGenerationFacade(Type):
     
 
     @ReturnMapping(ErrorResult)
-    async def AbortBranch(self, branch=None):
+    def AbortBranch(self, branch=None):
         '''
         AbortBranch aborts the input branch, marking it complete.  However no
         changes are made applicable to the whole model.  No units may be assigned
@@ -2272,13 +1537,13 @@ class ModelGenerationFacade(Type):
                    version=4,
                    params=_params)
         _params['branch'] = branch
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResult)
-    async def AddBranch(self, branch=None):
+    def AddBranch(self, branch=None):
         '''
         AddBranch adds a new branch with the input name to the model.
 
@@ -2295,13 +1560,13 @@ class ModelGenerationFacade(Type):
                    version=4,
                    params=_params)
         _params['branch'] = branch
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(BranchResults)
-    async def BranchInfo(self, branches=None, detailed=None):
+    def BranchInfo(self, branches=None, detailed=None):
         '''
         BranchInfo will return details of branch identified by the input argument,
         including units on the branch and the configuration disjoint with the
@@ -2326,13 +1591,13 @@ class ModelGenerationFacade(Type):
                    params=_params)
         _params['branches'] = branches
         _params['detailed'] = detailed
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(IntResult)
-    async def CommitBranch(self, branch=None):
+    def CommitBranch(self, branch=None):
         '''
         CommitBranch commits the input branch, making its changes applicable to
         the whole model and marking it complete.
@@ -2350,13 +1615,13 @@ class ModelGenerationFacade(Type):
                    version=4,
                    params=_params)
         _params['branch'] = branch
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(BoolResult)
-    async def HasActiveBranch(self, branch=None):
+    def HasActiveBranch(self, branch=None):
         '''
         HasActiveBranch returns a true result if the input model has an "in-flight"
         branch matching the input name.
@@ -2374,13 +1639,13 @@ class ModelGenerationFacade(Type):
                    version=4,
                    params=_params)
         _params['branch'] = branch
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(BranchResults)
-    async def ListCommits(self):
+    def ListCommits(self):
         '''
         ListCommits will return the commits, hence only branches with generation_id higher than 0
 
@@ -2395,13 +1660,13 @@ class ModelGenerationFacade(Type):
                    version=4,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(GenerationResult)
-    async def ShowCommit(self, generation_id=None):
+    def ShowCommit(self, generation_id=None):
         '''
         ShowCommit will return details a commit given by its generationId
         An error is returned if either no branch can be found corresponding to the generation id.
@@ -2420,13 +1685,13 @@ class ModelGenerationFacade(Type):
                    version=4,
                    params=_params)
         _params['generation-id'] = generation_id
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def TrackBranch(self, branch=None, entities=None, num_units=None):
+    def TrackBranch(self, branch=None, entities=None, num_units=None):
         '''
         TrackBranch marks the input units and/or applications as tracking the input
         branch, causing them to realise changes made under that branch.
@@ -2454,7 +1719,7 @@ class ModelGenerationFacade(Type):
         _params['branch'] = branch
         _params['entities'] = entities
         _params['num-units'] = num_units
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
@@ -2603,7 +1868,7 @@ class SSHClientFacade(Type):
     
 
     @ReturnMapping(SSHAddressesResults)
-    async def AllAddresses(self, entities=None):
+    def AllAddresses(self, entities=None):
         '''
         AllAddresses reports all addresses that might have SSH listening for each
         entity in args. The result is sorted with public addresses first.
@@ -2622,13 +1887,13 @@ class SSHClientFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringResult)
-    async def Leader(self, tag=None):
+    def Leader(self, tag=None):
         '''
         Leader returns the unit name of the leader for the given application.
         TODO(juju3) - remove
@@ -2646,13 +1911,13 @@ class SSHClientFacade(Type):
                    version=4,
                    params=_params)
         _params['tag'] = tag
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(CloudSpecResult)
-    async def ModelCredentialForSSH(self):
+    def ModelCredentialForSSH(self):
         '''
         ModelCredentialForSSH returns a cloud spec for ssh purpose.
         This facade call is only used for k8s model.
@@ -2668,13 +1933,13 @@ class SSHClientFacade(Type):
                    version=4,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(SSHAddressResults)
-    async def PrivateAddress(self, entities=None):
+    def PrivateAddress(self, entities=None):
         '''
         PrivateAddress reports the preferred private network address for one or
         more entities. Machines and units are supported.
@@ -2692,13 +1957,13 @@ class SSHClientFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(SSHProxyResult)
-    async def Proxy(self):
+    def Proxy(self):
         '''
         Proxy returns whether SSH connections should be proxied through the
         controller hosts for the model associated with the API connection.
@@ -2714,13 +1979,13 @@ class SSHClientFacade(Type):
                    version=4,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(SSHAddressResults)
-    async def PublicAddress(self, entities=None):
+    def PublicAddress(self, entities=None):
         '''
         PublicAddress reports the preferred public network address for one
         or more entities. Machines and units are supported.
@@ -2738,13 +2003,13 @@ class SSHClientFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(SSHPublicKeysResults)
-    async def PublicKeys(self, entities=None):
+    def PublicKeys(self, entities=None):
         '''
         PublicKeys returns the public SSH hosts for one or more
         entities. Machines and units are supported.
@@ -2762,7 +2027,7 @@ class SSHClientFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
@@ -3443,7 +2708,7 @@ class StorageProvisionerFacade(Type):
     
 
     @ReturnMapping(LifeResults)
-    async def AttachmentLife(self, ids=None):
+    def AttachmentLife(self, ids=None):
         '''
         AttachmentLife returns the lifecycle state of each specified machine
         storage attachment.
@@ -3461,13 +2726,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['ids'] = ids
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def CreateVolumeAttachmentPlans(self, volume_plans=None):
+    def CreateVolumeAttachmentPlans(self, volume_plans=None):
         '''
         volume_plans : typing.Sequence[~VolumeAttachmentPlan]
         Returns -> ErrorResults
@@ -3482,13 +2747,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['volume-plans'] = volume_plans
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def EnsureDead(self, entities=None):
+    def EnsureDead(self, entities=None):
         '''
         EnsureDead calls EnsureDead on each given entity from state. It
         will fail if the entity is not present. If it's Alive, nothing will
@@ -3507,13 +2772,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(FilesystemAttachmentParamsResults)
-    async def FilesystemAttachmentParams(self, ids=None):
+    def FilesystemAttachmentParams(self, ids=None):
         '''
         FilesystemAttachmentParams returns the parameters for creating the filesystem
         attachments with the specified IDs.
@@ -3531,13 +2796,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['ids'] = ids
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(FilesystemAttachmentResults)
-    async def FilesystemAttachments(self, ids=None):
+    def FilesystemAttachments(self, ids=None):
         '''
         FilesystemAttachments returns details of filesystem attachments with the specified IDs.
 
@@ -3554,13 +2819,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['ids'] = ids
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(FilesystemParamsResults)
-    async def FilesystemParams(self, entities=None):
+    def FilesystemParams(self, entities=None):
         '''
         FilesystemParams returns the parameters for creating the filesystems
         with the specified tags.
@@ -3578,13 +2843,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(FilesystemResults)
-    async def Filesystems(self, entities=None):
+    def Filesystems(self, entities=None):
         '''
         Filesystems returns details of filesystems with the specified tags.
 
@@ -3601,13 +2866,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringResults)
-    async def InstanceId(self, entities=None):
+    def InstanceId(self, entities=None):
         '''
         InstanceId returns the provider specific instance id for each given
         machine or an CodeNotProvisioned error, if not set.
@@ -3625,13 +2890,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(LifeResults)
-    async def Life(self, entities=None):
+    def Life(self, entities=None):
         '''
         Life returns the life status of every supplied entity, where available.
 
@@ -3648,13 +2913,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def Remove(self, entities=None):
+    def Remove(self, entities=None):
         '''
         Remove removes volumes and filesystems from state.
 
@@ -3671,13 +2936,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def RemoveAttachment(self, ids=None):
+    def RemoveAttachment(self, ids=None):
         '''
         RemoveAttachment removes the specified machine storage attachments
         from state.
@@ -3695,13 +2960,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['ids'] = ids
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(RemoveFilesystemParamsResults)
-    async def RemoveFilesystemParams(self, entities=None):
+    def RemoveFilesystemParams(self, entities=None):
         '''
         RemoveFilesystemParams returns the parameters for destroying or
         releasing the filesystems with the specified tags.
@@ -3719,13 +2984,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def RemoveVolumeAttachmentPlan(self, ids=None):
+    def RemoveVolumeAttachmentPlan(self, ids=None):
         '''
         ids : typing.Sequence[~MachineStorageId]
         Returns -> ErrorResults
@@ -3740,13 +3005,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['ids'] = ids
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(RemoveVolumeParamsResults)
-    async def RemoveVolumeParams(self, entities=None):
+    def RemoveVolumeParams(self, entities=None):
         '''
         RemoveVolumeParams returns the parameters for destroying
         or releasing the volumes with the specified tags.
@@ -3764,13 +3029,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetFilesystemAttachmentInfo(self, filesystem_attachments=None):
+    def SetFilesystemAttachmentInfo(self, filesystem_attachments=None):
         '''
         SetFilesystemAttachmentInfo records the details of newly provisioned filesystem
         attachments.
@@ -3788,13 +3053,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['filesystem-attachments'] = filesystem_attachments
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetFilesystemInfo(self, filesystems=None):
+    def SetFilesystemInfo(self, filesystems=None):
         '''
         SetFilesystemInfo records the details of newly provisioned filesystems.
 
@@ -3811,13 +3076,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['filesystems'] = filesystems
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetStatus(self, entities=None):
+    def SetStatus(self, entities=None):
         '''
         SetStatus sets the status of each given entity.
 
@@ -3834,13 +3099,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetVolumeAttachmentInfo(self, volume_attachments=None):
+    def SetVolumeAttachmentInfo(self, volume_attachments=None):
         '''
         SetVolumeAttachmentInfo records the details of newly provisioned volume
         attachments.
@@ -3858,13 +3123,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['volume-attachments'] = volume_attachments
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetVolumeAttachmentPlanBlockInfo(self, volume_plans=None):
+    def SetVolumeAttachmentPlanBlockInfo(self, volume_plans=None):
         '''
         volume_plans : typing.Sequence[~VolumeAttachmentPlan]
         Returns -> ErrorResults
@@ -3879,13 +3144,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['volume-plans'] = volume_plans
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetVolumeInfo(self, volumes=None):
+    def SetVolumeInfo(self, volumes=None):
         '''
         SetVolumeInfo records the details of newly provisioned volumes.
 
@@ -3902,13 +3167,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['volumes'] = volumes
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(VolumeAttachmentParamsResults)
-    async def VolumeAttachmentParams(self, ids=None):
+    def VolumeAttachmentParams(self, ids=None):
         '''
         VolumeAttachmentParams returns the parameters for creating the volume
         attachments with the specified IDs.
@@ -3926,13 +3191,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['ids'] = ids
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(VolumeAttachmentPlanResults)
-    async def VolumeAttachmentPlans(self, ids=None):
+    def VolumeAttachmentPlans(self, ids=None):
         '''
         VolumeAttachmentPlans returns details of volume attachment plans with the specified IDs.
 
@@ -3949,13 +3214,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['ids'] = ids
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(VolumeAttachmentResults)
-    async def VolumeAttachments(self, ids=None):
+    def VolumeAttachments(self, ids=None):
         '''
         VolumeAttachments returns details of volume attachments with the specified IDs.
 
@@ -3972,13 +3237,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['ids'] = ids
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(BlockDeviceResults)
-    async def VolumeBlockDevices(self, ids=None):
+    def VolumeBlockDevices(self, ids=None):
         '''
         VolumeBlockDevices returns details of the block devices corresponding to the
         volume attachments with the specified IDs.
@@ -3996,13 +3261,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['ids'] = ids
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(VolumeParamsResults)
-    async def VolumeParams(self, entities=None):
+    def VolumeParams(self, entities=None):
         '''
         VolumeParams returns the parameters for creating or destroying
         the volumes with the specified tags.
@@ -4020,13 +3285,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(VolumeResults)
-    async def Volumes(self, entities=None):
+    def Volumes(self, entities=None):
         '''
         Volumes returns details of volumes with the specified tags.
 
@@ -4043,13 +3308,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsWatchResult)
-    async def WatchApplications(self):
+    def WatchApplications(self):
         '''
         WatchApplications starts a StringsWatcher to watch CAAS applications
         deployed to this model.
@@ -4065,13 +3330,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(NotifyWatchResults)
-    async def WatchBlockDevices(self, entities=None):
+    def WatchBlockDevices(self, entities=None):
         '''
         WatchBlockDevices watches for changes to the specified machines' block devices.
 
@@ -4088,13 +3353,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(MachineStorageIdsWatchResults)
-    async def WatchFilesystemAttachments(self, entities=None):
+    def WatchFilesystemAttachments(self, entities=None):
         '''
         WatchFilesystemAttachments watches for changes to filesystem attachments
         scoped to the entity with the tag passed to NewState.
@@ -4112,13 +3377,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsWatchResults)
-    async def WatchFilesystems(self, entities=None):
+    def WatchFilesystems(self, entities=None):
         '''
         WatchFilesystems watches for changes to filesystems scoped
         to the entity with the tag passed to NewState.
@@ -4136,13 +3401,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(NotifyWatchResults)
-    async def WatchMachines(self, entities=None):
+    def WatchMachines(self, entities=None):
         '''
         WatchMachines watches for changes to the specified machines.
 
@@ -4159,13 +3424,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(MachineStorageIdsWatchResults)
-    async def WatchVolumeAttachmentPlans(self, entities=None):
+    def WatchVolumeAttachmentPlans(self, entities=None):
         '''
         WatchVolumeAttachmentPlans watches for changes to volume attachments for a machine for the purpose of allowing
         that machine to run any initialization needed, for that volume to actually appear as a block device (ie: iSCSI)
@@ -4183,13 +3448,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(MachineStorageIdsWatchResults)
-    async def WatchVolumeAttachments(self, entities=None):
+    def WatchVolumeAttachments(self, entities=None):
         '''
         WatchVolumeAttachments watches for changes to volume attachments scoped to
         the entity with the tag passed to NewState.
@@ -4207,13 +3472,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsWatchResults)
-    async def WatchVolumes(self, entities=None):
+    def WatchVolumes(self, entities=None):
         '''
         WatchVolumes watches for changes to volumes scoped to the
         entity with the tag passed to NewState.
@@ -4231,240 +3496,7 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-class SubnetsFacade(Type):
-    name = 'Subnets'
-    version = 4
-    schema =     {'definitions': {'AddSubnetParams': {'additionalProperties': False,
-                                         'properties': {'cidr': {'type': 'string'},
-                                                        'provider-network-id': {'type': 'string'},
-                                                        'space-tag': {'type': 'string'},
-                                                        'subnet-provider-id': {'type': 'string'},
-                                                        'vlan-tag': {'type': 'integer'},
-                                                        'zones': {'items': {'type': 'string'},
-                                                                  'type': 'array'}},
-                                         'required': ['space-tag'],
-                                         'type': 'object'},
-                     'AddSubnetsParams': {'additionalProperties': False,
-                                          'properties': {'subnets': {'items': {'$ref': '#/definitions/AddSubnetParams'},
-                                                                     'type': 'array'}},
-                                          'required': ['subnets'],
-                                          'type': 'object'},
-                     'CIDRParams': {'additionalProperties': False,
-                                    'properties': {'cidrs': {'items': {'type': 'string'},
-                                                             'type': 'array'}},
-                                    'required': ['cidrs'],
-                                    'type': 'object'},
-                     'Error': {'additionalProperties': False,
-                               'properties': {'code': {'type': 'string'},
-                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
-                                                                                    'type': 'object'}},
-                                                       'type': 'object'},
-                                              'message': {'type': 'string'}},
-                               'required': ['message', 'code'],
-                               'type': 'object'},
-                     'ErrorResult': {'additionalProperties': False,
-                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
-                                     'type': 'object'},
-                     'ErrorResults': {'additionalProperties': False,
-                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
-                                                                 'type': 'array'}},
-                                      'required': ['results'],
-                                      'type': 'object'},
-                     'ListSubnetsResults': {'additionalProperties': False,
-                                            'properties': {'results': {'items': {'$ref': '#/definitions/Subnet'},
-                                                                       'type': 'array'}},
-                                            'required': ['results'],
-                                            'type': 'object'},
-                     'Subnet': {'additionalProperties': False,
-                                'properties': {'cidr': {'type': 'string'},
-                                               'life': {'type': 'string'},
-                                               'provider-id': {'type': 'string'},
-                                               'provider-network-id': {'type': 'string'},
-                                               'provider-space-id': {'type': 'string'},
-                                               'space-tag': {'type': 'string'},
-                                               'status': {'type': 'string'},
-                                               'vlan-tag': {'type': 'integer'},
-                                               'zones': {'items': {'type': 'string'},
-                                                         'type': 'array'}},
-                                'required': ['cidr',
-                                             'vlan-tag',
-                                             'life',
-                                             'space-tag',
-                                             'zones'],
-                                'type': 'object'},
-                     'SubnetV2': {'additionalProperties': False,
-                                  'properties': {'Subnet': {'$ref': '#/definitions/Subnet'},
-                                                 'cidr': {'type': 'string'},
-                                                 'id': {'type': 'string'},
-                                                 'life': {'type': 'string'},
-                                                 'provider-id': {'type': 'string'},
-                                                 'provider-network-id': {'type': 'string'},
-                                                 'provider-space-id': {'type': 'string'},
-                                                 'space-tag': {'type': 'string'},
-                                                 'status': {'type': 'string'},
-                                                 'vlan-tag': {'type': 'integer'},
-                                                 'zones': {'items': {'type': 'string'},
-                                                           'type': 'array'}},
-                                  'required': ['cidr',
-                                               'vlan-tag',
-                                               'life',
-                                               'space-tag',
-                                               'zones',
-                                               'Subnet'],
-                                  'type': 'object'},
-                     'SubnetsFilters': {'additionalProperties': False,
-                                        'properties': {'space-tag': {'type': 'string'},
-                                                       'zone': {'type': 'string'}},
-                                        'type': 'object'},
-                     'SubnetsResult': {'additionalProperties': False,
-                                       'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                      'subnets': {'items': {'$ref': '#/definitions/SubnetV2'},
-                                                                  'type': 'array'}},
-                                       'type': 'object'},
-                     'SubnetsResults': {'additionalProperties': False,
-                                        'properties': {'results': {'items': {'$ref': '#/definitions/SubnetsResult'},
-                                                                   'type': 'array'}},
-                                        'required': ['results'],
-                                        'type': 'object'},
-                     'ZoneResult': {'additionalProperties': False,
-                                    'properties': {'available': {'type': 'boolean'},
-                                                   'error': {'$ref': '#/definitions/Error'},
-                                                   'name': {'type': 'string'}},
-                                    'required': ['name', 'available'],
-                                    'type': 'object'},
-                     'ZoneResults': {'additionalProperties': False,
-                                     'properties': {'results': {'items': {'$ref': '#/definitions/ZoneResult'},
-                                                                'type': 'array'}},
-                                     'required': ['results'],
-                                     'type': 'object'}},
-     'properties': {'AddSubnets': {'description': 'AddSubnets adds existing '
-                                                  'subnets to Juju.',
-                                   'properties': {'Params': {'$ref': '#/definitions/AddSubnetsParams'},
-                                                  'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                   'type': 'object'},
-                    'AllZones': {'description': 'AllZones returns all availability '
-                                                'zones known to Juju. If a\n'
-                                                'zone is unusable, unavailable, or '
-                                                'deprecated the Available\n'
-                                                'field will be false.',
-                                 'properties': {'Result': {'$ref': '#/definitions/ZoneResults'}},
-                                 'type': 'object'},
-                    'ListSubnets': {'description': 'ListSubnets returns the '
-                                                   'matching subnets after '
-                                                   'applying\n'
-                                                   'optional filters.',
-                                    'properties': {'Params': {'$ref': '#/definitions/SubnetsFilters'},
-                                                   'Result': {'$ref': '#/definitions/ListSubnetsResults'}},
-                                    'type': 'object'},
-                    'SubnetsByCIDR': {'description': 'SubnetsByCIDR returns the '
-                                                     'collection of subnets '
-                                                     'matching each CIDR in the '
-                                                     'input.',
-                                      'properties': {'Params': {'$ref': '#/definitions/CIDRParams'},
-                                                     'Result': {'$ref': '#/definitions/SubnetsResults'}},
-                                      'type': 'object'}},
-     'type': 'object'}
-    
-
-    @ReturnMapping(ErrorResults)
-    async def AddSubnets(self, subnets=None):
-        '''
-        AddSubnets adds existing subnets to Juju.
-
-        subnets : typing.Sequence[~AddSubnetParams]
-        Returns -> ErrorResults
-        '''
-        if subnets is not None and not isinstance(subnets, (bytes, str, list)):
-            raise Exception("Expected subnets to be a Sequence, received: {}".format(type(subnets)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Subnets',
-                   request='AddSubnets',
-                   version=4,
-                   params=_params)
-        _params['subnets'] = subnets
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ZoneResults)
-    async def AllZones(self):
-        '''
-        AllZones returns all availability zones known to Juju. If a
-        zone is unusable, unavailable, or deprecated the Available
-        field will be false.
-
-
-        Returns -> ZoneResults
-        '''
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Subnets',
-                   request='AllZones',
-                   version=4,
-                   params=_params)
-
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ListSubnetsResults)
-    async def ListSubnets(self, space_tag=None, zone=None):
-        '''
-        ListSubnets returns the matching subnets after applying
-        optional filters.
-
-        space_tag : str
-        zone : str
-        Returns -> ListSubnetsResults
-        '''
-        if space_tag is not None and not isinstance(space_tag, (bytes, str)):
-            raise Exception("Expected space_tag to be a str, received: {}".format(type(space_tag)))
-
-        if zone is not None and not isinstance(zone, (bytes, str)):
-            raise Exception("Expected zone to be a str, received: {}".format(type(zone)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Subnets',
-                   request='ListSubnets',
-                   version=4,
-                   params=_params)
-        _params['space-tag'] = space_tag
-        _params['zone'] = zone
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(SubnetsResults)
-    async def SubnetsByCIDR(self, cidrs=None):
-        '''
-        SubnetsByCIDR returns the collection of subnets matching each CIDR in the input.
-
-        cidrs : typing.Sequence[str]
-        Returns -> SubnetsResults
-        '''
-        if cidrs is not None and not isinstance(cidrs, (bytes, str, list)):
-            raise Exception("Expected cidrs to be a Sequence, received: {}".format(type(cidrs)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Subnets',
-                   request='SubnetsByCIDR',
-                   version=4,
-                   params=_params)
-        _params['cidrs'] = cidrs
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 

@@ -30,7 +30,7 @@ class AllModelWatcherFacade(Type):
     
 
     @ReturnMapping(AllWatcherNextResults)
-    async def Next(self):
+    def Next(self):
         '''
         Next will return the current state of everything on the first call
         and subsequent calls will
@@ -46,13 +46,13 @@ class AllModelWatcherFacade(Type):
                    version=4,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(None)
-    async def Stop(self):
+    def Stop(self):
         '''
         Stop stops the watcher.
 
@@ -67,12 +67,12 @@ class AllModelWatcherFacade(Type):
                    version=4,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
-    async def rpc(self, msg):
+    def rpc(self, msg):
         '''
         Patch rpc method to add Id.
         '''
@@ -81,7 +81,7 @@ class AllModelWatcherFacade(Type):
         msg['Id'] = id
 
         from .facade import TypeEncoder
-        reply = await self.connection.rpc(msg, encoder=TypeEncoder)
+        reply = self.connection.rpc(msg, encoder=TypeEncoder)
         return reply
 
 
@@ -457,7 +457,7 @@ class ApplicationOffersFacade(Type):
     
 
     @ReturnMapping(ApplicationOffersResults)
-    async def ApplicationOffers(self, bakery_version=None, offer_urls=None):
+    def ApplicationOffers(self, bakery_version=None, offer_urls=None):
         '''
         ApplicationOffers gets details about remote applications that match given URLs.
 
@@ -479,13 +479,13 @@ class ApplicationOffersFacade(Type):
                    params=_params)
         _params['bakery-version'] = bakery_version
         _params['offer-urls'] = offer_urls
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def DestroyOffers(self, force=None, offer_urls=None):
+    def DestroyOffers(self, force=None, offer_urls=None):
         '''
         DestroyOffers removes the offers specified by the given URLs, forcing if necessary.
 
@@ -507,13 +507,13 @@ class ApplicationOffersFacade(Type):
                    params=_params)
         _params['force'] = force
         _params['offer-urls'] = offer_urls
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(QueryApplicationOffersResults)
-    async def FindApplicationOffers(self, filters=None):
+    def FindApplicationOffers(self, filters=None):
         '''
         FindApplicationOffers gets details about remote applications that match given filter.
 
@@ -530,13 +530,13 @@ class ApplicationOffersFacade(Type):
                    version=4,
                    params=_params)
         _params['Filters'] = filters
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ConsumeOfferDetailsResults)
-    async def GetConsumeDetails(self, offer_urls=None, user_tag=None):
+    def GetConsumeDetails(self, offer_urls=None, user_tag=None):
         '''
         GetConsumeDetails returns the details necessary to pass to another model
         to allow the specified args user to consume the offers represented by the args URLs.
@@ -559,13 +559,13 @@ class ApplicationOffersFacade(Type):
                    params=_params)
         _params['offer-urls'] = offer_urls
         _params['user-tag'] = user_tag
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(QueryApplicationOffersResults)
-    async def ListApplicationOffers(self, filters=None):
+    def ListApplicationOffers(self, filters=None):
         '''
         ListApplicationOffers gets deployed details about application offers that match given filter.
         The results contain details about the deployed applications such as connection count.
@@ -583,13 +583,13 @@ class ApplicationOffersFacade(Type):
                    version=4,
                    params=_params)
         _params['Filters'] = filters
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def ModifyOfferAccess(self, changes=None):
+    def ModifyOfferAccess(self, changes=None):
         '''
         ModifyOfferAccess changes the application offer access granted to users.
 
@@ -606,13 +606,13 @@ class ApplicationOffersFacade(Type):
                    version=4,
                    params=_params)
         _params['changes'] = changes
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def Offer(self, offers=None):
+    def Offer(self, offers=None):
         '''
         Offer makes application endpoints available for consumption at a specified URL.
 
@@ -629,13 +629,13 @@ class ApplicationOffersFacade(Type):
                    version=4,
                    params=_params)
         _params['Offers'] = offers
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(RemoteApplicationInfoResults)
-    async def RemoteApplicationInfo(self, bakery_version=None, offer_urls=None):
+    def RemoteApplicationInfo(self, bakery_version=None, offer_urls=None):
         '''
         RemoteApplicationInfo returns information about the requested remote application.
         This call currently has no client side API, only there for the Dashboard at this stage.
@@ -658,7 +658,7 @@ class ApplicationOffersFacade(Type):
                    params=_params)
         _params['bakery-version'] = bakery_version
         _params['offer-urls'] = offer_urls
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
@@ -675,7 +675,8 @@ class CharmsFacade(Type):
                                           'required': ['url',
                                                        'charm-origin',
                                                        'macaroon',
-                                                       'force'],
+                                                       'force',
+                                                       'series'],
                                           'type': 'object'},
                      'AddCharmWithOrigin': {'additionalProperties': False,
                                             'properties': {'charm-origin': {'$ref': '#/definitions/CharmOrigin'},
@@ -684,7 +685,8 @@ class CharmsFacade(Type):
                                                            'url': {'type': 'string'}},
                                             'required': ['url',
                                                          'charm-origin',
-                                                         'force'],
+                                                         'force',
+                                                         'series'],
                                             'type': 'object'},
                      'ApplicationCharmPlacement': {'additionalProperties': False,
                                                    'properties': {'application': {'type': 'string'},
@@ -697,11 +699,6 @@ class CharmsFacade(Type):
                                                                                   'type': 'array'}},
                                                     'required': ['placements'],
                                                     'type': 'object'},
-                     'Base': {'additionalProperties': False,
-                              'properties': {'channel': {'type': 'string'},
-                                             'name': {'type': 'string'}},
-                              'required': ['name', 'channel'],
-                              'type': 'object'},
                      'Charm': {'additionalProperties': False,
                                'properties': {'actions': {'$ref': '#/definitions/CharmActions'},
                                               'config': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmOption'}},
@@ -836,9 +833,7 @@ class CharmsFacade(Type):
                                      'type': 'object'},
                      'CharmOrigin': {'additionalProperties': False,
                                      'properties': {'architecture': {'type': 'string'},
-                                                    'base': {'$ref': '#/definitions/Base'},
                                                     'branch': {'type': 'string'},
-                                                    'channel': {'type': 'string'},
                                                     'hash': {'type': 'string'},
                                                     'id': {'type': 'string'},
                                                     'instance-key': {'type': 'string'},
@@ -1140,7 +1135,7 @@ class CharmsFacade(Type):
     
 
     @ReturnMapping(CharmOriginResult)
-    async def AddCharm(self, charm_origin=None, force=None, series=None, url=None):
+    def AddCharm(self, charm_origin=None, force=None, series=None, url=None):
         '''
         AddCharm adds the given charm URL (which must include revision) to the
         environment, if it does not exist yet. Local charms are not supported,
@@ -1174,13 +1169,13 @@ class CharmsFacade(Type):
         _params['force'] = force
         _params['series'] = series
         _params['url'] = url
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(CharmOriginResult)
-    async def AddCharmWithAuthorization(self, charm_origin=None, force=None, macaroon=None, series=None, url=None):
+    def AddCharmWithAuthorization(self, charm_origin=None, force=None, macaroon=None, series=None, url=None):
         '''
         AddCharmWithAuthorization adds the given charm URL (which must include
         revision) to the environment, if it does not exist yet. Local charms are
@@ -1222,13 +1217,13 @@ class CharmsFacade(Type):
         _params['macaroon'] = macaroon
         _params['series'] = series
         _params['url'] = url
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(Charm)
-    async def CharmInfo(self, url=None):
+    def CharmInfo(self, url=None):
         '''
         CharmInfo returns information about the requested charm.
 
@@ -1245,13 +1240,13 @@ class CharmsFacade(Type):
                    version=4,
                    params=_params)
         _params['url'] = url
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def CheckCharmPlacement(self, placements=None):
+    def CheckCharmPlacement(self, placements=None):
         '''
         CheckCharmPlacement checks if a charm is allowed to be placed with in a
         given application.
@@ -1269,13 +1264,13 @@ class CharmsFacade(Type):
                    version=4,
                    params=_params)
         _params['placements'] = placements
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(DownloadInfoResults)
-    async def GetDownloadInfos(self, entities=None):
+    def GetDownloadInfos(self, entities=None):
         '''
         GetDownloadInfos attempts to get the bundle corresponding to the charm url
         and origin.
@@ -1293,13 +1288,13 @@ class CharmsFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(IsMeteredResult)
-    async def IsMetered(self, url=None):
+    def IsMetered(self, url=None):
         '''
         IsMetered returns whether or not the charm is metered.
 
@@ -1316,13 +1311,13 @@ class CharmsFacade(Type):
                    version=4,
                    params=_params)
         _params['url'] = url
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(CharmsListResult)
-    async def List(self, names=None):
+    def List(self, names=None):
         '''
         List returns a list of charm URLs currently in the state.
         If supplied parameter contains any names, the result will
@@ -1341,13 +1336,13 @@ class CharmsFacade(Type):
                    version=4,
                    params=_params)
         _params['names'] = names
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(CharmResourcesResults)
-    async def ListCharmResources(self, entities=None):
+    def ListCharmResources(self, entities=None):
         '''
         ListCharmResources returns a series of resources for a given charm.
 
@@ -1364,13 +1359,13 @@ class CharmsFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ResolveCharmWithChannelResults)
-    async def ResolveCharms(self, macaroon=None, resolve=None):
+    def ResolveCharms(self, macaroon=None, resolve=None):
         '''
         ResolveCharms resolves the given charm URLs with an optionally specified
         preferred channel.  Channel provided via CharmOrigin.
@@ -1393,7 +1388,7 @@ class CharmsFacade(Type):
                    params=_params)
         _params['macaroon'] = macaroon
         _params['resolve'] = resolve
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
@@ -1776,7 +1771,7 @@ class InstancePollerFacade(Type):
     
 
     @ReturnMapping(BoolResults)
-    async def AreManuallyProvisioned(self, entities=None):
+    def AreManuallyProvisioned(self, entities=None):
         '''
         AreManuallyProvisioned returns whether each given entity is
         manually provisioned or not. Only machine tags are accepted.
@@ -1794,13 +1789,13 @@ class InstancePollerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringResults)
-    async def InstanceId(self, entities=None):
+    def InstanceId(self, entities=None):
         '''
         InstanceId returns the provider specific instance id for each given
         machine or an CodeNotProvisioned error, if not set.
@@ -1818,13 +1813,13 @@ class InstancePollerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StatusResults)
-    async def InstanceStatus(self, entities=None):
+    def InstanceStatus(self, entities=None):
         '''
         InstanceStatus returns the instance status for each given entity.
         Only machine tags are accepted.
@@ -1842,13 +1837,13 @@ class InstancePollerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(LifeResults)
-    async def Life(self, entities=None):
+    def Life(self, entities=None):
         '''
         Life returns the life status of every supplied entity, where available.
 
@@ -1865,13 +1860,13 @@ class InstancePollerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ModelConfigResult)
-    async def ModelConfig(self):
+    def ModelConfig(self):
         '''
         ModelConfig returns the current model's configuration.
 
@@ -1886,13 +1881,13 @@ class InstancePollerFacade(Type):
                    version=4,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(MachineAddressesResults)
-    async def ProviderAddresses(self, entities=None):
+    def ProviderAddresses(self, entities=None):
         '''
         ProviderAddresses returns the list of all known provider addresses
         for each given entity. Only machine tags are accepted.
@@ -1910,13 +1905,13 @@ class InstancePollerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetInstanceStatus(self, entities=None):
+    def SetInstanceStatus(self, entities=None):
         '''
         SetInstanceStatus updates the instance status for each given entity.
         Only machine tags are accepted.
@@ -1934,13 +1929,13 @@ class InstancePollerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetProviderAddresses(self, machine_addresses=None):
+    def SetProviderAddresses(self, machine_addresses=None):
         '''
         SetProviderAddresses updates the list of known provider addresses
         for each given entity. Only machine tags are accepted.
@@ -1958,13 +1953,13 @@ class InstancePollerFacade(Type):
                    version=4,
                    params=_params)
         _params['machine-addresses'] = machine_addresses
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(SetProviderNetworkConfigResults)
-    async def SetProviderNetworkConfig(self, args=None):
+    def SetProviderNetworkConfig(self, args=None):
         '''
         SetProviderNetworkConfig updates the provider addresses for one or more
         machines.
@@ -1987,13 +1982,13 @@ class InstancePollerFacade(Type):
                    version=4,
                    params=_params)
         _params['args'] = args
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StatusResults)
-    async def Status(self, entities=None):
+    def Status(self, entities=None):
         '''
         Status returns the status of each given entity.
 
@@ -2010,13 +2005,13 @@ class InstancePollerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(NotifyWatchResult)
-    async def WatchForModelConfigChanges(self):
+    def WatchForModelConfigChanges(self):
         '''
         WatchForModelConfigChanges returns a NotifyWatcher that observes
         changes to the model configuration.
@@ -2035,13 +2030,13 @@ class InstancePollerFacade(Type):
                    version=4,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsWatchResult)
-    async def WatchModelMachineStartTimes(self):
+    def WatchModelMachineStartTimes(self):
         '''
         WatchModelMachineStartTimes watches the non-container machines in the model
         for changes to the Life or AgentStartTime fields and reports them as a batch.
@@ -2057,13 +2052,13 @@ class InstancePollerFacade(Type):
                    version=4,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsWatchResult)
-    async def WatchModelMachines(self):
+    def WatchModelMachines(self):
         '''
         WatchModelMachines returns a StringsWatcher that notifies of
         changes to the life cycles of the top level machines in the current
@@ -2080,7 +2075,7 @@ class InstancePollerFacade(Type):
                    version=4,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
@@ -2253,7 +2248,7 @@ class ModelGenerationFacade(Type):
     
 
     @ReturnMapping(ErrorResult)
-    async def AbortBranch(self, branch=None):
+    def AbortBranch(self, branch=None):
         '''
         AbortBranch aborts the input branch, marking it complete.  However no
         changes are made applicable to the whole model.  No units may be assigned
@@ -2272,13 +2267,13 @@ class ModelGenerationFacade(Type):
                    version=4,
                    params=_params)
         _params['branch'] = branch
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResult)
-    async def AddBranch(self, branch=None):
+    def AddBranch(self, branch=None):
         '''
         AddBranch adds a new branch with the input name to the model.
 
@@ -2295,13 +2290,13 @@ class ModelGenerationFacade(Type):
                    version=4,
                    params=_params)
         _params['branch'] = branch
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(BranchResults)
-    async def BranchInfo(self, branches=None, detailed=None):
+    def BranchInfo(self, branches=None, detailed=None):
         '''
         BranchInfo will return details of branch identified by the input argument,
         including units on the branch and the configuration disjoint with the
@@ -2326,13 +2321,13 @@ class ModelGenerationFacade(Type):
                    params=_params)
         _params['branches'] = branches
         _params['detailed'] = detailed
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(IntResult)
-    async def CommitBranch(self, branch=None):
+    def CommitBranch(self, branch=None):
         '''
         CommitBranch commits the input branch, making its changes applicable to
         the whole model and marking it complete.
@@ -2350,13 +2345,13 @@ class ModelGenerationFacade(Type):
                    version=4,
                    params=_params)
         _params['branch'] = branch
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(BoolResult)
-    async def HasActiveBranch(self, branch=None):
+    def HasActiveBranch(self, branch=None):
         '''
         HasActiveBranch returns a true result if the input model has an "in-flight"
         branch matching the input name.
@@ -2374,13 +2369,13 @@ class ModelGenerationFacade(Type):
                    version=4,
                    params=_params)
         _params['branch'] = branch
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(BranchResults)
-    async def ListCommits(self):
+    def ListCommits(self):
         '''
         ListCommits will return the commits, hence only branches with generation_id higher than 0
 
@@ -2395,13 +2390,13 @@ class ModelGenerationFacade(Type):
                    version=4,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(GenerationResult)
-    async def ShowCommit(self, generation_id=None):
+    def ShowCommit(self, generation_id=None):
         '''
         ShowCommit will return details a commit given by its generationId
         An error is returned if either no branch can be found corresponding to the generation id.
@@ -2420,13 +2415,13 @@ class ModelGenerationFacade(Type):
                    version=4,
                    params=_params)
         _params['generation-id'] = generation_id
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def TrackBranch(self, branch=None, entities=None, num_units=None):
+    def TrackBranch(self, branch=None, entities=None, num_units=None):
         '''
         TrackBranch marks the input units and/or applications as tracking the input
         branch, causing them to realise changes made under that branch.
@@ -2454,7 +2449,7 @@ class ModelGenerationFacade(Type):
         _params['branch'] = branch
         _params['entities'] = entities
         _params['num-units'] = num_units
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
@@ -2592,7 +2587,7 @@ class SSHClientFacade(Type):
     
 
     @ReturnMapping(SSHAddressesResults)
-    async def AllAddresses(self, entities=None):
+    def AllAddresses(self, entities=None):
         '''
         AllAddresses reports all addresses that might have SSH listening for each
         entity in args. The result is sorted with public addresses first.
@@ -2611,13 +2606,13 @@ class SSHClientFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(CloudSpecResult)
-    async def ModelCredentialForSSH(self):
+    def ModelCredentialForSSH(self):
         '''
         ModelCredentialForSSH returns a cloud spec for ssh purpose.
         This facade call is only used for k8s model.
@@ -2633,13 +2628,13 @@ class SSHClientFacade(Type):
                    version=4,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(SSHAddressResults)
-    async def PrivateAddress(self, entities=None):
+    def PrivateAddress(self, entities=None):
         '''
         PrivateAddress reports the preferred private network address for one or
         more entities. Machines and units are supported.
@@ -2657,13 +2652,13 @@ class SSHClientFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(SSHProxyResult)
-    async def Proxy(self):
+    def Proxy(self):
         '''
         Proxy returns whether SSH connections should be proxied through the
         controller hosts for the model associated with the API connection.
@@ -2679,13 +2674,13 @@ class SSHClientFacade(Type):
                    version=4,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(SSHAddressResults)
-    async def PublicAddress(self, entities=None):
+    def PublicAddress(self, entities=None):
         '''
         PublicAddress reports the preferred public network address for one
         or more entities. Machines and units are supported.
@@ -2703,13 +2698,13 @@ class SSHClientFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(SSHPublicKeysResults)
-    async def PublicKeys(self, entities=None):
+    def PublicKeys(self, entities=None):
         '''
         PublicKeys returns the public SSH hosts for one or more
         entities. Machines and units are supported.
@@ -2727,7 +2722,7 @@ class SSHClientFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
@@ -3408,7 +3403,7 @@ class StorageProvisionerFacade(Type):
     
 
     @ReturnMapping(LifeResults)
-    async def AttachmentLife(self, ids=None):
+    def AttachmentLife(self, ids=None):
         '''
         AttachmentLife returns the lifecycle state of each specified machine
         storage attachment.
@@ -3426,13 +3421,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['ids'] = ids
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def CreateVolumeAttachmentPlans(self, volume_plans=None):
+    def CreateVolumeAttachmentPlans(self, volume_plans=None):
         '''
         volume_plans : typing.Sequence[~VolumeAttachmentPlan]
         Returns -> ErrorResults
@@ -3447,13 +3442,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['volume-plans'] = volume_plans
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def EnsureDead(self, entities=None):
+    def EnsureDead(self, entities=None):
         '''
         EnsureDead calls EnsureDead on each given entity from state. It
         will fail if the entity is not present. If it's Alive, nothing will
@@ -3472,13 +3467,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(FilesystemAttachmentParamsResults)
-    async def FilesystemAttachmentParams(self, ids=None):
+    def FilesystemAttachmentParams(self, ids=None):
         '''
         FilesystemAttachmentParams returns the parameters for creating the filesystem
         attachments with the specified IDs.
@@ -3496,13 +3491,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['ids'] = ids
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(FilesystemAttachmentResults)
-    async def FilesystemAttachments(self, ids=None):
+    def FilesystemAttachments(self, ids=None):
         '''
         FilesystemAttachments returns details of filesystem attachments with the specified IDs.
 
@@ -3519,13 +3514,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['ids'] = ids
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(FilesystemParamsResults)
-    async def FilesystemParams(self, entities=None):
+    def FilesystemParams(self, entities=None):
         '''
         FilesystemParams returns the parameters for creating the filesystems
         with the specified tags.
@@ -3543,13 +3538,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(FilesystemResults)
-    async def Filesystems(self, entities=None):
+    def Filesystems(self, entities=None):
         '''
         Filesystems returns details of filesystems with the specified tags.
 
@@ -3566,13 +3561,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringResults)
-    async def InstanceId(self, entities=None):
+    def InstanceId(self, entities=None):
         '''
         InstanceId returns the provider specific instance id for each given
         machine or an CodeNotProvisioned error, if not set.
@@ -3590,13 +3585,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(LifeResults)
-    async def Life(self, entities=None):
+    def Life(self, entities=None):
         '''
         Life returns the life status of every supplied entity, where available.
 
@@ -3613,13 +3608,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def Remove(self, entities=None):
+    def Remove(self, entities=None):
         '''
         Remove removes volumes and filesystems from state.
 
@@ -3636,13 +3631,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def RemoveAttachment(self, ids=None):
+    def RemoveAttachment(self, ids=None):
         '''
         RemoveAttachment removes the specified machine storage attachments
         from state.
@@ -3660,13 +3655,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['ids'] = ids
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(RemoveFilesystemParamsResults)
-    async def RemoveFilesystemParams(self, entities=None):
+    def RemoveFilesystemParams(self, entities=None):
         '''
         RemoveFilesystemParams returns the parameters for destroying or
         releasing the filesystems with the specified tags.
@@ -3684,13 +3679,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def RemoveVolumeAttachmentPlan(self, ids=None):
+    def RemoveVolumeAttachmentPlan(self, ids=None):
         '''
         ids : typing.Sequence[~MachineStorageId]
         Returns -> ErrorResults
@@ -3705,13 +3700,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['ids'] = ids
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(RemoveVolumeParamsResults)
-    async def RemoveVolumeParams(self, entities=None):
+    def RemoveVolumeParams(self, entities=None):
         '''
         RemoveVolumeParams returns the parameters for destroying
         or releasing the volumes with the specified tags.
@@ -3729,13 +3724,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetFilesystemAttachmentInfo(self, filesystem_attachments=None):
+    def SetFilesystemAttachmentInfo(self, filesystem_attachments=None):
         '''
         SetFilesystemAttachmentInfo records the details of newly provisioned filesystem
         attachments.
@@ -3753,13 +3748,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['filesystem-attachments'] = filesystem_attachments
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetFilesystemInfo(self, filesystems=None):
+    def SetFilesystemInfo(self, filesystems=None):
         '''
         SetFilesystemInfo records the details of newly provisioned filesystems.
 
@@ -3776,13 +3771,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['filesystems'] = filesystems
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetStatus(self, entities=None):
+    def SetStatus(self, entities=None):
         '''
         SetStatus sets the status of each given entity.
 
@@ -3799,13 +3794,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetVolumeAttachmentInfo(self, volume_attachments=None):
+    def SetVolumeAttachmentInfo(self, volume_attachments=None):
         '''
         SetVolumeAttachmentInfo records the details of newly provisioned volume
         attachments.
@@ -3823,13 +3818,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['volume-attachments'] = volume_attachments
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetVolumeAttachmentPlanBlockInfo(self, volume_plans=None):
+    def SetVolumeAttachmentPlanBlockInfo(self, volume_plans=None):
         '''
         volume_plans : typing.Sequence[~VolumeAttachmentPlan]
         Returns -> ErrorResults
@@ -3844,13 +3839,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['volume-plans'] = volume_plans
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetVolumeInfo(self, volumes=None):
+    def SetVolumeInfo(self, volumes=None):
         '''
         SetVolumeInfo records the details of newly provisioned volumes.
 
@@ -3867,13 +3862,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['volumes'] = volumes
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(VolumeAttachmentParamsResults)
-    async def VolumeAttachmentParams(self, ids=None):
+    def VolumeAttachmentParams(self, ids=None):
         '''
         VolumeAttachmentParams returns the parameters for creating the volume
         attachments with the specified IDs.
@@ -3891,13 +3886,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['ids'] = ids
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(VolumeAttachmentPlanResults)
-    async def VolumeAttachmentPlans(self, ids=None):
+    def VolumeAttachmentPlans(self, ids=None):
         '''
         VolumeAttachmentPlans returns details of volume attachment plans with the specified IDs.
 
@@ -3914,13 +3909,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['ids'] = ids
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(VolumeAttachmentResults)
-    async def VolumeAttachments(self, ids=None):
+    def VolumeAttachments(self, ids=None):
         '''
         VolumeAttachments returns details of volume attachments with the specified IDs.
 
@@ -3937,13 +3932,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['ids'] = ids
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(BlockDeviceResults)
-    async def VolumeBlockDevices(self, ids=None):
+    def VolumeBlockDevices(self, ids=None):
         '''
         VolumeBlockDevices returns details of the block devices corresponding to the
         volume attachments with the specified IDs.
@@ -3961,13 +3956,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['ids'] = ids
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(VolumeParamsResults)
-    async def VolumeParams(self, entities=None):
+    def VolumeParams(self, entities=None):
         '''
         VolumeParams returns the parameters for creating or destroying
         the volumes with the specified tags.
@@ -3985,13 +3980,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(VolumeResults)
-    async def Volumes(self, entities=None):
+    def Volumes(self, entities=None):
         '''
         Volumes returns details of volumes with the specified tags.
 
@@ -4008,13 +4003,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsWatchResult)
-    async def WatchApplications(self):
+    def WatchApplications(self):
         '''
         WatchApplications starts a StringsWatcher to watch CAAS applications
         deployed to this model.
@@ -4030,13 +4025,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(NotifyWatchResults)
-    async def WatchBlockDevices(self, entities=None):
+    def WatchBlockDevices(self, entities=None):
         '''
         WatchBlockDevices watches for changes to the specified machines' block devices.
 
@@ -4053,13 +4048,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(MachineStorageIdsWatchResults)
-    async def WatchFilesystemAttachments(self, entities=None):
+    def WatchFilesystemAttachments(self, entities=None):
         '''
         WatchFilesystemAttachments watches for changes to filesystem attachments
         scoped to the entity with the tag passed to NewState.
@@ -4077,13 +4072,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsWatchResults)
-    async def WatchFilesystems(self, entities=None):
+    def WatchFilesystems(self, entities=None):
         '''
         WatchFilesystems watches for changes to filesystems scoped
         to the entity with the tag passed to NewState.
@@ -4101,13 +4096,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(NotifyWatchResults)
-    async def WatchMachines(self, entities=None):
+    def WatchMachines(self, entities=None):
         '''
         WatchMachines watches for changes to the specified machines.
 
@@ -4124,13 +4119,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(MachineStorageIdsWatchResults)
-    async def WatchVolumeAttachmentPlans(self, entities=None):
+    def WatchVolumeAttachmentPlans(self, entities=None):
         '''
         WatchVolumeAttachmentPlans watches for changes to volume attachments for a machine for the purpose of allowing
         that machine to run any initialization needed, for that volume to actually appear as a block device (ie: iSCSI)
@@ -4148,13 +4143,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(MachineStorageIdsWatchResults)
-    async def WatchVolumeAttachments(self, entities=None):
+    def WatchVolumeAttachments(self, entities=None):
         '''
         WatchVolumeAttachments watches for changes to volume attachments scoped to
         the entity with the tag passed to NewState.
@@ -4172,13 +4167,13 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsWatchResults)
-    async def WatchVolumes(self, entities=None):
+    def WatchVolumes(self, entities=None):
         '''
         WatchVolumes watches for changes to volumes scoped to the
         entity with the tag passed to NewState.
@@ -4196,7 +4191,7 @@ class StorageProvisionerFacade(Type):
                    version=4,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
@@ -4337,7 +4332,7 @@ class SubnetsFacade(Type):
     
 
     @ReturnMapping(ErrorResults)
-    async def AddSubnets(self, subnets=None):
+    def AddSubnets(self, subnets=None):
         '''
         AddSubnets adds existing subnets to Juju.
 
@@ -4354,13 +4349,13 @@ class SubnetsFacade(Type):
                    version=4,
                    params=_params)
         _params['subnets'] = subnets
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ZoneResults)
-    async def AllZones(self):
+    def AllZones(self):
         '''
         AllZones returns all availability zones known to Juju. If a
         zone is unusable, unavailable, or deprecated the Available
@@ -4377,13 +4372,13 @@ class SubnetsFacade(Type):
                    version=4,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ListSubnetsResults)
-    async def ListSubnets(self, space_tag=None, zone=None):
+    def ListSubnets(self, space_tag=None, zone=None):
         '''
         ListSubnets returns the matching subnets after applying
         optional filters.
@@ -4406,13 +4401,13 @@ class SubnetsFacade(Type):
                    params=_params)
         _params['space-tag'] = space_tag
         _params['zone'] = zone
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(SubnetsResults)
-    async def SubnetsByCIDR(self, cidrs=None):
+    def SubnetsByCIDR(self, cidrs=None):
         '''
         SubnetsByCIDR returns the collection of subnets matching each CIDR in the input.
 
@@ -4429,7 +4424,7 @@ class SubnetsFacade(Type):
                    version=4,
                    params=_params)
         _params['cidrs'] = cidrs
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 

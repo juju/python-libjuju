@@ -653,7 +653,7 @@ class Model:
     async def __aexit__(self, exc_type, exc, tb):
         await self.disconnect()
 
-    async def connect(self, *args, **kwargs):
+    def connect(self, *args, **kwargs):
         """Connect to a juju model.
 
         This supports two calling conventions:
@@ -692,8 +692,8 @@ class Model:
             specified facades.
         """
         is_debug_log_conn = 'debug_log_conn' in kwargs
-        if not is_debug_log_conn:
-            await self.disconnect()
+        # if not is_debug_log_conn:
+        #     await self.disconnect()
         model_name = model_uuid = None
         if 'endpoint' not in kwargs and len(args) < 2:
             # Then we're using the model_name to pick the model
@@ -703,7 +703,7 @@ class Model:
                 model_name = args[0]
             else:
                 model_name = kwargs.pop('model_name', None)
-            _, model_uuid = await self._connector.connect_model(model_name, **kwargs)
+            _, model_uuid = self._connector.connect_model(model_name, **kwargs)
         else:
             # Then we're using the endpoint to pick the model
             if 'model_name' in kwargs:
@@ -739,9 +739,9 @@ class Model:
                     {'bakery_client', 'macaroons'}.intersection(kwargs)):
                 raise ValueError('Authentication parameters are required '
                                  'if model_name not given')
-            await self._connector.connect(**kwargs)
-        if not is_debug_log_conn:
-            await self._after_connect(model_name, model_uuid)
+            self._connector.connect(**kwargs)
+        #if not is_debug_log_conn:
+        #    await self._after_connect(model_name, model_uuid)
 
     async def connect_model(self, model_name, **kwargs):
         """
@@ -790,19 +790,19 @@ class Model:
 
         self.uuid = self.info.uuid
 
-    async def disconnect(self):
+    def disconnect(self):
         """Shut down the watcher task and close websockets.
 
         """
         if not self._watch_stopped.is_set():
             log.debug('Stopping watcher task')
             self._watch_stopping.set()
-            await self._watch_stopped.wait()
+            self._watch_stopped.wait()
             self._watch_stopping.clear()
 
         if self.is_connected():
             log.debug('Closing model connection')
-            await self._connector.disconnect()
+            self._connector.disconnect()
             self._info = None
 
     async def add_local_charm_dir(self, charm_dir, series):
@@ -2170,7 +2170,7 @@ class Model:
         log.info("Backup archive downloaded in : %s" % file_name)
         return file_name
 
-    async def get_config(self):
+    def get_config(self):
         """Return the configuration settings for this model.
 
         :returns: A ``dict`` mapping keys to `ConfigValue` instances,
@@ -2179,7 +2179,7 @@ class Model:
         config_facade = client.ModelConfigFacade.from_connection(
             self.connection()
         )
-        result = await config_facade.ModelGet()
+        result = config_facade.ModelGet()
         config = result.config
         for key, value in config.items():
             config[key] = client.ConfigValue.from_json(value)

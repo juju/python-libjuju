@@ -363,7 +363,7 @@ class MachineManagerFacade(Type):
     
 
     @ReturnMapping(AddMachinesResults)
-    async def AddMachines(self, params=None):
+    def AddMachines(self, params=None):
         '''
         AddMachines adds new machines with the supplied parameters.
         The args will contain Base info.
@@ -381,13 +381,13 @@ class MachineManagerFacade(Type):
                    version=9,
                    params=_params)
         _params['params'] = params
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(DestroyMachineResults)
-    async def DestroyMachineWithParams(self, force=None, keep=None, machine_tags=None, max_wait=None):
+    def DestroyMachineWithParams(self, force=None, keep=None, machine_tags=None, max_wait=None):
         '''
         DestroyMachineWithParams removes a set of machines from the model.
 
@@ -419,13 +419,13 @@ class MachineManagerFacade(Type):
         _params['keep'] = keep
         _params['machine-tags'] = machine_tags
         _params['max-wait'] = max_wait
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsResults)
-    async def GetUpgradeSeriesMessages(self, params=None):
+    def GetUpgradeSeriesMessages(self, params=None):
         '''
         GetUpgradeSeriesMessages returns all new messages associated with upgrade
         series events. Messages that have already been retrieved once are not
@@ -444,13 +444,13 @@ class MachineManagerFacade(Type):
                    version=9,
                    params=_params)
         _params['params'] = params
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(InstanceTypesResults)
-    async def InstanceTypes(self, constraints=None):
+    def InstanceTypes(self, constraints=None):
         '''
         InstanceTypes returns instance type information for the cloud and region
         in which the current model is deployed.
@@ -468,13 +468,13 @@ class MachineManagerFacade(Type):
                    version=9,
                    params=_params)
         _params['constraints'] = constraints
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ProvisioningScriptResult)
-    async def ProvisioningScript(self, data_dir=None, disable_package_commands=None, machine_id=None, nonce=None):
+    def ProvisioningScript(self, data_dir=None, disable_package_commands=None, machine_id=None, nonce=None):
         '''
         ProvisioningScript returns a shell script that, when run,
         provisions a machine agent on the machine executing the script.
@@ -507,13 +507,13 @@ class MachineManagerFacade(Type):
         _params['disable-package-commands'] = disable_package_commands
         _params['machine-id'] = machine_id
         _params['nonce'] = nonce
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def RetryProvisioning(self, all_=None, machines=None):
+    def RetryProvisioning(self, all_=None, machines=None):
         '''
         RetryProvisioning marks a provisioning error as transient on the machines.
 
@@ -535,13 +535,13 @@ class MachineManagerFacade(Type):
                    params=_params)
         _params['all'] = all_
         _params['machines'] = machines
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResult)
-    async def UpgradeSeriesComplete(self, channel=None, force=None, tag=None):
+    def UpgradeSeriesComplete(self, channel=None, force=None, tag=None):
         '''
         UpgradeSeriesComplete marks a machine as having completed a managed series
         upgrade.
@@ -569,13 +569,13 @@ class MachineManagerFacade(Type):
         _params['channel'] = channel
         _params['force'] = force
         _params['tag'] = tag
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResult)
-    async def UpgradeSeriesPrepare(self, channel=None, force=None, tag=None):
+    def UpgradeSeriesPrepare(self, channel=None, force=None, tag=None):
         '''
         UpgradeSeriesPrepare prepares a machine for a OS series upgrade.
 
@@ -602,13 +602,13 @@ class MachineManagerFacade(Type):
         _params['channel'] = channel
         _params['force'] = force
         _params['tag'] = tag
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(UpgradeSeriesUnitsResults)
-    async def UpgradeSeriesValidate(self, args=None):
+    def UpgradeSeriesValidate(self, args=None):
         '''
         UpgradeSeriesValidate validates that the incoming arguments correspond to a
         valid series upgrade for the target machine.
@@ -628,13 +628,13 @@ class MachineManagerFacade(Type):
                    version=9,
                    params=_params)
         _params['args'] = args
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(NotifyWatchResults)
-    async def WatchUpgradeSeriesNotifications(self, entities=None):
+    def WatchUpgradeSeriesNotifications(self, entities=None):
         '''
         WatchUpgradeSeriesNotifications returns a watcher that fires on upgrade
         series events.
@@ -652,7 +652,7 @@ class MachineManagerFacade(Type):
                    version=9,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
@@ -1172,7 +1172,7 @@ class ModelManagerFacade(Type):
     
 
     @ReturnMapping(ErrorResults)
-    async def ChangeModelCredential(self, model_credentials=None):
+    def ChangeModelCredential(self, model_credentials=None):
         '''
         ChangeModelCredential changes cloud credential reference for models.
         These new cloud credentials must already exist on the controller.
@@ -1190,13 +1190,13 @@ class ModelManagerFacade(Type):
                    version=9,
                    params=_params)
         _params['model-credentials'] = model_credentials
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ModelInfo)
-    async def CreateModel(self, cloud_tag=None, config=None, credential=None, name=None, owner_tag=None, region=None):
+    def CreateModel(self, cloud_tag=None, config=None, credential=None, name=None, owner_tag=None, region=None):
         '''
         CreateModel creates a new model using the account and
         model config specified in the args.
@@ -1239,13 +1239,13 @@ class ModelManagerFacade(Type):
         _params['name'] = name
         _params['owner-tag'] = owner_tag
         _params['region'] = region
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def DestroyModels(self, models=None):
+    def DestroyModels(self, models=None):
         '''
         DestroyModels will try to destroy the specified models.
         If there is a block on destruction, this method will return an error.
@@ -1264,13 +1264,13 @@ class ModelManagerFacade(Type):
                    version=9,
                    params=_params)
         _params['models'] = models
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringResults)
-    async def DumpModels(self, entities=None, simplified=None):
+    def DumpModels(self, entities=None, simplified=None):
         '''
         DumpModels will export the models into the database agnostic
         representation. The user needs to either be a controller admin, or have
@@ -1294,13 +1294,13 @@ class ModelManagerFacade(Type):
                    params=_params)
         _params['entities'] = entities
         _params['simplified'] = simplified
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(MapResults)
-    async def DumpModelsDB(self, entities=None):
+    def DumpModelsDB(self, entities=None):
         '''
         DumpModelsDB will gather all documents from all model collections
         for the specified model. The map result contains a map of collection
@@ -1319,13 +1319,13 @@ class ModelManagerFacade(Type):
                    version=9,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ModelSummaryResults)
-    async def ListModelSummaries(self, all_=None, user_tag=None):
+    def ListModelSummaries(self, all_=None, user_tag=None):
         '''
         ListModelSummaries returns models that the specified user
         has access to in the current server.  Controller admins (superuser)
@@ -1350,13 +1350,13 @@ class ModelManagerFacade(Type):
                    params=_params)
         _params['all'] = all_
         _params['user-tag'] = user_tag
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(UserModelList)
-    async def ListModels(self, tag=None):
+    def ListModels(self, tag=None):
         '''
         ListModels returns the models that the specified user
         has access to in the current server.  Controller admins (superuser)
@@ -1376,13 +1376,13 @@ class ModelManagerFacade(Type):
                    version=9,
                    params=_params)
         _params['tag'] = tag
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ModelDefaultsResults)
-    async def ModelDefaultsForClouds(self, entities=None):
+    def ModelDefaultsForClouds(self, entities=None):
         '''
         ModelDefaultsForClouds returns the default config values for the specified
         clouds.
@@ -1400,13 +1400,13 @@ class ModelManagerFacade(Type):
                    version=9,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ModelInfoResults)
-    async def ModelInfo(self, entities=None):
+    def ModelInfo(self, entities=None):
         '''
         ModelInfo returns information about the specified models.
 
@@ -1423,13 +1423,13 @@ class ModelManagerFacade(Type):
                    version=9,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ModelStatusResults)
-    async def ModelStatus(self, entities=None):
+    def ModelStatus(self, entities=None):
         '''
         ModelStatus returns a summary of the model.
 
@@ -1446,13 +1446,13 @@ class ModelManagerFacade(Type):
                    version=9,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def ModifyModelAccess(self, changes=None):
+    def ModifyModelAccess(self, changes=None):
         '''
         ModifyModelAccess changes the model access granted to users.
 
@@ -1469,13 +1469,13 @@ class ModelManagerFacade(Type):
                    version=9,
                    params=_params)
         _params['changes'] = changes
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetModelDefaults(self, config=None):
+    def SetModelDefaults(self, config=None):
         '''
         SetModelDefaults writes new values for the specified default model settings.
 
@@ -1492,13 +1492,13 @@ class ModelManagerFacade(Type):
                    version=9,
                    params=_params)
         _params['config'] = config
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def UnsetModelDefaults(self, keys=None):
+    def UnsetModelDefaults(self, keys=None):
         '''
         UnsetModelDefaults removes the specified default model settings.
 
@@ -1515,7 +1515,7 @@ class ModelManagerFacade(Type):
                    version=9,
                    params=_params)
         _params['keys'] = keys
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 

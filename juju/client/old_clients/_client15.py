@@ -2,7 +2,7 @@
 # Changes will be overwritten/lost when the file is regenerated.
 
 from juju.client.facade import Type, ReturnMapping
-from juju.client.old_clients._definitions import *
+from juju.client._definitions import *
 
 
 class ApplicationFacade(Type):
@@ -946,7 +946,7 @@ class ApplicationFacade(Type):
     
 
     @ReturnMapping(AddRelationResults)
-    async def AddRelation(self, endpoints=None, via_cidrs=None):
+    def AddRelation(self, endpoints=None, via_cidrs=None):
         '''
         AddRelation adds a relation between the specified endpoints and returns the relation info.
 
@@ -968,13 +968,13 @@ class ApplicationFacade(Type):
                    params=_params)
         _params['endpoints'] = endpoints
         _params['via-cidrs'] = via_cidrs
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(AddApplicationUnitsResults)
-    async def AddUnits(self, application=None, attach_storage=None, num_units=None, placement=None, policy=None):
+    def AddUnits(self, application=None, attach_storage=None, num_units=None, placement=None, policy=None):
         '''
         AddUnits adds a given number of units to an application.
 
@@ -1011,13 +1011,13 @@ class ApplicationFacade(Type):
         _params['num-units'] = num_units
         _params['placement'] = placement
         _params['policy'] = policy
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ApplicationInfoResults)
-    async def ApplicationsInfo(self, entities=None):
+    def ApplicationsInfo(self, entities=None):
         '''
         ApplicationsInfo returns applications information.
 
@@ -1034,13 +1034,13 @@ class ApplicationFacade(Type):
                    version=15,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ApplicationGetConfigResults)
-    async def CharmConfig(self, args=None):
+    def CharmConfig(self, args=None):
         '''
         CharmConfig returns charm config for the input list of applications and
         model generations.
@@ -1058,13 +1058,13 @@ class ApplicationFacade(Type):
                    version=15,
                    params=_params)
         _params['args'] = args
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ApplicationCharmRelationsResults)
-    async def CharmRelations(self, application=None):
+    def CharmRelations(self, application=None):
         '''
         CharmRelations implements the server side of Application.CharmRelations.
 
@@ -1081,13 +1081,13 @@ class ApplicationFacade(Type):
                    version=15,
                    params=_params)
         _params['application'] = application
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def Consume(self, args=None):
+    def Consume(self, args=None):
         '''
         Consume adds remote applications to the model without creating any
         relations.
@@ -1105,13 +1105,13 @@ class ApplicationFacade(Type):
                    version=15,
                    params=_params)
         _params['args'] = args
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def Deploy(self, applications=None):
+    def Deploy(self, applications=None):
         '''
         Deploy fetches the charms from the charm store and deploys them
         using the specified placement directives.
@@ -1129,13 +1129,13 @@ class ApplicationFacade(Type):
                    version=15,
                    params=_params)
         _params['applications'] = applications
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(None)
-    async def Destroy(self, application=None):
+    def Destroy(self, application=None):
         '''
         Destroy destroys a given application, local or remote.
 
@@ -1161,13 +1161,13 @@ class ApplicationFacade(Type):
                    version=15,
                    params=_params)
         _params['application'] = application
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(DestroyApplicationResults)
-    async def DestroyApplication(self, applications=None):
+    def DestroyApplication(self, applications=None):
         '''
         DestroyApplication removes a given set of applications.
 
@@ -1184,13 +1184,13 @@ class ApplicationFacade(Type):
                    version=15,
                    params=_params)
         _params['applications'] = applications
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def DestroyConsumedApplications(self, applications=None):
+    def DestroyConsumedApplications(self, applications=None):
         '''
         DestroyConsumedApplications removes a given set of consumed (remote) applications.
 
@@ -1207,13 +1207,13 @@ class ApplicationFacade(Type):
                    version=15,
                    params=_params)
         _params['applications'] = applications
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(None)
-    async def DestroyRelation(self, endpoints=None, force=None, max_wait=None, relation_id=None):
+    def DestroyRelation(self, endpoints=None, force=None, max_wait=None, relation_id=None):
         '''
         DestroyRelation removes the relation between the
         specified endpoints or an id.
@@ -1246,13 +1246,13 @@ class ApplicationFacade(Type):
         _params['force'] = force
         _params['max-wait'] = max_wait
         _params['relation-id'] = relation_id
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(DestroyUnitResults)
-    async def DestroyUnit(self, units=None):
+    def DestroyUnit(self, units=None):
         '''
         DestroyUnit removes a given set of application units.
 
@@ -1269,13 +1269,13 @@ class ApplicationFacade(Type):
                    version=15,
                    params=_params)
         _params['units'] = units
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(None)
-    async def DestroyUnits(self, unit_names=None):
+    def DestroyUnits(self, unit_names=None):
         '''
         DestroyUnits removes a given set of application units.
 
@@ -1301,13 +1301,13 @@ class ApplicationFacade(Type):
                    version=15,
                    params=_params)
         _params['unit-names'] = unit_names
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(None)
-    async def Expose(self, application=None, exposed_endpoints=None):
+    def Expose(self, application=None, exposed_endpoints=None):
         '''
         Expose changes the juju-managed firewall to expose any ports that
         were also explicitly marked by units as open.
@@ -1330,13 +1330,13 @@ class ApplicationFacade(Type):
                    params=_params)
         _params['application'] = application
         _params['exposed-endpoints'] = exposed_endpoints
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ApplicationGetResults)
-    async def Get(self, application=None, branch=None):
+    def Get(self, application=None, branch=None):
         '''
         Get returns the charm configuration for an application.
 
@@ -1358,13 +1358,13 @@ class ApplicationFacade(Type):
                    params=_params)
         _params['application'] = application
         _params['branch'] = branch
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringResult)
-    async def GetCharmURL(self, application=None, branch=None):
+    def GetCharmURL(self, application=None, branch=None):
         '''
         GetCharmURL returns the charm URL the given application is
         running at present.
@@ -1387,13 +1387,13 @@ class ApplicationFacade(Type):
                    params=_params)
         _params['application'] = application
         _params['branch'] = branch
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(CharmURLOriginResult)
-    async def GetCharmURLOrigin(self, application=None, branch=None):
+    def GetCharmURLOrigin(self, application=None, branch=None):
         '''
         GetCharmURLOrigin returns the charm URL and charm origin the given
         application is running at present.
@@ -1416,13 +1416,13 @@ class ApplicationFacade(Type):
                    params=_params)
         _params['application'] = application
         _params['branch'] = branch
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ApplicationGetConfigResults)
-    async def GetConfig(self, entities=None):
+    def GetConfig(self, entities=None):
         '''
         GetConfig returns the charm config for each of the input applications.
 
@@ -1439,13 +1439,13 @@ class ApplicationFacade(Type):
                    version=15,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ApplicationGetConstraintsResults)
-    async def GetConstraints(self, entities=None):
+    def GetConstraints(self, entities=None):
         '''
         GetConstraints returns the constraints for a given application.
 
@@ -1462,13 +1462,13 @@ class ApplicationFacade(Type):
                    version=15,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringResult)
-    async def Leader(self, tag=None):
+    def Leader(self, tag=None):
         '''
         Leader returns the unit name of the leader for the given application.
 
@@ -1485,13 +1485,13 @@ class ApplicationFacade(Type):
                    version=15,
                    params=_params)
         _params['tag'] = tag
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def MergeBindings(self, args=None):
+    def MergeBindings(self, args=None):
         '''
         MergeBindings merges operator-defined bindings with the current bindings for
         one or more applications.
@@ -1509,13 +1509,13 @@ class ApplicationFacade(Type):
                    version=15,
                    params=_params)
         _params['args'] = args
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def ResolveUnitErrors(self, all_=None, retry=None, tags=None):
+    def ResolveUnitErrors(self, all_=None, retry=None, tags=None):
         '''
         ResolveUnitErrors marks errors on the specified units as resolved.
 
@@ -1542,13 +1542,13 @@ class ApplicationFacade(Type):
         _params['all'] = all_
         _params['retry'] = retry
         _params['tags'] = tags
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ScaleApplicationResults)
-    async def ScaleApplications(self, applications=None):
+    def ScaleApplications(self, applications=None):
         '''
         ScaleApplications scales the specified application to the requested number of units.
 
@@ -1565,13 +1565,13 @@ class ApplicationFacade(Type):
                    version=15,
                    params=_params)
         _params['applications'] = applications
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(None)
-    async def Set(self, application=None, branch=None, options=None):
+    def Set(self, application=None, branch=None, options=None):
         '''
         Set implements the server side of Application.Set.
         It does not unset values that are set to an empty string.
@@ -1600,13 +1600,13 @@ class ApplicationFacade(Type):
         _params['application'] = application
         _params['branch'] = branch
         _params['options'] = options
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(None)
-    async def SetCharm(self, application=None, channel=None, charm_origin=None, charm_url=None, config_settings=None, config_settings_yaml=None, endpoint_bindings=None, force=None, force_series=None, force_units=None, generation=None, resource_ids=None, storage_constraints=None):
+    def SetCharm(self, application=None, channel=None, charm_origin=None, charm_url=None, config_settings=None, config_settings_yaml=None, endpoint_bindings=None, force=None, force_series=None, force_units=None, generation=None, resource_ids=None, storage_constraints=None):
         '''
         SetCharm sets the charm for a given for the application.
 
@@ -1683,13 +1683,13 @@ class ApplicationFacade(Type):
         _params['generation'] = generation
         _params['resource-ids'] = resource_ids
         _params['storage-constraints'] = storage_constraints
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetConfigs(self, args=None):
+    def SetConfigs(self, args=None):
         '''
         SetConfig implements the server side of Application.SetConfig.  Both
         application and charm config are set. It does not unset values in
@@ -1708,13 +1708,13 @@ class ApplicationFacade(Type):
                    version=15,
                    params=_params)
         _params['Args'] = args
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(None)
-    async def SetConstraints(self, application=None, constraints=None):
+    def SetConstraints(self, application=None, constraints=None):
         '''
         SetConstraints sets the constraints for a given application.
 
@@ -1736,13 +1736,13 @@ class ApplicationFacade(Type):
                    params=_params)
         _params['application'] = application
         _params['constraints'] = constraints
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetMetricCredentials(self, creds=None):
+    def SetMetricCredentials(self, creds=None):
         '''
         SetMetricCredentials sets credentials on the application.
 
@@ -1759,13 +1759,13 @@ class ApplicationFacade(Type):
                    version=15,
                    params=_params)
         _params['creds'] = creds
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def SetRelationsSuspended(self, args=None):
+    def SetRelationsSuspended(self, args=None):
         '''
         SetRelationsSuspended sets the suspended status of the specified relations.
 
@@ -1782,13 +1782,13 @@ class ApplicationFacade(Type):
                    version=15,
                    params=_params)
         _params['args'] = args
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(None)
-    async def Unexpose(self, application=None, exposed_endpoints=None):
+    def Unexpose(self, application=None, exposed_endpoints=None):
         '''
         Unexpose changes the juju-managed firewall to unexpose any ports that
         were also explicitly marked by units as open.
@@ -1811,13 +1811,13 @@ class ApplicationFacade(Type):
                    params=_params)
         _params['application'] = application
         _params['exposed-endpoints'] = exposed_endpoints
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(UnitInfoResults)
-    async def UnitsInfo(self, entities=None):
+    def UnitsInfo(self, entities=None):
         '''
         UnitsInfo returns unit information for the given entities (units or
         applications).
@@ -1835,13 +1835,13 @@ class ApplicationFacade(Type):
                    version=15,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(None)
-    async def Unset(self, application=None, branch=None, options=None):
+    def Unset(self, application=None, branch=None, options=None):
         '''
         Unset implements the server side of Client.Unset.
 
@@ -1868,13 +1868,13 @@ class ApplicationFacade(Type):
         _params['application'] = application
         _params['branch'] = branch
         _params['options'] = options
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def UnsetApplicationsConfig(self, args=None):
+    def UnsetApplicationsConfig(self, args=None):
         '''
         UnsetApplicationsConfig implements the server side of Application.UnsetApplicationsConfig.
 
@@ -1891,13 +1891,13 @@ class ApplicationFacade(Type):
                    version=15,
                    params=_params)
         _params['Args'] = args
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def UpdateApplicationBase(self, args=None):
+    def UpdateApplicationBase(self, args=None):
         '''
         UpdateApplicationBase updates the application series. Bases for
         subordinates updated too.
@@ -1915,7 +1915,7 @@ class ApplicationFacade(Type):
                    version=15,
                    params=_params)
         _params['args'] = args
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
