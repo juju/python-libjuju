@@ -838,7 +838,7 @@ class Connection:
                     self.info = result
                     # Whenever a connection is established, set
                     # the new_client flag in the Client module
-                    client.set_new_client(self.info['server-version'])
+                    # client.set_new_client(self.info['server-version'])
                     success = True
                     return result
                 macaroon = bakery.Macaroon.from_dict(macaroonJSON)

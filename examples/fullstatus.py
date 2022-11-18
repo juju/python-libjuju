@@ -1,7 +1,6 @@
 from juju import jasyncio
 from juju.model import Model
 
-
 async def status():
     model = Model()
     await model.connect()

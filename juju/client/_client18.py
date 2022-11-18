@@ -334,7 +334,7 @@ class UniterFacade(Type):
                      'GetSecretContentArg': {'additionalProperties': False,
                                              'properties': {'label': {'type': 'string'},
                                                             'peek': {'type': 'boolean'},
-                                                            'update': {'type': 'boolean'},
+                                                            'refresh': {'type': 'boolean'},
                                                             'uri': {'type': 'string'}},
                                              'required': ['uri'],
                                              'type': 'object'},
