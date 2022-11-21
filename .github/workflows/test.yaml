@@ -39,6 +39,7 @@ jobs:
       shell: bash
       # language=bash
       run: |
+        sudo mkdir .ssh
         juju bootstrap localhost test \
           --config 'identity-url=https://api.staging.jujucharms.com/identity' \
           --config 'allow-model-access=true' \
