@@ -28,10 +28,12 @@ import logging
 
 ROOT_LOGGER = logging.getLogger()
 
-from asyncio import ensure_future, \
-    gather, sleep, wait_for, create_subprocess_exec, \
-    wait, FIRST_COMPLETED, as_completed, new_event_loop, \
+from asyncio import Event, TimeoutError, Queue, ensure_future, \
+    gather, sleep, wait_for, create_subprocess_exec, subprocess, \
+    wait, FIRST_COMPLETED, Lock, as_completed, new_event_loop, \
     get_event_loop_policy, CancelledError # noqa
+
+
 
 try:
     from asyncio import get_running_loop
