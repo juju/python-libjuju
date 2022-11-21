@@ -21,7 +21,6 @@ jobs:
       # language=bash
       run: |
           set -euxo pipefail
-          sudo apt remove lxd lxd-client
           sudo snap install lxd yq
           sudo lxd waitready
           sudo lxd init --auto
