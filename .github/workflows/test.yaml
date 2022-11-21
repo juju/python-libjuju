@@ -30,7 +30,7 @@ jobs:
           attempts=$((attempts + 1))
         done
         
-        lxd waitready --timeout 120
+        lxd waitready --timeout 240
         sudo chmod 666 /var/snap/lxd/common/lxd/unix.socket
         lxd init --auto --network-address='[::]' --network-port=8443
         lxc network set lxdbr0 ipv6.address none
