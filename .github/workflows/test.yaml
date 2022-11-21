@@ -15,17 +15,16 @@ jobs:
     steps:
     - name: Check out code
       uses: actions/checkout@v3
-    # - name: Install LXD
-    #   if: ${{ !env.ACT }}
-    #   shell: bash
-    #   # language=bash
-    #   run: |
-    #       set -euxo pipefail
-    #       sudo snap install lxd yq
-    #       sudo lxd waitready
-    #       sudo lxd init --auto
-    #       sudo chmod a+wr /var/snap/lxd/common/lxd/unix.socket
-    #       echo "/snap/bin" >> $GITHUB_PATH
+    - name: Install LXD
+      if: ${{ !env.ACT }}
+      shell: bash
+      # language=bash
+      run: |
+        set -euxo pipefail
+        sudo lxd waitready
+        sudo lxd init --auto
+        sudo chmod a+wr /var/snap/lxd/common/lxd/unix.socket
+        echo "/snap/bin" >> $GITHUB_PATH
     - name: Install juju
       shell: bash
       env: 
