@@ -34,7 +34,7 @@ jobs:
       run: |
         set -euxo pipefail
         sudo snap install juju --channel=$JUJU_CHANNEL
-        lxc network set lxdbr0 ipv6.address none
+        # lxc network set lxdbr0 ipv6.address none
     - name: Bootstrap controller
       shell: bash
       # language=bash
