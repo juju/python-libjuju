@@ -1,6 +1,7 @@
 from juju import jasyncio
 from juju.model import Model
 
+
 async def status():
     model = Model()
     await model.connect()
@@ -13,7 +14,6 @@ async def status():
     print('Relations:', status.relations)
 
     return status
-
 
 if __name__ == '__main__':
     jasyncio.run(status())
