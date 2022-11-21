@@ -34,7 +34,6 @@ from asyncio import Event, TimeoutError, Queue, ensure_future, \
     get_event_loop_policy, CancelledError # noqa
 
 
-
 try:
     from asyncio import get_running_loop
 except ImportError:

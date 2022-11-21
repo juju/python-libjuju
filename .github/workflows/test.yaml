@@ -1,0 +1,64 @@
+name: Integration test
+
+on: [push, pull_request]
+
+jobs:
+  integration:
+    name: Integration
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python:
+          - "3.8"
+          - "3.9"
+          - "3.10"
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v3
+    - name: Prepare environment
+      with: 
+        juju-channel: "3.0/stable"
+      run: |
+        sudo mkdir -p ~/.config
+        sudo chown -R $USER:$USER ~/.config
+        sudo chmod -R 755 ~/.config
+        sudo ls -l -R ~/.config
+        attempts=0
+        while [ $attempts -lt 3 ]; do
+          sudo snap install lxd && break || true
+          attempts=$((attempts + 1))
+        done
+        
+        lxd waitready --timeout 120
+        sudo chmod 666 /var/snap/lxd/common/lxd/unix.socket
+        lxd init --auto --network-address='[::]' --network-port=8443
+        lxc network set lxdbr0 ipv6.address none
+
+        lxc storage create juju-zfs dir source=/var/snap/lxd/common/lxd/storage-pools/juju-zfs
+        lxc storage create juju-btrfs dir source=/var/snap/lxd/common/lxd/storage-pools/juju-btrfs
+
+        # TODO (stickupkid): we should be able to use security.priviledged="true",
+        # but for some reason that doesn't work in 2 nested deep containers. So
+        # instead we turn apparmor off, we should investigate why this doesn't work correctly.
+        # lxc profile set default raw.lxc lxc.apparmor.profile=unconfined
+
+        attempts=0
+        while [ $attempts -lt 3 ]; do
+          sudo snap install juju --channel "${JUJU_CHANNEL}" && break || true
+          attempts=$((attempts + 1))
+        done
+
+        juju bootstrap localhost test \
+          --config 'identity-url=https://api.staging.jujucharms.com/identity' \
+          --config 'allow-model-access=true' \
+          --config 'test-mode=true'
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Install dependencies
+      run: pip install tox
+    - name: Run unit tests
+      run: tox -e py3
+    - name: Run integration
+      run: tox -e py3 -e integration,serial
