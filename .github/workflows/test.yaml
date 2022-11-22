@@ -44,8 +44,9 @@ jobs:
       shell: bash
       # language=bash
       run: |
+        sudo usermod -a -G snap_microk8s runner
         sudo mkdir /home/runner/.ssh
-        juju bootstrap localhost test --debug    
+        juju bootstrap microk8s test --debug    
     - name: Setup Python
       uses: actions/setup-python@v2
       with:
