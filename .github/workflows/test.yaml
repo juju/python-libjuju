@@ -28,7 +28,7 @@ jobs:
     - name: Install juju
       shell: bash
       env: 
-        JUJU_CHANNEL: "3.0/stable"
+        JUJU_CHANNEL: "3.0/candidate"
       # language=bash
       run: |
         set -euxo pipefail
