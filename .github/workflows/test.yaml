@@ -40,14 +40,14 @@ jobs:
     #   run: |
     #     set -euxo pipefail
     #     sudo snap install juju --channel=$JUJU_CHANNEL
-    - name: Bootstrap controller
-      shell: bash
-      # language=bash
-      run: |
-        sudo usermod -a -G snap_microk8s runner
-        newgrp snap_microk8s
-        sudo mkdir /home/runner/.ssh
-        juju bootstrap microk8s test --debug    
+    # - name: Bootstrap controller
+    #   shell: bash
+    #   # language=bash
+    #   run: |
+    #     sudo usermod -a -G snap_microk8s runner
+    #     newgrp snap_microk8s
+    #     sudo mkdir /home/runner/.ssh
+    #     juju bootstrap microk8s test --debug    
     - name: Setup Python
       uses: actions/setup-python@v2
       with:
