@@ -45,6 +45,7 @@ jobs:
       # language=bash
       run: |
         sudo usermod -a -G snap_microk8s runner
+        newgrp snap_microk8s
         sudo mkdir /home/runner/.ssh
         juju bootstrap microk8s test --debug    
     - name: Setup Python
