@@ -3,6 +3,26 @@ name: Integration test
 on: [push, pull_request]
 
 jobs:
+  unit-tests:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python:
+          - "3.8"
+          - "3.9"
+          - "3.10"
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v3
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Run unit tests
+      run: tox -e py3
+    
+
   integration:
     name: Integration
     runs-on: ubuntu-latest
@@ -15,46 +35,18 @@ jobs:
     steps:
     - name: Check out code
       uses: actions/checkout@v3
-    # - name: Install LXD
-    #   if: ${{ !env.ACT }}
-    #   shell: bash
-    #   # language=bash
-    #   run: |
-    #     set -euxo pipefail      
-    #     sudo lxd waitready
-    #     sudo lxd init --auto
-    #     sudo chmod a+wr /var/snap/lxd/common/lxd/unix.socket
-    #     echo "/snap/bin" >> $GITHUB_PATH
     - name: Setup operator environment
       uses: charmed-kubernetes/actions-operator@main
       with:
-        provider: microk8s
+        provider: lxd
         juju-channel: 3.0/stable
-        channel: 1.25-strict/stable
-        microk8s-group: snap_microk8s
-    # - name: Install juju
-    #   shell: bash
-    #   env: 
-    #     JUJU_CHANNEL: "3.0/candidate"
-    #   # language=bash
-    #   run: |
-    #     set -euxo pipefail
-    #     sudo snap install juju --channel=$JUJU_CHANNEL
-    # - name: Bootstrap controller
-    #   shell: bash
-    #   # language=bash
-    #   run: |
-    #     sudo usermod -a -G snap_microk8s runner
-    #     newgrp snap_microk8s
-    #     sudo mkdir /home/runner/.ssh
-    #     juju bootstrap microk8s test --debug    
+        #channel: 1.25-strict/stable
+        #microk8s-group: snap_microk8s
     - name: Setup Python
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python }}
     - name: Install dependencies
       run: pip install tox
-    - name: Run unit tests
-      run: tox -e py3
     - name: Run integration
       run: tox -e py3 -e integration,serial

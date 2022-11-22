@@ -143,10 +143,10 @@ async def test_deploy_charmstore_charm(event_loop):
 @pytest.mark.asyncio
 async def test_deploy_charmhub_charm(event_loop):
     async with base.CleanModel() as model:
-        app = await model.deploy('ch:hello-juju')
+        app = await model.deploy('ch:hello-kubecon')
         await model.block_until(lambda: (len(app.units) > 0 and
                                          app.units[0].machine))
-        assert 'hello-juju' in app.data['charm-url']
+        assert 'hello-kubecon' in app.data['charm-url']
 
 
 @base.bootstrapped
@@ -179,6 +179,7 @@ async def test_upgrade_charm_channel(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.skip('Skip until a similar k8s solution is found')
 async def test_upgrade_charm_switch_channel(event_loop):
     # Note for future:
     # This test requires a charm that has different

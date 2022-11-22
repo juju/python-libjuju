@@ -31,23 +31,24 @@ ROOT_LOGGER = logging.getLogger()
 from asyncio import Event, TimeoutError, Queue, ensure_future, \
     gather, sleep, wait_for, create_subprocess_exec, subprocess, \
     wait, FIRST_COMPLETED, Lock, as_completed, new_event_loop, \
-    get_event_loop_policy, CancelledError # noqa
+    get_event_loop_policy, CancelledError, get_running_loop, \
+    create_task     # noqa
 
+# No more workaround for these imports
+# try:
+#     from asyncio import get_running_loop
+# except ImportError:
+#     def get_running_loop():
+#         loop = asyncio.get_event_loop()
+#         if not loop.is_running():
+#             raise RuntimeError("no running event loop")
+#         return loop
 
-try:
-    from asyncio import get_running_loop
-except ImportError:
-    def get_running_loop():
-        loop = asyncio.get_event_loop()
-        if not loop.is_running():
-            raise RuntimeError("no running event loop")
-        return loop
-
-try:
-    from asyncio import create_task
-except ImportError:
-    def create_task(coro):
-        return asyncio.ensure_future(coro)
+# try:
+#     from asyncio import create_task
+# except ImportError:
+#     def create_task(coro):
+#         return asyncio.ensure_future(coro)
 
 
 def create_task_with_handler(coro, task_name, logger=ROOT_LOGGER):
