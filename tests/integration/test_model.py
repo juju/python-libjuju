@@ -57,11 +57,11 @@ async def test_deploy_local_bundle_file(event_loop):
     async with base.CleanModel() as model:
         await model.deploy(str(mini_bundle_file_path))
 
-        ghost = model.applications.get('ghost')
-        mysql = model.applications.get('mysql')
-        assert ghost and mysql
-        await model.block_until(lambda: (len(ghost.units) == 1 and
-                                len(mysql.units) == 1),
+        app1 = model.applications.get('grafana')
+        app2 = model.applications.get('prometheus')
+        assert app1 and app2
+        await model.block_until(lambda: (len(app1.units) == 1 and
+                                len(app2.units) == 1),
                                 timeout=60 * 4)
 
 

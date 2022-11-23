@@ -1,14 +1,14 @@
-series: xenial
+series: jammy
 applications:
   ghost:
-    charm: "ghost"
+    charm: "prometheus"
     channel: stable
     num_units: 1
   mysql:
-    charm: "mysql"
+    charm: "prometheus"
     channel: stable
     num_units: 1
   test:
     charm: "./tests/integration/charm"
 relations:
-  - ["ghost", "mysql"]
+  - ["prometheus:grafana-source", "grafana:grafana-source"]
