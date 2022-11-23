@@ -11,4 +11,4 @@ applications:
   test:
     charm: "./tests/integration/charm"
 relations:
-  - ["grafana", "prometheus"]
+  - ["prometheus:grafana-source", "grafana:grafana-source"]

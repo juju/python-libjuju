@@ -1,11 +1,12 @@
+series: jammy
 applications:
-  ghost:
-    charm: "hello-juju"
+  grafana:
+    charm: "grafana"
     channel: stable
     num_units: 1
-  mysql:
-    charm: "postgresql"
-    channel: candidate
+  prometheus:
+    charm: "prometheus"
+    channel: stable
     num_units: 1
 relations:
-  - ["hello-juju", "postgresql"]
+  - ["prometheus:grafana-source", "grafana:grafana-source"]
