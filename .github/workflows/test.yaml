@@ -16,13 +16,13 @@ jobs:
     - name: Check out code
       uses: actions/checkout@v3
     - name: Setup Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python }}
     - name: Install dependencies
       run: pip install tox
     - name: Run unit tests
-      run: tox -e py3,serial
+      run: tox -e py3
     
 
   integration:
@@ -43,7 +43,7 @@ jobs:
         provider: lxd
         juju-channel: 3.0/stable
     - name: Setup Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python }}
     - name: Install dependencies
