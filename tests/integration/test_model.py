@@ -1060,8 +1060,8 @@ async def test_connect_to_connection(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-@pytest.skip("This assumes that we have a model to connect to...")
 async def test_connect_current(event_loop):
+    pytest.skip("This assumes that we have a model to connect to...")
     m = Model()
     await m.connect_current()
     assert m.is_connected()
