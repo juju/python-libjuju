@@ -13,7 +13,7 @@ from juju import jasyncio
 async def test_offer(event_loop):
     async with base.CleanModel() as model:
         await model.deploy(
-            'cs:~jameinel/ubuntu-lite-7',
+            'ubuntu',
             application_name='ubuntu',
             series='focal',
             channel='stable',
@@ -35,7 +35,7 @@ async def test_offer(event_loop):
 async def test_consume(event_loop):
     async with base.CleanModel() as model_1:
         await model_1.deploy(
-            'cs:~jameinel/ubuntu-lite-7',
+            'ubuntu',
             application_name='ubuntu',
             series='focal',
             channel='stable',
@@ -66,7 +66,7 @@ async def test_consume(event_loop):
 async def test_remove_saas(event_loop):
     async with base.CleanModel() as model_1:
         await model_1.deploy(
-            'cs:~jameinel/ubuntu-lite-7',
+            'ubuntu',
             application_name='ubuntu',
             series='focal',
             channel='stable',
@@ -97,48 +97,48 @@ async def test_remove_saas(event_loop):
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_relate_with_offer(event_loop):
-    pytest.skip('Revise: intermittent problem with the remove_saas call')
+    # pytest.skip('Revise: intermittent problem with the remove_saas call')
     async with base.CleanModel() as model_1:
         application = await model_1.deploy(
-            'ch:mysql',
-            application_name='mysql',
-            series='xenial',
+            'postgresql',
+            application_name='postgresql',
+            series='focal',
             channel='stable',
         )
-        assert 'mysql' in model_1.applications
+        assert 'postgresql' in model_1.applications
         await model_1.wait_for_idle(status="active")
-        await model_1.create_offer("mysql:db")
+        await model_1.create_offer("postgresql:db")
 
         offers = await model_1.list_offers()
         await model_1.block_until(
-            lambda: all(offer.application_name == 'mysql'
+            lambda: all(offer.application_name == 'postgresql'
                         for offer in offers.results))
 
         # farm off a new model to test the consumption
         async with base.CleanModel() as model_2:
             await model_2.deploy(
-                'ch:mediawiki',
-                application_name='mediawiki',
-                series='trusty',
+                'hello-juju',
+                application_name='hello-juju',
+                series='focal',
                 channel='stable',
             )
             await model_2.block_until(
                 lambda: all(unit.agent_status == 'idle'
                             for unit in application.units))
 
-            await model_2.relate("mediawiki:db", "admin/{}.mysql".format(model_1.name))
+            await model_2.relate("hello-juju:db", "admin/{}.postgresql".format(model_1.name))
             status = await model_2.get_status()
-            if 'mysql' not in status.remote_applications:
+            if 'postgresql' not in status.remote_applications:
                 raise Exception("Expected mysql in saas")
 
-            await model_2.remove_saas('mysql')
+            await model_2.remove_saas('postgresql')
             await jasyncio.sleep(5)
 
             status = await model_2.get_status()
-            if 'mysql' in status.remote_applications:
+            if 'postgresql' in status.remote_applications:
                 raise Exception("Expected mysql not to be in saas")
 
-        await model_1.remove_offer("admin/{}.mysql".format(model_1.name), force=True)
+        await model_1.remove_offer("admin/{}.postgresql".format(model_1.name), force=True)
 
 
 @base.bootstrapped

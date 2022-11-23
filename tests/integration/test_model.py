@@ -29,7 +29,7 @@ OVERLAYS_DIR = HERE_DIR / 'bundle' / 'test-overlays'
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_model_name(event_loop):
     model = Model()
     with pytest.raises(JujuModelError):
@@ -42,7 +42,7 @@ async def test_model_name(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_deploy_local_bundle_dir(event_loop):
     bundle_path = TESTS_DIR / 'bundle'
 
@@ -58,7 +58,7 @@ async def test_deploy_local_bundle_dir(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_deploy_local_bundle_file(event_loop):
     bundle_path = TESTS_DIR / 'bundle'
     mini_bundle_file_path = bundle_path / 'mini-bundle.yaml'
@@ -66,8 +66,8 @@ async def test_deploy_local_bundle_file(event_loop):
     async with base.CleanModel() as model:
         await model.deploy(str(mini_bundle_file_path))
 
-        ghost = model.applications.get('ghost')
-        mysql = model.applications.get('mysql')
+        ghost = model.applications.get('hello-juju')
+        mysql = model.applications.get('postgresql')
         assert ghost and mysql
         await model.block_until(lambda: (len(ghost.units) == 1 and
                                 len(mysql.units) == 1),
@@ -75,7 +75,7 @@ async def test_deploy_local_bundle_file(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_deploy_bundle_local_resource_relative_path(event_loop):
     bundle_file_path = HERE_DIR / 'bundle-file-resource.yaml'
 
@@ -89,7 +89,7 @@ async def test_deploy_bundle_local_resource_relative_path(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_deploy_local_bundle_include_file(event_loop):
     bundle_dir = TESTS_DIR / 'integration' / 'bundle'
     bundle_yaml_path = bundle_dir / 'bundle-include-file.yaml'
@@ -97,16 +97,16 @@ async def test_deploy_local_bundle_include_file(event_loop):
     async with base.CleanModel() as model:
         await model.deploy(str(bundle_yaml_path))
 
-        mysql = model.applications.get('mysql', None)
-        ghost = model.applications.get('ghost', None)
+        appa = model.applications.get('helloa', None)
+        appb = model.applications.get('hellob', None)
         test = model.applications.get('test', None)
-        assert mysql and ghost and test
-        assert ghost.config.get('port', None) == 2369
-        assert ghost.config.get('url', "") == 'http://my-ghost.blg'
+        assert appa and appb and test
+        assert appa.config.get('port', None) == 666
+        assert appa.config.get('application-repo', "") == "http://my-juju.com"
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_deploy_local_bundle_include_base64(event_loop):
     bundle_dir = TESTS_DIR / 'integration' / 'bundle'
     bundle_yaml_path = bundle_dir / 'bundle-include-base64.yaml'
@@ -114,15 +114,15 @@ async def test_deploy_local_bundle_include_base64(event_loop):
     async with base.CleanModel() as model:
         await model.deploy(str(bundle_yaml_path))
 
-        mysql = model.applications.get('mysql', None)
-        ghost = model.applications.get('ghost', None)
+        appa = model.applications.get('helloa', None)
+        appb = model.applications.get('hellob', None)
         test = model.applications.get('test', None)
-        assert mysql and ghost and test
-        assert mysql.config.get('tuning-level', '') == 'fast'
+        assert appa and appb and test
+        assert appa.config.get('application-repo', "") == "http://my-juju.com"
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_deploy_bundle_local_charms(event_loop):
     bundle_path = TESTS_DIR / 'integration' / 'bundle' / 'local.yaml'
 
@@ -137,7 +137,7 @@ async def test_deploy_bundle_local_charms(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_deploy_invalid_bundle(event_loop):
     pytest.skip('test_deploy_invalid_bundle intermittent test failure')
     bundle_path = TESTS_DIR / 'bundle' / 'invalid.yaml'
@@ -147,7 +147,7 @@ async def test_deploy_invalid_bundle(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_deploy_local_charm(event_loop):
     charm_path = TESTS_DIR / 'charm'
 
@@ -159,7 +159,7 @@ async def test_deploy_local_charm(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_wait_local_charm_blocked(event_loop):
     charm_path = TESTS_DIR / 'charm'
 
@@ -174,7 +174,7 @@ async def test_wait_local_charm_blocked(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_wait_local_charm_waiting_timeout(event_loop):
     charm_path = TESTS_DIR / 'charm'
 
@@ -187,7 +187,7 @@ async def test_wait_local_charm_waiting_timeout(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_deploy_bundle(event_loop):
     async with base.CleanModel() as model:
         await model.deploy('canonical-livepatch-onprem', channel='edge', trust=True)
@@ -197,7 +197,7 @@ async def test_deploy_bundle(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_deploy_local_bundle_with_overlay_multi(event_loop):
     async with base.CleanModel() as model:
         bundle_with_overlay_path = OVERLAYS_DIR / 'bundle-with-overlay-multi.yaml'
@@ -210,7 +210,7 @@ async def test_deploy_local_bundle_with_overlay_multi(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_deploy_bundle_with_overlay_as_argument(event_loop):
     async with base.CleanModel() as model:
         overlay_path = OVERLAYS_DIR / 'test-overlay.yaml'
@@ -231,7 +231,7 @@ async def test_deploy_bundle_with_overlay_as_argument(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_deploy_bundle_with_multi_overlay_as_argument(event_loop):
     async with base.CleanModel() as model:
         overlay_path = OVERLAYS_DIR / 'test-multi-overlay.yaml'
@@ -243,7 +243,7 @@ async def test_deploy_bundle_with_multi_overlay_as_argument(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_deploy_bundle_with_multiple_overlays_with_include_files(event_loop):
     async with base.CleanModel() as model:
         bundle_yaml_path = TESTS_DIR / 'integration' / 'bundle' / 'bundle.yaml'
@@ -264,7 +264,7 @@ async def test_deploy_bundle_with_multiple_overlays_with_include_files(event_loo
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_deploy_local_charm_folder_symlink(event_loop):
     charm_path = TESTS_DIR / 'charm-folder-symlink'
 
@@ -281,7 +281,7 @@ async def test_deploy_local_charm_folder_symlink(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_deploy_trusted_bundle(event_loop):
     async with base.CleanModel() as model:
         await model.deploy('canonical-livepatch-onprem', channel='stable', trust=True)
@@ -295,7 +295,7 @@ async def test_deploy_trusted_bundle(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_deploy_channels_revs(event_loop):
     pytest.skip('Revise to use local charms - shouldnt fail b/c of origin')
     async with base.CleanModel() as model:
@@ -312,7 +312,7 @@ async def test_deploy_channels_revs(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_deploy_from_ch_with_series(event_loop):
     charm = 'ch:ubuntu'
     for series in ['focal']:
@@ -331,7 +331,7 @@ async def test_deploy_from_ch_with_series(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_deploy_from_ch_with_invalid_series(event_loop):
     async with base.CleanModel() as model:
         charm = 'ch:ubuntu'
@@ -343,7 +343,7 @@ async def test_deploy_from_ch_with_invalid_series(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_add_machine(event_loop):
     from juju.machine import Machine
 
@@ -526,7 +526,7 @@ async def add_manual_machine_ssh(event_loop, is_root=False):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_add_manual_machine_ssh(event_loop):
     """Test manual machine provisioning with a non-root user
 
@@ -536,7 +536,7 @@ async def test_add_manual_machine_ssh(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_add_manual_machine_ssh_root(event_loop):
     """Test manual machine provisioning with the root user"""
 
@@ -544,7 +544,7 @@ async def test_add_manual_machine_ssh_root(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_relate(event_loop):
     from juju.relation import Relation
 
@@ -609,7 +609,7 @@ async def _deploy_in_loop(new_loop, model_name, jujudata):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_explicit_loop_threaded(event_loop):
     async with base.CleanModel() as model:
         model_name = model.name
@@ -626,7 +626,7 @@ async def test_explicit_loop_threaded(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_store_resources_charm(event_loop):
     pytest.skip('Revise: test_store_resources_charm intermittent test failure')
     async with base.CleanModel() as model:
@@ -645,7 +645,7 @@ async def test_store_resources_charm(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_local_oci_image_resource_charm(event_loop):
     charm_path = TESTS_DIR / 'integration' / 'oci-image-charm'
     async with base.CleanModel() as model:
@@ -663,7 +663,7 @@ async def test_local_oci_image_resource_charm(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_local_file_resource_charm(event_loop):
     charm_path = TESTS_DIR / 'integration' / 'file-resource-charm'
     async with base.CleanModel() as model:
@@ -680,7 +680,7 @@ async def test_local_file_resource_charm(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_attach_resource(event_loop):
     charm_path = TESTS_DIR / 'integration' / 'file-resource-charm'
     async with base.CleanModel() as model:
@@ -699,7 +699,7 @@ async def test_attach_resource(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_store_resources_bundle(event_loop):
     pytest.skip('test_store_resources_bundle intermittent test failure')
     async with base.CleanModel() as model:
@@ -721,7 +721,7 @@ async def test_store_resources_bundle(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_store_resources_bundle_revs(event_loop):
     pytest.skip('test_store_resources_bundle_revs intermittent test failure')
     async with base.CleanModel() as model:
@@ -743,7 +743,7 @@ async def test_store_resources_bundle_revs(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_ssh_key(event_loop):
     async with base.CleanModel() as model:
         await model.add_ssh_key('admin', SSH_KEY)
@@ -757,7 +757,7 @@ async def test_ssh_key(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_get_machines(event_loop):
     async with base.CleanModel() as model:
         result = await model.get_machines()
@@ -765,7 +765,7 @@ async def test_get_machines(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_wait_for_idle_without_units(event_loop):
     async with base.CleanModel() as model:
         await model.deploy(
@@ -780,7 +780,7 @@ async def test_wait_for_idle_without_units(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_wait_for_idle_with_not_enough_units(event_loop):
     async with base.CleanModel() as model:
         await model.deploy(
@@ -795,7 +795,7 @@ async def test_wait_for_idle_with_not_enough_units(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_wait_for_idle_with_enough_units(event_loop):
     async with base.CleanModel() as model:
         await model.deploy(
@@ -809,7 +809,7 @@ async def test_wait_for_idle_with_enough_units(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_wait_for_idle_with_exact_units(event_loop):
     async with base.CleanModel() as model:
         await model.deploy(
@@ -823,7 +823,7 @@ async def test_wait_for_idle_with_exact_units(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_wait_for_idle_with_exact_units_scale_down(event_loop):
     """Deploys 3 units, waits for them to be idle, then removes 2 of them,
     then waits for exactly 1 unit to be left.
@@ -851,7 +851,7 @@ async def test_wait_for_idle_with_exact_units_scale_down(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_wait_for_idle_with_exact_units_scale_down_zero(event_loop):
     """Deploys 3 units, waits for them to be idle, then removes 3 of them,
     then waits for exactly 0 unit to be left.
@@ -880,7 +880,7 @@ async def test_wait_for_idle_with_exact_units_scale_down_zero(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_watcher_reconnect(event_loop):
     async with base.CleanModel() as model:
         await model.connection().close()
@@ -888,7 +888,7 @@ async def test_watcher_reconnect(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_config(event_loop):
     async with base.CleanModel() as model:
         # first test get_config with nothing.
@@ -905,7 +905,7 @@ async def test_config(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_config_with_json(event_loop):
     async with base.CleanModel() as model:
         # first test get_config with nothing.
@@ -925,7 +925,7 @@ async def test_config_with_json(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_set_constraints(event_loop):
     async with base.CleanModel() as model:
         await model.set_constraints({'cpu-power': 1})
@@ -933,7 +933,7 @@ async def test_set_constraints(event_loop):
         assert cons['cpu_power'] == 1
 
 # @base.bootstrapped
-# @pytest.mark.asyncio
+# @pytest.mark.serial
 # async def test_grant(event_loop)
 #    async with base.CleanController() as controller:
 #        await controller.add_user('test-model-grant')
@@ -946,7 +946,7 @@ async def test_set_constraints(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_model_annotations(event_loop):
 
     async with base.CleanModel() as model:
@@ -961,7 +961,7 @@ async def test_model_annotations(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_machine_annotations(event_loop):
 
     async with base.CleanModel() as model:
@@ -978,7 +978,7 @@ async def test_machine_annotations(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_application_annotations(event_loop):
 
     async with base.CleanModel() as model:
@@ -995,7 +995,7 @@ async def test_application_annotations(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_unit_annotations(event_loop):
 
     async with base.CleanModel() as model:
@@ -1014,7 +1014,7 @@ async def test_unit_annotations(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_backups(event_loop):
     pytest.skip('Revise: mongodb issues')
     m = Model()
@@ -1041,7 +1041,7 @@ async def test_backups(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_connect_to_connection(event_loop):
     async with base.CleanModel() as test_model:
         # get the connection from test_model
@@ -1064,7 +1064,7 @@ async def test_connect_to_connection(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_connect_current(event_loop):
     m = Model()
     await m.connect_current()
@@ -1072,7 +1072,7 @@ async def test_connect_current(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_model_cache_update(event_loop):
     """Connecting to a new model shouldn't fail because the cache is not
     updated yet
@@ -1105,7 +1105,7 @@ async def test_model_cache_update(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_add_storage(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy('postgresql')
@@ -1116,7 +1116,7 @@ async def test_add_storage(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_model_attach_storage_at_deploy(event_loop):
     pytest.skip('detach/attach_storage inconsistent on Juju side, unable to test')
     async with base.CleanModel() as model:
@@ -1158,7 +1158,7 @@ async def test_model_attach_storage_at_deploy(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_detach_storage(event_loop):
     pytest.skip('detach/attach_storage inconsistent on Juju side, unable to test')
     async with base.CleanModel() as model:
@@ -1189,7 +1189,7 @@ async def test_detach_storage(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_list_storage(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy('postgresql')
@@ -1204,7 +1204,7 @@ async def test_list_storage(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 async def test_storage_pools(event_loop):
     async with base.CleanModel() as model:
         await model.deploy('postgresql')

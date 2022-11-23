@@ -19,8 +19,10 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python }}
+    - name: Install dependencies
+      run: pip install tox
     - name: Run unit tests
-      run: tox -e py3
+      run: tox -e py3,serial
     
 
   integration:
@@ -40,8 +42,6 @@ jobs:
       with:
         provider: lxd
         juju-channel: 3.0/stable
-        #channel: 1.25-strict/stable
-        #microk8s-group: snap_microk8s
     - name: Setup Python
       uses: actions/setup-python@v2
       with:
@@ -49,4 +49,4 @@ jobs:
     - name: Install dependencies
       run: pip install tox
     - name: Run integration
-      run: tox -e py3 -e integration,serial
+      run: tox -e integration
