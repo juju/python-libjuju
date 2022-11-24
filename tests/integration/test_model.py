@@ -51,6 +51,10 @@ async def test_deploy_local_bundle_dir(event_loop):
 
         app1 = model.applications.get('grafana')
         app2 = model.applications.get('prometheus')
+        with open("/tmp/output", "w") as writer:
+            writer.write(str(bundle_path)+"\n")
+            for (k,v) in model.applications.items():
+                writer.write(k)
         assert app1 and app2
         await model.block_until(lambda: (len(app1.units) == 1 and
                                 len(app2.units) == 1),
