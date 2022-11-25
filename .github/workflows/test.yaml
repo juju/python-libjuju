@@ -47,7 +47,7 @@ jobs:
       with:
         provider: lxd
         juju-channel: 2.9/stable
-        bootstrap-constraints: "--model-default apt-http-proxy=$PROXY --model-default apts-https-proxy=$PROXY --model-default juju-http-proxy=$PROXY --model-default juju-https-proxy=$PROXY --model-default apt-http-proxy=$PROXY --model-default apt-https-proxy=$PROXY"
+        bootstrap-options: "--model-default apt-http-proxy=$PROXY --model-default apts-https-proxy=$PROXY --model-default juju-http-proxy=$PROXY --model-default juju-https-proxy=$PROXY --model-default apt-http-proxy=$PROXY --model-default apt-https-proxy=$PROXY"
     - name: Setup Python
       uses: actions/setup-python@v4
       with:
