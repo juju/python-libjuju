@@ -47,9 +47,10 @@ jobs:
       with:
         provider: lxd
         juju-channel: 2.9/stable
-        bootstrap-options: "--model-default apt-http-proxy=$PROXY --model-default apts-https-proxy=$PROXY --model-default juju-http-proxy=$PROXY --model-default juju-https-proxy=$PROXY --model-default apt-http-proxy=$PROXY --model-default apt-https-proxy=$PROXY --model-default snap-http-proxy=$PROXY --model-default snap-https-proxy=$PROXY"
-    - name: Check controller config
-      run: juju model-defaults localhost
+    - name: Set model defaults
+      run: |
+        juju model-defaults localhost apt-http-proxy=$PROXY apts-https-proxy=$PROXY  juju-http-proxy=$PROXY juju-https-proxy=$PROXY apt-http-proxy=$PROXY apt-https-proxy=$PROXY snap-http-proxy=$PROXY snap-https-proxy=$PROXY
+        juju model-defaults localhost
     - name: Setup Python
       uses: actions/setup-python@v4
       with:

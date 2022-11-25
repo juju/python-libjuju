@@ -246,6 +246,18 @@ async def test_upgrade_local_charm(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_upgrade_switch_charmstore_to_charmhub(event_loop):
+    async with base.CleanModel() as model:
+        app = await model.deploy('cs:ubuntu', series='focal')
+        await model.wait_for_idle(status="active")
+        assert app.data['charm-url'].startswith('cs:ubuntu')
+        await app.upgrade_charm(channel='latest/stable', switch='ch:ubuntu-8')
+        await model.wait_for_idle(status="active")
+        assert app.data['charm-url'].startswith('ch:')
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_upgrade_charm_resource(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy('cs:~juju-qa/bionic/upgrade-charm-resource-test-0')
