@@ -40,14 +40,16 @@ jobs:
     - name: Install Squid proxy
       run: |
         sudo apt-get install squid
-        curl --proxy http://127.0.0.1:3128 https://charmhub.io
         export PROXY=http://127.0.0.1:3128
+        curl -s -o /dev/null -w "%{http_code}" --proxy $PROXY https://charmhub.io
     - name: Setup operator environment
       uses: charmed-kubernetes/actions-operator@main
       with:
         provider: lxd
         juju-channel: 2.9/stable
-        bootstrap-options: "--model-default apt-http-proxy=$PROXY --model-default apts-https-proxy=$PROXY --model-default juju-http-proxy=$PROXY --model-default juju-https-proxy=$PROXY --model-default apt-http-proxy=$PROXY --model-default apt-https-proxy=$PROXY"
+        bootstrap-options: "--model-default apt-http-proxy=$PROXY --model-default apts-https-proxy=$PROXY --model-default juju-http-proxy=$PROXY --model-default juju-https-proxy=$PROXY --model-default apt-http-proxy=$PROXY --model-default apt-https-proxy=$PROXY --model-default snap-http-proxy=$PROXY --model-default snap-https-proxy=$PROXY"
+    - name: Check controller config
+      run: juju controller-config
     - name: Setup Python
       uses: actions/setup-python@v4
       with:
