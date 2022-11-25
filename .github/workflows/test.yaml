@@ -54,7 +54,7 @@ jobs:
         PROXY: http://127.0.0.1:3128
       run: |
         set -euxo pipefail
-        juju model-defaults localhost apt-http-proxy=$PROXY apts-https-proxy=$PROXY  juju-http-proxy=$PROXY juju-https-proxy=$PROXY apt-http-proxy=$PROXY apt-https-proxy=$PROXY snap-http-proxy=$PROXY snap-https-proxy=$PROXY http-proxy=$PROXY https-proxy=$PROXY
+        juju model-defaults localhost apt-http-proxy=$PROXY apt-https-proxy=$PROXY  juju-http-proxy=$PROXY juju-https-proxy=$PROXY apt-http-proxy=$PROXY apt-https-proxy=$PROXY snap-http-proxy=$PROXY snap-https-proxy=$PROXY http-proxy=$PROXY https-proxy=$PROXY
         juju model-defaults localhost
     - name: Setup Python
       uses: actions/setup-python@v4
