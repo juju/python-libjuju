@@ -71,7 +71,7 @@ jobs:
         set -euxo pipefail
         lxc launch ubuntu:22.04 proxy
         lxc exec proxy -- bash -c "\
-        sudo apt-get install squid &&
+        sudo apt-get install -y squid &&
         echo \"acl all src all\" > /tmp/squid.conf &&
         echo \"http_access allow all\" >> /tmp/squid.conf &&
         echo \"http_port proxy.lxd:3128\" >> /tmp/squid.conf &&
