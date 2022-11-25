@@ -71,11 +71,12 @@ jobs:
         set -euxo pipefail
         lxc launch ubuntu:22.04 proxy
         lxc exec proxy -- bash -c "\
-        sudo apt-get install squid \\
-        echo \"allow all src all\" >> /tmp/squid.conf \\
-        echo \"http_access allow all\" >> /tmp/squid.conf \\
-        echo \"http_port proxy.lxd:3128\" >> /tmp/squid.conf \\
-        sudo squid -k reconfigure -f /tmp/squid.conf"
+        sudo apt-get install squid &&
+        echo \"acl all src all\" > /tmp/squid.conf &&
+        echo \"http_access allow all\" >> /tmp/squid.conf &&
+        echo \"http_port proxy.lxd:3128\" >> /tmp/squid.conf &&
+        mv /tmp/squid.conf /etc/squid/squid.conf &&
+        sudo squid -k reconfigure"
     - name: Setup Python
       uses: actions/setup-python@v4
       with:
