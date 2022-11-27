@@ -92,7 +92,7 @@ jobs:
         # copy to the controller and reconfigure it
         juju status -m controller
         juju switch controller
-        juju ssh 0 "sudo apt-get install squid"
+        juju ssh 0 "sudo apt-get install squid -y"
         juju scp /tmp/squid.conf 0:/etc/squid/squid.conf
         juju ssh 0 "sudo squid -k reconfigure"
         # set model defaults
