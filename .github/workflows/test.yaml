@@ -64,19 +64,32 @@ jobs:
         set -euxo pipefail
         juju model-defaults localhost apt-http-proxy=$PROXY apt-https-proxy=$PROXY  juju-http-proxy=$PROXY juju-https-proxy=$PROXY  snap-http-proxy=$PROXY snap-https-proxy=$PROXY
         juju model-defaults localhost
-    - name: Set proxy
-      env: 
-        PROXY: proxy.lxd:3128
+    # - name: Set proxy
+    #   env: 
+    #     PROXY: proxy.lxd:3128
+    #   run: |
+    #     set -euxo pipefail
+    #     lxc launch ubuntu:22.04 proxy
+    #     lxc exec proxy -- bash -c "\
+    #     sudo apt-get install -y squid &&
+    #     echo \"acl all src all\" > /tmp/squid.conf &&
+    #     echo \"http_access allow all\" >> /tmp/squid.conf &&
+    #     echo \"http_port proxy.lxd:3128\" >> /tmp/squid.conf &&
+    #     sudo mv /tmp/squid.conf /etc/squid/squid.conf &&
+    #     sudo squid -k reconfigure"
+    - name: Set proxy in controller
       run: |
         set -euxo pipefail
-        lxc launch ubuntu:22.04 proxy
-        lxc exec proxy -- bash -c "\
-        sudo apt-get install -y squid &&
-        echo \"acl all src all\" > /tmp/squid.conf &&
-        echo \"http_access allow all\" >> /tmp/squid.conf &&
-        echo \"http_port proxy.lxd:3128\" >> /tmp/squid.conf &&
-        mv /tmp/squid.conf /etc/squid/squid.conf &&
-        sudo squid -k reconfigure"
+        # build a squid config file
+        CONTROLLER_ADDR = 
+        echo "acl all src all" > /tmp/squid.conf
+        echo "http_access allow all" >> /tmp/squid.conf
+        echo "http_port $CONTROLLER_ADDR:3128" >> /tmp/squid.conf
+        echo "sudo mv /tmp/squid.conf /etc/squid/squid.conf" >> /tmp/squid.conf
+        echo "sudo squid -k reconfigure" >> /tmp/squid.conf
+        # copy to the controller and reconfigure it
+        juju scp /tmp/squid_script.sh 0:/tmp/squid_script.sh
+        juju ssh 0 bash /tmp/squid_script.sh
     - name: Setup Python
       uses: actions/setup-python@v4
       with:
