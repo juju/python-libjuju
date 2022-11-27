@@ -91,7 +91,7 @@ jobs:
         echo "sudo mv /tmp/squid.conf /etc/squid/squid.conf" >> /tmp/squid.conf
         echo "sudo squid -k reconfigure" >> /tmp/squid.conf
         # copy to the controller and reconfigure it
-        juju scp /tmp/squid_script.sh 0:/tmp/squid_script.sh
+        juju scp /tmp/squid_script.sh controller/0:/tmp/squid_script.sh
         juju ssh 0 bash /tmp/squid_script.sh
         # set model defaults
         juju model-defaults localhost apt-http-proxy=$PROXY apt-https-proxy=$PROXY  juju-http-proxy=$PROXY juju-https-proxy=$PROXY  snap-http-proxy=$PROXY snap-https-proxy=$PROXY
