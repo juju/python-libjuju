@@ -91,6 +91,7 @@ jobs:
         echo "sudo mv /tmp/squid.conf /etc/squid/squid.conf" >> /tmp/squid.conf
         echo "sudo squid -k reconfigure" >> /tmp/squid.conf
         # copy to the controller and reconfigure it
+        juju status -m controller
         juju scp /tmp/squid_script.sh controller/0:/tmp/squid_script.sh
         juju ssh 0 bash /tmp/squid_script.sh
         # set model defaults
