@@ -88,9 +88,11 @@ jobs:
         echo "acl all src all" > /tmp/squid.conf
         echo "http_access allow all" >> /tmp/squid.conf
         echo "http_port $PROXY" >> /tmp/squid.conf
+        cat /tmp/squid.conf
         # copy to the controller and reconfigure it
         juju status -m controller
-        juju scp /tmp/squid.conf controller/0:/etc/squid/squid.conf
+        juju switch controller
+        juju scp /tmp/squid.conf 0:/etc/squid/squid.conf
         juju ssh 0 "sudo squid -k reconfigure"
         # set model defaults
         juju model-defaults localhost apt-http-proxy=$PROXY apt-https-proxy=$PROXY  juju-http-proxy=$PROXY juju-https-proxy=$PROXY  snap-http-proxy=$PROXY snap-https-proxy=$PROXY
