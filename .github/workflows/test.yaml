@@ -37,46 +37,11 @@ jobs:
     steps:
     - name: Check out code
       uses: actions/checkout@v3
-    # - name: Install Squid proxy
-    #   env:
-    #     PROXY: proxy.lxd:3128
-    #   run: |
-    #     set -euxo pipefail
-    #     sudo apt-get install squid
-    #     # generate a specific config file and restart squid
-    #     echo "http_port 192.0.2.1:3128" > /tmp/squid.conf
-    #     sudo squid -k reconfigure -f /tmp/squid.conf
-    #     curl -s -o /dev/null -w "%{http_code}" --proxy $PROXY https://charmhub.io
-    #     # allow all requests    
-    #     # acl all src all
-    #     # http_access allow all
-
-    #     # http_port proxy.lxd:3128
     - name: Setup operator environment
       uses: charmed-kubernetes/actions-operator@main
       with:
         provider: lxd
         juju-channel: 2.9/stable
-    # - name: Set model defaults
-    #   env:
-    #     PROXY: proxy.lxd:3128
-    #   run: |
-    #     set -euxo pipefail
-    #     juju model-defaults localhost apt-http-proxy=$PROXY apt-https-proxy=$PROXY  juju-http-proxy=$PROXY juju-https-proxy=$PROXY  snap-http-proxy=$PROXY snap-https-proxy=$PROXY
-    #     juju model-defaults localhost
-    # - name: Set proxy
-    #   env: 
-    #     PROXY: proxy.lxd:3128
-    #   run: |
-    #     set -euxo pipefail
-    #     lxc launch ubuntu:22.04 proxy
-    #     lxc exec proxy -- bash -c "\
-    #     sudo apt-get install -y squid &&
-    #     echo \"acl all src all\" > /tmp/squid.conf &&
-    #     echo \"http_access allow all\" >> /tmp/squid.conf &&
-    #     echo \"http_port proxy.lxd:3128\" >> /tmp/squid.conf &&
-    #     sudo mv /tmp/squid.conf /etc/squid/squid.conf &&
-    #     sudo squid -k reconfigure"
     - name: Set proxy in controller
       run: |
         set -euxo pipefail
