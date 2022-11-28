@@ -26,6 +26,7 @@ jobs:
     
 
   integration:
+    timeout-minutes: 90
     name: Integration
     runs-on: ubuntu-latest
     strategy:

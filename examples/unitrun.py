@@ -27,9 +27,9 @@ async def main():
     await model.connect()
 
     app = await model.deploy(
-        'cs:ubuntu-0',
+        'jammy',
         application_name='ubuntu',
-        series='trusty',
+        series='jammy',
         channel='stable',
     )
 
