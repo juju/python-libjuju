@@ -154,7 +154,7 @@ async def test_add_bundle(event_loop):
 
     async with base.CleanModel() as model_1:
         tmp_path = None
-        wait_for_min = 5
+        wait_for_min = 10
 
         with tempfile.TemporaryDirectory() as dirpath:
             try:
