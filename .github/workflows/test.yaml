@@ -53,14 +53,13 @@ jobs:
         echo "acl all src all" > squid.conf
         echo "http_access allow all" >> squid.conf
         echo "http_port $PROXY" >> squid.conf
-        cat /tmp/squid.conf
+        cat squid.conf
         # copy to the controller and reconfigure it
         juju status -m controller
         juju switch controller
-        sudo mkdir /home/runner/.ssh
         juju ssh 0 "sudo apt-get install squid -y"
         juju scp squid.conf 0:/tmp/squid.conf
-        juju ssh 0 "sudo mv squid.conf /etc/squid/squid.conf"
+        juju ssh 0 "sudo mv /tmp/squid.conf /etc/squid/squid.conf"
         juju ssh 0 "sudo squid -k reconfigure"
         # Test curl after waiting
         sleep 10
