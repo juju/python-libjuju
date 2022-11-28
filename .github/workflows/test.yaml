@@ -57,6 +57,7 @@ jobs:
         # copy to the controller and reconfigure it
         juju status -m controller
         juju switch controller
+        sudo mkdir /home/runner/.ssh
         juju ssh 0 "sudo apt-get install squid -y"
         juju scp /tmp/squid.conf 0:/tmp/squid.conf
         juju ssh 0 "sudo mv /tmp/squid.conf /etc/squid/squid.conf"
