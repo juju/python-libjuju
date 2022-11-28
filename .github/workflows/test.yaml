@@ -77,4 +77,4 @@ jobs:
       run: pip install tox
     - name: Run integration
       # Force one single concurrent test
-      run: tox -e integration -n 1
+      run: tox -e integration -- -n 1
