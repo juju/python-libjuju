@@ -110,6 +110,7 @@ async def test_run(event_loop):
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_run_action(event_loop):
+    pytest.skip('Find a better charm for this test')
     async def run_action(unit):
         # unit.run() returns a juju.action.Action instance
         action = await unit.run_action('add-repo', repo='myrepo')
