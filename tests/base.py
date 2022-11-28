@@ -111,7 +111,8 @@ class CleanModel():
 
     async def __aexit__(self, exc_type, exc, tb):
         await self._model.disconnect()
-        await self._controller.destroy_model(self._model_uuid, force=True)
+        # do not wait more than a minute for the model to be destroyed
+        await self._controller.destroy_model(self._model_uuid, force=True, max_wait=60)
         await self._controller.disconnect()
 
 
