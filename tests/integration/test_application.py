@@ -135,30 +135,6 @@ async def test_deploy_charmhub_charm(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_upgrade_charm(event_loop):
-    async with base.CleanModel() as model:
-        app = await model.deploy('ubuntu')
-        await model.block_until(lambda: (len(app.units) > 0 and
-                                         app.units[0].machine))
-        assert app.data['charm-url'] == 'ubuntu'
-        await app.upgrade_charm()
-        assert app.data['charm-url'] != 'ubuntu'
-
-
-@base.bootstrapped
-@pytest.mark.asyncio
-async def test_upgrade_charm_channel(event_loop):
-    async with base.CleanModel() as model:
-        app = await model.deploy('ubuntu')
-        await model.block_until(lambda: (len(app.units) > 0 and
-                                         app.units[0].machine))
-        assert app.data['charm-url'] == 'ubuntu'
-        await app.upgrade_charm(channel='stable')
-        assert app.data['charm-url'] != 'ubuntu'
-
-
-@base.bootstrapped
-@pytest.mark.asyncio
 async def test_upgrade_charm_switch_channel(event_loop):
     # Note for future:
     # This test requires a charm that has different
@@ -199,21 +175,6 @@ async def test_upgrade_charm_switch_channel(event_loop):
         await model.wait_for_idle(status='active')
         await app.upgrade_charm(channel='candidate')
         await model.wait_for_idle(status='active')
-
-
-@base.bootstrapped
-@pytest.mark.asyncio
-async def test_upgrade_charm_switch(event_loop):
-    pytest.skip('This upgrading is not the recommended approach')
-    async with base.CleanModel() as model:
-        app = await model.deploy('cs:ubuntu-0')
-        await model.block_until(lambda: (len(app.units) > 0 and
-                                         app.units[0].machine))
-        assert app.data['charm-url'] == 'cs:ubuntu-0'
-        with pytest.raises(errors.JujuError):
-            await app.upgrade_charm(switch='ubuntu-8')
-        await app.upgrade_charm(switch='cs:ubuntu-8')
-        assert app.data['charm-url'] == 'cs:ubuntu-8'
 
 
 @base.bootstrapped
