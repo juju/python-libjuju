@@ -52,8 +52,8 @@ async def test_deploy_local_bundle_dir(event_loop):
         app1 = model.applications.get('grafana')
         app2 = model.applications.get('prometheus')
         with open("/tmp/output", "w") as writer:
-            writer.write(str(bundle_path)+"\n")
-            for (k,v) in model.applications.items():
+            writer.write(str(bundle_path) + "\n")
+            for (k, v) in model.applications.items():
                 writer.write(k)
         assert app1 and app2
         await model.block_until(lambda: (len(app1.units) == 1 and
@@ -255,7 +255,7 @@ async def test_deploy_bundle_with_multiple_overlays_with_include_files(event_loo
         overlay2_path = OVERLAYS_DIR / 'test-overlay3.yaml'
 
         await model.deploy(str(bundle_yaml_path), overlays=[overlay1_path, overlay2_path])
-        
+
         assert 'influxdb' not in model.applications
         assert 'test' not in model.applications
         assert 'memcached' not in model.applications

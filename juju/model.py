@@ -2295,8 +2295,9 @@ class Model:
 
         :param dict config: Mapping of model constraints
         """
+
         facade_cls = client.ModelConfigFacade
-        
+
         facade = facade_cls.from_connection(self.connection())
 
         await facade.SetModelConstraints(

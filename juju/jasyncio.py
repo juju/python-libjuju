@@ -67,17 +67,21 @@ def create_task_with_handler(coro, task_name, logger=ROOT_LOGGER):
     task.add_done_callback(functools.partial(_task_result_exp_handler, task_name=task_name, logger=logger))
     return task
 
+
 class SingletonEventLoop(object):
     """
     Single instance containing an event loop to be reused.
     """
+
     loop = None
+
     def __new__(cls):
         if not hasattr(cls, 'instance'):
-          cls.instance = super(SingletonEventLoop, cls).__new__(cls)
-          cls.instance.loop = asyncio.new_event_loop()
+            cls.instance = super(SingletonEventLoop, cls).__new__(cls)
+            cls.instance.loop = asyncio.new_event_loop()
 
         return cls.instance
+
 
 def run(*steps):
     """
@@ -86,6 +90,7 @@ def run(*steps):
 
     Returns the return value of the last function.
     """
+
     if not steps:
         return
 

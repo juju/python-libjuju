@@ -12,12 +12,14 @@ from juju.controller import Controller
 
 from juju.jasyncio import SingletonEventLoop
 
+
 @pytest.fixture(scope="session")
 def event_loop():
     """
     This fixture forces all the asyncio tests
     to use the same events loop
     """
+
     loop = SingletonEventLoop().loop
     yield loop
     loop.close()
