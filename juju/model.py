@@ -1797,27 +1797,26 @@ class Model:
                 # We have a local charm dir that needs to be uploaded
                 charm_dir = os.path.abspath(os.path.expanduser(identifier))
                 charm_origin = res.origin
+                base = None
 
                 metadata = utils.get_local_charm_metadata(charm_dir)
                 charm_series = charm_series or await get_charm_series(metadata,
                                                                       self)
 
-                # If we're using a newer client, then the CharmOrigin needs a
-                # base
-                if not self.connection().is_using_old_client:
-                    charm_origin.base = utils.get_local_charm_base(charm_series,
-                                                                   channel,
-                                                                   metadata,
-                                                                   charm_dir,
-                                                                   client.Base)
-
+                if not self.connection().is_using_old_client or \
+                        not charm_series:
+                    base = utils.get_local_charm_base(charm_series,
+                                                      channel,
+                                                      metadata,
+                                                      charm_dir,
+                                                      client.Base)
+                    charm_origin.base = base
                 if not application_name:
                     application_name = metadata['name']
-                if self.connection().is_using_old_client and not charm_series:
+                if base is None and charm_series is None:
                     raise JujuError(
-                        "Couldn't determine series for charm at {}. "
-                        "Pass a 'series' kwarg to Model.deploy().".format(
-                            charm_dir))
+                        "Either series or base is needed to deploy the "
+                        "charm at {}. ".format(charm_dir))
                 identifier = await self.add_local_charm_dir(charm_dir,
                                                             charm_series)
                 resources = await self.add_local_resources(application_name,
