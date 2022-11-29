@@ -12,10 +12,11 @@ from juju.client import client
 log = logging.getLogger('connector')
 
 # The SUPPORTED_JUJU_API_PREFIX indicates the prefix of the
-# juju version this python-libjuju version supports. For 
+# juju version this python-libjuju version supports. For
 # example, "3.0." indicates that all the 3.0.x versions
 # are intended to be supported.
 SUPPORTED_JUJU_API_PREFIX = "3.0."
+
 
 class NoConnectionException(Exception):
     '''Raised by Connector when the connection method is called
