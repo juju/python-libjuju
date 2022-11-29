@@ -141,6 +141,7 @@ async def test_relate_with_offer(event_loop):
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_add_bundle(event_loop):
+    pytest.skip("Skip until we find a faster alternative to this test")
     tests_dir = Path(__file__).absolute().parent
     bundle_path = tests_dir / 'bundle'
     cmr_bundle_path = str(bundle_path / 'cmr-bundle.yaml')
