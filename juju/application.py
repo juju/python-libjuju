@@ -823,9 +823,12 @@ class Application(model.ModelEntity):
 
         series = (
             await self.get_series() or
-            self.model.info.get('default-series', '') or
-            await get_charm_series(charm_dir, self.model)
+            self.model.info.get('default-series', '')
         )
+        if not series:
+            metadata = utils.get_local_charm_metadata(charm_dir)
+            await get_charm_series(metadata, self.model)
+
         if not series:
             default_series = model_config.get("default-series")
             if default_series:

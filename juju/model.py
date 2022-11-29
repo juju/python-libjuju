@@ -1795,14 +1795,11 @@ class Model:
                                                                 identifier)
             else:
                 # We have a local charm dir that needs to be uploaded
-                charm_dir = os.path.abspath(
-                    os.path.expanduser(identifier))
+                charm_dir = os.path.abspath(os.path.expanduser(identifier))
                 charm_origin = res.origin
 
                 metadata = utils.get_local_charm_metadata(charm_dir)
-                # TODO (cderici) : pass the metadata into get_charm_series, as
-                #  it also reads that file redundantly
-                charm_series = charm_series or await get_charm_series(charm_dir,
+                charm_series = charm_series or await get_charm_series(metadata,
                                                                       self)
 
                 # If we're using a newer client, then the CharmOrigin needs a

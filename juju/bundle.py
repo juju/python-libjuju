@@ -124,11 +124,10 @@ class BundleHandler:
                 pass
             except FileNotFoundError:
                 continue
-            series = (
-                app_dict.get('series') or
-                default_series or
-                await get_charm_series(charm_dir, self.model)
-            )
+            series = (app_dict.get('series') or default_series)
+            if not series:
+                metadata = utils.get_local_charm_metadata(charm_dir)
+                series = await get_charm_series(metadata, self.model)
             if not self.model.connection().is_using_old_client and not series:
                 raise JujuError(
                     "Couldn't determine series for charm at {}. "
@@ -430,32 +429,17 @@ def is_local_charm(charm_url):
     return charm_url.startswith('.') or charm_url.startswith('local:') or os.path.isabs(charm_url)
 
 
-async def get_charm_series(path, model):
-    """Inspects the charm directory at ``path`` and returns a default
-    series from its metadata.yaml (the first item in the 'series' list).
+async def get_charm_series(metadata, model):
+    """Inspects the given metadata and returns a default series from its
+    metadata.yaml (the first item in the 'series' list).
 
-    Tries to extract the informiation from the given model if no
-    series is determined from the path.
+    Tries to extract the information from the given model if no
+    series is determined from the given metadata.
     Returns None if no series can be determined.
 
     """
-    path = Path(path)
-    try:
-        if path.suffix == '.charm':
-            md = "metadata.yaml in %s" % path
-            with zipfile.ZipFile(str(path), 'r') as charm_file:
-                data = yaml.safe_load(charm_file.read('metadata.yaml'))
-        else:
-            md = path / "metadata.yaml"
-            if not md.exists():
-                return None
-            data = yaml.safe_load(md.open())
-    except yaml.YAMLError as exc:
-        if hasattr(exc, "problem_mark"):
-            mark = exc.problem_mark
-            log.error("Error parsing YAML file {}, line {}, column: {}".format(md, mark.line, mark.column))
-        raise
-    _series = data.get('series')
+
+    _series = metadata.get('series')
     series = _series[0] if _series else None
 
     if series is None:
