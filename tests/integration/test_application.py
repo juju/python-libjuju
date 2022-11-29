@@ -151,34 +151,6 @@ async def test_deploy_charmhub_charm(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-@pytest.mark.skip('Update charm')
-async def test_upgrade_charm(event_loop):
-    async with base.CleanModel() as model:
-        app = await model.deploy('cs:ubuntu-0')
-        await model.block_until(lambda: (len(app.units) > 0 and
-                                         app.units[0].machine))
-        assert app.data['charm-url'] == 'cs:ubuntu-0'
-        await app.upgrade_charm()
-        assert app.data['charm-url'].startswith('cs:ubuntu-')
-        assert app.data['charm-url'] != 'cs:ubuntu-0'
-
-
-@base.bootstrapped
-@pytest.mark.asyncio
-@pytest.mark.skip('Update charm')
-async def test_upgrade_charm_channel(event_loop):
-    async with base.CleanModel() as model:
-        app = await model.deploy('cs:ubuntu-0')
-        await model.block_until(lambda: (len(app.units) > 0 and
-                                         app.units[0].machine))
-        assert app.data['charm-url'] == 'cs:ubuntu-0'
-        await app.upgrade_charm(channel='stable')
-        assert app.data['charm-url'].startswith('cs:ubuntu-')
-        assert app.data['charm-url'] != 'cs:ubuntu-0'
-
-
-@base.bootstrapped
-@pytest.mark.asyncio
 @pytest.mark.skip('Skip until a similar k8s solution is found')
 async def test_upgrade_charm_switch_channel(event_loop):
     # Note for future:
