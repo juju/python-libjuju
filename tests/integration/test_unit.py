@@ -116,7 +116,7 @@ async def test_run_action(event_loop):
 
         for unit in app.units:
             action = await run_action(unit)
-            out = await model.get_action_output(action.entity_id, wait=5)
+            out = await model.get_action_output(action.entity_id, wait=10)
             assert out['Code'] == '0'
             assert 'password' in out
             assert len(out['password']) != 0
