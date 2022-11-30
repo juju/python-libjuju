@@ -1797,9 +1797,7 @@ class Model:
 
                 metadata = utils.get_local_charm_metadata(charm_dir)
                 charm_series = charm_series or await get_charm_series(metadata,
-                                                                      self)                   
-                charm_origin.base = utils.get_local_charm_base,
-                    charm_series, channel, metadata, charm_dir, client.Base)
+                                                                      self)
                 base = utils.get_local_charm_base(
                     charm_series, channel, metadata, charm_dir, client.Base)
                 charm_origin.base = base
