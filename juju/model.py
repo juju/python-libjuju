@@ -1747,10 +1747,6 @@ class Model:
 
         charm_series = series
 
-        if self.connection().is_using_old_client and charm_series is None:
-            # Also try
-            charm_series = res.origin.series
-
         if res.is_bundle:
             handler = BundleHandler(self, trusted=trust, forced=force)
             await handler.fetch_plan(url, res.origin, overlays=overlays)
@@ -1805,22 +1801,11 @@ class Model:
                 charm_series = charm_series or await get_charm_series(charm_dir,
                                                                       self)
 
-                # If we're using a newer client, then the CharmOrigin needs a
-                # base
-                if not self.connection().is_using_old_client:
-                    charm_origin.base = utils.get_local_charm_base(charm_series,
-                                                                   channel,
-                                                                   metadata,
-                                                                   charm_dir,
-                                                                   client.Base)
+                charm_origin.base = utils.get_local_charm_base(charm_series, channel, metadata, charm_dir, client.Base)
 
                 if not application_name:
                     application_name = metadata['name']
-                if self.connection().is_using_old_client and not charm_series:
-                    raise JujuError(
-                        "Couldn't determine series for charm at {}. "
-                        "Pass a 'series' kwarg to Model.deploy().".format(
-                            charm_dir))
+
                 identifier = await self.add_local_charm_dir(charm_dir,
                                                             charm_series)
                 resources = await self.add_local_resources(application_name,
@@ -1895,8 +1880,7 @@ class Model:
             'track': origin.track,
             'risk': origin.risk,
         }
-        if not self.connection().is_using_old_client:
-            resolve_origin['base'] = origin.base
+        resolve_origin['base'] = origin.base
 
         resp = await charms_facade.ResolveCharms(resolve=[{
             'reference': str(url),
@@ -2192,8 +2176,6 @@ class Model:
         """
         constraints = {}
         facade_cls = client.ModelConfigFacade
-        if self.connection().is_using_old_client:
-            facade_cls = client.ClientFacade
 
         facade = facade_cls.from_connection(self.connection())
         result = await facade.GetModelConstraints()
@@ -2313,9 +2295,9 @@ class Model:
 
         :param dict config: Mapping of model constraints
         """
+
         facade_cls = client.ModelConfigFacade
-        if self.connection().is_using_old_client:
-            facade_cls = client.ClientFacade
+
         facade = facade_cls.from_connection(self.connection())
 
         await facade.SetModelConstraints(

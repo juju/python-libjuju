@@ -15,6 +15,5 @@ async def status():
 
     return status
 
-
 if __name__ == '__main__':
     jasyncio.run(status())

@@ -10,6 +10,20 @@ import pytest
 from juju.client.jujudata import FileJujuData
 from juju.controller import Controller
 
+from juju.jasyncio import SingletonEventLoop
+
+
+@pytest.fixture(scope="session")
+def event_loop():
+    """
+    This fixture forces all the asyncio tests
+    to use the same events loop
+    """
+
+    loop = SingletonEventLoop().loop
+    yield loop
+    loop.close()
+
 
 def is_bootstrapped():
     try:
@@ -99,7 +113,8 @@ class CleanModel():
 
     async def __aexit__(self, exc_type, exc, tb):
         await self._model.disconnect()
-        await self._controller.destroy_model(self._model_uuid, force=True)
+        # do not wait more than a minute for the model to be destroyed
+        await self._controller.destroy_model(self._model_uuid, force=True, max_wait=60)
         await self._controller.disconnect()
 
 

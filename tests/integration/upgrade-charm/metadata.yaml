@@ -1,5 +1,5 @@
 name: ubuntu
-series: ["bionic", "focal"]
+series: ["focal", "jammy"]
 summary: "test"
 description: "test"
 maintainers: ["test"]
