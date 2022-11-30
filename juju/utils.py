@@ -239,7 +239,7 @@ def get_local_charm_data(path, yaml_file):
 
     :patam str path: Path of charm directory or .charm file
     :patam str yaml_file: name of the yaml file, can be either
-    "metadata.yaml", or "manifest.yaml"
+    "metadata.yaml", or "manifest.yaml", or "charmcraft.yaml"
 
     :return: Object of charm metadata
     """
@@ -249,6 +249,8 @@ def get_local_charm_data(path, yaml_file):
     else:
         entity_path = Path(path)
         metadata_path = entity_path / yaml_file
+        if not metadata_path.exists():
+            return {}
         metadata = yaml.load(metadata_path.read_text(), Loader=yaml.FullLoader)
 
     return metadata
@@ -260,6 +262,10 @@ def get_local_charm_metadata(path):
 
 def get_local_charm_manifest(path):
     return get_local_charm_data(path, 'manifest.yaml')
+
+
+def get_local_charm_charmcraft_yaml(path):
+    return get_local_charm_data(path, 'charmcraft.yaml')
 
 
 PRECISE = "precise"
@@ -376,6 +382,12 @@ def get_local_charm_base(series, channel_from_arg, charm_metadata,
         if 'bases' in charm_manifest:
             channel_for_base = charm_manifest['bases'][0]['channel']
             os_name_for_base = charm_manifest['bases'][0]['name']
+        else:
+            # Also check the charmcraft.yaml
+            charmcraft_yaml = get_local_charm_charmcraft_yaml(charm_path)
+        if 'bases' in charmcraft_yaml:
+            channel_for_base = charmcraft_yaml['bases'][0]['run-on'][0]['channel']
+            os_name_for_base = charmcraft_yaml['bases'][0]['run-on'][0]['name']
 
     if channel_for_base == '':
         raise errors.JujuError("Unable to determine base for charm : %s" %

@@ -164,6 +164,18 @@ async def test_deploy_local_charm(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_deploy_local_charm_base_charmcraft_yaml(event_loop):
+    charm_path = HERE_DIR / 'charm-base-charmcraft-yaml'
+
+    async with base.CleanModel() as model:
+        await model.deploy(str(charm_path))
+        assert 'charm' in model.applications
+        await model.wait_for_idle(status="active")
+        assert model.units['charm/0'].workload_status == 'active'
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_wait_local_charm_blocked(event_loop):
     charm_path = TESTS_DIR / 'charm'
 
