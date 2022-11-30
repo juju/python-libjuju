@@ -13,9 +13,9 @@ from .. import base
 async def test_block_coroutine(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy(
-            'ch:ubuntu',
+            'ubuntu',
             application_name='ubuntu',
-            series='bionic',
+            series='jammy',
             channel='stable',
             num_units=3,
         )
@@ -32,9 +32,9 @@ async def test_block_coroutine(event_loop):
 async def test_unit_public_address(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy(
-            'ch:ubuntu',
+            'ubuntu',
             application_name='ubuntu',
-            series='bionic',
+            series='jammy',
             channel='stable',
             num_units=1,
         )
@@ -69,7 +69,7 @@ async def test_run(event_loop):
         app = await model.deploy(
             'ubuntu',
             application_name='ubuntu',
-            series='focal',
+            series='jammy',
             channel='stable',
         )
 
@@ -110,6 +110,8 @@ async def test_run(event_loop):
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_run_action(event_loop):
+    pytest.skip('Find a better charm for this test')
+
     async def run_action(unit):
         # unit.run() returns a juju.action.Action instance
         action = await unit.run_action('add-repo', repo='myrepo')

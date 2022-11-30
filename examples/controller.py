@@ -24,9 +24,9 @@ async def main():
         'aws-tim',
     )
     await model.deploy(
-        'cs:ubuntu-0',
+        'ubuntu',
         application_name='ubuntu',
-        series='trusty',
+        series='focal',
         channel='stable',
     )
     await model.disconnect()

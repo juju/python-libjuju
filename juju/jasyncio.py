@@ -31,22 +31,8 @@ ROOT_LOGGER = logging.getLogger()
 from asyncio import Event, TimeoutError, Queue, ensure_future, \
     gather, sleep, wait_for, create_subprocess_exec, subprocess, \
     wait, FIRST_COMPLETED, Lock, as_completed, new_event_loop, \
-    get_event_loop_policy, CancelledError # noqa
-
-try:
-    from asyncio import get_running_loop
-except ImportError:
-    def get_running_loop():
-        loop = asyncio.get_event_loop()
-        if not loop.is_running():
-            raise RuntimeError("no running event loop")
-        return loop
-
-try:
-    from asyncio import create_task
-except ImportError:
-    def create_task(coro):
-        return asyncio.ensure_future(coro)
+    get_event_loop_policy, CancelledError, get_running_loop, \
+    create_task     # noqa
 
 
 def create_task_with_handler(coro, task_name, logger=ROOT_LOGGER):
@@ -82,6 +68,21 @@ def create_task_with_handler(coro, task_name, logger=ROOT_LOGGER):
     return task
 
 
+class SingletonEventLoop(object):
+    """
+    Single instance containing an event loop to be reused.
+    """
+
+    loop = None
+
+    def __new__(cls):
+        if not hasattr(cls, 'instance'):
+            cls.instance = super(SingletonEventLoop, cls).__new__(cls)
+            cls.instance.loop = asyncio.new_event_loop()
+
+        return cls.instance
+
+
 def run(*steps):
     """
     Helper to run one or more async functions synchronously, with graceful
@@ -89,12 +90,14 @@ def run(*steps):
 
     Returns the return value of the last function.
     """
+
     if not steps:
         return
 
     task = None
     run._sigint = False  # function attr to allow setting from closure
-    loop = asyncio.new_event_loop()
+    # Use a singleton class to force a single event loop instance
+    loop = SingletonEventLoop().loop
 
     def abort():
         task.cancel()

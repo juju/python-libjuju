@@ -18,9 +18,8 @@ log = logging.getLogger(__name__)
 
 
 # this test must be run serially because it modifies the login password
-@pytest.mark.serial
 @base.bootstrapped
-@pytest.mark.asyncio
+@pytest.mark.serial
 @pytest.mark.skip('one of old macaroon_auth tests, needs to be revised')
 async def test_macaroon_auth_serial(event_loop):
     jujudata = FileJujuData()
