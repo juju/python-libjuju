@@ -19,7 +19,7 @@ async def test_action(event_loop):
         ubuntu_app = await model.deploy(
             'percona-cluster',
             application_name='mysql',
-            series='xenial',
+            series='bionic',
             channel='stable',
             config={
                 'tuning-level': 'safest',
@@ -57,7 +57,7 @@ async def test_get_set_config(event_loop):
         ubuntu_app = await model.deploy(
             'percona-cluster',
             application_name='mysql',
-            series='xenial',
+            series='bionic',
             channel='stable',
             config={
                 'tuning-level': 'safest',
