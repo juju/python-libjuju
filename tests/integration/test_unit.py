@@ -102,37 +102,26 @@ async def test_run(event_loop):
 async def test_run_action(event_loop):
     async def run_action(unit):
         # unit.run() returns a juju.action.Action instance
-        action = await unit.run_action('add-repo', repo='myrepo')
+        action = await unit.run_action('get-admin-password')
         # wait for the action to complete
         return await action.wait()
 
     async with base.CleanModel() as model:
         app = await model.deploy(
-            'git',
-            application_name='git',
-            series='trusty',
+            'grafana',
+            application_name='grafana',
+            series='focal',
             channel='stable',
         )
 
         for unit in app.units:
             action = await run_action(unit)
-            assert action.results == {
-                'Code': '0',
-                'Stdout': "Adding group `myrepo' (GID 1001) ...\n"
-                          'Done.\n'
-                          'Initialized empty Git repository in '
-                          '/var/git/myrepo.git/\n',
-                'dir': '/var/git/myrepo.git',
-            }
+            
             out = await model.get_action_output(action.entity_id, wait=5)
-            assert out == {
-                'Code': '0',
-                'Stdout': "Adding group `myrepo' (GID 1001) ...\n"
-                          'Done.\n'
-                          'Initialized empty Git repository in '
-                          '/var/git/myrepo.git/\n',
-                'dir': '/var/git/myrepo.git',
-            }
+            assert out['Code'] == '0'
+            assert 'password' in out
+            assert len(out['password']) != 0
+            
             status = await model.get_action_status(
                 uuid_or_prefix=action.entity_id)
             assert status[action.entity_id] == 'completed'
