@@ -5,6 +5,785 @@ from juju.client.facade import Type, ReturnMapping
 from juju.client._definitions import *
 
 
+class ActionFacade(Type):
+    name = 'Action'
+    version = 7
+    schema =     {'definitions': {'Action': {'additionalProperties': False,
+                                'properties': {'name': {'type': 'string'},
+                                               'parameters': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                           'type': 'object'}},
+                                                              'type': 'object'},
+                                               'receiver': {'type': 'string'},
+                                               'tag': {'type': 'string'}},
+                                'required': ['tag', 'receiver', 'name'],
+                                'type': 'object'},
+                     'ActionMessage': {'additionalProperties': False,
+                                       'properties': {'message': {'type': 'string'},
+                                                      'timestamp': {'format': 'date-time',
+                                                                    'type': 'string'}},
+                                       'required': ['timestamp', 'message'],
+                                       'type': 'object'},
+                     'ActionResult': {'additionalProperties': False,
+                                      'properties': {'action': {'$ref': '#/definitions/Action'},
+                                                     'completed': {'format': 'date-time',
+                                                                   'type': 'string'},
+                                                     'enqueued': {'format': 'date-time',
+                                                                  'type': 'string'},
+                                                     'error': {'$ref': '#/definitions/Error'},
+                                                     'log': {'items': {'$ref': '#/definitions/ActionMessage'},
+                                                             'type': 'array'},
+                                                     'message': {'type': 'string'},
+                                                     'output': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                             'type': 'object'}},
+                                                                'type': 'object'},
+                                                     'started': {'format': 'date-time',
+                                                                 'type': 'string'},
+                                                     'status': {'type': 'string'}},
+                                      'type': 'object'},
+                     'ActionResults': {'additionalProperties': False,
+                                       'properties': {'results': {'items': {'$ref': '#/definitions/ActionResult'},
+                                                                  'type': 'array'}},
+                                       'type': 'object'},
+                     'ActionSpec': {'additionalProperties': False,
+                                    'properties': {'description': {'type': 'string'},
+                                                   'params': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                           'type': 'object'}},
+                                                              'type': 'object'}},
+                                    'required': ['description', 'params'],
+                                    'type': 'object'},
+                     'Actions': {'additionalProperties': False,
+                                 'properties': {'actions': {'items': {'$ref': '#/definitions/Action'},
+                                                            'type': 'array'}},
+                                 'type': 'object'},
+                     'ActionsByName': {'additionalProperties': False,
+                                       'properties': {'actions': {'items': {'$ref': '#/definitions/ActionResult'},
+                                                                  'type': 'array'},
+                                                      'error': {'$ref': '#/definitions/Error'},
+                                                      'name': {'type': 'string'}},
+                                       'type': 'object'},
+                     'ActionsByNames': {'additionalProperties': False,
+                                        'properties': {'actions': {'items': {'$ref': '#/definitions/ActionsByName'},
+                                                                   'type': 'array'}},
+                                        'type': 'object'},
+                     'ActionsByReceiver': {'additionalProperties': False,
+                                           'properties': {'actions': {'items': {'$ref': '#/definitions/ActionResult'},
+                                                                      'type': 'array'},
+                                                          'error': {'$ref': '#/definitions/Error'},
+                                                          'receiver': {'type': 'string'}},
+                                           'type': 'object'},
+                     'ActionsByReceivers': {'additionalProperties': False,
+                                            'properties': {'actions': {'items': {'$ref': '#/definitions/ActionsByReceiver'},
+                                                                       'type': 'array'}},
+                                            'type': 'object'},
+                     'ApplicationCharmActionsResult': {'additionalProperties': False,
+                                                       'properties': {'actions': {'patternProperties': {'.*': {'$ref': '#/definitions/ActionSpec'}},
+                                                                                  'type': 'object'},
+                                                                      'application-tag': {'type': 'string'},
+                                                                      'error': {'$ref': '#/definitions/Error'}},
+                                                       'type': 'object'},
+                     'ApplicationsCharmActionsResults': {'additionalProperties': False,
+                                                         'properties': {'results': {'items': {'$ref': '#/definitions/ApplicationCharmActionsResult'},
+                                                                                    'type': 'array'}},
+                                                         'type': 'object'},
+                     'EnqueuedActionsV2': {'additionalProperties': False,
+                                           'properties': {'actions': {'items': {'$ref': '#/definitions/ActionResult'},
+                                                                      'type': 'array'},
+                                                          'operation': {'type': 'string'}},
+                                           'required': ['operation'],
+                                           'type': 'object'},
+                     'Entities': {'additionalProperties': False,
+                                  'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
+                                                              'type': 'array'}},
+                                  'required': ['entities'],
+                                  'type': 'object'},
+                     'Entity': {'additionalProperties': False,
+                                'properties': {'tag': {'type': 'string'}},
+                                'required': ['tag'],
+                                'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'FindActionsByNames': {'additionalProperties': False,
+                                            'properties': {'names': {'items': {'type': 'string'},
+                                                                     'type': 'array'}},
+                                            'type': 'object'},
+                     'FindTags': {'additionalProperties': False,
+                                  'properties': {'prefixes': {'items': {'type': 'string'},
+                                                              'type': 'array'}},
+                                  'required': ['prefixes'],
+                                  'type': 'object'},
+                     'FindTagsResults': {'additionalProperties': False,
+                                         'properties': {'matches': {'patternProperties': {'.*': {'items': {'$ref': '#/definitions/Entity'},
+                                                                                                 'type': 'array'}},
+                                                                    'type': 'object'}},
+                                         'required': ['matches'],
+                                         'type': 'object'},
+                     'OperationQueryArgs': {'additionalProperties': False,
+                                            'properties': {'actions': {'items': {'type': 'string'},
+                                                                       'type': 'array'},
+                                                           'applications': {'items': {'type': 'string'},
+                                                                            'type': 'array'},
+                                                           'limit': {'type': 'integer'},
+                                                           'machines': {'items': {'type': 'string'},
+                                                                        'type': 'array'},
+                                                           'offset': {'type': 'integer'},
+                                                           'status': {'items': {'type': 'string'},
+                                                                      'type': 'array'},
+                                                           'units': {'items': {'type': 'string'},
+                                                                     'type': 'array'}},
+                                            'type': 'object'},
+                     'OperationResult': {'additionalProperties': False,
+                                         'properties': {'actions': {'items': {'$ref': '#/definitions/ActionResult'},
+                                                                    'type': 'array'},
+                                                        'completed': {'format': 'date-time',
+                                                                      'type': 'string'},
+                                                        'enqueued': {'format': 'date-time',
+                                                                     'type': 'string'},
+                                                        'error': {'$ref': '#/definitions/Error'},
+                                                        'fail': {'type': 'string'},
+                                                        'operation': {'type': 'string'},
+                                                        'started': {'format': 'date-time',
+                                                                    'type': 'string'},
+                                                        'status': {'type': 'string'},
+                                                        'summary': {'type': 'string'}},
+                                         'required': ['operation', 'summary'],
+                                         'type': 'object'},
+                     'OperationResults': {'additionalProperties': False,
+                                          'properties': {'results': {'items': {'$ref': '#/definitions/OperationResult'},
+                                                                     'type': 'array'},
+                                                         'truncated': {'type': 'boolean'}},
+                                          'type': 'object'},
+                     'RunParams': {'additionalProperties': False,
+                                   'properties': {'applications': {'items': {'type': 'string'},
+                                                                   'type': 'array'},
+                                                  'commands': {'type': 'string'},
+                                                  'machines': {'items': {'type': 'string'},
+                                                               'type': 'array'},
+                                                  'timeout': {'type': 'integer'},
+                                                  'units': {'items': {'type': 'string'},
+                                                            'type': 'array'},
+                                                  'workload-context': {'type': 'boolean'}},
+                                   'required': ['commands', 'timeout'],
+                                   'type': 'object'},
+                     'StringsWatchResult': {'additionalProperties': False,
+                                            'properties': {'changes': {'items': {'type': 'string'},
+                                                                       'type': 'array'},
+                                                           'error': {'$ref': '#/definitions/Error'},
+                                                           'watcher-id': {'type': 'string'}},
+                                            'required': ['watcher-id'],
+                                            'type': 'object'},
+                     'StringsWatchResults': {'additionalProperties': False,
+                                             'properties': {'results': {'items': {'$ref': '#/definitions/StringsWatchResult'},
+                                                                        'type': 'array'}},
+                                             'required': ['results'],
+                                             'type': 'object'}},
+     'properties': {'Actions': {'description': 'Actions takes a list of '
+                                               'ActionTags, and returns the full '
+                                               'Action for\n'
+                                               'each ID.',
+                                'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                               'Result': {'$ref': '#/definitions/ActionResults'}},
+                                'type': 'object'},
+                    'ApplicationsCharmsActions': {'description': 'ApplicationsCharmsActions '
+                                                                 'returns a slice '
+                                                                 'of charm Actions '
+                                                                 'for a slice of\n'
+                                                                 'services.',
+                                                  'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                                 'Result': {'$ref': '#/definitions/ApplicationsCharmActionsResults'}},
+                                                  'type': 'object'},
+                    'Cancel': {'description': 'Cancel attempts to cancel enqueued '
+                                              'Actions from running.',
+                               'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                              'Result': {'$ref': '#/definitions/ActionResults'}},
+                               'type': 'object'},
+                    'Enqueue': {'description': 'Enqueue takes a list of Actions '
+                                               'and queues them up to be executed '
+                                               'by\n'
+                                               'the designated ActionReceiver, '
+                                               'returning the params.Action for '
+                                               'each\n'
+                                               'enqueued Action, or an error if '
+                                               'there was a problem enqueueing '
+                                               'the\n'
+                                               'Action.',
+                                'properties': {'Params': {'$ref': '#/definitions/Actions'},
+                                               'Result': {'$ref': '#/definitions/ActionResults'}},
+                                'type': 'object'},
+                    'EnqueueOperation': {'description': 'EnqueueOperation takes a '
+                                                        'list of Actions and '
+                                                        'queues them up to be '
+                                                        'executed as\n'
+                                                        'an operation, each action '
+                                                        'running as a task on the '
+                                                        'designated '
+                                                        'ActionReceiver.\n'
+                                                        'We return the ID of the '
+                                                        'overall operation and '
+                                                        'each individual task.',
+                                         'properties': {'Params': {'$ref': '#/definitions/Actions'},
+                                                        'Result': {'$ref': '#/definitions/EnqueuedActionsV2'}},
+                                         'type': 'object'},
+                    'FindActionTagsByPrefix': {'description': 'FindActionTagsByPrefix '
+                                                              'takes a list of '
+                                                              'string prefixes and '
+                                                              'finds\n'
+                                                              'corresponding '
+                                                              'ActionTags that '
+                                                              'match that prefix.\n'
+                                                              'TODO(juju3) - '
+                                                              'rename API method '
+                                                              'since we only need '
+                                                              'prefix matching for '
+                                                              'UUIDs',
+                                               'properties': {'Params': {'$ref': '#/definitions/FindTags'},
+                                                              'Result': {'$ref': '#/definitions/FindTagsResults'}},
+                                               'type': 'object'},
+                    'FindActionsByNames': {'properties': {'Params': {'$ref': '#/definitions/FindActionsByNames'},
+                                                          'Result': {'$ref': '#/definitions/ActionsByNames'}},
+                                           'type': 'object'},
+                    'ListAll': {'description': 'ListAll takes a list of Entities '
+                                               'representing ActionReceivers and\n'
+                                               'returns all of the Actions that '
+                                               'have been enqueued or run by each '
+                                               'of\n'
+                                               'those Entities.',
+                                'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                               'Result': {'$ref': '#/definitions/ActionsByReceivers'}},
+                                'type': 'object'},
+                    'ListCompleted': {'description': 'ListCompleted takes a list '
+                                                     'of Entities representing '
+                                                     'ActionReceivers\n'
+                                                     'and returns all of the '
+                                                     'Actions that have been run '
+                                                     'on each of those\n'
+                                                     'Entities.',
+                                      'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                     'Result': {'$ref': '#/definitions/ActionsByReceivers'}},
+                                      'type': 'object'},
+                    'ListOperations': {'description': 'ListOperations fetches the '
+                                                      'called actions for '
+                                                      'specified apps/units.',
+                                       'properties': {'Params': {'$ref': '#/definitions/OperationQueryArgs'},
+                                                      'Result': {'$ref': '#/definitions/OperationResults'}},
+                                       'type': 'object'},
+                    'ListPending': {'description': 'ListPending takes a list of '
+                                                   'Entities representing '
+                                                   'ActionReceivers\n'
+                                                   'and returns all of the Actions '
+                                                   'that are enqueued for each of '
+                                                   'those\n'
+                                                   'Entities.',
+                                    'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                   'Result': {'$ref': '#/definitions/ActionsByReceivers'}},
+                                    'type': 'object'},
+                    'ListRunning': {'description': 'ListRunning takes a list of '
+                                                   'Entities representing '
+                                                   'ActionReceivers and\n'
+                                                   'returns all of the Actions '
+                                                   'that have are running on each '
+                                                   'of those\n'
+                                                   'Entities.',
+                                    'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                   'Result': {'$ref': '#/definitions/ActionsByReceivers'}},
+                                    'type': 'object'},
+                    'Operations': {'description': 'Operations fetches the '
+                                                  'specified operation ids.',
+                                   'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                  'Result': {'$ref': '#/definitions/OperationResults'}},
+                                   'type': 'object'},
+                    'Run': {'description': 'Run the commands specified on the '
+                                           'machines identified through the\n'
+                                           'list of machines, units and services.',
+                            'properties': {'Params': {'$ref': '#/definitions/RunParams'},
+                                           'Result': {'$ref': '#/definitions/EnqueuedActionsV2'}},
+                            'type': 'object'},
+                    'RunOnAllMachines': {'description': 'RunOnAllMachines attempts '
+                                                        'to run the specified '
+                                                        'command on all the '
+                                                        'machines.',
+                                         'properties': {'Params': {'$ref': '#/definitions/RunParams'},
+                                                        'Result': {'$ref': '#/definitions/EnqueuedActionsV2'}},
+                                         'type': 'object'},
+                    'WatchActionsProgress': {'description': 'WatchActionsProgress '
+                                                            'creates a watcher '
+                                                            'that reports on '
+                                                            'action log messages.',
+                                             'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                            'Result': {'$ref': '#/definitions/StringsWatchResults'}},
+                                             'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(ActionResults)
+    async def Actions(self, entities=None):
+        '''
+        Actions takes a list of ActionTags, and returns the full Action for
+        each ID.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ActionResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Action',
+                   request='Actions',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ApplicationsCharmActionsResults)
+    async def ApplicationsCharmsActions(self, entities=None):
+        '''
+        ApplicationsCharmsActions returns a slice of charm Actions for a slice of
+        services.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ApplicationsCharmActionsResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Action',
+                   request='ApplicationsCharmsActions',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ActionResults)
+    async def Cancel(self, entities=None):
+        '''
+        Cancel attempts to cancel enqueued Actions from running.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ActionResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Action',
+                   request='Cancel',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ActionResults)
+    async def Enqueue(self, actions=None):
+        '''
+        Enqueue takes a list of Actions and queues them up to be executed by
+        the designated ActionReceiver, returning the params.Action for each
+        enqueued Action, or an error if there was a problem enqueueing the
+        Action.
+
+        actions : typing.Sequence[~Action]
+        Returns -> ActionResults
+        '''
+        if actions is not None and not isinstance(actions, (bytes, str, list)):
+            raise Exception("Expected actions to be a Sequence, received: {}".format(type(actions)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Action',
+                   request='Enqueue',
+                   version=7,
+                   params=_params)
+        _params['actions'] = actions
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(EnqueuedActionsV2)
+    async def EnqueueOperation(self, actions=None):
+        '''
+        EnqueueOperation takes a list of Actions and queues them up to be executed as
+        an operation, each action running as a task on the designated ActionReceiver.
+        We return the ID of the overall operation and each individual task.
+
+        actions : typing.Sequence[~Action]
+        Returns -> EnqueuedActionsV2
+        '''
+        if actions is not None and not isinstance(actions, (bytes, str, list)):
+            raise Exception("Expected actions to be a Sequence, received: {}".format(type(actions)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Action',
+                   request='EnqueueOperation',
+                   version=7,
+                   params=_params)
+        _params['actions'] = actions
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(FindTagsResults)
+    async def FindActionTagsByPrefix(self, prefixes=None):
+        '''
+        FindActionTagsByPrefix takes a list of string prefixes and finds
+        corresponding ActionTags that match that prefix.
+        TODO(juju3) - rename API method since we only need prefix matching for UUIDs
+
+        prefixes : typing.Sequence[str]
+        Returns -> FindTagsResults
+        '''
+        if prefixes is not None and not isinstance(prefixes, (bytes, str, list)):
+            raise Exception("Expected prefixes to be a Sequence, received: {}".format(type(prefixes)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Action',
+                   request='FindActionTagsByPrefix',
+                   version=7,
+                   params=_params)
+        _params['prefixes'] = prefixes
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ActionsByNames)
+    async def FindActionsByNames(self, names=None):
+        '''
+        names : typing.Sequence[str]
+        Returns -> ActionsByNames
+        '''
+        if names is not None and not isinstance(names, (bytes, str, list)):
+            raise Exception("Expected names to be a Sequence, received: {}".format(type(names)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Action',
+                   request='FindActionsByNames',
+                   version=7,
+                   params=_params)
+        _params['names'] = names
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ActionsByReceivers)
+    async def ListAll(self, entities=None):
+        '''
+        ListAll takes a list of Entities representing ActionReceivers and
+        returns all of the Actions that have been enqueued or run by each of
+        those Entities.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ActionsByReceivers
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Action',
+                   request='ListAll',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ActionsByReceivers)
+    async def ListCompleted(self, entities=None):
+        '''
+        ListCompleted takes a list of Entities representing ActionReceivers
+        and returns all of the Actions that have been run on each of those
+        Entities.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ActionsByReceivers
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Action',
+                   request='ListCompleted',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(OperationResults)
+    async def ListOperations(self, actions=None, applications=None, limit=None, machines=None, offset=None, status=None, units=None):
+        '''
+        ListOperations fetches the called actions for specified apps/units.
+
+        actions : typing.Sequence[str]
+        applications : typing.Sequence[str]
+        limit : int
+        machines : typing.Sequence[str]
+        offset : int
+        status : typing.Sequence[str]
+        units : typing.Sequence[str]
+        Returns -> OperationResults
+        '''
+        if actions is not None and not isinstance(actions, (bytes, str, list)):
+            raise Exception("Expected actions to be a Sequence, received: {}".format(type(actions)))
+
+        if applications is not None and not isinstance(applications, (bytes, str, list)):
+            raise Exception("Expected applications to be a Sequence, received: {}".format(type(applications)))
+
+        if limit is not None and not isinstance(limit, int):
+            raise Exception("Expected limit to be a int, received: {}".format(type(limit)))
+
+        if machines is not None and not isinstance(machines, (bytes, str, list)):
+            raise Exception("Expected machines to be a Sequence, received: {}".format(type(machines)))
+
+        if offset is not None and not isinstance(offset, int):
+            raise Exception("Expected offset to be a int, received: {}".format(type(offset)))
+
+        if status is not None and not isinstance(status, (bytes, str, list)):
+            raise Exception("Expected status to be a Sequence, received: {}".format(type(status)))
+
+        if units is not None and not isinstance(units, (bytes, str, list)):
+            raise Exception("Expected units to be a Sequence, received: {}".format(type(units)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Action',
+                   request='ListOperations',
+                   version=7,
+                   params=_params)
+        _params['actions'] = actions
+        _params['applications'] = applications
+        _params['limit'] = limit
+        _params['machines'] = machines
+        _params['offset'] = offset
+        _params['status'] = status
+        _params['units'] = units
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ActionsByReceivers)
+    async def ListPending(self, entities=None):
+        '''
+        ListPending takes a list of Entities representing ActionReceivers
+        and returns all of the Actions that are enqueued for each of those
+        Entities.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ActionsByReceivers
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Action',
+                   request='ListPending',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ActionsByReceivers)
+    async def ListRunning(self, entities=None):
+        '''
+        ListRunning takes a list of Entities representing ActionReceivers and
+        returns all of the Actions that have are running on each of those
+        Entities.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ActionsByReceivers
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Action',
+                   request='ListRunning',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(OperationResults)
+    async def Operations(self, entities=None):
+        '''
+        Operations fetches the specified operation ids.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> OperationResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Action',
+                   request='Operations',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(EnqueuedActionsV2)
+    async def Run(self, applications=None, commands=None, machines=None, timeout=None, units=None, workload_context=None):
+        '''
+        Run the commands specified on the machines identified through the
+        list of machines, units and services.
+
+        applications : typing.Sequence[str]
+        commands : str
+        machines : typing.Sequence[str]
+        timeout : int
+        units : typing.Sequence[str]
+        workload_context : bool
+        Returns -> EnqueuedActionsV2
+        '''
+        if applications is not None and not isinstance(applications, (bytes, str, list)):
+            raise Exception("Expected applications to be a Sequence, received: {}".format(type(applications)))
+
+        if commands is not None and not isinstance(commands, (bytes, str)):
+            raise Exception("Expected commands to be a str, received: {}".format(type(commands)))
+
+        if machines is not None and not isinstance(machines, (bytes, str, list)):
+            raise Exception("Expected machines to be a Sequence, received: {}".format(type(machines)))
+
+        if timeout is not None and not isinstance(timeout, int):
+            raise Exception("Expected timeout to be a int, received: {}".format(type(timeout)))
+
+        if units is not None and not isinstance(units, (bytes, str, list)):
+            raise Exception("Expected units to be a Sequence, received: {}".format(type(units)))
+
+        if workload_context is not None and not isinstance(workload_context, bool):
+            raise Exception("Expected workload_context to be a bool, received: {}".format(type(workload_context)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Action',
+                   request='Run',
+                   version=7,
+                   params=_params)
+        _params['applications'] = applications
+        _params['commands'] = commands
+        _params['machines'] = machines
+        _params['timeout'] = timeout
+        _params['units'] = units
+        _params['workload-context'] = workload_context
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(EnqueuedActionsV2)
+    async def RunOnAllMachines(self, applications=None, commands=None, machines=None, timeout=None, units=None, workload_context=None):
+        '''
+        RunOnAllMachines attempts to run the specified command on all the machines.
+
+        applications : typing.Sequence[str]
+        commands : str
+        machines : typing.Sequence[str]
+        timeout : int
+        units : typing.Sequence[str]
+        workload_context : bool
+        Returns -> EnqueuedActionsV2
+        '''
+        if applications is not None and not isinstance(applications, (bytes, str, list)):
+            raise Exception("Expected applications to be a Sequence, received: {}".format(type(applications)))
+
+        if commands is not None and not isinstance(commands, (bytes, str)):
+            raise Exception("Expected commands to be a str, received: {}".format(type(commands)))
+
+        if machines is not None and not isinstance(machines, (bytes, str, list)):
+            raise Exception("Expected machines to be a Sequence, received: {}".format(type(machines)))
+
+        if timeout is not None and not isinstance(timeout, int):
+            raise Exception("Expected timeout to be a int, received: {}".format(type(timeout)))
+
+        if units is not None and not isinstance(units, (bytes, str, list)):
+            raise Exception("Expected units to be a Sequence, received: {}".format(type(units)))
+
+        if workload_context is not None and not isinstance(workload_context, bool):
+            raise Exception("Expected workload_context to be a bool, received: {}".format(type(workload_context)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Action',
+                   request='RunOnAllMachines',
+                   version=7,
+                   params=_params)
+        _params['applications'] = applications
+        _params['commands'] = commands
+        _params['machines'] = machines
+        _params['timeout'] = timeout
+        _params['units'] = units
+        _params['workload-context'] = workload_context
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResults)
+    async def WatchActionsProgress(self, entities=None):
+        '''
+        WatchActionsProgress creates a watcher that reports on action log messages.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringsWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Action',
+                   request='WatchActionsProgress',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
 class CloudFacade(Type):
     name = 'Cloud'
     version = 7
