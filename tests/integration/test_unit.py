@@ -101,6 +101,7 @@ async def test_run(event_loop):
 @pytest.mark.asyncio
 async def test_run_action(event_loop):
     pytest.skip("This test takes so long that it fails in Github.")
+
     async def run_action(unit):
         # unit.run() returns a juju.action.Action instance
         action = await unit.run_action('get-admin-password')
