@@ -82,6 +82,19 @@ def create_task_with_handler(coro, task_name, logger=ROOT_LOGGER):
     return task
 
 
+class SingletonEventLoop(object):
+    """
+    Single instance containing an event loop to be reused.
+    """
+    loop = None
+
+    def __new__(cls):
+        if not hasattr(cls, 'instance'):
+            cls.instance = super(SingletonEventLoop, cls).__new__(cls)
+            cls.instance.loop = asyncio.new_event_loop()
+        return cls.instance
+
+
 def run(*steps):
     """
     Helper to run one or more async functions synchronously, with graceful
@@ -94,7 +107,7 @@ def run(*steps):
 
     task = None
     run._sigint = False  # function attr to allow setting from closure
-    loop = asyncio.new_event_loop()
+    loop = SingletonEventLoop().loop
 
     def abort():
         task.cancel()

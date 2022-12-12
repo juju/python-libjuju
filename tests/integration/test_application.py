@@ -19,7 +19,7 @@ async def test_action(event_loop):
         ubuntu_app = await model.deploy(
             'percona-cluster',
             application_name='mysql',
-            series='xenial',
+            series='bionic',
             channel='stable',
             config={
                 'tuning-level': 'safest',
@@ -57,7 +57,7 @@ async def test_get_set_config(event_loop):
         ubuntu_app = await model.deploy(
             'percona-cluster',
             application_name='mysql',
-            series='xenial',
+            series='bionic',
             channel='stable',
             config={
                 'tuning-level': 'safest',
@@ -80,9 +80,9 @@ async def test_get_set_config(event_loop):
 async def test_status_is_not_unset(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy(
-            'cs:ubuntu-0',
+            'ubuntu',
             application_name='ubuntu',
-            series='trusty',
+            series='jammy',
             channel='stable',
         )
 
@@ -111,9 +111,9 @@ async def test_add_units(event_loop):
 
     async with base.CleanModel() as model:
         app = await model.deploy(
-            'cs:ubuntu-0',
+            'ubuntu',
             application_name='ubuntu',
-            series='trusty',
+            series='jammy',
             channel='stable',
         )
         units = await app.add_units(count=2)
@@ -125,48 +125,12 @@ async def test_add_units(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_deploy_charmstore_charm(event_loop):
-    async with base.CleanModel() as model:
-        app = await model.deploy('cs:ubuntu-0')
-        await model.block_until(lambda: (len(app.units) > 0 and
-                                         app.units[0].machine))
-        assert app.data['charm-url'] == 'cs:ubuntu-0'
-
-
-@base.bootstrapped
-@pytest.mark.asyncio
 async def test_deploy_charmhub_charm(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy('ch:hello-juju')
         await model.block_until(lambda: (len(app.units) > 0 and
                                          app.units[0].machine))
         assert 'hello-juju' in app.data['charm-url']
-
-
-@base.bootstrapped
-@pytest.mark.asyncio
-async def test_upgrade_charm(event_loop):
-    async with base.CleanModel() as model:
-        app = await model.deploy('cs:ubuntu-0')
-        await model.block_until(lambda: (len(app.units) > 0 and
-                                         app.units[0].machine))
-        assert app.data['charm-url'] == 'cs:ubuntu-0'
-        await app.upgrade_charm()
-        assert app.data['charm-url'].startswith('cs:ubuntu-')
-        assert app.data['charm-url'] != 'cs:ubuntu-0'
-
-
-@base.bootstrapped
-@pytest.mark.asyncio
-async def test_upgrade_charm_channel(event_loop):
-    async with base.CleanModel() as model:
-        app = await model.deploy('cs:ubuntu-0')
-        await model.block_until(lambda: (len(app.units) > 0 and
-                                         app.units[0].machine))
-        assert app.data['charm-url'] == 'cs:ubuntu-0'
-        await app.upgrade_charm(channel='stable')
-        assert app.data['charm-url'].startswith('cs:ubuntu-')
-        assert app.data['charm-url'] != 'cs:ubuntu-0'
 
 
 @base.bootstrapped
@@ -211,32 +175,6 @@ async def test_upgrade_charm_switch_channel(event_loop):
         await model.wait_for_idle(status='active')
         await app.upgrade_charm(channel='candidate')
         await model.wait_for_idle(status='active')
-
-
-@base.bootstrapped
-@pytest.mark.asyncio
-async def test_upgrade_charm_revision(event_loop):
-    async with base.CleanModel() as model:
-        app = await model.deploy('cs:ubuntu-0')
-        await model.block_until(lambda: (len(app.units) > 0 and
-                                         app.units[0].machine))
-        assert app.data['charm-url'] == 'cs:ubuntu-0'
-        await app.upgrade_charm(revision=8)
-        assert app.data['charm-url'] == 'cs:ubuntu-8'
-
-
-@base.bootstrapped
-@pytest.mark.asyncio
-async def test_upgrade_charm_switch(event_loop):
-    async with base.CleanModel() as model:
-        app = await model.deploy('cs:ubuntu-0')
-        await model.block_until(lambda: (len(app.units) > 0 and
-                                         app.units[0].machine))
-        assert app.data['charm-url'] == 'cs:ubuntu-0'
-        with pytest.raises(errors.JujuError):
-            await app.upgrade_charm(switch='ubuntu-8')
-        await app.upgrade_charm(switch='cs:ubuntu-8')
-        assert app.data['charm-url'] == 'cs:ubuntu-8'
 
 
 @base.bootstrapped

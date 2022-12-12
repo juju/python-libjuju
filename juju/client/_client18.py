@@ -876,7 +876,8 @@ class UniterFacade(Type):
                                                       'storage instance do not '
                                                       'block remaining\n'
                                                       'instances from being '
-                                                      'processed.',
+                                                      'processed.\n'
+                                                      'TODO(juju3) - remove',
                                        'properties': {'Params': {'$ref': '#/definitions/StoragesAddParams'},
                                                       'Result': {'$ref': '#/definitions/ErrorResults'}},
                                        'type': 'object'},
@@ -973,7 +974,8 @@ class UniterFacade(Type):
                     'ClosePorts': {'description': 'ClosePorts sets the policy of '
                                                   'the port range with protocol to '
                                                   'be\n'
-                                                  'closed, for all given units.',
+                                                  'closed, for all given units.\n'
+                                                  'TODO(juju3) - remove',
                                    'properties': {'Params': {'$ref': '#/definitions/EntitiesPortRanges'},
                                                   'Result': {'$ref': '#/definitions/ErrorResults'}},
                                    'type': 'object'},
@@ -1164,7 +1166,8 @@ class UniterFacade(Type):
                                     'properties': {'Params': {'$ref': '#/definitions/NetworkInfoParams'},
                                                    'Result': {'$ref': '#/definitions/NetworkInfoResults'}},
                                     'type': 'object'},
-                    'OpenPorts': {'properties': {'Params': {'$ref': '#/definitions/EntitiesPortRanges'},
+                    'OpenPorts': {'description': 'TODO(juju3) - remove',
+                                  'properties': {'Params': {'$ref': '#/definitions/EntitiesPortRanges'},
                                                  'Result': {'$ref': '#/definitions/ErrorResults'}},
                                   'type': 'object'},
                     'OpenedMachinePortRangesByEndpoint': {'description': 'OpenedMachinePortRangesByEndpoint '
@@ -1448,7 +1451,8 @@ class UniterFacade(Type):
                                                       'and unit. Keys with empty '
                                                       'values are\n'
                                                       'considered a signal to '
-                                                      'delete these values.',
+                                                      'delete these values.\n'
+                                                      'TODO(juju3) - remove',
                                        'properties': {'Params': {'$ref': '#/definitions/RelationUnitsSettings'},
                                                       'Result': {'$ref': '#/definitions/ErrorResults'}},
                                        'type': 'object'},
@@ -1805,6 +1809,7 @@ class UniterFacade(Type):
         AddUnitStorage validates and creates additional storage instances for units.
         Failures on an individual storage instance do not block remaining
         instances from being processed.
+        TODO(juju3) - remove
 
         storages : typing.Sequence[~StorageAddParams]
         Returns -> ErrorResults
@@ -2071,6 +2076,7 @@ class UniterFacade(Type):
         '''
         ClosePorts sets the policy of the port range with protocol to be
         closed, for all given units.
+        TODO(juju3) - remove
 
         entities : typing.Sequence[~EntityPortRange]
         Returns -> ErrorResults
@@ -2708,6 +2714,8 @@ class UniterFacade(Type):
     @ReturnMapping(ErrorResults)
     async def OpenPorts(self, entities=None):
         '''
+        TODO(juju3) - remove
+
         entities : typing.Sequence[~EntityPortRange]
         Returns -> ErrorResults
         '''
@@ -3477,6 +3485,7 @@ class UniterFacade(Type):
         UpdateSettings persists all changes made to the local settings of
         all given pairs of relation and unit. Keys with empty values are
         considered a signal to delete these values.
+        TODO(juju3) - remove
 
         relation_units : typing.Sequence[~RelationUnitSettings]
         Returns -> ErrorResults

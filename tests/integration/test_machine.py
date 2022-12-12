@@ -11,9 +11,9 @@ from .. import base
 async def test_status(event_loop):
     async with base.CleanModel() as model:
         await model.deploy(
-            'cs:ubuntu-0',
+            'ubuntu',
             application_name='ubuntu',
-            series='trusty',
+            series='jammy',
             channel='stable',
         )
 

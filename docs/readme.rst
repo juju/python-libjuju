@@ -11,8 +11,11 @@ Documentation: https://pythonlibjuju.readthedocs.io/en/latest/
 Requirements
 ------------
 
-* Python 3.5+
-* Juju 2.0+
+This version may support old versions of Juju. However, it has been
+tested with the following requirements.
+
+* Python 3.8/3.9/3.10
+* Juju 2.9.37
 
 
 Design Notes

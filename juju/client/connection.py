@@ -128,6 +128,7 @@ client_facades = {
     'VolumeAttachmentPlansWatcher': {'versions': [1]},
     'FilesystemAttachmentsWatcher': {'versions': [2]},
     'EntityWatcher': {'versions': [2]},
+    'EnvironUpgrader': {'versions': [1]},
     'MigrationStatusWatcher': {'versions': [1]},
     'ModelSummaryWatcher': {'versions': [1]},
 }
