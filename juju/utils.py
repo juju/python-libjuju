@@ -385,9 +385,9 @@ def get_local_charm_base(series, channel_from_arg, charm_metadata,
         else:
             # Also check the charmcraft.yaml
             charmcraft_yaml = get_local_charm_charmcraft_yaml(charm_path)
-        if 'bases' in charmcraft_yaml:
-            channel_for_base = charmcraft_yaml['bases'][0]['run-on'][0]['channel']
-            os_name_for_base = charmcraft_yaml['bases'][0]['run-on'][0]['name']
+            if 'bases' in charmcraft_yaml:
+                channel_for_base = charmcraft_yaml['bases'][0]['run-on'][0]['channel']
+                os_name_for_base = charmcraft_yaml['bases'][0]['run-on'][0]['name']
 
     if channel_for_base == '':
         raise errors.JujuError("Unable to determine base for charm : %s" %
