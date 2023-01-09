@@ -158,7 +158,7 @@ class BundleHandler:
                 apps_dict[app_name]['charm'] = charm_url
                 apps_dict[app_name]["resources"] = resources
                 origin = client.CharmOrigin(source="local", risk="stable")
-                
+
                 self.origins[charm_url] = {str(None): origin}
 
         return bundle
