@@ -158,11 +158,7 @@ class BundleHandler:
                 apps_dict[app_name]['charm'] = charm_url
                 apps_dict[app_name]["resources"] = resources
                 origin = client.CharmOrigin(source="local", risk="stable")
-                if not self.model.connection().is_using_old_client:
-                    origin.base = utils.get_local_charm_base(series, '',
-                                                             metadata,
-                                                             charm_dir,
-                                                             client.Base)
+                
                 self.origins[charm_url] = {str(None): origin}
 
         return bundle
