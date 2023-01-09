@@ -1609,7 +1609,8 @@ class Model:
             raise JujuError('unknown charm or bundle {}'.format(entity_url))
         identifier = res.identifier
 
-        series = res.origin.series or series
+        # series = res.origin.series or series
+        charm_series = series
         if res.is_bundle:
             handler = BundleHandler(self, trusted=trust, forced=force)
             await handler.fetch_plan(url, res.origin, overlays=overlays)
@@ -1660,24 +1661,27 @@ class Model:
                                                                 identifier)
             else:
                 # We have a local charm dir that needs to be uploaded
-                charm_dir = os.path.abspath(
-                    os.path.expanduser(identifier))
+                charm_dir = os.path.abspath(os.path.expanduser(identifier))
                 charm_origin = res.origin
+                base = None
+
                 metadata = utils.get_local_charm_metadata(charm_dir)
+                charm_series = charm_series or await get_charm_series(metadata,
+                                                                      self)
+                base = utils.get_local_charm_base(
+                    charm_series, channel, metadata, charm_dir, client.Base)
+                charm_origin.base = base
                 if not application_name:
                     application_name = metadata['name']
-                series = series or await get_charm_series(charm_dir, self)
-                if not series:
-                    model_config = await self.get_config()
-                    default_series = model_config.get("default-series")
-                    if default_series:
-                        series = default_series.value
-                if not series:
+                if not application_name:
+                    application_name = metadata['name']
+                if base is None and charm_series is None:
                     raise JujuError(
-                        "Couldn't determine series for charm at {}. "
-                        "Pass a 'series' kwarg to Model.deploy().".format(
-                            charm_dir))
-                identifier = await self.add_local_charm_dir(charm_dir, series)
+                        "Either series or base is needed to deploy the "
+                        "charm at {}. ".format(charm_dir))
+
+                identifier = await self.add_local_charm_dir(charm_dir,
+                                                            charm_series)
                 resources = await self.add_local_resources(application_name,
                                                            identifier,
                                                            metadata,
@@ -1691,7 +1695,7 @@ class Model:
             return await self._deploy(
                 charm_url=identifier,
                 application=res.app_name,
-                series=series,
+                series=charm_series,
                 config=config,
                 constraints=constraints,
                 endpoint_bindings=bind,
