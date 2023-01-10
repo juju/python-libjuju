@@ -20,13 +20,13 @@ jobs:
     - name: Check Juju release candidate version
       id: check-version
       run: |
-        echo "::candidate-version snap info juju | grep 3.0/candidate | awk '{print $2}'"
+        echo "::set-output name=candidate-version::$(snap info juju | grep 3.0/candidate | awk '{print $2}')"
       shell: bash
     - name: Cache Juju release candidate version
       id: cache
       uses: actions/cache@v3
       with:
-        path: cache/version
+        path: ~/.last-juju-candidate
         key: ${{ runner.os }}-${{ steps.check-version.outputs.candidate-version }}
     - name: Check out code
       uses: actions/checkout@v3
