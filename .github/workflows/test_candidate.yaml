@@ -26,7 +26,7 @@ jobs:
     - name: Check if there is a new candidate
       shell: bash
       run: |
-        candidate=$(snap info juju | grep 3.0/candidate | awk '{print $2}')
+        candidate=$(snap info juju | grep 2.9/candidate | awk '{print $2}')
         last_tested=NA
         if [ -f juju-last-candidate-version ]; then
           last-tested=$(cat juju-last-candidate-version)
