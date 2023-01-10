@@ -21,6 +21,8 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: juju-last-candidate-version
+      # An error may happen the first time we run
+      continue-on-error: true
     - name: Check if there is a new candidate
       shell: bash
       run: |
