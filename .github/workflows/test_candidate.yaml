@@ -27,7 +27,10 @@ jobs:
       shell: bash
       run: |
         candidate=$(snap info juju | grep 3.0/candidate | awk '{print $2}')
-        last-tested=$(cat juju-last-candidate-version)
+        last-tested="NA"
+        if [ -f juju-last-candidate-version ]; then
+          last-tested=$(cat juju-last-candidate-version)
+        fi
         next-test="NA"
         if [[ "$candidate" == "^" ]]; then
           echo "No candidate to test"
