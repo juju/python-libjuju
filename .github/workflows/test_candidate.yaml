@@ -1,9 +1,8 @@
-name: Release candidate testing
+name: Nightly release candidate testing
 
-# on:
-#   schedule:
-#     - cron: '0 0 * * *'
-on: [push, pull_request]
+on:
+  schedule:
+    - cron: '0 0 * * *'
 
 jobs:
   candidate-integration:
@@ -63,13 +62,44 @@ jobs:
     - name: Install dependencies
       if: ${{ env.next-test != 'NA' }}
       run: pip install tox
-    - name: Run integration
-      if: ${{ env.next-test != 'NA' }}
-      # Force one single concurrent test
-      run: tox -e integration -- -n 1
+    # - name: Run integration
+    #   if: ${{ env.next-test != 'NA' }}
+    #   # Force one single concurrent test
+    #   run: tox -e integration -- -n 1
     - name: Upload artifact
       if: ${{ env.next-test != 'NA' }}
       uses: actions/upload-artifact@v3
       with:
         name: juju-last-candidate-version
         path: ~/juju-last-candidate-version
+    - name: Generate sucess badge
+      uses: emibcn/badge-action@v2.0.2
+      if: ${{ success() }}
+      with:
+        label: 'Juju candidate'
+        status: '${{ env.next-test }}'
+        color: 'green'
+        path: '.github/badges/candidate_coverage.svg'
+    - name: Generate failure badge
+      uses: emibcn/badge-action@v2.0.2
+      if: ${{ fail() }}
+      with:
+        label: 'Juju candidate'
+        status: '${{ env.next-test }}'
+        color: 'red'
+        path: '.github/badges/candidate_coverage.svg'
+    - name: Commit badge
+      continue-on-error: true
+      env:
+        BADGE: badges
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add "${BADGE}"
+        git commit -m "Add/Update badge"
+    - name: Push badge commit
+      uses: ad-m/github-push-action@master
+      if: ${{ success() }}
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: badges

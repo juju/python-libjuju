@@ -13,7 +13,7 @@ Status
 This is a summary of the current status for testing suites for the
 current Juju versions.
 
-![Candidate](https://github.com/juju/python-libjuju/actions/workflows/test_candidate.yml/badge.svg)
+![Candidate](https://github.com/juju/python-libjuju/actions/workflows/test_candidate.yml/badge.svg?branch=develop)
 
 
 Requirements
