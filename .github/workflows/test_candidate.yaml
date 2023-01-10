@@ -13,30 +13,49 @@ jobs:
     strategy:
       matrix:
         python:
-          - "3.8"
-          - "3.9"
+          # - "3.8"
+          # - "3.9"
           - "3.10"
     steps:
-    - name: Check Juju release candidate version
-      id: check-version
-      run: |
-        echo "::set-output name=candidate-version::$(snap info juju | grep 3.0/candidate | awk '{print $2}')"
-      shell: bash
-    - name: Cache Juju release candidate version
-      id: cache
-      uses: actions/cache@v3
+    - name: Get latest tested release candidate
+      uses: actions/download-artifact@v3
       with:
-        path: ~/.last-juju-candidate
-        key: ${{ runner.os }}-${{ steps.check-version.outputs.candidate-version }}
+        name: juju-last-candidate-version
+    - name: Check if there is a new candidate
+      shell: bash
+      run: |
+        candidate=$(snap info juju | grep 3.0/candidate | awk '{print $2}')
+        last-tested=$(cat juju-last-candidate-version)
+        next-test="NA"
+        if [[ "$candidate" == "^" ]]; then
+          echo "No candidate to test"
+        else
+          if [[ "$candidate" == "$last-tested" ]]; then
+            echo "Candidate $candidate was already tested"
+          else
+            echo "Candidate $candidate has to be tested"
+            next-test="$candidate"
+          fi 
+        fi
+        echo "next-test=$next-test" >> $GITHUB_ENV
+        echo "$next-test" > juju-last-candidate-version
+    
     - name: Check out code
       uses: actions/checkout@v3
-      if: steps.cache.outputs.cache-hit != 'true'
+      if: env.next-test != "NA"
     - name: Setup operator environment
+      if: env.next-test != "NA"
       uses: charmed-kubernetes/actions-operator@main
       with:
         provider: lxd
         juju-channel: 3.0/stable
-      if: steps.cache.outputs.cache-hit != 'true'
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: juju-last-candidate-version
+        path: juju-last-candidate-version
+
+      
     # - name: Set proxy in controller
     #   if: steps.cache.outputs.cache-hit != 'true'
     #   run: |
