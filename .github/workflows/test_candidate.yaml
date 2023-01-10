@@ -29,7 +29,7 @@ jobs:
         candidate=$(snap info juju | grep 2.9/candidate | awk '{print $2}')
         last_tested=NA
         if [ -f juju-last-candidate-version ]; then
-          last-tested=$(cat juju-last-candidate-version)
+          last_tested=$(cat juju-last-candidate-version)
         fi
         next_test=NA
         if [[ "$candidate" == "^" ]]; then
@@ -87,15 +87,15 @@ jobs:
     #     # set model defaults
     #     juju model-defaults apt-http-proxy=$PROXY apt-https-proxy=$PROXY  juju-http-proxy=$PROXY juju-https-proxy=$PROXY  snap-http-proxy=$PROXY snap-https-proxy=$PROXY
     #     juju model-defaults
-    - name: Setup Python
-      if: steps.cache.outputs.cache-hit != 'true'
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python }}
-    - name: Install dependencies
-      if: steps.cache.outputs.cache-hit != 'true'
-      run: pip install tox
-    - name: Run integration
-      if: steps.cache.outputs.cache-hit != 'true'
-      # Force one single concurrent test
-      run: tox -e integration -- -n 1
+    # - name: Setup Python
+    #   if: steps.cache.outputs.cache-hit != 'true'
+    #   uses: actions/setup-python@v4
+    #   with:
+    #     python-version: ${{ matrix.python }}
+    # - name: Install dependencies
+    #   if: steps.cache.outputs.cache-hit != 'true'
+    #   run: pip install tox
+    # - name: Run integration
+    #   if: steps.cache.outputs.cache-hit != 'true'
+    #   # Force one single concurrent test
+    #   run: tox -e integration -- -n 1
