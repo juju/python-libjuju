@@ -17,12 +17,17 @@ jobs:
           # - "3.9"
           - "3.10"
     steps:
-    - name: Get latest tested release candidate
-      uses: actions/download-artifact@v3
+    # - name: Get latest tested release candidate
+    #   uses: actions/download-artifact@v3
+    #   with:
+    #     name: juju-last-candidate-version
+    #   # An error may happen the first time we run
+    #   continue-on-error: true
+    - name: Download artifact
+      uses: dawidd6/action-download-artifact@v2
       with:
-        name: juju-last-candidate-version
-      # An error may happen the first time we run
-      continue-on-error: true
+        branch: master
+        workflow_conclusion: success
     - name: Check if there is a new candidate
       shell: bash
       run: |
@@ -45,9 +50,9 @@ jobs:
         echo "next-test=$next_test" >> $GITHUB_ENV
         echo "$next_test" > ~/juju-last-candidate-version
     
-    - name: Check out code
-      uses: actions/checkout@v3
-      if: ${{ env.next-test != 'NA' }}
+    # - name: Check out code
+    #   uses: actions/checkout@v3
+    #   if: ${{ env.next-test != 'NA' }}
     # - name: Setup operator environment
     #   if: ${{ env.next-test != 'NA' }}
     #   uses: charmed-kubernetes/actions-operator@main
@@ -59,34 +64,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: juju-last-candidate-version
-        path: ~/juju-last-candidate-version      
-    # - name: Set proxy in controller
-    #   if: steps.cache.outputs.cache-hit != 'true'
-    #   run: |
-    #     set -euxo pipefail
-    #     # build a squid config file
-    #     CONTROLLER_IP=$(juju list-controllers --format yaml | yq '.controllers[.current-controller].recent-server' | awk -F '[:]' '{print $1}');
-    #     echo "Controller IP is: $CONTROLLER_IP"
-    #     PROXY=$CONTROLLER_IP:3128
-    #     echo "Proxy address is: $PROXY"
-    #     echo "acl all src all" > squid.conf
-    #     echo "http_access allow all" >> squid.conf
-    #     echo "http_port $PROXY" >> squid.conf
-    #     cat squid.conf
-    #     # copy to the controller and reconfigure it
-    #     juju status -m controller
-    #     juju switch controller
-    #     juju ssh 0 "sudo apt-get install squid -y"
-    #     juju scp squid.conf 0:/tmp/squid.conf
-    #     juju ssh 0 "sudo mv /tmp/squid.conf /etc/squid/squid.conf"
-    #     juju ssh 0 "sudo squid -k reconfigure"
-    #     # Test curl after waiting
-    #     sleep 10
-    #     echo "Test proxy access"
-    #     curl -s -o /dev/null -w "%{http_code}" --proxy http://$PROXY https://charmhub.io
-    #     # set model defaults
-    #     juju model-defaults apt-http-proxy=$PROXY apt-https-proxy=$PROXY  juju-http-proxy=$PROXY juju-https-proxy=$PROXY  snap-http-proxy=$PROXY snap-https-proxy=$PROXY
-    #     juju model-defaults
+        path: ~/juju-last-candidate-version
     # - name: Setup Python
     #   if: steps.cache.outputs.cache-hit != 'true'
     #   uses: actions/setup-python@v4
