@@ -27,23 +27,23 @@ jobs:
       shell: bash
       run: |
         candidate=$(snap info juju | grep 3.0/candidate | awk '{print $2}')
-        last-tested=NA
+        last_tested=NA
         if [ -f juju-last-candidate-version ]; then
           last-tested=$(cat juju-last-candidate-version)
         fi
-        next-test=NA
+        next_test=NA
         if [[ "$candidate" == "^" ]]; then
           echo "No candidate to test"
         else
-          if [[ "$candidate" == "$last-tested" ]]; then
+          if [[ "$candidate" == "$last_tested" ]]; then
             echo "Candidate $candidate was already tested"
           else
             echo "Candidate $candidate has to be tested"
-            next-test="$candidate"
+            next_test="$candidate"
           fi 
         fi
-        echo "next-test=$next-test" >> $GITHUB_ENV
-        echo "$next-test" > juju-last-candidate-version
+        echo "next-test=$next_test" >> $GITHUB_ENV
+        echo "$next_test" > juju-last-candidate-version
     
     - name: Check out code
       uses: actions/checkout@v3
