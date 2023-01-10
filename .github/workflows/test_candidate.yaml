@@ -6,8 +6,8 @@ name: Release candidate
 on: [push, pull_request]
 
 jobs:
-  integration:
-    name: Integration
+  candidate-integration:
+    name: Candidate integration
     timeout-minutes: 120
     runs-on: ubuntu-latest
     strategy:
@@ -42,14 +42,15 @@ jobs:
     
     - name: Check out code
       uses: actions/checkout@v3
-      if: env.next-test != "NA"
+      if: ${{ env.next-test != 'NA' }}
     - name: Setup operator environment
-      if: env.next-test != "NA"
+      if: ${{ env.next-test != 'NA' }}
       uses: charmed-kubernetes/actions-operator@main
       with:
         provider: lxd
         juju-channel: 3.0/stable
     - name: Upload artifact
+      if: ${{ env.next-test != 'NA' }}
       uses: actions/upload-artifact@v3
       with:
         name: juju-last-candidate-version
