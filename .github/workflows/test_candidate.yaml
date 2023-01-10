@@ -13,17 +13,12 @@ jobs:
     strategy:
       matrix:
         python:
-          # - "3.8"
-          # - "3.9"
+          - "3.8"
+          - "3.9"
           - "3.10"
     steps:
-    # - name: Get latest tested release candidate
-    #   uses: actions/download-artifact@v3
-    #   with:
-    #     name: juju-last-candidate-version
-    #   # An error may happen the first time we run
-    #   continue-on-error: true
-    - name: Download artifact
+    - name: Download artifact from previous workflow
+      id: download_artifact
       uses: dawidd6/action-download-artifact@v2
       with:
         workflow_conclusion: success
@@ -32,7 +27,7 @@ jobs:
     - name: Check if there is a new candidate
       shell: bash
       run: |
-        candidate=$(snap info juju | grep 2.9/candidate | awk '{print $2}')
+        candidate=$(snap info juju | grep 3.0/candidate | awk '{print $2}')
         last_tested=NA
         if [ -f juju-last-candidate-version ]; then
           last_tested=$(cat juju-last-candidate-version)
@@ -51,30 +46,30 @@ jobs:
         echo "next-test=$next_test" >> $GITHUB_ENV
         echo "$next_test" > ~/juju-last-candidate-version
     
-    # - name: Check out code
-    #   uses: actions/checkout@v3
-    #   if: ${{ env.next-test != 'NA' }}
-    # - name: Setup operator environment
-    #   if: ${{ env.next-test != 'NA' }}
-    #   uses: charmed-kubernetes/actions-operator@main
-    #   with:
-    #     provider: lxd
-    #     juju-channel: 3.0/candidate
+    - name: Check out code
+      uses: actions/checkout@v3
+      if: ${{ env.next-test != 'NA' }}
+    - name: Setup operator environment
+      if: ${{ env.next-test != 'NA' }}
+      uses: charmed-kubernetes/actions-operator@main
+      with:
+        provider: lxd
+        juju-channel: 3.0/candidate
+    - name: Setup Python
+      if: ${{ env.next-test != 'NA' }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Install dependencies
+      if: ${{ env.next-test != 'NA' }}
+      run: pip install tox
+    - name: Run integration
+      if: ${{ env.next-test != 'NA' }}
+      # Force one single concurrent test
+      run: tox -e integration -- -n 1
     - name: Upload artifact
       if: ${{ env.next-test != 'NA' }}
       uses: actions/upload-artifact@v3
       with:
         name: juju-last-candidate-version
         path: ~/juju-last-candidate-version
-    # - name: Setup Python
-    #   if: steps.cache.outputs.cache-hit != 'true'
-    #   uses: actions/setup-python@v4
-    #   with:
-    #     python-version: ${{ matrix.python }}
-    # - name: Install dependencies
-    #   if: steps.cache.outputs.cache-hit != 'true'
-    #   run: pip install tox
-    # - name: Run integration
-    #   if: steps.cache.outputs.cache-hit != 'true'
-    #   # Force one single concurrent test
-    #   run: tox -e integration -- -n 1
