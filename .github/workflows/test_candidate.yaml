@@ -1,4 +1,4 @@
-name: Release candidate
+name: Release candidate testing
 
 # on:
 #   schedule:
@@ -26,7 +26,7 @@ jobs:
     - name: Check if there is a new candidate
       shell: bash
       run: |
-        candidate=$(snap info juju | grep 2.9/candidate | awk '{print $2}')
+        candidate=$(snap info juju | grep 3.0/candidate | awk '{print $2}')
         last_tested=NA
         if [ -f juju-last-candidate-version ]; then
           last-tested=$(cat juju-last-candidate-version)
@@ -43,25 +43,23 @@ jobs:
           fi 
         fi
         echo "next-test=$next_test" >> $GITHUB_ENV
-        echo "$next_test" > juju-last-candidate-version
+        echo "$next_test" > ~/juju-last-candidate-version
     
     - name: Check out code
       uses: actions/checkout@v3
       if: ${{ env.next-test != 'NA' }}
-    - name: Setup operator environment
-      if: ${{ env.next-test != 'NA' }}
-      uses: charmed-kubernetes/actions-operator@main
-      with:
-        provider: lxd
-        juju-channel: 3.0/stable
+    # - name: Setup operator environment
+    #   if: ${{ env.next-test != 'NA' }}
+    #   uses: charmed-kubernetes/actions-operator@main
+    #   with:
+    #     provider: lxd
+    #     juju-channel: 3.0/candidate
     - name: Upload artifact
       if: ${{ env.next-test != 'NA' }}
       uses: actions/upload-artifact@v3
       with:
         name: juju-last-candidate-version
-        path: juju-last-candidate-version
-
-      
+        path: ~/juju-last-candidate-version      
     # - name: Set proxy in controller
     #   if: steps.cache.outputs.cache-hit != 'true'
     #   run: |
@@ -89,15 +87,15 @@ jobs:
     #     # set model defaults
     #     juju model-defaults apt-http-proxy=$PROXY apt-https-proxy=$PROXY  juju-http-proxy=$PROXY juju-https-proxy=$PROXY  snap-http-proxy=$PROXY snap-https-proxy=$PROXY
     #     juju model-defaults
-    # - name: Setup Python
-    #   if: steps.cache.outputs.cache-hit != 'true'
-    #   uses: actions/setup-python@v4
-    #   with:
-    #     python-version: ${{ matrix.python }}
-    # - name: Install dependencies
-    #   if: steps.cache.outputs.cache-hit != 'true'
-    #   run: pip install tox
-    # - name: Run integration
-    #   if: steps.cache.outputs.cache-hit != 'true'
-    #   # Force one single concurrent test
-    #   run: tox -e integration -- -n 1
+    - name: Setup Python
+      if: steps.cache.outputs.cache-hit != 'true'
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Install dependencies
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: pip install tox
+    - name: Run integration
+      if: steps.cache.outputs.cache-hit != 'true'
+      # Force one single concurrent test
+      run: tox -e integration -- -n 1

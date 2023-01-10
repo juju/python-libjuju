@@ -7,6 +7,14 @@ Bug reports: https://github.com/juju/python-libjuju/issues
 
 Documentation: https://pythonlibjuju.readthedocs.io/en/latest/
 
+Status
+------
+
+This is a summary of the current status for testing suites for the
+current Juju versions.
+
+![Candidate](https://github.com/juju/python-libjuju/actions/workflows/test_candidate.yml/badge.svg)
+
 
 Requirements
 ------------
