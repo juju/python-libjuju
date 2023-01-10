@@ -26,7 +26,8 @@ jobs:
       id: cache
       uses: actions/cache@v3
       with:
-        key: ${{ runner.os }}-${{ steps.check-version.outputs.candidate-version}}
+        path: cache/version
+        key: ${{ runner.os }}-${{ steps.check-version.outputs.candidate-version }}
     - name: Check out code
       uses: actions/checkout@v3
       if: steps.cache.outputs.cache-hit != 'true'
