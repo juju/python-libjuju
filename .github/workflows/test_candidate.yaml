@@ -77,7 +77,7 @@ jobs:
       with:
         auth: ${{ secrets.JUJU_VERSION_GIST }}
         gistID: 8e0fa71b69c8e90f8797d749685bd280
-        filename: python-libjuju_${{ env.BRANCH }}.json
+        filename: juju_version_badge.json
         label: Juju version
         message: ${{ env.next-test }}
         color: green
