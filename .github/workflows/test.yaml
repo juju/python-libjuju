@@ -65,32 +65,34 @@ jobs:
       with:
         provider: lxd
         juju-channel: 3.0/stable
-    - name: Set proxy in controller
-      run: |
-        set -euxo pipefail
-        # build a squid config file
-        CONTROLLER_IP=$(juju list-controllers --format yaml | yq '.controllers[.current-controller].recent-server' | awk -F '[:]' '{print $1}');
-        echo "Controller IP is: $CONTROLLER_IP"
-        PROXY=$CONTROLLER_IP:3128
-        echo "Proxy address is: $PROXY"
-        echo "acl all src all" > squid.conf
-        echo "http_access allow all" >> squid.conf
-        echo "http_port $PROXY" >> squid.conf
-        cat squid.conf
-        # copy to the controller and reconfigure it
-        juju status -m controller
-        juju switch controller
-        juju ssh 0 "sudo apt-get install squid -y"
-        juju scp squid.conf 0:/tmp/squid.conf
-        juju ssh 0 "sudo mv /tmp/squid.conf /etc/squid/squid.conf"
-        juju ssh 0 "sudo squid -k reconfigure"
-        # Test curl after waiting
-        sleep 10
-        echo "Test proxy access"
-        curl -s -o /dev/null -w "%{http_code}" --proxy http://$PROXY https://charmhub.io
-        # set model defaults
-        juju model-defaults apt-http-proxy=$PROXY apt-https-proxy=$PROXY  juju-http-proxy=$PROXY juju-https-proxy=$PROXY  snap-http-proxy=$PROXY snap-https-proxy=$PROXY
-        juju model-defaults
+    # 2023-01-11 Commented until we discover a 
+    # clear approach for this.
+    # - name: Set proxy in controller
+    #   run: |
+    #     set -euxo pipefail
+    #     # build a squid config file
+    #     CONTROLLER_IP=$(juju list-controllers --format yaml | yq '.controllers[.current-controller].recent-server' | awk -F '[:]' '{print $1}');
+    #     echo "Controller IP is: $CONTROLLER_IP"
+    #     PROXY=$CONTROLLER_IP:3128
+    #     echo "Proxy address is: $PROXY"
+    #     echo "acl all src all" > squid.conf
+    #     echo "http_access allow all" >> squid.conf
+    #     echo "http_port $PROXY" >> squid.conf
+    #     cat squid.conf
+    #     # copy to the controller and reconfigure it
+    #     juju status -m controller
+    #     juju switch controller
+    #     juju ssh 0 "sudo apt-get install squid -y"
+    #     juju scp squid.conf 0:/tmp/squid.conf
+    #     juju ssh 0 "sudo mv /tmp/squid.conf /etc/squid/squid.conf"
+    #     juju ssh 0 "sudo squid -k reconfigure"
+    #     # Test curl after waiting
+    #     sleep 10
+    #     echo "Test proxy access"
+    #     curl -s -o /dev/null -w "%{http_code}" --proxy http://$PROXY https://charmhub.io
+    #     # set model defaults
+    #     juju model-defaults apt-http-proxy=$PROXY apt-https-proxy=$PROXY  juju-http-proxy=$PROXY juju-https-proxy=$PROXY  snap-http-proxy=$PROXY snap-https-proxy=$PROXY
+    #     juju model-defaults
     - name: Setup Python
       uses: actions/setup-python@v4
       with:
