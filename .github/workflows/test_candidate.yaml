@@ -31,6 +31,8 @@ jobs:
         if [ -f juju-last-candidate-version ]; then
           last_tested=$(cat juju-last-candidate-version)
         fi
+        echo "Last tested was $last_tested"
+        echo "Latest juju version found is $candidate"
         next_test=NA
         if [[ "$candidate" == "^" ]]; then
           echo "No candidate to test"

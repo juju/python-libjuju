@@ -1,8 +1,8 @@
 name: Nightly release edge testing
 
-on: [push, pull_request]
-  # schedule:
-  #   - cron: "0 0 * * *"  # Run at 12AM UTC, every day
+on:
+  schedule:
+    - cron: "0 0 * * *"  # Run at 12AM UTC, every day
 
 jobs:
   candidate-integration:
@@ -49,24 +49,24 @@ jobs:
     - name: Check out code
       uses: actions/checkout@v3
       if: ${{ env.next-test != 'NA' }}
-    # - name: Setup operator environment
-    #   if: ${{ env.next-test != 'NA' }}
-    #   uses: charmed-kubernetes/actions-operator@main
-    #   with:
-    #     provider: lxd
-    #     juju-channel: 3.0/edge
-    # - name: Setup Python
-    #   if: ${{ env.next-test != 'NA' }}
-    #   uses: actions/setup-python@v4
-    #   with:
-    #     python-version: ${{ matrix.python }}
-    # - name: Install dependencies
-    #   if: ${{ env.next-test != 'NA' }}
-    #   run: pip install tox
-    # - name: Run integration
-    #   if: ${{ env.next-test != 'NA' }}
-    #   # Force one single concurrent test
-    #   run: tox -e integration -- -n 1
+    - name: Setup operator environment
+      if: ${{ env.next-test != 'NA' }}
+      uses: charmed-kubernetes/actions-operator@main
+      with:
+        provider: lxd
+        juju-channel: 3.0/edge
+    - name: Setup Python
+      if: ${{ env.next-test != 'NA' }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Install dependencies
+      if: ${{ env.next-test != 'NA' }}
+      run: pip install tox
+    - name: Run integration
+      if: ${{ env.next-test != 'NA' }}
+      # Force one single concurrent test
+      run: tox -e integration -- -n 1
     - name: Upload artifact
       if: ${{ env.next-test != 'NA' }}
       uses: actions/upload-artifact@v3
