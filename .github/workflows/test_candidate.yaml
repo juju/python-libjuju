@@ -72,12 +72,20 @@ jobs:
       with:
         name: juju-last-candidate-version
         path: ~/juju-last-candidate-version
-    - name: Create Badge
-      uses: schneegans/dynamic-badges-action@v1.6.0
+    # - name: Create Badge
+    #   uses: schneegans/dynamic-badges-action@v1.6.0
+    #   with:
+    #     auth: ${{ secrets.JUJU_VERSION_GIST }}
+    #     gistID: 8e0fa71b69c8e90f8797d749685bd280
+    #     filename: juju_version_badge.json
+    #     label: Juju version
+    #     message: ${{ env.next-test }}
+    #     color: green
+    - name: Time badge
+      uses: RubbaBoy/BYOB@v1.3.0
       with:
-        auth: ${{ secrets.JUJU_VERSION_GIST }}
-        gistID: 8e0fa71b69c8e90f8797d749685bd280
-        filename: juju_version_badge.json
-        label: Juju version
-        message: ${{ env.next-test }}
-        color: green
+        NAME: juju_last_candidate
+        LABEL: 'Juju version'
+        STATUS: ${{ env.next-test }}
+        COLOR: green
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
