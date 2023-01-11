@@ -1,8 +1,8 @@
 name: Nightly release candidate testing
 
-on:
-  schedule:
-    - cron: "0 0 * * *"  # Run at 12AM UTC, every day
+on: [push, pull_request]
+  # schedule:
+  #   - cron: "0 0 * * *"  # Run at 12AM UTC, every day
 
 jobs:
   candidate-integration:
