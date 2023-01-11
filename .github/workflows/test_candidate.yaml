@@ -1,8 +1,8 @@
 name: Nightly release candidate testing
 
-on: [push, pull_request]
-  #schedule:
-  #  - cron: '0 0 * * *'
+on:
+  schedule:
+    - cron: '0 0 * * *'
 
 jobs:
   candidate-integration:
@@ -12,8 +12,8 @@ jobs:
     strategy:
       matrix:
         python:
-          # - "3.8"
-          # - "3.9"
+          - "3.8"
+          - "3.9"
           - "3.10"
     steps:
     - name: Download artifact from previous workflow
@@ -44,48 +44,30 @@ jobs:
         fi
         echo "next-test=$next_test" >> $GITHUB_ENV
         echo "$next_test" > ~/juju-last-candidate-version
-    
-    # - name: Check out code
-    #   uses: actions/checkout@v3
-    #   if: ${{ env.next-test != 'NA' }}
-    # - name: Setup operator environment
-    #   if: ${{ env.next-test != 'NA' }}
-    #   uses: charmed-kubernetes/actions-operator@main
-    #   with:
-    #     provider: lxd
-    #     juju-channel: 3.0/candidate
-    # - name: Setup Python
-    #   if: ${{ env.next-test != 'NA' }}
-    #   uses: actions/setup-python@v4
-    #   with:
-    #     python-version: ${{ matrix.python }}
-    # - name: Install dependencies
-    #   if: ${{ env.next-test != 'NA' }}
-    #   run: pip install tox
-    # - name: Run integration
-    #   if: ${{ env.next-test != 'NA' }}
-    #   # Force one single concurrent test
-    #   run: tox -e integration -- -n 1
+    - name: Check out code
+      uses: actions/checkout@v3
+      if: ${{ env.next-test != 'NA' }}
+    - name: Setup operator environment
+      if: ${{ env.next-test != 'NA' }}
+      uses: charmed-kubernetes/actions-operator@main
+      with:
+        provider: lxd
+        juju-channel: 3.0/candidate
+    - name: Setup Python
+      if: ${{ env.next-test != 'NA' }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Install dependencies
+      if: ${{ env.next-test != 'NA' }}
+      run: pip install tox
+    - name: Run integration
+      if: ${{ env.next-test != 'NA' }}
+      # Force one single concurrent test
+      run: tox -e integration -- -n 1
     - name: Upload artifact
       if: ${{ env.next-test != 'NA' }}
       uses: actions/upload-artifact@v3
       with:
         name: juju-last-candidate-version
         path: ~/juju-last-candidate-version
-    # - name: Create Badge
-    #   uses: schneegans/dynamic-badges-action@v1.6.0
-    #   with:
-    #     auth: ${{ secrets.JUJU_VERSION_GIST }}
-    #     gistID: 8e0fa71b69c8e90f8797d749685bd280
-    #     filename: juju_version_badge.json
-    #     label: Juju version
-    #     message: ${{ env.next-test }}
-    #     color: green
-    - name: Time badge
-      uses: RubbaBoy/BYOB@v1.3.0
-      with:
-        NAME: juju_last_candidate
-        LABEL: 'Juju version'
-        STATUS: ${{ env.next-test }}
-        COLOR: green
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
