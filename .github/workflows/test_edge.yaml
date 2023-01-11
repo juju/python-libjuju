@@ -31,6 +31,8 @@ jobs:
         if [ -f juju-last-edge-version ]; then
           last_tested=$(cat juju-last-edge-version)
         fi
+        echo "Last tested was $last_tested"
+        echo "Latest juju version found is $edge"
         next_test=NA
         if [[ "$edge" == "^" ]]; then
           echo "No edge to test"
