@@ -12,8 +12,8 @@ jobs:
     strategy:
       matrix:
         python:
-          - "3.8"
-          - "3.9"
+          # - "3.8"
+          # - "3.9"
           - "3.10"
     steps:
     - name: Download artifact from previous workflow
@@ -77,7 +77,7 @@ jobs:
       with:
         auth: ${{ secrets.JUJU_VERSION_GIST }}
         gistID: 8e0fa71b69c8e90f8797d749685bd280
-        filename: juju_version_badge.json
+        filename: python-libjuju_${{ env.BRANCH }}.json
         label: Juju version
         message: ${{ env.next-test }}
         color: green
