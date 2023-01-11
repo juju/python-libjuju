@@ -21,7 +21,7 @@ jobs:
       uses: dawidd6/action-download-artifact@v2
       with:
         workflow_conclusion: success
-        name: juju-last-candidate-version
+        name: juju-last-edge-version
         if_no_artifact_found: ignore
     - name: Check if there is a new candidate
       shell: bash
