@@ -69,5 +69,5 @@ jobs:
       if: ${{ env.next-test != 'NA' }}
       uses: actions/upload-artifact@v3
       with:
-        name: juju-last-candidate-version
-        path: ~/juju-last-candidate-version
+        name: juju-last-edge-version
+        path: ~/juju-last-edge-version
