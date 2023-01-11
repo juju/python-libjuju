@@ -1,8 +1,8 @@
-name: Nightly release candidate testing
+name: Nightly release edge testing
 
-on: [push, pull_request]
-  # schedule:
-  #   - cron: "0 0 * * *"  # Run at 12AM UTC, every day
+on:
+  schedule:
+    - cron: "0 0 * * *"  # Run at 12AM UTC, every day
 
 jobs:
   candidate-integration:
@@ -26,45 +26,45 @@ jobs:
     - name: Check if there is a new candidate
       shell: bash
       run: |
-        candidate=$(snap info juju | grep 3.0/candidate | awk '{print $2}')
+        edge=$(snap info juju | grep 3.0/edge | awk '{print $2}')
         last_tested=NA
-        if [ -f juju-last-candidate-version ]; then
-          last_tested=$(cat juju-last-candidate-version)
+        if [ -f juju-last-edge-version ]; then
+          last_tested=$(cat juju-last-edge-version)
         fi
         next_test=NA
-        if [[ "$candidate" == "^" ]]; then
-          echo "No candidate to test"
+        if [[ "$edge" == "^" ]]; then
+          echo "No edge to test"
         else
-          if [[ "$candidate" == "$last_tested" ]]; then
-            echo "Candidate $candidate was already tested"
+          if [[ "$edge" == "$last_tested" ]]; then
+            echo "Edge $edge was already tested"
           else
-            echo "Candidate $candidate has to be tested"
-            next_test="$candidate"
+            echo "Edge $edge has to be tested"
+            next_test="$edge"
           fi 
         fi
         echo "next-test=$next_test" >> $GITHUB_ENV
-        echo "$next_test" > ~/juju-last-candidate-version
+        echo "$next_test" > ~/juju-last-edge-version
     - name: Check out code
       uses: actions/checkout@v3
       if: ${{ env.next-test != 'NA' }}
-    - name: Setup operator environment
-      if: ${{ env.next-test != 'NA' }}
-      uses: charmed-kubernetes/actions-operator@main
-      with:
-        provider: lxd
-        juju-channel: 3.0/candidate
-    - name: Setup Python
-      if: ${{ env.next-test != 'NA' }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python }}
-    - name: Install dependencies
-      if: ${{ env.next-test != 'NA' }}
-      run: pip install tox
-    - name: Run integration
-      if: ${{ env.next-test != 'NA' }}
-      # Force one single concurrent test
-      run: tox -e integration -- -n 1
+    # - name: Setup operator environment
+    #   if: ${{ env.next-test != 'NA' }}
+    #   uses: charmed-kubernetes/actions-operator@main
+    #   with:
+    #     provider: lxd
+    #     juju-channel: 3.0/edge
+    # - name: Setup Python
+    #   if: ${{ env.next-test != 'NA' }}
+    #   uses: actions/setup-python@v4
+    #   with:
+    #     python-version: ${{ matrix.python }}
+    # - name: Install dependencies
+    #   if: ${{ env.next-test != 'NA' }}
+    #   run: pip install tox
+    # - name: Run integration
+    #   if: ${{ env.next-test != 'NA' }}
+    #   # Force one single concurrent test
+    #   run: tox -e integration -- -n 1
     - name: Upload artifact
       if: ${{ env.next-test != 'NA' }}
       uses: actions/upload-artifact@v3
