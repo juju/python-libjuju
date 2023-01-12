@@ -412,7 +412,6 @@ class TestAddCharmChangeRun:
                                                "series": "series",
                                                "channel": "channel"})
 
-
         charms_facade = mock.Mock()
         charms_facade.AddCharm = base.AsyncMock(return_value=None)
 
