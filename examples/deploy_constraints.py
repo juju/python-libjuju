@@ -16,7 +16,8 @@ async def main():
 
     try:
         model = await controller.add_model("test-model")
-        application = await model.deploy("cs:ubuntu", constraints={"arch": "amd64"})
+        application = await model.deploy("ch:ubuntu",
+                                         constraints={"arch": "amd64"})
 
         print('Waiting for active')
         await model.block_until(

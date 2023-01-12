@@ -32,7 +32,7 @@ async def main():
 
         print('Deploying mysql')
         application_1 = await offering_model.deploy(
-            'cs:mysql-58',
+            'ch:mysql',
             application_name='mysql',
             series='xenial',
             channel='stable',

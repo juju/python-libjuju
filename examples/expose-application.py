@@ -22,7 +22,7 @@ async def main():
     try:
         print('Deploying ubuntu')
         application = await model.deploy(
-            'cs:~jameinel/ubuntu-lite-7',
+            'ch:ubuntu',
             application_name='ubuntu',
             series='trusty',
             channel='stable',

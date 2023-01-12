@@ -19,8 +19,7 @@ async def main():
     try:
         print('Deploying trusted bundle application ubuntu')
         applications = await model.deploy(
-            'cs:~juju-qa/bundle/basic-trusted-1',
-            channel='beta',
+            'ch:aws-integrator',
             trust=True,
         )
 

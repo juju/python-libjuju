@@ -32,7 +32,7 @@ async def main():
 
         print('Deploying mysql')
         application_1 = await offering_model.deploy(
-            'cs:mysql-58',
+            'ch:mysql',
             application_name='mysql',
             series='xenial',
             channel='stable',
@@ -55,7 +55,7 @@ async def main():
 
         print('Deploying wordpress')
         application_2 = await consuming_model.deploy(
-            'cs:trusty/wordpress-5',
+            'ch:trusty/wordpress',
             application_name='wordpress',
             series='xenial',
             channel='stable',

@@ -22,7 +22,7 @@ async def main(cloud_name, credential_name):
 
         # verify we can deploy
         print('Deploying ubuntu')
-        app = await model.deploy('cs:ubuntu-10')
+        app = await model.deploy('ch:ubuntu')
 
         print('Waiting for active')
         await model.block_until(

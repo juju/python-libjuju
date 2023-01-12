@@ -18,9 +18,6 @@ async def main():
     # Deploy charmhub bundle
     await deploy_bundle(controller, 'juju-qa-bundle-test')
 
-    # Deploy legacy bundle
-    await deploy_bundle(controller, 'cs:~juju-qa/bundle/basic-0', 'beta')
-
     await controller.disconnect()
 
 
