@@ -118,12 +118,12 @@ def test_get_series():
             },
         },
     }
-    assert model._get_series('cs:trusty/ubuntu', entity) == 'trusty'
+    assert model._get_series('ch:trusty/ubuntu', entity) == 'trusty'
     assert model._get_series('xenial/ubuntu', entity) == 'xenial'
     assert model._get_series('~foo/xenial/ubuntu', entity) == 'xenial'
     assert model._get_series('~foo/ubuntu', entity) == 'xenial'
     assert model._get_series('ubuntu', entity) == 'xenial'
-    assert model._get_series('cs:ubuntu', entity) == 'xenial'
+    assert model._get_series('ch:ubuntu', entity) == 'xenial'
 
 
 class TestContextManager(asynctest.TestCase):
