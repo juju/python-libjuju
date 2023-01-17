@@ -1964,6 +1964,19 @@ class CAASApplicationProvisionerFacade(Type):
                                                          'deployed to this model.',
                                           'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
                                           'type': 'object'},
+                    'WatchProvisioningInfo': {'description': 'WatchProvisioningInfo '
+                                                             'provides a watcher '
+                                                             'for changes that '
+                                                             'affect the\n'
+                                                             'information returned '
+                                                             'by ProvisioningInfo. '
+                                                             'This is useful for '
+                                                             'ensuring the\n'
+                                                             'latest application '
+                                                             'stated is ensured.',
+                                              'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                             'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
+                                              'type': 'object'},
                     'WatchUnits': {'description': 'WatchUnits starts a '
                                                   'StringsWatcher to watch changes '
                                                   'to the\n'
@@ -2297,6 +2310,31 @@ class CAASApplicationProvisionerFacade(Type):
                    version=1,
                    params=_params)
 
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResults)
+    async def WatchProvisioningInfo(self, entities=None):
+        '''
+        WatchProvisioningInfo provides a watcher for changes that affect the
+        information returned by ProvisioningInfo. This is useful for ensuring the
+        latest application stated is ensured.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> NotifyWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASApplicationProvisioner',
+                   request='WatchProvisioningInfo',
+                   version=1,
+                   params=_params)
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
