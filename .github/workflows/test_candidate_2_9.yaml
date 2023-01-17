@@ -1,0 +1,75 @@
+name: Nightly release candidate testing 2.9
+
+on:
+  schedule:
+    - cron: "0 0 * * *"  # Run at 12AM UTC, every day
+
+jobs:
+  candidate-integration:
+    name: Edge integration
+    timeout-minutes: 120
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python:
+          - "3.8"
+          - "3.9"
+          - "3.10"
+    steps:
+    - name: Download artifact from previous workflow
+      id: download_artifact
+      uses: dawidd6/action-download-artifact@v2
+      with:
+        workflow_conclusion: success
+        name: juju-last-candidate-version
+        if_no_artifact_found: ignore
+    - name: Check if there is a new candidate
+      shell: bash
+      run: |
+        candidate=$(snap info juju | grep 2.9/candidate | awk '{print $2}')
+        last_tested=NA
+        if [ -f juju-last-candidate-version ]; then
+          last_tested=$(cat juju-last-candidate-version)
+        fi
+        echo "Last tested was $last_tested"
+        echo "Latest juju version found is $candidate"
+        next_test=NA
+        if [[ "$candidate" == "^" ]]; then
+          echo "No candidate to test"
+        else
+          if [[ "$candidate" == "$last_tested" ]]; then
+            echo "Candidate $candidate was already tested"
+          else
+            echo "Candidate $candidate has to be tested"
+            next_test="$candidate"
+          fi 
+        fi
+        echo "next-test=$next_test" >> $GITHUB_ENV
+        echo "$next_test" > ~/juju-last-candidate-version
+    - name: Check out code
+      uses: actions/checkout@v3
+      if: ${{ env.next-test != 'NA' }}
+    - name: Setup operator environment
+      if: ${{ env.next-test != 'NA' }}
+      uses: charmed-kubernetes/actions-operator@main
+      with:
+        provider: lxd
+        juju-channel: 2.9/candidate
+    - name: Setup Python
+      if: ${{ env.next-test != 'NA' }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Install dependencies
+      if: ${{ env.next-test != 'NA' }}
+      run: pip install tox
+    - name: Run integration
+      if: ${{ env.next-test != 'NA' }}
+      # Force one single concurrent test
+      run: tox -e integration -- -n 1
+    - name: Upload artifact
+      if: ${{ env.next-test != 'NA' }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: juju-last-candidate-version
+        path: ~/juju-last-candidate-version
