@@ -1655,12 +1655,8 @@ class Model:
 
     def _get_series(self, entity_url, entity):
         # try to get the series from the provided charm URL
-        if entity_url.startswith('cs:'):
-            parts = entity_url[3:].split('/')
-        else:
-            parts = entity_url.split('/')
-        if parts[0].startswith('~'):
-            parts.pop(0)
+        parts = entity_url.split('/')
+
         if len(parts) > 1:
             # series was specified in the URL
             return parts[0]
