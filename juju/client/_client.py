@@ -4,7 +4,7 @@
 from juju.client._definitions import *
 
 
-from juju.client import _client7, _client1, _client3, _client4, _client2, _client15, _client6, _client5, _client11, _client9, _client18
+from juju.client import _client7, _client1, _client3, _client4, _client2, _client16, _client6, _client11, _client10, _client5, _client9, _client18
 
 
 CLIENTS = {
@@ -13,10 +13,11 @@ CLIENTS = {
     "3": _client3,
     "4": _client4,
     "2": _client2,
-    "15": _client15,
+    "16": _client16,
     "6": _client6,
-    "5": _client5,
     "11": _client11,
+    "10": _client10,
+    "5": _client5,
     "9": _client9,
     "18": _client18
 }
@@ -453,6 +454,10 @@ class RetryStrategyFacade(TypeFactory):
 
 
 class SSHClientFacade(TypeFactory):
+    pass
+
+
+class SecretBackendsFacade(TypeFactory):
     pass
 
 

@@ -8,15 +8,9 @@ from juju.client.jujudata import FileJujuData
 from juju.client.proxy.factory import proxy_from_config
 from juju.errors import JujuConnectionError, JujuError
 from juju.client import client
+from juju.version import SUPPORTED_MAJOR_VERSION
 
 log = logging.getLogger('connector')
-
-# The SUPPORTED_JUJU_API_PREFIX indicates the prefix of the
-# juju version this python-libjuju version supports. For
-# example, "3.0." indicates that all the 3.0.x versions
-# are intended to be supported.
-SUPPORTED_JUJU_API_PREFIX = "3.0."
-
 
 class NoConnectionException(Exception):
     '''Raised by Connector when the connection method is called
@@ -80,7 +74,7 @@ class Connector:
             self._connection = await Connection.connect(**kwargs)
 
         # Check if we support the target controller
-        if not self._connection.info['server-version'].startswith(SUPPORTED_JUJU_API_PREFIX):
+        if not self._connection.info['server-version'].startswith(SUPPORTED_MAJOR_VERSION):
             raise JujuConnectionError("juju server-version %s not supported" % self._connection.info["server-version"])
 
     async def disconnect(self):

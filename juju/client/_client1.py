@@ -1205,6 +1205,19 @@ class CAASApplicationProvisionerFacade(Type):
                                                          'deployed to this model.',
                                           'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
                                           'type': 'object'},
+                    'WatchProvisioningInfo': {'description': 'WatchProvisioningInfo '
+                                                             'provides a watcher '
+                                                             'for changes that '
+                                                             'affect the\n'
+                                                             'information returned '
+                                                             'by ProvisioningInfo. '
+                                                             'This is useful for '
+                                                             'ensuring the\n'
+                                                             'latest application '
+                                                             'stated is ensured.',
+                                              'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                             'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
+                                              'type': 'object'},
                     'WatchUnits': {'description': 'WatchUnits starts a '
                                                   'StringsWatcher to watch changes '
                                                   'to the\n'
@@ -1538,6 +1551,31 @@ class CAASApplicationProvisionerFacade(Type):
                    version=1,
                    params=_params)
 
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResults)
+    async def WatchProvisioningInfo(self, entities=None):
+        '''
+        WatchProvisioningInfo provides a watcher for changes that affect the
+        information returned by ProvisioningInfo. This is useful for ensuring the
+        latest application stated is ensured.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> NotifyWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASApplicationProvisioner',
+                   request='WatchProvisioningInfo',
+                   version=1,
+                   params=_params)
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
@@ -2044,6 +2082,24 @@ class CAASFirewallerSidecarFacade(Type):
                                                                                 'type': 'array'}},
                                                      'required': ['Results'],
                                                      'type': 'object'},
+                     'ApplicationOpenedPorts': {'additionalProperties': False,
+                                                'properties': {'endpoint': {'type': 'string'},
+                                                               'port-ranges': {'items': {'$ref': '#/definitions/PortRange'},
+                                                                               'type': 'array'}},
+                                                'required': ['endpoint',
+                                                             'port-ranges'],
+                                                'type': 'object'},
+                     'ApplicationOpenedPortsResult': {'additionalProperties': False,
+                                                      'properties': {'application-port-ranges': {'items': {'$ref': '#/definitions/ApplicationOpenedPorts'},
+                                                                                                 'type': 'array'},
+                                                                     'error': {'$ref': '#/definitions/Error'}},
+                                                      'required': ['application-port-ranges'],
+                                                      'type': 'object'},
+                     'ApplicationOpenedPortsResults': {'additionalProperties': False,
+                                                       'properties': {'results': {'items': {'$ref': '#/definitions/ApplicationOpenedPortsResult'},
+                                                                                  'type': 'array'}},
+                                                       'required': ['results'],
+                                                       'type': 'object'},
                      'BoolResult': {'additionalProperties': False,
                                     'properties': {'error': {'$ref': '#/definitions/Error'},
                                                    'result': {'type': 'boolean'}},
@@ -2293,6 +2349,12 @@ class CAASFirewallerSidecarFacade(Type):
                                                                        'type': 'array'}},
                                             'required': ['results'],
                                             'type': 'object'},
+                     'PortRange': {'additionalProperties': False,
+                                   'properties': {'from-port': {'type': 'integer'},
+                                                  'protocol': {'type': 'string'},
+                                                  'to-port': {'type': 'integer'}},
+                                   'required': ['from-port', 'to-port', 'protocol'],
+                                   'type': 'object'},
                      'StringsWatchResult': {'additionalProperties': False,
                                             'properties': {'changes': {'items': {'type': 'string'},
                                                                        'type': 'array'},
@@ -2324,6 +2386,14 @@ class CAASFirewallerSidecarFacade(Type):
                                   'properties': {'Params': {'$ref': '#/definitions/CharmURL'},
                                                  'Result': {'$ref': '#/definitions/Charm'}},
                                   'type': 'object'},
+                    'GetApplicationOpenedPorts': {'description': 'GetApplicationOpenedPorts '
+                                                                 'returns all the '
+                                                                 'opened ports for '
+                                                                 'each given '
+                                                                 'application tag.',
+                                                  'properties': {'Params': {'$ref': '#/definitions/Entity'},
+                                                                 'Result': {'$ref': '#/definitions/ApplicationOpenedPortsResults'}},
+                                                  'type': 'object'},
                     'IsExposed': {'description': 'IsExposed returns whether the '
                                                  'specified applications are '
                                                  'exposed.',
@@ -2420,6 +2490,29 @@ class CAASFirewallerSidecarFacade(Type):
                    version=1,
                    params=_params)
         _params['url'] = url
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ApplicationOpenedPortsResults)
+    async def GetApplicationOpenedPorts(self, tag=None):
+        '''
+        GetApplicationOpenedPorts returns all the opened ports for each given application tag.
+
+        tag : str
+        Returns -> ApplicationOpenedPortsResults
+        '''
+        if tag is not None and not isinstance(tag, (bytes, str)):
+            raise Exception("Expected tag to be a str, received: {}".format(type(tag)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASFirewallerSidecar',
+                   request='GetApplicationOpenedPorts',
+                   version=1,
+                   params=_params)
+        _params['tag'] = tag
         reply = await self.rpc(msg)
         return reply
 
@@ -9134,6 +9227,224 @@ class RetryStrategyFacade(Type):
 
 
 
+class SecretBackendsFacade(Type):
+    name = 'SecretBackends'
+    version = 1
+    schema =     {'definitions': {'AddSecretBackendArg': {'additionalProperties': False,
+                                             'properties': {'SecretBackend': {'$ref': '#/definitions/SecretBackend'},
+                                                            'backend-type': {'type': 'string'},
+                                                            'config': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                    'type': 'object'}},
+                                                                       'type': 'object'},
+                                                            'id': {'type': 'string'},
+                                                            'name': {'type': 'string'},
+                                                            'token-rotate-interval': {'type': 'integer'}},
+                                             'required': ['name',
+                                                          'backend-type',
+                                                          'config',
+                                                          'SecretBackend'],
+                                             'type': 'object'},
+                     'AddSecretBackendArgs': {'additionalProperties': False,
+                                              'properties': {'args': {'items': {'$ref': '#/definitions/AddSecretBackendArg'},
+                                                                      'type': 'array'}},
+                                              'required': ['args'],
+                                              'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ErrorResult': {'additionalProperties': False,
+                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
+                                     'type': 'object'},
+                     'ErrorResults': {'additionalProperties': False,
+                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
+                                                                 'type': 'array'}},
+                                      'required': ['results'],
+                                      'type': 'object'},
+                     'ListSecretBackendsArgs': {'additionalProperties': False,
+                                                'properties': {'reveal': {'type': 'boolean'}},
+                                                'required': ['reveal'],
+                                                'type': 'object'},
+                     'ListSecretBackendsResults': {'additionalProperties': False,
+                                                   'properties': {'results': {'items': {'$ref': '#/definitions/SecretBackendResult'},
+                                                                              'type': 'array'}},
+                                                   'required': ['results'],
+                                                   'type': 'object'},
+                     'RemoveSecretBackendArg': {'additionalProperties': False,
+                                                'properties': {'force': {'type': 'boolean'},
+                                                               'name': {'type': 'string'}},
+                                                'required': ['name'],
+                                                'type': 'object'},
+                     'RemoveSecretBackendArgs': {'additionalProperties': False,
+                                                 'properties': {'args': {'items': {'$ref': '#/definitions/RemoveSecretBackendArg'},
+                                                                         'type': 'array'}},
+                                                 'required': ['args'],
+                                                 'type': 'object'},
+                     'SecretBackend': {'additionalProperties': False,
+                                       'properties': {'backend-type': {'type': 'string'},
+                                                      'config': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                              'type': 'object'}},
+                                                                 'type': 'object'},
+                                                      'name': {'type': 'string'},
+                                                      'token-rotate-interval': {'type': 'integer'}},
+                                       'required': ['name',
+                                                    'backend-type',
+                                                    'config'],
+                                       'type': 'object'},
+                     'SecretBackendResult': {'additionalProperties': False,
+                                             'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                            'id': {'type': 'string'},
+                                                            'message': {'type': 'string'},
+                                                            'num-secrets': {'type': 'integer'},
+                                                            'result': {'$ref': '#/definitions/SecretBackend'},
+                                                            'status': {'type': 'string'}},
+                                             'required': ['result',
+                                                          'id',
+                                                          'num-secrets',
+                                                          'status'],
+                                             'type': 'object'},
+                     'UpdateSecretBackendArg': {'additionalProperties': False,
+                                                'properties': {'config': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                       'type': 'object'}},
+                                                                          'type': 'object'},
+                                                               'force': {'type': 'boolean'},
+                                                               'name': {'type': 'string'},
+                                                               'name-change': {'type': 'string'},
+                                                               'reset': {'items': {'type': 'string'},
+                                                                         'type': 'array'},
+                                                               'token-rotate-interval': {'type': 'integer'}},
+                                                'required': ['name',
+                                                             'token-rotate-interval',
+                                                             'config',
+                                                             'reset'],
+                                                'type': 'object'},
+                     'UpdateSecretBackendArgs': {'additionalProperties': False,
+                                                 'properties': {'args': {'items': {'$ref': '#/definitions/UpdateSecretBackendArg'},
+                                                                         'type': 'array'}},
+                                                 'required': ['args'],
+                                                 'type': 'object'}},
+     'properties': {'AddSecretBackends': {'description': 'AddSecretBackends adds '
+                                                         'new secret backends.',
+                                          'properties': {'Params': {'$ref': '#/definitions/AddSecretBackendArgs'},
+                                                         'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                          'type': 'object'},
+                    'ListSecretBackends': {'description': 'ListSecretBackends '
+                                                          'lists available secret '
+                                                          'backends.',
+                                           'properties': {'Params': {'$ref': '#/definitions/ListSecretBackendsArgs'},
+                                                          'Result': {'$ref': '#/definitions/ListSecretBackendsResults'}},
+                                           'type': 'object'},
+                    'RemoveSecretBackends': {'description': 'RemoveSecretBackends '
+                                                            'removes secret '
+                                                            'backends.',
+                                             'properties': {'Params': {'$ref': '#/definitions/RemoveSecretBackendArgs'},
+                                                            'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                             'type': 'object'},
+                    'UpdateSecretBackends': {'description': 'UpdateSecretBackends '
+                                                            'updates secret '
+                                                            'backends.',
+                                             'properties': {'Params': {'$ref': '#/definitions/UpdateSecretBackendArgs'},
+                                                            'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                             'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(ErrorResults)
+    async def AddSecretBackends(self, args=None):
+        '''
+        AddSecretBackends adds new secret backends.
+
+        args : typing.Sequence[~AddSecretBackendArg]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SecretBackends',
+                   request='AddSecretBackends',
+                   version=1,
+                   params=_params)
+        _params['args'] = args
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ListSecretBackendsResults)
+    async def ListSecretBackends(self, reveal=None):
+        '''
+        ListSecretBackends lists available secret backends.
+
+        reveal : bool
+        Returns -> ListSecretBackendsResults
+        '''
+        if reveal is not None and not isinstance(reveal, bool):
+            raise Exception("Expected reveal to be a bool, received: {}".format(type(reveal)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SecretBackends',
+                   request='ListSecretBackends',
+                   version=1,
+                   params=_params)
+        _params['reveal'] = reveal
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def RemoveSecretBackends(self, args=None):
+        '''
+        RemoveSecretBackends removes secret backends.
+
+        args : typing.Sequence[~RemoveSecretBackendArg]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SecretBackends',
+                   request='RemoveSecretBackends',
+                   version=1,
+                   params=_params)
+        _params['args'] = args
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def UpdateSecretBackends(self, args=None):
+        '''
+        UpdateSecretBackends updates secret backends.
+
+        args : typing.Sequence[~UpdateSecretBackendArg]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SecretBackends',
+                   request='UpdateSecretBackends',
+                   version=1,
+                   params=_params)
+        _params['args'] = args
+        reply = await self.rpc(msg)
+        return reply
+
+
+
 class SecretsFacade(Type):
     name = 'Secrets'
     version = 1
@@ -9187,11 +9498,16 @@ class SecretsFacade(Type):
                                                                        'type': 'string'},
                                                        'expire-time': {'format': 'date-time',
                                                                        'type': 'string'},
-                                                       'provider-id': {'type': 'string'},
                                                        'revision': {'type': 'integer'},
                                                        'update-time': {'format': 'date-time',
-                                                                       'type': 'string'}},
+                                                                       'type': 'string'},
+                                                       'value-ref': {'$ref': '#/definitions/SecretValueRef'}},
                                         'required': ['revision'],
+                                        'type': 'object'},
+                     'SecretValueRef': {'additionalProperties': False,
+                                        'properties': {'backend-id': {'type': 'string'},
+                                                       'revision-id': {'type': 'string'}},
+                                        'required': ['backend-id', 'revision-id'],
                                         'type': 'object'},
                      'SecretValueResult': {'additionalProperties': False,
                                            'properties': {'data': {'patternProperties': {'.*': {'type': 'string'}},
@@ -9370,6 +9686,25 @@ class SecretsManagerFacade(Type):
                                                                       'type': 'array'}},
                                            'required': ['results'],
                                            'type': 'object'},
+                     'SecretBackendConfig': {'additionalProperties': False,
+                                             'properties': {'params': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                    'type': 'object'}},
+                                                                       'type': 'object'},
+                                                            'type': {'type': 'string'}},
+                                             'required': ['type'],
+                                             'type': 'object'},
+                     'SecretBackendConfigResults': {'additionalProperties': False,
+                                                    'properties': {'active-id': {'type': 'string'},
+                                                                   'configs': {'patternProperties': {'.*': {'$ref': '#/definitions/SecretBackendConfig'}},
+                                                                               'type': 'object'},
+                                                                   'model-controller': {'type': 'string'},
+                                                                   'model-name': {'type': 'string'},
+                                                                   'model-uuid': {'type': 'string'}},
+                                                    'required': ['model-controller',
+                                                                 'model-uuid',
+                                                                 'model-name',
+                                                                 'active-id'],
+                                                    'type': 'object'},
                      'SecretConsumerInfoResult': {'additionalProperties': False,
                                                   'properties': {'error': {'$ref': '#/definitions/Error'},
                                                                  'label': {'type': 'string'},
@@ -9384,7 +9719,7 @@ class SecretsManagerFacade(Type):
                      'SecretContentParams': {'additionalProperties': False,
                                              'properties': {'data': {'patternProperties': {'.*': {'type': 'string'}},
                                                                      'type': 'object'},
-                                                            'provider-id': {'type': 'string'}},
+                                                            'value-ref': {'$ref': '#/definitions/SecretValueRef'}},
                                              'type': 'object'},
                      'SecretContentResult': {'additionalProperties': False,
                                              'properties': {'content': {'$ref': '#/definitions/SecretContentParams'},
@@ -9401,12 +9736,21 @@ class SecretsManagerFacade(Type):
                                                                        'type': 'string'},
                                                        'expire-time': {'format': 'date-time',
                                                                        'type': 'string'},
-                                                       'provider-id': {'type': 'string'},
                                                        'revision': {'type': 'integer'},
                                                        'update-time': {'format': 'date-time',
-                                                                       'type': 'string'}},
+                                                                       'type': 'string'},
+                                                       'value-ref': {'$ref': '#/definitions/SecretValueRef'}},
                                         'required': ['revision'],
                                         'type': 'object'},
+                     'SecretRevisionArg': {'additionalProperties': False,
+                                           'properties': {'pending-delete': {'type': 'boolean'},
+                                                          'revisions': {'items': {'type': 'integer'},
+                                                                        'type': 'array'},
+                                                          'uri': {'type': 'string'}},
+                                           'required': ['uri',
+                                                        'revisions',
+                                                        'pending-delete'],
+                                           'type': 'object'},
                      'SecretRotatedArg': {'additionalProperties': False,
                                           'properties': {'original-revision': {'type': 'integer'},
                                                          'skip': {'type': 'boolean'},
@@ -9419,13 +9763,6 @@ class SecretsManagerFacade(Type):
                                            'properties': {'args': {'items': {'$ref': '#/definitions/SecretRotatedArg'},
                                                                    'type': 'array'}},
                                            'required': ['args'],
-                                           'type': 'object'},
-                     'SecretStoreConfig': {'additionalProperties': False,
-                                           'properties': {'params': {'patternProperties': {'.*': {'additionalProperties': True,
-                                                                                                  'type': 'object'}},
-                                                                     'type': 'object'},
-                                                          'type': {'type': 'string'}},
-                                           'required': ['type'],
                                            'type': 'object'},
                      'SecretTriggerChange': {'additionalProperties': False,
                                              'properties': {'next-trigger-time': {'format': 'date-time',
@@ -9443,6 +9780,11 @@ class SecretsManagerFacade(Type):
                                                   'required': ['watcher-id',
                                                                'changes'],
                                                   'type': 'object'},
+                     'SecretValueRef': {'additionalProperties': False,
+                                        'properties': {'backend-id': {'type': 'string'},
+                                                       'revision-id': {'type': 'string'}},
+                                        'required': ['backend-id', 'revision-id'],
+                                        'type': 'object'},
                      'SecretValueResult': {'additionalProperties': False,
                                            'properties': {'data': {'patternProperties': {'.*': {'type': 'string'}},
                                                                    'type': 'object'},
@@ -9521,6 +9863,13 @@ class SecretsManagerFacade(Type):
                                                        'properties': {'Params': {'$ref': '#/definitions/GetSecretConsumerInfoArgs'},
                                                                       'Result': {'$ref': '#/definitions/SecretConsumerInfoResults'}},
                                                        'type': 'object'},
+                    'GetSecretBackendConfig': {'description': 'GetSecretBackendConfig '
+                                                              'gets the config '
+                                                              'needed to create a '
+                                                              'client to secret '
+                                                              'backends.',
+                                               'properties': {'Result': {'$ref': '#/definitions/SecretBackendConfigResults'}},
+                                               'type': 'object'},
                     'GetSecretContentInfo': {'description': 'GetSecretContentInfo '
                                                             'returns the secret '
                                                             'values for the '
@@ -9533,12 +9882,23 @@ class SecretsManagerFacade(Type):
                                                          "caller's secrets.",
                                           'properties': {'Result': {'$ref': '#/definitions/ListSecretResults'}},
                                           'type': 'object'},
+                    'GetSecretRevisionContentInfo': {'description': 'GetSecretRevisionContentInfo '
+                                                                    'returns the '
+                                                                    'secret values '
+                                                                    'for the '
+                                                                    'specified '
+                                                                    'secret '
+                                                                    'revisions.',
+                                                     'properties': {'Params': {'$ref': '#/definitions/SecretRevisionArg'},
+                                                                    'Result': {'$ref': '#/definitions/SecretContentResults'}},
+                                                     'type': 'object'},
                     'GetSecretStoreConfig': {'description': 'GetSecretStoreConfig '
-                                                            'gets the config '
-                                                            'needed to create a '
-                                                            "client to the model's "
-                                                            'secret store.',
-                                             'properties': {'Result': {'$ref': '#/definitions/SecretStoreConfig'}},
+                                                            'is for 3.0.x agents.\n'
+                                                            'TODO(wallyworld) - '
+                                                            'remove when we auto '
+                                                            'upgrade migrated '
+                                                            'models.',
+                                             'properties': {'Result': {'$ref': '#/definitions/SecretBackendConfig'}},
                                              'type': 'object'},
                     'RemoveSecrets': {'description': 'RemoveSecrets removes the '
                                                      'specified secrets.',
@@ -9697,6 +10057,27 @@ class SecretsManagerFacade(Type):
 
 
 
+    @ReturnMapping(SecretBackendConfigResults)
+    async def GetSecretBackendConfig(self):
+        '''
+        GetSecretBackendConfig gets the config needed to create a client to secret backends.
+
+
+        Returns -> SecretBackendConfigResults
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SecretsManager',
+                   request='GetSecretBackendConfig',
+                   version=1,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
     @ReturnMapping(SecretContentResults)
     async def GetSecretContentInfo(self, args=None):
         '''
@@ -9741,13 +10122,47 @@ class SecretsManagerFacade(Type):
 
 
 
-    @ReturnMapping(SecretStoreConfig)
+    @ReturnMapping(SecretContentResults)
+    async def GetSecretRevisionContentInfo(self, pending_delete=None, revisions=None, uri=None):
+        '''
+        GetSecretRevisionContentInfo returns the secret values for the specified secret revisions.
+
+        pending_delete : bool
+        revisions : typing.Sequence[int]
+        uri : str
+        Returns -> SecretContentResults
+        '''
+        if pending_delete is not None and not isinstance(pending_delete, bool):
+            raise Exception("Expected pending_delete to be a bool, received: {}".format(type(pending_delete)))
+
+        if revisions is not None and not isinstance(revisions, (bytes, str, list)):
+            raise Exception("Expected revisions to be a Sequence, received: {}".format(type(revisions)))
+
+        if uri is not None and not isinstance(uri, (bytes, str)):
+            raise Exception("Expected uri to be a str, received: {}".format(type(uri)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SecretsManager',
+                   request='GetSecretRevisionContentInfo',
+                   version=1,
+                   params=_params)
+        _params['pending-delete'] = pending_delete
+        _params['revisions'] = revisions
+        _params['uri'] = uri
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SecretBackendConfig)
     async def GetSecretStoreConfig(self):
         '''
-        GetSecretStoreConfig gets the config needed to create a client to the model's secret store.
+        GetSecretStoreConfig is for 3.0.x agents.
+        TODO(wallyworld) - remove when we auto upgrade migrated models.
 
 
-        Returns -> SecretStoreConfig
+        Returns -> SecretBackendConfig
         '''
 
         # map input types to rpc msg

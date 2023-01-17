@@ -2546,6 +2546,35 @@ class Model:
         except IOError:
             raise
 
+    async def list_secrets(self, filter="", show_secrets=False):
+        """
+        Returns the list of available secrets.
+        """
+        facade = client.SecretsFacade.from_connection(self.connection())
+        return await facade.ListSecrets({
+            'filter': filter,
+            'show-secrets': show_secrets,
+        })
+
+    async def add_secret_backends(self, ):    
+        """
+        Add a new secret backend. The backend argument follows the 
+        """
+        facade = client.SecretBackends.from_connection(self.connection())
+        return await facade.AddSecretBackends({})
+
+    async def list_secret_backendss(self, show_secrets=False):
+        facade = client.SecretBackends.from_connection(self.connection())
+        return await facade.ListSecretBackends(show_secrets)
+
+    async def remove_secret_backends(self):
+        facade = client.SecretBackends.from_connection(self.connection())
+        return await facade.RemoveSecretBackends()
+
+    async def update_secret_backends(self):
+        facade = client.SecretBackends.from_connection(self.connection())
+        return await facade.UpdateSecretBackends()
+
     async def _get_source_api(self, url, controller_name=None):
         controller = Controller()
         if url.has_empty_source():

@@ -2374,8 +2374,8 @@ class ResourcesFacade(Type):
                                                            'are not available '
                                                            'until\n'
                                                            'resolved. Handles '
-                                                           'CharmHub, CharmStore '
-                                                           'and Local charms.',
+                                                           'CharmHub and Local '
+                                                           'charms.',
                                             'properties': {'Params': {'$ref': '#/definitions/AddPendingResourcesArgsV2'},
                                                            'Result': {'$ref': '#/definitions/AddPendingResourcesResult'}},
                                             'type': 'object'},
@@ -2393,7 +2393,7 @@ class ResourcesFacade(Type):
         '''
         AddPendingResources adds the provided resources (info) to the Juju
         model in a pending state, meaning they are not available until
-        resolved. Handles CharmHub, CharmStore and Local charms.
+        resolved. Handles CharmHub and Local charms.
 
         entity : Entity
         charm_origin : CharmOrigin
