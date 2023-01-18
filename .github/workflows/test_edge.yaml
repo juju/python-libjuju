@@ -26,7 +26,7 @@ jobs:
     - name: Check if there is a new candidate
       shell: bash
       run: |
-        edge=$(snap info juju | grep 3.0/edge | awk '{print $2}')
+        edge=$(snap info juju | grep 3.1/edge | awk '{print $2}')
         last_tested=NA
         if [ -f juju-last-edge-version ]; then
           last_tested=$(cat juju-last-edge-version)
@@ -54,7 +54,7 @@ jobs:
       uses: charmed-kubernetes/actions-operator@main
       with:
         provider: lxd
-        juju-channel: 3.0/edge
+        juju-channel: 3.1/edge
     - name: Setup Python
       if: ${{ env.next-test != 'NA' }}
       uses: actions/setup-python@v4
