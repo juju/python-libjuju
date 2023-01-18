@@ -1200,7 +1200,8 @@ async def test_list_storage(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_storage_pools(event_loop):
+async def test_storage_pools_on_lxd(event_loop):
+    # This will fail when ran on anything but lxd
     async with base.CleanModel() as model:
         await model.deploy('postgresql')
         await model.wait_for_idle(status="active")
