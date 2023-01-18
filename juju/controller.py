@@ -871,16 +871,17 @@ class Controller:
         jasyncio.ensure_future(_watcher(stop_event))
         return stop_event
 
-    async def add_secret_backends(self, backend_type, config, id, name, token_rotate_interval):    
+    async def add_secret_backends(self, name, backend_type, config, token_rotate_interval):    
         """
         Add a new secret backend.
 
         Parameters
         ---------- 
-        backend-type : string 		
-        config : object 		
-        id : string 		
-        name : string 		
+        name : string
+            name of the backend
+        backend-type : string		
+        config : dict
+            dictionary with the backend configuration values 		 		
         token-rotate-interval :	integer 
 
         Returns
@@ -892,7 +893,6 @@ class Controller:
         return await facade.AddSecretBackends([{
             'backend-type': backend_type,
             'config': config,
-            'id': id,
             'name': name,
             'token-rorate-interval': token_rotate_interval,
         }])
@@ -901,24 +901,59 @@ class Controller:
         """
         Return the list of secret backends
 
-        Params
-        ------
-        reveal : include sensitive backend config content
+        Parameters
+        ----------
+        reveal : boolean
+            include sensitive backend config content if true
 
         Returns
         -------
-        
+        list
+           a list of available secret backends
         """
         facade = client.SecretBackendsFacade.from_connection(self.connection())
         return await facade.ListSecretBackends(reveal)
 
-    async def remove_secret_backends(self):
-        facade = client.SecretBackendsFacade.from_connection(self.connection())
-        return await facade.RemoveSecretBackends()
+    async def remove_secret_backends(self, name, force=False):
+        """
+        Remove a secrets backend.
 
-    async def update_secret_backends(self):
+        Parameters
+        ----------
+        name : name of the backend
+        force : true if the operation is foced
+
+        Returns
+        -------
+        error if any
+        """
         facade = client.SecretBackendsFacade.from_connection(self.connection())
-        return await facade.UpdateSecretBackends()
+        return await facade.RemoveSecretBackends(
+            [{'name': name,
+            'force': force}]
+        )
+
+    async def update_secret_backends(self, name, config=None, force=False, name_change=None, token_rotate_interval=None):
+        """
+        Update a backend
+
+        Parameters
+        ----------
+        name : string
+            the backend name
+        config : dict 
+            key value dict with configuration parameters
+        force : boolean
+            true to force the upate process
+        name_change : string
+            new name for the backend
+        token_rotate_interval : int
+            token rotation interval
+        """
+        facade = client.SecretBackendsFacade.from_connection(self.connection())
+        return await facade.UpdateSecretBackends([{
+            'name' : name
+        }])
 
 class ConnectedController(Controller):
     def __init__(
