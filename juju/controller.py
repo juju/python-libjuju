@@ -871,6 +871,54 @@ class Controller:
         jasyncio.ensure_future(_watcher(stop_event))
         return stop_event
 
+    async def add_secret_backends(self, backend_type, config, id, name, token_rotate_interval):    
+        """
+        Add a new secret backend.
+
+        Parameters
+        ---------- 
+        backend-type : string 		
+        config : object 		
+        id : string 		
+        name : string 		
+        token-rotate-interval :	integer 
+
+        Returns
+        -------
+        list
+           a list of errors if any
+        """
+        facade = client.SecretBackendsFacade.from_connection(self.connection())
+        return await facade.AddSecretBackends([{
+            'backend-type': backend_type,
+            'config': config,
+            'id': id,
+            'name': name,
+            'token-rorate-interval': token_rotate_interval,
+        }])
+
+    async def list_secret_backends(self, reveal=False):
+        """
+        Return the list of secret backends
+
+        Params
+        ------
+        reveal : include sensitive backend config content
+
+        Returns
+        -------
+        
+        """
+        facade = client.SecretBackendsFacade.from_connection(self.connection())
+        return await facade.ListSecretBackends(reveal)
+
+    async def remove_secret_backends(self):
+        facade = client.SecretBackendsFacade.from_connection(self.connection())
+        return await facade.RemoveSecretBackends()
+
+    async def update_secret_backends(self):
+        facade = client.SecretBackendsFacade.from_connection(self.connection())
+        return await facade.UpdateSecretBackends()
 
 class ConnectedController(Controller):
     def __init__(
