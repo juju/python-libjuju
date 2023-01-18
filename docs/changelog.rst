@@ -1,6 +1,27 @@
 Changelog
 ---------
 
+2.9.38
+^^^^^^
+
+The 2.9.38 version breaks the existing python-libjuju release versioning policy.
+Initially, the version number matches the juju version this release is intended
+to support and has been tested against.
+
+## What's Changed
+* Merge 2.9.11 by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/713
+* add support for ipv6 by @jdkandersson in https://github.com/juju/python-libjuju/pull/726
+* [JUJU-1979] Backport upgrade-charm fixes onto `2.9` by @cderici in https://github.com/juju/python-libjuju/pull/744
+* [JUJU-2256] Add integration tests to github actions pinning juju 2.9 by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/775
+* [JUJU-2392] Cherrypick to fix wrong bases by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/783
+* [JUJU-2485] Added nightly built checks. by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/787
+* [JUJU-2381] Facade updated to 2.9.38 by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/788
+
+## New Contributors
+* @jdkandersson made their first contribution in https://github.com/juju/python-libjuju/pull/726
+
+**Full Changelog**: https://github.com/juju/python-libjuju/compare/2.9.11...2.9.38
+
 2.9.11
 ^^^^^^
 
