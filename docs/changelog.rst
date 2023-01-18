@@ -1,10 +1,10 @@
 Changelog
 ---------
 
-2.9.38
-^^^^^^
+2.9.38.1
+^^^^^^^^
 
-The 2.9.38 version breaks the existing python-libjuju release versioning policy.
+The 2.9.38.1 version breaks the existing python-libjuju release versioning policy.
 Initially, the version number matches the juju version this release is intended
 to support and has been tested against.
 
