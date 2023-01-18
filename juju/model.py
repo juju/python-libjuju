@@ -483,6 +483,7 @@ class LocalDeployType:
             is_bundle=is_bundle,
         )
 
+
 class CharmhubDeployType:
     """CharmhubDeployType defines a class for resolving and deploying charmhub
     charms and bundles.
@@ -2361,8 +2362,9 @@ class Model:
 
         consume_details = await source.get_consume_details(offer.as_local().string())
 
-        # Only disconnect when the controller object has been created within with function
-        # We don't want to disconnect the object passed by the user in the controller argument
+        # Only disconnect when the controller object has been created within
+        # with function We don't want to disconnect the object passed by the
+        # user in the controller argument
         if not controller:
             await source.disconnect()
         if consume_details is None or consume_details.offer is None:
