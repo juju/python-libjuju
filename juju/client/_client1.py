@@ -9266,8 +9266,10 @@ class SecretBackendsFacade(Type):
                                       'required': ['results'],
                                       'type': 'object'},
                      'ListSecretBackendsArgs': {'additionalProperties': False,
-                                                'properties': {'reveal': {'type': 'boolean'}},
-                                                'required': ['reveal'],
+                                                'properties': {'names': {'items': {'type': 'string'},
+                                                                         'type': 'array'},
+                                                               'reveal': {'type': 'boolean'}},
+                                                'required': ['names', 'reveal'],
                                                 'type': 'object'},
                      'ListSecretBackendsResults': {'additionalProperties': False,
                                                    'properties': {'results': {'items': {'$ref': '#/definitions/SecretBackendResult'},
@@ -9377,13 +9379,17 @@ class SecretBackendsFacade(Type):
 
 
     @ReturnMapping(ListSecretBackendsResults)
-    async def ListSecretBackends(self, reveal=None):
+    async def ListSecretBackends(self, names=None, reveal=None):
         '''
         ListSecretBackends lists available secret backends.
 
+        names : typing.Sequence[str]
         reveal : bool
         Returns -> ListSecretBackendsResults
         '''
+        if names is not None and not isinstance(names, (bytes, str, list)):
+            raise Exception("Expected names to be a Sequence, received: {}".format(type(names)))
+
         if reveal is not None and not isinstance(reveal, bool):
             raise Exception("Expected reveal to be a bool, received: {}".format(type(reveal)))
 
@@ -9393,6 +9399,7 @@ class SecretBackendsFacade(Type):
                    request='ListSecretBackends',
                    version=1,
                    params=_params)
+        _params['names'] = names
         _params['reveal'] = reveal
         reply = await self.rpc(msg)
         return reply

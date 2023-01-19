@@ -12257,18 +12257,24 @@ class ListSSHKeys(Type):
 
 
 class ListSecretBackendsArgs(Type):
-    _toSchema = {'reveal': 'reveal'}
-    _toPy = {'reveal': 'reveal'}
-    def __init__(self, reveal=None, **unknown_fields):
+    _toSchema = {'names': 'names', 'reveal': 'reveal'}
+    _toPy = {'names': 'names', 'reveal': 'reveal'}
+    def __init__(self, names=None, reveal=None, **unknown_fields):
         '''
+        names : typing.Sequence[str]
         reveal : bool
         '''
+        names_ = names
         reveal_ = reveal
 
         # Validate arguments against known Juju API types.
+        if names_ is not None and not isinstance(names_, (bytes, str, list)):
+            raise Exception("Expected names_ to be a Sequence, received: {}".format(type(names_)))
+
         if reveal_ is not None and not isinstance(reveal_, bool):
             raise Exception("Expected reveal_ to be a bool, received: {}".format(type(reveal_)))
 
+        self.names = names_
         self.reveal = reveal_
         self.unknown_fields = unknown_fields
 
@@ -14205,6 +14211,24 @@ class ModelAccess(Type):
 
 
 
+class ModelApplicationInfo(Type):
+    _toSchema = {'name': 'name'}
+    _toPy = {'name': 'name'}
+    def __init__(self, name=None, **unknown_fields):
+        '''
+        name : str
+        '''
+        name_ = name
+
+        # Validate arguments against known Juju API types.
+        if name_ is not None and not isinstance(name_, (bytes, str)):
+            raise Exception("Expected name_ to be a str, received: {}".format(type(name_)))
+
+        self.name = name_
+        self.unknown_fields = unknown_fields
+
+
+
 class ModelArgs(Type):
     _toSchema = {'model_tag': 'model-tag'}
     _toPy = {'model-tag': 'model_tag'}
@@ -15058,11 +15082,12 @@ class ModelSet(Type):
 
 
 class ModelStatus(Type):
-    _toSchema = {'application_count': 'application-count', 'error': 'error', 'filesystems': 'filesystems', 'hosted_machine_count': 'hosted-machine-count', 'life': 'life', 'machines': 'machines', 'model_tag': 'model-tag', 'owner_tag': 'owner-tag', 'type_': 'type', 'unit_count': 'unit-count', 'volumes': 'volumes'}
-    _toPy = {'application-count': 'application_count', 'error': 'error', 'filesystems': 'filesystems', 'hosted-machine-count': 'hosted_machine_count', 'life': 'life', 'machines': 'machines', 'model-tag': 'model_tag', 'owner-tag': 'owner_tag', 'type': 'type_', 'unit-count': 'unit_count', 'volumes': 'volumes'}
-    def __init__(self, application_count=None, error=None, filesystems=None, hosted_machine_count=None, life=None, machines=None, model_tag=None, owner_tag=None, type_=None, unit_count=None, volumes=None, **unknown_fields):
+    _toSchema = {'application_count': 'application-count', 'applications': 'applications', 'error': 'error', 'filesystems': 'filesystems', 'hosted_machine_count': 'hosted-machine-count', 'life': 'life', 'machines': 'machines', 'model_tag': 'model-tag', 'owner_tag': 'owner-tag', 'type_': 'type', 'unit_count': 'unit-count', 'volumes': 'volumes'}
+    _toPy = {'application-count': 'application_count', 'applications': 'applications', 'error': 'error', 'filesystems': 'filesystems', 'hosted-machine-count': 'hosted_machine_count', 'life': 'life', 'machines': 'machines', 'model-tag': 'model_tag', 'owner-tag': 'owner_tag', 'type': 'type_', 'unit-count': 'unit_count', 'volumes': 'volumes'}
+    def __init__(self, application_count=None, applications=None, error=None, filesystems=None, hosted_machine_count=None, life=None, machines=None, model_tag=None, owner_tag=None, type_=None, unit_count=None, volumes=None, **unknown_fields):
         '''
         application_count : int
+        applications : typing.Sequence[~ModelApplicationInfo]
         error : Error
         filesystems : typing.Sequence[~ModelFilesystemInfo]
         hosted_machine_count : int
@@ -15075,6 +15100,7 @@ class ModelStatus(Type):
         volumes : typing.Sequence[~ModelVolumeInfo]
         '''
         application_count_ = application_count
+        applications_ = [ModelApplicationInfo.from_json(o) for o in applications or []]
         error_ = Error.from_json(error) if error else None
         filesystems_ = [ModelFilesystemInfo.from_json(o) for o in filesystems or []]
         hosted_machine_count_ = hosted_machine_count
@@ -15089,6 +15115,9 @@ class ModelStatus(Type):
         # Validate arguments against known Juju API types.
         if application_count_ is not None and not isinstance(application_count_, int):
             raise Exception("Expected application_count_ to be a int, received: {}".format(type(application_count_)))
+
+        if applications_ is not None and not isinstance(applications_, (bytes, str, list)):
+            raise Exception("Expected applications_ to be a Sequence, received: {}".format(type(applications_)))
 
         if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
@@ -15121,6 +15150,7 @@ class ModelStatus(Type):
             raise Exception("Expected volumes_ to be a Sequence, received: {}".format(type(volumes_)))
 
         self.application_count = application_count_
+        self.applications = applications_
         self.error = error_
         self.filesystems = filesystems_
         self.hosted_machine_count = hosted_machine_count_
