@@ -2117,7 +2117,7 @@ class Model:
             's' if len(unit_names) == 1 else '',
             ' '.join(unit_names))
 
-        return await app_facade.DestroyUnits(unit_names=list(unit_names))
+        return await app_facade.DestroyUnit(unit_names=list(unit_names))
     destroy_units = destroy_unit
 
     def download_backup(self, archive_id, target_filename=None):
