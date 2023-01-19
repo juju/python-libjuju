@@ -18,7 +18,7 @@ import logging
 import pathlib
 
 from . import model, tag, utils, jasyncio
-from .url import URL, Schema
+from .url import URL
 from .status import derive_status
 from .annotationhelper import _get_annotations, _set_annotations
 from .client import client
@@ -675,31 +675,14 @@ class Application(model.ModelEntity):
 
         # Make the source-specific changes to the origin/channel/url
         # (and also get the resources necessary to deploy the (destination) charm -- for later)
-        if Schema.CHARM_HUB.matches(parsed_url.schema):
-            origin.source = Source.CHARM_HUB
-            if channel:
-                ch = Channel.parse(channel).normalize()
-                origin.risk = ch.risk
-                origin.track = ch.track
+        origin.source = Source.CHARM_HUB.value
+        if channel:
+            ch = Channel.parse(channel).normalize()
+            origin.risk = ch.risk
+            origin.track = ch.track
 
-            charmhub = self.model.charmhub
-            charm_resources = await charmhub.list_resources(charm_name)
-        else:
-            charmstore = self.model.charmstore
-            charmstore_entity = None
-            if switch is None:
-                charm_url = charm_url.rpartition('-')[0]
-                if revision is not None:
-                    charm_url = "%s-%d" % (charm_url, revision)
-                else:
-                    charmstore_entity = await charmstore.entity(charm_url, channel=channel)
-                    charm_url = charmstore_entity['Id']
-            origin.source = 'charm-store'
-            if channel:
-                origin.risk = channel
-            if charmstore_entity is None:
-                charmstore_entity = await charmstore.entity(charm_url, channel=channel)
-            charm_resources = charmstore_entity['Meta']['resources']
+        charmhub = self.model.charmhub
+        charm_resources = await charmhub.list_resources(charm_name)
 
         # Resolve the given charm URLs with an optionally specified preferred channel.
         # Channel provided via CharmOrigin.
