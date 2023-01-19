@@ -31,15 +31,13 @@ async def main():
         application = await model.deploy(
             'ch:ubuntu',
             application_name='ubuntu',
-            series='trusty',
+            series='jammy',
             channel='stable',
         )
 
         print('Waiting for active')
         await asyncio.sleep(10)
-        await model.block_until(
-            lambda: all(unit.workload_status == 'active'
-                        for unit in application.units))
+        await model.wait_for_idle(status='active')
 
         print("Verifying that we can ssh into the created model")
         ret = await utils.execute_process(

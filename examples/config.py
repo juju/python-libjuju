@@ -22,33 +22,38 @@ async def main():
     await model.connect()
 
     ubuntu_app = await model.deploy(
-        'ch:mysql',
+        'mysql',
         application_name='mysql',
-        series='trusty',
-        channel='stable',
+        series='jammy',
+        channel='edge',
         config={
-            'tuning-level': 'safest',
+            'cluster-name': 'foo',
         },
         constraints={
             'mem': 256 * MB,
         },
     )
+    await model.wait_for_idle(status='active')
 
     # update and check app config
-    await ubuntu_app.set_config({'tuning-level': 'fast'})
+    await ubuntu_app.set_config({'cluster-name': 'bar'})
     config = await ubuntu_app.get_config()
-    assert (config['tuning-level']['value'] == 'fast')
+    assert (config['cluster-name']['value'] == 'bar')
 
     # update and check app constraints
     await ubuntu_app.set_constraints({'mem': 512 * MB})
     constraints = await ubuntu_app.get_constraints()
     assert (constraints['mem'] == 512 * MB)
 
+    print('Removing mysql')
+    await ubuntu_app.remove()
+
+    print('Disconnecting from model')
     await model.disconnect()
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
+    # logging.basicConfig(level=logging.DEBUG)
     ws_logger = logging.getLogger('websockets.protocol')
     ws_logger.setLevel(logging.INFO)
     jasyncio.run(main())

@@ -31,8 +31,8 @@ async def main():
         application = await offering_model.deploy(
             'ch:mysql',
             application_name='mysql',
-            series='trusty',
-            channel='stable',
+            series='jammy',
+            channel='edge',
         )
 
         print('Waiting for active')

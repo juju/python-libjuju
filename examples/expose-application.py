@@ -24,7 +24,7 @@ async def main():
         application = await model.deploy(
             'ch:ubuntu',
             application_name='ubuntu',
-            series='trusty',
+            series='jammy',
             channel='stable',
         )
 
@@ -57,6 +57,7 @@ async def main():
             "ubuntu": ExposedEndpoint(to_cidrs=["10.42.42.0/24"])
         })
 
+        # TODO (cderici) : this part needs to be revisited
         print('Unexpose individual endpoints (other endpoints remain exposed)')
         await application.unexpose(exposed_endpoints=["ubuntu"])
 

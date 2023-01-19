@@ -30,30 +30,28 @@ async def main():
                 'mem': 256 * MB,
             },
             disks=[{
-                'pool': 'rootfs',
                 'size': 10 * GB,
                 'count': 1,
             }],
-            series='xenial',
+            series='jammy',
         )
+
         # add a lxd container to machine2
         machine3 = await model.add_machine(
             'lxd:{}'.format(machine2.id),
-            series='xenial'
+            series='jammy'
         )
 
         # deploy charm to the lxd container
         application = await model.deploy(
             'ch:ubuntu',
             application_name='ubuntu',
-            series='xenial',
+            series='jammy',
             channel='stable',
             to=machine3.id
         )
 
-        await model.block_until(
-            lambda: all(unit.workload_status == 'active'
-                        for unit in application.units))
+        await model.wait_for_idle(status='active')
 
         await application.remove()
 

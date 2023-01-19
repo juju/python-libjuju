@@ -31,17 +31,15 @@ async def main():
         consuming_model = await controller.add_model('test-cmr-2')
 
         print('Deploying mysql')
-        application_1 = await offering_model.deploy(
+        await offering_model.deploy(
             'ch:mysql',
             application_name='mysql',
-            series='xenial',
-            channel='stable',
+            series='jammy',
+            channel='edge',
         )
 
         print('Waiting for active')
-        await offering_model.block_until(
-            lambda: all(unit.workload_status == 'active'
-                        for unit in application_1.units))
+        await offering_model.wait_for_idle(status='active')
 
         print('Adding offer')
         await offering_model.create_offer("mysql:db")

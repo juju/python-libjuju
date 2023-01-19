@@ -20,7 +20,7 @@ async def main():
     application = await model.deploy(
         'ch:ubuntu',
         application_name='ubuntu',
-        series='trusty',
+        series='jammy',
         channel='stable',
     )
     await jasyncio.sleep(10)
@@ -38,7 +38,10 @@ async def main():
             print(e)
         await jasyncio.sleep(5)
 
+    print('Removing ubuntu')
     await application.remove()
+
+    print('Disconnecting from model')
     await model.disconnect()
 
 if __name__ == '__main__':
