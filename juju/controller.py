@@ -871,18 +871,19 @@ class Controller:
         jasyncio.ensure_future(_watcher(stop_event))
         return stop_event
 
-    async def add_secret_backends(self, name, backend_type, config, token_rotate_interval):    
+    async def add_secret_backends(self, id, name, backend_type, config):    
         """
         Add a new secret backend.
 
         Parameters
         ---------- 
+        id : string
+            id for the backend
         name : string
             name of the backend
         backend-type : string		
         config : dict
-            dictionary with the backend configuration values 		 		
-        token-rotate-interval :	integer 
+            dictionary with the backend configuration values 
 
         Returns
         -------
@@ -891,10 +892,11 @@ class Controller:
         """
         facade = client.SecretBackendsFacade.from_connection(self.connection())
         return await facade.AddSecretBackends([{
+            'id': id,
             'backend-type': backend_type,
             'config': config,
             'name': name,
-            'token-rorate-interval': token_rotate_interval,
+            'token-rotate-interval': config.get('token-rotate-interval', None),
         }])
 
     async def list_secret_backends(self, reveal=False):
@@ -912,7 +914,7 @@ class Controller:
            a list of available secret backends
         """
         facade = client.SecretBackendsFacade.from_connection(self.connection())
-        return await facade.ListSecretBackends(reveal)
+        return await facade.ListSecretBackends(None, reveal)
 
     async def remove_secret_backends(self, name, force=False):
         """
@@ -952,7 +954,11 @@ class Controller:
         """
         facade = client.SecretBackendsFacade.from_connection(self.connection())
         return await facade.UpdateSecretBackends([{
-            'name' : name
+            'name' : name,
+            'config' : config,
+            'force': force,
+            'token-rotate-interval' : token_rotate_interval,
+            'name-change' : name_change,
         }])
 
 class ConnectedController(Controller):
