@@ -15,7 +15,7 @@ from .client import client
 from .constraints import parse as parse_constraints, parse_storage_constraint, parse_device_constraint
 from .errors import JujuError
 from . import utils, jasyncio
-from .origin import Channel
+from .origin import Channel, Source
 from .url import Schema, URL
 
 log = logging.getLogger(__name__)
@@ -362,7 +362,7 @@ class BundleHandler:
                 else:
                     architecture = await self.model._resolve_architecture(charm_url)
 
-                origin = client.CharmOrigin(source="charm-hub",
+                origin = client.CharmOrigin(source=Source.CHARM_HUB.value,
                                             architecture=architecture,
                                             risk=risk,
                                             track=track)
@@ -372,7 +372,7 @@ class BundleHandler:
                 charm_url, charm_origin, _ = await self.model._resolve_charm(charm_url, origin)
                 spec['charm'] = str(charm_url)
             else:
-                charm_origin = client.CharmOrigin(source="charm-hub",
+                charm_origin = client.CharmOrigin(source=Source.CHARM_HUB.value,
                                                   risk=risk,
                                                   track=track)
 
@@ -715,7 +715,7 @@ class AddCharmChange(ChangeInfo):
             arch = self.architecture
             if not arch:
                 arch = await context.model._resolve_architecture(url)
-            origin = client.CharmOrigin(source="charm-hub",
+            origin = client.CharmOrigin(source=Source.CHARM_HUB.value,
                                         architecture=arch,
                                         risk=ch.risk,
                                         track=ch.track)

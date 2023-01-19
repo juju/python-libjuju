@@ -25,7 +25,7 @@ from .client import client
 from .errors import JujuError, JujuApplicationConfigError
 from .bundle import get_charm_series
 from .placement import parse as parse_placement
-from .origin import Channel
+from .origin import Channel, Source
 
 log = logging.getLogger(__name__)
 
@@ -676,7 +676,7 @@ class Application(model.ModelEntity):
         # Make the source-specific changes to the origin/channel/url
         # (and also get the resources necessary to deploy the (destination) charm -- for later)
         if Schema.CHARM_HUB.matches(parsed_url.schema):
-            origin.source = 'charm-hub'
+            origin.source = Source.CHARM_HUB
             if channel:
                 ch = Channel.parse(channel).normalize()
                 origin.risk = ch.risk

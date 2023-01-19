@@ -34,7 +34,7 @@ from .exceptions import DeadEntityException
 from .names import is_valid_application
 from .offerendpoints import ParseError as OfferParseError
 from .offerendpoints import parse_local_endpoint, parse_offer_url
-from .origin import Channel
+from .origin import Channel, Source
 from .placement import parse as parse_placement
 from .tag import application as application_tag
 from .url import URL, Schema
@@ -506,7 +506,7 @@ class CharmhubDeployType:
         if series:
             base.channel = ch.normalize().compute_base_channel(series=series)
             base.name = 'ubuntu'
-        origin = client.CharmOrigin(source="charm-hub",
+        origin = client.CharmOrigin(source=Source.CHARM_HUB.value,
                                     architecture=architecture,
                                     risk=ch.risk,
                                     track=ch.track,
@@ -1799,7 +1799,7 @@ class Model:
         #  origin should be set (including the base) before calling this,
         #  though all tests need to run (in earlier versions too) before
         #  committing to make sure there's no regression
-        source = "charm-hub"
+        source = Source.CHARM_HUB.value
 
         resolve_origin = {'source': source, 'architecture': origin.architecture,
                           'track': origin.track, 'risk': origin.risk,
