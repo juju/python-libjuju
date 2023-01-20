@@ -8,7 +8,7 @@ from juju.client.jujudata import FileJujuData
 from juju.client.proxy.factory import proxy_from_config
 from juju.errors import JujuConnectionError, JujuError
 from juju.client import client
-from juju.version import SUPPORTED_MAJOR_VERSION
+from juju.version import SUPPORTED_MINOR_VERSION
 
 log = logging.getLogger('connector')
 
@@ -74,7 +74,7 @@ class Connector:
             self._connection = await Connection.connect(**kwargs)
 
         # Check if we support the target controller
-        if not self._connection.info['server-version'].startswith(SUPPORTED_MAJOR_VERSION):
+        if not self._connection.info['server-version'].startswith(SUPPORTED_MINOR_VERSION):
             raise JujuConnectionError("juju server-version %s not supported" % self._connection.info["server-version"])
 
     async def disconnect(self):

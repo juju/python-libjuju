@@ -2105,15 +2105,22 @@ class Model:
             raise JujuError('\n'.join(errors))
         return await self._wait_for_new('application', application)
 
-    async def destroy_unit(self, unit_tag, destroy_storage=False, dry_run=False, force=False, max_wait=None):
+    async def destroy_unit(self, unit_id, destroy_storage=False, dry_run=False, force=False, max_wait=None):
         """Destroy units by name.
 
         """
         connection = self.connection()
         app_facade = client.ApplicationFacade.from_connection(connection)
 
+        # Get the corresponding unit tag
+        unit_tag = utils.unit_id_to_unit_tag(unit_id)
+        if unit_tag is None:
+            log.error("Error converting %s to a valid unit tag", unit_id)
+            return JujuUnitError("Error converting %s to a valid unit tag", unit_id)
+        
         log.debug(
-            'Destroying unit %s', unit_tag)
+            'Destroying unit %s', unit_id)
+
 
         return await app_facade.DestroyUnit(units=[{
             'unit-tag': unit_tag,

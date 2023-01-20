@@ -8,4 +8,4 @@ DEFAULT_ARCHITECTURE = 'amd64'
 TARGET_JUJU_VERSION = '3.1-beta1'
 
 # Used by connector to determine if we are compatible with the juju server
-SUPPORTED_MAJOR_VERSION = '3.1'
+SUPPORTED_MINOR_VERSION = '3.1'
