@@ -1231,3 +1231,21 @@ async def test_storage_pools(event_loop):
         await jasyncio.sleep(5)
         pools = await model.list_storage_pools()
         assert "test-pool" not in [p['name'] for p in pools]
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_list_secrets(event_loop):
+    """Use the charm-secret charm definition and see if the
+    arguments defined in the secret are correct or not."""
+
+    charm_path = TESTS_DIR / 'charm-secret'
+
+    async with base.CleanModel() as model:
+        await model.deploy(str(charm_path))
+        assert 'charm-secret' in model.applications
+        await model.wait_for_idle(status="active")
+        assert model.units['charm-secret/0'].workload_status == 'active'
+
+        secrets = model.list_secrets(show_secrets=True)
+        assert secrets.results is not None
+        assert len(secrets.results) == 1

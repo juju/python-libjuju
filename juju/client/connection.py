@@ -82,7 +82,7 @@ client_facades = {
     'LogForwarding': {'versions': [1]},
     'Machiner': {'versions': [1, 2, 5]},
     'MachineActions': {'versions': [1]},
-    'MachineManager': {'versions': [2, 3, 4, 7, 8, 9]},
+    'MachineManager': {'versions': [2, 3, 4, 7, 8, 9, 10]},
     'MachineUndertaker': {'versions': [1]},
     'MeterStatus': {'versions': [1, 2]},
     'MetricsAdder': {'versions': [2]},
