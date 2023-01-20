@@ -1232,6 +1232,7 @@ async def test_storage_pools(event_loop):
         pools = await model.list_storage_pools()
         assert "test-pool" not in [p['name'] for p in pools]
 
+
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_list_secrets(event_loop):
