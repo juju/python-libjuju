@@ -913,7 +913,7 @@ class Connection:
 
     async def login(self):
         params = {}
-        # Set the client version 
+        # Set the client version
         params['client-version'] = TARGET_JUJU_VERSION
         params['auth-tag'] = self.usertag
         if self.password:

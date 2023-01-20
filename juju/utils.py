@@ -404,12 +404,13 @@ def base_channel_to_series(channel):
     """
     return get_version_series(origin.Channel.parse(channel).track)
 
+
 def unit_id_to_unit_tag(unit_id):
     """
     Helping function to transform the unit-id
     into a valid unit tag. For example:
     ubuntu/0 -> unit-ubuntu-0
-    
+
     Params
     ------
     unit_id : string
@@ -424,5 +425,5 @@ def unit_id_to_unit_tag(unit_id):
     pos = unit_id.find("/")
     if pos == 1:
         return None
-    unit_id.replace("/","-")
+    unit_id.replace("/", "-")
     return "unit-" + unit_id

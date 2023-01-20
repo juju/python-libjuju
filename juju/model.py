@@ -2117,10 +2117,9 @@ class Model:
         if unit_tag is None:
             log.error("Error converting %s to a valid unit tag", unit_id)
             return JujuUnitError("Error converting %s to a valid unit tag", unit_id)
-        
+
         log.debug(
             'Destroying unit %s', unit_id)
-
 
         return await app_facade.DestroyUnit(units=[{
             'unit-tag': unit_tag,

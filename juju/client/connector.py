@@ -12,6 +12,7 @@ from juju.version import SUPPORTED_MINOR_VERSION
 
 log = logging.getLogger('connector')
 
+
 class NoConnectionException(Exception):
     '''Raised by Connector when the connection method is called
     and there is no current connection.'''

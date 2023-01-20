@@ -871,19 +871,19 @@ class Controller:
         jasyncio.ensure_future(_watcher(stop_event))
         return stop_event
 
-    async def add_secret_backends(self, id, name, backend_type, config):    
+    async def add_secret_backends(self, id, name, backend_type, config):
         """
         Add a new secret backend.
 
         Parameters
-        ---------- 
+        ----------
         id : string
             id for the backend
         name : string
             name of the backend
-        backend-type : string		
+        backend-type : string
         config : dict
-            dictionary with the backend configuration values 
+            dictionary with the backend configuration values
 
         Returns
         -------
@@ -930,10 +930,10 @@ class Controller:
         error if any
         """
         facade = client.SecretBackendsFacade.from_connection(self.connection())
-        return await facade.RemoveSecretBackends(
-            [{'name': name,
-            'force': force}]
-        )
+        return await facade.RemoveSecretBackends([{
+            'name': name,
+            'force': force
+        }])
 
     async def update_secret_backends(self, name, config=None, force=False, name_change=None, token_rotate_interval=None):
         """
@@ -943,7 +943,7 @@ class Controller:
         ----------
         name : string
             the backend name
-        config : dict 
+        config : dict
             key value dict with configuration parameters
         force : boolean
             true to force the upate process
@@ -954,12 +954,13 @@ class Controller:
         """
         facade = client.SecretBackendsFacade.from_connection(self.connection())
         return await facade.UpdateSecretBackends([{
-            'name' : name,
-            'config' : config,
+            'name': name,
+            'config': config,
             'force': force,
-            'token-rotate-interval' : token_rotate_interval,
-            'name-change' : name_change,
+            'token-rotate-interval': token_rotate_interval,
+            'name-change': name_change,
         }])
+
 
 class ConnectedController(Controller):
     def __init__(

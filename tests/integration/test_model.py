@@ -878,11 +878,11 @@ async def test_wait_for_idle_with_exact_units_scale_down_zero(event_loop):
             num_units=3,
         )
         await model.wait_for_idle(timeout=5 * 60, wait_for_exact_units=3)
-        
+
         # Remove all the units
         for u in app.units:
             await app.destroy_units(u.name)
-        
+
         # assert that the following wait is not returning instantaneously
         start_time = time.perf_counter()
         await model.wait_for_idle(timeout=5 * 60, wait_for_exact_units=0)
