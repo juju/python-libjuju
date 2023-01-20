@@ -1,0 +1,17 @@
+# This file populates the Overview on Charmhub.
+# See https://juju.is/docs/sdk/metadata-reference for a checklist and guidance.
+
+# The charm package name, no spaces (required)
+# See https://juju.is/docs/sdk/naming#heading--naming-charms for guidance.
+name: charm-secret
+ 
+# The following metadata are human-readable and will be published prominently on Charmhub.
+
+# (Recommended)
+display-name: Charm with secrets
+
+# (Required)
+summary: Naive charm using secrets
+
+description: |
+  A naive charm using secrets to be used in testing.
