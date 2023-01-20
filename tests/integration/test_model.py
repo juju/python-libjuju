@@ -844,14 +844,15 @@ async def test_wait_for_idle_with_exact_units_scale_down(event_loop):
         app = await model.deploy(
             'ubuntu',
             application_name='ubuntu',
-            series='bionic',
+            series='jammy',
             channel='stable',
             num_units=3,
         )
         await model.wait_for_idle(timeout=5 * 60, wait_for_exact_units=3)
 
         two_units_to_remove = [u.name for u in app.units[:2]]
-        await app.destroy_units(*two_units_to_remove)
+        for unit_tag in two_units_to_remove:
+            await app.destroy_units(unit_tag)
 
         # assert that the following wait is not returning instantaneously
         start_time = time.perf_counter()
@@ -872,16 +873,16 @@ async def test_wait_for_idle_with_exact_units_scale_down_zero(event_loop):
         app = await model.deploy(
             'ubuntu',
             application_name='ubuntu',
-            series='bionic',
+            series='jammy',
             channel='stable',
             num_units=3,
         )
         await model.wait_for_idle(timeout=5 * 60, wait_for_exact_units=3)
-
-        units_to_remove = [u.name for u in app.units]
+        
         # Remove all the units
-        await app.destroy_units(*units_to_remove)
-
+        for u in app.units:
+            await app.destroy_units(u.name)
+        
         # assert that the following wait is not returning instantaneously
         start_time = time.perf_counter()
         await model.wait_for_idle(timeout=5 * 60, wait_for_exact_units=0)

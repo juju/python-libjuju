@@ -2105,7 +2105,7 @@ class Model:
             raise JujuError('\n'.join(errors))
         return await self._wait_for_new('application', application)
 
-    async def destroy_unit(self, *unit_names):
+    async def destroy_unit(self, unit_tag, destroy_storage=False, dry_run=False, force=False, max_wait=None):
         """Destroy units by name.
 
         """
@@ -2113,11 +2113,15 @@ class Model:
         app_facade = client.ApplicationFacade.from_connection(connection)
 
         log.debug(
-            'Destroying unit%s %s',
-            's' if len(unit_names) == 1 else '',
-            ' '.join(unit_names))
+            'Destroying unit %s', unit_tag)
 
-        return await app_facade.DestroyUnit(unit_names=list(unit_names))
+        return await app_facade.DestroyUnit(units=[{
+            'unit-tag': unit_tag,
+            'destroy-storage': destroy_storage,
+            'force': force,
+            'max-wait': max_wait,
+            'dry-run': dry_run,
+        }])
     destroy_units = destroy_unit
 
     def download_backup(self, archive_id, target_filename=None):
