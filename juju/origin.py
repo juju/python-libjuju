@@ -10,7 +10,6 @@ class Source(Enum):
 
     """
     LOCAL = "local"
-    CHARM_STORE = "charm-store"
     CHARM_HUB = "charm-hub"
 
     def __str__(self):

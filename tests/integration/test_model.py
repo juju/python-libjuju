@@ -307,23 +307,6 @@ async def test_deploy_trusted_bundle(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_deploy_channels_revs(event_loop):
-    pytest.skip('Revise to use local charms - shouldnt fail b/c of origin')
-    async with base.CleanModel() as model:
-        charm = 'cs:~johnsca/libjuju-test'
-        stable = await model.deploy(charm, 'a1')
-        edge = await model.deploy(charm, 'a2', channel='edge')
-        rev = await model.deploy(charm + '-2', 'a3')
-
-        assert [a.charm_url for a in (stable, edge, rev)] == [
-            'cs:~johnsca/libjuju-test-1',
-            'cs:~johnsca/libjuju-test-2',
-            'cs:~johnsca/libjuju-test-2',
-        ]
-
-
-@base.bootstrapped
-@pytest.mark.asyncio
 async def test_deploy_from_ch_with_series(event_loop):
     charm = 'ch:ubuntu'
     for series in ['focal']:
@@ -1217,7 +1200,8 @@ async def test_list_storage(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_storage_pools(event_loop):
+async def test_storage_pools_on_lxd(event_loop):
+    # This will fail when ran on anything but lxd
     async with base.CleanModel() as model:
         await model.deploy('postgresql')
         await model.wait_for_idle(status="active")
