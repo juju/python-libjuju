@@ -97,7 +97,7 @@ async def test_status_is_not_unset(event_loop):
 @pytest.mark.skip('Update charm')
 async def test_status(event_loop):
     async with base.CleanModel() as model:
-        app = await model.deploy('cs:~juju-qa/blocked-0')
+        app = await model.deploy('ch:juju-qa-test')
 
         def app_ready():
             if not app.units:
@@ -116,7 +116,7 @@ async def test_add_units(event_loop):
 
     async with base.CleanModel() as model:
         app = await model.deploy(
-            'cs:ubuntu-0',
+            'ubuntu',
             application_name='ubuntu',
             series='trusty',
             channel='stable',
@@ -126,17 +126,6 @@ async def test_add_units(event_loop):
         assert len(units) == 2
         for unit in units:
             assert isinstance(unit, Unit)
-
-
-@base.bootstrapped
-@pytest.mark.asyncio
-@pytest.mark.skip('Update charm')
-async def test_deploy_charmstore_charm(event_loop):
-    async with base.CleanModel() as model:
-        app = await model.deploy('cs:ubuntu-0')
-        await model.block_until(lambda: (len(app.units) > 0 and
-                                         app.units[0].machine))
-        assert app.data['charm-url'] == 'cs:ubuntu-0'
 
 
 @base.bootstrapped
@@ -199,12 +188,12 @@ async def test_upgrade_charm_switch_channel(event_loop):
 @pytest.mark.skip('Update charm')
 async def test_upgrade_charm_revision(event_loop):
     async with base.CleanModel() as model:
-        app = await model.deploy('cs:ubuntu-0')
+        app = await model.deploy('ubuntu')
         await model.block_until(lambda: (len(app.units) > 0 and
                                          app.units[0].machine))
-        assert app.data['charm-url'] == 'cs:ubuntu-0'
+        assert app.data['charm-url'] == 'ubuntu'
         await app.upgrade_charm(revision=8)
-        assert app.data['charm-url'] == 'cs:ubuntu-8'
+        assert app.data['charm-url'] == 'ubuntu'
 
 
 @base.bootstrapped
@@ -212,14 +201,14 @@ async def test_upgrade_charm_revision(event_loop):
 @pytest.mark.skip('Update charm')
 async def test_upgrade_charm_switch(event_loop):
     async with base.CleanModel() as model:
-        app = await model.deploy('cs:ubuntu-0')
+        app = await model.deploy('ubuntu')
         await model.block_until(lambda: (len(app.units) > 0 and
                                          app.units[0].machine))
-        assert app.data['charm-url'] == 'cs:ubuntu-0'
+        assert app.data['charm-url'] == 'ubuntu'
         with pytest.raises(errors.JujuError):
-            await app.upgrade_charm(switch='ubuntu-8')
-        await app.upgrade_charm(switch='cs:ubuntu-8')
-        assert app.data['charm-url'] == 'cs:ubuntu-8'
+            await app.upgrade_charm(switch='ubuntu')
+        await app.upgrade_charm(switch='ubuntu')
+        assert app.data['charm-url'] == 'ubuntu'
 
 
 @base.bootstrapped
@@ -255,40 +244,6 @@ async def test_upgrade_local_charm_resource(event_loop):
         ress = await app.get_resources()
         assert 'file-res' in ress
         assert ress['file-res']
-
-
-@base.bootstrapped
-@pytest.mark.asyncio
-@pytest.mark.skip('Update charm')
-async def test_upgrade_switch_charmstore_to_charmhub(event_loop):
-    async with base.CleanModel() as model:
-        app = await model.deploy('cs:ubuntu', series='focal')
-        await model.wait_for_idle(status="active")
-        assert app.data['charm-url'].startswith('cs:ubuntu')
-        await app.upgrade_charm(channel='latest/stable', switch='ch:ubuntu-8')
-        await model.wait_for_idle(status="active")
-        assert app.data['charm-url'].startswith('ch:')
-
-
-@base.bootstrapped
-@pytest.mark.asyncio
-@pytest.mark.skip('Update charm')
-async def test_upgrade_charm_resource(event_loop):
-    async with base.CleanModel() as model:
-        app = await model.deploy('cs:~juju-qa/bionic/upgrade-charm-resource-test-0')
-
-        await model.wait_for_idle(wait_for_units=1)
-        unit = app.units[0]
-        expected_message = 'I have no resource.'
-        assert unit.workload_status_message == expected_message
-
-        await app.upgrade_charm(revision=1)
-        await model.block_until(
-            lambda: unit.workload_status_message != 'I have no resource.',
-            timeout=60,
-        )
-        expected_message = 'My resource: I am the resource.'
-        assert app.units[0].workload_status_message == expected_message
 
 
 @base.bootstrapped

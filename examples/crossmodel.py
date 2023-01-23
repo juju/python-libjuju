@@ -29,10 +29,10 @@ async def main():
 
         print('Deploying mysql')
         application = await offering_model.deploy(
-            'cs:mysql',
+            'ch:mysql',
             application_name='mysql',
-            series='trusty',
-            channel='stable',
+            series='jammy',
+            channel='edge',
         )
 
         print('Waiting for active')

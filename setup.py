@@ -35,7 +35,6 @@ setup(
         'macaroonbakery>=1.1,<2.0',
         'pyRFC3339>=1.0,<2.0',
         'pyyaml>=5.1.2,<=6.0',
-        'theblues>=0.5.1,<1.0',
         'websockets>=8.1,<9.0 ; python_version=="3.8"',
         'websockets>=9.0,<10.0 ; python_version=="3.9"',
         'websockets>=10.0; python_version>"3.9"',
