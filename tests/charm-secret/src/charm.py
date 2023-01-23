@@ -1,8 +1,4 @@
 #!/usr/bin/env python3
-# Copyright 2023 jtirado
-# See LICENSE file for licensing details.
-#
-# Learn more at: https://juju.is/docs/sdk
 
 """Charm the service.
 
@@ -28,9 +24,10 @@ class CharmSecretCharm(CharmBase):
     def __init__(self, *args):
         super().__init__(*args)
 
-        self.framework.observe(self.on.install, self._on_install_create_secret)
+        self.framework.observe(self.on.start, self._on_secrets_start)
 
-    def _on_install_create_secret(self, event):
+
+    def _on_secrets_start(self, event):
         """Create a secret to play with."""
         content = {
             'username': 'useradmin',
@@ -38,6 +35,7 @@ class CharmSecretCharm(CharmBase):
         }
         secret = self.app.add_secret(content)
         logger.info("created secret %s", secret)
+
         self.unit.status = ActiveStatus()
 
 
