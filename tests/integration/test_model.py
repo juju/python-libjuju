@@ -1242,7 +1242,7 @@ async def test_list_secrets(event_loop):
     arguments defined in the secret are correct or not."""
 
     charm_path = TESTS_DIR / 'charm-secret/charm-secret_ubuntu-22.04-amd64.charm'
-    
+
     async with base.CleanModel() as model:
         await model.deploy(str(charm_path))
         assert 'charm-secret' in model.applications

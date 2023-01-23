@@ -26,7 +26,6 @@ class CharmSecretCharm(CharmBase):
 
         self.framework.observe(self.on.start, self._on_secrets_start)
 
-
     def _on_secrets_start(self, event):
         """Create a secret to play with."""
         content = {
