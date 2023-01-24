@@ -1990,7 +1990,7 @@ class Model:
         app_facade = client.ApplicationFacade.from_connection(connection)
 
         # Get the corresponding unit tag
-        unit_tag = utils.unit_id_to_unit_tag(unit_id)
+        unit_tag = tag.unit(unit_id)
         if unit_tag is None:
             log.error("Error converting %s to a valid unit tag", unit_id)
             return JujuUnitError("Error converting %s to a valid unit tag", unit_id)
