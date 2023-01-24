@@ -276,7 +276,7 @@ async def test_secrets_backend_lifecycle(event_loop):
         vault_client.sys.submit_unseal_keys(keys['keys'])
 
         # Add the secret backend
-        response = await controller.add_secret_backends("1000", "myvault", "vault", {"endpoint": vault_url})
+        response = await controller.add_secret_backends("1001", "myvault", "vault", {"endpoint": vault_url})
         assert response["results"] is not None
         assert response["results"][0]['error'] is None
 
@@ -299,7 +299,7 @@ async def test_secrets_backend_lifecycle(event_loop):
             assert entry["result"].name == "internal" or entry["result"].name == "changed_name"
 
         # Remove it
-        await controller.remove_secret_backends("myvault")
+        await controller.remove_secret_backends("changed_name")
 
         # Finally after removing
         list_after = await controller.list_secret_backends()
