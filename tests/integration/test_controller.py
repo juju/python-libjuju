@@ -289,7 +289,7 @@ async def test_secrets_backend_lifecycle(event_loop):
 
         # Update it
         resp = await controller.update_secret_backends("myvault", name_change="changed_name")
-        assert resp["result"]["error"] is None
+        assert resp["results"][0]["error"] is None
 
         # List the secrets backend
         list = await controller.list_secret_backends()
@@ -304,4 +304,4 @@ async def test_secrets_backend_lifecycle(event_loop):
         # Finally after removing
         list_after = await controller.list_secret_backends()
         assert len(list_after["results"]) == 1
-        assert entry["results"][0]["result"].name == "internal"
+        assert list_after["results"][0]["result"].name == "internal"
