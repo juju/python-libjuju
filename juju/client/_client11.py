@@ -166,7 +166,8 @@ class ControllerFacade(Type):
                                                         'mem': {'type': 'integer'},
                                                         'root-disk': {'type': 'integer'},
                                                         'tags': {'items': {'type': 'string'},
-                                                                 'type': 'array'}},
+                                                                 'type': 'array'},
+                                                        'virt-type': {'type': 'string'}},
                                          'type': 'object'},
                      'MigrationSpec': {'additionalProperties': False,
                                        'properties': {'model-tag': {'type': 'string'},
@@ -194,6 +195,10 @@ class ControllerFacade(Type):
                                               'uuid': {'type': 'string'}},
                                'required': ['name', 'uuid', 'type', 'owner-tag'],
                                'type': 'object'},
+                     'ModelApplicationInfo': {'additionalProperties': False,
+                                              'properties': {'name': {'type': 'string'}},
+                                              'required': ['name'],
+                                              'type': 'object'},
                      'ModelBlockInfo': {'additionalProperties': False,
                                         'properties': {'blocks': {'items': {'type': 'string'},
                                                                   'type': 'array'},
@@ -236,6 +241,8 @@ class ControllerFacade(Type):
                                           'type': 'object'},
                      'ModelStatus': {'additionalProperties': False,
                                      'properties': {'application-count': {'type': 'integer'},
+                                                    'applications': {'items': {'$ref': '#/definitions/ModelApplicationInfo'},
+                                                                     'type': 'array'},
                                                     'error': {'$ref': '#/definitions/Error'},
                                                     'filesystems': {'items': {'$ref': '#/definitions/ModelFilesystemInfo'},
                                                                     'type': 'array'},
@@ -1355,12 +1362,10 @@ class ProvisionerFacade(Type):
                                          'properties': {'agentstream': {'type': 'string'},
                                                         'arch': {'type': 'string'},
                                                         'major': {'type': 'integer'},
-                                                        'minor': {'type': 'integer'},
                                                         'number': {'$ref': '#/definitions/Number'},
                                                         'os-type': {'type': 'string'}},
                                          'required': ['number',
                                                       'major',
-                                                      'minor',
                                                       'arch',
                                                       'os-type',
                                                       'agentstream'],
@@ -1380,7 +1385,8 @@ class ProvisionerFacade(Type):
                                                                 'root-disk': {'type': 'integer'},
                                                                 'root-disk-source': {'type': 'string'},
                                                                 'tags': {'items': {'type': 'string'},
-                                                                         'type': 'array'}},
+                                                                         'type': 'array'},
+                                                                'virt-type': {'type': 'string'}},
                                                  'type': 'object'},
                      'HostNetworkChange': {'additionalProperties': False,
                                            'properties': {'error': {'$ref': '#/definitions/Error'},
@@ -2559,14 +2565,13 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(FindToolsResult)
-    async def FindTools(self, agentstream=None, arch=None, major=None, minor=None, number=None, os_type=None):
+    async def FindTools(self, agentstream=None, arch=None, major=None, number=None, os_type=None):
         '''
         FindTools returns a List containing all tools matching the given parameters.
 
         agentstream : str
         arch : str
         major : int
-        minor : int
         number : Number
         os_type : str
         Returns -> FindToolsResult
@@ -2579,9 +2584,6 @@ class ProvisionerFacade(Type):
 
         if major is not None and not isinstance(major, int):
             raise Exception("Expected major to be a int, received: {}".format(type(major)))
-
-        if minor is not None and not isinstance(minor, int):
-            raise Exception("Expected minor to be a int, received: {}".format(type(minor)))
 
         if number is not None and not isinstance(number, (dict, Number)):
             raise Exception("Expected number to be a Number, received: {}".format(type(number)))
@@ -2598,7 +2600,6 @@ class ProvisionerFacade(Type):
         _params['agentstream'] = agentstream
         _params['arch'] = arch
         _params['major'] = major
-        _params['minor'] = minor
         _params['number'] = number
         _params['os-type'] = os_type
         reply = await self.rpc(msg)

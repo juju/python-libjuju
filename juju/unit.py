@@ -86,7 +86,7 @@ class Unit(model.ModelEntity):
         log.debug(
             'Destroying %s', self.name)
 
-        return await app_facade.DestroyUnits(unit_names=[self.name])
+        return await app_facade.DestroyUnit(units=[{"unit-tag": self.name}])
     remove = destroy
 
     async def get_public_address(self):

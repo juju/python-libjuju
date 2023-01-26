@@ -1982,19 +1982,29 @@ class Model:
             raise JujuError('\n'.join(errors))
         return await self._wait_for_new('application', application)
 
-    async def destroy_unit(self, *unit_names):
+    async def destroy_unit(self, unit_id, destroy_storage=False, dry_run=False, force=False, max_wait=None):
         """Destroy units by name.
 
         """
         connection = self.connection()
         app_facade = client.ApplicationFacade.from_connection(connection)
 
-        log.debug(
-            'Destroying unit%s %s',
-            's' if len(unit_names) == 1 else '',
-            ' '.join(unit_names))
+        # Get the corresponding unit tag
+        unit_tag = tag.unit(unit_id)
+        if unit_tag is None:
+            log.error("Error converting %s to a valid unit tag", unit_id)
+            return JujuUnitError("Error converting %s to a valid unit tag", unit_id)
 
-        return await app_facade.DestroyUnits(unit_names=list(unit_names))
+        log.debug(
+            'Destroying unit %s', unit_id)
+
+        return await app_facade.DestroyUnit(units=[{
+            'unit-tag': unit_tag,
+            'destroy-storage': destroy_storage,
+            'force': force,
+            'max-wait': max_wait,
+            'dry-run': dry_run,
+        }])
     destroy_units = destroy_unit
 
     def download_backup(self, archive_id, target_filename=None):
@@ -2423,6 +2433,16 @@ class Model:
                 file.write(result.result)
         except IOError:
             raise
+
+    async def list_secrets(self, filter="", show_secrets=False):
+        """
+        Returns the list of available secrets.
+        """
+        facade = client.SecretsFacade.from_connection(self.connection())
+        return await facade.ListSecrets({
+            'filter': filter,
+            'show-secrets': show_secrets,
+        })
 
     async def _get_source_api(self, url, controller_name=None):
         controller = Controller()

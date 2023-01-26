@@ -13,6 +13,7 @@ import websockets
 from juju import errors, tag, utils, jasyncio
 from juju.client import client
 from juju.utils import IdQueue
+from juju.version import TARGET_JUJU_VERSION
 
 log = logging.getLogger('juju.client.connection')
 
@@ -26,7 +27,7 @@ client_facades = {
     'AllWatcher': {'versions': [1, 2, 3]},
     'Annotations': {'versions': [2]},
     'Application': {'versions': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
-                                 14, 15]},
+                                 14, 15, 16]},
     'ApplicationOffers': {'versions': [1, 2, 4]},
     'ApplicationScaler': {'versions': [1]},
     'Backups': {'versions': [1, 2, 3]},
@@ -35,7 +36,7 @@ client_facades = {
     'CharmHub': {'versions': [1]},
     'CharmRevisionUpdater': {'versions': [2]},
     'CharmDownloader': {'versions': [1]},
-    'Charms': {'versions': [2, 3, 4, 5]},
+    'Charms': {'versions': [2, 3, 4, 5, 6]},
     'Cleaner': {'versions': [2]},
     'Client': {'versions': [1, 2, 5, 6]},
     'Cloud': {'versions': [1, 2, 3, 4, 5, 7]},
@@ -81,7 +82,7 @@ client_facades = {
     'LogForwarding': {'versions': [1]},
     'Machiner': {'versions': [1, 2, 5]},
     'MachineActions': {'versions': [1]},
-    'MachineManager': {'versions': [2, 3, 4, 7, 8, 9]},
+    'MachineManager': {'versions': [2, 3, 4, 7, 8, 9, 10]},
     'MachineUndertaker': {'versions': [1]},
     'MeterStatus': {'versions': [1, 2]},
     'MetricsAdder': {'versions': [2]},
@@ -116,6 +117,7 @@ client_facades = {
     'RetryStrategy': {'versions': [1]},
     'Secrets': {'versions': [1]},
     'SecretsManager': {'versions': [1]},
+    'SecretBackends': {'versions': [1]},
     'SecretsRotationWatcher': {'versions': [1]},
     'SecretsTriggerWatcher': {'versions': [1]},
     'Singular': {'versions': [2]},
@@ -911,6 +913,8 @@ class Connection:
 
     async def login(self):
         params = {}
+        # Set the client version
+        params['client-version'] = TARGET_JUJU_VERSION
         params['auth-tag'] = self.usertag
         if self.password:
             params['credentials'] = self.password

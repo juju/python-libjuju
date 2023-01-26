@@ -7,7 +7,7 @@ on:
 jobs:
   candidate-integration:
     name: Edge integration
-    timeout-minutes: 120
+    timeout-minutes: 150
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -26,7 +26,7 @@ jobs:
     - name: Check if there is a new candidate
       shell: bash
       run: |
-        candidate=$(snap info juju | grep 3.0/candidate | awk '{print $2}')
+        candidate=$(snap info juju | grep 3.1/candidate | awk '{print $2}')
         last_tested=NA
         if [ -f juju-last-candidate-version ]; then
           last_tested=$(cat juju-last-candidate-version)
@@ -54,7 +54,7 @@ jobs:
       uses: charmed-kubernetes/actions-operator@main
       with:
         provider: lxd
-        juju-channel: 3.0/candidate
+        juju-channel: 3.1/candidate
     - name: Setup Python
       if: ${{ env.next-test != 'NA' }}
       uses: actions/setup-python@v4
