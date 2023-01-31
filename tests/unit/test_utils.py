@@ -14,6 +14,8 @@ class TestDirResolve(unittest.TestCase):
         assert public.endswith('ssh/juju_id_rsa.pub')
         assert private.endswith('ssh/juju_id_rsa')
 
+
+class TestBaseArgument(unittest.TestCase):
     def test_parse_base_arg(self):
         base = parse_base_arg('ubuntu@22.04')
         assert isinstance(base, client.Base)
