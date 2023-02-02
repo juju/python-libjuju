@@ -1676,7 +1676,8 @@ class Model:
 
         charm_series = series
         charm_origin = res.origin
-        charm_origin.base = utils.parse_base_arg(base) if base else None
+        if base:
+            charm_origin.base = utils.parse_base_arg(base)
 
         if res.is_bundle:
             handler = BundleHandler(self, trusted=trust, forced=force)
