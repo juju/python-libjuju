@@ -1604,7 +1604,7 @@ class Model:
     async def deploy(
             self, entity_url, application_name=None, bind=None,
             channel=None, config=None, constraints=None, force=False,
-            num_units=1, overlays=[], plan=None, resources=None, series=None,
+            num_units=1, overlays=[], base=None, resources=None, series=None,
             storage=None, to=None, devices=None, trust=False, attach_storage=[]):
         """Deploy a new service or bundle.
 
@@ -1620,9 +1620,9 @@ class Model:
             an unsupported series
         :param int num_units: Number of units to deploy
         :param [] overlays: Bundles to overlay on the primary bundle, applied in order
-        :param str plan: Plan under which to deploy charm
+        :param str base: The base on which to deploy
         :param dict resources: <resource name>:<file path> pairs
-        :param str series: Series on which to deploy
+        :param str series: Series on which to deploy DEPRECATED: use --base (with Juju 3.1)
         :param dict storage: Storage constraints TODO how do these look?
         :param to: Placement directive as a string. For example:
 
@@ -1675,10 +1675,13 @@ class Model:
         identifier = res.identifier
 
         charm_series = series
+        charm_origin = res.origin
+        if base:
+            charm_origin.base = utils.parse_base_arg(base)
 
         if res.is_bundle:
             handler = BundleHandler(self, trusted=trust, forced=force)
-            await handler.fetch_plan(url, res.origin, overlays=overlays)
+            await handler.fetch_plan(url, charm_origin, overlays=overlays)
             await handler.execute_plan()
             extant_apps = {app for app in self.applications}
             pending_apps = handler.applications - extant_apps
@@ -1698,11 +1701,12 @@ class Model:
             # XXX: we're dropping local resources here, but we don't
             # actually support them yet anyway
             if not res.is_local:
-                add_charm_res = await self._add_charm(identifier, res.origin)
+                add_charm_res = await self._add_charm(identifier, charm_origin)
                 if isinstance(add_charm_res, dict):
                     # This is for backwards compatibility for older
                     # versions where AddCharm returns a dictionary
-                    charm_origin = add_charm_res.get('charm_origin', res.origin)
+                    charm_origin = add_charm_res.get('charm_origin',
+                                                     charm_origin)
                 else:
                     charm_origin = add_charm_res.charm_origin
                 if Schema.CHARM_HUB.matches(url.schema):
@@ -1718,15 +1722,13 @@ class Model:
             else:
                 # We have a local charm dir that needs to be uploaded
                 charm_dir = os.path.abspath(os.path.expanduser(identifier))
-                charm_origin = res.origin
-                base = None
-
                 metadata = utils.get_local_charm_metadata(charm_dir)
                 charm_series = charm_series or await get_charm_series(metadata,
                                                                       self)
-                base = utils.get_local_charm_base(
-                    charm_series, channel, metadata, charm_dir, client.Base)
-                charm_origin.base = base
+                if not base:
+                    charm_origin.base = utils.get_local_charm_base(
+                        charm_series, channel, metadata, charm_dir, client.Base)
+
                 if not application_name:
                     application_name = metadata['name']
                 if not application_name:

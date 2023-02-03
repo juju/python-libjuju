@@ -338,6 +338,14 @@ async def test_deploy_from_ch_with_invalid_series(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_deploy_with_base(event_loop):
+    async with base.CleanModel() as model:
+        await model.deploy("ubuntu", base="ubuntu@22.04")
+        await model.wait_for_idle(status='active')
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_add_machine(event_loop):
     from juju.machine import Machine
 

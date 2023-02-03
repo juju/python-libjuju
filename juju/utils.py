@@ -10,6 +10,7 @@ import yaml
 import zipfile
 
 from . import jasyncio, origin, errors
+from .client import client
 
 
 async def execute_process(*cmd, log=None):
@@ -403,3 +404,15 @@ def base_channel_to_series(channel):
     :return: str series (e.g. focal)
     """
     return get_version_series(origin.Channel.parse(channel).track)
+
+
+def parse_base_arg(base):
+    """Parses a given base into a Client.Base object
+    :param base str : The base to deploy a charm (e.g. ubuntu@22.04)
+    """
+    client.CharmBase()
+    if type(base) != str or "@" not in base:
+        raise errors.JujuError("expected base string to contain os and channel separated by '@'")
+
+    name, channel = base.split('@')
+    return client.Base(name=name, channel=channel)
