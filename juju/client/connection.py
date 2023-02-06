@@ -129,7 +129,7 @@ client_facades = {
     'SSHClient': {'versions': [1, 2, 3, 4]},
     'Undertaker': {'versions': [1]},
     'UnitAssigner': {'versions': [1]},
-    'Uniter': {'versions': [ 18]},
+    'Uniter': {'versions': [18]},
     'Upgrader': {'versions': [1]},
     'UpgradeSeries': {'versions': [1, 3]},
     'UpgradeSteps': {'versions': [1, 2]},

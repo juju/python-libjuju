@@ -347,9 +347,11 @@ def buildTypes(schema, capture):
     for kind in sorted((k for k in schema.types if not isinstance(k, str)),
                        key=lambda x: str(x)):
         name = schema.types[kind]
-        # A 
+        # [tiradojm] The schema for 3.1.0 construction generates a missing name
+        # entry here. This is a temporary fix and additional research should be
+        # done here.
         if name.strip() == "" or name == "~":
-             continue
+            continue
         if name in capture and name not in NAUGHTY_CLASSES:
             continue
         args = Args(schema, kind)
