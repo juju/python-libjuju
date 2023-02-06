@@ -57,12 +57,12 @@ async def test_action(event_loop):
 async def test_get_set_config(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy(
-            'hello-juju',
-            application_name='hello-juju',
-            series='focal',
+            'ubuntu',
+            application_name='ubuntu',
+            series='jammy',
             channel='stable',
             config={
-                'application-repo': 'http://my-juju.com',
+                'hostname': 'myubuntu',
             },
             constraints={
                 'arch': 'amd64',
@@ -118,7 +118,7 @@ async def test_add_units(event_loop):
         app = await model.deploy(
             'ubuntu',
             application_name='ubuntu',
-            series='trusty',
+            series='jammy',
             channel='stable',
         )
         units = await app.add_units(count=2)
@@ -132,10 +132,10 @@ async def test_add_units(event_loop):
 @pytest.mark.asyncio
 async def test_deploy_charmhub_charm(event_loop):
     async with base.CleanModel() as model:
-        app = await model.deploy('hello-juju')
+        app = await model.deploy('ubuntu')
         await model.block_until(lambda: (len(app.units) > 0 and
                                          app.units[0].machine))
-        assert 'hello-juju' in app.data['charm-url']
+        assert 'ubuntu' in app.data['charm-url']
 
 
 @base.bootstrapped

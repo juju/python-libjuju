@@ -64,7 +64,7 @@ jobs:
       uses: charmed-kubernetes/actions-operator@main
       with:
         provider: lxd
-        juju-channel: 3.1/beta
+        juju-channel: 3.1/stable
     # 2023-01-11 Commented until we discover a 
     # clear approach for this.
     # - name: Set proxy in controller

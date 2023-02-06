@@ -21168,16 +21168,18 @@ class SecretContentResults(Type):
 
 
 class SecretRevision(Type):
-    _toSchema = {'create_time': 'create-time', 'expire_time': 'expire-time', 'revision': 'revision', 'update_time': 'update-time', 'value_ref': 'value-ref'}
-    _toPy = {'create-time': 'create_time', 'expire-time': 'expire_time', 'revision': 'revision', 'update-time': 'update_time', 'value-ref': 'value_ref'}
-    def __init__(self, create_time=None, expire_time=None, revision=None, update_time=None, value_ref=None, **unknown_fields):
+    _toSchema = {'backend_name': 'backend-name', 'create_time': 'create-time', 'expire_time': 'expire-time', 'revision': 'revision', 'update_time': 'update-time', 'value_ref': 'value-ref'}
+    _toPy = {'backend-name': 'backend_name', 'create-time': 'create_time', 'expire-time': 'expire_time', 'revision': 'revision', 'update-time': 'update_time', 'value-ref': 'value_ref'}
+    def __init__(self, backend_name=None, create_time=None, expire_time=None, revision=None, update_time=None, value_ref=None, **unknown_fields):
         '''
+        backend_name : str
         create_time : str
         expire_time : str
         revision : int
         update_time : str
         value_ref : SecretValueRef
         '''
+        backend_name_ = backend_name
         create_time_ = create_time
         expire_time_ = expire_time
         revision_ = revision
@@ -21185,6 +21187,9 @@ class SecretRevision(Type):
         value_ref_ = SecretValueRef.from_json(value_ref) if value_ref else None
 
         # Validate arguments against known Juju API types.
+        if backend_name_ is not None and not isinstance(backend_name_, (bytes, str)):
+            raise Exception("Expected backend_name_ to be a str, received: {}".format(type(backend_name_)))
+
         if create_time_ is not None and not isinstance(create_time_, (bytes, str)):
             raise Exception("Expected create_time_ to be a str, received: {}".format(type(create_time_)))
 
@@ -21200,6 +21205,7 @@ class SecretRevision(Type):
         if value_ref_ is not None and not isinstance(value_ref_, (dict, SecretValueRef)):
             raise Exception("Expected value_ref_ to be a SecretValueRef, received: {}".format(type(value_ref_)))
 
+        self.backend_name = backend_name_
         self.create_time = create_time_
         self.expire_time = expire_time_
         self.revision = revision_
