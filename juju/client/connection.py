@@ -37,7 +37,7 @@ client_facades = {
     'CharmDownloader': {'versions': [1]},
     'Charms': {'versions': [5, 6]},
     'Cleaner': {'versions': [2]},
-    'Client': {'versions': [1, 2, 5, 6]},
+    'Client': {'versions': [5, 6]},
     'Cloud': {'versions': [1, 2, 3, 4, 5, 7]},
     'Controller': {'versions': [9, 11]},
     'CrossModelRelations': {'versions': [1, 2]},

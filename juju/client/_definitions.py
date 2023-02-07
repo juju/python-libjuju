@@ -490,6 +490,42 @@ class AddApplicationUnitsResults(Type):
 
 
 
+class AddCharmWithAuth(Type):
+    _toSchema = {'charm_origin': 'charm-origin', 'force': 'force', 'macaroon': 'macaroon', 'url': 'url'}
+    _toPy = {'charm-origin': 'charm_origin', 'force': 'force', 'macaroon': 'macaroon', 'url': 'url'}
+    def __init__(self, charm_origin=None, force=None, macaroon=None, url=None, **unknown_fields):
+        '''
+        charm_origin : CharmOrigin
+        force : bool
+        macaroon : Macaroon
+        url : str
+        '''
+        charm_origin_ = CharmOrigin.from_json(charm_origin) if charm_origin else None
+        force_ = force
+        macaroon_ = Macaroon.from_json(macaroon) if macaroon else None
+        url_ = url
+
+        # Validate arguments against known Juju API types.
+        if charm_origin_ is not None and not isinstance(charm_origin_, (dict, CharmOrigin)):
+            raise Exception("Expected charm_origin_ to be a CharmOrigin, received: {}".format(type(charm_origin_)))
+
+        if force_ is not None and not isinstance(force_, bool):
+            raise Exception("Expected force_ to be a bool, received: {}".format(type(force_)))
+
+        if macaroon_ is not None and not isinstance(macaroon_, (dict, Macaroon)):
+            raise Exception("Expected macaroon_ to be a Macaroon, received: {}".format(type(macaroon_)))
+
+        if url_ is not None and not isinstance(url_, (bytes, str)):
+            raise Exception("Expected url_ to be a str, received: {}".format(type(url_)))
+
+        self.charm_origin = charm_origin_
+        self.force = force_
+        self.macaroon = macaroon_
+        self.url = url_
+        self.unknown_fields = unknown_fields
+
+
+
 class AddCharmWithOrigin(Type):
     _toSchema = {'charm_origin': 'charm-origin', 'force': 'force', 'url': 'url'}
     _toPy = {'charm-origin': 'charm_origin', 'force': 'force', 'url': 'url'}
@@ -1608,6 +1644,24 @@ class ApplicationDeploy(Type):
         self.policy = policy_
         self.resources = resources_
         self.storage = storage_
+        self.unknown_fields = unknown_fields
+
+
+
+class ApplicationDestroy(Type):
+    _toSchema = {'application': 'application'}
+    _toPy = {'application': 'application'}
+    def __init__(self, application=None, **unknown_fields):
+        '''
+        application : str
+        '''
+        application_ = application
+
+        # Validate arguments against known Juju API types.
+        if application_ is not None and not isinstance(application_, (bytes, str)):
+            raise Exception("Expected application_ to be a str, received: {}".format(type(application_)))
+
+        self.application = application_
         self.unknown_fields = unknown_fields
 
 
@@ -7312,6 +7366,30 @@ class DashboardConnectionInfo(Type):
 
 
 
+class DashboardConnectionProxy(Type):
+    _toSchema = {'config': 'config', 'type_': 'type'}
+    _toPy = {'config': 'config', 'type': 'type_'}
+    def __init__(self, config=None, type_=None, **unknown_fields):
+        '''
+        config : typing.Mapping[str, typing.Any]
+        type_ : str
+        '''
+        config_ = config
+        type__ = type_
+
+        # Validate arguments against known Juju API types.
+        if config_ is not None and not isinstance(config_, dict):
+            raise Exception("Expected config_ to be a Mapping, received: {}".format(type(config_)))
+
+        if type__ is not None and not isinstance(type__, (bytes, str)):
+            raise Exception("Expected type__ to be a str, received: {}".format(type(type__)))
+
+        self.config = config_
+        self.type_ = type__
+        self.unknown_fields = unknown_fields
+
+
+
 class DashboardConnectionSSHTunnel(Type):
     _toSchema = {'entity': 'entity', 'host': 'host', 'model': 'model', 'port': 'port'}
     _toPy = {'entity': 'entity', 'host': 'host', 'model': 'model', 'port': 'port'}
@@ -7563,6 +7641,24 @@ class DestroyApplicationResults(Type):
             raise Exception("Expected results_ to be a Sequence, received: {}".format(type(results_)))
 
         self.results = results_
+        self.unknown_fields = unknown_fields
+
+
+
+class DestroyApplicationUnits(Type):
+    _toSchema = {'unit_names': 'unit-names'}
+    _toPy = {'unit-names': 'unit_names'}
+    def __init__(self, unit_names=None, **unknown_fields):
+        '''
+        unit_names : typing.Sequence[str]
+        '''
+        unit_names_ = unit_names
+
+        # Validate arguments against known Juju API types.
+        if unit_names_ is not None and not isinstance(unit_names_, (bytes, str, list)):
+            raise Exception("Expected unit_names_ to be a Sequence, received: {}".format(type(unit_names_)))
+
+        self.unit_names = unit_names_
         self.unknown_fields = unknown_fields
 
 
@@ -21289,6 +21385,30 @@ class SecretRotatedArgs(Type):
             raise Exception("Expected args_ to be a Sequence, received: {}".format(type(args_)))
 
         self.args = args_
+        self.unknown_fields = unknown_fields
+
+
+
+class SecretStoreConfig(Type):
+    _toSchema = {'params': 'params', 'type_': 'type'}
+    _toPy = {'params': 'params', 'type': 'type_'}
+    def __init__(self, params=None, type_=None, **unknown_fields):
+        '''
+        params : typing.Mapping[str, typing.Any]
+        type_ : str
+        '''
+        params_ = params
+        type__ = type_
+
+        # Validate arguments against known Juju API types.
+        if params_ is not None and not isinstance(params_, dict):
+            raise Exception("Expected params_ to be a Mapping, received: {}".format(type(params_)))
+
+        if type__ is not None and not isinstance(type__, (bytes, str)):
+            raise Exception("Expected type__ to be a str, received: {}".format(type(type__)))
+
+        self.params = params_
+        self.type_ = type__
         self.unknown_fields = unknown_fields
 
 
