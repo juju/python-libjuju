@@ -1427,7 +1427,7 @@ class Model:
         """
         return await self.relate(relation1, relation2)
 
-    async def relate(self, relation1, relation2):
+    async def integrate(self, relation1, relation2):
         """Add a relation between two applications.
 
         :param str relation1: '<application>[:<relation_name>]'
@@ -1498,6 +1498,13 @@ class Model:
 
         await self.block_until(lambda: _find_relation(*specs) is not None)
         return _find_relation(*specs)
+
+    async def relate(self, relation1, relation2):
+        """The relate function is deprecated in favor of instead.
+        The logic is the same.
+        """
+        log.warn("relate is deprecated and will be removed. Use integrate instead.")
+        return self.integrate(relation1, relation2)
 
     async def add_space(self, name, cidrs=None, public=True):
         """Add a new network space.
