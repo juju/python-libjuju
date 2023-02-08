@@ -1504,7 +1504,7 @@ class Model:
         The logic is the same.
         """
         log.warn("relate is deprecated and will be removed. Use integrate instead.")
-        return self.integrate(relation1, relation2)
+        return await self.integrate(relation1, relation2)
 
     async def add_space(self, name, cidrs=None, public=True):
         """Add a new network space.
