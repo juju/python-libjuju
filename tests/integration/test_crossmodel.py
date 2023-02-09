@@ -129,7 +129,7 @@ async def test_relate_with_offer(event_loop):
             await model_2.relate("hello-juju:db", "admin/{}.postgresql".format(model_1.name))
             status = await model_2.get_status()
             if 'postgresql' not in status.remote_applications:
-                raise Exception("Expected mysql in saas")
+                raise Exception("Expected postgresql in saas")
 
             await model_2.remove_saas('postgresql')
             await jasyncio.sleep(5)

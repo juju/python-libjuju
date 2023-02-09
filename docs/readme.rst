@@ -12,7 +12,7 @@ Requirements
 ------------
 
 * Python 3.8/3.9/3.10
-* Tested using Juju 3.0.2
+* Tested using Juju 3.1.0
 
 
 Design Notes

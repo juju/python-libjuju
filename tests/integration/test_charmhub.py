@@ -9,8 +9,8 @@ from juju import jasyncio
 @pytest.mark.asyncio
 async def test_info(event_loop):
     async with base.CleanModel() as model:
-        _, name = await model.charmhub.get_charm_id("hello-juju")
-        assert name == "hello-juju"
+        _, name = await model.charmhub.get_charm_id("ubuntu")
+        assert name == "ubuntu"
 
         charm_name = 'juju-qa-test'
         charm_info = await model.charmhub.info(charm_name)
