@@ -8,8 +8,7 @@ from juju.client._definitions import *
 class ApplicationFacade(Type):
     name = 'Application'
     version = 17
-    schema =     {'definitions': {'': {'additionalProperties': False, 'type': 'object'},
-                     'AddApplicationUnits': {'additionalProperties': False,
+    schema =     {'definitions': {'AddApplicationUnits': {'additionalProperties': False,
                                              'properties': {'application': {'type': 'string'},
                                                             'attach-storage': {'items': {'type': 'string'},
                                                                                'type': 'array'},
@@ -713,8 +712,6 @@ class ApplicationFacade(Type):
                                'properties': {'Params': {'$ref': '#/definitions/ApplicationsDeploy'},
                                               'Result': {'$ref': '#/definitions/ErrorResults'}},
                                'type': 'object'},
-                    'Destroy': {'properties': {'Params': {'$ref': '#/definitions/'}},
-                                'type': 'object'},
                     'DestroyApplication': {'description': 'DestroyApplication '
                                                           'removes a given set of '
                                                           'applications.',
@@ -741,8 +738,6 @@ class ApplicationFacade(Type):
                                     'properties': {'Params': {'$ref': '#/definitions/DestroyUnitsParams'},
                                                    'Result': {'$ref': '#/definitions/DestroyUnitResults'}},
                                     'type': 'object'},
-                    'DestroyUnits': {'properties': {'Params': {'$ref': '#/definitions/'}},
-                                     'type': 'object'},
                     'Expose': {'description': 'Expose changes the juju-managed '
                                               'firewall to expose any ports that\n'
                                               'were also explicitly marked by '
@@ -1058,25 +1053,6 @@ class ApplicationFacade(Type):
 
 
 
-    @ReturnMapping(None)
-    async def Destroy(self):
-        '''
-
-        Returns -> None
-        '''
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Application',
-                   request='Destroy',
-                   version=17,
-                   params=_params)
-
-        reply = await self.rpc(msg)
-        return reply
-
-
-
     @ReturnMapping(DestroyApplicationResults)
     async def DestroyApplication(self, applications=None):
         '''
@@ -1180,25 +1156,6 @@ class ApplicationFacade(Type):
                    version=17,
                    params=_params)
         _params['units'] = units
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(None)
-    async def DestroyUnits(self):
-        '''
-
-        Returns -> None
-        '''
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Application',
-                   request='DestroyUnits',
-                   version=17,
-                   params=_params)
-
         reply = await self.rpc(msg)
         return reply
 
