@@ -1,3 +1,4 @@
+from __future__ import annotations
 import asyncio
 import base64
 import collections
@@ -13,6 +14,7 @@ import zipfile
 from concurrent.futures import CancelledError
 from functools import partial
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import yaml
 
@@ -30,6 +32,13 @@ from .delta import get_entity_class, get_entity_delta
 from .errors import JujuAPIError, JujuError
 from .exceptions import DeadEntityException
 from .placement import parse as parse_placement
+
+if TYPE_CHECKING:
+    from .application import Application
+    from .client import _definitions
+    from .machine import Machine
+    from .relation import Relation
+    from .unit import Unit
 
 log = logging.getLogger(__name__)
 
@@ -122,7 +131,7 @@ class ModelState:
         }
 
     @property
-    def applications(self):
+    def applications(self) -> dict[str, Application]:
         """Return a map of application-name:Application for all applications
         currently in the model.
 
@@ -130,7 +139,7 @@ class ModelState:
         return self._live_entity_map('application')
 
     @property
-    def machines(self):
+    def machines(self) -> dict[str, Machine]:
         """Return a map of machine-id:Machine for all machines currently in
         the model.
 
@@ -138,7 +147,7 @@ class ModelState:
         return self._live_entity_map('machine')
 
     @property
-    def units(self):
+    def units(self) -> dict[str, Unit]:
         """Return a map of unit-id:Unit for all units currently in
         the model.
 
@@ -146,7 +155,7 @@ class ModelState:
         return self._live_entity_map('unit')
 
     @property
-    def relations(self):
+    def relations(self) -> dict[str, Relation]:
         """Return a map of relation-id:Relation for all relations currently in
         the model.
 
@@ -747,7 +756,7 @@ class Model:
         return self.info
 
     @property
-    def info(self):
+    def info(self) -> None | _definitions.ModelInfo:
         """Return the cached client.ModelInfo object for this Model.
 
         If Model.get_info() has not been called, this will return None.
