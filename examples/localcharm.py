@@ -6,11 +6,10 @@ This example shows how to deploy a local charm. It:
 3. Deploys the uploaded charm.
 
 """
-import asyncio
 import logging
 
+from juju import jasyncio
 from juju.model import Model
-from juju import loop
 
 
 async def main():
@@ -19,7 +18,7 @@ async def main():
 
     # Deploy a local charm using a path to the charm directory
     await model.deploy(
-        '/home/tvansteenburgh/src/charms/ubuntu',
+        './charms/ubuntu',
         application_name='ubuntu',
         series='trusty',
     )
@@ -31,4 +30,4 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     ws_logger = logging.getLogger('websockets.protocol')
     ws_logger.setLevel(logging.INFO)
-    loop.run(main())
+    jasyncio.run(main())

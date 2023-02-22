@@ -1,0 +1,10 @@
+name: test-charm-with-storage
+series: ["focal"]
+summary: "test charm"
+description: "test"
+maintainers: ["test"]
+
+storage:
+  pgdata:
+    type: filesystem
+    description: "test storage"

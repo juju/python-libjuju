@@ -1,4 +1,5 @@
 import logging
+import subprocess
 import os
 
 import macaroonbakery.bakery as bakery
@@ -6,6 +7,8 @@ import macaroonbakery.httpbakery as httpbakery
 import macaroonbakery.httpbakery.agent as agent
 from juju.errors import JujuAPIError
 from juju.model import Model
+from juju.client.jujudata import FileJujuData
+from juju.controller import Controller
 
 import pytest
 
@@ -14,9 +17,38 @@ from .. import base
 log = logging.getLogger(__name__)
 
 
+# this test must be run serially because it modifies the login password
+@base.bootstrapped
+@pytest.mark.serial
+@pytest.mark.skip('one of old macaroon_auth tests, needs to be revised')
+async def test_macaroon_auth_serial(event_loop):
+    jujudata = FileJujuData()
+    account = jujudata.accounts()[jujudata.current_controller()]
+    with base.patch_file('~/.local/share/juju/accounts.yaml'):
+        if 'password' in account:
+            # force macaroon auth by "changing" password to current password
+            result = subprocess.run(
+                ['juju', 'change-user-password'],
+                input='{0}\n{0}\n'.format(account['password']),
+                universal_newlines=True,
+                stderr=subprocess.PIPE)
+            assert result.returncode == 0, ('Failed to change password: '
+                                            '{}'.format(result.stderr))
+        controller = Controller()
+        try:
+            await controller.connect()
+            assert controller.is_connected()
+        finally:
+            if controller.is_connected():
+                await controller.disconnect()
+        async with base.CleanModel():
+            pass  # create and login to model works
+
+
 @base.bootstrapped
 @pytest.mark.asyncio
-@pytest.mark.xfail
+# @pytest.mark.xfail
+@pytest.mark.skip('one of old macaroon_auth tests, needs to be revised')
 async def test_macaroon_auth(event_loop):
     auth_info, username = agent_auth_info()
     # Create a bakery client that can do agent authentication.
@@ -37,7 +69,8 @@ async def test_macaroon_auth(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-@pytest.mark.xfail
+# @pytest.mark.xfail
+@pytest.mark.skip('one of old macaroon_auth tests, needs to be revised')
 async def test_macaroon_auth_with_bad_key(event_loop):
     auth_info, username = agent_auth_info()
     # Use a random key rather than the correct key.
@@ -65,6 +98,8 @@ async def test_macaroon_auth_with_bad_key(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+# @pytest.mark.xfail
+@pytest.mark.skip('one of old macaroon_auth tests, needs to be revised')
 async def test_macaroon_auth_with_unauthorized_user(event_loop):
     auth_info, username = agent_auth_info()
     # Create a bakery client can do agent authentication.

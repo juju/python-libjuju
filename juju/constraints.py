@@ -23,11 +23,33 @@ MEM = re.compile('^[1-9][0-9]*[MGTP]$')
 # Multiplication factors to get Megabytes
 # https://github.com/juju/juju/blob/master/constraints/constraints.go#L666
 FACTORS = {
-    "M": 1,
-    "G": 1024,
-    "T": 1024 * 1024,
-    "P": 1024 * 1024 * 1024
+    "M": 1024 ** 0,
+    "G": 1024 ** 1,
+    "T": 1024 ** 2,
+    "P": 1024 ** 3,
+    "E": 1024 ** 4,
+    "Z": 1024 ** 5,
+    "Y": 1024 ** 6
 }
+
+# List of supported constraint keys, see
+# http://github.com/cderici/juju/blob/2.9/core/constraints/constraints.go#L20-L39
+SUPPORTED_KEYS = [
+    "arch",
+    "container",
+    "cpu_cores",
+    "cores",
+    "cpu_power",
+    "mem",
+    "root_disk",
+    "root_disk_source",
+    "tags",
+    "instance_role",
+    "instance_type",
+    "spaces",
+    "virt_type",
+    "zones",
+    "allocate_public_ip"]
 
 LIST_KEYS = {'tags', 'spaces'}
 
@@ -48,17 +70,20 @@ def parse(constraints):
         # Fowards compatibilty: already parsed
         return constraints
 
-    constraints = {
-        normalize_key(k): (
-            normalize_list_value(v) if k in LIST_KEYS else
-            normalize_value(v)
-        ) for k, v in [s.split("=") for s in constraints.split(" ")]}
+    normalized_constraints = {}
+    for s in constraints.split(" "):
+        if "=" not in s:
+            raise Exception("malformed constraint %s" % s)
 
-    return constraints
+        k, v = s.split("=")
+        normalized_constraints[normalize_key(k)] = normalize_list_value(v) if\
+            k in LIST_KEYS else normalize_value(v)
+
+    return normalized_constraints
 
 
-def normalize_key(key):
-    key = key.strip()
+def normalize_key(orig_key):
+    key = orig_key.strip()
 
     key = key.replace("-", "_")  # Our _client lib wants "_" in place of "-"
 
@@ -66,6 +91,8 @@ def normalize_key(key):
     key = SNAKE1.sub(r'\1_\2', key)
     key = SNAKE2.sub(r'\1_\2', key).lower()
 
+    if key not in SUPPORTED_KEYS:
+        raise Exception("unknown constraint in %s" % orig_key)
     return key
 
 
@@ -79,9 +106,60 @@ def normalize_value(value):
     if value.isdigit():
         return int(value)
 
+    if value.lower() == 'true':
+        return True
+    if value.lower() == 'false':
+        return False
+
     return value
 
 
 def normalize_list_value(value):
     values = value.strip().split(',')
     return [normalize_value(value) for value in values]
+
+
+STORAGE = re.compile(
+    '(?:(?:^|(?<=,))(?:|(?P<pool>[a-zA-Z]+[-?a-zA-Z0-9]*)|(?P<count>-?[0-9]+)|(?:(?P<size>-?[0-9]+(?:\\.[0-9]+)?)(?P<size_exp>[MGTPEZY])(?:i?B)?))(?:$|,))')
+
+
+def parse_storage_constraint(constraint):
+    storage = {'count': 1}
+    for m in STORAGE.finditer(constraint):
+        pool = m.group('pool')
+        if pool:
+            if 'pool' in storage:
+                raise Exception("pool already specified")
+            storage['pool'] = pool
+        count = m.group('count')
+        if count:
+            count = int(count)
+            storage['count'] = count if count > 0 else 1
+        size = m.group('size')
+        if size:
+            storage['size'] = int(float(size) * FACTORS[m.group('size_exp')])
+    return storage
+
+
+DEVICE = re.compile(
+    '^(?P<count>[0-9]+)?(?:^|,)(?P<type>[^,]+)(?:$|,(?!$))(?P<attrs>(?:[^=]+=[^;]+)+)*$')
+ATTR = re.compile(';?(?P<key>[^=]+)=(?P<value>[^;]+)')
+
+
+def parse_device_constraint(constraint):
+    m = DEVICE.match(constraint)
+    if m is None:
+        raise Exception("device constraint does not match")
+    device = {}
+    count = m.group('count')
+    if count:
+        count = int(count)
+        device['count'] = count if count > 0 else 1
+    else:
+        device['count'] = 1
+    device['type'] = m.group('type')
+    attrs = m.group('attrs')
+    if attrs:
+        device['attributes'] = {match.group('key'): match.group('value')
+                                for match in ATTR.finditer(attrs)}
+    return device

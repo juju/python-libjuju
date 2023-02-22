@@ -1,0 +1,6 @@
+applications:
+  file-resource-charm:
+    charm: ./file-resource-charm
+    num_units: 1
+    resources:
+      file-res: ./file-resource-charm/test.file

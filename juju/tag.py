@@ -19,6 +19,10 @@ def cloud(cloud_name):
     return _prefix('cloud-', cloud_name)
 
 
+def controller(controller_uuid):
+    return _prefix('controller-', controller_uuid)
+
+
 def credential(cloud, user, credential_name):
     credential_string = '{}_{}_{}'.format(cloud, user, credential_name)
     return _prefix('cloudcred-', credential_string)
@@ -40,9 +44,17 @@ def application(app_name):
     return _prefix('application-', app_name)
 
 
+def storage(app_name):
+    return _prefix('storage-', app_name)
+
+
 def unit(unit_name):
     return _prefix('unit-', unit_name.replace('/', '-'))
 
 
 def action(action_uuid):
     return _prefix('action-', action_uuid)
+
+
+def space(space_name):
+    return _prefix('space-', space_name)

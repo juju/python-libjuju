@@ -13,7 +13,8 @@
 #     limitations under the License.
 
 from pathlib import Path
-from setuptools import setup, find_packages
+
+from setuptools import find_packages, setup
 
 here = Path(__file__).absolute().parent
 readme = here / 'docs' / 'readme.rst'
@@ -29,14 +30,20 @@ setup(
     version=version.read_text().strip(),
     packages=find_packages(
         exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
+    package_data={'juju': ['py.typed']},
     install_requires=[
         'macaroonbakery>=1.1,<2.0',
         'pyRFC3339>=1.0,<2.0',
-        'pyyaml>=3.0,<=4.2',
-        'theblues>=0.3.8,<1.0',
-        'websockets>=7.0,<8.0',
+        'pyyaml>=5.1.2,<=6.0',
+        'websockets>=8.1,<9.0 ; python_version=="3.8"',
+        'websockets>=9.0,<10.0 ; python_version=="3.9"',
+        'websockets>=10.0; python_version>"3.9"',
         'paramiko>=2.4.0,<3.0.0',
         'pyasn1>=0.4.4',
+        'toposort>=1.5,<2',
+        'typing_inspect>=0.6.0',
+        'kubernetes>=12.0.1',
+        'hvac',
     ],
     include_package_data=True,
     maintainer='Juju Ecosystem Engineering',
@@ -50,9 +57,9 @@ setup(
         "Intended Audience :: Developers",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
     ],
     entry_points={
         'console_scripts': [

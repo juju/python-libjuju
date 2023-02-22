@@ -1,0 +1,11 @@
+saas:
+  influxdb:
+    url: admin/{}.influxdb
+applications:
+  grafana:
+    charm: grafana
+    channel: stable
+    num_units: 1
+relations:
+- - grafana:grafana-source
+  - influxdb:grafana-source

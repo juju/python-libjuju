@@ -1,0 +1,12 @@
+bundle: kubernetes
+name: magma-orc8r
+description: |
+  Orchestrator is a Magma service that provides a simple and consistent way to 
+  configure and monitor the wireless network securely. The metrics acquired through the platform 
+  allows you to see the analytics and traffic flows of the wireless users through the Magma web UI.
+applications:
+  nms-magmalte:
+    charm: magma-nms-magmalte
+    channel: edge
+    scale: 1
+    trust: true

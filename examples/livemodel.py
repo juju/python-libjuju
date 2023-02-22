@@ -7,7 +7,7 @@ This example:
 
 """
 from juju.model import Model
-from juju import loop
+from juju import jasyncio
 
 
 async def on_model_change(delta, old, new, model):
@@ -28,4 +28,4 @@ async def watch_model():
 if __name__ == '__main__':
     # Run loop until the process is manually stopped (watch_model will loop
     # forever).
-    loop.run(watch_model())
+    jasyncio.run(watch_model())

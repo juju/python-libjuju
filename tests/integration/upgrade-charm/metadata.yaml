@@ -1,0 +1,5 @@
+name: ubuntu
+series: ["focal", "jammy"]
+summary: "test"
+description: "test"
+maintainers: ["test"]

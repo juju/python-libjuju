@@ -1,21 +1,156 @@
-import asyncio
 import base64
 import json
 import logging
 import ssl
 import urllib.request
 import weakref
-from concurrent.futures import CancelledError
 from http.client import HTTPSConnection
+from dateutil.parser import parse
 
-import macaroonbakery.httpbakery as httpbakery
 import macaroonbakery.bakery as bakery
+import macaroonbakery.httpbakery as httpbakery
 import websockets
-from juju import errors, tag, utils
+from juju import errors, tag, utils, jasyncio
 from juju.client import client
 from juju.utils import IdQueue
+from juju.version import TARGET_JUJU_VERSION
 
 log = logging.getLogger('juju.client.connection')
+
+# Please keep in alphabetical order
+client_facades = {
+    'Action': {'versions': [2, 6, 7]},
+    'ActionPruner': {'versions': [1]},
+    'Agent': {'versions': [2, 3]},
+    'AgentTools': {'versions': [1]},
+    'AllModelWatcher': {'versions': [2, 3, 4]},
+    'AllWatcher': {'versions': [1, 2, 3, 4]},
+    'Annotations': {'versions': [2]},
+    'Application': {'versions': [14, 15, 16, 17]},
+    'ApplicationOffers': {'versions': [1, 2, 4]},
+    'ApplicationScaler': {'versions': [1]},
+    'Backups': {'versions': [1, 2, 3]},
+    'Block': {'versions': [2]},
+    'Bundle': {'versions': [5, 6]},
+    'CharmHub': {'versions': [1]},
+    'CharmRevisionUpdater': {'versions': [2]},
+    'CharmDownloader': {'versions': [1]},
+    'Charms': {'versions': [5, 6]},
+    'Cleaner': {'versions': [2]},
+    'Client': {'versions': [5, 6]},
+    'Cloud': {'versions': [1, 2, 3, 4, 5, 7]},
+    'Controller': {'versions': [9, 11]},
+    'CrossModelRelations': {'versions': [1, 2]},
+    'CrossController': {'versions': [1]},
+    'CredentialManager': {'versions': [1]},
+    'CredentialValidator': {'versions': [1, 2]},
+    'CAASAdmission': {'versions': [1]},
+    'CAASAgent': {'versions': [1, 2]},
+    'CAASApplication': {'versions': [1]},
+    'CAASApplicationProvisioner': {'versions': [1]},
+    'CAASFirewaller': {'versions': [1]},
+    'CAASFirewallerEmbedded': {'versions': [1]},
+    'CAASFirewallerSidecar': {'versions': [1]},
+    'CAASModelOperator': {'versions': [1]},
+    'CAASModelConfigManager': {'versions': [1]},
+    'CAASOperator': {'versions': [1]},
+    'CAASOperatorProvisioner': {'versions': [1]},
+    'CAASOperatorUpgrader': {'versions': [1]},
+    'CAASUnitProvisioner': {'versions': [1, 2]},
+    'Deployer': {'versions': [1]},
+    'DiskManager': {'versions': [2]},
+    'EntityWatcher': {'versions': [2]},
+    'EnvironUpgrader': {'versions': [1]},
+    'ExternalControllerUpdater': {'versions': [1]},
+    'FanConfigurer': {'versions': [1]},
+    'FilesystemAttachmentsWatcher': {'versions': [2]},
+    'Firewaller': {'versions': [3, 4, 5, 7]},
+    'FirewallRules': {'versions': [1]},
+    'HighAvailability': {'versions': [2]},
+    'HostKeyReporter': {'versions': [1]},
+    'ImageManager': {'versions': [2]},
+    'ImageMetadata': {'versions': [3]},
+    'ImageMetadataManager': {'versions': [1]},
+    'InstanceMutater': {'versions': [2, 3]},
+    'InstancePoller': {'versions': [3, 4]},
+    'KeyManager': {'versions': [1]},
+    'KeyUpdater': {'versions': [1]},
+    'LeadershipService': {'versions': [2]},
+    'LifeFlag': {'versions': [1]},
+    'Logger': {'versions': [1]},
+    'LogForwarding': {'versions': [1]},
+    'Machiner': {'versions': [1, 2, 5]},
+    'MachineActions': {'versions': [1]},
+    'MachineManager': {'versions': [9, 10]},
+    'MachineUndertaker': {'versions': [1]},
+    'MeterStatus': {'versions': [1, 2]},
+    'MetricsAdder': {'versions': [2]},
+    'MetricsDebug': {'versions': [2]},
+    'MetricsManager': {'versions': [1]},
+    'MigrationFlag': {'versions': [1]},
+    'MigrationMaster': {'versions': [1, 3]},
+    'MigrationMinion': {'versions': [1]},
+    'MigrationStatusWatcher': {'versions': [1]},
+    'MigrationTarget': {'versions': [1]},
+    'ModelConfig': {'versions': [1, 2, 3]},
+    'ModelGeneration': {'versions': [1, 2, 4]},
+    'ModelManager': {'versions': [2, 3, 4, 5, 9]},
+    'ModelSummaryWatcher': {'versions': [1]},
+    'ModelUpgrader': {'versions': [1]},
+    'NotifyWatcher': {'versions': [1]},
+    'OfferStatusWatcher': {'versions': [1]},
+    'Payloads': {'versions': [1]},
+    'PayloadsHookContext': {'versions': [1]},
+    'Pinger': {'versions': [1]},
+    'Provisioner': {'versions': [11]},
+    'ProxyUpdater': {'versions': [1, 2]},
+    'RaftLease': {'versions': [1, 2]},
+    'Reboot': {'versions': [2]},
+    'RelationStatusWatcher': {'versions': [1]},
+    'RelationUnitsWatcher': {'versions': [1]},
+    'RemoteRelations': {'versions': [1, 2]},
+    'RemoteRelationWatcher': {'versions': [1]},
+    'Resources': {'versions': [1, 2, 3]},
+    'ResourcesHookContext': {'versions': [1]},
+    'Resumer': {'versions': [2]},
+    'RetryStrategy': {'versions': [1]},
+    'Secrets': {'versions': [1]},
+    'SecretsManager': {'versions': [1]},
+    'SecretBackends': {'versions': [1]},
+    'SecretsRotationWatcher': {'versions': [1]},
+    'SecretsTriggerWatcher': {'versions': [1]},
+    'Singular': {'versions': [2]},
+    'Spaces': {'versions': [6]},
+    'StatusHistory': {'versions': [2]},
+    'Storage': {'versions': [3, 4, 6]},
+    'StorageProvisioner': {'versions': [3, 4]},
+    'StringsWatcher': {'versions': [1]},
+    'Subnets': {'versions': [2, 4, 5]},
+    'SSHClient': {'versions': [1, 2, 3, 4]},
+    'Undertaker': {'versions': [1]},
+    'UnitAssigner': {'versions': [1]},
+    'Uniter': {'versions': [18]},
+    'Upgrader': {'versions': [1]},
+    'UpgradeSeries': {'versions': [1, 3]},
+    'UpgradeSteps': {'versions': [1, 2]},
+    'UserManager': {'versions': [1, 2, 3]},
+    'VolumeAttachmentsWatcher': {'versions': [2]},
+    'VolumeAttachmentPlansWatcher': {'versions': [1]},
+}
+
+
+def facade_versions(name, versions):
+    """
+    facade_versions returns a new object that correctly returns a object in
+    format expected by the connection facades inspection.
+    :param name: name of the facade
+    :param versions: versions to support by the facade
+    """
+    if name.endswith('Facade'):
+        name = name[:-len('Facade')]
+    return {
+        name: {'versions': versions},
+    }
 
 
 class Monitor:
@@ -39,8 +174,8 @@ class Monitor:
 
     def __init__(self, connection):
         self.connection = weakref.ref(connection)
-        self.reconnecting = asyncio.Lock(loop=connection.loop)
-        self.close_called = asyncio.Event(loop=connection.loop)
+        self.reconnecting = jasyncio.Lock()
+        self.close_called = jasyncio.Event()
 
     @property
     def status(self):
@@ -62,7 +197,7 @@ class Monitor:
             return self.DISCONNECTED
 
         # connection cleanly disconnected or not yet opened
-        if not connection.ws:
+        if not connection._ws:
             return self.DISCONNECTED
 
         # close called but not yet complete
@@ -70,8 +205,12 @@ class Monitor:
             return self.DISCONNECTING
 
         # connection closed uncleanly (we didn't call connection.close)
-        stopped = connection._receiver_task.stopped.is_set()
-        if stopped or not connection.ws.open:
+        if connection.is_debug_log_connection:
+            stopped = connection._debug_log_task.cancelled()
+        else:
+            stopped = connection._receiver_task.cancelled()
+
+        if stopped or not connection._ws.open:
             return self.ERROR
 
         # everything is fine!
@@ -86,8 +225,6 @@ class Connection:
         client = await Connection.connect(
             api_endpoint, model_uuid, username, password, cacert)
 
-    Note: Any connection method or constructor can accept an optional `loop`
-    argument to override the default event loop from `asyncio.get_event_loop`.
     """
 
     MAX_FRAME_SIZE = 2**22
@@ -102,17 +239,20 @@ class Connection:
             password=None,
             cacert=None,
             bakery_client=None,
-            loop=None,
             max_frame_size=None,
             retries=3,
             retry_backoff=10,
+            specified_facades=None,
+            proxy=None,
+            debug_log_conn=None,
+            debug_log_params={}
     ):
         """Connect to the websocket.
 
         If uuid is None, the connection will be to the controller. Otherwise it
         will be to the model.
 
-        :param str endpoint: The hostname:port of the controller to connect to.
+        :param str endpoint: The hostname:port of the controller to connect to (or list of strings).
         :param str uuid: The model UUID to connect to (None for a
             controller-only connection).
         :param str username: The username for controller-local users (or None
@@ -124,18 +264,22 @@ class Connection:
             to use when performing macaroon-based login. Macaroon tokens
             acquired when logging will be saved to bakery_client.cookies.
             If this is None, a default bakery_client will be used.
-        :param asyncio.BaseEventLoop loop: The event loop to use for async
-            operations.
         :param int max_frame_size: The maximum websocket frame size to allow.
         :param int retries: When connecting or reconnecting, and all endpoints
             fail, how many times to retry the connection before giving up.
         :param int retry_backoff: Number of seconds to increase the wait
             between connection retry attempts (a backoff of 10 with 3 retries
             would wait 10s, 20s, and 30s).
+        :param specified_facades: Define a series of facade versions you wish to override
+            to prevent using the conservative client pinning with in the client.
+        :param TextIOWrapper debug_log_conn: target if this is a debug log connection
+        :param dict debug_log_params: filtering parameters for the debug-log output
         """
         self = cls()
         if endpoint is None:
             raise ValueError('no endpoint provided')
+        if not isinstance(endpoint, str) and not isinstance(endpoint, list):
+            raise TypeError("Endpoint should be either str or list")
         self.uuid = uuid
         if bakery_client is None:
             bakery_client = httpbakery.Client()
@@ -149,7 +293,6 @@ class Connection:
             username = None
         self.usertag = tag.user(username)
         self.password = password
-        self.loop = loop or asyncio.get_event_loop()
 
         self.__request_id__ = 0
 
@@ -157,32 +300,77 @@ class Connection:
         # _connect_with_redirect method, but create them here
         # as a reminder that they will exist.
         self.addr = None
-        self.ws = None
+        self._ws = None
         self.endpoint = None
+        self.endpoints = None
         self.cacert = None
         self.info = None
 
+        self.debug_log_target = debug_log_conn
+        self.is_debug_log_connection = debug_log_conn is not None
+        self.debug_log_params = debug_log_params
+        self.debug_log_shown_lines = 0  # number of lines
+
         # Create that _Task objects but don't start the tasks yet.
-        self._pinger_task = _Task(self._pinger, self.loop)
-        self._receiver_task = _Task(self._receiver, self.loop)
+        self._pinger_task = None
+        self._receiver_task = None
+        self._debug_log_task = None
 
         self._retries = retries
         self._retry_backoff = retry_backoff
 
         self.facades = {}
-        self.messages = IdQueue(loop=self.loop)
+        self.specified_facades = specified_facades or {}
+
+        self.messages = IdQueue()
         self.monitor = Monitor(connection=self)
         if max_frame_size is None:
             max_frame_size = self.MAX_FRAME_SIZE
         self.max_frame_size = max_frame_size
-        await self._connect_with_redirect([(endpoint, cacert)])
-        return self
+
+        self.proxy = proxy
+        if self.proxy is not None:
+            self.proxy.connect()
+
+        _endpoints = [(endpoint, cacert)] if isinstance(endpoint, str) else [(e, cacert) for e in endpoint]
+        lastError = None
+        for _ep in _endpoints:
+            try:
+                if self.is_debug_log_connection:
+                    # make a direct connection with basic auth if
+                    # debug-log (i.e. no redirection or login)
+                    await self._connect([_ep])
+                else:
+                    await self._connect_with_redirect([_ep])
+                return self
+            except ssl.SSLError as e:
+                lastError = e
+                continue
+            except OSError as e:
+                logging.debug(
+                    "Cannot access endpoint {}: {}".format(_ep, e.strerror))
+                lastError = e
+                continue
+        if lastError is not None:
+            raise lastError
+        raise Exception("Unable to connect to websocket")
+
+    @property
+    def ws(self):
+        log.warning('Direct access to the websocket object may cause disruptions in asyncio event handling.')
+        return self._ws
 
     @property
     def username(self):
         if not self.usertag:
             return None
         return self.usertag[len('user-'):]
+
+    @property
+    def is_using_old_client(self):
+        if self.info is None:
+            raise errors.JujuError("Not connected yet.")
+        return self.info['server-version'].startswith('2.')
 
     @property
     def is_open(self):
@@ -202,53 +390,167 @@ class Connection:
         return context
 
     async def _open(self, endpoint, cacert):
-        if self.uuid:
+
+        if self.is_debug_log_connection:
+            assert self.uuid
+            url = "wss://user-{}:{}@{}/model/{}/log".format(
+                self.username, self.password, endpoint, self.uuid)
+        elif self.uuid:
             url = "wss://{}/model/{}/api".format(endpoint, self.uuid)
         else:
             url = "wss://{}/api".format(endpoint)
 
+        # We need to establish a server_hostname here for TLS sni if we are
+        # connecting through a proxy as the Juju controller certificates will
+        # not be covering the proxy
+        sock = None
+        server_hostname = None
+        if self.proxy is not None:
+            sock = self.proxy.socket()
+            server_hostname = "juju-app"
+
         return (await websockets.connect(
             url,
             ssl=self._get_ssl(cacert),
-            loop=self.loop,
             max_size=self.max_frame_size,
-        ), url, endpoint, cacert)
+            server_hostname=server_hostname,
+            sock=sock,
+        )), url, endpoint, cacert
 
-    async def close(self):
-        if not self.ws:
+    async def close(self, to_reconnect=False):
+        if not self._ws:
             return
         self.monitor.close_called.set()
-        await self._pinger_task.stopped.wait()
-        await self._receiver_task.stopped.wait()
-        await self.ws.close()
-        self.ws = None
+
+        if self._pinger_task:
+            self._pinger_task.cancel()
+            self._pinger_task = None
+        if self._receiver_task:
+            self._receiver_task.cancel()
+            self._receiver_task = None
+        if self._debug_log_task:
+            self._debug_log_task.cancel()
+            self._debug_log_task = None
+        #  Allow a second for tasks to be cancelled
+        await jasyncio.sleep(1)
+
+        if self._ws and not self._ws.closed:
+            await self._ws.close()
+        self._ws = None
+
+        if self.proxy is not None:
+            self.proxy.close()
 
     async def _recv(self, request_id):
         if not self.is_open:
             raise websockets.exceptions.ConnectionClosed(0, 'websocket closed')
-        return await self.messages.get(request_id)
+        try:
+            return await self.messages.get(request_id)
+        except GeneratorExit:
+            return {}
+
+    def debug_log_filter_write(self, result):
+
+        write_or_not = True
+
+        entity = result['tag']
+        msg_lev = result['sev']
+        mod = result['mod']
+        msg = result['msg']
+
+        excluded_entities = self.debug_log_params['exclude']
+        excluded_modules = self.debug_log_params['exclude_module']
+        write_or_not = write_or_not and \
+            (mod not in excluded_modules) and \
+            (entity not in excluded_entities)
+
+        included_entities = self.debug_log_params['include']
+        only_these_modules = self.debug_log_params['include_module']
+        write_or_not = write_or_not and \
+            (only_these_modules == [] or mod in only_these_modules) and \
+            (included_entities == [] or entity in included_entities)
+
+        LEVELS = ['TRACE', 'DEBUG', 'INFO', 'WARNING', 'ERROR']
+        log_level = self.debug_log_params['level']
+
+        if log_level != "" and log_level not in LEVELS:
+            log.warning("Debug Logger: level should be one of %s, given %s" % (LEVELS, log_level))
+        else:
+            write_or_not = write_or_not and \
+                (log_level == "" or (LEVELS.index(msg_lev) >= LEVELS.index(log_level)))
+
+        # TODO
+        # lines = self.debug_log_params['lines']
+        # no_tail = self.debug_log_params['no_tail']
+
+        if write_or_not:
+            ts = parse(result['ts'])
+
+            self.debug_log_target.write("%s %02d:%02d:%02d %s %s %s\n" % (entity, ts.hour, ts.minute, ts.second, msg_lev, mod, msg))
+            return 1
+        else:
+            return 0
+
+    async def _debug_logger(self):
+        try:
+            while self.is_open:
+                result = await utils.run_with_interrupt(
+                    self._ws.recv(),
+                    self.monitor.close_called,
+                    log=log)
+                if self.monitor.close_called.is_set():
+                    break
+                if result is not None and result != '{}\n':
+                    result = json.loads(result)
+
+                    number_of_lines_written = self.debug_log_filter_write(result)
+
+                    self.debug_log_shown_lines += number_of_lines_written
+
+                    if self.debug_log_shown_lines >= self.debug_log_params['limit']:
+                        jasyncio.create_task(self.close())
+                        return
+
+        except KeyError as e:
+            log.exception('Unexpected debug line -- %s' % e)
+            jasyncio.create_task(self.close())
+            raise
+        except jasyncio.CancelledError:
+            jasyncio.create_task(self.close())
+            raise
+        except websockets.exceptions.ConnectionClosed:
+            log.warning('Debug Logger: Connection closed, reconnecting')
+            # the reconnect has to be done as a task because the receiver will
+            # be cancelled by the reconnect and we don't want the reconnect
+            # to be aborted half-way through
+            jasyncio.ensure_future(self.reconnect())
+            return
+        except Exception as e:
+            log.exception("Error in debug logger : %s" % e)
+            jasyncio.create_task(self.close())
+            raise
 
     async def _receiver(self):
         try:
             while self.is_open:
                 result = await utils.run_with_interrupt(
-                    self.ws.recv(),
+                    self._ws.recv(),
                     self.monitor.close_called,
-                    loop=self.loop)
+                    log=log)
                 if self.monitor.close_called.is_set():
                     break
                 if result is not None:
                     result = json.loads(result)
                     await self.messages.put(result['request-id'], result)
-        except CancelledError:
-            pass
-        except websockets.ConnectionClosed as e:
+        except jasyncio.CancelledError:
+            raise
+        except websockets.exceptions.ConnectionClosed as e:
             log.warning('Receiver: Connection closed, reconnecting')
             await self.messages.put_all(e)
             # the reconnect has to be done as a task because the receiver will
             # be cancelled by the reconnect and we don't want the reconnect
             # to be aborted half-way through
-            self.loop.create_task(self.reconnect())
+            jasyncio.ensure_future(self.reconnect())
             return
         except Exception as e:
             log.exception("Error in receiver")
@@ -267,9 +569,8 @@ class Connection:
         async def _do_ping():
             try:
                 await pinger_facade.Ping()
-                await asyncio.sleep(10, loop=self.loop)
-            except CancelledError:
-                pass
+            except jasyncio.CancelledError:
+                raise
 
         pinger_facade = client.PingerFacade.from_connection(self)
         try:
@@ -277,9 +578,12 @@ class Connection:
                 await utils.run_with_interrupt(
                     _do_ping(),
                     self.monitor.close_called,
-                    loop=self.loop)
+                    log=log)
                 if self.monitor.close_called.is_set():
                     break
+                await jasyncio.sleep(10)
+        except jasyncio.CancelledError:
+            raise
         except websockets.exceptions.ConnectionClosed:
             # The connection has closed - we can't do anything
             # more until the connection is restarted.
@@ -297,7 +601,7 @@ class Connection:
         '''
         self.__request_id__ += 1
         msg['request-id'] = self.__request_id__
-        if'params' not in msg:
+        if 'params' not in msg:
             msg['params'] = {}
         if "version" not in msg:
             msg['version'] = self.facades[msg['type']]
@@ -309,7 +613,7 @@ class Connection:
                 raise websockets.exceptions.ConnectionClosed(
                     0, 'websocket closed')
             try:
-                await self.ws.send(outgoing)
+                await self._ws.send(outgoing)
                 break
             except websockets.ConnectionClosed:
                 if attempt == 2:
@@ -319,7 +623,7 @@ class Connection:
                 # if it is triggered by the pinger, then this RPC call will
                 # be cancelled when the pinger is cancelled by the reconnect,
                 # and we don't want the reconnect to be aborted halfway through
-                await asyncio.wait([self.reconnect()], loop=self.loop)
+                await jasyncio.wait([self.reconnect()])
                 if self.monitor.status != Monitor.CONNECTED:
                     # reconnect failed; abort and shutdown
                     log.error('RPC: Automatic reconnect failed')
@@ -345,7 +649,7 @@ class Connection:
             # errors, or perhaps a keyword parameter to the rpc method
             # could be added to trigger this behaviour.
             err_results = []
-            for res in result['response']['results']:
+            for res in result['response']['results'] or []:
                 if res.get('error', {}).get('message'):
                     err_results.append(res['error']['message'])
             if err_results:
@@ -410,11 +714,9 @@ class Connection:
         return await Connection.connect(**self.connect_params())
 
     def connect_params(self):
-        """Return a tuple of parameters suitable for passing to
+        """Return a dict of parameters suitable for passing to
         Connection.connect that can be used to make a new connection
-        to the same controller (and model if specified. The first
-        element in the returned tuple holds the endpoint argument;
-        the other holds a dict of the keyword args.
+        to the same controller (and model if specified).
         """
         return {
             'endpoint': self.endpoint,
@@ -423,8 +725,8 @@ class Connection:
             'password': self.password,
             'cacert': self.cacert,
             'bakery_client': self.bakery_client,
-            'loop': self.loop,
             'max_frame_size': self.max_frame_size,
+            'proxy': self.proxy,
         }
 
     async def controller(self):
@@ -436,7 +738,6 @@ class Connection:
             password=self.password,
             cacert=self.cacert,
             bakery_client=self.bakery_client,
-            loop=self.loop,
             max_frame_size=self.max_frame_size,
         )
 
@@ -447,8 +748,17 @@ class Connection:
         if monitor.reconnecting.locked() or monitor.close_called.is_set():
             return
         async with monitor.reconnecting:
-            await self.close()
-            await self._connect_with_login([(self.endpoint, self.cacert)])
+            await self.close(to_reconnect=True)
+            connector = self._connect if self.is_debug_log_connection else self._connect_with_login
+            res = await connector(
+                [(self.endpoint, self.cacert)]
+                if not self.endpoints else
+                self.endpoints
+            )
+            if not self.is_debug_log_connection:
+                self._build_facades(res.get('facades', {}))
+                if not self._pinger_task:
+                    self._pinger_task = jasyncio.create_task(self._pinger())
 
     async def _connect(self, endpoints):
         if len(endpoints) == 0:
@@ -456,17 +766,17 @@ class Connection:
 
         async def _try_endpoint(endpoint, cacert, delay):
             if delay:
-                await asyncio.sleep(delay)
+                await jasyncio.sleep(delay)
             return await self._open(endpoint, cacert)
 
         # Try all endpoints in parallel, with slight increasing delay (+100ms
         # for each subsequent endpoint); the delay allows us to prefer the
         # earlier endpoints over the latter. Use first successful connection.
-        tasks = [self.loop.create_task(_try_endpoint(endpoint, cacert,
-                                                     0.1 * i))
+        tasks = [jasyncio.ensure_future(_try_endpoint(endpoint, cacert,
+                                                      0.1 * i))
                  for i, (endpoint, cacert) in enumerate(endpoints)]
         for attempt in range(self._retries + 1):
-            for task in asyncio.as_completed(tasks, loop=self.loop):
+            for task in jasyncio.as_completed(tasks):
                 try:
                     result = await task
                     break
@@ -480,7 +790,7 @@ class Connection:
                               'attempt {} of {}'.format(_endpoints_str,
                                                         attempt + 1,
                                                         self._retries + 1))
-                    await asyncio.sleep((attempt + 1) * self._retry_backoff)
+                    await jasyncio.sleep((attempt + 1) * self._retry_backoff)
                     continue
                 else:
                     raise errors.JujuConnectionError(
@@ -491,11 +801,21 @@ class Connection:
             break
         for task in tasks:
             task.cancel()
-        self.ws = result[0]
+        self._ws = result[0]
         self.addr = result[1]
         self.endpoint = result[2]
         self.cacert = result[3]
-        self._receiver_task.start()
+
+        #  If this is a debug-log connection, and the _debug_log_task
+        #  is not created yet, then go ahead and schedule it
+        if self.is_debug_log_connection and not self._debug_log_task:
+            self._debug_log_task = jasyncio.create_task(self._debug_logger())
+
+        #  If this is regular connection, and we dont have a
+        #  receiver_task yet, then schedule a _receiver_task
+        elif not self.is_debug_log_connection and not self._receiver_task:
+            self._receiver_task = jasyncio.create_task(self._receiver())
+
         log.debug("Driver connected to juju %s", self.addr)
         self.monitor.close_called.clear()
 
@@ -548,15 +868,52 @@ class Connection:
                 raise
             login_result = await self._connect_with_login(e.endpoints)
         self._build_facades(login_result.get('facades', {}))
-        self._pinger_task.start()
+        if not self._pinger_task:
+            self._pinger_task = jasyncio.create_task(self._pinger())
 
     def _build_facades(self, facades):
         self.facades.clear()
         for facade in facades:
-            self.facades[facade['name']] = facade['versions'][-1]
+            name = facade['name']
+            # the following attempts to get the best facade version for the
+            # client. The client knows about the best facade versions it speaks,
+            # so in order to be compatible forwards and backwards we speak a
+            # common facade versions.
+            if (name not in client_facades) and (name not in self.specified_facades):
+                # if a facade is required but the client doesn't know about
+                # it, then log a warning.
+                log.warning('unknown facade {}'.format(name))
+
+            try:
+                known = []
+                # allow the ability to specify a set of facade versions, so the
+                # client can define the non-conservitive facade client pinning.
+                if name in self.specified_facades:
+                    known = self.specified_facades[name]['versions']
+                elif name in client_facades:
+                    known = client_facades[name]['versions']
+                else:
+                    raise errors.JujuConnectionError("unexpected facade {}".format(name))
+                discovered = facade['versions']
+                version = max(set(known).intersection(set(discovered)))
+            except ValueError:
+                # this can occur if known is [1, 2] and discovered is [3, 4]
+                # there is just no way to know how to communicate with the
+                # facades we're trying to call.
+                log.warning("unknown common facade version for {}".format(name))
+            except errors.JujuConnectionError:
+                # If the facade isn't with in the local facades then it's not
+                # possible to reason about what version should be used. In this
+                # case we should log the facade was found, but we couldn't
+                # handle it.
+                log.warning("unexpected facade {} found, unable to decipher version to use".format(name))
+            else:
+                self.facades[name] = version
 
     async def login(self):
         params = {}
+        # Set the client version
+        params['client-version'] = TARGET_JUJU_VERSION
         params['auth-tag'] = self.usertag
         if self.password:
             params['credentials'] = self.password
@@ -595,23 +952,6 @@ class Connection:
                 "version": 3,
             }))['response']
             raise errors.JujuRedirectException(redirect_info, True) from e
-
-
-class _Task:
-    def __init__(self, task, loop):
-        self.stopped = asyncio.Event(loop=loop)
-        self.stopped.set()
-        self.task = task
-        self.loop = loop
-
-    def start(self):
-        async def run():
-            try:
-                return await self.task()
-            finally:
-                self.stopped.set()
-        self.stopped.clear()
-        self.loop.create_task(run())
 
 
 def _macaroons_for_domain(cookies, domain):

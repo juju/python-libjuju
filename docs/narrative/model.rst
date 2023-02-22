@@ -110,8 +110,9 @@ py:method:`juju.controller.Controller.destroy_model` for more info.
   # Do stuff with our model...
 
   # Destroy the model
+  model_uuid = model.info.uuid
   await model.disconnect()
-  await controller.destroy_model(model.info.uuid)
+  await controller.destroy_model(model_uuid)
   model = None
 
 

@@ -7,17 +7,18 @@ This example:
 4. Runs forever (kill with Ctrl-C)
 
 """
-import asyncio
 import logging
 
-from juju.client.connection import Connection
+from juju import jasyncio
 from juju.client import client
-from juju import loop
+from juju.model import Model
 
 
 async def watch():
-    conn = await Connection.connect()
-    allwatcher = client.AllWatcherFacade.from_connection(conn)
+    model = Model()
+    await model.connect()
+
+    allwatcher = client.AllWatcherFacade.from_connection(model.connection())
     while True:
         change = await allwatcher.Next()
         for delta in change.deltas:
@@ -26,6 +27,8 @@ async def watch():
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
+    ws_logger = logging.getLogger('websockets.protocol')
+    ws_logger.setLevel(logging.INFO)
     # Run loop until the process is manually stopped (watch will loop
     # forever).
-    loop.run(watch())
+    jasyncio.run(watch())

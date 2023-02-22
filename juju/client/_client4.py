@@ -5,263 +5,219 @@ from juju.client.facade import Type, ReturnMapping
 from juju.client._definitions import *
 
 
-class ApplicationFacade(Type):
-    name = 'Application'
+class AllModelWatcherFacade(Type):
+    name = 'AllModelWatcher'
     version = 4
-    schema =     {'definitions': {'AddApplicationUnits': {'additionalProperties': False,
-                                             'properties': {'application': {'type': 'string'},
-                                                            'num-units': {'type': 'integer'},
-                                                            'placement': {'items': {'$ref': '#/definitions/Placement'},
-                                                                          'type': 'array'}},
-                                             'required': ['application',
-                                                          'num-units',
-                                                          'placement'],
-                                             'type': 'object'},
-                     'AddApplicationUnitsResults': {'additionalProperties': False,
-                                                    'properties': {'units': {'items': {'type': 'string'},
-                                                                             'type': 'array'}},
-                                                    'required': ['units'],
-                                                    'type': 'object'},
-                     'AddRelation': {'additionalProperties': False,
-                                     'properties': {'endpoints': {'items': {'type': 'string'},
-                                                                  'type': 'array'}},
-                                     'required': ['endpoints'],
-                                     'type': 'object'},
-                     'AddRelationResults': {'additionalProperties': False,
-                                            'properties': {'endpoints': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmRelation'}},
-                                                                         'type': 'object'}},
-                                            'required': ['endpoints'],
-                                            'type': 'object'},
-                     'ApplicationCharmRelations': {'additionalProperties': False,
-                                                   'properties': {'application': {'type': 'string'}},
-                                                   'required': ['application'],
-                                                   'type': 'object'},
-                     'ApplicationCharmRelationsResults': {'additionalProperties': False,
-                                                          'properties': {'charm-relations': {'items': {'type': 'string'},
-                                                                                             'type': 'array'}},
-                                                          'required': ['charm-relations'],
-                                                          'type': 'object'},
-                     'ApplicationDeploy': {'additionalProperties': False,
-                                           'properties': {'application': {'type': 'string'},
-                                                          'channel': {'type': 'string'},
-                                                          'charm-url': {'type': 'string'},
-                                                          'config': {'patternProperties': {'.*': {'type': 'string'}},
-                                                                     'type': 'object'},
-                                                          'config-yaml': {'type': 'string'},
-                                                          'constraints': {'$ref': '#/definitions/Value'},
-                                                          'endpoint-bindings': {'patternProperties': {'.*': {'type': 'string'}},
-                                                                                'type': 'object'},
-                                                          'num-units': {'type': 'integer'},
-                                                          'placement': {'items': {'$ref': '#/definitions/Placement'},
-                                                                        'type': 'array'},
-                                                          'resources': {'patternProperties': {'.*': {'type': 'string'}},
-                                                                        'type': 'object'},
-                                                          'series': {'type': 'string'},
-                                                          'storage': {'patternProperties': {'.*': {'$ref': '#/definitions/Constraints'}},
-                                                                      'type': 'object'}},
-                                           'required': ['application',
-                                                        'series',
-                                                        'charm-url',
-                                                        'channel',
-                                                        'num-units',
-                                                        'config-yaml',
-                                                        'constraints'],
-                                           'type': 'object'},
-                     'ApplicationDestroy': {'additionalProperties': False,
-                                            'properties': {'application': {'type': 'string'}},
-                                            'required': ['application'],
-                                            'type': 'object'},
-                     'ApplicationExpose': {'additionalProperties': False,
-                                           'properties': {'application': {'type': 'string'}},
-                                           'required': ['application'],
-                                           'type': 'object'},
-                     'ApplicationGet': {'additionalProperties': False,
-                                        'properties': {'application': {'type': 'string'}},
-                                        'required': ['application'],
-                                        'type': 'object'},
-                     'ApplicationGetResults': {'additionalProperties': False,
-                                               'properties': {'application': {'type': 'string'},
-                                                              'charm': {'type': 'string'},
-                                                              'config': {'patternProperties': {'.*': {'additionalProperties': True,
-                                                                                                      'type': 'object'}},
-                                                                         'type': 'object'},
-                                                              'constraints': {'$ref': '#/definitions/Value'},
-                                                              'series': {'type': 'string'}},
-                                               'required': ['application',
-                                                            'charm',
-                                                            'config',
-                                                            'constraints',
-                                                            'series'],
+    schema =     {'definitions': {'AllWatcherNextResults': {'additionalProperties': False,
+                                               'properties': {'deltas': {'items': {'$ref': '#/definitions/Delta'},
+                                                                         'type': 'array'}},
+                                               'required': ['deltas'],
                                                'type': 'object'},
-                     'ApplicationMetricCredential': {'additionalProperties': False,
-                                                     'properties': {'application': {'type': 'string'},
-                                                                    'metrics-credentials': {'items': {'type': 'integer'},
-                                                                                            'type': 'array'}},
-                                                     'required': ['application',
-                                                                  'metrics-credentials'],
-                                                     'type': 'object'},
-                     'ApplicationMetricCredentials': {'additionalProperties': False,
-                                                      'properties': {'creds': {'items': {'$ref': '#/definitions/ApplicationMetricCredential'},
-                                                                               'type': 'array'}},
-                                                      'required': ['creds'],
-                                                      'type': 'object'},
-                     'ApplicationSet': {'additionalProperties': False,
-                                        'properties': {'application': {'type': 'string'},
-                                                       'options': {'patternProperties': {'.*': {'type': 'string'}},
-                                                                   'type': 'object'}},
-                                        'required': ['application', 'options'],
-                                        'type': 'object'},
-                     'ApplicationSetCharm': {'additionalProperties': False,
-                                             'properties': {'application': {'type': 'string'},
-                                                            'channel': {'type': 'string'},
-                                                            'charm-url': {'type': 'string'},
-                                                            'config-settings': {'patternProperties': {'.*': {'type': 'string'}},
-                                                                                'type': 'object'},
-                                                            'config-settings-yaml': {'type': 'string'},
-                                                            'force-series': {'type': 'boolean'},
-                                                            'force-units': {'type': 'boolean'},
-                                                            'resource-ids': {'patternProperties': {'.*': {'type': 'string'}},
-                                                                             'type': 'object'},
-                                                            'storage-constraints': {'patternProperties': {'.*': {'$ref': '#/definitions/StorageConstraints'}},
-                                                                                    'type': 'object'}},
-                                             'required': ['application',
-                                                          'charm-url',
-                                                          'channel',
-                                                          'force-units',
-                                                          'force-series'],
+                     'Delta': {'additionalProperties': False,
+                               'properties': {'entity': {'additionalProperties': True,
+                                                         'type': 'object'},
+                                              'removed': {'type': 'boolean'}},
+                               'required': ['removed', 'entity'],
+                               'type': 'object'}},
+     'properties': {'Next': {'description': 'Next will return the current state of '
+                                            'everything on the first call\n'
+                                            'and subsequent calls will',
+                             'properties': {'Result': {'$ref': '#/definitions/AllWatcherNextResults'}},
+                             'type': 'object'},
+                    'Stop': {'description': 'Stop stops the watcher.',
+                             'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(AllWatcherNextResults)
+    async def Next(self):
+        '''
+        Next will return the current state of everything on the first call
+        and subsequent calls will
+
+
+        Returns -> AllWatcherNextResults
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='AllModelWatcher',
+                   request='Next',
+                   version=4,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def Stop(self):
+        '''
+        Stop stops the watcher.
+
+
+        Returns -> None
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='AllModelWatcher',
+                   request='Stop',
+                   version=4,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    async def rpc(self, msg):
+        '''
+        Patch rpc method to add Id.
+        '''
+        if not hasattr(self, 'Id'):
+            raise RuntimeError('Missing "Id" field')
+        msg['Id'] = id
+
+        from .facade import TypeEncoder
+        reply = await self.connection.rpc(msg, encoder=TypeEncoder)
+        return reply
+
+
+
+class ApplicationOffersFacade(Type):
+    name = 'ApplicationOffers'
+    version = 4
+    schema =     {'definitions': {'AddApplicationOffer': {'additionalProperties': False,
+                                             'properties': {'application-description': {'type': 'string'},
+                                                            'application-name': {'type': 'string'},
+                                                            'endpoints': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                          'type': 'object'},
+                                                            'model-tag': {'type': 'string'},
+                                                            'offer-name': {'type': 'string'},
+                                                            'owner-tag': {'type': 'string'}},
+                                             'required': ['model-tag',
+                                                          'offer-name',
+                                                          'application-name',
+                                                          'application-description',
+                                                          'endpoints'],
                                              'type': 'object'},
-                     'ApplicationURLs': {'additionalProperties': False,
-                                         'properties': {'application-urls': {'items': {'type': 'string'},
-                                                                             'type': 'array'}},
-                                         'type': 'object'},
-                     'ApplicationUnexpose': {'additionalProperties': False,
-                                             'properties': {'application': {'type': 'string'}},
-                                             'required': ['application'],
-                                             'type': 'object'},
-                     'ApplicationUnset': {'additionalProperties': False,
-                                          'properties': {'application': {'type': 'string'},
-                                                         'options': {'items': {'type': 'string'},
-                                                                     'type': 'array'}},
-                                          'required': ['application', 'options'],
-                                          'type': 'object'},
-                     'ApplicationUpdate': {'additionalProperties': False,
-                                           'properties': {'application': {'type': 'string'},
-                                                          'charm-url': {'type': 'string'},
-                                                          'constraints': {'$ref': '#/definitions/Value'},
-                                                          'force-charm-url': {'type': 'boolean'},
-                                                          'force-series': {'type': 'boolean'},
-                                                          'min-units': {'type': 'integer'},
-                                                          'settings': {'patternProperties': {'.*': {'type': 'string'}},
-                                                                       'type': 'object'},
-                                                          'settings-yaml': {'type': 'string'}},
-                                           'required': ['application',
-                                                        'charm-url',
-                                                        'force-charm-url',
-                                                        'force-series',
-                                                        'settings-yaml'],
-                                           'type': 'object'},
-                     'ApplicationsDeploy': {'additionalProperties': False,
-                                            'properties': {'applications': {'items': {'$ref': '#/definitions/ApplicationDeploy'},
-                                                                            'type': 'array'}},
-                                            'required': ['applications'],
-                                            'type': 'object'},
-                     'CharmRelation': {'additionalProperties': False,
-                                       'properties': {'interface': {'type': 'string'},
-                                                      'limit': {'type': 'integer'},
-                                                      'name': {'type': 'string'},
-                                                      'optional': {'type': 'boolean'},
-                                                      'role': {'type': 'string'},
-                                                      'scope': {'type': 'string'}},
-                                       'required': ['name',
-                                                    'role',
-                                                    'interface',
-                                                    'optional',
-                                                    'limit',
-                                                    'scope'],
-                                       'type': 'object'},
-                     'Constraints': {'additionalProperties': False,
-                                     'properties': {'Count': {'type': 'integer'},
-                                                    'Pool': {'type': 'string'},
-                                                    'Size': {'type': 'integer'}},
-                                     'required': ['Pool', 'Size', 'Count'],
-                                     'type': 'object'},
-                     'ConsumeApplicationArg': {'additionalProperties': False,
-                                               'properties': {'application-alias': {'type': 'string'},
-                                                              'application-url': {'type': 'string'}},
-                                               'required': ['application-url'],
-                                               'type': 'object'},
-                     'ConsumeApplicationArgs': {'additionalProperties': False,
-                                                'properties': {'args': {'items': {'$ref': '#/definitions/ConsumeApplicationArg'},
+                     'AddApplicationOffers': {'additionalProperties': False,
+                                              'properties': {'Offers': {'items': {'$ref': '#/definitions/AddApplicationOffer'},
                                                                         'type': 'array'}},
-                                                'type': 'object'},
-                     'ConsumeApplicationResult': {'additionalProperties': False,
-                                                  'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                                 'local-name': {'type': 'string'}},
-                                                  'type': 'object'},
-                     'ConsumeApplicationResults': {'additionalProperties': False,
-                                                   'properties': {'results': {'items': {'$ref': '#/definitions/ConsumeApplicationResult'},
-                                                                              'type': 'array'}},
-                                                   'required': ['results'],
-                                                   'type': 'object'},
-                     'DestroyApplicationInfo': {'additionalProperties': False,
-                                                'properties': {'destroyed-storage': {'items': {'$ref': '#/definitions/Entity'},
+                                              'required': ['Offers'],
+                                              'type': 'object'},
+                     'ApplicationOfferAdminDetails': {'additionalProperties': False,
+                                                      'properties': {'ApplicationOfferDetails': {'$ref': '#/definitions/ApplicationOfferDetails'},
+                                                                     'application-description': {'type': 'string'},
+                                                                     'application-name': {'type': 'string'},
+                                                                     'bindings': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                                  'type': 'object'},
+                                                                     'charm-url': {'type': 'string'},
+                                                                     'connections': {'items': {'$ref': '#/definitions/OfferConnection'},
                                                                                      'type': 'array'},
-                                                               'destroyed-units': {'items': {'$ref': '#/definitions/Entity'},
+                                                                     'endpoints': {'items': {'$ref': '#/definitions/RemoteEndpoint'},
                                                                                    'type': 'array'},
-                                                               'detached-storage': {'items': {'$ref': '#/definitions/Entity'},
-                                                                                    'type': 'array'}},
-                                                'type': 'object'},
-                     'DestroyApplicationResult': {'additionalProperties': False,
-                                                  'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                                 'info': {'$ref': '#/definitions/DestroyApplicationInfo'}},
-                                                  'type': 'object'},
-                     'DestroyApplicationResults': {'additionalProperties': False,
-                                                   'properties': {'results': {'items': {'$ref': '#/definitions/DestroyApplicationResult'},
-                                                                              'type': 'array'}},
-                                                   'type': 'object'},
-                     'DestroyApplicationUnits': {'additionalProperties': False,
-                                                 'properties': {'unit-names': {'items': {'type': 'string'},
+                                                                     'offer-name': {'type': 'string'},
+                                                                     'offer-url': {'type': 'string'},
+                                                                     'offer-uuid': {'type': 'string'},
+                                                                     'source-model-tag': {'type': 'string'},
+                                                                     'spaces': {'items': {'$ref': '#/definitions/RemoteSpace'},
+                                                                                'type': 'array'},
+                                                                     'users': {'items': {'$ref': '#/definitions/OfferUserDetails'},
                                                                                'type': 'array'}},
-                                                 'required': ['unit-names'],
-                                                 'type': 'object'},
-                     'DestroyRelation': {'additionalProperties': False,
-                                         'properties': {'endpoints': {'items': {'type': 'string'},
-                                                                      'type': 'array'}},
-                                         'required': ['endpoints'],
-                                         'type': 'object'},
-                     'DestroyUnitInfo': {'additionalProperties': False,
-                                         'properties': {'destroyed-storage': {'items': {'$ref': '#/definitions/Entity'},
+                                                      'required': ['source-model-tag',
+                                                                   'offer-uuid',
+                                                                   'offer-url',
+                                                                   'offer-name',
+                                                                   'application-description',
+                                                                   'ApplicationOfferDetails',
+                                                                   'application-name',
+                                                                   'charm-url'],
+                                                      'type': 'object'},
+                     'ApplicationOfferDetails': {'additionalProperties': False,
+                                                 'properties': {'application-description': {'type': 'string'},
+                                                                'bindings': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                             'type': 'object'},
+                                                                'endpoints': {'items': {'$ref': '#/definitions/RemoteEndpoint'},
                                                                               'type': 'array'},
-                                                        'detached-storage': {'items': {'$ref': '#/definitions/Entity'},
+                                                                'offer-name': {'type': 'string'},
+                                                                'offer-url': {'type': 'string'},
+                                                                'offer-uuid': {'type': 'string'},
+                                                                'source-model-tag': {'type': 'string'},
+                                                                'spaces': {'items': {'$ref': '#/definitions/RemoteSpace'},
+                                                                           'type': 'array'},
+                                                                'users': {'items': {'$ref': '#/definitions/OfferUserDetails'},
+                                                                          'type': 'array'}},
+                                                 'required': ['source-model-tag',
+                                                              'offer-uuid',
+                                                              'offer-url',
+                                                              'offer-name',
+                                                              'application-description'],
+                                                 'type': 'object'},
+                     'ApplicationOfferResult': {'additionalProperties': False,
+                                                'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                               'result': {'$ref': '#/definitions/ApplicationOfferAdminDetails'}},
+                                                'type': 'object'},
+                     'ApplicationOffersResults': {'additionalProperties': False,
+                                                  'properties': {'results': {'items': {'$ref': '#/definitions/ApplicationOfferResult'},
                                                                              'type': 'array'}},
-                                         'type': 'object'},
-                     'DestroyUnitResult': {'additionalProperties': False,
-                                           'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                          'info': {'$ref': '#/definitions/DestroyUnitInfo'}},
-                                           'type': 'object'},
-                     'DestroyUnitResults': {'additionalProperties': False,
-                                            'properties': {'results': {'items': {'$ref': '#/definitions/DestroyUnitResult'},
-                                                                       'type': 'array'}},
-                                            'type': 'object'},
-                     'Entities': {'additionalProperties': False,
-                                  'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
-                                                              'type': 'array'}},
-                                  'required': ['entities'],
-                                  'type': 'object'},
-                     'Entity': {'additionalProperties': False,
-                                'properties': {'tag': {'type': 'string'}},
-                                'required': ['tag'],
-                                'type': 'object'},
+                                                  'type': 'object'},
+                     'ConsumeOfferDetails': {'additionalProperties': False,
+                                             'properties': {'external-controller': {'$ref': '#/definitions/ExternalControllerInfo'},
+                                                            'macaroon': {'$ref': '#/definitions/Macaroon'},
+                                                            'offer': {'$ref': '#/definitions/ApplicationOfferDetails'}},
+                                             'type': 'object'},
+                     'ConsumeOfferDetailsArg': {'additionalProperties': False,
+                                                'properties': {'offer-urls': {'$ref': '#/definitions/OfferURLs'},
+                                                               'user-tag': {'type': 'string'}},
+                                                'required': ['offer-urls'],
+                                                'type': 'object'},
+                     'ConsumeOfferDetailsResult': {'additionalProperties': False,
+                                                   'properties': {'ConsumeOfferDetails': {'$ref': '#/definitions/ConsumeOfferDetails'},
+                                                                  'error': {'$ref': '#/definitions/Error'},
+                                                                  'external-controller': {'$ref': '#/definitions/ExternalControllerInfo'},
+                                                                  'macaroon': {'$ref': '#/definitions/Macaroon'},
+                                                                  'offer': {'$ref': '#/definitions/ApplicationOfferDetails'}},
+                                                   'required': ['ConsumeOfferDetails'],
+                                                   'type': 'object'},
+                     'ConsumeOfferDetailsResults': {'additionalProperties': False,
+                                                    'properties': {'results': {'items': {'$ref': '#/definitions/ConsumeOfferDetailsResult'},
+                                                                               'type': 'array'}},
+                                                    'type': 'object'},
+                     'DestroyApplicationOffers': {'additionalProperties': False,
+                                                  'properties': {'force': {'type': 'boolean'},
+                                                                 'offer-urls': {'items': {'type': 'string'},
+                                                                                'type': 'array'}},
+                                                  'required': ['offer-urls'],
+                                                  'type': 'object'},
+                     'EndpointFilterAttributes': {'additionalProperties': False,
+                                                  'properties': {'interface': {'type': 'string'},
+                                                                 'name': {'type': 'string'},
+                                                                 'role': {'type': 'string'}},
+                                                  'required': ['role',
+                                                               'interface',
+                                                               'name'],
+                                                  'type': 'object'},
+                     'EntityStatus': {'additionalProperties': False,
+                                      'properties': {'data': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                           'type': 'object'}},
+                                                              'type': 'object'},
+                                                     'info': {'type': 'string'},
+                                                     'since': {'format': 'date-time',
+                                                               'type': 'string'},
+                                                     'status': {'type': 'string'}},
+                                      'required': ['status', 'info', 'since'],
+                                      'type': 'object'},
                      'Error': {'additionalProperties': False,
                                'properties': {'code': {'type': 'string'},
-                                              'info': {'$ref': '#/definitions/ErrorInfo'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
                                               'message': {'type': 'string'}},
                                'required': ['message', 'code'],
                                'type': 'object'},
-                     'ErrorInfo': {'additionalProperties': False,
-                                   'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
-                                                  'macaroon-path': {'type': 'string'}},
-                                   'type': 'object'},
                      'ErrorResult': {'additionalProperties': False,
                                      'properties': {'error': {'$ref': '#/definitions/Error'}},
                                      'type': 'object'},
@@ -270,33 +226,107 @@ class ApplicationFacade(Type):
                                                                  'type': 'array'}},
                                       'required': ['results'],
                                       'type': 'object'},
-                     'GetApplicationConstraints': {'additionalProperties': False,
-                                                   'properties': {'application': {'type': 'string'}},
-                                                   'required': ['application'],
-                                                   'type': 'object'},
-                     'GetConstraintsResults': {'additionalProperties': False,
-                                               'properties': {'constraints': {'$ref': '#/definitions/Value'}},
-                                               'required': ['constraints'],
-                                               'type': 'object'},
+                     'ExternalControllerInfo': {'additionalProperties': False,
+                                                'properties': {'addrs': {'items': {'type': 'string'},
+                                                                         'type': 'array'},
+                                                               'ca-cert': {'type': 'string'},
+                                                               'controller-alias': {'type': 'string'},
+                                                               'controller-tag': {'type': 'string'}},
+                                                'required': ['controller-tag',
+                                                             'controller-alias',
+                                                             'addrs',
+                                                             'ca-cert'],
+                                                'type': 'object'},
                      'Macaroon': {'additionalProperties': False, 'type': 'object'},
-                     'Placement': {'additionalProperties': False,
-                                   'properties': {'directive': {'type': 'string'},
-                                                  'scope': {'type': 'string'}},
-                                   'required': ['scope', 'directive'],
+                     'ModifyOfferAccess': {'additionalProperties': False,
+                                           'properties': {'access': {'type': 'string'},
+                                                          'action': {'type': 'string'},
+                                                          'offer-url': {'type': 'string'},
+                                                          'user-tag': {'type': 'string'}},
+                                           'required': ['user-tag',
+                                                        'action',
+                                                        'access',
+                                                        'offer-url'],
+                                           'type': 'object'},
+                     'ModifyOfferAccessRequest': {'additionalProperties': False,
+                                                  'properties': {'changes': {'items': {'$ref': '#/definitions/ModifyOfferAccess'},
+                                                                             'type': 'array'}},
+                                                  'required': ['changes'],
+                                                  'type': 'object'},
+                     'OfferConnection': {'additionalProperties': False,
+                                         'properties': {'endpoint': {'type': 'string'},
+                                                        'ingress-subnets': {'items': {'type': 'string'},
+                                                                            'type': 'array'},
+                                                        'relation-id': {'type': 'integer'},
+                                                        'source-model-tag': {'type': 'string'},
+                                                        'status': {'$ref': '#/definitions/EntityStatus'},
+                                                        'username': {'type': 'string'}},
+                                         'required': ['source-model-tag',
+                                                      'relation-id',
+                                                      'username',
+                                                      'endpoint',
+                                                      'status',
+                                                      'ingress-subnets'],
+                                         'type': 'object'},
+                     'OfferFilter': {'additionalProperties': False,
+                                     'properties': {'allowed-users': {'items': {'type': 'string'},
+                                                                      'type': 'array'},
+                                                    'application-description': {'type': 'string'},
+                                                    'application-name': {'type': 'string'},
+                                                    'application-user': {'type': 'string'},
+                                                    'connected-users': {'items': {'type': 'string'},
+                                                                        'type': 'array'},
+                                                    'endpoints': {'items': {'$ref': '#/definitions/EndpointFilterAttributes'},
+                                                                  'type': 'array'},
+                                                    'model-name': {'type': 'string'},
+                                                    'offer-name': {'type': 'string'},
+                                                    'owner-name': {'type': 'string'}},
+                                     'required': ['owner-name',
+                                                  'model-name',
+                                                  'offer-name',
+                                                  'application-name',
+                                                  'application-description',
+                                                  'application-user',
+                                                  'endpoints',
+                                                  'connected-users',
+                                                  'allowed-users'],
+                                     'type': 'object'},
+                     'OfferFilters': {'additionalProperties': False,
+                                      'properties': {'Filters': {'items': {'$ref': '#/definitions/OfferFilter'},
+                                                                 'type': 'array'}},
+                                      'required': ['Filters'],
+                                      'type': 'object'},
+                     'OfferURLs': {'additionalProperties': False,
+                                   'properties': {'bakery-version': {'type': 'integer'},
+                                                  'offer-urls': {'items': {'type': 'string'},
+                                                                 'type': 'array'}},
                                    'type': 'object'},
+                     'OfferUserDetails': {'additionalProperties': False,
+                                          'properties': {'access': {'type': 'string'},
+                                                         'display-name': {'type': 'string'},
+                                                         'user': {'type': 'string'}},
+                                          'required': ['user',
+                                                       'display-name',
+                                                       'access'],
+                                          'type': 'object'},
+                     'QueryApplicationOffersResults': {'additionalProperties': False,
+                                                       'properties': {'results': {'items': {'$ref': '#/definitions/ApplicationOfferAdminDetails'},
+                                                                                  'type': 'array'}},
+                                                       'required': ['results'],
+                                                       'type': 'object'},
                      'RemoteApplicationInfo': {'additionalProperties': False,
-                                               'properties': {'application-url': {'type': 'string'},
-                                                              'description': {'type': 'string'},
+                                               'properties': {'description': {'type': 'string'},
                                                               'endpoints': {'items': {'$ref': '#/definitions/RemoteEndpoint'},
                                                                             'type': 'array'},
                                                               'icon-url-path': {'type': 'string'},
                                                               'model-tag': {'type': 'string'},
                                                               'name': {'type': 'string'},
+                                                              'offer-url': {'type': 'string'},
                                                               'source-model-label': {'type': 'string'}},
                                                'required': ['model-tag',
                                                             'name',
                                                             'description',
-                                                            'application-url',
+                                                            'offer-url',
                                                             'endpoints',
                                                             'icon-url-path'],
                                                'type': 'object'},
@@ -313,560 +343,350 @@ class ApplicationFacade(Type):
                                         'properties': {'interface': {'type': 'string'},
                                                        'limit': {'type': 'integer'},
                                                        'name': {'type': 'string'},
-                                                       'role': {'type': 'string'},
-                                                       'scope': {'type': 'string'}},
+                                                       'role': {'type': 'string'}},
                                         'required': ['name',
                                                      'role',
                                                      'interface',
-                                                     'limit',
-                                                     'scope'],
+                                                     'limit'],
                                         'type': 'object'},
-                     'SetConstraints': {'additionalProperties': False,
-                                        'properties': {'application': {'type': 'string'},
-                                                       'constraints': {'$ref': '#/definitions/Value'}},
-                                        'required': ['application', 'constraints'],
-                                        'type': 'object'},
-                     'StorageConstraints': {'additionalProperties': False,
-                                            'properties': {'count': {'type': 'integer'},
-                                                           'pool': {'type': 'string'},
-                                                           'size': {'type': 'integer'}},
-                                            'type': 'object'},
-                     'StringResult': {'additionalProperties': False,
-                                      'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                     'result': {'type': 'string'}},
-                                      'required': ['result'],
-                                      'type': 'object'},
-                     'Value': {'additionalProperties': False,
-                               'properties': {'arch': {'type': 'string'},
-                                              'container': {'type': 'string'},
-                                              'cores': {'type': 'integer'},
-                                              'cpu-power': {'type': 'integer'},
-                                              'instance-type': {'type': 'string'},
-                                              'mem': {'type': 'integer'},
-                                              'root-disk': {'type': 'integer'},
-                                              'spaces': {'items': {'type': 'string'},
-                                                         'type': 'array'},
-                                              'tags': {'items': {'type': 'string'},
-                                                       'type': 'array'},
-                                              'virt-type': {'type': 'string'}},
-                               'type': 'object'}},
-     'properties': {'AddRelation': {'properties': {'Params': {'$ref': '#/definitions/AddRelation'},
-                                                   'Result': {'$ref': '#/definitions/AddRelationResults'}},
-                                    'type': 'object'},
-                    'AddUnits': {'properties': {'Params': {'$ref': '#/definitions/AddApplicationUnits'},
-                                                'Result': {'$ref': '#/definitions/AddApplicationUnitsResults'}},
-                                 'type': 'object'},
-                    'CharmRelations': {'properties': {'Params': {'$ref': '#/definitions/ApplicationCharmRelations'},
-                                                      'Result': {'$ref': '#/definitions/ApplicationCharmRelationsResults'}},
-                                       'type': 'object'},
-                    'Consume': {'properties': {'Params': {'$ref': '#/definitions/ConsumeApplicationArgs'},
-                                               'Result': {'$ref': '#/definitions/ConsumeApplicationResults'}},
-                                'type': 'object'},
-                    'Deploy': {'properties': {'Params': {'$ref': '#/definitions/ApplicationsDeploy'},
-                                              'Result': {'$ref': '#/definitions/ErrorResults'}},
-                               'type': 'object'},
-                    'Destroy': {'properties': {'Params': {'$ref': '#/definitions/ApplicationDestroy'}},
-                                'type': 'object'},
-                    'DestroyApplication': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                          'Result': {'$ref': '#/definitions/DestroyApplicationResults'}},
-                                           'type': 'object'},
-                    'DestroyRelation': {'properties': {'Params': {'$ref': '#/definitions/DestroyRelation'}},
-                                        'type': 'object'},
-                    'DestroyUnit': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                   'Result': {'$ref': '#/definitions/DestroyUnitResults'}},
-                                    'type': 'object'},
-                    'DestroyUnits': {'properties': {'Params': {'$ref': '#/definitions/DestroyApplicationUnits'}},
+                     'RemoteSpace': {'additionalProperties': False,
+                                     'properties': {'cloud-type': {'type': 'string'},
+                                                    'name': {'type': 'string'},
+                                                    'provider-attributes': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                         'type': 'object'}},
+                                                                            'type': 'object'},
+                                                    'provider-id': {'type': 'string'},
+                                                    'subnets': {'items': {'$ref': '#/definitions/Subnet'},
+                                                                'type': 'array'}},
+                                     'required': ['cloud-type',
+                                                  'name',
+                                                  'provider-id',
+                                                  'provider-attributes',
+                                                  'subnets'],
                                      'type': 'object'},
-                    'Expose': {'properties': {'Params': {'$ref': '#/definitions/ApplicationExpose'}},
-                               'type': 'object'},
-                    'Get': {'properties': {'Params': {'$ref': '#/definitions/ApplicationGet'},
-                                           'Result': {'$ref': '#/definitions/ApplicationGetResults'}},
-                            'type': 'object'},
-                    'GetCharmURL': {'properties': {'Params': {'$ref': '#/definitions/ApplicationGet'},
-                                                   'Result': {'$ref': '#/definitions/StringResult'}},
-                                    'type': 'object'},
-                    'GetConstraints': {'properties': {'Params': {'$ref': '#/definitions/GetApplicationConstraints'},
-                                                      'Result': {'$ref': '#/definitions/GetConstraintsResults'}},
-                                       'type': 'object'},
-                    'RemoteApplicationInfo': {'properties': {'Params': {'$ref': '#/definitions/ApplicationURLs'},
-                                                             'Result': {'$ref': '#/definitions/RemoteApplicationInfoResults'}},
+                     'Subnet': {'additionalProperties': False,
+                                'properties': {'cidr': {'type': 'string'},
+                                               'life': {'type': 'string'},
+                                               'provider-id': {'type': 'string'},
+                                               'provider-network-id': {'type': 'string'},
+                                               'provider-space-id': {'type': 'string'},
+                                               'space-tag': {'type': 'string'},
+                                               'status': {'type': 'string'},
+                                               'vlan-tag': {'type': 'integer'},
+                                               'zones': {'items': {'type': 'string'},
+                                                         'type': 'array'}},
+                                'required': ['cidr',
+                                             'vlan-tag',
+                                             'life',
+                                             'space-tag',
+                                             'zones'],
+                                'type': 'object'}},
+     'properties': {'ApplicationOffers': {'description': 'ApplicationOffers gets '
+                                                         'details about remote '
+                                                         'applications that match '
+                                                         'given URLs.',
+                                          'properties': {'Params': {'$ref': '#/definitions/OfferURLs'},
+                                                         'Result': {'$ref': '#/definitions/ApplicationOffersResults'}},
+                                          'type': 'object'},
+                    'DestroyOffers': {'description': 'DestroyOffers removes the '
+                                                     'offers specified by the '
+                                                     'given URLs, forcing if '
+                                                     'necessary.',
+                                      'properties': {'Params': {'$ref': '#/definitions/DestroyApplicationOffers'},
+                                                     'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                      'type': 'object'},
+                    'FindApplicationOffers': {'description': 'FindApplicationOffers '
+                                                             'gets details about '
+                                                             'remote applications '
+                                                             'that match given '
+                                                             'filter.',
+                                              'properties': {'Params': {'$ref': '#/definitions/OfferFilters'},
+                                                             'Result': {'$ref': '#/definitions/QueryApplicationOffersResults'}},
                                               'type': 'object'},
-                    'Set': {'properties': {'Params': {'$ref': '#/definitions/ApplicationSet'}},
-                            'type': 'object'},
-                    'SetCharm': {'properties': {'Params': {'$ref': '#/definitions/ApplicationSetCharm'}},
-                                 'type': 'object'},
-                    'SetConstraints': {'properties': {'Params': {'$ref': '#/definitions/SetConstraints'}},
-                                       'type': 'object'},
-                    'SetMetricCredentials': {'properties': {'Params': {'$ref': '#/definitions/ApplicationMetricCredentials'},
-                                                            'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                             'type': 'object'},
-                    'Unexpose': {'properties': {'Params': {'$ref': '#/definitions/ApplicationUnexpose'}},
-                                 'type': 'object'},
-                    'Unset': {'properties': {'Params': {'$ref': '#/definitions/ApplicationUnset'}},
+                    'GetConsumeDetails': {'description': 'GetConsumeDetails '
+                                                         'returns the details '
+                                                         'necessary to pass to '
+                                                         'another model\n'
+                                                         'to allow the specified '
+                                                         'args user to consume the '
+                                                         'offers represented by '
+                                                         'the args URLs.',
+                                          'properties': {'Params': {'$ref': '#/definitions/ConsumeOfferDetailsArg'},
+                                                         'Result': {'$ref': '#/definitions/ConsumeOfferDetailsResults'}},
+                                          'type': 'object'},
+                    'ListApplicationOffers': {'description': 'ListApplicationOffers '
+                                                             'gets deployed '
+                                                             'details about '
+                                                             'application offers '
+                                                             'that match given '
+                                                             'filter.\n'
+                                                             'The results contain '
+                                                             'details about the '
+                                                             'deployed '
+                                                             'applications such as '
+                                                             'connection count.',
+                                              'properties': {'Params': {'$ref': '#/definitions/OfferFilters'},
+                                                             'Result': {'$ref': '#/definitions/QueryApplicationOffersResults'}},
+                                              'type': 'object'},
+                    'ModifyOfferAccess': {'description': 'ModifyOfferAccess '
+                                                         'changes the application '
+                                                         'offer access granted to '
+                                                         'users.',
+                                          'properties': {'Params': {'$ref': '#/definitions/ModifyOfferAccessRequest'},
+                                                         'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                          'type': 'object'},
+                    'Offer': {'description': 'Offer makes application endpoints '
+                                             'available for consumption at a '
+                                             'specified URL.',
+                              'properties': {'Params': {'$ref': '#/definitions/AddApplicationOffers'},
+                                             'Result': {'$ref': '#/definitions/ErrorResults'}},
                               'type': 'object'},
-                    'Update': {'properties': {'Params': {'$ref': '#/definitions/ApplicationUpdate'}},
-                               'type': 'object'}},
+                    'RemoteApplicationInfo': {'description': 'RemoteApplicationInfo '
+                                                             'returns information '
+                                                             'about the requested '
+                                                             'remote application.\n'
+                                                             'This call currently '
+                                                             'has no client side '
+                                                             'API, only there for '
+                                                             'the Dashboard at '
+                                                             'this stage.',
+                                              'properties': {'Params': {'$ref': '#/definitions/OfferURLs'},
+                                                             'Result': {'$ref': '#/definitions/RemoteApplicationInfoResults'}},
+                                              'type': 'object'}},
      'type': 'object'}
     
 
-    @ReturnMapping(AddRelationResults)
-    async def AddRelation(self, endpoints):
+    @ReturnMapping(ApplicationOffersResults)
+    async def ApplicationOffers(self, bakery_version=None, offer_urls=None):
         '''
-        endpoints : typing.Sequence<+T_co>[str]
-        Returns -> typing.Mapping<~KT, +VT_co>[str, ~CharmRelation]<~CharmRelation>
+        ApplicationOffers gets details about remote applications that match given URLs.
+
+        bakery_version : int
+        offer_urls : typing.Sequence[str]
+        Returns -> ApplicationOffersResults
         '''
+        if bakery_version is not None and not isinstance(bakery_version, int):
+            raise Exception("Expected bakery_version to be a int, received: {}".format(type(bakery_version)))
+
+        if offer_urls is not None and not isinstance(offer_urls, (bytes, str, list)):
+            raise Exception("Expected offer_urls to be a Sequence, received: {}".format(type(offer_urls)))
+
         # map input types to rpc msg
         _params = dict()
-        msg = dict(type='Application',
-                   request='AddRelation',
+        msg = dict(type='ApplicationOffers',
+                   request='ApplicationOffers',
                    version=4,
                    params=_params)
-        _params['endpoints'] = endpoints
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(AddApplicationUnitsResults)
-    async def AddUnits(self, application, num_units, placement):
-        '''
-        application : str
-        num_units : int
-        placement : typing.Sequence<+T_co>[~Placement]<~Placement>
-        Returns -> typing.Sequence<+T_co>[str]
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Application',
-                   request='AddUnits',
-                   version=4,
-                   params=_params)
-        _params['application'] = application
-        _params['num-units'] = num_units
-        _params['placement'] = placement
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ApplicationCharmRelationsResults)
-    async def CharmRelations(self, application):
-        '''
-        application : str
-        Returns -> typing.Sequence<+T_co>[str]
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Application',
-                   request='CharmRelations',
-                   version=4,
-                   params=_params)
-        _params['application'] = application
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ConsumeApplicationResults)
-    async def Consume(self, args):
-        '''
-        args : typing.Sequence<+T_co>[~ConsumeApplicationArg]<~ConsumeApplicationArg>
-        Returns -> typing.Sequence<+T_co>[~ConsumeApplicationResult]<~ConsumeApplicationResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Application',
-                   request='Consume',
-                   version=4,
-                   params=_params)
-        _params['args'] = args
+        _params['bakery-version'] = bakery_version
+        _params['offer-urls'] = offer_urls
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def Deploy(self, applications):
+    async def DestroyOffers(self, force=None, offer_urls=None):
         '''
-        applications : typing.Sequence<+T_co>[~ApplicationDeploy]<~ApplicationDeploy>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        DestroyOffers removes the offers specified by the given URLs, forcing if necessary.
+
+        force : bool
+        offer_urls : typing.Sequence[str]
+        Returns -> ErrorResults
         '''
+        if force is not None and not isinstance(force, bool):
+            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
+
+        if offer_urls is not None and not isinstance(offer_urls, (bytes, str, list)):
+            raise Exception("Expected offer_urls to be a Sequence, received: {}".format(type(offer_urls)))
+
         # map input types to rpc msg
         _params = dict()
-        msg = dict(type='Application',
-                   request='Deploy',
+        msg = dict(type='ApplicationOffers',
+                   request='DestroyOffers',
                    version=4,
                    params=_params)
-        _params['applications'] = applications
+        _params['force'] = force
+        _params['offer-urls'] = offer_urls
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(None)
-    async def Destroy(self, application):
+    @ReturnMapping(QueryApplicationOffersResults)
+    async def FindApplicationOffers(self, filters=None):
         '''
-        application : str
-        Returns -> None
+        FindApplicationOffers gets details about remote applications that match given filter.
+
+        filters : typing.Sequence[~OfferFilter]
+        Returns -> QueryApplicationOffersResults
         '''
+        if filters is not None and not isinstance(filters, (bytes, str, list)):
+            raise Exception("Expected filters to be a Sequence, received: {}".format(type(filters)))
+
         # map input types to rpc msg
         _params = dict()
-        msg = dict(type='Application',
-                   request='Destroy',
+        msg = dict(type='ApplicationOffers',
+                   request='FindApplicationOffers',
                    version=4,
                    params=_params)
-        _params['application'] = application
+        _params['Filters'] = filters
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(DestroyApplicationResults)
-    async def DestroyApplication(self, entities):
+    @ReturnMapping(ConsumeOfferDetailsResults)
+    async def GetConsumeDetails(self, offer_urls=None, user_tag=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~DestroyApplicationResult]<~DestroyApplicationResult>
+        GetConsumeDetails returns the details necessary to pass to another model
+        to allow the specified args user to consume the offers represented by the args URLs.
+
+        offer_urls : OfferURLs
+        user_tag : str
+        Returns -> ConsumeOfferDetailsResults
         '''
+        if offer_urls is not None and not isinstance(offer_urls, (dict, OfferURLs)):
+            raise Exception("Expected offer_urls to be a OfferURLs, received: {}".format(type(offer_urls)))
+
+        if user_tag is not None and not isinstance(user_tag, (bytes, str)):
+            raise Exception("Expected user_tag to be a str, received: {}".format(type(user_tag)))
+
         # map input types to rpc msg
         _params = dict()
-        msg = dict(type='Application',
-                   request='DestroyApplication',
+        msg = dict(type='ApplicationOffers',
+                   request='GetConsumeDetails',
                    version=4,
                    params=_params)
-        _params['entities'] = entities
+        _params['offer-urls'] = offer_urls
+        _params['user-tag'] = user_tag
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(None)
-    async def DestroyRelation(self, endpoints):
+    @ReturnMapping(QueryApplicationOffersResults)
+    async def ListApplicationOffers(self, filters=None):
         '''
-        endpoints : typing.Sequence<+T_co>[str]
-        Returns -> None
+        ListApplicationOffers gets deployed details about application offers that match given filter.
+        The results contain details about the deployed applications such as connection count.
+
+        filters : typing.Sequence[~OfferFilter]
+        Returns -> QueryApplicationOffersResults
         '''
+        if filters is not None and not isinstance(filters, (bytes, str, list)):
+            raise Exception("Expected filters to be a Sequence, received: {}".format(type(filters)))
+
         # map input types to rpc msg
         _params = dict()
-        msg = dict(type='Application',
-                   request='DestroyRelation',
+        msg = dict(type='ApplicationOffers',
+                   request='ListApplicationOffers',
                    version=4,
                    params=_params)
-        _params['endpoints'] = endpoints
+        _params['Filters'] = filters
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(DestroyUnitResults)
-    async def DestroyUnit(self, entities):
+    @ReturnMapping(ErrorResults)
+    async def ModifyOfferAccess(self, changes=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~DestroyUnitResult]<~DestroyUnitResult>
+        ModifyOfferAccess changes the application offer access granted to users.
+
+        changes : typing.Sequence[~ModifyOfferAccess]
+        Returns -> ErrorResults
         '''
+        if changes is not None and not isinstance(changes, (bytes, str, list)):
+            raise Exception("Expected changes to be a Sequence, received: {}".format(type(changes)))
+
         # map input types to rpc msg
         _params = dict()
-        msg = dict(type='Application',
-                   request='DestroyUnit',
+        msg = dict(type='ApplicationOffers',
+                   request='ModifyOfferAccess',
                    version=4,
                    params=_params)
-        _params['entities'] = entities
+        _params['changes'] = changes
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(None)
-    async def DestroyUnits(self, unit_names):
+    @ReturnMapping(ErrorResults)
+    async def Offer(self, offers=None):
         '''
-        unit_names : typing.Sequence<+T_co>[str]
-        Returns -> None
+        Offer makes application endpoints available for consumption at a specified URL.
+
+        offers : typing.Sequence[~AddApplicationOffer]
+        Returns -> ErrorResults
         '''
+        if offers is not None and not isinstance(offers, (bytes, str, list)):
+            raise Exception("Expected offers to be a Sequence, received: {}".format(type(offers)))
+
         # map input types to rpc msg
         _params = dict()
-        msg = dict(type='Application',
-                   request='DestroyUnits',
+        msg = dict(type='ApplicationOffers',
+                   request='Offer',
                    version=4,
                    params=_params)
-        _params['unit-names'] = unit_names
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(None)
-    async def Expose(self, application):
-        '''
-        application : str
-        Returns -> None
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Application',
-                   request='Expose',
-                   version=4,
-                   params=_params)
-        _params['application'] = application
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ApplicationGetResults)
-    async def Get(self, application):
-        '''
-        application : str
-        Returns -> typing.Union[str, typing.Mapping<~KT, +VT_co>[str, typing.Any], _ForwardRef('Value')]
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Application',
-                   request='Get',
-                   version=4,
-                   params=_params)
-        _params['application'] = application
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(StringResult)
-    async def GetCharmURL(self, application):
-        '''
-        application : str
-        Returns -> typing.Union[_ForwardRef('Error'), str]
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Application',
-                   request='GetCharmURL',
-                   version=4,
-                   params=_params)
-        _params['application'] = application
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(GetConstraintsResults)
-    async def GetConstraints(self, application):
-        '''
-        application : str
-        Returns -> Value
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Application',
-                   request='GetConstraints',
-                   version=4,
-                   params=_params)
-        _params['application'] = application
+        _params['Offers'] = offers
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(RemoteApplicationInfoResults)
-    async def RemoteApplicationInfo(self, application_urls):
+    async def RemoteApplicationInfo(self, bakery_version=None, offer_urls=None):
         '''
-        application_urls : typing.Sequence<+T_co>[str]
-        Returns -> typing.Sequence<+T_co>[~RemoteApplicationInfoResult]<~RemoteApplicationInfoResult>
+        RemoteApplicationInfo returns information about the requested remote application.
+        This call currently has no client side API, only there for the Dashboard at this stage.
+
+        bakery_version : int
+        offer_urls : typing.Sequence[str]
+        Returns -> RemoteApplicationInfoResults
         '''
+        if bakery_version is not None and not isinstance(bakery_version, int):
+            raise Exception("Expected bakery_version to be a int, received: {}".format(type(bakery_version)))
+
+        if offer_urls is not None and not isinstance(offer_urls, (bytes, str, list)):
+            raise Exception("Expected offer_urls to be a Sequence, received: {}".format(type(offer_urls)))
+
         # map input types to rpc msg
         _params = dict()
-        msg = dict(type='Application',
+        msg = dict(type='ApplicationOffers',
                    request='RemoteApplicationInfo',
                    version=4,
                    params=_params)
-        _params['application-urls'] = application_urls
+        _params['bakery-version'] = bakery_version
+        _params['offer-urls'] = offer_urls
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(None)
-    async def Set(self, application, options):
-        '''
-        application : str
-        options : typing.Mapping<~KT, +VT_co>[str, str]
-        Returns -> None
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Application',
-                   request='Set',
-                   version=4,
-                   params=_params)
-        _params['application'] = application
-        _params['options'] = options
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(None)
-    async def SetCharm(self, application, channel, charm_url, config_settings, config_settings_yaml, force_series, force_units, resource_ids, storage_constraints):
-        '''
-        application : str
-        channel : str
-        charm_url : str
-        config_settings : typing.Mapping<~KT, +VT_co>[str, str]
-        config_settings_yaml : str
-        force_series : bool
-        force_units : bool
-        resource_ids : typing.Mapping<~KT, +VT_co>[str, str]
-        storage_constraints : typing.Mapping<~KT, +VT_co>[str, ~StorageConstraints]<~StorageConstraints>
-        Returns -> None
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Application',
-                   request='SetCharm',
-                   version=4,
-                   params=_params)
-        _params['application'] = application
-        _params['channel'] = channel
-        _params['charm-url'] = charm_url
-        _params['config-settings'] = config_settings
-        _params['config-settings-yaml'] = config_settings_yaml
-        _params['force-series'] = force_series
-        _params['force-units'] = force_units
-        _params['resource-ids'] = resource_ids
-        _params['storage-constraints'] = storage_constraints
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(None)
-    async def SetConstraints(self, application, constraints):
-        '''
-        application : str
-        constraints : Value
-        Returns -> None
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Application',
-                   request='SetConstraints',
-                   version=4,
-                   params=_params)
-        _params['application'] = application
-        _params['constraints'] = constraints
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
-    async def SetMetricCredentials(self, creds):
-        '''
-        creds : typing.Sequence<+T_co>[~ApplicationMetricCredential]<~ApplicationMetricCredential>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Application',
-                   request='SetMetricCredentials',
-                   version=4,
-                   params=_params)
-        _params['creds'] = creds
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(None)
-    async def Unexpose(self, application):
-        '''
-        application : str
-        Returns -> None
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Application',
-                   request='Unexpose',
-                   version=4,
-                   params=_params)
-        _params['application'] = application
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(None)
-    async def Unset(self, application, options):
-        '''
-        application : str
-        options : typing.Sequence<+T_co>[str]
-        Returns -> None
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Application',
-                   request='Unset',
-                   version=4,
-                   params=_params)
-        _params['application'] = application
-        _params['options'] = options
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(None)
-    async def Update(self, application, charm_url, constraints, force_charm_url, force_series, min_units, settings, settings_yaml):
-        '''
-        application : str
-        charm_url : str
-        constraints : Value
-        force_charm_url : bool
-        force_series : bool
-        min_units : int
-        settings : typing.Mapping<~KT, +VT_co>[str, str]
-        settings_yaml : str
-        Returns -> None
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Application',
-                   request='Update',
-                   version=4,
-                   params=_params)
-        _params['application'] = application
-        _params['charm-url'] = charm_url
-        _params['constraints'] = constraints
-        _params['force-charm-url'] = force_charm_url
-        _params['force-series'] = force_series
-        _params['min-units'] = min_units
-        _params['settings'] = settings
-        _params['settings-yaml'] = settings_yaml
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-class StorageFacade(Type):
-    name = 'Storage'
+class InstancePollerFacade(Type):
+    name = 'InstancePoller'
     version = 4
-    schema =     {'definitions': {'AddStorageDetails': {'additionalProperties': False,
-                                           'properties': {'storage-tags': {'items': {'type': 'string'},
-                                                                           'type': 'array'}},
-                                           'required': ['storage-tags'],
-                                           'type': 'object'},
-                     'AddStorageResult': {'additionalProperties': False,
-                                          'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                         'result': {'$ref': '#/definitions/AddStorageDetails'}},
-                                          'type': 'object'},
-                     'AddStorageResults': {'additionalProperties': False,
-                                           'properties': {'results': {'items': {'$ref': '#/definitions/AddStorageResult'},
-                                                                      'type': 'array'}},
-                                           'required': ['results'],
-                                           'type': 'object'},
-                     'BulkImportStorageParams': {'additionalProperties': False,
-                                                 'properties': {'storage': {'items': {'$ref': '#/definitions/ImportStorageParams'},
-                                                                            'type': 'array'}},
-                                                 'required': ['storage'],
-                                                 'type': 'object'},
+    schema =     {'definitions': {'Address': {'additionalProperties': False,
+                                 'properties': {'cidr': {'type': 'string'},
+                                                'config-type': {'type': 'string'},
+                                                'is-secondary': {'type': 'boolean'},
+                                                'scope': {'type': 'string'},
+                                                'space-id': {'type': 'string'},
+                                                'space-name': {'type': 'string'},
+                                                'type': {'type': 'string'},
+                                                'value': {'type': 'string'}},
+                                 'required': ['value', 'type', 'scope'],
+                                 'type': 'object'},
+                     'BoolResult': {'additionalProperties': False,
+                                    'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                   'result': {'type': 'boolean'}},
+                                    'required': ['result'],
+                                    'type': 'object'},
+                     'BoolResults': {'additionalProperties': False,
+                                     'properties': {'results': {'items': {'$ref': '#/definitions/BoolResult'},
+                                                                'type': 'array'}},
+                                     'required': ['results'],
+                                     'type': 'object'},
                      'Entities': {'additionalProperties': False,
                                   'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
                                                               'type': 'array'}},
@@ -876,26 +696,26 @@ class StorageFacade(Type):
                                 'properties': {'tag': {'type': 'string'}},
                                 'required': ['tag'],
                                 'type': 'object'},
-                     'EntityStatus': {'additionalProperties': False,
-                                      'properties': {'data': {'patternProperties': {'.*': {'additionalProperties': True,
-                                                                                           'type': 'object'}},
-                                                              'type': 'object'},
-                                                     'info': {'type': 'string'},
-                                                     'since': {'format': 'date-time',
-                                                               'type': 'string'},
-                                                     'status': {'type': 'string'}},
-                                      'required': ['status', 'info', 'since'],
-                                      'type': 'object'},
+                     'EntityStatusArgs': {'additionalProperties': False,
+                                          'properties': {'data': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                               'type': 'object'}},
+                                                                  'type': 'object'},
+                                                         'info': {'type': 'string'},
+                                                         'status': {'type': 'string'},
+                                                         'tag': {'type': 'string'}},
+                                          'required': ['tag',
+                                                       'status',
+                                                       'info',
+                                                       'data'],
+                                          'type': 'object'},
                      'Error': {'additionalProperties': False,
                                'properties': {'code': {'type': 'string'},
-                                              'info': {'$ref': '#/definitions/ErrorInfo'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
                                               'message': {'type': 'string'}},
                                'required': ['message', 'code'],
                                'type': 'object'},
-                     'ErrorInfo': {'additionalProperties': False,
-                                   'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
-                                                  'macaroon-path': {'type': 'string'}},
-                                   'type': 'object'},
                      'ErrorResult': {'additionalProperties': False,
                                      'properties': {'error': {'$ref': '#/definitions/Error'}},
                                      'type': 'object'},
@@ -904,476 +724,1271 @@ class StorageFacade(Type):
                                                                  'type': 'array'}},
                                       'required': ['results'],
                                       'type': 'object'},
-                     'FilesystemAttachmentDetails': {'additionalProperties': False,
-                                                     'properties': {'FilesystemAttachmentInfo': {'$ref': '#/definitions/FilesystemAttachmentInfo'},
-                                                                    'life': {'type': 'string'}},
-                                                     'required': ['FilesystemAttachmentInfo'],
-                                                     'type': 'object'},
-                     'FilesystemAttachmentInfo': {'additionalProperties': False,
-                                                  'properties': {'mount-point': {'type': 'string'},
-                                                                 'read-only': {'type': 'boolean'}},
-                                                  'type': 'object'},
-                     'FilesystemDetails': {'additionalProperties': False,
-                                           'properties': {'filesystem-tag': {'type': 'string'},
-                                                          'info': {'$ref': '#/definitions/FilesystemInfo'},
-                                                          'life': {'type': 'string'},
-                                                          'machine-attachments': {'patternProperties': {'.*': {'$ref': '#/definitions/FilesystemAttachmentDetails'}},
-                                                                                  'type': 'object'},
-                                                          'status': {'$ref': '#/definitions/EntityStatus'},
-                                                          'storage': {'$ref': '#/definitions/StorageDetails'},
-                                                          'unit-attachments': {'patternProperties': {'.*': {'$ref': '#/definitions/FilesystemAttachmentDetails'}},
-                                                                               'type': 'object'},
-                                                          'volume-tag': {'type': 'string'}},
-                                           'required': ['filesystem-tag',
-                                                        'info',
-                                                        'status'],
-                                           'type': 'object'},
-                     'FilesystemDetailsListResult': {'additionalProperties': False,
-                                                     'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                                    'result': {'items': {'$ref': '#/definitions/FilesystemDetails'},
-                                                                               'type': 'array'}},
-                                                     'type': 'object'},
-                     'FilesystemDetailsListResults': {'additionalProperties': False,
-                                                      'properties': {'results': {'items': {'$ref': '#/definitions/FilesystemDetailsListResult'},
-                                                                                 'type': 'array'}},
-                                                      'type': 'object'},
-                     'FilesystemFilter': {'additionalProperties': False,
-                                          'properties': {'machines': {'items': {'type': 'string'},
-                                                                      'type': 'array'}},
+                     'LifeResult': {'additionalProperties': False,
+                                    'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                   'life': {'type': 'string'}},
+                                    'required': ['life'],
+                                    'type': 'object'},
+                     'LifeResults': {'additionalProperties': False,
+                                     'properties': {'results': {'items': {'$ref': '#/definitions/LifeResult'},
+                                                                'type': 'array'}},
+                                     'required': ['results'],
+                                     'type': 'object'},
+                     'MachineAddresses': {'additionalProperties': False,
+                                          'properties': {'addresses': {'items': {'$ref': '#/definitions/Address'},
+                                                                       'type': 'array'},
+                                                         'tag': {'type': 'string'}},
+                                          'required': ['tag', 'addresses'],
                                           'type': 'object'},
-                     'FilesystemFilters': {'additionalProperties': False,
-                                           'properties': {'filters': {'items': {'$ref': '#/definitions/FilesystemFilter'},
-                                                                      'type': 'array'}},
-                                           'type': 'object'},
-                     'FilesystemInfo': {'additionalProperties': False,
-                                        'properties': {'filesystem-id': {'type': 'string'},
-                                                       'pool': {'type': 'string'},
-                                                       'size': {'type': 'integer'}},
-                                        'required': ['filesystem-id',
-                                                     'pool',
-                                                     'size'],
-                                        'type': 'object'},
-                     'ImportStorageDetails': {'additionalProperties': False,
-                                              'properties': {'storage-tag': {'type': 'string'}},
-                                              'required': ['storage-tag'],
-                                              'type': 'object'},
-                     'ImportStorageParams': {'additionalProperties': False,
-                                             'properties': {'kind': {'type': 'integer'},
-                                                            'pool': {'type': 'string'},
-                                                            'provider-id': {'type': 'string'},
-                                                            'storage-name': {'type': 'string'}},
-                                             'required': ['kind',
-                                                          'pool',
-                                                          'provider-id',
-                                                          'storage-name'],
-                                             'type': 'object'},
-                     'ImportStorageResult': {'additionalProperties': False,
-                                             'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                            'result': {'$ref': '#/definitions/ImportStorageDetails'}},
-                                             'type': 'object'},
-                     'ImportStorageResults': {'additionalProperties': False,
-                                              'properties': {'results': {'items': {'$ref': '#/definitions/ImportStorageResult'},
-                                                                         'type': 'array'}},
-                                              'required': ['results'],
-                                              'type': 'object'},
-                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
-                     'RemoveStorage': {'additionalProperties': False,
-                                       'properties': {'storage': {'items': {'$ref': '#/definitions/RemoveStorageInstance'},
-                                                                  'type': 'array'}},
-                                       'required': ['storage'],
-                                       'type': 'object'},
-                     'RemoveStorageInstance': {'additionalProperties': False,
-                                               'properties': {'destroy-attachments': {'type': 'boolean'},
-                                                              'destroy-storage': {'type': 'boolean'},
-                                                              'tag': {'type': 'string'}},
-                                               'required': ['tag'],
-                                               'type': 'object'},
-                     'StorageAddParams': {'additionalProperties': False,
-                                          'properties': {'name': {'type': 'string'},
-                                                         'storage': {'$ref': '#/definitions/StorageConstraints'},
-                                                         'unit': {'type': 'string'}},
-                                          'required': ['unit', 'name', 'storage'],
-                                          'type': 'object'},
-                     'StorageAttachmentDetails': {'additionalProperties': False,
-                                                  'properties': {'life': {'type': 'string'},
-                                                                 'location': {'type': 'string'},
-                                                                 'machine-tag': {'type': 'string'},
-                                                                 'storage-tag': {'type': 'string'},
-                                                                 'unit-tag': {'type': 'string'}},
-                                                  'required': ['storage-tag',
-                                                               'unit-tag',
-                                                               'machine-tag'],
-                                                  'type': 'object'},
-                     'StorageAttachmentId': {'additionalProperties': False,
-                                             'properties': {'storage-tag': {'type': 'string'},
-                                                            'unit-tag': {'type': 'string'}},
-                                             'required': ['storage-tag',
-                                                          'unit-tag'],
-                                             'type': 'object'},
-                     'StorageAttachmentIds': {'additionalProperties': False,
-                                              'properties': {'ids': {'items': {'$ref': '#/definitions/StorageAttachmentId'},
-                                                                     'type': 'array'}},
-                                              'required': ['ids'],
-                                              'type': 'object'},
-                     'StorageConstraints': {'additionalProperties': False,
-                                            'properties': {'count': {'type': 'integer'},
-                                                           'pool': {'type': 'string'},
-                                                           'size': {'type': 'integer'}},
-                                            'type': 'object'},
-                     'StorageDetails': {'additionalProperties': False,
-                                        'properties': {'attachments': {'patternProperties': {'.*': {'$ref': '#/definitions/StorageAttachmentDetails'}},
-                                                                       'type': 'object'},
-                                                       'kind': {'type': 'integer'},
-                                                       'life': {'type': 'string'},
-                                                       'owner-tag': {'type': 'string'},
-                                                       'persistent': {'type': 'boolean'},
-                                                       'status': {'$ref': '#/definitions/EntityStatus'},
-                                                       'storage-tag': {'type': 'string'}},
-                                        'required': ['storage-tag',
-                                                     'owner-tag',
-                                                     'kind',
-                                                     'status',
-                                                     'persistent'],
-                                        'type': 'object'},
-                     'StorageDetailsListResult': {'additionalProperties': False,
-                                                  'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                                 'result': {'items': {'$ref': '#/definitions/StorageDetails'},
+                     'MachineAddressesResult': {'additionalProperties': False,
+                                                'properties': {'addresses': {'items': {'$ref': '#/definitions/Address'},
+                                                                             'type': 'array'},
+                                                               'error': {'$ref': '#/definitions/Error'}},
+                                                'required': ['addresses'],
+                                                'type': 'object'},
+                     'MachineAddressesResults': {'additionalProperties': False,
+                                                 'properties': {'results': {'items': {'$ref': '#/definitions/MachineAddressesResult'},
                                                                             'type': 'array'}},
-                                                  'type': 'object'},
-                     'StorageDetailsListResults': {'additionalProperties': False,
-                                                   'properties': {'results': {'items': {'$ref': '#/definitions/StorageDetailsListResult'},
-                                                                              'type': 'array'}},
-                                                   'type': 'object'},
-                     'StorageDetailsResult': {'additionalProperties': False,
-                                              'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                             'result': {'$ref': '#/definitions/StorageDetails'}},
-                                              'type': 'object'},
-                     'StorageDetailsResults': {'additionalProperties': False,
-                                               'properties': {'results': {'items': {'$ref': '#/definitions/StorageDetailsResult'},
-                                                                          'type': 'array'}},
-                                               'type': 'object'},
-                     'StorageFilter': {'additionalProperties': False,
+                                                 'required': ['results'],
+                                                 'type': 'object'},
+                     'ModelConfigResult': {'additionalProperties': False,
+                                           'properties': {'config': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                  'type': 'object'}},
+                                                                     'type': 'object'}},
+                                           'required': ['config'],
+                                           'type': 'object'},
+                     'NetworkConfig': {'additionalProperties': False,
+                                       'properties': {'address': {'type': 'string'},
+                                                      'addresses': {'items': {'$ref': '#/definitions/Address'},
+                                                                    'type': 'array'},
+                                                      'cidr': {'type': 'string'},
+                                                      'config-type': {'type': 'string'},
+                                                      'device-index': {'type': 'integer'},
+                                                      'disabled': {'type': 'boolean'},
+                                                      'dns-search-domains': {'items': {'type': 'string'},
+                                                                             'type': 'array'},
+                                                      'dns-servers': {'items': {'type': 'string'},
+                                                                      'type': 'array'},
+                                                      'gateway-address': {'type': 'string'},
+                                                      'interface-name': {'type': 'string'},
+                                                      'interface-type': {'type': 'string'},
+                                                      'is-default-gateway': {'type': 'boolean'},
+                                                      'mac-address': {'type': 'string'},
+                                                      'mtu': {'type': 'integer'},
+                                                      'no-auto-start': {'type': 'boolean'},
+                                                      'origin': {'type': 'string'},
+                                                      'parent-interface-name': {'type': 'string'},
+                                                      'provider-address-id': {'type': 'string'},
+                                                      'provider-id': {'type': 'string'},
+                                                      'provider-network-id': {'type': 'string'},
+                                                      'provider-space-id': {'type': 'string'},
+                                                      'provider-subnet-id': {'type': 'string'},
+                                                      'provider-vlan-id': {'type': 'string'},
+                                                      'routes': {'items': {'$ref': '#/definitions/NetworkRoute'},
+                                                                 'type': 'array'},
+                                                      'shadow-addresses': {'items': {'$ref': '#/definitions/Address'},
+                                                                           'type': 'array'},
+                                                      'virtual-port-type': {'type': 'string'},
+                                                      'vlan-tag': {'type': 'integer'}},
+                                       'required': ['device-index',
+                                                    'mac-address',
+                                                    'cidr',
+                                                    'mtu',
+                                                    'provider-id',
+                                                    'provider-network-id',
+                                                    'provider-subnet-id',
+                                                    'provider-space-id',
+                                                    'provider-address-id',
+                                                    'provider-vlan-id',
+                                                    'vlan-tag',
+                                                    'interface-name',
+                                                    'parent-interface-name',
+                                                    'interface-type',
+                                                    'disabled'],
                                        'type': 'object'},
-                     'StorageFilters': {'additionalProperties': False,
-                                        'properties': {'filters': {'items': {'$ref': '#/definitions/StorageFilter'},
-                                                                   'type': 'array'}},
-                                        'type': 'object'},
-                     'StoragePool': {'additionalProperties': False,
-                                     'properties': {'attrs': {'patternProperties': {'.*': {'additionalProperties': True,
+                     'NetworkRoute': {'additionalProperties': False,
+                                      'properties': {'destination-cidr': {'type': 'string'},
+                                                     'gateway-ip': {'type': 'string'},
+                                                     'metric': {'type': 'integer'}},
+                                      'required': ['destination-cidr',
+                                                   'gateway-ip',
+                                                   'metric'],
+                                      'type': 'object'},
+                     'NotifyWatchResult': {'additionalProperties': False,
+                                           'properties': {'NotifyWatcherId': {'type': 'string'},
+                                                          'error': {'$ref': '#/definitions/Error'}},
+                                           'required': ['NotifyWatcherId'],
+                                           'type': 'object'},
+                     'ProviderNetworkConfig': {'additionalProperties': False,
+                                               'properties': {'config': {'items': {'$ref': '#/definitions/NetworkConfig'},
+                                                                         'type': 'array'},
+                                                              'tag': {'type': 'string'}},
+                                               'required': ['tag', 'config'],
+                                               'type': 'object'},
+                     'SetMachinesAddresses': {'additionalProperties': False,
+                                              'properties': {'machine-addresses': {'items': {'$ref': '#/definitions/MachineAddresses'},
+                                                                                   'type': 'array'}},
+                                              'required': ['machine-addresses'],
+                                              'type': 'object'},
+                     'SetProviderNetworkConfig': {'additionalProperties': False,
+                                                  'properties': {'args': {'items': {'$ref': '#/definitions/ProviderNetworkConfig'},
+                                                                          'type': 'array'}},
+                                                  'required': ['args'],
+                                                  'type': 'object'},
+                     'SetProviderNetworkConfigResult': {'additionalProperties': False,
+                                                        'properties': {'addresses': {'items': {'$ref': '#/definitions/Address'},
+                                                                                     'type': 'array'},
+                                                                       'error': {'$ref': '#/definitions/Error'},
+                                                                       'modified': {'type': 'boolean'}},
+                                                        'required': ['addresses',
+                                                                     'modified'],
+                                                        'type': 'object'},
+                     'SetProviderNetworkConfigResults': {'additionalProperties': False,
+                                                         'properties': {'results': {'items': {'$ref': '#/definitions/SetProviderNetworkConfigResult'},
+                                                                                    'type': 'array'}},
+                                                         'required': ['results'],
+                                                         'type': 'object'},
+                     'SetStatus': {'additionalProperties': False,
+                                   'properties': {'entities': {'items': {'$ref': '#/definitions/EntityStatusArgs'},
+                                                               'type': 'array'}},
+                                   'required': ['entities'],
+                                   'type': 'object'},
+                     'StatusResult': {'additionalProperties': False,
+                                      'properties': {'data': {'patternProperties': {'.*': {'additionalProperties': True,
                                                                                            'type': 'object'}},
                                                               'type': 'object'},
-                                                    'name': {'type': 'string'},
-                                                    'provider': {'type': 'string'}},
-                                     'required': ['name', 'provider', 'attrs'],
-                                     'type': 'object'},
-                     'StoragePoolFilter': {'additionalProperties': False,
-                                           'properties': {'names': {'items': {'type': 'string'},
-                                                                    'type': 'array'},
-                                                          'providers': {'items': {'type': 'string'},
-                                                                        'type': 'array'}},
-                                           'type': 'object'},
-                     'StoragePoolFilters': {'additionalProperties': False,
-                                            'properties': {'filters': {'items': {'$ref': '#/definitions/StoragePoolFilter'},
-                                                                       'type': 'array'}},
-                                            'type': 'object'},
-                     'StoragePoolsResult': {'additionalProperties': False,
-                                            'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                           'storage-pools': {'items': {'$ref': '#/definitions/StoragePool'},
-                                                                             'type': 'array'}},
-                                            'type': 'object'},
-                     'StoragePoolsResults': {'additionalProperties': False,
-                                             'properties': {'results': {'items': {'$ref': '#/definitions/StoragePoolsResult'},
-                                                                        'type': 'array'}},
-                                             'type': 'object'},
-                     'StoragesAddParams': {'additionalProperties': False,
-                                           'properties': {'storages': {'items': {'$ref': '#/definitions/StorageAddParams'},
-                                                                       'type': 'array'}},
-                                           'required': ['storages'],
-                                           'type': 'object'},
-                     'VolumeAttachmentDetails': {'additionalProperties': False,
-                                                 'properties': {'VolumeAttachmentInfo': {'$ref': '#/definitions/VolumeAttachmentInfo'},
-                                                                'life': {'type': 'string'}},
-                                                 'required': ['VolumeAttachmentInfo'],
-                                                 'type': 'object'},
-                     'VolumeAttachmentInfo': {'additionalProperties': False,
-                                              'properties': {'bus-address': {'type': 'string'},
-                                                             'device-link': {'type': 'string'},
-                                                             'device-name': {'type': 'string'},
-                                                             'plan-info': {'$ref': '#/definitions/VolumeAttachmentPlanInfo'},
-                                                             'read-only': {'type': 'boolean'}},
-                                              'type': 'object'},
-                     'VolumeAttachmentPlanInfo': {'additionalProperties': False,
-                                                  'properties': {'device-attributes': {'patternProperties': {'.*': {'type': 'string'}},
-                                                                                       'type': 'object'},
-                                                                 'device-type': {'type': 'string'}},
-                                                  'type': 'object'},
-                     'VolumeDetails': {'additionalProperties': False,
-                                       'properties': {'info': {'$ref': '#/definitions/VolumeInfo'},
-                                                      'life': {'type': 'string'},
-                                                      'machine-attachments': {'patternProperties': {'.*': {'$ref': '#/definitions/VolumeAttachmentDetails'}},
-                                                                              'type': 'object'},
-                                                      'status': {'$ref': '#/definitions/EntityStatus'},
-                                                      'storage': {'$ref': '#/definitions/StorageDetails'},
-                                                      'unit-attachments': {'patternProperties': {'.*': {'$ref': '#/definitions/VolumeAttachmentDetails'}},
-                                                                           'type': 'object'},
-                                                      'volume-tag': {'type': 'string'}},
-                                       'required': ['volume-tag', 'info', 'status'],
-                                       'type': 'object'},
-                     'VolumeDetailsListResult': {'additionalProperties': False,
-                                                 'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                                'result': {'items': {'$ref': '#/definitions/VolumeDetails'},
-                                                                           'type': 'array'}},
-                                                 'type': 'object'},
-                     'VolumeDetailsListResults': {'additionalProperties': False,
-                                                  'properties': {'results': {'items': {'$ref': '#/definitions/VolumeDetailsListResult'},
-                                                                             'type': 'array'}},
-                                                  'type': 'object'},
-                     'VolumeFilter': {'additionalProperties': False,
-                                      'properties': {'machines': {'items': {'type': 'string'},
-                                                                  'type': 'array'}},
+                                                     'error': {'$ref': '#/definitions/Error'},
+                                                     'id': {'type': 'string'},
+                                                     'info': {'type': 'string'},
+                                                     'life': {'type': 'string'},
+                                                     'since': {'format': 'date-time',
+                                                               'type': 'string'},
+                                                     'status': {'type': 'string'}},
+                                      'required': ['id',
+                                                   'life',
+                                                   'status',
+                                                   'info',
+                                                   'data',
+                                                   'since'],
                                       'type': 'object'},
-                     'VolumeFilters': {'additionalProperties': False,
-                                       'properties': {'filters': {'items': {'$ref': '#/definitions/VolumeFilter'},
+                     'StatusResults': {'additionalProperties': False,
+                                       'properties': {'results': {'items': {'$ref': '#/definitions/StatusResult'},
                                                                   'type': 'array'}},
+                                       'required': ['results'],
                                        'type': 'object'},
-                     'VolumeInfo': {'additionalProperties': False,
-                                    'properties': {'hardware-id': {'type': 'string'},
-                                                   'persistent': {'type': 'boolean'},
-                                                   'pool': {'type': 'string'},
-                                                   'size': {'type': 'integer'},
-                                                   'volume-id': {'type': 'string'},
-                                                   'wwn': {'type': 'string'}},
-                                    'required': ['volume-id', 'size', 'persistent'],
-                                    'type': 'object'}},
-     'properties': {'AddToUnit': {'properties': {'Params': {'$ref': '#/definitions/StoragesAddParams'},
-                                                 'Result': {'$ref': '#/definitions/AddStorageResults'}},
-                                  'type': 'object'},
-                    'Attach': {'properties': {'Params': {'$ref': '#/definitions/StorageAttachmentIds'},
-                                              'Result': {'$ref': '#/definitions/ErrorResults'}},
-                               'type': 'object'},
-                    'CreatePool': {'properties': {'Params': {'$ref': '#/definitions/StoragePool'}},
+                     'StringResult': {'additionalProperties': False,
+                                      'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                     'result': {'type': 'string'}},
+                                      'required': ['result'],
+                                      'type': 'object'},
+                     'StringResults': {'additionalProperties': False,
+                                       'properties': {'results': {'items': {'$ref': '#/definitions/StringResult'},
+                                                                  'type': 'array'}},
+                                       'required': ['results'],
+                                       'type': 'object'},
+                     'StringsWatchResult': {'additionalProperties': False,
+                                            'properties': {'changes': {'items': {'type': 'string'},
+                                                                       'type': 'array'},
+                                                           'error': {'$ref': '#/definitions/Error'},
+                                                           'watcher-id': {'type': 'string'}},
+                                            'required': ['watcher-id'],
+                                            'type': 'object'}},
+     'properties': {'AreManuallyProvisioned': {'description': 'AreManuallyProvisioned '
+                                                              'returns whether '
+                                                              'each given entity '
+                                                              'is\n'
+                                                              'manually '
+                                                              'provisioned or not. '
+                                                              'Only machine tags '
+                                                              'are accepted.',
+                                               'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                              'Result': {'$ref': '#/definitions/BoolResults'}},
+                                               'type': 'object'},
+                    'InstanceId': {'description': 'InstanceId returns the provider '
+                                                  'specific instance id for each '
+                                                  'given\n'
+                                                  'machine or an '
+                                                  'CodeNotProvisioned error, if '
+                                                  'not set.',
+                                   'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                  'Result': {'$ref': '#/definitions/StringResults'}},
                                    'type': 'object'},
-                    'Detach': {'properties': {'Params': {'$ref': '#/definitions/StorageAttachmentIds'},
-                                              'Result': {'$ref': '#/definitions/ErrorResults'}},
-                               'type': 'object'},
-                    'Import': {'properties': {'Params': {'$ref': '#/definitions/BulkImportStorageParams'},
-                                              'Result': {'$ref': '#/definitions/ImportStorageResults'}},
-                               'type': 'object'},
-                    'ListFilesystems': {'properties': {'Params': {'$ref': '#/definitions/FilesystemFilters'},
-                                                       'Result': {'$ref': '#/definitions/FilesystemDetailsListResults'}},
-                                        'type': 'object'},
-                    'ListPools': {'properties': {'Params': {'$ref': '#/definitions/StoragePoolFilters'},
-                                                 'Result': {'$ref': '#/definitions/StoragePoolsResults'}},
-                                  'type': 'object'},
-                    'ListStorageDetails': {'properties': {'Params': {'$ref': '#/definitions/StorageFilters'},
-                                                          'Result': {'$ref': '#/definitions/StorageDetailsListResults'}},
-                                           'type': 'object'},
-                    'ListVolumes': {'properties': {'Params': {'$ref': '#/definitions/VolumeFilters'},
-                                                   'Result': {'$ref': '#/definitions/VolumeDetailsListResults'}},
+                    'InstanceStatus': {'description': 'InstanceStatus returns the '
+                                                      'instance status for each '
+                                                      'given entity.\n'
+                                                      'Only machine tags are '
+                                                      'accepted.',
+                                       'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                      'Result': {'$ref': '#/definitions/StatusResults'}},
+                                       'type': 'object'},
+                    'Life': {'description': 'Life returns the life status of every '
+                                            'supplied entity, where available.',
+                             'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                            'Result': {'$ref': '#/definitions/LifeResults'}},
+                             'type': 'object'},
+                    'ModelConfig': {'description': 'ModelConfig returns the '
+                                                   "current model's configuration.",
+                                    'properties': {'Result': {'$ref': '#/definitions/ModelConfigResult'}},
                                     'type': 'object'},
-                    'Remove': {'properties': {'Params': {'$ref': '#/definitions/RemoveStorage'},
-                                              'Result': {'$ref': '#/definitions/ErrorResults'}},
+                    'ProviderAddresses': {'description': 'ProviderAddresses '
+                                                         'returns the list of all '
+                                                         'known provider '
+                                                         'addresses\n'
+                                                         'for each given entity. '
+                                                         'Only machine tags are '
+                                                         'accepted.',
+                                          'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                         'Result': {'$ref': '#/definitions/MachineAddressesResults'}},
+                                          'type': 'object'},
+                    'SetInstanceStatus': {'description': 'SetInstanceStatus '
+                                                         'updates the instance '
+                                                         'status for each given '
+                                                         'entity.\n'
+                                                         'Only machine tags are '
+                                                         'accepted.',
+                                          'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
+                                                         'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                          'type': 'object'},
+                    'SetProviderAddresses': {'description': 'SetProviderAddresses '
+                                                            'updates the list of '
+                                                            'known provider '
+                                                            'addresses\n'
+                                                            'for each given '
+                                                            'entity. Only machine '
+                                                            'tags are accepted.',
+                                             'properties': {'Params': {'$ref': '#/definitions/SetMachinesAddresses'},
+                                                            'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                             'type': 'object'},
+                    'SetProviderNetworkConfig': {'description': 'SetProviderNetworkConfig '
+                                                                'updates the '
+                                                                'provider '
+                                                                'addresses for one '
+                                                                'or more\n'
+                                                                'machines.\n'
+                                                                '\n'
+                                                                "What's more, if "
+                                                                'the client '
+                                                                'request includes '
+                                                                'provider-specific '
+                                                                'IDs (e.g.\n'
+                                                                'network, subnet '
+                                                                'or address IDs), '
+                                                                'this method will '
+                                                                'also iterate any '
+                                                                'present\n'
+                                                                'link layer '
+                                                                'devices (and '
+                                                                'their addresses) '
+                                                                'and merge in any '
+                                                                'missing\n'
+                                                                'provider-specific '
+                                                                'information.',
+                                                 'properties': {'Params': {'$ref': '#/definitions/SetProviderNetworkConfig'},
+                                                                'Result': {'$ref': '#/definitions/SetProviderNetworkConfigResults'}},
+                                                 'type': 'object'},
+                    'Status': {'description': 'Status returns the status of each '
+                                              'given entity.',
+                               'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                              'Result': {'$ref': '#/definitions/StatusResults'}},
                                'type': 'object'},
-                    'StorageDetails': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                      'Result': {'$ref': '#/definitions/StorageDetailsResults'}},
-                                       'type': 'object'}},
+                    'WatchForModelConfigChanges': {'description': 'WatchForModelConfigChanges '
+                                                                  'returns a '
+                                                                  'NotifyWatcher '
+                                                                  'that observes\n'
+                                                                  'changes to the '
+                                                                  'model '
+                                                                  'configuration.\n'
+                                                                  'Note that '
+                                                                  'although the '
+                                                                  'NotifyWatchResult '
+                                                                  'contains an '
+                                                                  'Error field,\n'
+                                                                  "it's not used "
+                                                                  'because we are '
+                                                                  'only returning '
+                                                                  'a single '
+                                                                  'watcher,\n'
+                                                                  'so we use the '
+                                                                  'regular error '
+                                                                  'return.',
+                                                   'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
+                                                   'type': 'object'},
+                    'WatchModelMachineStartTimes': {'description': 'WatchModelMachineStartTimes '
+                                                                   'watches the '
+                                                                   'non-container '
+                                                                   'machines in '
+                                                                   'the model\n'
+                                                                   'for changes to '
+                                                                   'the Life or '
+                                                                   'AgentStartTime '
+                                                                   'fields and '
+                                                                   'reports them '
+                                                                   'as a batch.',
+                                                    'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
+                                                    'type': 'object'},
+                    'WatchModelMachines': {'description': 'WatchModelMachines '
+                                                          'returns a '
+                                                          'StringsWatcher that '
+                                                          'notifies of\n'
+                                                          'changes to the life '
+                                                          'cycles of the top level '
+                                                          'machines in the '
+                                                          'current\n'
+                                                          'model.',
+                                           'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
+                                           'type': 'object'}},
      'type': 'object'}
     
 
-    @ReturnMapping(AddStorageResults)
-    async def AddToUnit(self, storages):
+    @ReturnMapping(BoolResults)
+    async def AreManuallyProvisioned(self, entities=None):
         '''
-        storages : typing.Sequence<+T_co>[~StorageAddParams]<~StorageAddParams>
-        Returns -> typing.Sequence<+T_co>[~AddStorageResult]<~AddStorageResult>
+        AreManuallyProvisioned returns whether each given entity is
+        manually provisioned or not. Only machine tags are accepted.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> BoolResults
         '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
         # map input types to rpc msg
         _params = dict()
-        msg = dict(type='Storage',
-                   request='AddToUnit',
+        msg = dict(type='InstancePoller',
+                   request='AreManuallyProvisioned',
                    version=4,
                    params=_params)
-        _params['storages'] = storages
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResults)
+    async def InstanceId(self, entities=None):
+        '''
+        InstanceId returns the provider specific instance id for each given
+        machine or an CodeNotProvisioned error, if not set.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='InstancePoller',
+                   request='InstanceId',
+                   version=4,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StatusResults)
+    async def InstanceStatus(self, entities=None):
+        '''
+        InstanceStatus returns the instance status for each given entity.
+        Only machine tags are accepted.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StatusResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='InstancePoller',
+                   request='InstanceStatus',
+                   version=4,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(LifeResults)
+    async def Life(self, entities=None):
+        '''
+        Life returns the life status of every supplied entity, where available.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> LifeResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='InstancePoller',
+                   request='Life',
+                   version=4,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ModelConfigResult)
+    async def ModelConfig(self):
+        '''
+        ModelConfig returns the current model's configuration.
+
+
+        Returns -> ModelConfigResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='InstancePoller',
+                   request='ModelConfig',
+                   version=4,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(MachineAddressesResults)
+    async def ProviderAddresses(self, entities=None):
+        '''
+        ProviderAddresses returns the list of all known provider addresses
+        for each given entity. Only machine tags are accepted.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> MachineAddressesResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='InstancePoller',
+                   request='ProviderAddresses',
+                   version=4,
+                   params=_params)
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def Attach(self, ids):
+    async def SetInstanceStatus(self, entities=None):
         '''
-        ids : typing.Sequence<+T_co>[~StorageAttachmentId]<~StorageAttachmentId>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        SetInstanceStatus updates the instance status for each given entity.
+        Only machine tags are accepted.
+
+        entities : typing.Sequence[~EntityStatusArgs]
+        Returns -> ErrorResults
         '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
         # map input types to rpc msg
         _params = dict()
-        msg = dict(type='Storage',
-                   request='Attach',
+        msg = dict(type='InstancePoller',
+                   request='SetInstanceStatus',
                    version=4,
                    params=_params)
-        _params['ids'] = ids
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(None)
-    async def CreatePool(self, attrs, name, provider):
-        '''
-        attrs : typing.Mapping<~KT, +VT_co>[str, typing.Any]
-        name : str
-        provider : str
-        Returns -> None
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Storage',
-                   request='CreatePool',
-                   version=4,
-                   params=_params)
-        _params['attrs'] = attrs
-        _params['name'] = name
-        _params['provider'] = provider
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def Detach(self, ids):
+    async def SetProviderAddresses(self, machine_addresses=None):
         '''
-        ids : typing.Sequence<+T_co>[~StorageAttachmentId]<~StorageAttachmentId>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        SetProviderAddresses updates the list of known provider addresses
+        for each given entity. Only machine tags are accepted.
+
+        machine_addresses : typing.Sequence[~MachineAddresses]
+        Returns -> ErrorResults
         '''
+        if machine_addresses is not None and not isinstance(machine_addresses, (bytes, str, list)):
+            raise Exception("Expected machine_addresses to be a Sequence, received: {}".format(type(machine_addresses)))
+
         # map input types to rpc msg
         _params = dict()
-        msg = dict(type='Storage',
-                   request='Detach',
+        msg = dict(type='InstancePoller',
+                   request='SetProviderAddresses',
                    version=4,
                    params=_params)
-        _params['ids'] = ids
+        _params['machine-addresses'] = machine_addresses
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(ImportStorageResults)
-    async def Import(self, storage):
+    @ReturnMapping(SetProviderNetworkConfigResults)
+    async def SetProviderNetworkConfig(self, args=None):
         '''
-        storage : typing.Sequence<+T_co>[~ImportStorageParams]<~ImportStorageParams>
-        Returns -> typing.Sequence<+T_co>[~ImportStorageResult]<~ImportStorageResult>
+        SetProviderNetworkConfig updates the provider addresses for one or more
+        machines.
+
+        What's more, if the client request includes provider-specific IDs (e.g.
+        network, subnet or address IDs), this method will also iterate any present
+        link layer devices (and their addresses) and merge in any missing
+        provider-specific information.
+
+        args : typing.Sequence[~ProviderNetworkConfig]
+        Returns -> SetProviderNetworkConfigResults
         '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
         # map input types to rpc msg
         _params = dict()
-        msg = dict(type='Storage',
-                   request='Import',
+        msg = dict(type='InstancePoller',
+                   request='SetProviderNetworkConfig',
                    version=4,
                    params=_params)
-        _params['storage'] = storage
+        _params['args'] = args
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(FilesystemDetailsListResults)
-    async def ListFilesystems(self, filters):
+    @ReturnMapping(StatusResults)
+    async def Status(self, entities=None):
         '''
-        filters : typing.Sequence<+T_co>[~FilesystemFilter]<~FilesystemFilter>
-        Returns -> typing.Sequence<+T_co>[~FilesystemDetailsListResult]<~FilesystemDetailsListResult>
+        Status returns the status of each given entity.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StatusResults
         '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
         # map input types to rpc msg
         _params = dict()
-        msg = dict(type='Storage',
-                   request='ListFilesystems',
+        msg = dict(type='InstancePoller',
+                   request='Status',
                    version=4,
                    params=_params)
-        _params['filters'] = filters
+        _params['entities'] = entities
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(StoragePoolsResults)
-    async def ListPools(self, filters):
+    @ReturnMapping(NotifyWatchResult)
+    async def WatchForModelConfigChanges(self):
         '''
-        filters : typing.Sequence<+T_co>[~StoragePoolFilter]<~StoragePoolFilter>
-        Returns -> typing.Sequence<+T_co>[~StoragePoolsResult]<~StoragePoolsResult>
+        WatchForModelConfigChanges returns a NotifyWatcher that observes
+        changes to the model configuration.
+        Note that although the NotifyWatchResult contains an Error field,
+        it's not used because we are only returning a single watcher,
+        so we use the regular error return.
+
+
+        Returns -> NotifyWatchResult
         '''
+
         # map input types to rpc msg
         _params = dict()
-        msg = dict(type='Storage',
-                   request='ListPools',
+        msg = dict(type='InstancePoller',
+                   request='WatchForModelConfigChanges',
                    version=4,
                    params=_params)
-        _params['filters'] = filters
+
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(StorageDetailsListResults)
-    async def ListStorageDetails(self, filters):
+    @ReturnMapping(StringsWatchResult)
+    async def WatchModelMachineStartTimes(self):
         '''
-        filters : typing.Sequence<+T_co>[~StorageFilter]<~StorageFilter>
-        Returns -> typing.Sequence<+T_co>[~StorageDetailsListResult]<~StorageDetailsListResult>
+        WatchModelMachineStartTimes watches the non-container machines in the model
+        for changes to the Life or AgentStartTime fields and reports them as a batch.
+
+
+        Returns -> StringsWatchResult
         '''
+
         # map input types to rpc msg
         _params = dict()
-        msg = dict(type='Storage',
-                   request='ListStorageDetails',
+        msg = dict(type='InstancePoller',
+                   request='WatchModelMachineStartTimes',
                    version=4,
                    params=_params)
-        _params['filters'] = filters
+
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(VolumeDetailsListResults)
-    async def ListVolumes(self, filters):
+    @ReturnMapping(StringsWatchResult)
+    async def WatchModelMachines(self):
         '''
-        filters : typing.Sequence<+T_co>[~VolumeFilter]<~VolumeFilter>
-        Returns -> typing.Sequence<+T_co>[~VolumeDetailsListResult]<~VolumeDetailsListResult>
+        WatchModelMachines returns a StringsWatcher that notifies of
+        changes to the life cycles of the top level machines in the current
+        model.
+
+
+        Returns -> StringsWatchResult
         '''
+
         # map input types to rpc msg
         _params = dict()
-        msg = dict(type='Storage',
-                   request='ListVolumes',
+        msg = dict(type='InstancePoller',
+                   request='WatchModelMachines',
                    version=4,
                    params=_params)
-        _params['filters'] = filters
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+class ModelGenerationFacade(Type):
+    name = 'ModelGeneration'
+    version = 4
+    schema =     {'definitions': {'BoolResult': {'additionalProperties': False,
+                                    'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                   'result': {'type': 'boolean'}},
+                                    'required': ['result'],
+                                    'type': 'object'},
+                     'BranchArg': {'additionalProperties': False,
+                                   'properties': {'branch': {'type': 'string'}},
+                                   'required': ['branch'],
+                                   'type': 'object'},
+                     'BranchInfoArgs': {'additionalProperties': False,
+                                        'properties': {'branches': {'items': {'type': 'string'},
+                                                                    'type': 'array'},
+                                                       'detailed': {'type': 'boolean'}},
+                                        'required': ['branches', 'detailed'],
+                                        'type': 'object'},
+                     'BranchResults': {'additionalProperties': False,
+                                       'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                      'generations': {'items': {'$ref': '#/definitions/Generation'},
+                                                                      'type': 'array'}},
+                                       'required': ['generations'],
+                                       'type': 'object'},
+                     'BranchTrackArg': {'additionalProperties': False,
+                                        'properties': {'branch': {'type': 'string'},
+                                                       'entities': {'items': {'$ref': '#/definitions/Entity'},
+                                                                    'type': 'array'},
+                                                       'num-units': {'type': 'integer'}},
+                                        'required': ['branch', 'entities'],
+                                        'type': 'object'},
+                     'Entity': {'additionalProperties': False,
+                                'properties': {'tag': {'type': 'string'}},
+                                'required': ['tag'],
+                                'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ErrorResult': {'additionalProperties': False,
+                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
+                                     'type': 'object'},
+                     'ErrorResults': {'additionalProperties': False,
+                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
+                                                                 'type': 'array'}},
+                                      'required': ['results'],
+                                      'type': 'object'},
+                     'Generation': {'additionalProperties': False,
+                                    'properties': {'applications': {'items': {'$ref': '#/definitions/GenerationApplication'},
+                                                                    'type': 'array'},
+                                                   'branch': {'type': 'string'},
+                                                   'completed': {'type': 'integer'},
+                                                   'completed-by': {'type': 'string'},
+                                                   'created': {'type': 'integer'},
+                                                   'created-by': {'type': 'string'},
+                                                   'generation-id': {'type': 'integer'}},
+                                    'required': ['branch',
+                                                 'created',
+                                                 'created-by',
+                                                 'applications'],
+                                    'type': 'object'},
+                     'GenerationApplication': {'additionalProperties': False,
+                                               'properties': {'application': {'type': 'string'},
+                                                              'config': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                      'type': 'object'}},
+                                                                         'type': 'object'},
+                                                              'pending': {'items': {'type': 'string'},
+                                                                          'type': 'array'},
+                                                              'progress': {'type': 'string'},
+                                                              'tracking': {'items': {'type': 'string'},
+                                                                           'type': 'array'}},
+                                               'required': ['application',
+                                                            'progress',
+                                                            'config'],
+                                               'type': 'object'},
+                     'GenerationId': {'additionalProperties': False,
+                                      'properties': {'generation-id': {'type': 'integer'}},
+                                      'required': ['generation-id'],
+                                      'type': 'object'},
+                     'GenerationResult': {'additionalProperties': False,
+                                          'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                         'generation': {'$ref': '#/definitions/Generation'}},
+                                          'required': ['generation'],
+                                          'type': 'object'},
+                     'IntResult': {'additionalProperties': False,
+                                   'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                  'result': {'type': 'integer'}},
+                                   'required': ['result'],
+                                   'type': 'object'}},
+     'properties': {'AbortBranch': {'description': 'AbortBranch aborts the input '
+                                                   'branch, marking it complete.  '
+                                                   'However no\n'
+                                                   'changes are made applicable to '
+                                                   'the whole model.  No units may '
+                                                   'be assigned\n'
+                                                   'to the branch when aborting.',
+                                    'properties': {'Params': {'$ref': '#/definitions/BranchArg'},
+                                                   'Result': {'$ref': '#/definitions/ErrorResult'}},
+                                    'type': 'object'},
+                    'AddBranch': {'description': 'AddBranch adds a new branch with '
+                                                 'the input name to the model.',
+                                  'properties': {'Params': {'$ref': '#/definitions/BranchArg'},
+                                                 'Result': {'$ref': '#/definitions/ErrorResult'}},
+                                  'type': 'object'},
+                    'BranchInfo': {'description': 'BranchInfo will return details '
+                                                  'of branch identified by the '
+                                                  'input argument,\n'
+                                                  'including units on the branch '
+                                                  'and the configuration disjoint '
+                                                  'with the\n'
+                                                  'master generation.\n'
+                                                  'An error is returned if no '
+                                                  'in-flight branch matching in '
+                                                  'input is found.',
+                                   'properties': {'Params': {'$ref': '#/definitions/BranchInfoArgs'},
+                                                  'Result': {'$ref': '#/definitions/BranchResults'}},
+                                   'type': 'object'},
+                    'CommitBranch': {'description': 'CommitBranch commits the '
+                                                    'input branch, making its '
+                                                    'changes applicable to\n'
+                                                    'the whole model and marking '
+                                                    'it complete.',
+                                     'properties': {'Params': {'$ref': '#/definitions/BranchArg'},
+                                                    'Result': {'$ref': '#/definitions/IntResult'}},
+                                     'type': 'object'},
+                    'HasActiveBranch': {'description': 'HasActiveBranch returns a '
+                                                       'true result if the input '
+                                                       'model has an "in-flight"\n'
+                                                       'branch matching the input '
+                                                       'name.',
+                                        'properties': {'Params': {'$ref': '#/definitions/BranchArg'},
+                                                       'Result': {'$ref': '#/definitions/BoolResult'}},
+                                        'type': 'object'},
+                    'ListCommits': {'description': 'ListCommits will return the '
+                                                   'commits, hence only branches '
+                                                   'with generation_id higher than '
+                                                   '0',
+                                    'properties': {'Result': {'$ref': '#/definitions/BranchResults'}},
+                                    'type': 'object'},
+                    'ShowCommit': {'description': 'ShowCommit will return details '
+                                                  'a commit given by its '
+                                                  'generationId\n'
+                                                  'An error is returned if either '
+                                                  'no branch can be found '
+                                                  'corresponding to the generation '
+                                                  'id.\n'
+                                                  'Or the generation id given is '
+                                                  'below 1.',
+                                   'properties': {'Params': {'$ref': '#/definitions/GenerationId'},
+                                                  'Result': {'$ref': '#/definitions/GenerationResult'}},
+                                   'type': 'object'},
+                    'TrackBranch': {'description': 'TrackBranch marks the input '
+                                                   'units and/or applications as '
+                                                   'tracking the input\n'
+                                                   'branch, causing them to '
+                                                   'realise changes made under '
+                                                   'that branch.',
+                                    'properties': {'Params': {'$ref': '#/definitions/BranchTrackArg'},
+                                                   'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                    'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(ErrorResult)
+    async def AbortBranch(self, branch=None):
+        '''
+        AbortBranch aborts the input branch, marking it complete.  However no
+        changes are made applicable to the whole model.  No units may be assigned
+        to the branch when aborting.
+
+        branch : str
+        Returns -> ErrorResult
+        '''
+        if branch is not None and not isinstance(branch, (bytes, str)):
+            raise Exception("Expected branch to be a str, received: {}".format(type(branch)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ModelGeneration',
+                   request='AbortBranch',
+                   version=4,
+                   params=_params)
+        _params['branch'] = branch
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResult)
+    async def AddBranch(self, branch=None):
+        '''
+        AddBranch adds a new branch with the input name to the model.
+
+        branch : str
+        Returns -> ErrorResult
+        '''
+        if branch is not None and not isinstance(branch, (bytes, str)):
+            raise Exception("Expected branch to be a str, received: {}".format(type(branch)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ModelGeneration',
+                   request='AddBranch',
+                   version=4,
+                   params=_params)
+        _params['branch'] = branch
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(BranchResults)
+    async def BranchInfo(self, branches=None, detailed=None):
+        '''
+        BranchInfo will return details of branch identified by the input argument,
+        including units on the branch and the configuration disjoint with the
+        master generation.
+        An error is returned if no in-flight branch matching in input is found.
+
+        branches : typing.Sequence[str]
+        detailed : bool
+        Returns -> BranchResults
+        '''
+        if branches is not None and not isinstance(branches, (bytes, str, list)):
+            raise Exception("Expected branches to be a Sequence, received: {}".format(type(branches)))
+
+        if detailed is not None and not isinstance(detailed, bool):
+            raise Exception("Expected detailed to be a bool, received: {}".format(type(detailed)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ModelGeneration',
+                   request='BranchInfo',
+                   version=4,
+                   params=_params)
+        _params['branches'] = branches
+        _params['detailed'] = detailed
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(IntResult)
+    async def CommitBranch(self, branch=None):
+        '''
+        CommitBranch commits the input branch, making its changes applicable to
+        the whole model and marking it complete.
+
+        branch : str
+        Returns -> IntResult
+        '''
+        if branch is not None and not isinstance(branch, (bytes, str)):
+            raise Exception("Expected branch to be a str, received: {}".format(type(branch)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ModelGeneration',
+                   request='CommitBranch',
+                   version=4,
+                   params=_params)
+        _params['branch'] = branch
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(BoolResult)
+    async def HasActiveBranch(self, branch=None):
+        '''
+        HasActiveBranch returns a true result if the input model has an "in-flight"
+        branch matching the input name.
+
+        branch : str
+        Returns -> BoolResult
+        '''
+        if branch is not None and not isinstance(branch, (bytes, str)):
+            raise Exception("Expected branch to be a str, received: {}".format(type(branch)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ModelGeneration',
+                   request='HasActiveBranch',
+                   version=4,
+                   params=_params)
+        _params['branch'] = branch
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(BranchResults)
+    async def ListCommits(self):
+        '''
+        ListCommits will return the commits, hence only branches with generation_id higher than 0
+
+
+        Returns -> BranchResults
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ModelGeneration',
+                   request='ListCommits',
+                   version=4,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(GenerationResult)
+    async def ShowCommit(self, generation_id=None):
+        '''
+        ShowCommit will return details a commit given by its generationId
+        An error is returned if either no branch can be found corresponding to the generation id.
+        Or the generation id given is below 1.
+
+        generation_id : int
+        Returns -> GenerationResult
+        '''
+        if generation_id is not None and not isinstance(generation_id, int):
+            raise Exception("Expected generation_id to be a int, received: {}".format(type(generation_id)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ModelGeneration',
+                   request='ShowCommit',
+                   version=4,
+                   params=_params)
+        _params['generation-id'] = generation_id
         reply = await self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def Remove(self, storage):
+    async def TrackBranch(self, branch=None, entities=None, num_units=None):
         '''
-        storage : typing.Sequence<+T_co>[~RemoveStorageInstance]<~RemoveStorageInstance>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        TrackBranch marks the input units and/or applications as tracking the input
+        branch, causing them to realise changes made under that branch.
+
+        branch : str
+        entities : typing.Sequence[~Entity]
+        num_units : int
+        Returns -> ErrorResults
         '''
+        if branch is not None and not isinstance(branch, (bytes, str)):
+            raise Exception("Expected branch to be a str, received: {}".format(type(branch)))
+
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        if num_units is not None and not isinstance(num_units, int):
+            raise Exception("Expected num_units to be a int, received: {}".format(type(num_units)))
+
         # map input types to rpc msg
         _params = dict()
-        msg = dict(type='Storage',
-                   request='Remove',
+        msg = dict(type='ModelGeneration',
+                   request='TrackBranch',
                    version=4,
                    params=_params)
-        _params['storage'] = storage
+        _params['branch'] = branch
+        _params['entities'] = entities
+        _params['num-units'] = num_units
         reply = await self.rpc(msg)
         return reply
 
 
 
-    @ReturnMapping(StorageDetailsResults)
-    async def StorageDetails(self, entities):
+class SSHClientFacade(Type):
+    name = 'SSHClient'
+    version = 4
+    schema =     {'definitions': {'CloudCredential': {'additionalProperties': False,
+                                         'properties': {'attrs': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                  'type': 'object'},
+                                                        'auth-type': {'type': 'string'},
+                                                        'redacted': {'items': {'type': 'string'},
+                                                                     'type': 'array'}},
+                                         'required': ['auth-type'],
+                                         'type': 'object'},
+                     'CloudSpec': {'additionalProperties': False,
+                                   'properties': {'cacertificates': {'items': {'type': 'string'},
+                                                                     'type': 'array'},
+                                                  'credential': {'$ref': '#/definitions/CloudCredential'},
+                                                  'endpoint': {'type': 'string'},
+                                                  'identity-endpoint': {'type': 'string'},
+                                                  'is-controller-cloud': {'type': 'boolean'},
+                                                  'name': {'type': 'string'},
+                                                  'region': {'type': 'string'},
+                                                  'skip-tls-verify': {'type': 'boolean'},
+                                                  'storage-endpoint': {'type': 'string'},
+                                                  'type': {'type': 'string'}},
+                                   'required': ['type', 'name'],
+                                   'type': 'object'},
+                     'CloudSpecResult': {'additionalProperties': False,
+                                         'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                        'result': {'$ref': '#/definitions/CloudSpec'}},
+                                         'type': 'object'},
+                     'Entities': {'additionalProperties': False,
+                                  'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
+                                                              'type': 'array'}},
+                                  'required': ['entities'],
+                                  'type': 'object'},
+                     'Entity': {'additionalProperties': False,
+                                'properties': {'tag': {'type': 'string'}},
+                                'required': ['tag'],
+                                'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'SSHAddressResult': {'additionalProperties': False,
+                                          'properties': {'address': {'type': 'string'},
+                                                         'error': {'$ref': '#/definitions/Error'}},
+                                          'type': 'object'},
+                     'SSHAddressResults': {'additionalProperties': False,
+                                           'properties': {'results': {'items': {'$ref': '#/definitions/SSHAddressResult'},
+                                                                      'type': 'array'}},
+                                           'required': ['results'],
+                                           'type': 'object'},
+                     'SSHAddressesResult': {'additionalProperties': False,
+                                            'properties': {'addresses': {'items': {'type': 'string'},
+                                                                         'type': 'array'},
+                                                           'error': {'$ref': '#/definitions/Error'}},
+                                            'required': ['addresses'],
+                                            'type': 'object'},
+                     'SSHAddressesResults': {'additionalProperties': False,
+                                             'properties': {'results': {'items': {'$ref': '#/definitions/SSHAddressesResult'},
+                                                                        'type': 'array'}},
+                                             'required': ['results'],
+                                             'type': 'object'},
+                     'SSHProxyResult': {'additionalProperties': False,
+                                        'properties': {'use-proxy': {'type': 'boolean'}},
+                                        'required': ['use-proxy'],
+                                        'type': 'object'},
+                     'SSHPublicKeysResult': {'additionalProperties': False,
+                                             'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                            'public-keys': {'items': {'type': 'string'},
+                                                                            'type': 'array'}},
+                                             'type': 'object'},
+                     'SSHPublicKeysResults': {'additionalProperties': False,
+                                              'properties': {'results': {'items': {'$ref': '#/definitions/SSHPublicKeysResult'},
+                                                                         'type': 'array'}},
+                                              'required': ['results'],
+                                              'type': 'object'}},
+     'properties': {'AllAddresses': {'description': 'AllAddresses reports all '
+                                                    'addresses that might have SSH '
+                                                    'listening for each\n'
+                                                    'entity in args. The result is '
+                                                    'sorted with public addresses '
+                                                    'first.\n'
+                                                    'Machines and units are '
+                                                    'supported as entity types.',
+                                     'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                    'Result': {'$ref': '#/definitions/SSHAddressesResults'}},
+                                     'type': 'object'},
+                    'ModelCredentialForSSH': {'description': 'ModelCredentialForSSH '
+                                                             'returns a cloud spec '
+                                                             'for ssh purpose.\n'
+                                                             'This facade call is '
+                                                             'only used for k8s '
+                                                             'model.',
+                                              'properties': {'Result': {'$ref': '#/definitions/CloudSpecResult'}},
+                                              'type': 'object'},
+                    'PrivateAddress': {'description': 'PrivateAddress reports the '
+                                                      'preferred private network '
+                                                      'address for one or\n'
+                                                      'more entities. Machines and '
+                                                      'units are supported.',
+                                       'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                      'Result': {'$ref': '#/definitions/SSHAddressResults'}},
+                                       'type': 'object'},
+                    'Proxy': {'description': 'Proxy returns whether SSH '
+                                             'connections should be proxied '
+                                             'through the\n'
+                                             'controller hosts for the model '
+                                             'associated with the API connection.',
+                              'properties': {'Result': {'$ref': '#/definitions/SSHProxyResult'}},
+                              'type': 'object'},
+                    'PublicAddress': {'description': 'PublicAddress reports the '
+                                                     'preferred public network '
+                                                     'address for one\n'
+                                                     'or more entities. Machines '
+                                                     'and units are supported.',
+                                      'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                     'Result': {'$ref': '#/definitions/SSHAddressResults'}},
+                                      'type': 'object'},
+                    'PublicKeys': {'description': 'PublicKeys returns the public '
+                                                  'SSH hosts for one or more\n'
+                                                  'entities. Machines and units '
+                                                  'are supported.',
+                                   'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                                  'Result': {'$ref': '#/definitions/SSHPublicKeysResults'}},
+                                   'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(SSHAddressesResults)
+    async def AllAddresses(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~StorageDetailsResult]<~StorageDetailsResult>
+        AllAddresses reports all addresses that might have SSH listening for each
+        entity in args. The result is sorted with public addresses first.
+        Machines and units are supported as entity types.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> SSHAddressesResults
         '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
         # map input types to rpc msg
         _params = dict()
-        msg = dict(type='Storage',
-                   request='StorageDetails',
+        msg = dict(type='SSHClient',
+                   request='AllAddresses',
+                   version=4,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CloudSpecResult)
+    async def ModelCredentialForSSH(self):
+        '''
+        ModelCredentialForSSH returns a cloud spec for ssh purpose.
+        This facade call is only used for k8s model.
+
+
+        Returns -> CloudSpecResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SSHClient',
+                   request='ModelCredentialForSSH',
+                   version=4,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SSHAddressResults)
+    async def PrivateAddress(self, entities=None):
+        '''
+        PrivateAddress reports the preferred private network address for one or
+        more entities. Machines and units are supported.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> SSHAddressResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SSHClient',
+                   request='PrivateAddress',
+                   version=4,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SSHProxyResult)
+    async def Proxy(self):
+        '''
+        Proxy returns whether SSH connections should be proxied through the
+        controller hosts for the model associated with the API connection.
+
+
+        Returns -> SSHProxyResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SSHClient',
+                   request='Proxy',
+                   version=4,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SSHAddressResults)
+    async def PublicAddress(self, entities=None):
+        '''
+        PublicAddress reports the preferred public network address for one
+        or more entities. Machines and units are supported.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> SSHAddressResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SSHClient',
+                   request='PublicAddress',
+                   version=4,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SSHPublicKeysResults)
+    async def PublicKeys(self, entities=None):
+        '''
+        PublicKeys returns the public SSH hosts for one or more
+        entities. Machines and units are supported.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> SSHPublicKeysResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SSHClient',
+                   request='PublicKeys',
                    version=4,
                    params=_params)
         _params['entities'] = entities
@@ -1395,6 +2010,7 @@ class StorageProvisionerFacade(Type):
                                                     'InUse': {'type': 'boolean'},
                                                     'Label': {'type': 'string'},
                                                     'MountPoint': {'type': 'string'},
+                                                    'SerialId': {'type': 'string'},
                                                     'Size': {'type': 'integer'},
                                                     'UUID': {'type': 'string'},
                                                     'WWN': {'type': 'string'}},
@@ -1408,7 +2024,8 @@ class StorageProvisionerFacade(Type):
                                                   'Size',
                                                   'FilesystemType',
                                                   'InUse',
-                                                  'MountPoint'],
+                                                  'MountPoint',
+                                                  'SerialId'],
                                      'type': 'object'},
                      'BlockDeviceResult': {'additionalProperties': False,
                                            'properties': {'error': {'$ref': '#/definitions/Error'},
@@ -1786,119 +2403,287 @@ class StorageProvisionerFacade(Type):
                                                             'type': 'array'}},
                                  'required': ['volumes'],
                                  'type': 'object'}},
-     'properties': {'AttachmentLife': {'properties': {'Params': {'$ref': '#/definitions/MachineStorageIds'},
+     'properties': {'AttachmentLife': {'description': 'AttachmentLife returns the '
+                                                      'lifecycle state of each '
+                                                      'specified machine\n'
+                                                      'storage attachment.',
+                                       'properties': {'Params': {'$ref': '#/definitions/MachineStorageIds'},
                                                       'Result': {'$ref': '#/definitions/LifeResults'}},
                                        'type': 'object'},
                     'CreateVolumeAttachmentPlans': {'properties': {'Params': {'$ref': '#/definitions/VolumeAttachmentPlans'},
                                                                    'Result': {'$ref': '#/definitions/ErrorResults'}},
                                                     'type': 'object'},
-                    'EnsureDead': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'EnsureDead': {'description': 'EnsureDead calls EnsureDead on '
+                                                  'each given entity from state. '
+                                                  'It\n'
+                                                  'will fail if the entity is not '
+                                                  "present. If it's Alive, nothing "
+                                                  'will\n'
+                                                  'happen (see state/EnsureDead() '
+                                                  'for units or machines).',
+                                   'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                   'Result': {'$ref': '#/definitions/ErrorResults'}},
                                    'type': 'object'},
-                    'FilesystemAttachmentParams': {'properties': {'Params': {'$ref': '#/definitions/MachineStorageIds'},
+                    'FilesystemAttachmentParams': {'description': 'FilesystemAttachmentParams '
+                                                                  'returns the '
+                                                                  'parameters for '
+                                                                  'creating the '
+                                                                  'filesystem\n'
+                                                                  'attachments '
+                                                                  'with the '
+                                                                  'specified IDs.',
+                                                   'properties': {'Params': {'$ref': '#/definitions/MachineStorageIds'},
                                                                   'Result': {'$ref': '#/definitions/FilesystemAttachmentParamsResults'}},
                                                    'type': 'object'},
-                    'FilesystemAttachments': {'properties': {'Params': {'$ref': '#/definitions/MachineStorageIds'},
+                    'FilesystemAttachments': {'description': 'FilesystemAttachments '
+                                                             'returns details of '
+                                                             'filesystem '
+                                                             'attachments with the '
+                                                             'specified IDs.',
+                                              'properties': {'Params': {'$ref': '#/definitions/MachineStorageIds'},
                                                              'Result': {'$ref': '#/definitions/FilesystemAttachmentResults'}},
                                               'type': 'object'},
-                    'FilesystemParams': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'FilesystemParams': {'description': 'FilesystemParams returns '
+                                                        'the parameters for '
+                                                        'creating the filesystems\n'
+                                                        'with the specified tags.',
+                                         'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                         'Result': {'$ref': '#/definitions/FilesystemParamsResults'}},
                                          'type': 'object'},
-                    'Filesystems': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'Filesystems': {'description': 'Filesystems returns details of '
+                                                   'filesystems with the specified '
+                                                   'tags.',
+                                    'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                    'Result': {'$ref': '#/definitions/FilesystemResults'}},
                                     'type': 'object'},
-                    'InstanceId': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'InstanceId': {'description': 'InstanceId returns the provider '
+                                                  'specific instance id for each '
+                                                  'given\n'
+                                                  'machine or an '
+                                                  'CodeNotProvisioned error, if '
+                                                  'not set.',
+                                   'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                   'Result': {'$ref': '#/definitions/StringResults'}},
                                    'type': 'object'},
-                    'Life': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'Life': {'description': 'Life returns the life status of every '
+                                            'supplied entity, where available.',
+                             'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                             'Result': {'$ref': '#/definitions/LifeResults'}},
                              'type': 'object'},
-                    'Remove': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'Remove': {'description': 'Remove removes volumes and '
+                                              'filesystems from state.',
+                               'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                               'Result': {'$ref': '#/definitions/ErrorResults'}},
                                'type': 'object'},
-                    'RemoveAttachment': {'properties': {'Params': {'$ref': '#/definitions/MachineStorageIds'},
+                    'RemoveAttachment': {'description': 'RemoveAttachment removes '
+                                                        'the specified machine '
+                                                        'storage attachments\n'
+                                                        'from state.',
+                                         'properties': {'Params': {'$ref': '#/definitions/MachineStorageIds'},
                                                         'Result': {'$ref': '#/definitions/ErrorResults'}},
                                          'type': 'object'},
-                    'RemoveFilesystemParams': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'RemoveFilesystemParams': {'description': 'RemoveFilesystemParams '
+                                                              'returns the '
+                                                              'parameters for '
+                                                              'destroying or\n'
+                                                              'releasing the '
+                                                              'filesystems with '
+                                                              'the specified tags.',
+                                               'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                               'Result': {'$ref': '#/definitions/RemoveFilesystemParamsResults'}},
                                                'type': 'object'},
                     'RemoveVolumeAttachmentPlan': {'properties': {'Params': {'$ref': '#/definitions/MachineStorageIds'},
                                                                   'Result': {'$ref': '#/definitions/ErrorResults'}},
                                                    'type': 'object'},
-                    'RemoveVolumeParams': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'RemoveVolumeParams': {'description': 'RemoveVolumeParams '
+                                                          'returns the parameters '
+                                                          'for destroying\n'
+                                                          'or releasing the '
+                                                          'volumes with the '
+                                                          'specified tags.',
+                                           'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                           'Result': {'$ref': '#/definitions/RemoveVolumeParamsResults'}},
                                            'type': 'object'},
-                    'SetFilesystemAttachmentInfo': {'properties': {'Params': {'$ref': '#/definitions/FilesystemAttachments'},
+                    'SetFilesystemAttachmentInfo': {'description': 'SetFilesystemAttachmentInfo '
+                                                                   'records the '
+                                                                   'details of '
+                                                                   'newly '
+                                                                   'provisioned '
+                                                                   'filesystem\n'
+                                                                   'attachments.',
+                                                    'properties': {'Params': {'$ref': '#/definitions/FilesystemAttachments'},
                                                                    'Result': {'$ref': '#/definitions/ErrorResults'}},
                                                     'type': 'object'},
-                    'SetFilesystemInfo': {'properties': {'Params': {'$ref': '#/definitions/Filesystems'},
+                    'SetFilesystemInfo': {'description': 'SetFilesystemInfo '
+                                                         'records the details of '
+                                                         'newly provisioned '
+                                                         'filesystems.',
+                                          'properties': {'Params': {'$ref': '#/definitions/Filesystems'},
                                                          'Result': {'$ref': '#/definitions/ErrorResults'}},
                                           'type': 'object'},
-                    'SetStatus': {'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
+                    'SetStatus': {'description': 'SetStatus sets the status of '
+                                                 'each given entity.',
+                                  'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
                                                  'Result': {'$ref': '#/definitions/ErrorResults'}},
                                   'type': 'object'},
-                    'SetVolumeAttachmentInfo': {'properties': {'Params': {'$ref': '#/definitions/VolumeAttachments'},
+                    'SetVolumeAttachmentInfo': {'description': 'SetVolumeAttachmentInfo '
+                                                               'records the '
+                                                               'details of newly '
+                                                               'provisioned '
+                                                               'volume\n'
+                                                               'attachments.',
+                                                'properties': {'Params': {'$ref': '#/definitions/VolumeAttachments'},
                                                                'Result': {'$ref': '#/definitions/ErrorResults'}},
                                                 'type': 'object'},
                     'SetVolumeAttachmentPlanBlockInfo': {'properties': {'Params': {'$ref': '#/definitions/VolumeAttachmentPlans'},
                                                                         'Result': {'$ref': '#/definitions/ErrorResults'}},
                                                          'type': 'object'},
-                    'SetVolumeInfo': {'properties': {'Params': {'$ref': '#/definitions/Volumes'},
+                    'SetVolumeInfo': {'description': 'SetVolumeInfo records the '
+                                                     'details of newly provisioned '
+                                                     'volumes.',
+                                      'properties': {'Params': {'$ref': '#/definitions/Volumes'},
                                                      'Result': {'$ref': '#/definitions/ErrorResults'}},
                                       'type': 'object'},
-                    'UpdateStatus': {'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
-                                                    'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                     'type': 'object'},
-                    'VolumeAttachmentParams': {'properties': {'Params': {'$ref': '#/definitions/MachineStorageIds'},
+                    'VolumeAttachmentParams': {'description': 'VolumeAttachmentParams '
+                                                              'returns the '
+                                                              'parameters for '
+                                                              'creating the '
+                                                              'volume\n'
+                                                              'attachments with '
+                                                              'the specified IDs.',
+                                               'properties': {'Params': {'$ref': '#/definitions/MachineStorageIds'},
                                                               'Result': {'$ref': '#/definitions/VolumeAttachmentParamsResults'}},
                                                'type': 'object'},
-                    'VolumeAttachmentPlans': {'properties': {'Params': {'$ref': '#/definitions/MachineStorageIds'},
+                    'VolumeAttachmentPlans': {'description': 'VolumeAttachmentPlans '
+                                                             'returns details of '
+                                                             'volume attachment '
+                                                             'plans with the '
+                                                             'specified IDs.',
+                                              'properties': {'Params': {'$ref': '#/definitions/MachineStorageIds'},
                                                              'Result': {'$ref': '#/definitions/VolumeAttachmentPlanResults'}},
                                               'type': 'object'},
-                    'VolumeAttachments': {'properties': {'Params': {'$ref': '#/definitions/MachineStorageIds'},
+                    'VolumeAttachments': {'description': 'VolumeAttachments '
+                                                         'returns details of '
+                                                         'volume attachments with '
+                                                         'the specified IDs.',
+                                          'properties': {'Params': {'$ref': '#/definitions/MachineStorageIds'},
                                                          'Result': {'$ref': '#/definitions/VolumeAttachmentResults'}},
                                           'type': 'object'},
-                    'VolumeBlockDevices': {'properties': {'Params': {'$ref': '#/definitions/MachineStorageIds'},
+                    'VolumeBlockDevices': {'description': 'VolumeBlockDevices '
+                                                          'returns details of the '
+                                                          'block devices '
+                                                          'corresponding to the\n'
+                                                          'volume attachments with '
+                                                          'the specified IDs.',
+                                           'properties': {'Params': {'$ref': '#/definitions/MachineStorageIds'},
                                                           'Result': {'$ref': '#/definitions/BlockDeviceResults'}},
                                            'type': 'object'},
-                    'VolumeParams': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'VolumeParams': {'description': 'VolumeParams returns the '
+                                                    'parameters for creating or '
+                                                    'destroying\n'
+                                                    'the volumes with the '
+                                                    'specified tags.',
+                                     'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                     'Result': {'$ref': '#/definitions/VolumeParamsResults'}},
                                      'type': 'object'},
-                    'Volumes': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'Volumes': {'description': 'Volumes returns details of volumes '
+                                               'with the specified tags.',
+                                'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                'Result': {'$ref': '#/definitions/VolumeResults'}},
                                 'type': 'object'},
-                    'WatchApplications': {'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
+                    'WatchApplications': {'description': 'WatchApplications starts '
+                                                         'a StringsWatcher to '
+                                                         'watch CAAS applications\n'
+                                                         'deployed to this model.',
+                                          'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
                                           'type': 'object'},
-                    'WatchBlockDevices': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'WatchBlockDevices': {'description': 'WatchBlockDevices '
+                                                         'watches for changes to '
+                                                         "the specified machines' "
+                                                         'block devices.',
+                                          'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                          'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
                                           'type': 'object'},
-                    'WatchFilesystemAttachments': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'WatchFilesystemAttachments': {'description': 'WatchFilesystemAttachments '
+                                                                  'watches for '
+                                                                  'changes to '
+                                                                  'filesystem '
+                                                                  'attachments\n'
+                                                                  'scoped to the '
+                                                                  'entity with the '
+                                                                  'tag passed to '
+                                                                  'NewState.',
+                                                   'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                                   'Result': {'$ref': '#/definitions/MachineStorageIdsWatchResults'}},
                                                    'type': 'object'},
-                    'WatchFilesystems': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'WatchFilesystems': {'description': 'WatchFilesystems watches '
+                                                        'for changes to '
+                                                        'filesystems scoped\n'
+                                                        'to the entity with the '
+                                                        'tag passed to NewState.',
+                                         'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                         'Result': {'$ref': '#/definitions/StringsWatchResults'}},
                                          'type': 'object'},
-                    'WatchMachines': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'WatchMachines': {'description': 'WatchMachines watches for '
+                                                     'changes to the specified '
+                                                     'machines.',
+                                      'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                      'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
                                       'type': 'object'},
-                    'WatchVolumeAttachmentPlans': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'WatchVolumeAttachmentPlans': {'description': 'WatchVolumeAttachmentPlans '
+                                                                  'watches for '
+                                                                  'changes to '
+                                                                  'volume '
+                                                                  'attachments for '
+                                                                  'a machine for '
+                                                                  'the purpose of '
+                                                                  'allowing\n'
+                                                                  'that machine to '
+                                                                  'run any '
+                                                                  'initialization '
+                                                                  'needed, for '
+                                                                  'that volume to '
+                                                                  'actually appear '
+                                                                  'as a block '
+                                                                  'device (ie: '
+                                                                  'iSCSI)',
+                                                   'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                                   'Result': {'$ref': '#/definitions/MachineStorageIdsWatchResults'}},
                                                    'type': 'object'},
-                    'WatchVolumeAttachments': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'WatchVolumeAttachments': {'description': 'WatchVolumeAttachments '
+                                                              'watches for changes '
+                                                              'to volume '
+                                                              'attachments scoped '
+                                                              'to\n'
+                                                              'the entity with the '
+                                                              'tag passed to '
+                                                              'NewState.',
+                                               'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                               'Result': {'$ref': '#/definitions/MachineStorageIdsWatchResults'}},
                                                'type': 'object'},
-                    'WatchVolumes': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                    'WatchVolumes': {'description': 'WatchVolumes watches for '
+                                                    'changes to volumes scoped to '
+                                                    'the\n'
+                                                    'entity with the tag passed to '
+                                                    'NewState.',
+                                     'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                     'Result': {'$ref': '#/definitions/StringsWatchResults'}},
                                      'type': 'object'}},
      'type': 'object'}
     
 
     @ReturnMapping(LifeResults)
-    async def AttachmentLife(self, ids):
+    async def AttachmentLife(self, ids=None):
         '''
-        ids : typing.Sequence<+T_co>[~MachineStorageId]<~MachineStorageId>
-        Returns -> typing.Sequence<+T_co>[~LifeResult]<~LifeResult>
+        AttachmentLife returns the lifecycle state of each specified machine
+        storage attachment.
+
+        ids : typing.Sequence[~MachineStorageId]
+        Returns -> LifeResults
         '''
+        if ids is not None and not isinstance(ids, (bytes, str, list)):
+            raise Exception("Expected ids to be a Sequence, received: {}".format(type(ids)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -1912,11 +2697,14 @@ class StorageProvisionerFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def CreateVolumeAttachmentPlans(self, volume_plans):
+    async def CreateVolumeAttachmentPlans(self, volume_plans=None):
         '''
-        volume_plans : typing.Sequence<+T_co>[~VolumeAttachmentPlan]<~VolumeAttachmentPlan>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        volume_plans : typing.Sequence[~VolumeAttachmentPlan]
+        Returns -> ErrorResults
         '''
+        if volume_plans is not None and not isinstance(volume_plans, (bytes, str, list)):
+            raise Exception("Expected volume_plans to be a Sequence, received: {}".format(type(volume_plans)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -1930,11 +2718,18 @@ class StorageProvisionerFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def EnsureDead(self, entities):
+    async def EnsureDead(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        EnsureDead calls EnsureDead on each given entity from state. It
+        will fail if the entity is not present. If it's Alive, nothing will
+        happen (see state/EnsureDead() for units or machines).
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ErrorResults
         '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -1948,11 +2743,17 @@ class StorageProvisionerFacade(Type):
 
 
     @ReturnMapping(FilesystemAttachmentParamsResults)
-    async def FilesystemAttachmentParams(self, ids):
+    async def FilesystemAttachmentParams(self, ids=None):
         '''
-        ids : typing.Sequence<+T_co>[~MachineStorageId]<~MachineStorageId>
-        Returns -> typing.Sequence<+T_co>[~FilesystemAttachmentParamsResult]<~FilesystemAttachmentParamsResult>
+        FilesystemAttachmentParams returns the parameters for creating the filesystem
+        attachments with the specified IDs.
+
+        ids : typing.Sequence[~MachineStorageId]
+        Returns -> FilesystemAttachmentParamsResults
         '''
+        if ids is not None and not isinstance(ids, (bytes, str, list)):
+            raise Exception("Expected ids to be a Sequence, received: {}".format(type(ids)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -1966,11 +2767,16 @@ class StorageProvisionerFacade(Type):
 
 
     @ReturnMapping(FilesystemAttachmentResults)
-    async def FilesystemAttachments(self, ids):
+    async def FilesystemAttachments(self, ids=None):
         '''
-        ids : typing.Sequence<+T_co>[~MachineStorageId]<~MachineStorageId>
-        Returns -> typing.Sequence<+T_co>[~FilesystemAttachmentResult]<~FilesystemAttachmentResult>
+        FilesystemAttachments returns details of filesystem attachments with the specified IDs.
+
+        ids : typing.Sequence[~MachineStorageId]
+        Returns -> FilesystemAttachmentResults
         '''
+        if ids is not None and not isinstance(ids, (bytes, str, list)):
+            raise Exception("Expected ids to be a Sequence, received: {}".format(type(ids)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -1984,11 +2790,17 @@ class StorageProvisionerFacade(Type):
 
 
     @ReturnMapping(FilesystemParamsResults)
-    async def FilesystemParams(self, entities):
+    async def FilesystemParams(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~FilesystemParamsResult]<~FilesystemParamsResult>
+        FilesystemParams returns the parameters for creating the filesystems
+        with the specified tags.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> FilesystemParamsResults
         '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -2002,11 +2814,16 @@ class StorageProvisionerFacade(Type):
 
 
     @ReturnMapping(FilesystemResults)
-    async def Filesystems(self, entities):
+    async def Filesystems(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~FilesystemResult]<~FilesystemResult>
+        Filesystems returns details of filesystems with the specified tags.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> FilesystemResults
         '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -2020,11 +2837,17 @@ class StorageProvisionerFacade(Type):
 
 
     @ReturnMapping(StringResults)
-    async def InstanceId(self, entities):
+    async def InstanceId(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~StringResult]<~StringResult>
+        InstanceId returns the provider specific instance id for each given
+        machine or an CodeNotProvisioned error, if not set.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringResults
         '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -2038,11 +2861,16 @@ class StorageProvisionerFacade(Type):
 
 
     @ReturnMapping(LifeResults)
-    async def Life(self, entities):
+    async def Life(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~LifeResult]<~LifeResult>
+        Life returns the life status of every supplied entity, where available.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> LifeResults
         '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -2056,11 +2884,16 @@ class StorageProvisionerFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def Remove(self, entities):
+    async def Remove(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        Remove removes volumes and filesystems from state.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ErrorResults
         '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -2074,11 +2907,17 @@ class StorageProvisionerFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def RemoveAttachment(self, ids):
+    async def RemoveAttachment(self, ids=None):
         '''
-        ids : typing.Sequence<+T_co>[~MachineStorageId]<~MachineStorageId>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        RemoveAttachment removes the specified machine storage attachments
+        from state.
+
+        ids : typing.Sequence[~MachineStorageId]
+        Returns -> ErrorResults
         '''
+        if ids is not None and not isinstance(ids, (bytes, str, list)):
+            raise Exception("Expected ids to be a Sequence, received: {}".format(type(ids)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -2092,11 +2931,17 @@ class StorageProvisionerFacade(Type):
 
 
     @ReturnMapping(RemoveFilesystemParamsResults)
-    async def RemoveFilesystemParams(self, entities):
+    async def RemoveFilesystemParams(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~RemoveFilesystemParamsResult]<~RemoveFilesystemParamsResult>
+        RemoveFilesystemParams returns the parameters for destroying or
+        releasing the filesystems with the specified tags.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> RemoveFilesystemParamsResults
         '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -2110,11 +2955,14 @@ class StorageProvisionerFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def RemoveVolumeAttachmentPlan(self, ids):
+    async def RemoveVolumeAttachmentPlan(self, ids=None):
         '''
-        ids : typing.Sequence<+T_co>[~MachineStorageId]<~MachineStorageId>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        ids : typing.Sequence[~MachineStorageId]
+        Returns -> ErrorResults
         '''
+        if ids is not None and not isinstance(ids, (bytes, str, list)):
+            raise Exception("Expected ids to be a Sequence, received: {}".format(type(ids)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -2128,11 +2976,17 @@ class StorageProvisionerFacade(Type):
 
 
     @ReturnMapping(RemoveVolumeParamsResults)
-    async def RemoveVolumeParams(self, entities):
+    async def RemoveVolumeParams(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~RemoveVolumeParamsResult]<~RemoveVolumeParamsResult>
+        RemoveVolumeParams returns the parameters for destroying
+        or releasing the volumes with the specified tags.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> RemoveVolumeParamsResults
         '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -2146,11 +3000,17 @@ class StorageProvisionerFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def SetFilesystemAttachmentInfo(self, filesystem_attachments):
+    async def SetFilesystemAttachmentInfo(self, filesystem_attachments=None):
         '''
-        filesystem_attachments : typing.Sequence<+T_co>[~FilesystemAttachment]<~FilesystemAttachment>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        SetFilesystemAttachmentInfo records the details of newly provisioned filesystem
+        attachments.
+
+        filesystem_attachments : typing.Sequence[~FilesystemAttachment]
+        Returns -> ErrorResults
         '''
+        if filesystem_attachments is not None and not isinstance(filesystem_attachments, (bytes, str, list)):
+            raise Exception("Expected filesystem_attachments to be a Sequence, received: {}".format(type(filesystem_attachments)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -2164,11 +3024,16 @@ class StorageProvisionerFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def SetFilesystemInfo(self, filesystems):
+    async def SetFilesystemInfo(self, filesystems=None):
         '''
-        filesystems : typing.Sequence<+T_co>[~Filesystem]<~Filesystem>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        SetFilesystemInfo records the details of newly provisioned filesystems.
+
+        filesystems : typing.Sequence[~Filesystem]
+        Returns -> ErrorResults
         '''
+        if filesystems is not None and not isinstance(filesystems, (bytes, str, list)):
+            raise Exception("Expected filesystems to be a Sequence, received: {}".format(type(filesystems)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -2182,11 +3047,16 @@ class StorageProvisionerFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def SetStatus(self, entities):
+    async def SetStatus(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        SetStatus sets the status of each given entity.
+
+        entities : typing.Sequence[~EntityStatusArgs]
+        Returns -> ErrorResults
         '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -2200,11 +3070,17 @@ class StorageProvisionerFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def SetVolumeAttachmentInfo(self, volume_attachments):
+    async def SetVolumeAttachmentInfo(self, volume_attachments=None):
         '''
-        volume_attachments : typing.Sequence<+T_co>[~VolumeAttachment]<~VolumeAttachment>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        SetVolumeAttachmentInfo records the details of newly provisioned volume
+        attachments.
+
+        volume_attachments : typing.Sequence[~VolumeAttachment]
+        Returns -> ErrorResults
         '''
+        if volume_attachments is not None and not isinstance(volume_attachments, (bytes, str, list)):
+            raise Exception("Expected volume_attachments to be a Sequence, received: {}".format(type(volume_attachments)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -2218,11 +3094,14 @@ class StorageProvisionerFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def SetVolumeAttachmentPlanBlockInfo(self, volume_plans):
+    async def SetVolumeAttachmentPlanBlockInfo(self, volume_plans=None):
         '''
-        volume_plans : typing.Sequence<+T_co>[~VolumeAttachmentPlan]<~VolumeAttachmentPlan>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        volume_plans : typing.Sequence[~VolumeAttachmentPlan]
+        Returns -> ErrorResults
         '''
+        if volume_plans is not None and not isinstance(volume_plans, (bytes, str, list)):
+            raise Exception("Expected volume_plans to be a Sequence, received: {}".format(type(volume_plans)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -2236,11 +3115,16 @@ class StorageProvisionerFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def SetVolumeInfo(self, volumes):
+    async def SetVolumeInfo(self, volumes=None):
         '''
-        volumes : typing.Sequence<+T_co>[~Volume]<~Volume>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
+        SetVolumeInfo records the details of newly provisioned volumes.
+
+        volumes : typing.Sequence[~Volume]
+        Returns -> ErrorResults
         '''
+        if volumes is not None and not isinstance(volumes, (bytes, str, list)):
+            raise Exception("Expected volumes to be a Sequence, received: {}".format(type(volumes)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -2253,30 +3137,18 @@ class StorageProvisionerFacade(Type):
 
 
 
-    @ReturnMapping(ErrorResults)
-    async def UpdateStatus(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='StorageProvisioner',
-                   request='UpdateStatus',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
     @ReturnMapping(VolumeAttachmentParamsResults)
-    async def VolumeAttachmentParams(self, ids):
+    async def VolumeAttachmentParams(self, ids=None):
         '''
-        ids : typing.Sequence<+T_co>[~MachineStorageId]<~MachineStorageId>
-        Returns -> typing.Sequence<+T_co>[~VolumeAttachmentParamsResult]<~VolumeAttachmentParamsResult>
+        VolumeAttachmentParams returns the parameters for creating the volume
+        attachments with the specified IDs.
+
+        ids : typing.Sequence[~MachineStorageId]
+        Returns -> VolumeAttachmentParamsResults
         '''
+        if ids is not None and not isinstance(ids, (bytes, str, list)):
+            raise Exception("Expected ids to be a Sequence, received: {}".format(type(ids)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -2290,11 +3162,16 @@ class StorageProvisionerFacade(Type):
 
 
     @ReturnMapping(VolumeAttachmentPlanResults)
-    async def VolumeAttachmentPlans(self, ids):
+    async def VolumeAttachmentPlans(self, ids=None):
         '''
-        ids : typing.Sequence<+T_co>[~MachineStorageId]<~MachineStorageId>
-        Returns -> typing.Sequence<+T_co>[~VolumeAttachmentPlanResult]<~VolumeAttachmentPlanResult>
+        VolumeAttachmentPlans returns details of volume attachment plans with the specified IDs.
+
+        ids : typing.Sequence[~MachineStorageId]
+        Returns -> VolumeAttachmentPlanResults
         '''
+        if ids is not None and not isinstance(ids, (bytes, str, list)):
+            raise Exception("Expected ids to be a Sequence, received: {}".format(type(ids)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -2308,11 +3185,16 @@ class StorageProvisionerFacade(Type):
 
 
     @ReturnMapping(VolumeAttachmentResults)
-    async def VolumeAttachments(self, ids):
+    async def VolumeAttachments(self, ids=None):
         '''
-        ids : typing.Sequence<+T_co>[~MachineStorageId]<~MachineStorageId>
-        Returns -> typing.Sequence<+T_co>[~VolumeAttachmentResult]<~VolumeAttachmentResult>
+        VolumeAttachments returns details of volume attachments with the specified IDs.
+
+        ids : typing.Sequence[~MachineStorageId]
+        Returns -> VolumeAttachmentResults
         '''
+        if ids is not None and not isinstance(ids, (bytes, str, list)):
+            raise Exception("Expected ids to be a Sequence, received: {}".format(type(ids)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -2326,11 +3208,17 @@ class StorageProvisionerFacade(Type):
 
 
     @ReturnMapping(BlockDeviceResults)
-    async def VolumeBlockDevices(self, ids):
+    async def VolumeBlockDevices(self, ids=None):
         '''
-        ids : typing.Sequence<+T_co>[~MachineStorageId]<~MachineStorageId>
-        Returns -> typing.Sequence<+T_co>[~BlockDeviceResult]<~BlockDeviceResult>
+        VolumeBlockDevices returns details of the block devices corresponding to the
+        volume attachments with the specified IDs.
+
+        ids : typing.Sequence[~MachineStorageId]
+        Returns -> BlockDeviceResults
         '''
+        if ids is not None and not isinstance(ids, (bytes, str, list)):
+            raise Exception("Expected ids to be a Sequence, received: {}".format(type(ids)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -2344,11 +3232,17 @@ class StorageProvisionerFacade(Type):
 
 
     @ReturnMapping(VolumeParamsResults)
-    async def VolumeParams(self, entities):
+    async def VolumeParams(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~VolumeParamsResult]<~VolumeParamsResult>
+        VolumeParams returns the parameters for creating or destroying
+        the volumes with the specified tags.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> VolumeParamsResults
         '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -2362,11 +3256,16 @@ class StorageProvisionerFacade(Type):
 
 
     @ReturnMapping(VolumeResults)
-    async def Volumes(self, entities):
+    async def Volumes(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~VolumeResult]<~VolumeResult>
+        Volumes returns details of volumes with the specified tags.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> VolumeResults
         '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -2382,9 +3281,13 @@ class StorageProvisionerFacade(Type):
     @ReturnMapping(StringsWatchResult)
     async def WatchApplications(self):
         '''
+        WatchApplications starts a StringsWatcher to watch CAAS applications
+        deployed to this model.
 
-        Returns -> typing.Union[typing.Sequence<+T_co>[str], _ForwardRef('Error')]
+
+        Returns -> StringsWatchResult
         '''
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -2398,11 +3301,16 @@ class StorageProvisionerFacade(Type):
 
 
     @ReturnMapping(NotifyWatchResults)
-    async def WatchBlockDevices(self, entities):
+    async def WatchBlockDevices(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
+        WatchBlockDevices watches for changes to the specified machines' block devices.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> NotifyWatchResults
         '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -2416,11 +3324,17 @@ class StorageProvisionerFacade(Type):
 
 
     @ReturnMapping(MachineStorageIdsWatchResults)
-    async def WatchFilesystemAttachments(self, entities):
+    async def WatchFilesystemAttachments(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~MachineStorageIdsWatchResult]<~MachineStorageIdsWatchResult>
+        WatchFilesystemAttachments watches for changes to filesystem attachments
+        scoped to the entity with the tag passed to NewState.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> MachineStorageIdsWatchResults
         '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -2434,11 +3348,17 @@ class StorageProvisionerFacade(Type):
 
 
     @ReturnMapping(StringsWatchResults)
-    async def WatchFilesystems(self, entities):
+    async def WatchFilesystems(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~StringsWatchResult]<~StringsWatchResult>
+        WatchFilesystems watches for changes to filesystems scoped
+        to the entity with the tag passed to NewState.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringsWatchResults
         '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -2452,11 +3372,16 @@ class StorageProvisionerFacade(Type):
 
 
     @ReturnMapping(NotifyWatchResults)
-    async def WatchMachines(self, entities):
+    async def WatchMachines(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
+        WatchMachines watches for changes to the specified machines.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> NotifyWatchResults
         '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -2470,11 +3395,17 @@ class StorageProvisionerFacade(Type):
 
 
     @ReturnMapping(MachineStorageIdsWatchResults)
-    async def WatchVolumeAttachmentPlans(self, entities):
+    async def WatchVolumeAttachmentPlans(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~MachineStorageIdsWatchResult]<~MachineStorageIdsWatchResult>
+        WatchVolumeAttachmentPlans watches for changes to volume attachments for a machine for the purpose of allowing
+        that machine to run any initialization needed, for that volume to actually appear as a block device (ie: iSCSI)
+
+        entities : typing.Sequence[~Entity]
+        Returns -> MachineStorageIdsWatchResults
         '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -2488,11 +3419,17 @@ class StorageProvisionerFacade(Type):
 
 
     @ReturnMapping(MachineStorageIdsWatchResults)
-    async def WatchVolumeAttachments(self, entities):
+    async def WatchVolumeAttachments(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~MachineStorageIdsWatchResult]<~MachineStorageIdsWatchResult>
+        WatchVolumeAttachments watches for changes to volume attachments scoped to
+        the entity with the tag passed to NewState.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> MachineStorageIdsWatchResults
         '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
@@ -2506,2116 +3443,21 @@ class StorageProvisionerFacade(Type):
 
 
     @ReturnMapping(StringsWatchResults)
-    async def WatchVolumes(self, entities):
+    async def WatchVolumes(self, entities=None):
         '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~StringsWatchResult]<~StringsWatchResult>
+        WatchVolumes watches for changes to volumes scoped to the
+        entity with the tag passed to NewState.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringsWatchResults
         '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='StorageProvisioner',
                    request='WatchVolumes',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-class UniterFacade(Type):
-    name = 'Uniter'
-    version = 4
-    schema =     {'definitions': {'APIHostPortsResult': {'additionalProperties': False,
-                                            'properties': {'servers': {'items': {'items': {'$ref': '#/definitions/HostPort'},
-                                                                                 'type': 'array'},
-                                                                       'type': 'array'}},
-                                            'required': ['servers'],
-                                            'type': 'object'},
-                     'Action': {'additionalProperties': False,
-                                'properties': {'name': {'type': 'string'},
-                                               'parameters': {'patternProperties': {'.*': {'additionalProperties': True,
-                                                                                           'type': 'object'}},
-                                                              'type': 'object'},
-                                               'receiver': {'type': 'string'},
-                                               'tag': {'type': 'string'}},
-                                'required': ['tag', 'receiver', 'name'],
-                                'type': 'object'},
-                     'ActionExecutionResult': {'additionalProperties': False,
-                                               'properties': {'action-tag': {'type': 'string'},
-                                                              'message': {'type': 'string'},
-                                                              'results': {'patternProperties': {'.*': {'additionalProperties': True,
-                                                                                                       'type': 'object'}},
-                                                                          'type': 'object'},
-                                                              'status': {'type': 'string'}},
-                                               'required': ['action-tag', 'status'],
-                                               'type': 'object'},
-                     'ActionExecutionResults': {'additionalProperties': False,
-                                                'properties': {'results': {'items': {'$ref': '#/definitions/ActionExecutionResult'},
-                                                                           'type': 'array'}},
-                                                'type': 'object'},
-                     'ActionResult': {'additionalProperties': False,
-                                      'properties': {'action': {'$ref': '#/definitions/Action'},
-                                                     'completed': {'format': 'date-time',
-                                                                   'type': 'string'},
-                                                     'enqueued': {'format': 'date-time',
-                                                                  'type': 'string'},
-                                                     'error': {'$ref': '#/definitions/Error'},
-                                                     'message': {'type': 'string'},
-                                                     'output': {'patternProperties': {'.*': {'additionalProperties': True,
-                                                                                             'type': 'object'}},
-                                                                'type': 'object'},
-                                                     'started': {'format': 'date-time',
-                                                                 'type': 'string'},
-                                                     'status': {'type': 'string'}},
-                                      'type': 'object'},
-                     'ActionResults': {'additionalProperties': False,
-                                       'properties': {'results': {'items': {'$ref': '#/definitions/ActionResult'},
-                                                                  'type': 'array'}},
-                                       'type': 'object'},
-                     'Address': {'additionalProperties': False,
-                                 'properties': {'scope': {'type': 'string'},
-                                                'space-name': {'type': 'string'},
-                                                'type': {'type': 'string'},
-                                                'value': {'type': 'string'}},
-                                 'required': ['value', 'type', 'scope'],
-                                 'type': 'object'},
-                     'ApplicationStatusResult': {'additionalProperties': False,
-                                                 'properties': {'application': {'$ref': '#/definitions/StatusResult'},
-                                                                'error': {'$ref': '#/definitions/Error'},
-                                                                'units': {'patternProperties': {'.*': {'$ref': '#/definitions/StatusResult'}},
-                                                                          'type': 'object'}},
-                                                 'required': ['application',
-                                                              'units'],
-                                                 'type': 'object'},
-                     'ApplicationStatusResults': {'additionalProperties': False,
-                                                  'properties': {'results': {'items': {'$ref': '#/definitions/ApplicationStatusResult'},
-                                                                             'type': 'array'}},
-                                                  'required': ['results'],
-                                                  'type': 'object'},
-                     'BoolResult': {'additionalProperties': False,
-                                    'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                   'result': {'type': 'boolean'}},
-                                    'required': ['result'],
-                                    'type': 'object'},
-                     'BoolResults': {'additionalProperties': False,
-                                     'properties': {'results': {'items': {'$ref': '#/definitions/BoolResult'},
-                                                                'type': 'array'}},
-                                     'required': ['results'],
-                                     'type': 'object'},
-                     'BytesResult': {'additionalProperties': False,
-                                     'properties': {'result': {'items': {'type': 'integer'},
-                                                               'type': 'array'}},
-                                     'required': ['result'],
-                                     'type': 'object'},
-                     'CharmRelation': {'additionalProperties': False,
-                                       'properties': {'interface': {'type': 'string'},
-                                                      'limit': {'type': 'integer'},
-                                                      'name': {'type': 'string'},
-                                                      'optional': {'type': 'boolean'},
-                                                      'role': {'type': 'string'},
-                                                      'scope': {'type': 'string'}},
-                                       'required': ['name',
-                                                    'role',
-                                                    'interface',
-                                                    'optional',
-                                                    'limit',
-                                                    'scope'],
-                                       'type': 'object'},
-                     'CharmURL': {'additionalProperties': False,
-                                  'properties': {'url': {'type': 'string'}},
-                                  'required': ['url'],
-                                  'type': 'object'},
-                     'CharmURLs': {'additionalProperties': False,
-                                   'properties': {'urls': {'items': {'$ref': '#/definitions/CharmURL'},
-                                                           'type': 'array'}},
-                                   'required': ['urls'],
-                                   'type': 'object'},
-                     'ConfigSettingsResult': {'additionalProperties': False,
-                                              'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                             'settings': {'patternProperties': {'.*': {'additionalProperties': True,
-                                                                                                       'type': 'object'}},
-                                                                          'type': 'object'}},
-                                              'required': ['settings'],
-                                              'type': 'object'},
-                     'ConfigSettingsResults': {'additionalProperties': False,
-                                               'properties': {'results': {'items': {'$ref': '#/definitions/ConfigSettingsResult'},
-                                                                          'type': 'array'}},
-                                               'required': ['results'],
-                                               'type': 'object'},
-                     'Endpoint': {'additionalProperties': False,
-                                  'properties': {'application-name': {'type': 'string'},
-                                                 'relation': {'$ref': '#/definitions/CharmRelation'}},
-                                  'required': ['application-name', 'relation'],
-                                  'type': 'object'},
-                     'Entities': {'additionalProperties': False,
-                                  'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
-                                                              'type': 'array'}},
-                                  'required': ['entities'],
-                                  'type': 'object'},
-                     'EntitiesCharmURL': {'additionalProperties': False,
-                                          'properties': {'entities': {'items': {'$ref': '#/definitions/EntityCharmURL'},
-                                                                      'type': 'array'}},
-                                          'required': ['entities'],
-                                          'type': 'object'},
-                     'EntitiesPortRanges': {'additionalProperties': False,
-                                            'properties': {'entities': {'items': {'$ref': '#/definitions/EntityPortRange'},
-                                                                        'type': 'array'}},
-                                            'required': ['entities'],
-                                            'type': 'object'},
-                     'Entity': {'additionalProperties': False,
-                                'properties': {'tag': {'type': 'string'}},
-                                'required': ['tag'],
-                                'type': 'object'},
-                     'EntityCharmURL': {'additionalProperties': False,
-                                        'properties': {'charm-url': {'type': 'string'},
-                                                       'tag': {'type': 'string'}},
-                                        'required': ['tag', 'charm-url'],
-                                        'type': 'object'},
-                     'EntityPortRange': {'additionalProperties': False,
-                                         'properties': {'from-port': {'type': 'integer'},
-                                                        'protocol': {'type': 'string'},
-                                                        'tag': {'type': 'string'},
-                                                        'to-port': {'type': 'integer'}},
-                                         'required': ['tag',
-                                                      'protocol',
-                                                      'from-port',
-                                                      'to-port'],
-                                         'type': 'object'},
-                     'EntityStatusArgs': {'additionalProperties': False,
-                                          'properties': {'data': {'patternProperties': {'.*': {'additionalProperties': True,
-                                                                                               'type': 'object'}},
-                                                                  'type': 'object'},
-                                                         'info': {'type': 'string'},
-                                                         'status': {'type': 'string'},
-                                                         'tag': {'type': 'string'}},
-                                          'required': ['tag',
-                                                       'status',
-                                                       'info',
-                                                       'data'],
-                                          'type': 'object'},
-                     'EntityWorkloadVersion': {'additionalProperties': False,
-                                               'properties': {'tag': {'type': 'string'},
-                                                              'workload-version': {'type': 'string'}},
-                                               'required': ['tag',
-                                                            'workload-version'],
-                                               'type': 'object'},
-                     'EntityWorkloadVersions': {'additionalProperties': False,
-                                                'properties': {'entities': {'items': {'$ref': '#/definitions/EntityWorkloadVersion'},
-                                                                            'type': 'array'}},
-                                                'required': ['entities'],
-                                                'type': 'object'},
-                     'Error': {'additionalProperties': False,
-                               'properties': {'code': {'type': 'string'},
-                                              'info': {'$ref': '#/definitions/ErrorInfo'},
-                                              'message': {'type': 'string'}},
-                               'required': ['message', 'code'],
-                               'type': 'object'},
-                     'ErrorInfo': {'additionalProperties': False,
-                                   'properties': {'macaroon': {'$ref': '#/definitions/Macaroon'},
-                                                  'macaroon-path': {'type': 'string'}},
-                                   'type': 'object'},
-                     'ErrorResult': {'additionalProperties': False,
-                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
-                                     'type': 'object'},
-                     'ErrorResults': {'additionalProperties': False,
-                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
-                                                                 'type': 'array'}},
-                                      'required': ['results'],
-                                      'type': 'object'},
-                     'GetLeadershipSettingsBulkResults': {'additionalProperties': False,
-                                                          'properties': {'results': {'items': {'$ref': '#/definitions/GetLeadershipSettingsResult'},
-                                                                                     'type': 'array'}},
-                                                          'required': ['results'],
-                                                          'type': 'object'},
-                     'GetLeadershipSettingsResult': {'additionalProperties': False,
-                                                     'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                                    'settings': {'patternProperties': {'.*': {'type': 'string'}},
-                                                                                 'type': 'object'}},
-                                                     'required': ['settings'],
-                                                     'type': 'object'},
-                     'HostPort': {'additionalProperties': False,
-                                  'properties': {'Address': {'$ref': '#/definitions/Address'},
-                                                 'port': {'type': 'integer'}},
-                                  'required': ['Address', 'port'],
-                                  'type': 'object'},
-                     'IntResult': {'additionalProperties': False,
-                                   'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                  'result': {'type': 'integer'}},
-                                   'required': ['result'],
-                                   'type': 'object'},
-                     'IntResults': {'additionalProperties': False,
-                                    'properties': {'results': {'items': {'$ref': '#/definitions/IntResult'},
-                                                               'type': 'array'}},
-                                    'required': ['results'],
-                                    'type': 'object'},
-                     'LifeResult': {'additionalProperties': False,
-                                    'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                   'life': {'type': 'string'}},
-                                    'required': ['life'],
-                                    'type': 'object'},
-                     'LifeResults': {'additionalProperties': False,
-                                     'properties': {'results': {'items': {'$ref': '#/definitions/LifeResult'},
-                                                                'type': 'array'}},
-                                     'required': ['results'],
-                                     'type': 'object'},
-                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
-                     'MachinePortRange': {'additionalProperties': False,
-                                          'properties': {'port-range': {'$ref': '#/definitions/PortRange'},
-                                                         'relation-tag': {'type': 'string'},
-                                                         'unit-tag': {'type': 'string'}},
-                                          'required': ['unit-tag',
-                                                       'relation-tag',
-                                                       'port-range'],
-                                          'type': 'object'},
-                     'MachinePortsResult': {'additionalProperties': False,
-                                            'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                           'ports': {'items': {'$ref': '#/definitions/MachinePortRange'},
-                                                                     'type': 'array'}},
-                                            'required': ['ports'],
-                                            'type': 'object'},
-                     'MachinePortsResults': {'additionalProperties': False,
-                                             'properties': {'results': {'items': {'$ref': '#/definitions/MachinePortsResult'},
-                                                                        'type': 'array'}},
-                                             'required': ['results'],
-                                             'type': 'object'},
-                     'MergeLeadershipSettingsBulkParams': {'additionalProperties': False,
-                                                           'properties': {'params': {'items': {'$ref': '#/definitions/MergeLeadershipSettingsParam'},
-                                                                                     'type': 'array'}},
-                                                           'required': ['params'],
-                                                           'type': 'object'},
-                     'MergeLeadershipSettingsParam': {'additionalProperties': False,
-                                                      'properties': {'application-tag': {'type': 'string'},
-                                                                     'settings': {'patternProperties': {'.*': {'type': 'string'}},
-                                                                                  'type': 'object'}},
-                                                      'required': ['application-tag',
-                                                                   'settings'],
-                                                      'type': 'object'},
-                     'MeterStatusResult': {'additionalProperties': False,
-                                           'properties': {'code': {'type': 'string'},
-                                                          'error': {'$ref': '#/definitions/Error'},
-                                                          'info': {'type': 'string'}},
-                                           'required': ['code', 'info'],
-                                           'type': 'object'},
-                     'MeterStatusResults': {'additionalProperties': False,
-                                            'properties': {'results': {'items': {'$ref': '#/definitions/MeterStatusResult'},
-                                                                       'type': 'array'}},
-                                            'required': ['results'],
-                                            'type': 'object'},
-                     'Metric': {'additionalProperties': False,
-                                'properties': {'key': {'type': 'string'},
-                                               'time': {'format': 'date-time',
-                                                        'type': 'string'},
-                                               'value': {'type': 'string'}},
-                                'required': ['key', 'value', 'time'],
-                                'type': 'object'},
-                     'MetricBatch': {'additionalProperties': False,
-                                     'properties': {'charm-url': {'type': 'string'},
-                                                    'created': {'format': 'date-time',
-                                                                'type': 'string'},
-                                                    'metrics': {'items': {'$ref': '#/definitions/Metric'},
-                                                                'type': 'array'},
-                                                    'uuid': {'type': 'string'}},
-                                     'required': ['uuid',
-                                                  'charm-url',
-                                                  'created',
-                                                  'metrics'],
-                                     'type': 'object'},
-                     'MetricBatchParam': {'additionalProperties': False,
-                                          'properties': {'batch': {'$ref': '#/definitions/MetricBatch'},
-                                                         'tag': {'type': 'string'}},
-                                          'required': ['tag', 'batch'],
-                                          'type': 'object'},
-                     'MetricBatchParams': {'additionalProperties': False,
-                                           'properties': {'batches': {'items': {'$ref': '#/definitions/MetricBatchParam'},
-                                                                      'type': 'array'}},
-                                           'required': ['batches'],
-                                           'type': 'object'},
-                     'ModelConfigResult': {'additionalProperties': False,
-                                           'properties': {'config': {'patternProperties': {'.*': {'additionalProperties': True,
-                                                                                                  'type': 'object'}},
-                                                                     'type': 'object'}},
-                                           'required': ['config'],
-                                           'type': 'object'},
-                     'ModelResult': {'additionalProperties': False,
-                                     'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                    'name': {'type': 'string'},
-                                                    'uuid': {'type': 'string'}},
-                                     'required': ['name', 'uuid'],
-                                     'type': 'object'},
-                     'NetworkConfig': {'additionalProperties': False,
-                                       'properties': {'address': {'type': 'string'},
-                                                      'cidr': {'type': 'string'},
-                                                      'config-type': {'type': 'string'},
-                                                      'device-index': {'type': 'integer'},
-                                                      'disabled': {'type': 'boolean'},
-                                                      'dns-search-domains': {'items': {'type': 'string'},
-                                                                             'type': 'array'},
-                                                      'dns-servers': {'items': {'type': 'string'},
-                                                                      'type': 'array'},
-                                                      'gateway-address': {'type': 'string'},
-                                                      'interface-name': {'type': 'string'},
-                                                      'interface-type': {'type': 'string'},
-                                                      'mac-address': {'type': 'string'},
-                                                      'mtu': {'type': 'integer'},
-                                                      'no-auto-start': {'type': 'boolean'},
-                                                      'parent-interface-name': {'type': 'string'},
-                                                      'provider-address-id': {'type': 'string'},
-                                                      'provider-id': {'type': 'string'},
-                                                      'provider-space-id': {'type': 'string'},
-                                                      'provider-subnet-id': {'type': 'string'},
-                                                      'provider-vlan-id': {'type': 'string'},
-                                                      'routes': {'items': {'$ref': '#/definitions/NetworkRoute'},
-                                                                 'type': 'array'},
-                                                      'vlan-tag': {'type': 'integer'}},
-                                       'required': ['device-index',
-                                                    'mac-address',
-                                                    'cidr',
-                                                    'mtu',
-                                                    'provider-id',
-                                                    'provider-subnet-id',
-                                                    'provider-space-id',
-                                                    'provider-address-id',
-                                                    'provider-vlan-id',
-                                                    'vlan-tag',
-                                                    'interface-name',
-                                                    'parent-interface-name',
-                                                    'interface-type',
-                                                    'disabled'],
-                                       'type': 'object'},
-                     'NetworkRoute': {'additionalProperties': False,
-                                      'properties': {'destination-cidr': {'type': 'string'},
-                                                     'gateway-ip': {'type': 'string'},
-                                                     'metric': {'type': 'integer'}},
-                                      'required': ['destination-cidr',
-                                                   'gateway-ip',
-                                                   'metric'],
-                                      'type': 'object'},
-                     'NotifyWatchResult': {'additionalProperties': False,
-                                           'properties': {'NotifyWatcherId': {'type': 'string'},
-                                                          'error': {'$ref': '#/definitions/Error'}},
-                                           'required': ['NotifyWatcherId'],
-                                           'type': 'object'},
-                     'NotifyWatchResults': {'additionalProperties': False,
-                                            'properties': {'results': {'items': {'$ref': '#/definitions/NotifyWatchResult'},
-                                                                       'type': 'array'}},
-                                            'required': ['results'],
-                                            'type': 'object'},
-                     'PortRange': {'additionalProperties': False,
-                                   'properties': {'from-port': {'type': 'integer'},
-                                                  'protocol': {'type': 'string'},
-                                                  'to-port': {'type': 'integer'}},
-                                   'required': ['from-port', 'to-port', 'protocol'],
-                                   'type': 'object'},
-                     'RelationIds': {'additionalProperties': False,
-                                     'properties': {'relation-ids': {'items': {'type': 'integer'},
-                                                                     'type': 'array'}},
-                                     'required': ['relation-ids'],
-                                     'type': 'object'},
-                     'RelationResult': {'additionalProperties': False,
-                                        'properties': {'endpoint': {'$ref': '#/definitions/Endpoint'},
-                                                       'error': {'$ref': '#/definitions/Error'},
-                                                       'id': {'type': 'integer'},
-                                                       'key': {'type': 'string'},
-                                                       'life': {'type': 'string'}},
-                                        'required': ['life',
-                                                     'id',
-                                                     'key',
-                                                     'endpoint'],
-                                        'type': 'object'},
-                     'RelationResults': {'additionalProperties': False,
-                                         'properties': {'results': {'items': {'$ref': '#/definitions/RelationResult'},
-                                                                    'type': 'array'}},
-                                         'required': ['results'],
-                                         'type': 'object'},
-                     'RelationUnit': {'additionalProperties': False,
-                                      'properties': {'relation': {'type': 'string'},
-                                                     'unit': {'type': 'string'}},
-                                      'required': ['relation', 'unit'],
-                                      'type': 'object'},
-                     'RelationUnitPair': {'additionalProperties': False,
-                                          'properties': {'local-unit': {'type': 'string'},
-                                                         'relation': {'type': 'string'},
-                                                         'remote-unit': {'type': 'string'}},
-                                          'required': ['relation',
-                                                       'local-unit',
-                                                       'remote-unit'],
-                                          'type': 'object'},
-                     'RelationUnitPairs': {'additionalProperties': False,
-                                           'properties': {'relation-unit-pairs': {'items': {'$ref': '#/definitions/RelationUnitPair'},
-                                                                                  'type': 'array'}},
-                                           'required': ['relation-unit-pairs'],
-                                           'type': 'object'},
-                     'RelationUnitSettings': {'additionalProperties': False,
-                                              'properties': {'relation': {'type': 'string'},
-                                                             'settings': {'patternProperties': {'.*': {'type': 'string'}},
-                                                                          'type': 'object'},
-                                                             'unit': {'type': 'string'}},
-                                              'required': ['relation',
-                                                           'unit',
-                                                           'settings'],
-                                              'type': 'object'},
-                     'RelationUnits': {'additionalProperties': False,
-                                       'properties': {'relation-units': {'items': {'$ref': '#/definitions/RelationUnit'},
-                                                                         'type': 'array'}},
-                                       'required': ['relation-units'],
-                                       'type': 'object'},
-                     'RelationUnitsChange': {'additionalProperties': False,
-                                             'properties': {'changed': {'patternProperties': {'.*': {'$ref': '#/definitions/UnitSettings'}},
-                                                                        'type': 'object'},
-                                                            'departed': {'items': {'type': 'string'},
-                                                                         'type': 'array'}},
-                                             'required': ['changed'],
-                                             'type': 'object'},
-                     'RelationUnitsSettings': {'additionalProperties': False,
-                                               'properties': {'relation-units': {'items': {'$ref': '#/definitions/RelationUnitSettings'},
-                                                                                 'type': 'array'}},
-                                               'required': ['relation-units'],
-                                               'type': 'object'},
-                     'RelationUnitsWatchResult': {'additionalProperties': False,
-                                                  'properties': {'changes': {'$ref': '#/definitions/RelationUnitsChange'},
-                                                                 'error': {'$ref': '#/definitions/Error'},
-                                                                 'watcher-id': {'type': 'string'}},
-                                                  'required': ['watcher-id',
-                                                               'changes'],
-                                                  'type': 'object'},
-                     'RelationUnitsWatchResults': {'additionalProperties': False,
-                                                   'properties': {'results': {'items': {'$ref': '#/definitions/RelationUnitsWatchResult'},
-                                                                              'type': 'array'}},
-                                                   'required': ['results'],
-                                                   'type': 'object'},
-                     'ResolvedModeResult': {'additionalProperties': False,
-                                            'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                           'mode': {'type': 'string'}},
-                                            'required': ['mode'],
-                                            'type': 'object'},
-                     'ResolvedModeResults': {'additionalProperties': False,
-                                             'properties': {'results': {'items': {'$ref': '#/definitions/ResolvedModeResult'},
-                                                                        'type': 'array'}},
-                                             'required': ['results'],
-                                             'type': 'object'},
-                     'SetStatus': {'additionalProperties': False,
-                                   'properties': {'entities': {'items': {'$ref': '#/definitions/EntityStatusArgs'},
-                                                               'type': 'array'}},
-                                   'required': ['entities'],
-                                   'type': 'object'},
-                     'SettingsResult': {'additionalProperties': False,
-                                        'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                       'settings': {'patternProperties': {'.*': {'type': 'string'}},
-                                                                    'type': 'object'}},
-                                        'required': ['settings'],
-                                        'type': 'object'},
-                     'SettingsResults': {'additionalProperties': False,
-                                         'properties': {'results': {'items': {'$ref': '#/definitions/SettingsResult'},
-                                                                    'type': 'array'}},
-                                         'required': ['results'],
-                                         'type': 'object'},
-                     'StatusResult': {'additionalProperties': False,
-                                      'properties': {'data': {'patternProperties': {'.*': {'additionalProperties': True,
-                                                                                           'type': 'object'}},
-                                                              'type': 'object'},
-                                                     'error': {'$ref': '#/definitions/Error'},
-                                                     'id': {'type': 'string'},
-                                                     'info': {'type': 'string'},
-                                                     'life': {'type': 'string'},
-                                                     'since': {'format': 'date-time',
-                                                               'type': 'string'},
-                                                     'status': {'type': 'string'}},
-                                      'required': ['id',
-                                                   'life',
-                                                   'status',
-                                                   'info',
-                                                   'data',
-                                                   'since'],
-                                      'type': 'object'},
-                     'StatusResults': {'additionalProperties': False,
-                                       'properties': {'results': {'items': {'$ref': '#/definitions/StatusResult'},
-                                                                  'type': 'array'}},
-                                       'required': ['results'],
-                                       'type': 'object'},
-                     'StorageAddParams': {'additionalProperties': False,
-                                          'properties': {'name': {'type': 'string'},
-                                                         'storage': {'$ref': '#/definitions/StorageConstraints'},
-                                                         'unit': {'type': 'string'}},
-                                          'required': ['unit', 'name', 'storage'],
-                                          'type': 'object'},
-                     'StorageAttachment': {'additionalProperties': False,
-                                           'properties': {'kind': {'type': 'integer'},
-                                                          'life': {'type': 'string'},
-                                                          'location': {'type': 'string'},
-                                                          'owner-tag': {'type': 'string'},
-                                                          'storage-tag': {'type': 'string'},
-                                                          'unit-tag': {'type': 'string'}},
-                                           'required': ['storage-tag',
-                                                        'owner-tag',
-                                                        'unit-tag',
-                                                        'kind',
-                                                        'location',
-                                                        'life'],
-                                           'type': 'object'},
-                     'StorageAttachmentId': {'additionalProperties': False,
-                                             'properties': {'storage-tag': {'type': 'string'},
-                                                            'unit-tag': {'type': 'string'}},
-                                             'required': ['storage-tag',
-                                                          'unit-tag'],
-                                             'type': 'object'},
-                     'StorageAttachmentIds': {'additionalProperties': False,
-                                              'properties': {'ids': {'items': {'$ref': '#/definitions/StorageAttachmentId'},
-                                                                     'type': 'array'}},
-                                              'required': ['ids'],
-                                              'type': 'object'},
-                     'StorageAttachmentIdsResult': {'additionalProperties': False,
-                                                    'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                                   'result': {'$ref': '#/definitions/StorageAttachmentIds'}},
-                                                    'required': ['result'],
-                                                    'type': 'object'},
-                     'StorageAttachmentIdsResults': {'additionalProperties': False,
-                                                     'properties': {'results': {'items': {'$ref': '#/definitions/StorageAttachmentIdsResult'},
-                                                                                'type': 'array'}},
-                                                     'type': 'object'},
-                     'StorageAttachmentResult': {'additionalProperties': False,
-                                                 'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                                'result': {'$ref': '#/definitions/StorageAttachment'}},
-                                                 'required': ['result'],
-                                                 'type': 'object'},
-                     'StorageAttachmentResults': {'additionalProperties': False,
-                                                  'properties': {'results': {'items': {'$ref': '#/definitions/StorageAttachmentResult'},
-                                                                             'type': 'array'}},
-                                                  'type': 'object'},
-                     'StorageConstraints': {'additionalProperties': False,
-                                            'properties': {'count': {'type': 'integer'},
-                                                           'pool': {'type': 'string'},
-                                                           'size': {'type': 'integer'}},
-                                            'type': 'object'},
-                     'StoragesAddParams': {'additionalProperties': False,
-                                           'properties': {'storages': {'items': {'$ref': '#/definitions/StorageAddParams'},
-                                                                       'type': 'array'}},
-                                           'required': ['storages'],
-                                           'type': 'object'},
-                     'StringBoolResult': {'additionalProperties': False,
-                                          'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                         'ok': {'type': 'boolean'},
-                                                         'result': {'type': 'string'}},
-                                          'required': ['result', 'ok'],
-                                          'type': 'object'},
-                     'StringBoolResults': {'additionalProperties': False,
-                                           'properties': {'results': {'items': {'$ref': '#/definitions/StringBoolResult'},
-                                                                      'type': 'array'}},
-                                           'required': ['results'],
-                                           'type': 'object'},
-                     'StringResult': {'additionalProperties': False,
-                                      'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                     'result': {'type': 'string'}},
-                                      'required': ['result'],
-                                      'type': 'object'},
-                     'StringResults': {'additionalProperties': False,
-                                       'properties': {'results': {'items': {'$ref': '#/definitions/StringResult'},
-                                                                  'type': 'array'}},
-                                       'required': ['results'],
-                                       'type': 'object'},
-                     'StringsResult': {'additionalProperties': False,
-                                       'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                      'result': {'items': {'type': 'string'},
-                                                                 'type': 'array'}},
-                                       'type': 'object'},
-                     'StringsResults': {'additionalProperties': False,
-                                        'properties': {'results': {'items': {'$ref': '#/definitions/StringsResult'},
-                                                                   'type': 'array'}},
-                                        'required': ['results'],
-                                        'type': 'object'},
-                     'StringsWatchResult': {'additionalProperties': False,
-                                            'properties': {'changes': {'items': {'type': 'string'},
-                                                                       'type': 'array'},
-                                                           'error': {'$ref': '#/definitions/Error'},
-                                                           'watcher-id': {'type': 'string'}},
-                                            'required': ['watcher-id'],
-                                            'type': 'object'},
-                     'StringsWatchResults': {'additionalProperties': False,
-                                             'properties': {'results': {'items': {'$ref': '#/definitions/StringsWatchResult'},
-                                                                        'type': 'array'}},
-                                             'required': ['results'],
-                                             'type': 'object'},
-                     'UnitNetworkConfig': {'additionalProperties': False,
-                                           'properties': {'binding-name': {'type': 'string'},
-                                                          'unit-tag': {'type': 'string'}},
-                                           'required': ['unit-tag', 'binding-name'],
-                                           'type': 'object'},
-                     'UnitNetworkConfigResult': {'additionalProperties': False,
-                                                 'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                                'info': {'items': {'$ref': '#/definitions/NetworkConfig'},
-                                                                         'type': 'array'}},
-                                                 'required': ['info'],
-                                                 'type': 'object'},
-                     'UnitNetworkConfigResults': {'additionalProperties': False,
-                                                  'properties': {'results': {'items': {'$ref': '#/definitions/UnitNetworkConfigResult'},
-                                                                             'type': 'array'}},
-                                                  'required': ['results'],
-                                                  'type': 'object'},
-                     'UnitSettings': {'additionalProperties': False,
-                                      'properties': {'version': {'type': 'integer'}},
-                                      'required': ['version'],
-                                      'type': 'object'},
-                     'UnitsNetworkConfig': {'additionalProperties': False,
-                                            'properties': {'args': {'items': {'$ref': '#/definitions/UnitNetworkConfig'},
-                                                                    'type': 'array'}},
-                                            'required': ['args'],
-                                            'type': 'object'}},
-     'properties': {'APIAddresses': {'properties': {'Result': {'$ref': '#/definitions/StringsResult'}},
-                                     'type': 'object'},
-                    'APIHostPorts': {'properties': {'Result': {'$ref': '#/definitions/APIHostPortsResult'}},
-                                     'type': 'object'},
-                    'Actions': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                               'Result': {'$ref': '#/definitions/ActionResults'}},
-                                'type': 'object'},
-                    'AddMetricBatches': {'properties': {'Params': {'$ref': '#/definitions/MetricBatchParams'},
-                                                        'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                         'type': 'object'},
-                    'AddUnitStorage': {'properties': {'Params': {'$ref': '#/definitions/StoragesAddParams'},
-                                                      'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                       'type': 'object'},
-                    'AllMachinePorts': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                       'Result': {'$ref': '#/definitions/MachinePortsResults'}},
-                                        'type': 'object'},
-                    'ApplicationStatus': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                         'Result': {'$ref': '#/definitions/ApplicationStatusResults'}},
-                                          'type': 'object'},
-                    'AssignedMachine': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                       'Result': {'$ref': '#/definitions/StringResults'}},
-                                        'type': 'object'},
-                    'AvailabilityZone': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                        'Result': {'$ref': '#/definitions/StringResults'}},
-                                         'type': 'object'},
-                    'BeginActions': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                    'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                     'type': 'object'},
-                    'CACert': {'properties': {'Result': {'$ref': '#/definitions/BytesResult'}},
-                               'type': 'object'},
-                    'CharmArchiveSha256': {'properties': {'Params': {'$ref': '#/definitions/CharmURLs'},
-                                                          'Result': {'$ref': '#/definitions/StringResults'}},
-                                           'type': 'object'},
-                    'CharmModifiedVersion': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                            'Result': {'$ref': '#/definitions/IntResults'}},
-                                             'type': 'object'},
-                    'CharmURL': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                'Result': {'$ref': '#/definitions/StringBoolResults'}},
-                                 'type': 'object'},
-                    'ClearResolved': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                     'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                      'type': 'object'},
-                    'ClosePorts': {'properties': {'Params': {'$ref': '#/definitions/EntitiesPortRanges'},
-                                                  'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                   'type': 'object'},
-                    'ConfigSettings': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                      'Result': {'$ref': '#/definitions/ConfigSettingsResults'}},
-                                       'type': 'object'},
-                    'CurrentModel': {'properties': {'Result': {'$ref': '#/definitions/ModelResult'}},
-                                     'type': 'object'},
-                    'Destroy': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                               'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                'type': 'object'},
-                    'DestroyAllSubordinates': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                              'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                               'type': 'object'},
-                    'DestroyUnitStorageAttachments': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                                     'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                                      'type': 'object'},
-                    'EnsureDead': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                  'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                   'type': 'object'},
-                    'EnterScope': {'properties': {'Params': {'$ref': '#/definitions/RelationUnits'},
-                                                  'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                   'type': 'object'},
-                    'FinishActions': {'properties': {'Params': {'$ref': '#/definitions/ActionExecutionResults'},
-                                                     'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                      'type': 'object'},
-                    'GetMeterStatus': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                      'Result': {'$ref': '#/definitions/MeterStatusResults'}},
-                                       'type': 'object'},
-                    'GetPrincipal': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                    'Result': {'$ref': '#/definitions/StringBoolResults'}},
-                                     'type': 'object'},
-                    'HasSubordinates': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                       'Result': {'$ref': '#/definitions/BoolResults'}},
-                                        'type': 'object'},
-                    'JoinedRelations': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                       'Result': {'$ref': '#/definitions/StringsResults'}},
-                                        'type': 'object'},
-                    'LeaveScope': {'properties': {'Params': {'$ref': '#/definitions/RelationUnits'},
-                                                  'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                   'type': 'object'},
-                    'Life': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                            'Result': {'$ref': '#/definitions/LifeResults'}},
-                             'type': 'object'},
-                    'Merge': {'properties': {'Params': {'$ref': '#/definitions/MergeLeadershipSettingsBulkParams'},
-                                             'Result': {'$ref': '#/definitions/ErrorResults'}},
-                              'type': 'object'},
-                    'ModelConfig': {'properties': {'Result': {'$ref': '#/definitions/ModelConfigResult'}},
-                                    'type': 'object'},
-                    'ModelUUID': {'properties': {'Result': {'$ref': '#/definitions/StringResult'}},
-                                  'type': 'object'},
-                    'NetworkConfig': {'properties': {'Params': {'$ref': '#/definitions/UnitsNetworkConfig'},
-                                                     'Result': {'$ref': '#/definitions/UnitNetworkConfigResults'}},
-                                      'type': 'object'},
-                    'OpenPorts': {'properties': {'Params': {'$ref': '#/definitions/EntitiesPortRanges'},
-                                                 'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                  'type': 'object'},
-                    'PrivateAddress': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                      'Result': {'$ref': '#/definitions/StringResults'}},
-                                       'type': 'object'},
-                    'ProviderType': {'properties': {'Result': {'$ref': '#/definitions/StringResult'}},
-                                     'type': 'object'},
-                    'PublicAddress': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                     'Result': {'$ref': '#/definitions/StringResults'}},
-                                      'type': 'object'},
-                    'Read': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                            'Result': {'$ref': '#/definitions/GetLeadershipSettingsBulkResults'}},
-                             'type': 'object'},
-                    'ReadRemoteSettings': {'properties': {'Params': {'$ref': '#/definitions/RelationUnitPairs'},
-                                                          'Result': {'$ref': '#/definitions/SettingsResults'}},
-                                           'type': 'object'},
-                    'ReadSettings': {'properties': {'Params': {'$ref': '#/definitions/RelationUnits'},
-                                                    'Result': {'$ref': '#/definitions/SettingsResults'}},
-                                     'type': 'object'},
-                    'Relation': {'properties': {'Params': {'$ref': '#/definitions/RelationUnits'},
-                                                'Result': {'$ref': '#/definitions/RelationResults'}},
-                                 'type': 'object'},
-                    'RelationById': {'properties': {'Params': {'$ref': '#/definitions/RelationIds'},
-                                                    'Result': {'$ref': '#/definitions/RelationResults'}},
-                                     'type': 'object'},
-                    'RemoveStorageAttachments': {'properties': {'Params': {'$ref': '#/definitions/StorageAttachmentIds'},
-                                                                'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                                 'type': 'object'},
-                    'RequestReboot': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                     'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                      'type': 'object'},
-                    'Resolved': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                'Result': {'$ref': '#/definitions/ResolvedModeResults'}},
-                                 'type': 'object'},
-                    'SetAgentStatus': {'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
-                                                      'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                       'type': 'object'},
-                    'SetApplicationStatus': {'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
-                                                            'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                             'type': 'object'},
-                    'SetCharmURL': {'properties': {'Params': {'$ref': '#/definitions/EntitiesCharmURL'},
-                                                   'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                    'type': 'object'},
-                    'SetStatus': {'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
-                                                 'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                  'type': 'object'},
-                    'SetUnitStatus': {'properties': {'Params': {'$ref': '#/definitions/SetStatus'},
-                                                     'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                      'type': 'object'},
-                    'SetWorkloadVersion': {'properties': {'Params': {'$ref': '#/definitions/EntityWorkloadVersions'},
-                                                          'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                           'type': 'object'},
-                    'StorageAttachmentLife': {'properties': {'Params': {'$ref': '#/definitions/StorageAttachmentIds'},
-                                                             'Result': {'$ref': '#/definitions/LifeResults'}},
-                                              'type': 'object'},
-                    'StorageAttachments': {'properties': {'Params': {'$ref': '#/definitions/StorageAttachmentIds'},
-                                                          'Result': {'$ref': '#/definitions/StorageAttachmentResults'}},
-                                           'type': 'object'},
-                    'UnitStatus': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                  'Result': {'$ref': '#/definitions/StatusResults'}},
-                                   'type': 'object'},
-                    'UnitStorageAttachments': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                              'Result': {'$ref': '#/definitions/StorageAttachmentIdsResults'}},
-                                               'type': 'object'},
-                    'UpdateSettings': {'properties': {'Params': {'$ref': '#/definitions/RelationUnitsSettings'},
-                                                      'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                       'type': 'object'},
-                    'Watch': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                             'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
-                              'type': 'object'},
-                    'WatchAPIHostPorts': {'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
-                                          'type': 'object'},
-                    'WatchActionNotifications': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                                'Result': {'$ref': '#/definitions/StringsWatchResults'}},
-                                                 'type': 'object'},
-                    'WatchApplicationRelations': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                                 'Result': {'$ref': '#/definitions/StringsWatchResults'}},
-                                                  'type': 'object'},
-                    'WatchConfigSettings': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                           'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
-                                            'type': 'object'},
-                    'WatchForModelConfigChanges': {'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
-                                                   'type': 'object'},
-                    'WatchLeadershipSettings': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                               'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
-                                                'type': 'object'},
-                    'WatchMeterStatus': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                        'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
-                                         'type': 'object'},
-                    'WatchRelationUnits': {'properties': {'Params': {'$ref': '#/definitions/RelationUnits'},
-                                                          'Result': {'$ref': '#/definitions/RelationUnitsWatchResults'}},
-                                           'type': 'object'},
-                    'WatchStorageAttachments': {'properties': {'Params': {'$ref': '#/definitions/StorageAttachmentIds'},
-                                                               'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
-                                                'type': 'object'},
-                    'WatchUnitAddresses': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                          'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
-                                           'type': 'object'},
-                    'WatchUnitStorageAttachments': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                                   'Result': {'$ref': '#/definitions/StringsWatchResults'}},
-                                                    'type': 'object'},
-                    'WorkloadVersion': {'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                       'Result': {'$ref': '#/definitions/StringResults'}},
-                                        'type': 'object'}},
-     'type': 'object'}
-    
-
-    @ReturnMapping(StringsResult)
-    async def APIAddresses(self):
-        '''
-
-        Returns -> typing.Union[_ForwardRef('Error'), typing.Sequence<+T_co>[str]]
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='APIAddresses',
-                   version=4,
-                   params=_params)
-
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(APIHostPortsResult)
-    async def APIHostPorts(self):
-        '''
-
-        Returns -> typing.Sequence<+T_co>[~HostPort]<~HostPort>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='APIHostPorts',
-                   version=4,
-                   params=_params)
-
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ActionResults)
-    async def Actions(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~ActionResult]<~ActionResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='Actions',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
-    async def AddMetricBatches(self, batches):
-        '''
-        batches : typing.Sequence<+T_co>[~MetricBatchParam]<~MetricBatchParam>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='AddMetricBatches',
-                   version=4,
-                   params=_params)
-        _params['batches'] = batches
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
-    async def AddUnitStorage(self, storages):
-        '''
-        storages : typing.Sequence<+T_co>[~StorageAddParams]<~StorageAddParams>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='AddUnitStorage',
-                   version=4,
-                   params=_params)
-        _params['storages'] = storages
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(MachinePortsResults)
-    async def AllMachinePorts(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~MachinePortsResult]<~MachinePortsResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='AllMachinePorts',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ApplicationStatusResults)
-    async def ApplicationStatus(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~ApplicationStatusResult]<~ApplicationStatusResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='ApplicationStatus',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(StringResults)
-    async def AssignedMachine(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~StringResult]<~StringResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='AssignedMachine',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(StringResults)
-    async def AvailabilityZone(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~StringResult]<~StringResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='AvailabilityZone',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
-    async def BeginActions(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='BeginActions',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(BytesResult)
-    async def CACert(self):
-        '''
-
-        Returns -> typing.Sequence<+T_co>[int]
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='CACert',
-                   version=4,
-                   params=_params)
-
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(StringResults)
-    async def CharmArchiveSha256(self, urls):
-        '''
-        urls : typing.Sequence<+T_co>[~CharmURL]<~CharmURL>
-        Returns -> typing.Sequence<+T_co>[~StringResult]<~StringResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='CharmArchiveSha256',
-                   version=4,
-                   params=_params)
-        _params['urls'] = urls
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(IntResults)
-    async def CharmModifiedVersion(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~IntResult]<~IntResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='CharmModifiedVersion',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(StringBoolResults)
-    async def CharmURL(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~StringBoolResult]<~StringBoolResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='CharmURL',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
-    async def ClearResolved(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='ClearResolved',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
-    async def ClosePorts(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~EntityPortRange]<~EntityPortRange>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='ClosePorts',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ConfigSettingsResults)
-    async def ConfigSettings(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~ConfigSettingsResult]<~ConfigSettingsResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='ConfigSettings',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ModelResult)
-    async def CurrentModel(self):
-        '''
-
-        Returns -> typing.Union[_ForwardRef('Error'), str]
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='CurrentModel',
-                   version=4,
-                   params=_params)
-
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
-    async def Destroy(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='Destroy',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
-    async def DestroyAllSubordinates(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='DestroyAllSubordinates',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
-    async def DestroyUnitStorageAttachments(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='DestroyUnitStorageAttachments',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
-    async def EnsureDead(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='EnsureDead',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
-    async def EnterScope(self, relation_units):
-        '''
-        relation_units : typing.Sequence<+T_co>[~RelationUnit]<~RelationUnit>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='EnterScope',
-                   version=4,
-                   params=_params)
-        _params['relation-units'] = relation_units
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
-    async def FinishActions(self, results):
-        '''
-        results : typing.Sequence<+T_co>[~ActionExecutionResult]<~ActionExecutionResult>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='FinishActions',
-                   version=4,
-                   params=_params)
-        _params['results'] = results
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(MeterStatusResults)
-    async def GetMeterStatus(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~MeterStatusResult]<~MeterStatusResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='GetMeterStatus',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(StringBoolResults)
-    async def GetPrincipal(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~StringBoolResult]<~StringBoolResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='GetPrincipal',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(BoolResults)
-    async def HasSubordinates(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~BoolResult]<~BoolResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='HasSubordinates',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(StringsResults)
-    async def JoinedRelations(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~StringsResult]<~StringsResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='JoinedRelations',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
-    async def LeaveScope(self, relation_units):
-        '''
-        relation_units : typing.Sequence<+T_co>[~RelationUnit]<~RelationUnit>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='LeaveScope',
-                   version=4,
-                   params=_params)
-        _params['relation-units'] = relation_units
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(LifeResults)
-    async def Life(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~LifeResult]<~LifeResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='Life',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
-    async def Merge(self, params):
-        '''
-        params : typing.Sequence<+T_co>[~MergeLeadershipSettingsParam]<~MergeLeadershipSettingsParam>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='Merge',
-                   version=4,
-                   params=_params)
-        _params['params'] = params
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ModelConfigResult)
-    async def ModelConfig(self):
-        '''
-
-        Returns -> typing.Mapping<~KT, +VT_co>[str, typing.Any]
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='ModelConfig',
-                   version=4,
-                   params=_params)
-
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(StringResult)
-    async def ModelUUID(self):
-        '''
-
-        Returns -> typing.Union[_ForwardRef('Error'), str]
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='ModelUUID',
-                   version=4,
-                   params=_params)
-
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(UnitNetworkConfigResults)
-    async def NetworkConfig(self, args):
-        '''
-        args : typing.Sequence<+T_co>[~UnitNetworkConfig]<~UnitNetworkConfig>
-        Returns -> typing.Sequence<+T_co>[~UnitNetworkConfigResult]<~UnitNetworkConfigResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='NetworkConfig',
-                   version=4,
-                   params=_params)
-        _params['args'] = args
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
-    async def OpenPorts(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~EntityPortRange]<~EntityPortRange>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='OpenPorts',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(StringResults)
-    async def PrivateAddress(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~StringResult]<~StringResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='PrivateAddress',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(StringResult)
-    async def ProviderType(self):
-        '''
-
-        Returns -> typing.Union[_ForwardRef('Error'), str]
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='ProviderType',
-                   version=4,
-                   params=_params)
-
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(StringResults)
-    async def PublicAddress(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~StringResult]<~StringResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='PublicAddress',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(GetLeadershipSettingsBulkResults)
-    async def Read(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~GetLeadershipSettingsResult]<~GetLeadershipSettingsResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='Read',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(SettingsResults)
-    async def ReadRemoteSettings(self, relation_unit_pairs):
-        '''
-        relation_unit_pairs : typing.Sequence<+T_co>[~RelationUnitPair]<~RelationUnitPair>
-        Returns -> typing.Sequence<+T_co>[~SettingsResult]<~SettingsResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='ReadRemoteSettings',
-                   version=4,
-                   params=_params)
-        _params['relation-unit-pairs'] = relation_unit_pairs
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(SettingsResults)
-    async def ReadSettings(self, relation_units):
-        '''
-        relation_units : typing.Sequence<+T_co>[~RelationUnit]<~RelationUnit>
-        Returns -> typing.Sequence<+T_co>[~SettingsResult]<~SettingsResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='ReadSettings',
-                   version=4,
-                   params=_params)
-        _params['relation-units'] = relation_units
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(RelationResults)
-    async def Relation(self, relation_units):
-        '''
-        relation_units : typing.Sequence<+T_co>[~RelationUnit]<~RelationUnit>
-        Returns -> typing.Sequence<+T_co>[~RelationResult]<~RelationResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='Relation',
-                   version=4,
-                   params=_params)
-        _params['relation-units'] = relation_units
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(RelationResults)
-    async def RelationById(self, relation_ids):
-        '''
-        relation_ids : typing.Sequence<+T_co>[int]
-        Returns -> typing.Sequence<+T_co>[~RelationResult]<~RelationResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='RelationById',
-                   version=4,
-                   params=_params)
-        _params['relation-ids'] = relation_ids
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
-    async def RemoveStorageAttachments(self, ids):
-        '''
-        ids : typing.Sequence<+T_co>[~StorageAttachmentId]<~StorageAttachmentId>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='RemoveStorageAttachments',
-                   version=4,
-                   params=_params)
-        _params['ids'] = ids
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
-    async def RequestReboot(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='RequestReboot',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ResolvedModeResults)
-    async def Resolved(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~ResolvedModeResult]<~ResolvedModeResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='Resolved',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
-    async def SetAgentStatus(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='SetAgentStatus',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
-    async def SetApplicationStatus(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='SetApplicationStatus',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
-    async def SetCharmURL(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~EntityCharmURL]<~EntityCharmURL>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='SetCharmURL',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
-    async def SetStatus(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='SetStatus',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
-    async def SetUnitStatus(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~EntityStatusArgs]<~EntityStatusArgs>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='SetUnitStatus',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
-    async def SetWorkloadVersion(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~EntityWorkloadVersion]<~EntityWorkloadVersion>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='SetWorkloadVersion',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(LifeResults)
-    async def StorageAttachmentLife(self, ids):
-        '''
-        ids : typing.Sequence<+T_co>[~StorageAttachmentId]<~StorageAttachmentId>
-        Returns -> typing.Sequence<+T_co>[~LifeResult]<~LifeResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='StorageAttachmentLife',
-                   version=4,
-                   params=_params)
-        _params['ids'] = ids
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(StorageAttachmentResults)
-    async def StorageAttachments(self, ids):
-        '''
-        ids : typing.Sequence<+T_co>[~StorageAttachmentId]<~StorageAttachmentId>
-        Returns -> typing.Sequence<+T_co>[~StorageAttachmentResult]<~StorageAttachmentResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='StorageAttachments',
-                   version=4,
-                   params=_params)
-        _params['ids'] = ids
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(StatusResults)
-    async def UnitStatus(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~StatusResult]<~StatusResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='UnitStatus',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(StorageAttachmentIdsResults)
-    async def UnitStorageAttachments(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~StorageAttachmentIdsResult]<~StorageAttachmentIdsResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='UnitStorageAttachments',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ErrorResults)
-    async def UpdateSettings(self, relation_units):
-        '''
-        relation_units : typing.Sequence<+T_co>[~RelationUnitSettings]<~RelationUnitSettings>
-        Returns -> typing.Sequence<+T_co>[~ErrorResult]<~ErrorResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='UpdateSettings',
-                   version=4,
-                   params=_params)
-        _params['relation-units'] = relation_units
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(NotifyWatchResults)
-    async def Watch(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='Watch',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(NotifyWatchResult)
-    async def WatchAPIHostPorts(self):
-        '''
-
-        Returns -> typing.Union[str, _ForwardRef('Error')]
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='WatchAPIHostPorts',
-                   version=4,
-                   params=_params)
-
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(StringsWatchResults)
-    async def WatchActionNotifications(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~StringsWatchResult]<~StringsWatchResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='WatchActionNotifications',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(StringsWatchResults)
-    async def WatchApplicationRelations(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~StringsWatchResult]<~StringsWatchResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='WatchApplicationRelations',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(NotifyWatchResults)
-    async def WatchConfigSettings(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='WatchConfigSettings',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(NotifyWatchResult)
-    async def WatchForModelConfigChanges(self):
-        '''
-
-        Returns -> typing.Union[str, _ForwardRef('Error')]
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='WatchForModelConfigChanges',
-                   version=4,
-                   params=_params)
-
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(NotifyWatchResults)
-    async def WatchLeadershipSettings(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='WatchLeadershipSettings',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(NotifyWatchResults)
-    async def WatchMeterStatus(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='WatchMeterStatus',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(RelationUnitsWatchResults)
-    async def WatchRelationUnits(self, relation_units):
-        '''
-        relation_units : typing.Sequence<+T_co>[~RelationUnit]<~RelationUnit>
-        Returns -> typing.Sequence<+T_co>[~RelationUnitsWatchResult]<~RelationUnitsWatchResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='WatchRelationUnits',
-                   version=4,
-                   params=_params)
-        _params['relation-units'] = relation_units
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(NotifyWatchResults)
-    async def WatchStorageAttachments(self, ids):
-        '''
-        ids : typing.Sequence<+T_co>[~StorageAttachmentId]<~StorageAttachmentId>
-        Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='WatchStorageAttachments',
-                   version=4,
-                   params=_params)
-        _params['ids'] = ids
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(NotifyWatchResults)
-    async def WatchUnitAddresses(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~NotifyWatchResult]<~NotifyWatchResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='WatchUnitAddresses',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(StringsWatchResults)
-    async def WatchUnitStorageAttachments(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~StringsWatchResult]<~StringsWatchResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='WatchUnitStorageAttachments',
-                   version=4,
-                   params=_params)
-        _params['entities'] = entities
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(StringResults)
-    async def WorkloadVersion(self, entities):
-        '''
-        entities : typing.Sequence<+T_co>[~Entity]<~Entity>
-        Returns -> typing.Sequence<+T_co>[~StringResult]<~StringResult>
-        '''
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='WorkloadVersion',
                    version=4,
                    params=_params)
         _params['entities'] = entities

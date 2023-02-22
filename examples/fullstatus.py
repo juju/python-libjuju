@@ -1,16 +1,13 @@
-import asyncio
+from juju import jasyncio
+from juju.model import Model
 
-from juju.client.connection import Connection
-from juju.client.client import ClientFacade
-from juju import loop
 
 async def status():
-    conn = await Connection.connect()
-    client = ClientFacade.from_connection(conn)
+    model = Model()
+    await model.connect()
 
-    patterns = None
-    status = await client.FullStatus(patterns)
-    await conn.close()
+    status = await model.get_status()
+    await model.disconnect()
 
     print('Applications:', list(status.applications.keys()))
     print('Machines:', list(status.machines.keys()))
@@ -19,5 +16,4 @@ async def status():
     return status
 
 if __name__ == '__main__':
-    loop.run(status())
-
+    jasyncio.run(status())

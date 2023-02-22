@@ -1,0 +1,28 @@
+# Copyright 2022 jtirado
+# See LICENSE file for licensing details.
+
+# For a complete list of supported options, see:
+# https://juju.is/docs/sdk/metadata-reference
+name: ubuntu-lite
+display-name: |
+  Ubuntu-Lite
+description: |
+  Ubuntu-lite is a reduced image for testing inside.
+summary: |
+  Ubuntu-lite is a reduced image for testing inside.
+series: ["xenial", "bionic", "trusty", "jammy"]
+provides:
+  ubuntu:
+    interface: ubuntu
+extra-bindings:
+  another:
+tags:
+  # https://jujucharms.com/docs/stable/authors-charm-metadata
+  - misc
+  - application_development
+subordinate: false
+# check: https://juju.is/docs/sdk/assumes for more details 
+assumes:
+  - any_of:
+    - juju >= 2.9
+    - k8s-api

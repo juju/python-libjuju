@@ -6,7 +6,7 @@ This example:
 3. Destroys the unit and application
 
 """
-from juju import loop
+from juju import jasyncio
 from juju.model import Model
 
 
@@ -19,7 +19,7 @@ async def main():
     try:
         print('Deploying ubuntu')
         application = await model.deploy(
-            'ubuntu-10',
+            'ch:ubuntu',
             application_name='ubuntu',
             series='trusty',
             channel='stable',
@@ -38,4 +38,4 @@ async def main():
 
 
 if __name__ == '__main__':
-    loop.run(main())
+    jasyncio.run(main())

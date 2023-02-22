@@ -17,6 +17,7 @@ class WebsocketMock:
         super().__init__()
         self.responses = deque(responses)
         self.open = True
+        self.closed = False
 
     async def send(self, message):
         pass
@@ -29,6 +30,7 @@ class WebsocketMock:
 
     async def close(self):
         self.open = False
+        self.closed = True
 
 
 @pytest.mark.asyncio
@@ -52,6 +54,7 @@ async def test_out_of_order(event_loop):
                     'juju.client.connection.Connection.login',
                     base.AsyncMock(return_value={'response': {
                         'facades': minimal_facades,
+                        'server-version': '3.0',
                     }}),
                 ), \
                 mock.patch('juju.client.connection.Connection._get_ssl'), \
@@ -148,7 +151,9 @@ SOMECERT
     wsForCont2 = WebsocketMock([
         {'request-id': 1},
         {'request-id': 2},
-        {'request-id': 3, 'response': {'result': minimal_facades}},
+        {'request-id': 3, 'response': {'result': minimal_facades,
+                                       'server-version': '3.0',
+                                       }},
     ])
 
     con = None
@@ -164,4 +169,35 @@ SOMECERT
     finally:
         if con:
             assert con.connect_params()['endpoint'] == "42.42.42.42:4242"
+            await con.close()
+
+
+@pytest.mark.asyncio
+async def test_rpc_none_results(event_loop):
+    ws = WebsocketMock([
+        {'request-id': 1, 'response': {'results': None}},
+    ])
+    expected_responses = [
+        {'request-id': 1, 'response': {'results': None}},
+    ]
+    minimal_facades = [{'name': 'Pinger', 'versions': [1]}]
+    con = None
+    try:
+        with \
+                mock.patch('websockets.connect', base.AsyncMock(return_value=ws)), \
+                mock.patch(
+                    'juju.client.connection.Connection.login',
+                    base.AsyncMock(return_value={'response': {
+                        'facades': minimal_facades,
+                        'server-version': '3.0',
+                    }}),
+                ), \
+                mock.patch('juju.client.connection.Connection._get_ssl'), \
+                mock.patch('juju.client.connection.Connection._pinger', base.AsyncMock()):
+            con = await Connection.connect('0.1.2.3:999')
+        actual_responses = []
+        actual_responses.append(await con.rpc({'version': 1}))
+        assert actual_responses == expected_responses
+    finally:
+        if con:
             await con.close()

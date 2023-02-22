@@ -1,0 +1,3 @@
+helloa:
+  application-repo: "http://my-juju.com"
+  port: 666

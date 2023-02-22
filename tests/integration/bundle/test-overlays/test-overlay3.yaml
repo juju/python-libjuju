@@ -1,0 +1,3 @@
+description: Another overlay to remove memcached
+applications:
+  memcached:

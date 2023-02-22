@@ -1,19 +1,28 @@
-import asyncio
 import json
 import logging
+from concurrent.futures import CancelledError
 from pathlib import Path
 
-from . import errors, tag, utils
+import websockets
+
+from . import errors, tag, utils, jasyncio
 from .client import client, connector
+from .errors import JujuAPIError
+from .offerendpoints import ParseError as OfferParseError
+from .offerendpoints import parse_offer_endpoint, parse_offer_url
 from .user import User
 
 log = logging.getLogger(__name__)
 
 
+class RemoveError(Exception):
+    def __init__(self, message):
+        self.message = message
+
+
 class Controller:
     def __init__(
         self,
-        loop=None,
         max_frame_size=None,
         bakery_client=None,
         jujudata=None,
@@ -25,7 +34,6 @@ class Controller:
 
         If jujudata is None, jujudata.FileJujuData will be used.
 
-        :param loop: an asyncio event loop
         :param max_frame_size: See
             `juju.client.connection.Connection.MAX_FRAME_SIZE`
         :param bakery_client httpbakery.Client: The bakery client to use
@@ -34,7 +42,6 @@ class Controller:
         information.
         """
         self._connector = connector.Connector(
-            loop=loop,
             max_frame_size=max_frame_size,
             bakery_client=bakery_client,
             jujudata=jujudata,
@@ -46,10 +53,6 @@ class Controller:
 
     async def __aexit__(self, exc_type, exc, tb):
         await self.disconnect()
-
-    @property
-    def loop(self):
-        return self._connector.loop
 
     async def connect(self, *args, **kwargs):
         """Connect to a Juju controller.
@@ -85,9 +88,9 @@ class Controller:
             If this is None, a default bakery_client will be used.
         :param list macaroons: List of macaroons to load into the
             ``bakery_client``.
-        :param asyncio.BaseEventLoop loop: The event loop to use for async
-            operations.
         :param int max_frame_size: The maximum websocket frame size to allow.
+        :param specified_facades: Overwrite the facades with a series of
+            specified facades.
         """
         await self.disconnect()
         if 'endpoint' not in kwargs and len(args) < 2:
@@ -118,7 +121,6 @@ class Controller:
                 'cacert',
                 'bakery_client',
                 'macaroons',
-                'loop',
                 'max_frame_size',
             ]
             for i, arg in enumerate(args):
@@ -131,6 +133,14 @@ class Controller:
                 raise ValueError('Authentication parameters are required '
                                  'if controller_name not given')
             await self._connector.connect(**kwargs)
+        await self.update_endpoints()
+
+    async def update_endpoints(self):
+        info = await self.info()
+        self._connector._connection.endpoints = [
+            (e, info.results[0].cacert)
+            for e in info.results[0].addresses
+        ]
 
     async def connect_current(self):
         """
@@ -162,6 +172,19 @@ class Controller:
     @property
     def controller_name(self):
         return self._connector.controller_name
+
+    @property
+    def controller_uuid(self):
+        return self._connector.controller_uuid
+
+    @property
+    async def api_endpoints(self):
+        """Get API endpoints
+
+        :return list string: List of API Endpoints
+        """
+        info = await self.info()
+        return info.results[0].addresses
 
     async def disconnect(self):
         """Shut down the watcher task and close websockets.
@@ -221,7 +244,7 @@ class Controller:
         log.debug('Uploading credential %s', name)
         cloud_facade = client.CloudFacade.from_connection(self.connection())
         tagged_credentials = [
-            client.UpdateCloudCredential(
+            client.TaggedCredential(
                 tag=tag.credential(cloud, tag.untag('user-', owner), name),
                 credential=credential,
             )]
@@ -232,8 +255,41 @@ class Controller:
                 credentials=tagged_credentials, force=force,
             )
         else:
-            await cloud_facade.UpdateCredentials(tagged_credentials)
+            await cloud_facade.UpdateCredentials(credentials=tagged_credentials)
         return name
+
+    async def add_cloud(self, name, cloud):
+        """Add a cloud to this controller.
+
+        :param str name: Name to give the new cloud.
+        :param Cloud cloud: Cloud configuration.
+        :return Cloud: Cloud that was created.
+        """
+        log.debug('Adding cloud %s', name)
+        cloud_facade = client.CloudFacade.from_connection(self.connection())
+        await cloud_facade.AddCloud(cloud=cloud, name=name)
+        result = await self.cloud(name=name)
+        return result.cloud
+
+    async def info(self):
+        """Show Controller Info from connection
+
+        :return ControllerAPIInfoResult
+        """
+        log.debug('Getting information')
+        uuids = await self.model_uuids()
+        controller_facade = client.ControllerFacade.from_connection(self.connection())
+        params = [client.Entity(tag.model(uuids["controller"]))]
+        return await controller_facade.ControllerAPIInfoForModels(entities=params)
+
+    async def remove_cloud(self, name):
+        """Remove a cloud from this controller.
+
+        :param str name: Name of the cloud to remove.
+        """
+        log.debug('Removing cloud %s', name)
+        cloud_facade = client.CloudFacade.from_connection(self.connection())
+        await cloud_facade.RemoveClouds(entities=[client.Entity(tag.cloud(name))])
 
     async def add_model(
             self, model_name, cloud_name=None, credential_name=None,
@@ -281,31 +337,34 @@ class Controller:
 
         if not config or 'authorized-keys' not in config:
             config = config or {}
-            config['authorized-keys'] = await utils.read_ssh_key(
-                loop=self._connector.loop)
+            config['authorized-keys'] = await utils.read_ssh_key()
 
         model_info = await model_facade.CreateModel(
-            tag.cloud(cloud_name),
-            config,
-            credential,
-            model_name,
-            owner,
-            region
+            cloud_tag=tag.cloud(cloud_name),
+            config=config,
+            credential=credential,
+            name=model_name,
+            owner_tag=owner,
+            region=region
         )
         from juju.model import Model
         model = Model(jujudata=self._connector.jujudata)
         kwargs = self.connection().connect_params()
         kwargs['uuid'] = model_info.uuid
+        model._info = model_info
         await model._connect_direct(**kwargs)
 
         return model
 
-    async def destroy_models(self, *models, destroy_storage=False):
+    async def destroy_models(self, *models, destroy_storage=False, force=False, max_wait=None):
         """Destroy one or more models.
 
         :param str *models: Names or UUIDs of models to destroy
         :param bool destroy_storage: Whether or not to destroy storage when
             destroying the models. Defaults to false.
+        :param bool force: Whether or not to force when destroying the models.
+            Defaults to false.
+        :param int max_wait : Max time in seconds to wait when destroying the models.
 
         """
         uuids = await self.model_uuids()
@@ -323,13 +382,18 @@ class Controller:
 
         if model_facade.version >= 5:
             params = [
-                client.DestroyModelParams(model_tag=tag.model(model),
-                                          destroy_storage=destroy_storage)
+                client.DestroyModelParams(
+                    model_tag=tag.model(model),
+                    destroy_storage=destroy_storage,
+                    force=force,
+                    max_wait=max_wait,
+                )
                 for model in models]
+            await model_facade.DestroyModels(models=params)
         else:
             params = [client.Entity(tag.model(model)) for model in models]
 
-        await model_facade.DestroyModels(params)
+            await model_facade.DestroyModels(entities=params)
     destroy_model = destroy_models
 
     async def add_user(self, username, password=None, display_name=None):
@@ -347,7 +411,7 @@ class Controller:
         users = [client.AddUser(display_name=display_name,
                                 username=username,
                                 password=password)]
-        results = await user_facade.AddUser(users)
+        results = await user_facade.AddUser(users=users)
         secret_key = results.results[0].secret_key
         return await self.get_user(username, secret_key=secret_key)
 
@@ -357,7 +421,7 @@ class Controller:
         client_facade = client.UserManagerFacade.from_connection(
             self.connection())
         user = tag.user(username)
-        await client_facade.RemoveUser([client.Entity(user)])
+        await client_facade.RemoveUser(entities=[client.Entity(user)])
 
     async def change_user_password(self, username, password):
         """Change the password for a user in this controller.
@@ -368,8 +432,8 @@ class Controller:
         """
         user_facade = client.UserManagerFacade.from_connection(
             self.connection())
-        entity = client.EntityPassword(password, tag.user(username))
-        return await user_facade.SetPassword([entity])
+        entity = client.EntityPassword(password=password, tag=tag.user(username))
+        return await user_facade.SetPassword(changes=[entity])
 
     async def reset_user_password(self, username):
         """Reset user password.
@@ -380,20 +444,21 @@ class Controller:
         user_facade = client.UserManagerFacade.from_connection(
             self.connection())
         entity = client.Entity(tag.user(username))
-        results = await user_facade.ResetPassword([entity])
+        results = await user_facade.ResetPassword(entities=[entity])
         secret_key = results.results[0].secret_key
         return await self.get_user(username, secret_key=secret_key)
 
-    async def destroy(self, destroy_all_models=False):
+    async def destroy(self, destroy_all_models=False, destroy_storage=False):
         """Destroy this controller.
 
         :param bool destroy_all_models: Destroy all hosted models in the
             controller.
-
+        :param bool destroy_storage: Destory all hosted storage in the
+            controller.
         """
         controller_facade = client.ControllerFacade.from_connection(
             self.connection())
-        return await controller_facade.DestroyController(destroy_all_models)
+        return await controller_facade.DestroyController(destroy_models=destroy_all_models, destroy_storage=destroy_storage)
 
     async def disable_user(self, username):
         """Disable a user.
@@ -404,7 +469,7 @@ class Controller:
         user_facade = client.UserManagerFacade.from_connection(
             self.connection())
         entity = client.Entity(tag.user(username))
-        return await user_facade.DisableUser([entity])
+        return await user_facade.DisableUser(entities=[entity])
 
     async def enable_user(self, username):
         """Re-enable a previously disabled user.
@@ -413,14 +478,62 @@ class Controller:
         user_facade = client.UserManagerFacade.from_connection(
             self.connection())
         entity = client.Entity(tag.user(username))
-        return await user_facade.EnableUser([entity])
+        return await user_facade.EnableUser(entities=[entity])
 
-    def kill(self):
-        """Forcibly terminate all machines and other associated resources for
-        this controller.
+    async def get_model_info(self, model_name=None, model_uuid=None):
+        """Return a client.ModelInfo object for a given Model.
+
+        Retrieves latest info for this Model from the api server. The
+        return value is cached on the Model.info attribute so that the
+        valued may be accessed again without another api call, if
+        desired.
+
+        This method is called automatically when the Model is connected,
+        resulting in Model.info being initialized without requiring an
+        explicit call to this method.
 
         """
-        raise NotImplementedError()
+        if model_uuid is None and model_name is None:
+            raise errors.JujuError("get_model_info requires either a name or a uuid for a model")
+
+        facade = client.ModelManagerFacade.from_connection(self.connection())
+        if model_uuid is None:
+            uuids = await self.model_uuids()
+            try:
+                model_uuid = uuids[model_name]
+            except KeyError:
+                raise errors.JujuError("{} is not among the models in the controller : {}".format(model_name, uuids))
+        entity = client.Entity(tag.model(model_uuid))
+        _model_info_results = await facade.ModelInfo(entities=[entity])
+        return _model_info_results.results[0].result
+
+    async def cloud(self, name=None):
+        """Get Cloud
+
+        :param str name: Cloud name. If not specified, the cloud where
+                         the controller lives on is returned.
+        :returns: -> ~CloudResult
+        """
+        if name is None:
+            name = await self.get_cloud()
+        entity = client.Entity(tag.cloud(name))
+        cloud_facade = client.CloudFacade.from_connection(self.connection())
+        cloud = await cloud_facade.Cloud(entities=[entity])
+        if len(cloud.results) == 0:
+            log.error("No clouds found.")
+            raise
+        elif len(cloud.results) > 1:
+            log.error("More than one cloud found.")
+            raise
+        return cloud.results[0]
+
+    async def clouds(self):
+        """Get all the clouds in the controller
+
+        :returns: -> ~CloudsResult
+        """
+        cloud_facade = client.CloudFacade.from_connection(self.connection())
+        return await cloud_facade.Clouds()
 
     async def get_cloud(self):
         """
@@ -432,79 +545,73 @@ class Controller:
         cloud = list(result.clouds.keys())[0]  # only lives on one cloud
         return tag.untag('cloud-', cloud)
 
-    async def get_models(self, all_=False, username=None):
+    async def get_models(self, all=False, username=None):
         """
         .. deprecated:: 0.7.0
            Use :meth:`.list_models` instead.
         """
-        controller_facade = client.ControllerFacade.from_connection(
-            self.connection())
-        for attempt in (1, 2, 3):
-            try:
-                return await controller_facade.AllModels()
-            except errors.JujuAPIError as e:
-                # retry concurrency error until resolved in Juju
-                # see: https://bugs.launchpad.net/juju/+bug/1721786
-                if 'has been removed' not in e.message or attempt == 3:
-                    raise
+        return await self.list_models(username, all)
 
-    async def model_uuids(self):
-        """Return a mapping of model names to UUIDs.
+    async def model_uuids(self, username=None, all=False):
+        """Return a mapping of model names to UUIDs the given user can access.
+
+        :param str username: Optional username argument, defaults to
+        current connected user.
+
+        :param bool all: Flag to list all models, regardless of
+        user accessibility (administrative users only)
+
+        :returns: {str name : str UUID}
         """
-        controller_facade = client.ControllerFacade.from_connection(
-            self.connection())
+
+        if all:
+            facade = client.ControllerFacade.from_connection(
+                self.connection())
+        else:
+            facade = client.ModelManagerFacade.from_connection(
+                self.connection())
+            u_name = username if username else self.get_current_username()
+            user = tag.user(u_name)
+
         for attempt in (1, 2, 3):
             try:
-                response = await controller_facade.AllModels()
+                if all:
+                    userModelList = await facade.AllModels()
+                else:
+                    userModelList = await facade.ListModels(tag=user)
+
                 return {um.model.name: um.model.uuid
-                        for um in response.user_models}
+                        for um in userModelList.user_models}
             except errors.JujuAPIError as e:
                 # retry concurrency error until resolved in Juju
                 # see: https://bugs.launchpad.net/juju/+bug/1721786
                 if 'has been removed' not in e.message or attempt == 3:
                     raise
-                await asyncio.sleep(attempt, loop=self._connector.loop)
+                await jasyncio.sleep(attempt)
 
-    async def list_models(self):
+    async def list_models(self, username=None, all=False):
         """Return list of names of the available models on this controller.
 
         Equivalent to ``sorted((await self.model_uuids()).keys())``
         """
-        uuids = await self.model_uuids()
+        uuids = await self.model_uuids(username, all)
         return sorted(uuids.keys())
 
-    def get_payloads(self, *patterns):
-        """Return list of known payloads.
+    async def get_current_user(self, secret_key=None):
+        """Returns the user object associated with the current connection.
+        :param str secret_key: Issued by juju when add or reset user
+            password
 
-        :param str *patterns: Patterns to match against
-
-        Each pattern will be checked against the following info in Juju::
-
-            - unit name
-            - machine id
-            - payload type
-            - payload class
-            - payload id
-            - payload tag
-            - payload status
-
+        :returns: A :class:`~juju.user.User` instance
         """
-        raise NotImplementedError()
+        return await self.get_user(self.connection().username)
 
-    def login(self):
-        """Log in to this controller.
+    def get_current_username(self):
+        """Returns the username associated with the current connection.
 
+        :returns: :str: username of the connected user
         """
-        raise NotImplementedError()
-
-    def logout(self, force=False):
-        """Log out of this controller.
-
-        :param bool force: Don't fail even if user not previously logged in
-            with a password
-
-        """
-        raise NotImplementedError()
+        return self.connection().username
 
     async def get_model(self, model):
         """Get a model by name or UUID.
@@ -538,7 +645,7 @@ class Controller:
         user = tag.user(username)
         args = [client.Entity(user)]
         try:
-            response = await client_facade.UserInfo(args, True)
+            response = await client_facade.UserInfo(entities=args, include_disabled=True)
         except errors.JujuError as e:
             if 'permission denied' in e.errors:
                 # apparently, trying to get info for a nonexistent user returns
@@ -557,7 +664,7 @@ class Controller:
         """
         client_facade = client.UserManagerFacade.from_connection(
             self.connection())
-        response = await client_facade.UserInfo(None, include_disabled)
+        response = await client_facade.UserInfo(entities=None, include_disabled=include_disabled)
         return [User(self, r.result) for r in response.results]
 
     async def grant(self, username, acl='login'):
@@ -575,7 +682,7 @@ class Controller:
         user = tag.user(username)
         changes = client.ModifyControllerAccess(acl, 'grant', user)
         try:
-            await controller_facade.ModifyControllerAccess([changes])
+            await controller_facade.ModifyControllerAccess(changes=[changes])
             return True
         except errors.JujuError as e:
             if 'user already has' in str(e):
@@ -595,8 +702,8 @@ class Controller:
         controller_facade = client.ControllerFacade.from_connection(
             self.connection())
         user = tag.user(username)
-        changes = client.ModifyControllerAccess('login', 'revoke', user)
-        return await controller_facade.ModifyControllerAccess([changes])
+        changes = client.ModifyControllerAccess(acl, 'revoke', user)
+        return await controller_facade.ModifyControllerAccess(changes=[changes])
 
     async def grant_model(self, username, model_uuid, acl='read'):
         """Grant a user access to a model. Note that if the user
@@ -613,7 +720,7 @@ class Controller:
         user = tag.user(username)
         model = tag.model(model_uuid)
         changes = client.ModifyModelAccess(acl, 'grant', model, user)
-        return await model_facade.ModifyModelAccess([changes])
+        return await model_facade.ModifyModelAccess(changes=[changes])
 
     async def revoke_model(self, username, model_uuid, acl='read'):
         """Revoke some or all of a user's access to a model.
@@ -630,4 +737,250 @@ class Controller:
         user = tag.user(username)
         model = tag.model(model_uuid)
         changes = client.ModifyModelAccess(acl, 'revoke', model, user)
-        return await model_facade.ModifyModelAccess([changes])
+        return await model_facade.ModifyModelAccess(changes=[changes])
+
+    async def create_offer(self, model_uuid, endpoint, offer_name=None, application_name=None):
+        """
+        Offer a deployed application using a series of endpoints for use by
+        consumers.
+
+        @param endpoint: holds the application and endpoint you want to offer
+        @param offer_name: over ride the offer name to help the consumer
+        """
+        try:
+            offer = parse_offer_endpoint(endpoint)
+        except OfferParseError as e:
+            log.error(e.message)
+            raise
+
+        if offer_name is None:
+            offer_name = offer.application
+
+        if application_name is None:
+            application_name = offer.application
+
+        params = client.AddApplicationOffer()
+        params.application_name = application_name
+        params.endpoints = {name: name for name in offer.endpoints}
+        params.offer_name = offer_name
+        params.model_tag = tag.model(model_uuid)
+
+        facade = client.ApplicationOffersFacade.from_connection(self.connection())
+        return await facade.Offer(offers=[params])
+
+    async def list_offers(self, model_name):
+        """
+        Offers list information about applications' endpoints that have been
+        shared and who is connected.
+        """
+        params = client.OfferFilter()
+        params.model_name = model_name
+
+        facade = client.ApplicationOffersFacade.from_connection(self.connection())
+        return await facade.ListApplicationOffers(filters=[params])
+
+    async def remove_offer(self, model_uuid, offer, force=False):
+        """
+        Remove offer for an application.
+
+        Offers will also remove relations to those offers, use force to do
+        so, without an error.
+        """
+        url = None
+        try:
+            url = parse_offer_url(offer)
+        except OfferParseError as e:
+            log.error(e.message)
+            raise
+        if url is None:
+            raise Exception
+
+        offer_source = url.source
+        if offer_source == "":
+            offer_source = self.controller_name
+        if not force:
+            raise RemoveError("removing offer will also remove relations, use force and try again.")
+
+        facade = client.ApplicationOffersFacade.from_connection(self.connection())
+        return await facade.DestroyOffers(force=force, offer_urls=[url.string()])
+
+    async def get_consume_details(self, endpoint):
+        """
+        get_consume_details returns the details necessary to pass to another
+        model to consume the specified offers represented by the urls.
+        """
+        facade = client.ApplicationOffersFacade.from_connection(self.connection())
+        offers = await facade.GetConsumeDetails(offer_urls=client.OfferURLs(offer_urls=[endpoint]))
+        if len(offers.results) != 1:
+            raise JujuAPIError("expected to find one result")
+        result = offers.results[0]
+        if result.error is not None:
+            raise JujuAPIError(result.error)
+
+        return result
+
+    async def watch_model_summaries(self, callback, as_admin=False):
+        """
+        Watch the controller for model summary updates.
+
+        If as_admin is true, a call will be made as the admin to watch
+        all models in the controller. If the user isn't a superuser they
+        will get a permission error.
+        """
+        stop_event = jasyncio.Event()
+
+        async def _watcher(stop_event):
+            try:
+                facade = client.ControllerFacade.from_connection(
+                    self.connection())
+                watcher = client.ModelSummaryWatcherFacade.from_connection(
+                    self.connection())
+                if as_admin:
+                    result = await facade.WatchAllModelSummaries()
+                    watcher.Id = result.watcher_id
+                else:
+                    result = await facade.WatchModelSummaries()
+                    log.debug("watcher id: {}".format(result.watcher_id))
+                    watcher.Id = result.watcher_id
+
+                while True:
+                    try:
+                        results = await utils.run_with_interrupt(
+                            watcher.Next(),
+                            stop_event)
+                    except JujuAPIError as e:
+                        if 'watcher was stopped' not in str(e):
+                            raise
+                    except websockets.ConnectionClosed:
+                        break
+                    if stop_event.is_set():
+                        try:
+                            await watcher.Stop()
+                        except websockets.ConnectionClosed:
+                            pass  # can't stop on a closed conn
+                        break
+                    for summary in results.models:
+                        callback(summary)
+            except CancelledError:
+                pass
+            except Exception:
+                log.exception('Error in watcher')
+                raise
+
+        log.debug('Starting watcher task for model summaries')
+        jasyncio.ensure_future(_watcher(stop_event))
+        return stop_event
+
+    async def add_secret_backends(self, id, name, backend_type, config):
+        """
+        Add a new secret backend.
+
+        Parameters
+        ----------
+        id : string
+            id for the backend
+        name : string
+            name of the backend
+        backend-type : string
+        config : dict
+            dictionary with the backend configuration values
+
+        Returns
+        -------
+        list
+           a list of errors if any
+        """
+        facade = client.SecretBackendsFacade.from_connection(self.connection())
+        return await facade.AddSecretBackends([{
+            'id': id,
+            'backend-type': backend_type,
+            'config': config,
+            'name': name,
+            'token-rotate-interval': config.get('token-rotate-interval', None),
+        }])
+
+    async def list_secret_backends(self, reveal=False):
+        """
+        Return the list of secret backends
+
+        Parameters
+        ----------
+        reveal : boolean
+            include sensitive backend config content if true
+
+        Returns
+        -------
+        list
+           a list of available secret backends
+        """
+        facade = client.SecretBackendsFacade.from_connection(self.connection())
+        return await facade.ListSecretBackends(None, reveal)
+
+    async def remove_secret_backends(self, name, force=False):
+        """
+        Remove a secrets backend.
+
+        Parameters
+        ----------
+        name : name of the backend
+        force : true if the operation is foced
+
+        Returns
+        -------
+        error if any
+        """
+        facade = client.SecretBackendsFacade.from_connection(self.connection())
+        return await facade.RemoveSecretBackends([{
+            'name': name,
+            'force': force
+        }])
+
+    async def update_secret_backends(self, name, config=None, force=False, name_change=None, token_rotate_interval=None):
+        """
+        Update a backend
+
+        Parameters
+        ----------
+        name : string
+            the backend name
+        config : dict
+            key value dict with configuration parameters
+        force : boolean
+            true to force the upate process
+        name_change : string
+            new name for the backend
+        token_rotate_interval : int
+            token rotation interval
+        """
+        facade = client.SecretBackendsFacade.from_connection(self.connection())
+        return await facade.UpdateSecretBackends([{
+            'name': name,
+            'config': config,
+            'force': force,
+            'token-rotate-interval': token_rotate_interval,
+            'name-change': name_change,
+        }])
+
+
+class ConnectedController(Controller):
+    def __init__(
+        self,
+        connection,
+        max_frame_size=None,
+        bakery_client=None,
+        jujudata=None,
+    ):
+        super().__init__(
+            max_frame_size=max_frame_size,
+            bakery_client=bakery_client,
+            jujudata=jujudata)
+        self._conn = connection
+
+    async def __aenter__(self):
+        kwargs = self._conn.connect_params()
+        kwargs.pop('uuid')
+        await self._connect_direct(**kwargs)
+        return self
+
+    async def __aexit__(self, exc_type, exc, tb):
+        await self.disconnect()

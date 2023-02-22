@@ -5,7 +5,7 @@ This example doesn't work - it demonstrates features that don't exist yet.
 import logging
 
 from juju.model import Model
-from juju import loop
+from juju import jasyncio
 
 
 async def main():
@@ -15,7 +15,7 @@ async def main():
 
     goal_state = Model.from_yaml('bundle-like-thing')
     ubuntu_app = await model.deploy(
-        'ubuntu-0',
+        'ch:ubuntu',
         application_name='ubuntu',
         series='trusty',
         channel='stable',
@@ -23,13 +23,13 @@ async def main():
     ubuntu_app.on_unit_added(callback=lambda unit: True)
 
     await model.deploy(
-        'nrpe-11',
+        'ch:nrpe',
         application_name='nrpe',
         series='trusty',
         channel='stable',
         num_units=0,
     )
-    await model.add_relation(
+    await model.relate(
         'ubuntu',
         'nrpe',
     )
@@ -44,4 +44,4 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     ws_logger = logging.getLogger('websockets.protocol')
     ws_logger.setLevel(logging.INFO)
-    loop.run(main())
+    jasyncio.run(main())

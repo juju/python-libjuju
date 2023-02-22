@@ -1,10 +1,9 @@
 import asyncio
-import subprocess
 import uuid
+import hvac
 
 from juju.client.connection import Connection
-from juju.client.jujudata import FileJujuData
-from juju.controller import Controller
+from juju.client import client
 from juju.errors import JujuAPIError
 
 import pytest
@@ -101,7 +100,9 @@ async def test_reset_user_password(event_loop):
             pass
         finally:
             # No connection with old password
-            assert new_connection is None
+            if new_connection:
+                await new_connection.close()
+                raise AssertionError()
 
 
 @base.bootstrapped
@@ -130,7 +131,26 @@ async def test_list_models(event_loop):
     async with base.CleanController() as controller:
         async with base.CleanModel() as model:
             result = await controller.list_models()
-            assert model.info.name in result
+            assert model.name in result
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_list_models_user_access(event_loop):
+    async with base.CleanController() as controller:
+        username = 'test-grant{}'.format(uuid.uuid4())
+        user = await controller.add_user(username)
+        await user.grant(acl='superuser')
+        assert user.access == 'superuser'
+        models1 = await controller.list_models(username)
+        await user.revoke(acl='superuser')
+        models2 = await controller.list_models(username)
+        assert len(models1) > len(models2)
+
+        # testing all flag
+        await user.grant(acl='superuser')
+        models_all = await controller.list_models(username, all=True)
+        assert len(models_all) > len(models2)
 
 
 @base.bootstrapped
@@ -145,9 +165,9 @@ async def test_get_model(event_loop):
         try:
             by_name = await controller.get_model(model_name)
             by_uuid = await controller.get_model(model_uuid)
-            assert by_name.info.name == model_name
+            assert by_name.name == model_name
             assert by_name.info.uuid == model_uuid
-            assert by_uuid.info.name == model_name
+            assert by_uuid.name == model_name
             assert by_uuid.info.uuid == model_uuid
         finally:
             if by_name:
@@ -159,12 +179,12 @@ async def test_get_model(event_loop):
 
 async def _wait_for_model(controller, model_name):
     while model_name not in await controller.list_models():
-        await asyncio.sleep(0.5, loop=controller.loop)
+        await asyncio.sleep(0.5)
 
 
 async def _wait_for_model_gone(controller, model_name):
     while model_name in await controller.list_models():
-        await asyncio.sleep(0.5, loop=controller.loop)
+        await asyncio.sleep(0.5)
 
 
 @base.bootstrapped
@@ -200,29 +220,88 @@ async def test_add_destroy_model_by_uuid(event_loop):
                                timeout=60)
 
 
-# this test must be run serially because it modifies the login password
-@pytest.mark.serial
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_macaroon_auth(event_loop):
-    jujudata = FileJujuData()
-    account = jujudata.accounts()[jujudata.current_controller()]
-    with base.patch_file('~/.local/share/juju/accounts.yaml'):
-        if 'password' in account:
-            # force macaroon auth by "changing" password to current password
-            result = subprocess.run(
-                ['juju', 'change-user-password'],
-                input='{0}\n{0}\n'.format(account['password']),
-                universal_newlines=True,
-                stderr=subprocess.PIPE)
-            assert result.returncode == 0, ('Failed to change password: '
-                                            '{}'.format(result.stderr))
-        controller = Controller()
+async def test_add_remove_cloud(event_loop):
+    async with base.CleanController() as controller:
+        cloud_name = 'test-{}'.format(uuid.uuid4())
+        cloud = client.Cloud(
+            auth_types=["userpass"],
+            endpoint="http://localhost:1234",
+            type_="kubernetes")
+        cloud = await controller.add_cloud(cloud_name, cloud)
         try:
-            await controller.connect()
-            assert controller.is_connected()
+            assert cloud.auth_types[0] == "userpass"
+            assert cloud.endpoint == "http://localhost:1234"
+            assert cloud.type_ == "kubernetes"
         finally:
-            if controller.is_connected():
-                await controller.disconnect()
-        async with base.CleanModel():
-            pass  # create and login to model works
+            await controller.remove_cloud(cloud_name)
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_secrets_backend_lifecycle(event_loop):
+    """Testing the add_secret_backends is particularly
+    costly in term of resources. This test sets a vault
+    charm, add it to the controller and plays with the
+    list, removal, and update. """
+    async with base.CleanModel() as m:
+        controller = await m.get_controller()
+        # deploy postgresql
+        await m.deploy('postgresql')
+        # deploy vault
+        await m.deploy("vault", series="focal")
+        # relate/integrate
+        await m.relate("vault:db", "postgresql:db")
+        # wait for the
+        await m.wait_for_idle(["vault"])
+        # expose vault
+        vault_app = m.applications["vault"]
+        await vault_app.expose()
+
+        # Get a vault client
+        # Deploy this entire thing
+        status = await m.get_status()
+        target = ""
+        for unit in status.applications['vault'].units.values():
+            target = unit.public_address
+
+        vault_url = "http://%s:8200" % target
+        vault_client = hvac.Client(url=vault_url)
+
+        # Initialize vault
+        keys = vault_client.sys.initialize(3, 2)
+
+        # Unseal vault
+        vault_client.sys.submit_unseal_keys(keys['keys'])
+
+        # Add the secret backend
+        response = await controller.add_secret_backends("1001", "myvault", "vault", {"endpoint": vault_url})
+        assert response["results"] is not None
+        assert response["results"][0]['error'] is None
+
+        # List the secrets backend
+        list = await controller.list_secret_backends()
+        assert len(list["results"]) == 2
+        # consider the internal secrets backend
+        for entry in list["results"]:
+            assert entry["result"].name == "internal" or entry["result"].name == "myvault"
+
+        # Update it
+        resp = await controller.update_secret_backends("myvault", name_change="changed_name")
+        assert resp["results"][0]["error"] is None
+
+        # List the secrets backend
+        list = await controller.list_secret_backends()
+        assert len(list["results"]) == 2
+        # consider the internal secrets backend
+        for entry in list["results"]:
+            assert entry["result"].name == "internal" or entry["result"].name == "changed_name"
+
+        # Remove it
+        await controller.remove_secret_backends("changed_name")
+
+        # Finally after removing
+        list_after = await controller.list_secret_backends()
+        assert len(list_after["results"]) == 1
+        assert list_after["results"][0]["result"].name == "internal"

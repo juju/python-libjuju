@@ -6,7 +6,7 @@ This example:
 3. Attempts to ssh into the charm
 
 """
-from juju import loop
+from juju import jasyncio
 from juju import utils
 from juju.controller import Controller
 import asyncio
@@ -29,17 +29,15 @@ async def main():
 
         print('Deploying ubuntu')
         application = await model.deploy(
-            'ubuntu-10',
+            'ch:ubuntu',
             application_name='ubuntu',
-            series='trusty',
+            series='jammy',
             channel='stable',
         )
 
         print('Waiting for active')
         await asyncio.sleep(10)
-        await model.block_until(
-            lambda: all(unit.workload_status == 'active'
-                        for unit in application.units))
+        await model.wait_for_idle(status='active')
 
         print("Verifying that we can ssh into the created model")
         ret = await utils.execute_process(
@@ -64,4 +62,4 @@ async def main():
 
 
 if __name__ == '__main__':
-    loop.run(main())
+    jasyncio.run(main())

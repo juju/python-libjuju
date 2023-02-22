@@ -6,32 +6,42 @@ import hashlib
 import json
 import logging
 import os
+import sys
 import re
 import stat
 import tempfile
+import warnings
 import weakref
 import zipfile
 from concurrent.futures import CancelledError
+from datetime import datetime, timedelta
 from functools import partial
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 import yaml
-
-import theblues.charmstore
-import theblues.errors
 import websockets
 
-from . import provisioner, tag, utils
+from . import provisioner, tag, utils, jasyncio
 from .annotationhelper import _get_annotations, _set_annotations
+from .bundle import BundleHandler, get_charm_series, is_local_charm
+from .charmhub import CharmHub
 from .client import client, connector
-from .client.client import ConfigValue, Value
-from .constraints import normalize_key
+from .client.overrides import Caveat, Macaroon
 from .constraints import parse as parse_constraints
+from .controller import Controller, ConnectedController
 from .delta import get_entity_class, get_entity_delta
-from .errors import JujuAPIError, JujuError
+from .errors import JujuAPIError, JujuError, JujuModelConfigError, JujuBackupError
+from .errors import JujuModelError, JujuAppError, JujuUnitError, JujuAgentError, JujuMachineError, PylibjujuError
 from .exceptions import DeadEntityException
+from .names import is_valid_application
+from .offerendpoints import ParseError as OfferParseError
+from .offerendpoints import parse_local_endpoint, parse_offer_url
+from .origin import Channel, Source
 from .placement import parse as parse_placement
+from .tag import application as application_tag
+from .url import URL, Schema
+from .version import DEFAULT_ARCHITECTURE
 
 if TYPE_CHECKING:
     from .application import Application
@@ -137,6 +147,21 @@ class ModelState:
 
         """
         return self._live_entity_map('application')
+
+    @property
+    def remote_applications(self):
+        """Return a map of application-name:Application for all remote
+        applications currently in the model.
+
+        """
+        return self._live_entity_map('remoteApplication')
+
+    @property
+    def application_offers(self):
+        """Return a map of application-name:Application for all applications
+        offers currently in the model.
+        """
+        return self._live_entity_map('applicationOffer')
 
     @property
     def machines(self) -> dict[str, Machine]:
@@ -289,7 +314,18 @@ class ModelEntity:
         'application' or 'unit', etc.
 
         """
-        return self.__class__.__name__.lower()
+        # Allow the overriding of entity names from the type instead of from
+        # the class name. Useful because Model and ModelInfo clash and we really
+        # want ModelInfo to be called Model.
+        if hasattr(self.__class__, "type_name_override") and callable(self.__class__.type_name_override):
+            return self.__class__.type_name_override()
+
+        def first_lower(s):
+            if len(s) == 0:
+                return s
+            else:
+                return s[0].lower() + s[1:]
+        return first_lower(self.__class__.__name__)
 
     @property
     def current(self):
@@ -398,13 +434,122 @@ class ModelEntity:
         return self.model.state.get_entity(self.entity_type, self.entity_id)
 
 
+class DeployTypeResult:
+    """DeployTypeResult represents the result of a deployment type after a
+    resolution.
+    """
+
+    def __init__(self, identifier, origin, app_name, is_local=False, is_bundle=False):
+        self.identifier = identifier
+        self.origin = origin
+        self.app_name = app_name
+        self.is_local = is_local
+        self.is_bundle = is_bundle
+
+
+class LocalDeployType:
+    """LocalDeployType deals with local only deployments.
+    """
+
+    async def resolve(self, url, architecture, app_name=None, channel=None, series=None, entity_url=None):
+        """resolve attempts to resolve a local charm or bundle using the url
+        and architecture. If information is missing, it will attempt to backfill
+        that information, before sending the result back.
+        """
+
+        entity_url = url.path()
+        entity_path = Path(entity_url)
+        bundle_path = entity_path / 'bundle.yaml'
+
+        identifier = entity_url
+        origin = client.CharmOrigin(source="local", architecture=architecture)
+        if not (entity_path.is_dir() or entity_path.is_file()):
+            raise JujuError('{} path not found'.format(entity_url))
+
+        is_bundle = (
+            (entity_path.suffix == ".yaml" and entity_path.exists()) or
+            bundle_path.exists()
+        )
+
+        if app_name is None:
+            app_name = url.name
+
+            if not is_bundle:
+                entity_url = url.path()
+                entity_path = Path(entity_url)
+                if entity_path.suffix == '.charm':
+                    with zipfile.ZipFile(str(entity_path), 'r') as charm_file:
+                        metadata = yaml.load(charm_file.read('metadata.yaml'), Loader=yaml.FullLoader)
+                else:
+                    metadata_path = entity_path / 'metadata.yaml'
+                    metadata = yaml.load(metadata_path.read_text(), Loader=yaml.FullLoader)
+                app_name = metadata['name']
+
+        return DeployTypeResult(
+            identifier=identifier,
+            origin=origin,
+            app_name=app_name,
+            is_local=True,
+            is_bundle=is_bundle,
+        )
+
+
+class CharmhubDeployType:
+    """CharmhubDeployType defines a class for resolving and deploying charmhub
+    charms and bundles.
+    """
+
+    def __init__(self, charm_resolver):
+        self.charm_resolver = charm_resolver
+
+    async def resolve(self, url, architecture, app_name=None, channel=None, series=None, entity_url=None):
+        """resolve attempts to resolve charmhub charms or bundles. A request to
+        the charmhub API is required to correctly determine the charm url and
+        underlying origin.
+        """
+
+        ch = Channel('latest', 'stable')
+        if channel is not None:
+            ch = Channel.parse(channel).normalize()
+
+        base = client.Base()
+        if series:
+            base.channel = ch.normalize().compute_base_channel(series=series)
+            base.name = 'ubuntu'
+        origin = client.CharmOrigin(source=Source.CHARM_HUB.value,
+                                    architecture=architecture,
+                                    risk=ch.risk,
+                                    track=ch.track,
+                                    base=base,
+                                    )
+
+        charm_url_str, origin, supported_series = await self.charm_resolver(url, origin)
+        charm_url = URL.parse(charm_url_str)
+
+        if app_name is None:
+            app_name = url.name
+
+        if series:
+            if series in supported_series:
+                origin.series = series
+                charm_url.series = series
+            else:
+                raise JujuError("Series {} not supported for {}. Only {}".format(series, url, supported_series))
+
+        return DeployTypeResult(
+            identifier=str(charm_url),
+            app_name=app_name,
+            origin=origin,
+            is_bundle=origin.type_ == "bundle",
+        )
+
+
 class Model:
     """
     The main API for interacting with a Juju model.
     """
     def __init__(
         self,
-        loop=None,
         max_frame_size=None,
         bakery_client=None,
         jujudata=None,
@@ -416,7 +561,6 @@ class Model:
 
         If jujudata is None, jujudata.FileJujuData will be used.
 
-        :param loop: an asyncio event loop
         :param max_frame_size: See
             `juju.client.connection.Connection.MAX_FRAME_SIZE`
         :param bakery_client httpbakery.Client: The bakery client to use
@@ -424,7 +568,6 @@ class Model:
         :param jujudata JujuData: The source for current controller information
         """
         self._connector = connector.Connector(
-            loop=loop,
             max_frame_size=max_frame_size,
             bakery_client=bakery_client,
             jujudata=jujudata,
@@ -432,19 +575,22 @@ class Model:
         self._observers = weakref.WeakValueDictionary()
         self.state = ModelState(self)
         self._info = None
-        self._watch_stopping = asyncio.Event(loop=self._connector.loop)
-        self._watch_stopped = asyncio.Event(loop=self._connector.loop)
-        self._watch_received = asyncio.Event(loop=self._connector.loop)
+        self._mode = None
+        self._watch_stopping = jasyncio.Event()
+        self._watch_stopped = jasyncio.Event()
+        self._watch_received = jasyncio.Event()
         self._watch_stopped.set()
-        self._charmstore = CharmStore(self._connector.loop)
+
+        self._charmhub = CharmHub(self)
+
+        self.deploy_types = {
+            "local": LocalDeployType(),
+            "ch": CharmhubDeployType(self._resolve_charm),
+        }
 
     def is_connected(self):
         """Reports whether the Model is currently connected."""
         return self._connector.is_connected()
-
-    @property
-    def loop(self):
-        return self._connector.loop
 
     def connection(self):
         """Return the current Connection object. It raises an exception
@@ -503,20 +649,25 @@ class Model:
             If this is None, a default bakery_client will be used.
         :param list macaroons: List of macaroons to load into the
             ``bakery_client``.
-        :param asyncio.BaseEventLoop loop: The event loop to use for async
-            operations.
         :param int max_frame_size: The maximum websocket frame size to allow.
+        :param specified_facades: Overwrite the facades with a series of
+            specified facades.
         """
-        await self.disconnect()
+        is_debug_log_conn = 'debug_log_conn' in kwargs
+        if not is_debug_log_conn:
+            await self.disconnect()
+        model_name = model_uuid = None
         if 'endpoint' not in kwargs and len(args) < 2:
+            # Then we're using the model_name to pick the model
             if args and 'model_name' in kwargs:
                 raise TypeError('connect() got multiple values for model_name')
             elif args:
                 model_name = args[0]
             else:
                 model_name = kwargs.pop('model_name', None)
-            await self._connector.connect_model(model_name, **kwargs)
+            _, model_uuid = await self._connector.connect_model(model_name, **kwargs)
         else:
+            # Then we're using the endpoint to pick the model
             if 'model_name' in kwargs:
                 raise TypeError('connect() got values for both '
                                 'model_name and endpoint')
@@ -538,11 +689,11 @@ class Model:
                 'cacert',
                 'bakery_client',
                 'macaroons',
-                'loop',
                 'max_frame_size',
             ]
             for i, arg in enumerate(args):
                 kwargs[arg_names[i]] = arg
+            model_uuid = kwargs['uuid']
             if not {'endpoint', 'uuid'}.issubset(kwargs):
                 raise ValueError('endpoint and uuid are required '
                                  'if model_name not given')
@@ -551,14 +702,15 @@ class Model:
                 raise ValueError('Authentication parameters are required '
                                  'if model_name not given')
             await self._connector.connect(**kwargs)
-        await self._after_connect()
+        if not is_debug_log_conn:
+            await self._after_connect(model_name, model_uuid)
 
-    async def connect_model(self, model_name):
+    async def connect_model(self, model_name, **kwargs):
         """
         .. deprecated:: 0.6.2
            Use ``connect(model_name=model_name)`` instead.
         """
-        return await self.connect(model_name=model_name)
+        return await self.connect(model_name=model_name, **kwargs)
 
     async def connect_current(self):
         """
@@ -567,12 +719,22 @@ class Model:
         """
         return await self.connect()
 
+    async def connect_to(self, connection):
+        conn_params = connection.connect_params()
+        await self._connect_direct(**conn_params)
+
     async def _connect_direct(self, **kwargs):
+        if self.info:
+            uuid = self.info.uuid
+        elif 'uuid' in kwargs:
+            uuid = kwargs['uuid']
+        else:
+            raise PylibjujuError("Unable to find uuid for the model")
         await self.disconnect()
         await self._connector.connect(**kwargs)
-        await self._after_connect()
+        await self._after_connect(model_uuid=uuid)
 
-    async def _after_connect(self):
+    async def _after_connect(self, model_name=None, model_uuid=None):
         self._watch()
 
         # Wait for the first packet of data from the AllWatcher,
@@ -583,7 +745,11 @@ class Model:
         # to do is make one RPC call.
         await self._watch_received.wait()
 
-        await self.get_info()
+        if self.info is None:
+            contr = await self.get_controller()
+            self._info = await contr.get_model_info(model_name, model_uuid)
+            log.debug('Got ModelInfo: %s', vars(self.info))
+
         self.uuid = self.info.uuid
 
     async def disconnect(self):
@@ -611,17 +777,22 @@ class Model:
         :param series: Charm series
 
         """
-        fh = tempfile.NamedTemporaryFile()
-        CharmArchiveGenerator(charm_dir).make_archive(fh.name)
-        with fh:
+        charm_dir = Path(charm_dir)
+        if charm_dir.suffix == '.charm':
+            fn = charm_dir
+        else:
+            fn = tempfile.NamedTemporaryFile().name
+            CharmArchiveGenerator(str(charm_dir)).make_archive(fn)
+        with open(str(fn), 'rb') as fh:
             func = partial(
-                self.add_local_charm, fh, series, os.stat(fh.name).st_size)
-            charm_url = await self._connector.loop.run_in_executor(None, func)
+                self.add_local_charm, fh, series, os.stat(str(fn)).st_size)
+            loop = jasyncio.get_running_loop()
+            charm_url = await loop.run_in_executor(None, func)
 
         log.debug('Uploaded local charm: %s -> %s', charm_dir, charm_url)
         return charm_url
 
-    def add_local_charm(self, charm_file, series, size=None):
+    def add_local_charm(self, charm_file, series="", size=None):
         """Upload a local charm archive to the model.
 
         Returns the 'local:...' url that should be used to deploy the charm.
@@ -676,11 +847,152 @@ class Model:
         log.debug('Resetting model')
         for app in self.applications.values():
             await app.destroy()
+        await self.block_until(
+            lambda: len(self.applications) == 0
+        )
         for machine in self.machines.values():
             await machine.destroy(force=force)
         await self.block_until(
             lambda: len(self.machines) == 0
         )
+
+    async def create_storage_pool(self, name, provider_type, attributes=""):
+        """Create or define a storage pool.
+
+        :param str name: a pool name
+        :param str provider_type: provider type (defaults to "kubernetes" for
+        Kubernetes models)
+        :param str attributes: attributes for configuration as space-separated pairs,
+        e.g. tags, size, path, etc.
+        :return:
+        """
+        _attrs = [splt.split("=") for splt in attributes.split()]
+
+        storage_facade = client.StorageFacade.from_connection(self.connection())
+        return await storage_facade.CreatePool(pools=[client.StoragePool(
+            name=name,
+            provider=provider_type,
+            attrs=dict(_attrs)
+        )])
+
+    async def remove_storage_pool(self, name):
+        """Remove an existing storage pool.
+
+        :param str name:
+        :return:
+        """
+        storage_facade = client.StorageFacade.from_connection(self.connection())
+        return await storage_facade.RemovePool(pools=[client.StoragePoolDeleteArg(name)])
+
+    async def update_storage_pool(self, name, attributes=""):
+        """ Update storage pool attributes.
+
+        :param name:
+        :param attributes: "key=value key=value ..."
+        :return:
+        """
+        _attrs = dict([splt.split("=") for splt in attributes.split()])
+        if len(_attrs) == 0:
+            raise JujuError("Expected at least one attribute to update")
+
+        storage_facade = client.StorageFacade.from_connection(self.connection())
+        return await storage_facade.UpdatePool(pools=[client.StoragePool(
+            name=name,
+            attrs=_attrs,
+        )])
+
+    async def list_storage(self, filesystem=False, volume=False):
+        """Lists storage details.
+
+        :param bool filesystem: List filesystem storage
+        :param bool volume: List volume storage
+        :return:
+        """
+        storage_facade = client.StorageFacade.from_connection(self.connection())
+
+        if filesystem and volume:
+            raise JujuError("--filesystem and --volume can not be used together")
+        if filesystem:
+            _res = await storage_facade.ListFilesystems(filters=[client.FilesystemFilter()])
+        elif volume:
+            _res = await storage_facade.ListVolumes(filters=[client.VolumeFilter()])
+        else:
+            _res = await storage_facade.ListStorageDetails(filters=[client.StorageFilter()])
+
+        err = _res.results[0].error
+        res = _res.results[0].result
+
+        if err is not None:
+            raise JujuError(err.message)
+
+        return [details.serialize() for details in res]
+
+    async def show_storage_details(self, *storage_ids):
+        """Shows storage instance information.
+
+        :param []str storage_ids:
+        :return:
+        """
+        if not storage_ids:
+            raise JujuError("Expected at least one storage ID")
+
+        storage_facade = client.StorageFacade.from_connection(self.connection())
+        res = await storage_facade.StorageDetails(entities=[client.Entity(tag.storage(s)) for s in storage_ids])
+        return [s.result.serialize() for s in res.results]
+
+    async def list_storage_pools(self):
+        """List storage pools.
+
+        :return:
+        """
+        # TODO (cderici): Filter on pool type, name.
+        storage_facade = client.StorageFacade.from_connection(self.connection())
+        res = await storage_facade.ListPools(filters=[client.StoragePoolFilter()])
+        err = res.results[0].error
+        if err:
+            raise JujuError(err.message)
+        return [p.serialize() for p in res.results[0].storage_pools]
+
+    async def remove_storage(self, *storage_ids, force=False, destroy_storage=False):
+        """Removes storage from the model.
+
+        :param bool force: Remove storage even if it is currently attached
+        :param bool destroy_storage: Remove the storage and destroy it
+        :param []str storage_ids:
+        :return:
+        """
+        if not storage_ids:
+            raise JujuError("Expected at least one storage ID")
+
+        storage_facade = client.StorageFacade.from_connection(self.connection())
+        ret = await storage_facade.Remove(storage=[client.RemoveStorageInstance(
+            destroy_storage=destroy_storage,
+            force=force,
+            tag=s,
+        ) for s in storage_ids])
+        if ret.results[0].error:
+            raise JujuError(ret.results[0].error.message)
+
+    async def remove_application(self, app_name, block_until_done=False, force=False, destroy_storage=False, no_wait=False):
+        """Removes the given application from the model.
+
+        :param str app_name: Name of the application
+        :param bool force: Completely remove an application and all its dependencies. (=false)
+        :param bool destroy_storage: Destroy storage attached to application unit. (=false)
+        :param bool no_wait: Rush through application removal without waiting for each individual step to complete (=false)
+        :param bool block_until_done: Ensure the app is removed from the
+        model when returned
+        """
+        if app_name not in self.applications:
+            raise JujuError("Given application doesn't seem to appear in the\
+             model: %s\nCurrent applications are: %s" %
+                            (app_name, self.applications))
+        await self.applications[app_name].remove(destroy_storage=destroy_storage,
+                                                 force=force,
+                                                 no_wait=no_wait,
+                                                 )
+        if block_until_done:
+            await self.block_until(lambda: app_name not in self.applications)
 
     async def block_until(self, *conditions, timeout=None, wait_period=0.5):
         """Return only after all conditions are true.
@@ -695,8 +1007,7 @@ class Model:
 
         await utils.block_until(done,
                                 timeout=timeout,
-                                wait_period=wait_period,
-                                loop=self.loop)
+                                wait_period=wait_period)
         if _disconnected():
             raise websockets.ConnectionClosed(1006, 'no reason')
 
@@ -711,6 +1022,21 @@ class Model:
 
         """
         return self.state.applications
+
+    @property
+    def remote_applications(self):
+        """Return a map of application-name:Application for all remote
+        applications currently in the model.
+
+        """
+        return self.state.remote_applications
+
+    @property
+    def application_offers(self):
+        """Return a map of application-name:Application for all applications
+        offers currently in the model.
+        """
+        return self.state.application_offers
 
     @property
     def machines(self):
@@ -735,25 +1061,22 @@ class Model:
         """
         return list(self.state.relations.values())
 
-    async def get_info(self):
-        """Return a client.ModelInfo object for this Model.
-
-        Retrieves latest info for this Model from the api server. The
-        return value is cached on the Model.info attribute so that the
-        valued may be accessed again without another api call, if
-        desired.
-
-        This method is called automatically when the Model is connected,
-        resulting in Model.info being initialized without requiring an
-        explicit call to this method.
+    @property
+    def charmhub(self):
+        """Return a charmhub repository for requesting charm information using
+        the charm-hub-url model config.
 
         """
-        facade = client.ClientFacade.from_connection(self.connection())
+        return self._charmhub
 
-        self._info = await facade.ModelInfo()
-        log.debug('Got ModelInfo: %s', vars(self.info))
+    @property
+    def name(self):
+        """Return the name of this model
 
-        return self.info
+        """
+        if self._info is None:
+            raise JujuModelError("Model is not connected")
+        return self._info.name
 
     @property
     def info(self) -> None | _definitions.ModelInfo:
@@ -762,6 +1085,10 @@ class Model:
         If Model.get_info() has not been called, this will return None.
         """
         return self._info
+
+    @property
+    def strict_mode(self):
+        return self._mode is not None and "strict" in self._mode
 
     def add_observer(
             self, callable_, entity_type=None, action=None, entity_id=None,
@@ -809,7 +1136,21 @@ class Model:
         See :meth:`add_observer` to register an onchange callback.
 
         """
+        def _post_step(obj):
+            # Once we get the model, ensure we're running in the correct state
+            # as a post step.
+            if isinstance(obj, ModelInfo) and obj.safe_data is not None:
+                model_config = obj.safe_data["config"]
+                if "mode" in model_config:
+                    self._mode = model_config["mode"]
+
         async def _all_watcher():
+            # First attempt to get the model config so we know what mode the
+            # library should be running in.
+            model_config = await self.get_config()
+            if "mode" in model_config:
+                self._mode = model_config["mode"]["value"]
+
             try:
                 allwatcher = client.AllWatcherFacade.from_connection(
                     self.connection())
@@ -817,8 +1158,7 @@ class Model:
                     try:
                         results = await utils.run_with_interrupt(
                             allwatcher.Next(),
-                            self._watch_stopping,
-                            loop=self._connector.loop)
+                            self._watch_stopping)
                     except JujuAPIError as e:
                         if 'watcher was stopped' not in str(e):
                             raise
@@ -858,12 +1198,20 @@ class Model:
                             pass  # can't stop on a closed conn
                         break
                     for delta in results.deltas:
+                        entity = None
                         try:
-                            delta = get_entity_delta(delta)
-                            old_obj, new_obj = self.state.apply_delta(delta)
-                            await self._notify_observers(delta, old_obj, new_obj)
-                        except KeyError as e:
-                            log.debug("unknown delta type: %s", e.args[0])
+                            entity = get_entity_delta(delta)
+                        except KeyError:
+                            if self.strict_mode:
+                                raise JujuError("unknown delta type '{}'".format(delta.entity))
+
+                        if not self.strict_mode and entity is None:
+                            continue
+                        old_obj, new_obj = self.state.apply_delta(entity)
+                        await self._notify_observers(entity, old_obj, new_obj)
+                        # Post step ensure that we can handle any settings
+                        # that need to be correctly set as a post step.
+                        _post_step(new_obj)
                     self._watch_received.set()
             except CancelledError:
                 pass
@@ -877,7 +1225,7 @@ class Model:
         self._watch_received.clear()
         self._watch_stopping.clear()
         self._watch_stopped.clear()
-        self._connector.loop.create_task(_all_watcher())
+        jasyncio.ensure_future(_all_watcher())
 
     async def _notify_observers(self, delta, old_obj, new_obj):
         """Call observing callbacks, notifying them of a change in model state
@@ -899,8 +1247,7 @@ class Model:
 
         for o in self._observers:
             if o.cares_about(delta):
-                asyncio.ensure_future(o(delta, old_obj, new_obj, self),
-                                      loop=self._connector.loop)
+                jasyncio.ensure_future(o(delta, old_obj, new_obj, self))
 
     async def _wait(self, entity_type, entity_id, action, predicate=None):
         """
@@ -917,7 +1264,7 @@ class Model:
             has a 'completed' status. See the _Observer class for details.
 
         """
-        q = asyncio.Queue(loop=self._connector.loop)
+        q = jasyncio.Queue()
 
         async def callback(delta, old, new, model):
             await q.put(delta.get_id())
@@ -1063,8 +1410,8 @@ class Model:
             params.series = series
 
         # Submit the request.
-        client_facade = client.ClientFacade.from_connection(self.connection())
-        results = await client_facade.AddMachines([params])
+        client_facade = client.MachineManagerFacade.from_connection(self.connection())
+        results = await client_facade.AddMachines(params=[params])
         error = results.machines[0].error
         if error:
             raise ValueError("Error adding machine: %s" % error.message)
@@ -1084,17 +1431,59 @@ class Model:
         return await self._wait_for_new('machine', machine_id)
 
     async def add_relation(self, relation1, relation2):
+        """
+        .. deprecated:: 2.9.9
+           Use ``relate()`` instead
+        """
+        return await self.relate(relation1, relation2)
+
+    async def integrate(self, relation1, relation2):
         """Add a relation between two applications.
 
         :param str relation1: '<application>[:<relation_name>]'
         :param str relation2: '<application>[:<relation_name>]'
 
         """
-        connection = self.connection()
-        app_facade = client.ApplicationFacade.from_connection(connection)
+        # attempt to validate any url that are passed in.
+        endpoints = []
+        remote_endpoint = None
+        for ep in [relation1, relation2]:
+            try:
+                url = parse_offer_url(ep)
+            except OfferParseError:
+                pass
+            else:
+                if remote_endpoint is not None:
+                    raise JujuError("move than one remote endpoints not supported")
+                remote_endpoint = url
+                endpoints.append(url.application)
+                continue
+
+            try:
+                parse_local_endpoint(ep)
+            except OfferParseError:
+                raise
+            else:
+                endpoints.append(ep)
+        if len(endpoints) != 2:
+            raise JujuError("error validating one of the endpoints")
+
+        facade_cls = client.ApplicationFacade
+        if remote_endpoint is not None:
+            if facade_cls.best_facade_version(self.connection()) < 5:
+                # old clients don't support cross model capability
+                raise JujuError("cannot add relation to {}: remote endpoints not supported".format(remote_endpoint.string()))
+
+            if remote_endpoint.has_empty_source():
+                async with ConnectedController(self.connection()) as current:
+                    remote_endpoint.source = current.controller_name
+            # consume the remote endpoint
+            await self.consume(remote_endpoint.string(),
+                               application_alias=remote_endpoint.application,
+                               controller_name=remote_endpoint.source)
 
         log.debug(
-            'Adding relation %s <-> %s', relation1, relation2)
+            'Adding relation %s <-> %s', endpoints[0], endpoints[1])
 
         def _find_relation(*specs):
             for rel in self.relations:
@@ -1102,16 +1491,17 @@ class Model:
                     return rel
             return None
 
+        app_facade = facade_cls.from_connection(self.connection())
         try:
-            result = await app_facade.AddRelation([relation1, relation2])
+            result = await app_facade.AddRelation(endpoints=endpoints, via_cidrs=None)
         except JujuAPIError as e:
             if 'relation already exists' not in e.message:
                 raise
-            rel = _find_relation(relation1, relation2)
+            rel = _find_relation(endpoints[0], endpoints[1])
             if rel:
                 return rel
             raise JujuError('Relation {} {} exists but not in model'.format(
-                relation1, relation2))
+                endpoints[0], endpoints[1]))
 
         specs = ['{}:{}'.format(app, data['name'])
                  for app, data in result.endpoints.items()]
@@ -1119,17 +1509,29 @@ class Model:
         await self.block_until(lambda: _find_relation(*specs) is not None)
         return _find_relation(*specs)
 
-    def add_space(self, name, *cidrs):
+    async def relate(self, relation1, relation2):
+        """The relate function is deprecated in favor of instead.
+        The logic is the same.
+        """
+        log.warn("relate is deprecated and will be removed. Use integrate instead.")
+        return await self.integrate(relation1, relation2)
+
+    async def add_space(self, name, cidrs=None, public=True):
         """Add a new network space.
 
         Adds a new space with the given name and associates the given
         (optional) list of existing subnet CIDRs with it.
 
         :param str name: Name of the space
-        :param *cidrs: Optional list of existing subnet CIDRs
-
+        :param List[str] cidrs: Optional list of existing subnet CIDRs
         """
-        raise NotImplementedError()
+        space_facade = client.SpacesFacade.from_connection(self.connection())
+        spaces = [
+            {
+                "cidrs": cidrs,
+                "space-tag": tag.space(name),
+                "public": public}]
+        return await space_facade.CreateSpaces(spaces=spaces)
 
     async def add_ssh_key(self, user, key):
         """Add a public SSH key to this model.
@@ -1139,74 +1541,51 @@ class Model:
 
         """
         key_facade = client.KeyManagerFacade.from_connection(self.connection())
-        return await key_facade.AddKeys([key], user)
+        return await key_facade.AddKeys(ssh_keys=[key], user=user)
     add_ssh_keys = add_ssh_key
 
-    def add_subnet(self, cidr_or_id, space, *zones):
-        """Add an existing subnet to this model.
-
-        :param str cidr_or_id: CIDR or provider ID of the existing subnet
-        :param str space: Network space with which to associate
-        :param str *zones: Zone(s) in which the subnet resides
-
-        """
-        raise NotImplementedError()
-
-    def get_backups(self):
+    async def get_backups(self):
         """Retrieve metadata for backups in this model.
 
+        :return [dict]: List of metadata for the stored backups
         """
-        raise NotImplementedError()
+        backups_facade = client.BackupsFacade.from_connection(self.connection())
+        _backups_metadata = await backups_facade.List()
+        backups_metadata = _backups_metadata.serialize()
+        if 'list' not in backups_metadata:
+            raise JujuAPIError("Unexpected response metadata : %s" % backups_metadata)
+        return backups_metadata['list']
 
-    def block(self, *commands):
-        """Add a new block to this model.
-
-        :param str *commands: The commands to block. Valid values are
-            'all-changes', 'destroy-model', 'remove-object'
-
-        """
-        raise NotImplementedError()
-
-    def get_blocks(self):
-        """List blocks for this model.
-
-        """
-        raise NotImplementedError()
-
-    def get_cached_images(self, arch=None, kind=None, series=None):
-        """Return a list of cached OS images.
-
-        :param str arch: Filter by image architecture
-        :param str kind: Filter by image kind, e.g. 'lxd'
-        :param str series: Filter by image series, e.g. 'xenial'
-
-        """
-        raise NotImplementedError()
-
-    def create_backup(self, note=None, no_download=False):
+    async def create_backup(self, notes=None):
         """Create a backup of this model.
 
         :param str note: A note to store with the backup
+        :param bool keep_copy: Keep a copy of the archive on the controller
         :param bool no_download: Do not download the backup archive
-        :return str: Path to downloaded archive
+        :return str, dict: Filename for the downloaded archive file, Extra metadata for the created backup
 
         """
-        raise NotImplementedError()
+        backups_facade = client.BackupsFacade.from_connection(self.connection())
+        results = await backups_facade.Create(notes=notes)
 
-    def create_storage_pool(self, name, provider_type, **pool_config):
-        """Create or define a storage pool.
+        if results is None:
+            raise JujuAPIError("unable to create a backup")
 
-        :param str name: Name to give the storage pool
-        :param str provider_type: Pool provider type
-        :param **pool_config: key/value pool configuration pairs
+        backup_metadata = results.serialize()
 
-        """
-        raise NotImplementedError()
+        if 'error' in backup_metadata:
+            raise JujuBackupError("unable to create a backup, got %s from Juju API" % backup_metadata)
 
-    def debug_log(
-            self, no_tail=False, exclude_module=None, include_module=None,
-            include=None, level=None, limit=0, lines=10, replay=False,
-            exclude=None):
+        backup_id = backup_metadata['filename']
+
+        file_name = self.download_backup(backup_id)
+
+        return file_name, backup_metadata
+
+    async def debug_log(
+            self, target=sys.stdout, no_tail=False, exclude_module=[],
+            include_module=[], include=[], level="", limit=sys.maxsize,
+            lines=10, exclude=[]):
         """Get log messages for this model.
 
         :param bool no_tail: Stop after returning existing log messages
@@ -1221,39 +1600,34 @@ class Model:
             filtered) lines are shown
         :param int lines: Yield this many of the most recent lines, and keep
             yielding
-        :param bool replay: Yield the entire log, and keep yielding
         :param list exclude: Do not show log messages for these entities
 
         """
-        raise NotImplementedError()
+        if not self.is_connected():
+            await self.connect()
 
-    def _get_series(self, entity_url, entity):
-        # try to get the series from the provided charm URL
-        if entity_url.startswith('cs:'):
-            parts = entity_url[3:].split('/')
-        else:
-            parts = entity_url.split('/')
-        if parts[0].startswith('~'):
-            parts.pop(0)
-        if len(parts) > 1:
-            # series was specified in the URL
-            return parts[0]
-        # series was not supplied at all, so use the newest
-        # supported series according to the charm store
-        ss = entity['Meta']['supported-series']
-        return ss['SupportedSeries'][0]
+        params = {
+            'no_tail': no_tail,
+            'exclude_module': exclude_module,
+            'include_module': include_module,
+            'include': include,
+            'level': level,
+            'limit': limit,
+            'lines': lines,
+            'exclude': exclude,
+        }
+        await self.connect(debug_log_conn=target, debug_log_params=params)
 
     async def deploy(
-            self, entity_url, application_name=None, bind=None, budget=None,
+            self, entity_url, application_name=None, bind=None,
             channel=None, config=None, constraints=None, force=False,
-            num_units=1, plan=None, resources=None, series=None, storage=None,
-            to=None, devices=None, trust=False):
+            num_units=1, overlays=[], base=None, resources=None, series=None,
+            storage=None, to=None, devices=None, trust=False, attach_storage=[]):
         """Deploy a new service or bundle.
 
         :param str entity_url: Charm or bundle url
         :param str application_name: Name to give the service
         :param dict bind: <charm endpoint>:<network space> pairs
-        :param dict budget: <budget name>:<limit> pairs
         :param str channel: Charm store channel from which to retrieve
             the charm or bundle, e.g. 'edge'
         :param dict config: Charm configuration dictionary
@@ -1262,9 +1636,10 @@ class Model:
         :param bool force: Allow charm to be deployed to a machine running
             an unsupported series
         :param int num_units: Number of units to deploy
-        :param str plan: Plan under which to deploy charm
+        :param [] overlays: Bundles to overlay on the primary bundle, applied in order
+        :param str base: The base on which to deploy
         :param dict resources: <resource name>:<file path> pairs
-        :param str series: Series on which to deploy
+        :param str series: Series on which to deploy DEPRECATED: use --base (with Juju 3.1)
         :param dict storage: Storage constraints TODO how do these look?
         :param to: Placement directive as a string. For example:
 
@@ -1277,9 +1652,11 @@ class Model:
             with access to trusted credentials. Hooks run by the charm can access
             cloud credentials and other trusted access credentials.
 
+        :param str[] attach_storage: Existing storage to attach to the deployed unit
+            (not available on k8s models)
         TODO::
 
-            - support local resources
+            - support local file resources
 
         """
         if storage:
@@ -1287,81 +1664,113 @@ class Model:
                 k: client.Constraints(**v)
                 for k, v in storage.items()
             }
+        if trust and (self.info.agent_version < client.Number.from_json('2.4.0')):
+            raise NotImplementedError("trusted is not supported on model version {}".format(self.info.agent_version))
 
-        entity_path = Path(entity_url.replace('local:', ''))
-        bundle_path = entity_path / 'bundle.yaml'
-        metadata_path = entity_path / 'metadata.yaml'
+        if not all([type(st) == str for st in attach_storage]):
+            raise JujuError("Expected attach_storage to be a list of strings, given {}".format(attach_storage))
 
-        is_local = (
-            entity_url.startswith('local:') or
-            entity_path.is_dir() or
-            entity_path.is_file()
-        )
-        if is_local:
-            entity_id = entity_url.replace('local:', '')
+        # Ensure what we pass in, is a string.
+        entity_url = str(entity_url)
+        if is_local_charm(entity_url) and not entity_url.startswith("local:"):
+            entity_url = "local:{}".format(entity_url)
+
+        if client.CharmsFacade.best_facade_version(self.connection()) < 3:
+            url = URL.parse(str(entity_url), default_store=Schema.CHARM_STORE)
         else:
-            entity = await self.charmstore.entity(entity_url, channel=channel,
-                                                  include_stats=False)
-            entity_id = entity['Id']
+            url = URL.parse(str(entity_url))
 
-        client_facade = client.ClientFacade.from_connection(self.connection())
+        architecture = await self._resolve_architecture(url)
 
-        is_bundle = ((is_local and
-                      (entity_id.endswith('.yaml') and entity_path.exists()) or
-                      bundle_path.exists()) or
-                     (not is_local and 'bundle/' in entity_id))
+        if str(url.schema) not in self.deploy_types:
+            raise JujuError("unknown deploy type {}, expected charmhub or local".format(url.schema))
 
-        if is_bundle:
+        res = await self.deploy_types[str(url.schema)].resolve(url, architecture, application_name, channel, series, entity_url)
+
+        if res.identifier is None:
+            raise JujuError('unknown charm or bundle {}'.format(entity_url))
+        identifier = res.identifier
+
+        charm_series = series
+        charm_origin = res.origin
+        if base:
+            charm_origin.base = utils.parse_base_arg(base)
+
+        if res.is_bundle:
             handler = BundleHandler(self, trusted=trust, forced=force)
-            await handler.fetch_plan(entity_id)
+            await handler.fetch_plan(url, charm_origin, overlays=overlays)
             await handler.execute_plan()
             extant_apps = {app for app in self.applications}
-            pending_apps = set(handler.applications) - extant_apps
+            pending_apps = handler.applications - extant_apps
             if pending_apps:
                 # new apps will usually be in the model by now, but if some
                 # haven't made it yet we'll need to wait on them to be added
-                await asyncio.gather(*[
-                    asyncio.ensure_future(
-                        self._wait_for_new('application', app_name),
-                        loop=self._connector.loop)
+                await jasyncio.gather(*[
+                    jasyncio.ensure_future(
+                        self._wait_for_new('application', app_name))
                     for app_name in pending_apps
-                ], loop=self._connector.loop)
+                ])
             return [app for name, app in self.applications.items()
                     if name in handler.applications]
         else:
-            if not is_local:
-                if not application_name:
-                    application_name = entity['Meta']['charm-metadata']['Name']
-                if not series:
-                    series = self._get_series(entity_url, entity)
-                await client_facade.AddCharm(channel, entity_id)
-                # XXX: we're dropping local resources here, but we don't
-                # actually support them yet anyway
-                resources = await self._add_store_resources(application_name,
-                                                            entity_id,
-                                                            entity=entity)
+            if overlays:
+                raise JujuError("options provided but not supported when deploying a charm: overlays=%s" % overlays)
+            # XXX: we're dropping local resources here, but we don't
+            # actually support them yet anyway
+            if not res.is_local:
+                add_charm_res = await self._add_charm(identifier, charm_origin)
+                if isinstance(add_charm_res, dict):
+                    # This is for backwards compatibility for older
+                    # versions where AddCharm returns a dictionary
+                    charm_origin = add_charm_res.get('charm_origin',
+                                                     charm_origin)
+                else:
+                    charm_origin = add_charm_res.charm_origin
+                if Schema.CHARM_HUB.matches(url.schema):
+                    resources = await self._add_charmhub_resources(res.app_name,
+                                                                   identifier,
+                                                                   add_charm_res.charm_origin)
+                    is_sub = await self.charmhub.is_subordinate(url.name)
+                    if is_sub:
+                        if num_units > 1:
+                            raise JujuError("cannot use num_units with subordinate application")
+                        num_units = 0
+
             else:
-                if not application_name:
-                    metadata = yaml.load(metadata_path.read_text())
-                    application_name = metadata['name']
                 # We have a local charm dir that needs to be uploaded
-                charm_dir = os.path.abspath(
-                    os.path.expanduser(entity_id))
-                series = series or get_charm_series(charm_dir)
-                if not series:
+                charm_dir = os.path.abspath(os.path.expanduser(identifier))
+                metadata = utils.get_local_charm_metadata(charm_dir)
+                charm_series = charm_series or await get_charm_series(metadata,
+                                                                      self)
+                if not base:
+                    charm_origin.base = utils.get_local_charm_base(
+                        charm_series, channel, metadata, charm_dir, client.Base)
+
+                if not application_name:
+                    application_name = metadata['name']
+                if not application_name:
+                    application_name = metadata['name']
+                if base is None and charm_series is None:
                     raise JujuError(
-                        "Couldn't determine series for charm at {}. "
-                        "Pass a 'series' kwarg to Model.deploy().".format(
-                            charm_dir))
-                entity_id = await self.add_local_charm_dir(charm_dir, series)
+                        "Either series or base is needed to deploy the "
+                        "charm at {}. ".format(charm_dir))
+
+                identifier = await self.add_local_charm_dir(charm_dir,
+                                                            charm_series)
+                resources = await self.add_local_resources(application_name,
+                                                           identifier,
+                                                           metadata,
+                                                           resources=resources)
+
             if config is None:
                 config = {}
             if trust:
                 config["trust"] = "true"
+
             return await self._deploy(
-                charm_url=entity_id,
-                application=application_name,
-                series=series,
+                charm_url=identifier,
+                application=res.app_name,
+                series=charm_series,
                 config=config,
                 constraints=constraints,
                 endpoint_bindings=bind,
@@ -1371,26 +1780,90 @@ class Model:
                 num_units=num_units,
                 placement=parse_placement(to),
                 devices=devices,
+                charm_origin=charm_origin,
+                attach_storage=attach_storage,
             )
 
-    async def _add_store_resources(self, application, entity_url,
-                                   overrides=None, entity=None):
-        if not entity:
-            # avoid extra charm store call if one was already made
-            entity = await self.charmstore.entity(entity_url,
-                                                  include_stats=False)
-        resources = [
-            {
-                'description': resource['Description'],
-                'fingerprint': resource['Fingerprint'],
-                'name': resource['Name'],
-                'path': resource['Path'],
-                'revision': resource['Revision'],
-                'size': resource['Size'],
-                'type_': resource['Type'],
+    async def _add_charm(self, charm_url, origin):
+        # client facade is deprecated with in Juju, and smaller, more focused
+        # facades have been created and we'll use that if it's available.
+        charms_cls = client.CharmsFacade
+        if charms_cls.best_facade_version(self.connection()) > 2:
+            charms_facade = charms_cls.from_connection(self.connection())
+            return await charms_facade.AddCharm(charm_origin=origin, url=charm_url, force=False)
+
+        client_facade = client.ClientFacade.from_connection(self.connection())
+        return await client_facade.AddCharm(channel=str(origin.risk), url=charm_url, force=False)
+
+    async def _resolve_charm(self, url, origin):
+        """Calls Charms.ResolveCharms to resolve all the fields of the
+        charm_origin and also the url and the supported_series
+
+        :param str url: The url of the charm
+        :param client.CharmOrigin origin: The manually constructed origin
+        based on what we know about the charm and the deployment so far
+
+        Returns the confirmed origin returned by the Juju API to be used in
+        calls like ApplicationFacade.Deploy
+
+        :returns str, client.CharmOrigin, [str]
+        """
+        charms_cls = client.CharmsFacade
+        if charms_cls.best_facade_version(self.connection()) < 3:
+            raise JujuError("resolve charm")
+
+        charms_facade = charms_cls.from_connection(self.connection())
+
+        # TODO (cderici): following part can be refactored out, since the
+        #  origin should be set (including the base) before calling this,
+        #  though all tests need to run (in earlier versions too) before
+        #  committing to make sure there's no regression
+        source = Source.CHARM_HUB.value
+
+        resolve_origin = {'source': source, 'architecture': origin.architecture,
+                          'track': origin.track, 'risk': origin.risk,
+                          'base': origin.base}
+
+        resp = await charms_facade.ResolveCharms(resolve=[{
+            'reference': str(url),
+            'charm-origin': resolve_origin
+        }])
+        if len(resp.results) != 1:
+            raise JujuError("expected one result, received {}".format(resp.results))
+
+        result = resp.results[0]
+        if result.error:
+            raise JujuError(result.error.message)
+
+        return (result.url, result.charm_origin, result.supported_series)
+
+    async def _resolve_architecture(self, url):
+        if url.architecture:
+            return url.architecture
+
+        constraints = await self.get_constraints()
+        if 'arch' in constraints:
+            return constraints['arch']
+
+        return DEFAULT_ARCHITECTURE
+
+    async def _add_charmhub_resources(self, application,
+                                      entity_url,
+                                      origin,
+                                      overrides=None):
+        charm_facade = client.CharmsFacade.from_connection(self.connection())
+        res = await charm_facade.CharmInfo(entity_url)
+
+        resources = []
+        for resource in res.meta.resources.values():
+            resources.append({
+                'description': resource.description,
+                'name': resource.name,
+                'path': resource.path,
+                'type_': resource.type_,
                 'origin': 'store',
-            } for resource in entity['Meta']['resources']
-        ]
+                'revision': -1,
+            })
 
         if overrides:
             names = {r['name'] for r in resources}
@@ -1403,24 +1876,97 @@ class Model:
                 if resource['name'] in overrides:
                     resource['revision'] = overrides[resource['name']]
 
-        if not resources:
-            return None
-
         resources_facade = client.ResourcesFacade.from_connection(
             self.connection())
         response = await resources_facade.AddPendingResources(
-            tag.application(application),
-            entity_url,
-            [client.CharmResource(**resource) for resource in resources])
+            application_tag=tag.application(application),
+            charm_url=entity_url,
+            charm_origin=origin,
+            resources=[client.CharmResource(**resource) for resource in resources],
+        )
+
+        # response.pending_ids always exists but it can itself be None
+        # see juju/client/_definitions.py for AddPendingResourcesResult
         resource_map = {resource['name']: pid
                         for resource, pid
-                        in zip(resources, response.pending_ids)}
+                        in zip(resources, response.pending_ids or {})}
+
+        return resource_map
+
+    async def add_local_resources(self, application, entity_url, metadata, resources):
+        if not resources:
+            return None
+
+        resource_map = dict()
+
+        for name, path in resources.items():
+            resource_type = metadata["resources"][name]["type"]
+            if resource_type not in {"oci-image", "file"}:
+                log.info("Resource {} of type {} is not supported".format(name, resource_type))
+                continue
+
+            charmresource = {
+                'description': '',
+                'fingerprint': '',
+                'name': name,
+                'path': Path(path).name,
+                'revision': 0,
+                'size': 0,
+                'type_': resource_type,
+                'origin': 'upload',
+            }
+
+            resources_facade = client.ResourcesFacade.from_connection(
+                self.connection())
+            response = await resources_facade.AddPendingResources(
+                application_tag=tag.application(application),
+                charm_url=entity_url,
+                resources=[client.CharmResource(**charmresource)])
+            pending_id = response.pending_ids[0]
+            resource_map[name] = pending_id
+
+            if resource_type == "oci-image":
+                # TODO Docker Image validation and support for local images.
+                docker_image_details = {
+                    'registrypath': path,
+                    'username': '',
+                    'password': '',
+                }
+
+                data = yaml.dump(docker_image_details)
+
+                hash_alg = hashlib.sha3_384
+
+                charmresource['fingerprint'] = hash_alg(bytes(data, 'utf-8')).digest()
+
+                conn, headers, path_prefix = self.connection().https_connection()
+
+                query = "?pendingid={}".format(pending_id)
+                url = "{}/applications/{}/resources/{}{}".format(
+                    path_prefix, application, name, query)
+                if resource_type == "oci-image":
+                    disp = "multipart/form-data; filename=\"{}\"".format(path)
+                else:
+                    disp = "form-data; filename=\"{}\"".format(path)
+
+                headers['Content-Type'] = 'application/octet-stream'
+                headers['Content-Length'] = len(data)
+                headers['Content-Sha384'] = charmresource['fingerprint'].hex()
+                headers['Content-Disposition'] = disp
+
+                conn.request('PUT', url, data, headers)
+
+                response = conn.getresponse()
+                result = response.read().decode()
+                if not response.status == 200:
+                    raise JujuError(result)
+
         return resource_map
 
     async def _deploy(self, charm_url, application, series, config,
                       constraints, endpoint_bindings, resources, storage,
                       channel=None, num_units=None, placement=None,
-                      devices=None):
+                      devices=None, charm_origin=None, attach_storage=[]):
         """Logic shared between `Model.deploy` and `BundleHandler.deploy`.
         """
         log.info('Deploying %s', charm_url)
@@ -1438,6 +1984,7 @@ class Model:
             application=application,
             series=series,
             channel=channel,
+            charm_origin=charm_origin,
             config_yaml=config,
             constraints=parse_constraints(constraints),
             endpoint_bindings=endpoint_bindings,
@@ -1446,61 +1993,76 @@ class Model:
             storage=storage,
             placement=placement,
             devices=devices,
+            attach_storage=attach_storage,
         )
-        result = await app_facade.Deploy([app])
+        result = await app_facade.Deploy(applications=[app])
         errors = [r.error.message for r in result.results if r.error]
         if errors:
             raise JujuError('\n'.join(errors))
         return await self._wait_for_new('application', application)
 
-    async def destroy(self):
-        """Terminate all machines and resources for this model.
-            Is already implemented in controller.py.
-        """
-        raise NotImplementedError()
-
-    async def destroy_unit(self, *unit_names):
+    async def destroy_unit(self, unit_id, destroy_storage=False, dry_run=False, force=False, max_wait=None):
         """Destroy units by name.
 
         """
         connection = self.connection()
         app_facade = client.ApplicationFacade.from_connection(connection)
 
-        log.debug(
-            'Destroying unit%s %s',
-            's' if len(unit_names) == 1 else '',
-            ' '.join(unit_names))
+        # Get the corresponding unit tag
+        unit_tag = tag.unit(unit_id)
+        if unit_tag is None:
+            log.error("Error converting %s to a valid unit tag", unit_id)
+            return JujuUnitError("Error converting %s to a valid unit tag", unit_id)
 
-        return await app_facade.DestroyUnits(list(unit_names))
+        log.debug(
+            'Destroying unit %s', unit_id)
+
+        return await app_facade.DestroyUnit(units=[{
+            'unit-tag': unit_tag,
+            'destroy-storage': destroy_storage,
+            'force': force,
+            'max-wait': max_wait,
+            'dry-run': dry_run,
+        }])
     destroy_units = destroy_unit
 
-    def get_backup(self, archive_id):
+    def download_backup(self, archive_id, target_filename=None):
         """Download a backup archive file.
 
         :param str archive_id: The id of the archive to download
+        :param str (optional) target_filename: A custom name for the target file
         :return str: Path to the archive file
 
         """
-        raise NotImplementedError()
 
-    def enable_ha(
-            self, num_controllers=0, constraints=None, series=None, to=None):
-        """Ensure sufficient controllers exist to provide redundancy.
+        conn, headers, path_prefix = self.connection().https_connection()
+        path = "%s/backups" % path_prefix
+        headers['Content-Type'] = 'application/json'
+        args = {'id': archive_id}
+        conn.request("GET", path, json.dumps(args, indent=2), headers=headers)
+        response = conn.getresponse()
+        result = response.read()
+        if not response.status == 200:
+            raise JujuBackupError("unable to download the backup ID : %s -- got : %s from the JujuAPI with a HTTP response code : %s" % (archive_id, result, response.status))
 
-        :param int num_controllers: Number of controllers to make available
-        :param constraints: Constraints to apply to the controller machines
-        :type constraints: :class:`juju.Constraints`
-        :param str series: Series of the controller machines
-        :param list to: Placement directives for controller machines, e.g.::
+        if target_filename:
+            file_name = target_filename
+        else:
+            # check if archive_id is a filename
+            if re.match(r'.*\.tar\.gz', archive_id):
+                # if so, use the same ID generated & sent by the Juju API
+                archive_id = re.compile('[0-9]+').findall(archive_id)[0]
 
-            '23' - machine 23
-            'lxc:7' - new lxc container on machine 7
-            '24/lxc/3' - lxc container 3 or machine 24
+            file_name = "juju-backup-%s.tar.gz" % archive_id
 
-            If None, a new machine is provisioned.
+        with open(str(file_name), 'wb') as f:
+            try:
+                f.write(result)
+            except (OSError, IOError) as e:
+                raise JujuBackupError("backup ID : %s was fetched, but : %s" % (archive_id, e))
 
-        """
-        raise NotImplementedError()
+        log.info("Backup archive downloaded in : %s" % file_name)
+        return file_name
 
     async def get_config(self):
         """Return the configuration settings for this model.
@@ -1514,7 +2076,7 @@ class Model:
         result = await config_facade.ModelGet()
         config = result.config
         for key, value in config.items():
-            config[key] = ConfigValue.from_json(value)
+            config[key] = client.ConfigValue.from_json(value)
         return config
 
     async def get_constraints(self):
@@ -1523,8 +2085,10 @@ class Model:
         :returns: A ``dict`` of constraints.
         """
         constraints = {}
-        client_facade = client.ClientFacade.from_connection(self.connection())
-        result = await client_facade.GetModelConstraints()
+        facade_cls = client.ModelConfigFacade
+
+        facade = facade_cls.from_connection(self.connection())
+        result = await facade.GetModelConstraints()
 
         # GetModelConstraints returns GetConstraintsResults which has a
         # 'constraints' attribute. If no constraints have been set
@@ -1534,7 +2098,7 @@ class Model:
         # set.
         if result.constraints:
             constraint_types = [a for a in dir(result.constraints)
-                                if a in Value._toSchema.keys()]
+                                if a in client.Value._toSchema.keys()]
             for constraint in constraint_types:
                 value = getattr(result.constraints, constraint)
                 if value is not None:
@@ -1542,32 +2106,20 @@ class Model:
                                                       constraint)
         return constraints
 
-    def import_ssh_key(self, identity):
-        """Add a public SSH key from a trusted indentity source to this model.
-
-        :param str identity: User identity in the form <lp|gh>:<username>
-
-        """
-        raise NotImplementedError()
-    import_ssh_keys = import_ssh_key
-
     async def get_machines(self):
         """Return list of machines in this model.
 
         """
         return list(self.state.machines.keys())
 
-    def get_shares(self):
-        """Return list of all users with access to this model.
-
-        """
-        raise NotImplementedError()
-
-    def get_spaces(self):
+    async def get_spaces(self):
         """Return list of all known spaces, including associated subnets.
 
+        Returns a List of :class:`~juju._definitions.Space` instances.
         """
-        raise NotImplementedError()
+        space_facade = client.SpacesFacade.from_connection(self.connection())
+        response = await space_facade.ListSpaces()
+        return response.results
 
     async def get_ssh_key(self, raw_ssh=False):
         """Return known SSH keys for this model.
@@ -1578,68 +2130,26 @@ class Model:
         key_facade = client.KeyManagerFacade.from_connection(self.connection())
         entity = {'tag': tag.model(self.info.uuid)}
         entities = client.Entities([entity])
-        return await key_facade.ListKeys(entities, raw_ssh)
+        return await key_facade.ListKeys(entities=entities, mode=raw_ssh)
     get_ssh_keys = get_ssh_key
 
-    def get_storage(self, filesystem=False, volume=False):
-        """Return details of storage instances.
-
-        :param bool filesystem: Include filesystem storage
-        :param bool volume: Include volume storage
-
-        """
-        raise NotImplementedError()
-
-    def get_storage_pools(self, names=None, providers=None):
-        """Return list of storage pools.
-
-        :param list names: Only include pools with these names
-        :param list providers: Only include pools for these providers
-
-        """
-        raise NotImplementedError()
-
-    def get_subnets(self, space=None, zone=None):
-        """Return list of known subnets.
-
-        :param str space: Only include subnets in this space
-        :param str zone: Only include subnets in this zone
-
-        """
-        raise NotImplementedError()
-
-    def remove_blocks(self):
-        """Remove all blocks from this model.
-
-        """
-        raise NotImplementedError()
-
-    def remove_backup(self, backup_id):
+    async def remove_backup(self, backup_id):
         """Delete a backup.
 
         :param str backup_id: The id of the backup to remove
 
         """
-        raise NotImplementedError()
+        backups_facade = client.BackupsFacade.from_connection(self.connection())
+        return await backups_facade.Remove([backup_id])
 
-    def remove_cached_images(self, arch=None, kind=None, series=None):
-        """Remove cached OS images.
+    async def remove_backups(self, backup_ids):
+        """Delete the given backups.
 
-        :param str arch: Architecture of the images to remove
-        :param str kind: Image kind to remove, e.g. 'lxd'
-        :param str series: Image series to remove, e.g. 'xenial'
-
-        """
-        raise NotImplementedError()
-
-    def remove_machine(self, *machine_ids):
-        """Remove a machine from this model.
-
-        :param str *machine_ids: Ids of the machines to remove
+        :param [str] backup_ids: The list of ids of the backups to remove
 
         """
-        raise NotImplementedError()
-    remove_machines = remove_machine
+        backups_facade = client.BackupsFacade.from_connection(self.connection())
+        return await backups_facade.Remove(backup_ids)
 
     async def remove_ssh_key(self, user, key):
         """Remove a public SSH key(s) from this model.
@@ -1652,38 +2162,23 @@ class Model:
         key = base64.b64decode(bytes(key.strip().split()[1].encode('ascii')))
         key = hashlib.md5(key).hexdigest()
         key = ':'.join(a + b for a, b in zip(key[::2], key[1::2]))
-        await key_facade.DeleteKeys([key], user)
+        await key_facade.DeleteKeys(ssh_keys=[key], user=user)
     remove_ssh_keys = remove_ssh_key
 
     def restore_backup(
-            self, bootstrap=False, constraints=None, archive=None,
-            backup_id=None, upload_tools=False):
+            self, backup_id, bootstrap=False,
+            constraints=None, archive=None, upload_tools=False):
         """Restore a backup archive to a new controller.
 
+        :param str backup_id: Id of backup to restore
         :param bool bootstrap: Bootstrap a new state machine
         :param constraints: Model constraints
         :type constraints: :class:`juju.Constraints`
         :param str archive: Path to backup archive to restore
-        :param str backup_id: Id of backup to restore
         :param bool upload_tools: Upload tools if bootstrapping a new machine
 
         """
-        raise NotImplementedError()
-
-    def retry_provisioning(self):
-        """Retry provisioning for failed machines.
-
-        """
-        raise NotImplementedError()
-
-    def run(self, command, timeout=None):
-        """Run command on all machines in this model.
-
-        :param str command: The command to run
-        :param int timeout: Time to wait before command is considered failed
-
-        """
-        raise NotImplementedError()
+        raise DeprecationWarning("juju restore-backup is deprecated in favor of the stand-alone 'juju-restore' tool: https://github.com/juju/juju-restore")
 
     async def set_config(self, config):
         """Set configuration keys on this model.
@@ -1694,23 +2189,45 @@ class Model:
         config_facade = client.ModelConfigFacade.from_connection(
             self.connection()
         )
+
+        new_conf = {}
         for key, value in config.items():
-            if isinstance(value, ConfigValue):
-                config[key] = value.value
-        await config_facade.ModelSet(config)
+            if isinstance(value, client.ConfigValue):
+                new_conf[key] = value.value
+            elif isinstance(value, str):
+                new_conf[key] = value
+            else:
+                raise JujuModelConfigError("Expected either a string or a ConfigValue as a config value, found : %s of type %s" % (value, type(value)))
+        await config_facade.ModelSet(config=new_conf)
 
     async def set_constraints(self, constraints):
         """Set machine constraints on this model.
 
         :param dict config: Mapping of model constraints
         """
-        client_facade = client.ClientFacade.from_connection(self.connection())
-        await client_facade.SetModelConstraints(
+
+        facade_cls = client.ModelConfigFacade
+
+        facade = facade_cls.from_connection(self.connection())
+
+        await facade.SetModelConstraints(
             application='',
             constraints=constraints)
 
     async def get_action_output(self, action_uuid, wait=None):
-        """Get the results of an action by ID.
+        """ Get the results of an action by ID.
+
+        :param str action_uuid: Id of the action
+        :param int wait: Time in seconds to wait for action to complete.
+        :return dict: Output from action
+        :raises: :class:`JujuError` if invalid action_uuid
+        """
+        action = await self._get_completed_action(action_uuid, wait=wait)
+        # ActionResult.output is None if the action produced no output
+        return {} if action.output is None else action.output
+
+    async def _get_completed_action(self, action_uuid, wait=None):
+        """Get the completed internal _definitions.Action object.
 
         :param str action_uuid: Id of the action
         :param int wait: Time in seconds to wait for action to complete.
@@ -1728,21 +2245,16 @@ class Model:
 
         async def _wait_for_action_status():
             while True:
-                action_output = await action_facade.Actions(entity)
+                action_output = await action_facade.Actions(entities=entity)
                 if action_output.results[0].status in ('completed', 'failed'):
                     return
                 else:
-                    await asyncio.sleep(1)
-        await asyncio.wait_for(
+                    await jasyncio.sleep(1)
+        await jasyncio.wait_for(
             _wait_for_action_status(),
             timeout=wait)
-        action_output = await action_facade.Actions(entity)
-        # ActionResult.output is None if the action produced no output
-        if action_output.results[0].output is None:
-            output = {}
-        else:
-            output = action_output.results[0].output
-        return output
+        action_results = await action_facade.Actions(entities=entity)
+        return action_results.results[0]
 
     async def get_action_status(self, uuid_or_prefix=None, name=None):
         """Get the status of all actions, filtered by ID, ID prefix, or name.
@@ -1757,29 +2269,21 @@ class Model:
             self.connection()
         )
         if name:
-            name_results = await action_facade.FindActionsByNames([name])
+            name_results = await action_facade.FindActionsByNames(names=[name])
             action_results.extend(name_results.actions[0].actions)
         if uuid_or_prefix:
             # Collect list of actions matching uuid or prefix
             matching_actions = await action_facade.FindActionTagsByPrefix(
-                [uuid_or_prefix])
+                prefixes=[uuid_or_prefix])
             entities = []
             for actions in matching_actions.matches.values():
                 entities = [{'tag': a.tag} for a in actions]
             # Get action results matching action tags
-            uuid_results = await action_facade.Actions(entities)
+            uuid_results = await action_facade.Actions(entities=entities)
             action_results.extend(uuid_results.results)
         for a in action_results:
             results[tag.untag('action-', a.action.tag)] = a.status
         return results
-
-    def get_budget(self, budget_name):
-        """Get budget usage info.
-
-        :param str budget_name: Name of budget
-
-        """
-        raise NotImplementedError()
 
     async def get_status(self, filters=None, utc=False):
         """Return the status of the model.
@@ -1790,73 +2294,7 @@ class Model:
 
         """
         client_facade = client.ClientFacade.from_connection(self.connection())
-        return await client_facade.FullStatus(filters)
-
-    def sync_tools(
-            self, all_=False, destination=None, dry_run=False, public=False,
-            source=None, stream=None, version=None):
-        """Copy Juju tools into this model.
-
-        :param bool all_: Copy all versions, not just the latest
-        :param str destination: Path to local destination directory
-        :param bool dry_run: Don't do the actual copy
-        :param bool public: Tools are for a public cloud, so generate mirrors
-            information
-        :param str source: Path to local source directory
-        :param str stream: Simplestreams stream for which to sync metadata
-        :param str version: Copy a specific major.minor version
-
-        """
-        raise NotImplementedError()
-
-    def unblock(self, *commands):
-        """Unblock an operation that would alter this model.
-
-        :param str *commands: The commands to unblock. Valid values are
-            'all-changes', 'destroy-model', 'remove-object'
-
-        """
-        raise NotImplementedError()
-
-    def unset_config(self, *keys):
-        """Unset configuration on this model.
-
-        :param str *keys: The keys to unset
-
-        """
-        raise NotImplementedError()
-
-    def upgrade_gui(self):
-        """Upgrade the Juju GUI for this model.
-
-        """
-        raise NotImplementedError()
-
-    def upgrade_juju(
-            self, dry_run=False, reset_previous_upgrade=False,
-            upload_tools=False, version=None):
-        """Upgrade Juju on all machines in a model.
-
-        :param bool dry_run: Don't do the actual upgrade
-        :param bool reset_previous_upgrade: Clear the previous (incomplete)
-            upgrade status
-        :param bool upload_tools: Upload local version of tools
-        :param str version: Upgrade to a specific version
-
-        """
-        raise NotImplementedError()
-
-    def upload_backup(self, archive_path):
-        """Store a backup archive remotely in Juju.
-
-        :param str archive_path: Path to local archive
-
-        """
-        raise NotImplementedError()
-
-    @property
-    def charmstore(self):
-        return self._charmstore
+        return await client_facade.FullStatus(patterns=filters)
 
     async def get_metrics(self, *tags):
         """Retrieve metrics.
@@ -1873,7 +2311,7 @@ class Model:
             self.connection())
 
         entities = [client.Entity(tag) for tag in tags]
-        metrics_result = await metrics_facade.GetMetrics(entities)
+        metrics_result = await metrics_facade.GetMetrics(entities=entities)
 
         metrics = collections.defaultdict(list)
 
@@ -1890,419 +2328,344 @@ class Model:
 
         return metrics
 
-
-def get_charm_series(path):
-    """Inspects the charm directory at ``path`` and returns a default
-    series from its metadata.yaml (the first item in the 'series' list).
-
-    Returns None if no series can be determined.
-
-    """
-    md = Path(path) / "metadata.yaml"
-    if not md.exists():
-        return None
-    data = yaml.load(md.open())
-    series = data.get('series')
-    return series[0] if series else None
-
-
-class BundleHandler:
-    """
-    Handle bundles by using the API to translate bundle YAML into a plan of
-    steps and then dispatching each of those using the API.
-    """
-    def __init__(self, model, trusted=False, forced=False):
-        self.model = model
-        self.trusted = trusted
-        self.forced = forced
-
-        self.charmstore = model.charmstore
-        self.plan = []
-        self.references = {}
-        self._units_by_app = {}
-
-        for unit_name, unit in model.units.items():
-            app_units = self._units_by_app.setdefault(unit.application, [])
-            app_units.append(unit_name)
-        self.bundle_facade = client.BundleFacade.from_connection(
-            model.connection())
-        self.client_facade = client.ClientFacade.from_connection(
-            model.connection())
-        self.app_facade = client.ApplicationFacade.from_connection(
-            model.connection())
-        self.ann_facade = client.AnnotationsFacade.from_connection(
-            model.connection())
-
-    async def _validate_bundle(self, bundle):
-        """Validate the bundle for known issues, raises an error if it
-        encounters a known problem
+    async def create_offer(self, endpoint, offer_name=None, application_name=None):
         """
-        apps_dict = bundle.get('applications', bundle.get('services', {}))
-        for app_name in self.applications:
-            app_dict = apps_dict[app_name]
-            app_trusted = app_dict.get('trust')
-            if (not self.trusted and not self.forced) and app_trusted:
-                raise JujuError(
-                    "Bundle cannot be deployed without trusting applications with your cloud credentials.\n"
-                    "Please repeat the deploy command with the --trust argument if you consent to trust the following application\n"
-                    " - {}\n".format(app_name)
-                )
-        return bundle
+        Offer a deployed application using a series of endpoints for use by
+        consumers.
 
-    async def _handle_local_charms(self, bundle):
-        """Search for references to local charms (i.e. filesystem paths)
-        in the bundle. Upload the local charms to the model, and replace
-        the filesystem paths with appropriate 'local:' paths in the bundle.
-
-        Return the modified bundle.
-
-        :param dict bundle: Bundle dictionary
-        :return: Modified bundle dictionary
-
+        @param endpoint: holds the application and endpoint you want to offer
+        @param offer_name: over ride the offer name to help the consumer
         """
-        apps, args = [], []
+        async with ConnectedController(self.connection()) as controller:
+            return await controller.create_offer(self.info.uuid, endpoint,
+                                                 offer_name=offer_name,
+                                                 application_name=application_name)
 
-        default_series = bundle.get('series')
-        apps_dict = bundle.get('applications', bundle.get('services', {}))
-        for app_name in self.applications:
-            app_dict = apps_dict[app_name]
-            charm_dir = os.path.abspath(os.path.expanduser(app_dict['charm']))
-            if not os.path.isdir(charm_dir):
-                continue
-            series = (
-                app_dict.get('series') or
-                default_series or
-                get_charm_series(charm_dir)
-            )
-            if not series:
-                raise JujuError(
-                    "Couldn't determine series for charm at {}. "
-                    "Add a 'series' key to the bundle.".format(charm_dir))
-            # Keep track of what we need to update. We keep a list of apps
-            # that need to be updated, and a corresponding list of args
-            # needed to update those apps.
-            apps.append(app_name)
-            args.append((charm_dir, series))
-
-        if apps:
-            # If we have apps to update, spawn all the coroutines concurrently
-            # and wait for them to finish.
-            charm_urls = await asyncio.gather(*[
-                self.model.add_local_charm_dir(*params)
-                for params in args
-            ], loop=self.model.loop)
-            # Update the 'charm:' entry for each app with the new 'local:' url.
-            for app_name, charm_url in zip(apps, charm_urls):
-                apps_dict[app_name]['charm'] = charm_url
-
-        return bundle
-
-    async def fetch_plan(self, entity_id):
-        is_store_url = entity_id.startswith('cs:')
-
-        if not is_store_url and os.path.isfile(entity_id):
-            bundle_yaml = Path(entity_id).read_text()
-        elif not is_store_url and os.path.isdir(entity_id):
-            bundle_yaml = (Path(entity_id) / "bundle.yaml").read_text()
-        else:
-            bundle_yaml = await self.charmstore.files(entity_id,
-                                                      filename='bundle.yaml',
-                                                      read_file=True)
-        self.bundle = yaml.safe_load(bundle_yaml)
-        self.bundle = await self._validate_bundle(self.bundle)
-        self.bundle = await self._handle_local_charms(self.bundle)
-
-        self.plan = await self.bundle_facade.GetChanges(
-            yaml.dump(self.bundle))
-
-        if self.plan.errors:
-            raise JujuError(self.plan.errors)
-
-    async def execute_plan(self):
-        for step in self.plan.changes:
-            method = getattr(self, step.method)
-            result = await method(*step.args)
-            self.references[step.id_] = result
-
-    @property
-    def applications(self):
-        apps_dict = self.bundle.get('applications',
-                                    self.bundle.get('services', {}))
-        return list(apps_dict.keys())
-
-    def resolve(self, reference):
-        if reference and reference.startswith('$'):
-            reference = self.references[reference[1:]]
-        return reference
-
-    async def addCharm(self, charm, series):
+    async def list_offers(self):
         """
-        :param charm string:
-            Charm holds the URL of the charm to be added.
-
-        :param series string:
-            Series holds the series of the charm to be added
-            if the charm default is not sufficient.
+        Offers list information about applications' endpoints that have been
+        shared and who is connected.
         """
-        # We don't add local charms because they've already been added
-        # by self._handle_local_charms
-        if charm.startswith('local:'):
-            return charm
+        async with ConnectedController(self.connection()) as controller:
+            return await controller.list_offers(self.name)
 
-        entity_id = await self.charmstore.entityId(charm)
-        log.debug('Adding %s', entity_id)
-        await self.client_facade.AddCharm(None, entity_id)
-        return entity_id
-
-    async def addMachines(self, params=None):
+    async def remove_offer(self, endpoint, force=False):
         """
-        :param params dict:
-            Dictionary specifying the machine to add. All keys are optional.
-            Keys include:
+        Remove offer for an application.
 
-            series: string specifying the machine OS series.
-
-            constraints: string holding machine constraints, if any. We'll
-                parse this into the json friendly dict that the juju api
-                expects.
-
-            container_type: string holding the type of the container (for
-                instance ""lxd" or kvm"). It is not specified for top level
-                machines.
-
-            parent_id: string holding a placeholder pointing to another
-                machine change or to a unit change. This value is only
-                specified in the case this machine is a container, in
-                which case also ContainerType is set.
-
+        Offers will also remove relations to those offers, use force to do
+        so, without an error.
         """
-        params = params or {}
+        async with ConnectedController(self.connection()) as controller:
+            return await controller.remove_offer(self.info.uuid, endpoint, force)
 
-        # Normalize keys
-        params = {normalize_key(k): params[k] for k in params.keys()}
-
-        # Fix up values, as necessary.
-        if 'parent_id' in params:
-            if params['parent_id'].startswith('$addUnit'):
-                unit = self.resolve(params['parent_id'])[0]
-                params['parent_id'] = unit.machine.entity_id
-            else:
-                params['parent_id'] = self.resolve(params['parent_id'])
-
-        params['constraints'] = parse_constraints(
-            params.get('constraints'))
-        params['jobs'] = params.get('jobs', ['JobHostUnits'])
-
-        if params.get('container_type') == 'lxc':
-            log.warning('Juju 2.0 does not support lxc containers. '
-                        'Converting containers to lxd.')
-            params['container_type'] = 'lxd'
-
-        # Submit the request.
-        params = client.AddMachineParams(**params)
-        results = await self.client_facade.AddMachines([params])
-        error = results.machines[0].error
-        if error:
-            raise ValueError("Error adding machine: %s" % error.message)
-        machine = results.machines[0].machine
-        log.debug('Added new machine %s', machine)
-        return machine
-
-    async def addRelation(self, endpoint1, endpoint2):
+    async def consume(self, endpoint, application_alias="", controller_name=None, controller=None):
         """
-        :param endpoint1 string:
-        :param endpoint2 string:
-            Endpoint1 and Endpoint2 hold relation endpoints in the
-            "application:interface" form, where the application is always a
-            placeholder pointing to an application change, and the interface is
-            optional. Examples are "$deploy-42:web" or just "$deploy-42".
+        Adds a remote offer to the model. Relations can be created later using
+        "juju relate".
         """
-        endpoints = [endpoint1, endpoint2]
-        # resolve indirect references
-        for i in range(len(endpoints)):
-            parts = endpoints[i].split(':')
-            parts[0] = self.resolve(parts[0])
-            endpoints[i] = ':'.join(parts)
-
-        log.info('Relating %s <-> %s', *endpoints)
-        return await self.model.add_relation(*endpoints)
-
-    async def deploy(self, charm, series, application, options, constraints,
-                     storage, endpoint_bindings, *args):
-        """
-        :param charm string:
-            Charm holds the URL of the charm to be used to deploy this
-            application.
-
-        :param series string:
-            Series holds the series of the application to be deployed
-            if the charm default is not sufficient.
-
-        :param application string:
-            Application holds the application name.
-
-        :param options map[string]interface{}:
-            Options holds application options.
-
-        :param constraints string:
-            Constraints holds the optional application constraints.
-
-        :param storage map[string]string:
-            Storage holds the optional storage constraints.
-
-        :param endpoint_bindings map[string]string:
-            EndpointBindings holds the optional endpoint bindings
-
-        :param devices map[string]string:
-            Devices holds the optional devices constraints.
-            (Only given on Juju 2.5+)
-
-        :param resources map[string]int:
-            Resources identifies the revision to use for each resource
-            of the application's charm.
-
-        :param num_units int:
-            NumUnits holds the number of units required.  For IAAS models, this
-            will be 0 and separate AddUnitChanges will be used.  For Kubernetes
-            models, this will be used to scale the application.
-            (Only given on Juju 2.5+)
-        """
-        # resolve indirect references
-        charm = self.resolve(charm)
-
-        if len(args) == 1:
-            # Juju 2.4 and below only sends the resources
-            resources = args[0]
-            devices, num_units = None, None
-        else:
-            # Juju 2.5+ sends devices before resources, as well as num_units
-            # There might be placement but we need to ignore that.
-            devices, resources, num_units = args[:3]
-
-        if options is None:
-            options = {}
-        if self.trusted:
-            options["trust"] = "true"
-        if not charm.startswith('local:'):
-            resources = await self.model._add_store_resources(
-                application, charm, overrides=resources)
-        await self.model._deploy(
-            charm_url=charm,
-            application=application,
-            series=series,
-            config=options,
-            constraints=constraints,
-            endpoint_bindings=endpoint_bindings,
-            resources=resources,
-            storage=storage,
-            devices=devices,
-            num_units=num_units,
-        )
-        return application
-
-    async def addUnit(self, application, to):
-        """
-        :param application string:
-            Application holds the application placeholder name for which a unit
-            is added.
-
-        :param to string:
-            To holds the optional location where to add the unit, as a
-            placeholder pointing to another unit change or to a machine change.
-        """
-        application = self.resolve(application)
-        placement = self.resolve(to)
-        if self._units_by_app.get(application):
-            # enough units for this application already exist;
-            # claim one, and carry on
-            # NB: this should probably honor placement, but the juju client
-            # doesn't, so we're not bothering, either
-            unit_name = self._units_by_app[application].pop()
-            log.debug('Reusing unit %s for %s', unit_name, application)
-            return self.model.units[unit_name]
-
-        log.debug('Adding new unit for %s%s', application,
-                  ' to %s' % placement if placement else '')
-        return await self.model.applications[application].add_unit(
-            count=1,
-            to=placement,
-        )
-
-    async def scale(self, application, scale):
-        """
-        Handle a change of scale to a k8s application.
-
-        :param string application:
-            Application holds the application placeholder name for which a unit
-            is added.
-
-        :param int scale:
-            New scale value to use.
-        """
-        application = self.resolve(application)
-        return await self.model.applications[application].scale(scale=scale)
-
-    async def expose(self, application):
-        """
-        :param application string:
-            Application holds the placeholder name of the application that must
-            be exposed.
-        """
-        application = self.resolve(application)
-        log.info('Exposing %s', application)
-        return await self.model.applications[application].expose()
-
-    async def setAnnotations(self, id_, entity_type, annotations):
-        """
-        :param id_ string:
-            Id is the placeholder for the application or machine change
-            corresponding to the entity to be annotated.
-
-        :param entity_type EntityType:
-            EntityType holds the type of the entity, "application" or
-            "machine".
-
-        :param annotations map[string]string:
-            Annotations holds the annotations as key/value pairs.
-        """
-        entity_id = self.resolve(id_)
+        if controller and controller_name:
+            raise JujuError("cannot set both controller_name and controller")
         try:
-            entity = self.model.state.get_entity(entity_type, entity_id)
-        except KeyError:
-            entity = await self.model._wait_for_new(entity_type, entity_id)
-        return await entity.set_annotations(annotations)
+            offer = parse_offer_url(endpoint)
+        except OfferParseError as e:
+            log.error(e.message)
+            raise
+        if offer.has_endpoint():
+            raise JujuError("remote offer {} should not include an endpoint".format(endpoint))
+        if offer.user == "":
+            offer.user = self.info.username
+            endpoint = offer.string()
 
-
-class CharmStore:
-    """
-    Async wrapper around theblues.charmstore.CharmStore
-    """
-    def __init__(self, loop, cs_timeout=20):
-        self.loop = loop
-        self._cs = theblues.charmstore.CharmStore(timeout=cs_timeout)
-
-    def __getattr__(self, name):
-        """
-        Wrap method calls in coroutines that use run_in_executor to make them
-        async.
-        """
-        attr = getattr(self._cs, name)
-        if not callable(attr):
-            wrapper = partial(getattr, self._cs, name)
-            setattr(self, name, wrapper)
+        source = None
+        if controller_name:
+            source = await self._get_source_api(offer, controller_name=controller_name)
         else:
-            async def coro(*args, **kwargs):
-                method = partial(attr, *args, **kwargs)
-                for attempt in range(1, 4):
-                    try:
-                        return await self.loop.run_in_executor(None, method)
-                    except theblues.errors.ServerError:
-                        if attempt == 3:
-                            raise
-                        await asyncio.sleep(1, loop=self.loop)
-            setattr(self, name, coro)
-            wrapper = coro
-        return wrapper
+            if controller:
+                source = controller
+            else:
+                source = Controller()
+                kwargs = self.connection().connect_params()
+                kwargs["uuid"] = None
+                await source._connect_direct(**kwargs)
+
+        consume_details = await source.get_consume_details(offer.as_local().string())
+
+        # Only disconnect when the controller object has been created within
+        # with function We don't want to disconnect the object passed by the
+        # user in the controller argument
+        if not controller:
+            await source.disconnect()
+        if consume_details is None or consume_details.offer is None:
+            raise JujuAPIError("missing consuming offer url for {}".format(offer.string()))
+
+        offer_url = parse_offer_url(consume_details.offer.offer_url)
+        offer_url.source = offer.source
+
+        consume_details.offer.offer_url = offer_url.string()
+        consume_details.offer.application_alias = application_alias
+
+        arg = _create_consume_args(consume_details.offer,
+                                   consume_details.macaroon,
+                                   consume_details.external_controller)
+
+        facade = client.ApplicationFacade.from_connection(self.connection())
+        results = await facade.Consume(args=[arg])
+        if len(results.results) != 1:
+            raise JujuAPIError("expected 1 result, recieved {}".format(len(results.results)))
+        if results.results[0].error is not None:
+            raise JujuAPIError(results.results[0].error)
+        local_name = offer_url.application
+        if application_alias != "":
+            local_name = application_alias
+        return local_name
+
+    async def remove_saas(self, name):
+        """
+        Removing a consumed (SAAS) application will terminate any relations that
+        application has, potentially leaving any related local applications
+        in a non-functional state.
+        """
+        if not is_valid_application(name):
+            raise JujuError("invalid SAAS application name {}".format(name))
+
+        arg = client.DestroyConsumedApplicationParams()
+        arg.application_tag = application_tag(name)
+
+        facade = client.ApplicationFacade.from_connection(self.connection())
+        return await facade.DestroyConsumedApplications(applications=[arg])
+
+    async def export_bundle(self, filename=None):
+        """
+        Exports the current model configuration as a reusable bundle.
+        """
+        facade = client.BundleFacade.from_connection(self.connection())
+        result = await facade.ExportBundle()
+        if result.error is not None:
+            raise JujuAPIError(result.error)
+
+        if filename is None:
+            return result.result
+
+        try:
+            with open(str(filename), "w") as file:
+                file.write(result.result)
+        except IOError:
+            raise
+
+    async def list_secrets(self, filter="", show_secrets=False):
+        """
+        Returns the list of available secrets.
+        """
+        facade = client.SecretsFacade.from_connection(self.connection())
+        return await facade.ListSecrets({
+            'filter': filter,
+            'show-secrets': show_secrets,
+        })
+
+    async def _get_source_api(self, url, controller_name=None):
+        controller = Controller()
+        if url.has_empty_source():
+            async with ConnectedController(self.connection()) as current:
+                if current.controller_name is not None:
+                    controller_name = current.controller_name
+        await controller.connect(controller_name=controller_name)
+        return controller
+
+    async def wait_for_idle(self, apps=None, raise_on_error=True, raise_on_blocked=False,
+                            wait_for_active=False, timeout=10 * 60, idle_period=15, check_freq=0.5,
+                            status=None, wait_for_units=1, wait_for_exact_units=None):
+        """Wait for applications in the model to settle into an idle state.
+
+        :param apps (list[str]): Optional list of specific app names to wait on.
+            If given, all apps must be present in the model and idle, while other
+            apps in the model can still be busy. If not given, all apps currently
+            in the model must be idle.
+
+        :param raise_on_error (bool): If True, then any unit or app going into
+            "error" status immediately raises either a JujuAppError or a JujuUnitError.
+            Note that machine or agent failures will always raise an exception (either
+            JujuMachineError or JujuAgentError), regardless of this param. The default
+            is True.
+
+        :param raise_on_blocked (bool): If True, then any unit or app going into
+            "blocked" status immediately raises either a JujuAppError or a JujuUnitError.
+            The defaul tis False.
+
+        :param wait_for_active (bool): If True, then also wait for all unit workload
+            statuses to be "active" as well. The default is False.
+
+        :param timeout (float): How long to wait, in seconds, for the bundle settles
+            before raising an asyncio.TimeoutError. If None, will wait forever.
+            The default is 10 minutes.
+
+        :param idle_period (float): How long, in seconds, the agent statuses of all
+            units of all apps need to be `idle`. This delay is used to ensure that
+            any pending hooks have a chance to start to avoid false positives.
+            The default is 15 seconds.
+
+        :param check_freq (float): How frequently, in seconds, to check the model.
+            The default is every half-second.
+
+        :param status (str): The status to wait for. If None, not waiting.
+            The default is None (not waiting for any status).
+
+        :param wait_for_units (int): The least number of units to be expected before
+            going into the idle state.
+            The default is 1 unit.
+
+        :param wait_for_exact_units (int): The exact number of units to be expected before
+            going into the idle state. (e.g. useful for scaling down).
+            When set, takes precedence over the `wait_for_units` parameter.
+        """
+        if wait_for_active:
+            warnings.warn("wait_for_active is deprecated; use status", DeprecationWarning)
+            status = "active"
+
+        timeout = timedelta(seconds=timeout) if timeout is not None else None
+        idle_period = timedelta(seconds=idle_period)
+        start_time = datetime.now()
+        # Type check against the common error of passing a str for apps
+        if apps is not None and (not isinstance(apps, list) or
+                                 any(not isinstance(o, str)
+                                     for o in apps)):
+            raise JujuError(f'Expected a List[str] for apps, given {apps}')
+
+        apps = apps or self.applications
+        idle_times = {}
+        last_log_time = None
+        log_interval = timedelta(seconds=30)
+
+        def _raise_for_status(entities, status):
+            if not entities:
+                return
+            for entity_name, error_type in (("Machine", JujuMachineError),
+                                            ("Agent", JujuAgentError),
+                                            ("Unit", JujuUnitError),
+                                            ("App", JujuAppError)):
+                errored = entities.get(entity_name, [])
+                if not errored:
+                    continue
+                raise error_type("{}{} in {}: {}".format(
+                    entity_name,
+                    "s" if len(errored) > 1 else "",
+                    status,
+                    ", ".join(errored),
+                ))
+
+        if wait_for_exact_units is not None:
+            assert type(wait_for_exact_units) == int and wait_for_exact_units >= 0, \
+                'Invalid value for wait_for_exact_units : %s' % wait_for_exact_units
+
+        while True:
+            busy = []
+            errors = {}
+            blocks = {}
+            for app_name in apps:
+                if app_name not in self.applications:
+                    busy.append(app_name + " (missing)")
+                    continue
+                app = self.applications[app_name]
+                if raise_on_error and app.status == "error":
+                    errors.setdefault("App", []).append(app.name)
+                if raise_on_blocked and app.status == "blocked":
+                    blocks.setdefault("App", []).append(app.name)
+                if wait_for_exact_units is not None:
+                    if len(app.units) != wait_for_exact_units:
+                        busy.append(app.name + " (waiting for exactly %s units, current : %s)" %
+                                    (wait_for_exact_units, len(app.units)))
+                        continue
+                elif len(app.units) < wait_for_units:
+                    busy.append(app.name + " (not enough units yet - %s/%s)" %
+                                (len(app.units), wait_for_units))
+                    continue
+                for unit in app.units:
+                    if unit.machine is not None and unit.machine.status == "error":
+                        errors.setdefault("Machine", []).append(unit.machine.id)
+                        continue
+                    if unit.agent_status == "error":
+                        errors.setdefault("Agent", []).append(unit.name)
+                        continue
+                    if raise_on_error and unit.workload_status == "error":
+                        errors.setdefault("Unit", []).append(unit.name)
+                        continue
+                    if raise_on_blocked and unit.workload_status == "blocked":
+                        blocks.setdefault("Unit", []).append(unit.name)
+                        continue
+                    waiting_for_status = status and unit.workload_status != status
+                    if not waiting_for_status and unit.agent_status == "idle":
+                        now = datetime.now()
+                        idle_start = idle_times.setdefault(unit.name, now)
+                        if now - idle_start < idle_period:
+                            busy.append("{} [{}] {}: {}".format(unit.name,
+                                                                unit.agent_status,
+                                                                unit.workload_status,
+                                                                unit.workload_status_message))
+                    else:
+                        idle_times.pop(unit.name, None)
+                        busy.append("{} [{}] {}: {}".format(unit.name,
+                                                            unit.agent_status,
+                                                            unit.workload_status,
+                                                            unit.workload_status_message))
+            _raise_for_status(errors, "error")
+            _raise_for_status(blocks, "blocked")
+            if not busy:
+                break
+            busy = "\n  ".join(busy)
+            if timeout is not None and datetime.now() - start_time > timeout:
+                raise jasyncio.TimeoutError("Timed out waiting for model:\n" + busy)
+            if last_log_time is None or datetime.now() - last_log_time > log_interval:
+                log.info("Waiting for model:\n  " + busy)
+                last_log_time = datetime.now()
+            await jasyncio.sleep(check_freq)
+
+
+def _create_consume_args(offer, macaroon, controller_info):
+    """
+    Convert a typed object that has been normalised to a overrided typed
+    definition.
+
+    @param offer: takes an offer and serialises it into a valid type
+    @param macaroon: takes a macaroon and serialises it into a valid type
+    @param controller_info: takes a controller information and serialises it into
+    a valid type.
+    """
+    endpoints = []
+    for ep in offer.endpoints:
+        endpoints.append(client.RemoteEndpoint(interface=ep.interface,
+                                               limit=ep.limit,
+                                               name=ep.name,
+                                               role=ep.role))
+    users = []
+    for u in offer.users:
+        users.append(client.OfferUserDetails(access=u.access,
+                                             display_name=u.display_name,
+                                             user=u.user))
+    external_controller = client.ExternalControllerInfo(addrs=controller_info.addrs,
+                                                        ca_cert=controller_info.ca_cert,
+                                                        controller_alias=controller_info.controller_alias,
+                                                        controller_tag=controller_info.controller_tag)
+    caveats = []
+    for c in macaroon.unknown_fields["caveats"]:
+        caveats.append(Caveat(cid=c["cid"]))
+    macaroon = Macaroon(signature=macaroon.unknown_fields["signature"],
+                        caveats=caveats,
+                        location=macaroon.unknown_fields["location"],
+                        identifier=macaroon.unknown_fields["identifier"])
+
+    arg = client.ConsumeApplicationArg()
+    arg.application_description = offer.application_description
+    arg.endpoints = endpoints
+    arg.offer_name = offer.offer_name
+    arg.offer_url = offer.offer_url
+    arg.offer_uuid = offer.offer_uuid
+    arg.source_model_tag = offer.source_model_tag
+    arg.users = users
+    arg.application_alias = offer.application_alias
+    arg.external_controller = external_controller
+    arg.macaroon = macaroon
+
+    return arg
 
 
 class CharmArchiveGenerator:
@@ -2329,11 +2692,17 @@ class CharmArchiveGenerator:
                           (.bzr, etc)
 
         """
-        zf = zipfile.ZipFile(path, 'w', zipfile.ZIP_DEFLATED)
+        zf = zipfile.ZipFile(str(path), 'w', zipfile.ZIP_DEFLATED)
         for dirpath, dirnames, filenames in os.walk(self.path):
             relative_path = dirpath[len(self.path) + 1:]
             if relative_path and not self._ignore(relative_path):
                 zf.write(dirpath, relative_path)
+            for dirname in dirnames:
+                archive_name = os.path.join(relative_path, dirname)
+                real_path = os.path.join(dirpath, dirname)
+                if os.path.islink(real_path):
+                    self._check_link(real_path)
+                    self._write_symlink(zf, os.readlink(real_path), archive_name)
             for name in filenames:
                 archive_name = os.path.join(relative_path, name)
                 if not self._ignore(archive_name):
@@ -2351,10 +2720,10 @@ class CharmArchiveGenerator:
     def _check_type(self, path):
         """Check the path
         """
-        s = os.stat(path)
+        s = os.stat(str(path))
         if stat.S_ISDIR(s.st_mode) or stat.S_ISREG(s.st_mode):
             return path
-        raise ValueError("Invalid Charm at % %s" % (
+        raise ValueError("Invalid Charm at %s %s" % (
             path, "Invalid file type for a charm"))
 
     def _check_link(self, path):
@@ -2385,3 +2754,14 @@ class CharmArchiveGenerator:
             return True
         if path.startswith('.'):
             return True
+
+
+class ModelInfo(ModelEntity):
+
+    @property
+    def tag(self):
+        return tag.model(self.uuid)
+
+    @staticmethod
+    def type_name_override():
+        return "model"

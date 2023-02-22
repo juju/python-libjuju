@@ -1,6 +1,429 @@
 Changelog
 ---------
 
+3.1.0.1
+^^^^^^^
+
+Friday 10th February 2023
+
+This release targets juju version 3.1.0 and enables the new secrets backend api.
+Connectivity with juju controllers in the 3.x series is allowed, connections with different major version controllers (e.g. 2.x, 4.x, etc.) will be cancelled.
+
+This version is only tested using Juju 3.1.0.
+
+## What's Changed
+* setup.py: adjust websockets versions for py38-310 by @mert-kirpici in https://github.com/juju/python-libjuju/pull/731
+* [JUJU-2175] Remove juju 2.9 support on 3.1.0 by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/774
+* [JUJU-2276] Series or base for local charms by @cderici in https://github.com/juju/python-libjuju/pull/777
+* [JUJU-2391] Fix wrong bases analysis. by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/782
+* [JUJU-2401] Added release candidate workflow. by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/784
+* [JUJU-2402] Prepare nightly juju edge testing. by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/785
+* [JUJU-2237] Remove charmstore charm support from pylibjuju by @cderici in https://github.com/juju/python-libjuju/pull/786
+* [JUJU-2426] Secrets support by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/791
+* [JUJU-2573] Base argument for model deploy by @cderici in https://github.com/juju/python-libjuju/pull/798
+* Add compatibility for juju 3.1.0 by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/799
+* Replace schemas.json with a wellformed version. by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/800
+
+## New Contributors
+* @mert-kirpici made their first contribution in https://github.com/juju/python-libjuju/pull/731
+
+**Full Changelog**: https://github.com/juju/python-libjuju/compare/3.0.4...3.1.0.1
+
+3.0.4
+^^^^^
+
+Wednesday 26th October
+
+## What's Changed
+* [JUJU-2027] Local refresh with resoruces by @cderici in https://github.com/juju/python-libjuju/pull/757
+* [JUJU-2026] Improve resolve charm by @cderici in https://github.com/juju/python-libjuju/pull/761
+* Add owner and data to license file by @arturo-seijas in https://github.com/juju/python-libjuju/pull/760
+
+## New Contributors
+* @arturo-seijas made their first contribution in https://github.com/juju/python-libjuju/pull/760
+
+**Full Changelog**: https://github.com/juju/python-libjuju/compare/3.0.3...3.0.4
+
+3.0.3
+^^^^^
+
+Saturay October 22 2022
+
+## What's Changed
+
+* Wait for idle arg type check by @cderici in https://github.com/juju/python-libjuju/pull/741
+* [JUJU-1970] Revise local refresh by @cderici in https://github.com/juju/python-libjuju/pull/742
+* [JUJU-1984] Update facade schemas for juju 3.0-rc1-2 by @cderici in https://github.com/juju/python-libjuju/pull/745
+* [JUJU-1992] Fix charmhub series deploy 3.0 by @cderici in https://github.com/juju/python-libjuju/pull/746
+* [JUJU-2001] Fix base for local charms and bundles for CharmOrigin 3.0 by @cderici in https://github.com/juju/python-libjuju/pull/749
+* [JUJU-2017] Check subordinate field value instead of existence by @cderici in https://github.com/juju/python-libjuju/pull/751
+* [JUJU-2018] Update 2.9.36 facades & clients by @cderici in https://github.com/juju/python-libjuju/pull/752
+* [JUJU-1705] Make sure the action status is correctly set by @cderici in https://github.com/juju/python-libjuju/pull/753
+* [JUJU-2019] Small fixes for 3.0 by @cderici in https://github.com/juju/python-libjuju/pull/754
+
+
+**Full Changelog**: https://github.com/juju/python-libjuju/compare/3.0.2...3.0.3
+
+3.0.2
+^^^^^
+
+Wednesday October 5 2022
+
+## What's Changed
+
+* Model name can now be accessed through model.name by @jack-w-shaw in https://github.com/juju/python-libjuju/pull/702
+* [JUJU-1593] Fix `unit.run()` and update the old client codes by @cderici in https://github.com/juju/python-libjuju/pull/710
+* Add py.typed marker by @sed-i in https://github.com/juju/python-libjuju/pull/709
+* [JUJU-1664] Add force, no-wait, destroy-storage params to app.destroy by @cderici in https://github.com/juju/python-libjuju/pull/714
+* snapcraft.io access should use https requests by @addyess in https://github.com/juju/python-libjuju/pull/715
+* [JUJU-1680] Add issue and PR templates by @cderici in https://github.com/juju/python-libjuju/pull/718
+* [JUJU-1681] Add --attach-storage parameter to model.deploy by @cderici in https://github.com/juju/python-libjuju/pull/720
+* [JUJU-1706] Allow waiting for `wait_for_exact_units=0` by @cderici in https://github.com/juju/python-libjuju/pull/723
+* [JUJU-1663] Drop Python 3.5 support from python-libjuju by @cderici in https://github.com/juju/python-libjuju/pull/722
+* [JUJU-1671] Charmhub url from model config by @cderici in https://github.com/juju/python-libjuju/pull/724
+* [JUJU-1733] Revisit unitrun example by @cderici in https://github.com/juju/python-libjuju/pull/725
+* [JUJU-1800] Revise the `application.upgrade_charm()` (refresh) by @cderici in https://github.com/juju/python-libjuju/pull/729
+* [JUJU-1893] Revisit `charmhub.info()` by @cderici in https://github.com/juju/python-libjuju/pull/737
+
+3.0.1
+^^^^^
+
+Thursday August 11 2022
+
+* [JUJU-1593] Fix `run_actions` and facade issues by @cderici in https://github.com/juju/python-libjuju/pull/706
+
+3.0.0
+^^^^^
+
+Tuesday August 9 2022
+
+Switching to semantic versioning. From this release on, at least the major release number matches
+the most recent Juju supported. Hence the jump to `3.0.0` since this release supports `Juju 3.0`.
+(This also means that `python-libjuju <= 2.9.11` only support up to `Juju 2.x`)
+
+* [JUJU-1439] Initial fixes for `test_model` to pass with juju 3.0 by @cderici in https://github.com/juju/python-libjuju/pull/689
+* [JUJU-1464] More fixes for 3.0 compatibility by @cderici in https://github.com/juju/python-libjuju/pull/691
+* [JUJU-1457] Merge 3.0 compatibility branch onto master by @cderici in https://github.com/juju/python-libjuju/pull/692
+* Fix conditional by @sed-i in https://github.com/juju/python-libjuju/pull/696
+* [JUJU-1534] Fix `model.connect_current()` by @cderici in https://github.com/juju/python-libjuju/pull/697
+* [JUJU-1542] Fix run actions on units by @cderici in https://github.com/juju/python-libjuju/pull/698
+* [JUJU-1577] Replace k8s bundles with machine bundles for tests by @cderici in https://github.com/juju/python-libjuju/pull/703
+* [JUJU-1528] Add storage implementation by @cderici in https://github.com/juju/python-libjuju/pull/701
+
+2.9.11
+^^^^^^
+
+Monday July 11 2022
+
+* Add REPL quickstart subsection by @sed-i in https://github.com/juju/python-libjuju/pull/676
+* Revision of test onos.charm by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/686
+* [JUJU-1353] Parse assume directives. by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/685
+* Replace deprecated juju.loop() calls from examples and documentation by @ittner in https://github.com/juju/python-libjuju/pull/687
+* Fixed the bundle run when the channel is None by @oEscal in https://github.com/juju/python-libjuju/pull/664
+
+2.9.10
+^^^^^^
+
+Thursday June 9 2022
+
+* [JUJU-1155] Avoid incorrectly setting `series: kubernetes` for sidecar charms in k8s bundles by @cderici in https://github.com/juju/python-libjuju/pull/679
+* [JUJU-1172] Visiting the pylibjuju CI by @cderici in https://github.com/juju/python-libjuju/pull/681
+* [JUJU-1124] Avoid sending path across the wire for local resource file name by @cderici in https://github.com/juju/python-libjuju/pull/678
+
+2.9.9
+^^^^^
+
+Wednesday April 26 2022
+
+* [JUJU-835] Avoid ignoring asyncio exceptions in coroutines by @cderici in https://github.com/juju/python-libjuju/pull/658
+* [JUJU-843] Attach-resource to check if given binary file by @cderici in https://github.com/juju/python-libjuju/pull/659
+* [JUJU-858] Add quality of life feature ensure application removal at return by @cderici in https://github.com/juju/python-libjuju/pull/665
+* [JUJU-965] Add a bit of client side constraint validation by @cderici in https://github.com/juju/python-libjuju/pull/666
+* support python3.10 with later versions of websockets by @addyess in https://github.com/juju/python-libjuju/pull/673
+* Revert "Avoid ignoring asyncio exceptions in coroutines" by @simskij in https://github.com/juju/python-libjuju/pull/672
+* [JUJU-796] Add relate method and deprecate add-relation by @jack-w-shaw in https://github.com/juju/python-libjuju/pull/660
+* [JUJU-981] Get series from deployed app instead of metadata when charm upgrade by @cderici in https://github.com/juju/python-libjuju/pull/671
+
+2.9.8
+^^^^^
+
+Monday March 21 2022
+
+* [JUJU-567] Use ModelManager instead of ControllerFacade to list available models by @cderici in https://github.com/juju/python-libjuju/pull/632
+* [JUJU-573] Fix charm resolution for Juju 2.8.11 by @cderici in https://github.com/juju/python-libjuju/pull/633
+* [JUJU-704] Remove non-implemented (stuıb) functions by @cderici in https://github.com/juju/python-libjuju/pull/646
+* [JUJU-676] Avoid defaulting to empty string for charm origin by @cderici in https://github.com/juju/python-libjuju/pull/647
+* Charmstore compatability of deploying bundles by @addyess in https://github.com/juju/python-libjuju/pull/650
+* [JUJU-731] Subordinate charm num unit by @cderici in https://github.com/juju/python-libjuju/pull/648
+* [JUJU-769] Facade schemas for 2.9.27 by @cderici in https://github.com/juju/python-libjuju/pull/652
+* [JUJU-771] Auto switch to scale from add_unit on container based models by @cderici in https://github.com/juju/python-libjuju/pull/653
+
+2.9.7
+^^^^^
+
+Friday February 11 2022
+
+* [JUJU-556] Facade schemas for Juju 2.9.24 by @cderici in https://github.com/juju/python-libjuju/pull/626
+* Provide extra metadata with charmstore.entity(...)  by @addyess in https://github.com/juju/python-libjuju/pull/635
+
+2.9.6
+^^^^^
+
+Thursday January 27 2022
+
+* [JUJU-320] Unit public address by @SimonRichardson in https://github.com/juju/python-libjuju/pull/600
+* [JUJU-244] Add attach-resource by @cderici in https://github.com/juju/python-libjuju/pull/601
+* [JUJU-140] Model.wait_for_idle -- for apps with no units yet by @cderici in https://github.com/juju/python-libjuju/pull/575
+* [JUJU-367] Improve `get_charm_series` to check the model for series for a local charm by @cderici in https://github.com/juju/python-libjuju/pull/607
+* [JUJU-366] Utility for connecting directly to existing connection by @cderici in https://github.com/juju/python-libjuju/pull/605
+* Use public-address key instead of public_address by @wolsen in https://github.com/juju/python-libjuju/pull/610
+* [JUJU-376] `wait_for_idle` to support scale down by @cderici in https://github.com/juju/python-libjuju/pull/613
+* [JUJU-378] Utility for block_until-ing with a custom coroutine by @cderici in https://github.com/juju/python-libjuju/pull/614
+* Fallback to 'local-fan' by @dparv in https://github.com/juju/python-libjuju/pull/612
+* Minor comments on docs for block_until related functions. by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/617
+* Additional checks in print status. by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/622
+
+2.9.5
+^^^^^
+
+Friday December 3 2021
+
+* remove the event loop arguments by @cderici in https://github.com/juju/python-libjuju/pull/560
+* add debug-log by @cderici in https://github.com/juju/python-libjuju/pull/562
+* Model status by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/563
+* Pin cffi version to 1.14.6 for Python 3.5 by @cderici in https://github.com/juju/python-libjuju/pull/570
+* Wait for applications to terminate on model reset by @balbirthomas in https://github.com/juju/python-libjuju/pull/572
+* Babysitting python3.5 by @cderici in https://github.com/juju/python-libjuju/pull/571
+* Deploy charmhub bundles by @cderici in https://github.com/juju/python-libjuju/pull/569
+* Facade schemas for 2.9.17 by @SimonRichardson in https://github.com/juju/python-libjuju/pull/579
+* Bundles with overlays by @cderici in https://github.com/juju/python-libjuju/pull/566
+* Consistently getting a unit's public address by @cderici in https://github.com/juju/python-libjuju/pull/573
+* [JUJU-158] Add python3.9 to setup.py by @cderici in https://github.com/juju/python-libjuju/pull/585
+* [JUJU-157] Add note for removing services by @cderici in https://github.com/juju/python-libjuju/pull/583
+* Added boolean entries to normalize values. by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/582
+* [JUJU-138] Streamlining asyncio tasks/events by @cderici in https://github.com/juju/python-libjuju/pull/580
+* [JUJU-234] Fix for small bug in task handling by @cderici in https://github.com/juju/python-libjuju/pull/589
+* Ensure all watchers validate for the Id by @SimonRichardson in https://github.com/juju/python-libjuju/pull/592
+* [JUJU-276] Facade schemas for 2.9.19 by @cderici in https://github.com/juju/python-libjuju/pull/594
+* [JUJU-238] Small bug fix for old ClientFacade support by @cderici in https://github.com/juju/python-libjuju/pull/593
+* [JUJU-239] Debug-log parameters by @cderici in https://github.com/juju/python-libjuju/pull/595
+* [JUJU-213] Local type `file` resource support by @cderici in https://github.com/juju/python-libjuju/pull/590
+* [JUJU-289] Use provided series in deploy if supported by @jack-w-shaw in https://github.com/juju/python-libjuju/pull/596
+* [JUJU-292] Update the charms in the tests to use Charmhub by @cderici in https://github.com/juju/python-libjuju/pull/597
+* Legacy "services" for describing "applications" within bundles are no longer supported. "applications" can be used as a direct replacement for "services" in bundles.yaml.
+* The websocket (ws) in a Connection object became a read-only property.
+
+2.9.4
+^^^^^
+
+Tuesday October 12 2021
+
+* Charmhub deploy charm by @SimonRichardson in https://github.com/juju/python-libjuju/pull/483
+* add wait_for_status instead of wait_for_active by @sed-i in https://github.com/juju/python-libjuju/pull/517
+* Adds resource support for charmhub deployments by @tlm in https://github.com/juju/python-libjuju/pull/516
+* Fix bug #519 and #522: Add local resources for bundles by @davigar15 in https://github.com/juju/python-libjuju/pull/520
+* Patching some missing kwargs by @cderici in https://github.com/juju/python-libjuju/pull/527
+* Implementing `backup` functionality by @cderici in https://github.com/juju/python-libjuju/pull/536
+* Fix issue 532: Set the default_series properly by @davigar15 in https://github.com/juju/python-libjuju/pull/533
+* A random small bug fix by @cderici in https://github.com/juju/python-libjuju/pull/541
+* Allow ApplicationFacade set_config with non-string values by @cderici in https://github.com/juju/python-libjuju/pull/540
+* Skip macaroon tests issue 534 by @cderici in https://github.com/juju/python-libjuju/pull/542
+* Fix issue 530: Check the controller for unsynched models by @cderici in https://github.com/juju/python-libjuju/pull/539
+* Upgrade setup-python action. by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/543
+* Fix integration tests by @cderici in https://github.com/juju/python-libjuju/pull/544
+* Bring juju/juju.py into life by @cderici in https://github.com/juju/python-libjuju/pull/546
+* Extract resources info from apps in locally deployed bundle by @cderici in https://github.com/juju/python-libjuju/pull/552
+* Fix for simple bug in bundle deployment code self.charm -> self['charm'] by @jnsgruk in https://github.com/juju/python-libjuju/pull/558
+* Fix integration tests continued by @cderici in https://github.com/juju/python-libjuju/pull/547
+* Get the config dir resolve logic into one place by @cderici in https://github.com/juju/python-libjuju/pull/555
+* Complete the backups functionality by @cderici in https://github.com/juju/python-libjuju/pull/556
+
+2.9.3
+^^^^^
+
+Monday August 12 2021
+
+* Bug fix - Fix 'Default to bundle series if the charm has no series field' #514
+
+2.9.2
+^^^^^
+
+Monday June 28 2021
+
+* Bug fix - Fix 'metadata referenced before assignment' error #509
+
+2.9.1
+^^^^^
+
+Wednesday June 16 2021
+
+* Bug fix - Bundle Exposed endpoints missing #502
+* Bug fix - Fix series requirement for local charms #504
+* Add local charm update support #507
+
+2.9.0
+^^^^^
+
+Thursday May 27 2021
+
+* Update facade methods for Juju 2.9.0
+* Update facade methods for Juju 2.9.1
+* Bug fix - Support for Juju client proxies (LP#1926595)
+* Bug fix - Honor charm channel in bundles #496
+* Remove machine workaround for Juju 2.2.3
+
+2.8.6
+^^^^^
+
+Tuesday March 23 2021
+
+* Update facade methods for Juju 2.8.10
+* Bug fix - Fix typo in param name for ScaleApplications
+* Introduction of hostname property for Machines
+
+2.8.5
+^^^^^
+
+Monday February 8 2021
+
+ * Implement add_space and get_spaces.
+ * Update facade controllers.
+ * Support already archived (.charm or .zip) local charms.
+ * Introduction of wait_for_bundle method.
+ * Bug fix - Handle None in list_offers results
+ * Bug fix - Update libraries to support Python 3.9+
+
+2.8.4
+^^^^^
+
+Thursday October 1 2020
+
+ * Update facade methods for Juju 2.8.3
+ * Bug fix - Add force and max wait for destroying a model
+ * Bug fix - Fix derivation of the application status
+
+2.8.3
+^^^^^
+
+Friday August 28 2020
+
+ * Bug fix - Export the CAAS model operator facade (#434)
+ * Bug fix - Allow passing controllers to prevent consume reading local filesystem (#436)
+
+
+2.8.2
+^^^^^
+
+Tuesday July 14 2020
+
+ * Update facade methods for Juju 2.8.1
+ * Add documentation to the client API methods (using the 2.8.1 changes)
+ * Bug fix -Fixes application status being reported as unset (#430)
+ * Bug fix - Handle Network Unreachable OSErrors (#426)
+
+2.8.1
+^^^^^
+
+Monday May 18 2020
+
+ * Fix positional argument usage in facade calls.
+ * Add get shim to facade types.
+ * Fix SSH await on unit
+ * Fix integration tests
+ * Fix tox.ini to use supported python versions.
+ * Fix constraints regex using subscript on matches (py36).
+ * Fix facade return type documentation.
+ * Fix schema objects with array values.
+ * Fix subscript lookups by using JSON keys.
+ * Add definition test.
+
+2.8.0
+^^^^^
+
+Wednesday May 13 2020
+
+ * Update facade methods for Juju 2.8.0
+ * Fixes codegen for Python 3.7+
+ * Nested facade definitions are now deserialised properly (e.g. storage on ApplicationDeploy)
+ * Missing client facades are now ignored and a warning is printed (#382)
+ * Add SCP example (#383)
+ * Add watch_model_summaries method to Controller (#390)
+ * Bug fix - make_archive on Model handles symlinks (#391 #392)
+ * Add SSH support for units and machines (#393)
+ * Add connection HA support (#402)
+ * Bug fix - resolve api_endpoints from controller (#406 #407)
+
+2.7.1
+^^^^^
+
+Thursday January 9 2020
+
+ * Added the missing facade type, when attempting to connect to a model.
+
+2.7.0
+^^^^^
+
+Tuesday January 7 2020
+
+ * Update facade methods for Juju 2.7.0
+ * Fix an issue when querying CMR relations (#366) 
+ * Fix storage support in bundles (#361)
+ * Fix reporting of unit leaders (#374)
+ * AddCloud API support (#370)
+
+2.6.3
+^^^^^
+
+ * Refactor bundle handler code so that it can be more resilient against changes
+   to the bundle changes API.
+ * Updated the dependencies to the latest version (pyyaml)
+
+2.6.2
+^^^^^
+Wednesday August 27 2019
+
+ * Fixes validation issue with a go interface{} type (Any type) being returned
+   from the Juju API server (#344)
+
+2.6.1
+^^^^^
+Wednesday August 21 2019
+
+ * Pylibjuju now validates arguments correctly, instead of relying on default
+   positional argument values.
+
+2.6.0
+^^^^^
+Wednesday August 14 2019
+
+* Update facade methods for Juju 2.6.6
+* Pylibjuju release now follows the cadence of Juju releases, which also
+  includes bumping the version number to follow suit.
+* Pinned API facades. All facades in Pylibjuju are now pinned to a set of
+  facade versions that is more conservative to prevent breakages against new
+  features. The ability to override the pinned facades and specify your own
+  facade versions is possible upon connection to a controller or model.
+* Cross model relations (CMR) when deploying and adding relations. Additionally
+  getting information about the CMR offers are available on the model.
+* Cross model relations (CMR) in bundles.
+* Ability to export bundle including overlays.
+* Manual provisioning without a ubuntu user (#335)
+* Addition of remote applications when adding relations via SAAS blocks
+* Applying topological sorting to bundle changes API response, allows deployment
+  of complex bundles possible.
+* Updated definitions types to include the latest information from Juju.
+* Keyword arguments (`unknown_field` in code) are now available on Juju
+  responses.
+
+0.11.7
+^^^^^^
+Wednesday April 19 2019
+
+* Update facade methods for Juju 2.6.4
+* Support for trusted bundles and charms (See: Trust_ documentation)
+
+.. _Trust: https://discourse.jujucharms.com/t/deploying-applications-advanced/1061#heading--trusting-an-application-with-a-credential
+
 0.11.6
 ^^^^^^
 Wednesday May 22 2019

@@ -6,8 +6,9 @@ This example:
 3. Destroys the units and applications
 
 """
-from juju import loop
+from juju import jasyncio
 from juju.model import Model
+
 
 async def main():
     model = Model()
@@ -18,16 +19,14 @@ async def main():
     try:
         print('Deploying trusted bundle application ubuntu')
         applications = await model.deploy(
-            'cs:~juju-qa/bundle/basic-trusted-1',
-            channel='beta',
+            'ch:aws-integrator',
             trust=True,
         )
 
         print('Waiting for active')
         await model.block_until(
             lambda: all(unit.workload_status == 'active'
-                        for application in applications
-                            for unit in application.units))
+                        for application in applications for unit in application.units))
         print("Successfully deployed!")
         print('Removing bundle')
         for application in applications:
@@ -38,4 +37,4 @@ async def main():
 
 
 if __name__ == '__main__':
-    loop.run(main())
+    jasyncio.run(main())

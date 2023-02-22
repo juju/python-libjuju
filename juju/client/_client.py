@@ -3,23 +3,24 @@
 
 from juju.client._definitions import *
 
-from juju.client import _client1, _client2, _client3, _client4, _client5, _client6, _client7, _client8, _client9, _client10, _client12
+
+from juju.client import _client7, _client1, _client3, _client4, _client2, _client17, _client6, _client11, _client10, _client5, _client9, _client18
 
 
 CLIENTS = {
+    "7": _client7,
     "1": _client1,
-    "2": _client2,
     "3": _client3,
     "4": _client4,
-    "5": _client5,
+    "2": _client2,
+    "17": _client17,
     "6": _client6,
-    "7": _client7,
-    "8": _client8,
-    "9": _client9,
+    "11": _client11,
     "10": _client10,
-    "12": _client12
+    "5": _client5,
+    "9": _client9,
+    "18": _client18
 }
-
 
 
 def lookup_facade(name, version):
@@ -37,7 +38,6 @@ def lookup_facade(name, version):
     else:
         raise ImportError("No supported version for facade: "
                           "{}".format(name))
-
 
 
 class TypeFactory:
@@ -66,12 +66,30 @@ class TypeFactory:
 
         return c
 
+    @classmethod
+    def best_facade_version(cls, connection):
+        """
+        Returns the best facade version for a given facade. This will help with
+        trying to provide different functionality for different facade versions.
+
+        @param connection: initialized Connection object.
+        """
+        facade_name = cls.__name__
+        if not facade_name.endswith('Facade'):
+           raise TypeError('Unexpected class name: {}'.format(facade_name))
+        facade_name = facade_name[:-len('Facade')]
+        return connection.facades.get(facade_name)
+
 
 class ActionFacade(TypeFactory):
     pass
 
 
 class ActionPrunerFacade(TypeFactory):
+    pass
+
+
+class AdminFacade(TypeFactory):
     pass
 
 
@@ -103,10 +121,6 @@ class ApplicationOffersFacade(TypeFactory):
     pass
 
 
-class ApplicationRelationsWatcherFacade(TypeFactory):
-    pass
-
-
 class ApplicationScalerFacade(TypeFactory):
     pass
 
@@ -123,11 +137,35 @@ class BundleFacade(TypeFactory):
     pass
 
 
+class CAASAdmissionFacade(TypeFactory):
+    pass
+
+
 class CAASAgentFacade(TypeFactory):
     pass
 
 
+class CAASApplicationFacade(TypeFactory):
+    pass
+
+
+class CAASApplicationProvisionerFacade(TypeFactory):
+    pass
+
+
 class CAASFirewallerFacade(TypeFactory):
+    pass
+
+
+class CAASFirewallerSidecarFacade(TypeFactory):
+    pass
+
+
+class CAASModelConfigManagerFacade(TypeFactory):
+    pass
+
+
+class CAASModelOperatorFacade(TypeFactory):
     pass
 
 
@@ -144,6 +182,10 @@ class CAASOperatorUpgraderFacade(TypeFactory):
 
 
 class CAASUnitProvisionerFacade(TypeFactory):
+    pass
+
+
+class CharmDownloaderFacade(TypeFactory):
     pass
 
 
@@ -191,10 +233,6 @@ class DeployerFacade(TypeFactory):
     pass
 
 
-class DiscoverSpacesFacade(TypeFactory):
-    pass
-
-
 class DiskManagerFacade(TypeFactory):
     pass
 
@@ -203,7 +241,15 @@ class EntityWatcherFacade(TypeFactory):
     pass
 
 
+class EnvironUpgraderFacade(TypeFactory):
+    pass
+
+
 class ExternalControllerUpdaterFacade(TypeFactory):
+    pass
+
+
+class FacadeVersions(TypeFactory):
     pass
 
 
@@ -231,11 +277,11 @@ class HostKeyReporterFacade(TypeFactory):
     pass
 
 
-class ImageManagerFacade(TypeFactory):
+class ImageMetadataFacade(TypeFactory):
     pass
 
 
-class ImageMetadataFacade(TypeFactory):
+class ImageMetadataManagerFacade(TypeFactory):
     pass
 
 
@@ -335,6 +381,10 @@ class ModelManagerFacade(TypeFactory):
     pass
 
 
+class ModelSummaryWatcherFacade(TypeFactory):
+    pass
+
+
 class ModelUpgraderFacade(TypeFactory):
     pass
 
@@ -367,6 +417,10 @@ class ProxyUpdaterFacade(TypeFactory):
     pass
 
 
+class RaftLeaseFacade(TypeFactory):
+    pass
+
+
 class RebootFacade(TypeFactory):
     pass
 
@@ -379,15 +433,11 @@ class RelationUnitsWatcherFacade(TypeFactory):
     pass
 
 
-class RemoteApplicationWatcherFacade(TypeFactory):
+class RemoteRelationWatcherFacade(TypeFactory):
     pass
 
 
 class RemoteRelationsFacade(TypeFactory):
-    pass
-
-
-class RemoteRelationsWatcherFacade(TypeFactory):
     pass
 
 
@@ -399,15 +449,27 @@ class ResourcesHookContextFacade(TypeFactory):
     pass
 
 
-class ResumerFacade(TypeFactory):
-    pass
-
-
 class RetryStrategyFacade(TypeFactory):
     pass
 
 
 class SSHClientFacade(TypeFactory):
+    pass
+
+
+class SecretBackendsFacade(TypeFactory):
+    pass
+
+
+class SecretsFacade(TypeFactory):
+    pass
+
+
+class SecretsManagerFacade(TypeFactory):
+    pass
+
+
+class SecretsTriggerWatcherFacade(TypeFactory):
     pass
 
 

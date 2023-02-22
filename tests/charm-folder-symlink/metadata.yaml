@@ -1,0 +1,5 @@
+name: simple
+summary: A simple example charm with the new operator framework
+series: ["focal"]
+description: |
+    Simple is an example charm

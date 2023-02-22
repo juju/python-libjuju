@@ -1,0 +1,10 @@
+name: file-resource-charm
+series: ["jammy"]
+summary: "test local file resource"
+description: "charm for test deploy local file resource"
+maintainers: ["test"]
+resources:
+  file-res:
+    type: file
+    filename: 'test.file'
+    description: 'Test File Resource'

@@ -20,11 +20,13 @@ class TestConstraints(unittest.TestCase):
     def test_normalize_key(self):
         _ = constraints.normalize_key
 
-        self.assertEqual(_("test-key"), "test_key")
-        self.assertEqual(_("test-key  "), "test_key")
-        self.assertEqual(_("  test-key"), "test_key")
-        self.assertEqual(_("TestKey"), "test_key")
-        self.assertEqual(_("testKey"), "test_key")
+        self.assertEqual(_("root-disk"), "root_disk")
+        self.assertEqual(_("root-disk  "), "root_disk")
+        self.assertEqual(_("  root-disk"), "root_disk")
+        self.assertEqual(_("RootDisk"), "root_disk")
+        self.assertEqual(_("rootDisk"), "root_disk")
+
+        self.assertRaises(Exception, lambda: _("not-one-of-the-supported-keys"))
 
     def test_normalize_val(self):
         _ = constraints.normalize_value
@@ -33,6 +35,10 @@ class TestConstraints(unittest.TestCase):
         self.assertEqual(_("10M"), 10)
         self.assertEqual(_("10"), 10)
         self.assertEqual(_("foo,bar"), "foo,bar")
+        self.assertEqual(_("false"), False)
+        self.assertEqual(_("true"), True)
+        self.assertEqual(_("FALSE"), False)
+        self.assertEqual(_("TRUE"), True)
 
     def test_normalize_list_val(self):
         _ = constraints.normalize_list_value
@@ -49,9 +55,85 @@ class TestConstraints(unittest.TestCase):
         )
 
         self.assertEqual(
-            _("mem=10G foo=bar,baz tags=tag1 spaces=space1,space2"),
+            _("mem=10G zones=bar,baz tags=tag1 spaces=space1,space2"),
             {"mem": 10 * 1024,
-             "foo": "bar,baz",
+             "zones": "bar,baz",
              "tags": ["tag1"],
              "spaces": ["space1", "space2"]}
+        )
+
+        self.assertRaises(Exception, lambda: _("root-disk>16G"))
+        self.assertRaises(Exception, lambda: _("root-disk>=16G"))
+
+    def test_parse_storage_constraint(self):
+        _ = constraints.parse_storage_constraint
+
+        self.assertEqual(
+            _("pool,1M"),
+            {"pool": "pool",
+             "count": 1,
+             "size": 1 * 1024 ** 0}
+        )
+        self.assertEqual(
+            _("pool,"),
+            {"pool": "pool",
+             "count": 1}
+        )
+        self.assertEqual(
+            _("1M"),
+            {"size": 1 * 1024 ** 0,
+             "count": 1}
+        )
+        self.assertEqual(
+            _("p,1G"),
+            {"pool": "p",
+             "count": 1,
+             "size": 1 * 1024 ** 1}
+        )
+        self.assertEqual(
+            _("p,0.5T"),
+            {"pool": "p",
+             "count": 1,
+             "size": 512 * 1024 ** 1}
+        )
+        self.assertEqual(
+            _("3,0.5T"),
+            {"count": 3,
+             "size": 512 * 1024 ** 1}
+        )
+        self.assertEqual(
+            _("0.5T,3"),
+            {"count": 3,
+             "size": 512 * 1024 ** 1}
+        )
+
+    def test_parse_device_constraint(self):
+        _ = constraints.parse_device_constraint
+
+        self.assertEqual(
+            _("nvidia.com/gpu"),
+            {"type": "nvidia.com/gpu",
+             "count": 1}
+        )
+        self.assertEqual(
+            _("2,nvidia.com/gpu"),
+            {"type": "nvidia.com/gpu",
+             "count": 2}
+        )
+        self.assertEqual(
+            _("3,nvidia.com/gpu,gpu=nvidia-tesla-p100"),
+            {"type": "nvidia.com/gpu",
+             "count": 3,
+             "attributes": {
+                 "gpu": "nvidia-tesla-p100"
+             }}
+        )
+        self.assertEqual(
+            _("3,nvidia.com/gpu,gpu=nvidia-tesla-p100;2ndattr=another-attr"),
+            {"type": "nvidia.com/gpu",
+             "count": 3,
+             "attributes": {
+                 "gpu": "nvidia-tesla-p100",
+                 "2ndattr": "another-attr"
+             }}
         )

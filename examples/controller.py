@@ -11,7 +11,7 @@ This example:
 import logging
 
 from juju.controller import Controller
-from juju import loop
+from juju import jasyncio
 
 
 async def main():
@@ -24,9 +24,9 @@ async def main():
         'aws-tim',
     )
     await model.deploy(
-        'ubuntu-0',
+        'ubuntu',
         application_name='ubuntu',
-        series='trusty',
+        series='focal',
         channel='stable',
     )
     await model.disconnect()
@@ -38,4 +38,4 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     ws_logger = logging.getLogger('websockets.protocol')
     ws_logger.setLevel(logging.INFO)
-    loop.run(main())
+    jasyncio.run(main())

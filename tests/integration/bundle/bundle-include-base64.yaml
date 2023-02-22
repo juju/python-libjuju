@@ -1,0 +1,32 @@
+# series: xenial
+# applications:
+#   ghost:
+#     charm: "ghost"
+#     num_units: 1
+#   mysql:
+#     charm: "mysql"
+#     channel: candidate
+#     num_units: 1
+#     options:
+#       max-connections: 2
+#       tuning-level: include-base64://config-base64.yaml
+#   test:
+#     charm: "../charm"
+# relations:
+#   - ["ghost", "mysql"]
+
+applications:
+  helloa:
+    charm: "hello-juju"
+    name: "helloa"
+    channel: stable
+    num_units: 1
+    options:
+      application-repo: include-base64://config-base64.yaml
+  hellob:
+    charm: "hello-juju"
+    name: "hellob"
+    channel: stable
+    num_units: 1
+  test:
+    charm: "../charm"

@@ -49,3 +49,69 @@ class JujuRedirectException(Exception):
             for servers in self.redirect_info['servers']
             for s in servers if s['scope'] == 'public' or not self.follow_redirect
         ]
+
+
+class JujuEntityNotFoundError(JujuError):
+    """Exception indicating that an entity was not found in the state. It was
+       expected that the entity was found in state and this is a terminal
+       condition.
+       To fix this condition, you should disconnect and reconnect to ensure that
+       any missing entities are correctly picked up."""
+    def __init__(self, entity_name, entity_types=None):
+        self.entity_name = entity_name
+        self.entity_types = entity_types
+        super().__init__("Entity not found: {}".format(entity_name))
+
+
+class JujuModelError(JujuError):
+    pass
+
+
+class JujuMachineError(JujuError):
+    pass
+
+
+class JujuAgentError(JujuError):
+    pass
+
+
+class JujuAppError(JujuError):
+    pass
+
+
+class JujuUnitError(JujuError):
+    pass
+
+
+class JujuBackupError(JujuError):
+    pass
+
+
+class JujuConfigError(JujuError):
+    """Exception raised during processing a configuration key-value pair
+    in a config set for an application.
+    """
+    def __init__(self, config, config_pair, message=None):
+        self.config = config
+        self.config_pair = config_pair
+        if message is None:
+            self.message = "Couldn't process the value of a config pair : %s, value of type %s" % (self.config_pair, type(self.config_pair[1]))
+        else:
+            self.message = message
+        super().__init__(self.message)
+
+
+class JujuApplicationConfigError(JujuConfigError):
+    pass
+
+
+class JujuModelConfigError(JujuConfigError):
+    pass
+
+
+class AbstractMethodError(Exception):
+    pass
+
+
+class PylibjujuError(JujuError):
+    pass

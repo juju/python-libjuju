@@ -18,7 +18,7 @@ async def test_juju_api_error(event_loop):
 
     async with base.CleanModel() as model:
         with pytest.raises(JujuAPIError):
-            await model.add_machine(constraints={'mem': 'foo'})
+            await model.add_machine(constraints={'mem': -50})
 
 
 @base.bootstrapped
@@ -54,7 +54,7 @@ async def test_juju_error_in_results_list(event_loop):
 @pytest.mark.asyncio
 async def test_juju_error_in_result(event_loop):
     '''
-    Verify that we raise a JujuError when appropraite when we are
+    Verify that we raise a JujuError when appropriate when we are
     looking at a single result coming back.
 
     '''
@@ -65,4 +65,4 @@ async def test_juju_error_in_result(event_loop):
         app_facade = client.ApplicationFacade.from_connection(model.connection())
 
         with pytest.raises(JujuError):
-            return await app_facade.GetCharmURL('foo')
+            return await app_facade.GetCharmURLOrigin(application='foo')

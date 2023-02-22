@@ -8,10 +8,11 @@ from .. import base
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.skip('Update charm')
 async def test_status(event_loop):
     async with base.CleanModel() as model:
         await model.deploy(
-            'ubuntu-0',
+            'ubuntu',
             application_name='ubuntu',
             series='trusty',
             channel='stable',

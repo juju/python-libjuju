@@ -1,0 +1,15 @@
+applications:
+  helloa:
+    charm: "hello-juju"
+    name: "helloa"
+    channel: stable
+    num_units: 1
+    options:
+      config: include-file://config1.yaml
+  hellob:
+    charm: "hello-juju"
+    name: "hellob"
+    channel: stable
+    num_units: 1
+  test:
+    charm: "../charm"

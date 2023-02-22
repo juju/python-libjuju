@@ -45,6 +45,16 @@ class AnnotationDelta(EntityDelta):
         return Annotation
 
 
+class ModelDelta(EntityDelta):
+    def get_id(self):
+        return self.data['model-uuid']
+
+    @classmethod
+    def get_entity_class(self):
+        from .model import ModelInfo
+        return ModelInfo
+
+
 class MachineDelta(EntityDelta):
     @classmethod
     def get_entity_class(self):
@@ -69,11 +79,45 @@ class RelationDelta(EntityDelta):
         return Relation
 
 
+class RemoteApplicationDelta(EntityDelta):
+    def get_id(self):
+        return self.data['name']
+
+    @classmethod
+    def get_entity_class(self):
+        from .remoteapplication import RemoteApplication
+        return RemoteApplication
+
+
+class CharmDelta(EntityDelta):
+    def get_id(self):
+        return self.data['charm-url']
+
+    @classmethod
+    def get_entity_class(self):
+        from .charm import Charm
+        return Charm
+
+
+class ApplicationOfferDelta(EntityDelta):
+    def get_id(self):
+        return self.data['application-name']
+
+    @classmethod
+    def get_entity_class(self):
+        from .remoteapplication import ApplicationOffer
+        return ApplicationOffer
+
+
 _delta_types = {
     'action': ActionDelta,
-    'application': ApplicationDelta,
     'annotation': AnnotationDelta,
+    'application': ApplicationDelta,
+    'applicationOffer': ApplicationOfferDelta,
+    'charm': CharmDelta,
     'machine': MachineDelta,
-    'unit': UnitDelta,
+    'model': ModelDelta,
     'relation': RelationDelta,
+    'remoteApplication': RemoteApplicationDelta,
+    'unit': UnitDelta,
 }

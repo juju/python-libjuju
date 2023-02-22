@@ -1,0 +1,8 @@
+description: An overlay for the grafana bundle to remove prometheus and add memcached
+applications:
+  test:
+  prometheus:
+  memcached:
+    charm: "memcached"
+    channel: stable
+    num_units: 1

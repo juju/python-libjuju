@@ -11,14 +11,14 @@ Documentation: https://pythonlibjuju.readthedocs.io/en/latest/
 Requirements
 ------------
 
-* Python 3.5+
-* Juju 2.0+
+* Python 3.8/3.9/3.10
+* Tested using Juju 3.1.0
 
 
 Design Notes
 ------------
 
-* Asynchronous - uses asyncio and async/await features of python 3.5
+* Asynchronous - Uses asyncio and async/await features of Python
 * Websocket-level bindings are programmatically generated (indirectly) from the
   Juju golang code, ensuring full api coverage
 * Provides an OO layer which encapsulates much of the websocket api and
@@ -36,6 +36,7 @@ Installation
 
 Quickstart
 ----------
+
 Here's a simple example that shows basic usage of the library. The example
 connects to the currently active Juju model, deploys a single unit of the
 ubuntu charm, then exits:
@@ -48,7 +49,7 @@ ubuntu charm, then exits:
   import logging
   import sys
 
-  from juju import loop
+  from juju import jasyncio
   from juju.model import Model
 
 
@@ -87,7 +88,7 @@ ubuntu charm, then exits:
 
       # Run the deploy coroutine in an asyncio event loop, using a helper
       # that abstracts loop creation and teardown.
-      loop.run(deploy())
+      jasyncio.run(deploy())
 
 
   if __name__ == '__main__':
@@ -101,3 +102,29 @@ example, to run ``examples/connect_current_model.py``, use:
 .. code:: bash
 
   tox -e example -- examples/connect_current_model.py
+
+
+REPL
+^^^^
+
+To experiment with the library in a REPL, launch python in asyncio mode
+
+.. code:: bash
+
+  $ python3 -m asyncio
+
+and then, to connect to the current model and fetch status:
+
+.. code::
+
+  >>> from juju.model import Model
+  >>> model = Model()
+  >>> await model.connect_current()
+  >>> status = await model.get_status()
+
+
+Versioning
+----------
+
+Pylibjuju releases now track the Juju release cadence. New generated schemas
+will be updated per Juju releases.
