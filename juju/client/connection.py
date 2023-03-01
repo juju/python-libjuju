@@ -131,7 +131,7 @@ client_facades = {
     'UserManager': {'versions': [1, 2]},
     'VolumeAttachmentPlansWatcher': {'versions': [1]},
     'VolumeAttachmentsWatcher': {'versions': [2]}
-    }
+}
 
 
 def facade_versions(name, versions):
