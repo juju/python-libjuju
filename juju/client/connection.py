@@ -116,7 +116,7 @@ client_facades = {
     'UpgradeSeries': {'versions': [1]},
     'UpgradeSteps': {'versions': [1]},
     'UserManager': {'versions': [1, 2]},
-    'AllWatcher': {'versions': [1]},
+    'AllWatcher': {'versions': [1, 2, 3]},
     'AllModelWatcher': {'versions': [2]},
     'NotifyWatcher': {'versions': [1]},
     'StringsWatcher': {'versions': [1]},
