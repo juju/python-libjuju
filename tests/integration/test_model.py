@@ -1244,3 +1244,30 @@ async def test_list_secrets(event_loop):
         secrets = await model.list_secrets(show_secrets=True)
         assert secrets.results is not None
         assert len(secrets.results) == 1
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_subordinate_units_status(event_loop):
+
+    async with base.CleanModel() as model:
+        await model.deploy(
+            'ubuntu',
+            application_name='ubuntu',
+            series='bionic',
+            channel='stable',
+        )
+        await model.deploy(
+            'nrpe',
+            application_name='nrpe',
+            series='bionic',
+            channel='stable',
+            # subordinates must be deployed without units
+            num_units=0,
+        )
+        await model.relate('ubuntu', 'nrpe')
+        await model.wait_for_idle(timeout=5*60)
+        stat = await model.get_status()
+        ## Assert all apps have units list not empty
+        ## This will currently fail for subordinates 
+        assert all(app.units for app in stat['applications'].values()) 
