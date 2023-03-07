@@ -45,7 +45,6 @@ async def main():
     # Unseal vault
     vault_client.sys.submit_unseal_keys(keys["keys"])
 
-
     # Add the secret backend
     c = await m.get_controller()
     response = await c.add_secret_backends("1000", "myvault", "vault", {"endpoint": vault_url})
