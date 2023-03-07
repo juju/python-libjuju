@@ -171,10 +171,6 @@ class CAASFirewallerFacade(TypeFactory):
     pass
 
 
-class CAASFirewallerSidecarFacade(TypeFactory):
-    pass
-
-
 class CAASModelConfigManagerFacade(TypeFactory):
     pass
 
@@ -495,10 +491,6 @@ class SSHClientFacade(TypeFactory):
     pass
 
 
-class SecretBackendsFacade(TypeFactory):
-    pass
-
-
 class SecretsFacade(TypeFactory):
     pass
 
@@ -508,10 +500,6 @@ class SecretsManagerFacade(TypeFactory):
 
 
 class SecretsRotationWatcherFacade(TypeFactory):
-    pass
-
-
-class SecretsTriggerWatcherFacade(TypeFactory):
     pass
 
 
