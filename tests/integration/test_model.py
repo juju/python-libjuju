@@ -1266,8 +1266,8 @@ async def test_subordinate_units_status(event_loop):
             num_units=0,
         )
         await model.relate('ubuntu', 'nrpe')
-        await model.wait_for_idle(timeout=5*60)
+        await model.wait_for_idle(timeout=5 * 60)
         stat = await model.get_status()
-        ## Assert all apps have units list not empty
-        ## This will currently fail for subordinates 
-        assert all(app.units for app in stat['applications'].values()) 
+        # Assert all apps have units list not empty
+        # This will currently fail for subordinates
+        assert all(app.units for app in stat['applications'].values())
