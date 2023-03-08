@@ -1254,13 +1254,13 @@ async def test_subordinate_units_status(event_loop):
         await model.deploy(
             'ubuntu',
             application_name='ubuntu',
-            series='bionic',
+            series='jammy',
             channel='stable',
         )
         await model.deploy(
             'nrpe',
             application_name='nrpe',
-            series='bionic',
+            series='jammy',
             channel='stable',
             # subordinates must be deployed without units
             num_units=0,
