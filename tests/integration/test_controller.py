@@ -248,7 +248,7 @@ async def test_secrets_backend_lifecycle(event_loop):
     async with base.CleanModel() as m:
         controller = await m.get_controller()
         # deploy postgresql
-        await m.deploy('postgresql')
+        await m.deploy('postgresql', series="focal")
         # deploy vault
         await m.deploy("vault", series="focal")
         # relate/integrate
@@ -271,6 +271,11 @@ async def test_secrets_backend_lifecycle(event_loop):
 
         # Initialize vault
         keys = vault_client.sys.initialize(3, 2)
+
+        # authorize charm
+        target_unit = m.applications['vault'].units[0]
+        action = await target_unit.run_action("authorize-charm", token=keys['root_token'])
+        action = await action.wait()
 
         # Unseal vault
         vault_client.sys.submit_unseal_keys(keys['keys'])

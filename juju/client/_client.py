@@ -229,6 +229,10 @@ class CrossModelRelationsFacade(TypeFactory):
     pass
 
 
+class CrossModelSecretsFacade(TypeFactory):
+    pass
+
+
 class DeployerFacade(TypeFactory):
     pass
 
@@ -458,6 +462,14 @@ class SSHClientFacade(TypeFactory):
 
 
 class SecretBackendsFacade(TypeFactory):
+    pass
+
+
+class SecretBackendsManagerFacade(TypeFactory):
+    pass
+
+
+class SecretBackendsRotateWatcherFacade(TypeFactory):
     pass
 
 
