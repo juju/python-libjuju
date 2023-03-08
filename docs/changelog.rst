@@ -1,6 +1,17 @@
 Changelog
 ---------
 
+2.9.42.1
+^^^^^^^^
+
+This is an scheduled release to support Juju 2.9.42.
+
+## What's Changed
+* [JUJU-2935] update juju 2942 by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/809
+
+
+**Full Changelog**: https://github.com/juju/python-libjuju/compare/2.9.38...2.9.42.1
+
 2.9.38.1
 ^^^^^^^^
 
