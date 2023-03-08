@@ -12,15 +12,15 @@ async def main():
     m = Model()
     await m.connect_current()
 
-    # deploy postgresql
-    await m.deploy('postgresql')
-    # deploy vault
+    # # deploy postgresql
+    # await m.deploy('postgresql', series="focal")
+    # # deploy vault
     await m.deploy("vault", series="focal")
-    # relate/integrate
-    await m.relate("vault:db", "postgresql:db")
-    # wait for the
+    # # relate/integrate
+    await m.integrate("vault:db", "postgresql:db")
+    # # wait for the
     await m.wait_for_idle(["vault"])
-    # expose vault
+    # # expose vault
     vault_app = m.applications["vault"]
     await vault_app.expose()
 
@@ -36,6 +36,11 @@ async def main():
 
     # Initialize vault
     keys = vault_client.sys.initialize(3, 2)
+    print(keys)
+
+    target_unit = m.applications['vault'].units[0]
+    action = await target_unit.run_action("authorize-charm", token=keys['token'])
+    await action.wait()
 
     # Unseal vault
     vault_client.sys.submit_unseal_keys(keys["keys"])
