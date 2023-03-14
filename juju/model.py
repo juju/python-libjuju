@@ -539,7 +539,7 @@ class CharmhubDeployType:
     def __init__(self, charm_resolver):
         self.charm_resolver = charm_resolver
 
-    async def resolve(self, url, architecture, app_name=None, channel=None, series=None, entity_url=None):
+    async def resolve(self, url, architecture, app_name=None, channel=None, series=None, entity_url=None, force=False):
         """resolve attempts to resolve charmhub charms or bundles. A request to
         the charmhub API is required to correctly determine the charm url and
         underlying origin.
@@ -561,7 +561,9 @@ class CharmhubDeployType:
             app_name = url.name
 
         if series:
-            if series in supported_series:
+            # Check whether the charm supports this series
+            # or we force it
+            if series in supported_series or force:
                 origin.series = series
                 charm_url.series = series
             else:
@@ -1603,7 +1605,7 @@ class Model:
         if str(url.schema) not in self.deploy_types:
             raise JujuError("unknown deploy type {}, expected charmhub, charmstore or local".format(url.schema))
 
-        res = await self.deploy_types[str(url.schema)].resolve(url, architecture, application_name, channel, series, entity_url)
+        res = await self.deploy_types[str(url.schema)].resolve(url, architecture, application_name, channel, series, entity_url, force)
 
         if res.identifier is None:
             raise JujuError('unknown charm or bundle {}'.format(entity_url))
@@ -1705,7 +1707,8 @@ class Model:
                 num_units=num_units,
                 placement=parse_placement(to),
                 devices=devices,
-                charm_origin=charm_origin
+                charm_origin=charm_origin,
+                force=force,
             )
 
     async def _add_charm(self, charm_url, origin):
@@ -1922,7 +1925,7 @@ class Model:
     async def _deploy(self, charm_url, application, series, config,
                       constraints, endpoint_bindings, resources, storage,
                       channel=None, num_units=None, placement=None,
-                      devices=None, charm_origin=None):
+                      devices=None, charm_origin=None, force=False):
         """Logic shared between `Model.deploy` and `BundleHandler.deploy`.
         """
         log.info('Deploying %s', charm_url)
@@ -1949,6 +1952,7 @@ class Model:
             storage=storage,
             placement=placement,
             devices=devices,
+            force=force,
         )
         result = await app_facade.Deploy(applications=[app])
         errors = [r.error.message for r in result.results if r.error]
