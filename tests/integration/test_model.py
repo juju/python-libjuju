@@ -321,8 +321,9 @@ async def test_deploy_bundle_with_multiple_overlays_with_include_files(event_loo
         bundle_yaml_path = TESTS_DIR / 'integration' / 'bundle' / 'bundle.yaml'
         overlay1_path = OVERLAYS_DIR / 'test-overlay2.yaml'
         overlay2_path = OVERLAYS_DIR / 'test-overlay3.yaml'
+        overlay3_path = OVERLAYS_DIR / 'test-overlay4.yaml'
 
-        await model.deploy(str(bundle_yaml_path), overlays=[overlay1_path, overlay2_path])
+        await model.deploy(str(bundle_yaml_path), overlays=[overlay1_path, overlay2_path, overlay3_path])
 
         assert 'influxdb' not in model.applications
         assert 'test' not in model.applications

@@ -1,0 +1,7 @@
+description: Another overlay to create an offer
+applications:
+  grafana:
+    offers:
+      dashboards:
+        endpoints:
+          - dashboards
