@@ -500,7 +500,7 @@ class CharmStoreDeployType:
         suggested_name = meta.get('charm-metadata', {}).get('Name')
         return suggested_name or meta.get('id', {}).get('Name')
 
-    async def resolve(self, url, architecture, app_name=None, channel=None, series=None, entity_url=None):
+    async def resolve(self, url, architecture, app_name=None, channel=None, series=None, entity_url=None, force=False):
         """resolve attempts to resolve charmstore charms or bundles. A request
         to the charmstore is required to get more information about the
         underlying identifier.
