@@ -884,6 +884,23 @@ async def test_wait_for_idle_with_exact_units_scale_down_zero(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_destroy_units(event_loop):
+    async with base.CleanModel() as model:
+        app = await model.deploy(
+            'ubuntu',
+            application_name='ubuntu',
+            series='jammy',
+            channel='stable',
+            num_units=3,
+        )
+        await model.wait_for_idle(status='active')
+        await model.destroy_units(*[u.name for u in app.units])
+        await model.wait_for_idle(timeout=5 * 60, wait_for_exact_units=0)
+        assert app.units == []
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_watcher_reconnect(event_loop):
     async with base.CleanModel() as model:
         await model.connection().close()
