@@ -692,7 +692,7 @@ class Type:
                     cls.splitEntries(v, d)
             return cls(**d)
         return None
-    
+
     @classmethod
     def splitEntries(cls, entry, result_dict):
         '''
@@ -711,7 +711,6 @@ class Type:
         else:
             # something like k8s-api
             result_dict[entry] = ''
-        
 
     def serialize(self):
         d = {}
