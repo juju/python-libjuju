@@ -8250,6 +8250,19 @@ class MigrationMasterFacade(Type):
                                                          'agent-version',
                                                          'controller-agent-version'],
                                             'type': 'object'},
+                     'MigrationSourceInfo': {'additionalProperties': False,
+                                             'properties': {'addrs': {'items': {'type': 'string'},
+                                                                      'type': 'array'},
+                                                            'ca-cert': {'type': 'string'},
+                                                            'controller-alias': {'type': 'string'},
+                                                            'controller-tag': {'type': 'string'},
+                                                            'local-related-models': {'items': {'type': 'string'},
+                                                                                     'type': 'array'}},
+                                             'required': ['local-related-models',
+                                                          'controller-tag',
+                                                          'addrs',
+                                                          'ca-cert'],
+                                             'type': 'object'},
                      'MigrationSpec': {'additionalProperties': False,
                                        'properties': {'model-tag': {'type': 'string'},
                                                       'target-info': {'$ref': '#/definitions/MigrationTargetInfo'}},
@@ -8449,6 +8462,14 @@ class MigrationMasterFacade(Type):
                                                         'the end user.',
                                          'properties': {'Params': {'$ref': '#/definitions/SetMigrationStatusMessageArgs'}},
                                          'type': 'object'},
+                    'SourceControllerInfo': {'description': 'SourceControllerInfo '
+                                                            'returns the details '
+                                                            'required to connect '
+                                                            'to\n'
+                                                            'the source controller '
+                                                            'for model migration.',
+                                             'properties': {'Result': {'$ref': '#/definitions/MigrationSourceInfo'}},
+                                             'type': 'object'},
                     'Watch': {'description': 'Watch starts watching for an active '
                                              'migration for the model\n'
                                              'associated with the API connection. '
@@ -8692,6 +8713,28 @@ class MigrationMasterFacade(Type):
                    version=3,
                    params=_params)
         _params['message'] = message
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(MigrationSourceInfo)
+    async def SourceControllerInfo(self):
+        '''
+        SourceControllerInfo returns the details required to connect to
+        the source controller for model migration.
+
+
+        Returns -> MigrationSourceInfo
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='MigrationMaster',
+                   request='SourceControllerInfo',
+                   version=3,
+                   params=_params)
+
         reply = await self.rpc(msg)
         return reply
 
