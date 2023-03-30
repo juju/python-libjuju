@@ -400,6 +400,54 @@ class ActionsByReceivers(Type):
 
 
 
+class ActivateModelArgs(Type):
+    _toSchema = {'controller_alias': 'controller-alias', 'controller_tag': 'controller-tag', 'cross_model_uuids': 'cross-model-uuids', 'model_tag': 'model-tag', 'source_api_addrs': 'source-api-addrs', 'source_ca_cert': 'source-ca-cert'}
+    _toPy = {'controller-alias': 'controller_alias', 'controller-tag': 'controller_tag', 'cross-model-uuids': 'cross_model_uuids', 'model-tag': 'model_tag', 'source-api-addrs': 'source_api_addrs', 'source-ca-cert': 'source_ca_cert'}
+    def __init__(self, controller_alias=None, controller_tag=None, cross_model_uuids=None, model_tag=None, source_api_addrs=None, source_ca_cert=None, **unknown_fields):
+        '''
+        controller_alias : str
+        controller_tag : str
+        cross_model_uuids : typing.Sequence[str]
+        model_tag : str
+        source_api_addrs : typing.Sequence[str]
+        source_ca_cert : str
+        '''
+        controller_alias_ = controller_alias
+        controller_tag_ = controller_tag
+        cross_model_uuids_ = cross_model_uuids
+        model_tag_ = model_tag
+        source_api_addrs_ = source_api_addrs
+        source_ca_cert_ = source_ca_cert
+
+        # Validate arguments against known Juju API types.
+        if controller_alias_ is not None and not isinstance(controller_alias_, (bytes, str)):
+            raise Exception("Expected controller_alias_ to be a str, received: {}".format(type(controller_alias_)))
+
+        if controller_tag_ is not None and not isinstance(controller_tag_, (bytes, str)):
+            raise Exception("Expected controller_tag_ to be a str, received: {}".format(type(controller_tag_)))
+
+        if cross_model_uuids_ is not None and not isinstance(cross_model_uuids_, (bytes, str, list)):
+            raise Exception("Expected cross_model_uuids_ to be a Sequence, received: {}".format(type(cross_model_uuids_)))
+
+        if model_tag_ is not None and not isinstance(model_tag_, (bytes, str)):
+            raise Exception("Expected model_tag_ to be a str, received: {}".format(type(model_tag_)))
+
+        if source_api_addrs_ is not None and not isinstance(source_api_addrs_, (bytes, str, list)):
+            raise Exception("Expected source_api_addrs_ to be a Sequence, received: {}".format(type(source_api_addrs_)))
+
+        if source_ca_cert_ is not None and not isinstance(source_ca_cert_, (bytes, str)):
+            raise Exception("Expected source_ca_cert_ to be a str, received: {}".format(type(source_ca_cert_)))
+
+        self.controller_alias = controller_alias_
+        self.controller_tag = controller_tag_
+        self.cross_model_uuids = cross_model_uuids_
+        self.model_tag = model_tag_
+        self.source_api_addrs = source_api_addrs_
+        self.source_ca_cert = source_ca_cert_
+        self.unknown_fields = unknown_fields
+
+
+
 class AddApplicationOffer(Type):
     _toSchema = {'application_description': 'application-description', 'application_name': 'application-name', 'endpoints': 'endpoints', 'model_tag': 'model-tag', 'offer_name': 'offer-name', 'owner_tag': 'owner-tag'}
     _toPy = {'application-description': 'application_description', 'application-name': 'application_name', 'endpoints': 'endpoints', 'model-tag': 'model_tag', 'offer-name': 'offer_name', 'owner-tag': 'owner_tag'}
@@ -15538,6 +15586,48 @@ class MigrationModelInfo(Type):
         self.name = name_
         self.owner_tag = owner_tag_
         self.uuid = uuid_
+        self.unknown_fields = unknown_fields
+
+
+
+class MigrationSourceInfo(Type):
+    _toSchema = {'addrs': 'addrs', 'ca_cert': 'ca-cert', 'controller_alias': 'controller-alias', 'controller_tag': 'controller-tag', 'local_related_models': 'local-related-models'}
+    _toPy = {'addrs': 'addrs', 'ca-cert': 'ca_cert', 'controller-alias': 'controller_alias', 'controller-tag': 'controller_tag', 'local-related-models': 'local_related_models'}
+    def __init__(self, addrs=None, ca_cert=None, controller_alias=None, controller_tag=None, local_related_models=None, **unknown_fields):
+        '''
+        addrs : typing.Sequence[str]
+        ca_cert : str
+        controller_alias : str
+        controller_tag : str
+        local_related_models : typing.Sequence[str]
+        '''
+        addrs_ = addrs
+        ca_cert_ = ca_cert
+        controller_alias_ = controller_alias
+        controller_tag_ = controller_tag
+        local_related_models_ = local_related_models
+
+        # Validate arguments against known Juju API types.
+        if addrs_ is not None and not isinstance(addrs_, (bytes, str, list)):
+            raise Exception("Expected addrs_ to be a Sequence, received: {}".format(type(addrs_)))
+
+        if ca_cert_ is not None and not isinstance(ca_cert_, (bytes, str)):
+            raise Exception("Expected ca_cert_ to be a str, received: {}".format(type(ca_cert_)))
+
+        if controller_alias_ is not None and not isinstance(controller_alias_, (bytes, str)):
+            raise Exception("Expected controller_alias_ to be a str, received: {}".format(type(controller_alias_)))
+
+        if controller_tag_ is not None and not isinstance(controller_tag_, (bytes, str)):
+            raise Exception("Expected controller_tag_ to be a str, received: {}".format(type(controller_tag_)))
+
+        if local_related_models_ is not None and not isinstance(local_related_models_, (bytes, str, list)):
+            raise Exception("Expected local_related_models_ to be a Sequence, received: {}".format(type(local_related_models_)))
+
+        self.addrs = addrs_
+        self.ca_cert = ca_cert_
+        self.controller_alias = controller_alias_
+        self.controller_tag = controller_tag_
+        self.local_related_models = local_related_models_
         self.unknown_fields = unknown_fields
 
 

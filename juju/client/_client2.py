@@ -10335,6 +10335,505 @@ class MigrationMasterFacade(Type):
 
 
 
+class MigrationTargetFacade(Type):
+    name = 'MigrationTarget'
+    version = 2
+    schema =     {'definitions': {'ActivateModelArgs': {'additionalProperties': False,
+                                           'properties': {'controller-alias': {'type': 'string'},
+                                                          'controller-tag': {'type': 'string'},
+                                                          'cross-model-uuids': {'items': {'type': 'string'},
+                                                                                'type': 'array'},
+                                                          'model-tag': {'type': 'string'},
+                                                          'source-api-addrs': {'items': {'type': 'string'},
+                                                                               'type': 'array'},
+                                                          'source-ca-cert': {'type': 'string'}},
+                                           'required': ['model-tag',
+                                                        'controller-tag',
+                                                        'source-api-addrs',
+                                                        'source-ca-cert',
+                                                        'cross-model-uuids'],
+                                           'type': 'object'},
+                     'AdoptResourcesArgs': {'additionalProperties': False,
+                                            'properties': {'model-tag': {'type': 'string'},
+                                                           'source-controller-version': {'$ref': '#/definitions/Number'}},
+                                            'required': ['model-tag',
+                                                         'source-controller-version'],
+                                            'type': 'object'},
+                     'BytesResult': {'additionalProperties': False,
+                                     'properties': {'result': {'items': {'type': 'integer'},
+                                                               'type': 'array'}},
+                                     'required': ['result'],
+                                     'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ErrorResult': {'additionalProperties': False,
+                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
+                                     'type': 'object'},
+                     'ErrorResults': {'additionalProperties': False,
+                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
+                                                                 'type': 'array'}},
+                                      'required': ['results'],
+                                      'type': 'object'},
+                     'MigrationModelInfo': {'additionalProperties': False,
+                                            'properties': {'agent-version': {'$ref': '#/definitions/Number'},
+                                                           'controller-agent-version': {'$ref': '#/definitions/Number'},
+                                                           'name': {'type': 'string'},
+                                                           'owner-tag': {'type': 'string'},
+                                                           'uuid': {'type': 'string'}},
+                                            'required': ['uuid',
+                                                         'name',
+                                                         'owner-tag',
+                                                         'agent-version',
+                                                         'controller-agent-version'],
+                                            'type': 'object'},
+                     'ModelArgs': {'additionalProperties': False,
+                                   'properties': {'model-tag': {'type': 'string'}},
+                                   'required': ['model-tag'],
+                                   'type': 'object'},
+                     'Number': {'additionalProperties': False,
+                                'properties': {'Build': {'type': 'integer'},
+                                               'Major': {'type': 'integer'},
+                                               'Minor': {'type': 'integer'},
+                                               'Patch': {'type': 'integer'},
+                                               'Tag': {'type': 'string'}},
+                                'required': ['Major',
+                                             'Minor',
+                                             'Tag',
+                                             'Patch',
+                                             'Build'],
+                                'type': 'object'},
+                     'SerializedModel': {'additionalProperties': False,
+                                         'properties': {'bytes': {'items': {'type': 'integer'},
+                                                                  'type': 'array'},
+                                                        'charms': {'items': {'type': 'string'},
+                                                                   'type': 'array'},
+                                                        'resources': {'items': {'$ref': '#/definitions/SerializedModelResource'},
+                                                                      'type': 'array'},
+                                                        'tools': {'items': {'$ref': '#/definitions/SerializedModelTools'},
+                                                                  'type': 'array'}},
+                                         'required': ['bytes',
+                                                      'charms',
+                                                      'tools',
+                                                      'resources'],
+                                         'type': 'object'},
+                     'SerializedModelResource': {'additionalProperties': False,
+                                                 'properties': {'application': {'type': 'string'},
+                                                                'application-revision': {'$ref': '#/definitions/SerializedModelResourceRevision'},
+                                                                'charmstore-revision': {'$ref': '#/definitions/SerializedModelResourceRevision'},
+                                                                'name': {'type': 'string'},
+                                                                'unit-revisions': {'patternProperties': {'.*': {'$ref': '#/definitions/SerializedModelResourceRevision'}},
+                                                                                   'type': 'object'}},
+                                                 'required': ['application',
+                                                              'name',
+                                                              'application-revision',
+                                                              'charmstore-revision',
+                                                              'unit-revisions'],
+                                                 'type': 'object'},
+                     'SerializedModelResourceRevision': {'additionalProperties': False,
+                                                         'properties': {'description': {'type': 'string'},
+                                                                        'fingerprint': {'type': 'string'},
+                                                                        'origin': {'type': 'string'},
+                                                                        'path': {'type': 'string'},
+                                                                        'revision': {'type': 'integer'},
+                                                                        'size': {'type': 'integer'},
+                                                                        'timestamp': {'format': 'date-time',
+                                                                                      'type': 'string'},
+                                                                        'type': {'type': 'string'},
+                                                                        'username': {'type': 'string'}},
+                                                         'required': ['revision',
+                                                                      'type',
+                                                                      'path',
+                                                                      'description',
+                                                                      'origin',
+                                                                      'fingerprint',
+                                                                      'size',
+                                                                      'timestamp'],
+                                                         'type': 'object'},
+                     'SerializedModelTools': {'additionalProperties': False,
+                                              'properties': {'uri': {'type': 'string'},
+                                                             'version': {'type': 'string'}},
+                                              'required': ['version', 'uri'],
+                                              'type': 'object'}},
+     'properties': {'Abort': {'description': 'Abort removes the specified model '
+                                             'from the database. It is an error '
+                                             'to\n'
+                                             'attempt to Abort a model that has a '
+                                             'migration mode other than importing.',
+                              'properties': {'Params': {'$ref': '#/definitions/ModelArgs'}},
+                              'type': 'object'},
+                    'Activate': {'description': 'Activate sets the migration mode '
+                                                'of the model to "none", meaning '
+                                                'it\n'
+                                                'is ready for use. It is an error '
+                                                'to attempt to Abort a model that\n'
+                                                'has a migration mode other than '
+                                                'importing. It also adds any '
+                                                'required\n'
+                                                'external controller records for '
+                                                'those controllers hosting offers '
+                                                'used\n'
+                                                'by the model.',
+                                 'properties': {'Params': {'$ref': '#/definitions/ActivateModelArgs'}},
+                                 'type': 'object'},
+                    'AdoptResources': {'description': 'AdoptResources asks the '
+                                                      'cloud provider to update '
+                                                      'the controller\n'
+                                                      "tags for a model's "
+                                                      'resources. This prevents '
+                                                      'the resources from\n'
+                                                      'being destroyed if the '
+                                                      'source controller is '
+                                                      'destroyed after the\n'
+                                                      'model is migrated away.',
+                                       'properties': {'Params': {'$ref': '#/definitions/AdoptResourcesArgs'}},
+                                       'type': 'object'},
+                    'CACert': {'description': 'CACert returns the certificate used '
+                                              'to validate the state connection.',
+                               'properties': {'Result': {'$ref': '#/definitions/BytesResult'}},
+                               'type': 'object'},
+                    'CheckMachines': {'description': 'CheckMachines compares the '
+                                                     'machines in state with the '
+                                                     'ones reported\n'
+                                                     'by the provider and reports '
+                                                     'any discrepancies.',
+                                      'properties': {'Params': {'$ref': '#/definitions/ModelArgs'},
+                                                     'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                      'type': 'object'},
+                    'Import': {'description': 'Import takes a serialized Juju '
+                                              'model, deserializes it, and\n'
+                                              'recreates it in the receiving '
+                                              'controller.',
+                               'properties': {'Params': {'$ref': '#/definitions/SerializedModel'}},
+                               'type': 'object'},
+                    'LatestLogTime': {'description': 'LatestLogTime returns the '
+                                                     'time of the most recent log '
+                                                     'record\n'
+                                                     'received by the logtransfer '
+                                                     'endpoint. This can be used '
+                                                     'as the start\n'
+                                                     'point for streaming logs '
+                                                     'from the source if the '
+                                                     'transfer was\n'
+                                                     'interrupted.\n'
+                                                     '\n'
+                                                     'For performance reasons, not '
+                                                     'every time is tracked, so if '
+                                                     'the\n'
+                                                     'target controller died '
+                                                     'during the transfer the '
+                                                     'latest log time\n'
+                                                     'might be up to 2 minutes '
+                                                     'earlier. If the transfer was '
+                                                     'interrupted\n'
+                                                     'in some other way (like the '
+                                                     'source controller going away '
+                                                     'or a\n'
+                                                     'network partition) the time '
+                                                     'will be up-to-date.\n'
+                                                     '\n'
+                                                     'Log messages are assumed to '
+                                                     'be sent in time order (which '
+                                                     'is how\n'
+                                                     'debug-log emits them). If '
+                                                     "that isn't the case then "
+                                                     'this mechanism\n'
+                                                     "can't be used to avoid "
+                                                     'duplicates when logtransfer '
+                                                     'is restarted.\n'
+                                                     '\n'
+                                                     'Returns the zero time if no '
+                                                     'logs have been transferred.',
+                                      'properties': {'Params': {'$ref': '#/definitions/ModelArgs'},
+                                                     'Result': {'format': 'date-time',
+                                                                'type': 'string'}},
+                                      'type': 'object'},
+                    'Prechecks': {'description': 'Prechecks ensure that the target '
+                                                 'controller is ready to accept a\n'
+                                                 'model migration.',
+                                  'properties': {'Params': {'$ref': '#/definitions/MigrationModelInfo'}},
+                                  'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(None)
+    async def Abort(self, model_tag=None):
+        '''
+        Abort removes the specified model from the database. It is an error to
+        attempt to Abort a model that has a migration mode other than importing.
+
+        model_tag : str
+        Returns -> None
+        '''
+        if model_tag is not None and not isinstance(model_tag, (bytes, str)):
+            raise Exception("Expected model_tag to be a str, received: {}".format(type(model_tag)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='MigrationTarget',
+                   request='Abort',
+                   version=2,
+                   params=_params)
+        _params['model-tag'] = model_tag
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def Activate(self, controller_alias=None, controller_tag=None, cross_model_uuids=None, model_tag=None, source_api_addrs=None, source_ca_cert=None):
+        '''
+        Activate sets the migration mode of the model to "none", meaning it
+        is ready for use. It is an error to attempt to Abort a model that
+        has a migration mode other than importing. It also adds any required
+        external controller records for those controllers hosting offers used
+        by the model.
+
+        controller_alias : str
+        controller_tag : str
+        cross_model_uuids : typing.Sequence[str]
+        model_tag : str
+        source_api_addrs : typing.Sequence[str]
+        source_ca_cert : str
+        Returns -> None
+        '''
+        if controller_alias is not None and not isinstance(controller_alias, (bytes, str)):
+            raise Exception("Expected controller_alias to be a str, received: {}".format(type(controller_alias)))
+
+        if controller_tag is not None and not isinstance(controller_tag, (bytes, str)):
+            raise Exception("Expected controller_tag to be a str, received: {}".format(type(controller_tag)))
+
+        if cross_model_uuids is not None and not isinstance(cross_model_uuids, (bytes, str, list)):
+            raise Exception("Expected cross_model_uuids to be a Sequence, received: {}".format(type(cross_model_uuids)))
+
+        if model_tag is not None and not isinstance(model_tag, (bytes, str)):
+            raise Exception("Expected model_tag to be a str, received: {}".format(type(model_tag)))
+
+        if source_api_addrs is not None and not isinstance(source_api_addrs, (bytes, str, list)):
+            raise Exception("Expected source_api_addrs to be a Sequence, received: {}".format(type(source_api_addrs)))
+
+        if source_ca_cert is not None and not isinstance(source_ca_cert, (bytes, str)):
+            raise Exception("Expected source_ca_cert to be a str, received: {}".format(type(source_ca_cert)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='MigrationTarget',
+                   request='Activate',
+                   version=2,
+                   params=_params)
+        _params['controller-alias'] = controller_alias
+        _params['controller-tag'] = controller_tag
+        _params['cross-model-uuids'] = cross_model_uuids
+        _params['model-tag'] = model_tag
+        _params['source-api-addrs'] = source_api_addrs
+        _params['source-ca-cert'] = source_ca_cert
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def AdoptResources(self, model_tag=None, source_controller_version=None):
+        '''
+        AdoptResources asks the cloud provider to update the controller
+        tags for a model's resources. This prevents the resources from
+        being destroyed if the source controller is destroyed after the
+        model is migrated away.
+
+        model_tag : str
+        source_controller_version : Number
+        Returns -> None
+        '''
+        if model_tag is not None and not isinstance(model_tag, (bytes, str)):
+            raise Exception("Expected model_tag to be a str, received: {}".format(type(model_tag)))
+
+        if source_controller_version is not None and not isinstance(source_controller_version, (dict, Number)):
+            raise Exception("Expected source_controller_version to be a Number, received: {}".format(type(source_controller_version)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='MigrationTarget',
+                   request='AdoptResources',
+                   version=2,
+                   params=_params)
+        _params['model-tag'] = model_tag
+        _params['source-controller-version'] = source_controller_version
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(BytesResult)
+    async def CACert(self):
+        '''
+        CACert returns the certificate used to validate the state connection.
+
+
+        Returns -> BytesResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='MigrationTarget',
+                   request='CACert',
+                   version=2,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def CheckMachines(self, model_tag=None):
+        '''
+        CheckMachines compares the machines in state with the ones reported
+        by the provider and reports any discrepancies.
+
+        model_tag : str
+        Returns -> ErrorResults
+        '''
+        if model_tag is not None and not isinstance(model_tag, (bytes, str)):
+            raise Exception("Expected model_tag to be a str, received: {}".format(type(model_tag)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='MigrationTarget',
+                   request='CheckMachines',
+                   version=2,
+                   params=_params)
+        _params['model-tag'] = model_tag
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def Import(self, bytes_=None, charms=None, resources=None, tools=None):
+        '''
+        Import takes a serialized Juju model, deserializes it, and
+        recreates it in the receiving controller.
+
+        bytes_ : typing.Sequence[int]
+        charms : typing.Sequence[str]
+        resources : typing.Sequence[~SerializedModelResource]
+        tools : typing.Sequence[~SerializedModelTools]
+        Returns -> None
+        '''
+        if bytes_ is not None and not isinstance(bytes_, (bytes, str, list)):
+            raise Exception("Expected bytes_ to be a Sequence, received: {}".format(type(bytes_)))
+
+        if charms is not None and not isinstance(charms, (bytes, str, list)):
+            raise Exception("Expected charms to be a Sequence, received: {}".format(type(charms)))
+
+        if resources is not None and not isinstance(resources, (bytes, str, list)):
+            raise Exception("Expected resources to be a Sequence, received: {}".format(type(resources)))
+
+        if tools is not None and not isinstance(tools, (bytes, str, list)):
+            raise Exception("Expected tools to be a Sequence, received: {}".format(type(tools)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='MigrationTarget',
+                   request='Import',
+                   version=2,
+                   params=_params)
+        _params['bytes'] = bytes_
+        _params['charms'] = charms
+        _params['resources'] = resources
+        _params['tools'] = tools
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(str)
+    async def LatestLogTime(self, model_tag=None):
+        '''
+        LatestLogTime returns the time of the most recent log record
+        received by the logtransfer endpoint. This can be used as the start
+        point for streaming logs from the source if the transfer was
+        interrupted.
+
+        For performance reasons, not every time is tracked, so if the
+        target controller died during the transfer the latest log time
+        might be up to 2 minutes earlier. If the transfer was interrupted
+        in some other way (like the source controller going away or a
+        network partition) the time will be up-to-date.
+
+        Log messages are assumed to be sent in time order (which is how
+        debug-log emits them). If that isn't the case then this mechanism
+        can't be used to avoid duplicates when logtransfer is restarted.
+
+        Returns the zero time if no logs have been transferred.
+
+        model_tag : str
+        Returns -> str
+        '''
+        if model_tag is not None and not isinstance(model_tag, (bytes, str)):
+            raise Exception("Expected model_tag to be a str, received: {}".format(type(model_tag)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='MigrationTarget',
+                   request='LatestLogTime',
+                   version=2,
+                   params=_params)
+        _params['model-tag'] = model_tag
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def Prechecks(self, agent_version=None, controller_agent_version=None, name=None, owner_tag=None, uuid=None):
+        '''
+        Prechecks ensure that the target controller is ready to accept a
+        model migration.
+
+        agent_version : Number
+        controller_agent_version : Number
+        name : str
+        owner_tag : str
+        uuid : str
+        Returns -> None
+        '''
+        if agent_version is not None and not isinstance(agent_version, (dict, Number)):
+            raise Exception("Expected agent_version to be a Number, received: {}".format(type(agent_version)))
+
+        if controller_agent_version is not None and not isinstance(controller_agent_version, (dict, Number)):
+            raise Exception("Expected controller_agent_version to be a Number, received: {}".format(type(controller_agent_version)))
+
+        if name is not None and not isinstance(name, (bytes, str)):
+            raise Exception("Expected name to be a str, received: {}".format(type(name)))
+
+        if owner_tag is not None and not isinstance(owner_tag, (bytes, str)):
+            raise Exception("Expected owner_tag to be a str, received: {}".format(type(owner_tag)))
+
+        if uuid is not None and not isinstance(uuid, (bytes, str)):
+            raise Exception("Expected uuid to be a str, received: {}".format(type(uuid)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='MigrationTarget',
+                   request='Prechecks',
+                   version=2,
+                   params=_params)
+        _params['agent-version'] = agent_version
+        _params['controller-agent-version'] = controller_agent_version
+        _params['name'] = name
+        _params['owner-tag'] = owner_tag
+        _params['uuid'] = uuid
+        reply = await self.rpc(msg)
+        return reply
+
+
+
 class ModelConfigFacade(Type):
     name = 'ModelConfig'
     version = 2

@@ -675,20 +675,42 @@ class Type:
                 raise
         if isinstance(data, list):
             # check: https://juju.is/docs/sdk/assumes
-            # assumes are in the form of a list
             d = {}
             for entry in data:
-                if '>' in entry or '>=' in entry:
-                    # something like juju >= 2.9.31
-                    i = entry.index('>')
-                    key = entry[:i].strip()
-                    value = entry[i:].strip()
-                    d[key] = value
+                if isinstance(entry, dict):
+                    # this could be
+                    # any-of
+                    # all-of
+                    for _, v in entry.items():
+                        if isinstance(v, list):
+                            for i in v:
+                                cls.splitEntries(i, d)
+                        else:
+                            cls.splitEntries(v, d)
                 else:
-                    # something like k8s-api
-                    d[entry] = ''
+                    # this is a simple entry
+                    cls.splitEntries(v, d)
             return cls(**d)
         return None
+
+    @classmethod
+    def splitEntries(cls, entry, result_dict):
+        '''
+        This is an auxiliary function to be used
+        in the from_json function to split entries
+        like:
+        juju >= 2.9.31
+        k8s-api
+        '''
+        if '>' in entry or '>=' in entry:
+            # something like juju >= 2.9.31
+            i = entry.index('>')
+            key = entry[:i].strip()
+            value = entry[i:].strip()
+            result_dict[key] = value
+        else:
+            # something like k8s-api
+            result_dict[entry] = ''
 
     def serialize(self):
         d = {}
