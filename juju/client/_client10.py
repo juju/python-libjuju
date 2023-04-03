@@ -365,7 +365,7 @@ class MachineManagerFacade(Type):
     
 
     @ReturnMapping(AddMachinesResults)
-    async def AddMachines(self, params=None):
+    def AddMachines(self, params=None):
         '''
         AddMachines adds new machines with the supplied parameters.
         The args will contain Base info.
@@ -383,13 +383,13 @@ class MachineManagerFacade(Type):
                    version=10,
                    params=_params)
         _params['params'] = params
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(DestroyMachineResults)
-    async def DestroyMachineWithParams(self, dry_run=None, force=None, keep=None, machine_tags=None, max_wait=None):
+    def DestroyMachineWithParams(self, dry_run=None, force=None, keep=None, machine_tags=None, max_wait=None):
         '''
         DestroyMachineWithParams removes a set of machines from the model.
 
@@ -426,13 +426,13 @@ class MachineManagerFacade(Type):
         _params['keep'] = keep
         _params['machine-tags'] = machine_tags
         _params['max-wait'] = max_wait
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(StringsResults)
-    async def GetUpgradeSeriesMessages(self, params=None):
+    def GetUpgradeSeriesMessages(self, params=None):
         '''
         GetUpgradeSeriesMessages returns all new messages associated with upgrade
         series events. Messages that have already been retrieved once are not
@@ -451,13 +451,13 @@ class MachineManagerFacade(Type):
                    version=10,
                    params=_params)
         _params['params'] = params
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(InstanceTypesResults)
-    async def InstanceTypes(self, constraints=None):
+    def InstanceTypes(self, constraints=None):
         '''
         InstanceTypes returns instance type information for the cloud and region
         in which the current model is deployed.
@@ -475,13 +475,13 @@ class MachineManagerFacade(Type):
                    version=10,
                    params=_params)
         _params['constraints'] = constraints
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ProvisioningScriptResult)
-    async def ProvisioningScript(self, data_dir=None, disable_package_commands=None, machine_id=None, nonce=None):
+    def ProvisioningScript(self, data_dir=None, disable_package_commands=None, machine_id=None, nonce=None):
         '''
         ProvisioningScript returns a shell script that, when run,
         provisions a machine agent on the machine executing the script.
@@ -514,13 +514,13 @@ class MachineManagerFacade(Type):
         _params['disable-package-commands'] = disable_package_commands
         _params['machine-id'] = machine_id
         _params['nonce'] = nonce
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def RetryProvisioning(self, all_=None, machines=None):
+    def RetryProvisioning(self, all_=None, machines=None):
         '''
         RetryProvisioning marks a provisioning error as transient on the machines.
 
@@ -542,13 +542,13 @@ class MachineManagerFacade(Type):
                    params=_params)
         _params['all'] = all_
         _params['machines'] = machines
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResult)
-    async def UpgradeSeriesComplete(self, channel=None, force=None, tag=None):
+    def UpgradeSeriesComplete(self, channel=None, force=None, tag=None):
         '''
         UpgradeSeriesComplete marks a machine as having completed a managed series
         upgrade.
@@ -576,13 +576,13 @@ class MachineManagerFacade(Type):
         _params['channel'] = channel
         _params['force'] = force
         _params['tag'] = tag
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResult)
-    async def UpgradeSeriesPrepare(self, channel=None, force=None, tag=None):
+    def UpgradeSeriesPrepare(self, channel=None, force=None, tag=None):
         '''
         UpgradeSeriesPrepare prepares a machine for a OS series upgrade.
 
@@ -609,13 +609,13 @@ class MachineManagerFacade(Type):
         _params['channel'] = channel
         _params['force'] = force
         _params['tag'] = tag
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(UpgradeSeriesUnitsResults)
-    async def UpgradeSeriesValidate(self, args=None):
+    def UpgradeSeriesValidate(self, args=None):
         '''
         UpgradeSeriesValidate validates that the incoming arguments correspond to a
         valid series upgrade for the target machine.
@@ -635,13 +635,13 @@ class MachineManagerFacade(Type):
                    version=10,
                    params=_params)
         _params['args'] = args
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(NotifyWatchResults)
-    async def WatchUpgradeSeriesNotifications(self, entities=None):
+    def WatchUpgradeSeriesNotifications(self, entities=None):
         '''
         WatchUpgradeSeriesNotifications returns a watcher that fires on upgrade
         series events.
@@ -659,7 +659,7 @@ class MachineManagerFacade(Type):
                    version=10,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 

@@ -74,18 +74,7 @@ class Connector:
                 self._connection.close()
             self._connection = Connection.connect(**kwargs)
 
-<<<<<<< HEAD
     def disconnect(self):
-=======
-        # Check if we support the target controller
-        juju_server_version = self._connection.info['server-version']
-        if not juju_server_version.startswith(TARGET_JUJU_VERSION):
-            log.warning("This version was tested using {} juju version {} may have compatibility issues".format(TARGET_JUJU_VERSION, juju_server_version))
-        if not self._connection.info['server-version'].startswith(SUPPORTED_MAJOR_VERSION):
-            raise JujuConnectionError("juju server-version %s not supported" % juju_server_version)
-
-    async def disconnect(self):
->>>>>>> upstream/master
         """Shut down the watcher task and close websockets.
         """
         if self._connection:

@@ -629,7 +629,7 @@ class CharmsFacade(Type):
     
 
     @ReturnMapping(CharmOriginResult)
-    async def AddCharm(self, charm_origin=None, force=None, url=None):
+    def AddCharm(self, charm_origin=None, force=None, url=None):
         '''
         AddCharm adds the given charm URL (which must include revision) to the
         environment, if it does not exist yet. Local charms are not supported,
@@ -658,13 +658,13 @@ class CharmsFacade(Type):
         _params['charm-origin'] = charm_origin
         _params['force'] = force
         _params['url'] = url
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(Charm)
-    async def CharmInfo(self, url=None):
+    def CharmInfo(self, url=None):
         '''
         CharmInfo returns information about the requested charm.
 
@@ -681,13 +681,13 @@ class CharmsFacade(Type):
                    version=6,
                    params=_params)
         _params['url'] = url
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def CheckCharmPlacement(self, placements=None):
+    def CheckCharmPlacement(self, placements=None):
         '''
         CheckCharmPlacement checks if a charm is allowed to be placed with in a
         given application.
@@ -705,13 +705,13 @@ class CharmsFacade(Type):
                    version=6,
                    params=_params)
         _params['placements'] = placements
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(DownloadInfoResults)
-    async def GetDownloadInfos(self, entities=None):
+    def GetDownloadInfos(self, entities=None):
         '''
         GetDownloadInfos attempts to get the bundle corresponding to the charm url
         and origin.
@@ -729,13 +729,13 @@ class CharmsFacade(Type):
                    version=6,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(IsMeteredResult)
-    async def IsMetered(self, url=None):
+    def IsMetered(self, url=None):
         '''
         IsMetered returns whether or not the charm is metered.
 
@@ -752,13 +752,13 @@ class CharmsFacade(Type):
                    version=6,
                    params=_params)
         _params['url'] = url
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(CharmsListResult)
-    async def List(self, names=None):
+    def List(self, names=None):
         '''
         List returns a list of charm URLs currently in the state.
         If supplied parameter contains any names, the result will
@@ -777,13 +777,13 @@ class CharmsFacade(Type):
                    version=6,
                    params=_params)
         _params['names'] = names
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(CharmResourcesResults)
-    async def ListCharmResources(self, entities=None):
+    def ListCharmResources(self, entities=None):
         '''
         ListCharmResources returns a series of resources for a given charm.
 
@@ -800,13 +800,13 @@ class CharmsFacade(Type):
                    version=6,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ResolveCharmWithChannelResults)
-    async def ResolveCharms(self, macaroon=None, resolve=None):
+    def ResolveCharms(self, macaroon=None, resolve=None):
         '''
         ResolveCharms resolves the given charm URLs with an optionally specified
         preferred channel.  Channel provided via CharmOrigin.
@@ -829,7 +829,7 @@ class CharmsFacade(Type):
                    params=_params)
         _params['macaroon'] = macaroon
         _params['resolve'] = resolve
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
@@ -1270,11 +1270,7 @@ class ClientFacade(Type):
     
 
     @ReturnMapping(FindToolsResult)
-<<<<<<< HEAD
-    def FindTools(self, agentstream=None, arch=None, major=None, minor=None, number=None, os_type=None):
-=======
-    async def FindTools(self, agentstream=None, arch=None, major=None, number=None, os_type=None):
->>>>>>> upstream/master
+    def FindTools(self, agentstream=None, arch=None, major=None, number=None, os_type=None):
         '''
         FindTools returns a List containing all tools matching the given parameters.
         TODO(juju 3.1) - remove, used by 2.9 client only

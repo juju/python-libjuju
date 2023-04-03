@@ -27,10 +27,8 @@ from .client import client, connector
 from .client.overrides import Caveat, Macaroon
 from .constraints import parse as parse_constraints
 from .controller import Controller, ConnectedController
-from .delta import get_entity_class, get_entity_delta
 from .errors import JujuAPIError, JujuError, JujuModelConfigError, JujuBackupError
 from .errors import JujuModelError, JujuAppError, JujuUnitError, JujuAgentError, JujuMachineError, PylibjujuError
-from .exceptions import DeadEntityException
 from .names import is_valid_application
 from .offerendpoints import ParseError as OfferParseError
 from .offerendpoints import parse_local_endpoint, parse_offer_url
@@ -41,388 +39,6 @@ from .url import URL, Schema
 from .version import DEFAULT_ARCHITECTURE
 
 log = logging.getLogger(__name__)
-
-
-class _Observer:
-    """Wrapper around an observer callable.
-
-    This wrapper allows filter criteria to be associated with the
-    callable so that it's only called for changes that meet the criteria.
-
-    """
-    def __init__(self, callable_, entity_type, action, entity_id, predicate):
-        self.callable_ = callable_
-        self.entity_type = entity_type
-        self.action = action
-        self.entity_id = entity_id
-        self.predicate = predicate
-        if self.entity_id:
-            self.entity_id = str(self.entity_id)
-            if not self.entity_id.startswith('^'):
-                self.entity_id = '^' + self.entity_id
-            if not self.entity_id.endswith('$'):
-                self.entity_id += '$'
-
-    async def __call__(self, delta, old, new, model):
-        await self.callable_(delta, old, new, model)
-
-    def cares_about(self, delta):
-        """Return True if this observer "cares about" (i.e. wants to be
-        called) for a this delta.
-
-        """
-        if (self.entity_id and delta.get_id() and
-                not re.match(self.entity_id, str(delta.get_id()))):
-            return False
-
-        if self.entity_type and self.entity_type != delta.entity:
-            return False
-
-        if self.action and self.action != delta.type:
-            return False
-
-        if self.predicate and not self.predicate(delta):
-            return False
-
-        return True
-
-
-class ModelObserver:
-    """
-    Base class for creating observers that react to changes in a model.
-    """
-    async def __call__(self, delta, old, new, model):
-        handler_name = 'on_{}_{}'.format(delta.entity, delta.type)
-        method = getattr(self, handler_name, self.on_change)
-        await method(delta, old, new, model)
-
-    async def on_change(self, delta, old, new, model):
-        """Generic model-change handler.
-
-        This should be overridden in a subclass.
-
-        :param delta: :class:`juju.client.overrides.Delta`
-        :param old: :class:`juju.model.ModelEntity`
-        :param new: :class:`juju.model.ModelEntity`
-        :param model: :class:`juju.model.Model`
-
-        """
-        pass
-
-
-class ModelState:
-    """Holds the state of the model, including the delta history of all
-    entities in the model.
-
-    """
-    def __init__(self, model):
-        self.model = model
-        self.state = dict()
-
-    def _live_entity_map(self, entity_type):
-        """Return an id:Entity map of all the living entities of
-        type ``entity_type``.
-
-        """
-        return {
-            entity_id: self.get_entity(entity_type, entity_id)
-            for entity_id, history in self.state.get(entity_type, {}).items()
-            if history[-1] is not None
-        }
-
-    @property
-    def applications(self):
-        """Return a map of application-name:Application for all applications
-        currently in the model.
-
-        """
-        return self._live_entity_map('application')
-
-    @property
-    def remote_applications(self):
-        """Return a map of application-name:Application for all remote
-        applications currently in the model.
-
-        """
-        return self._live_entity_map('remoteApplication')
-
-    @property
-    def application_offers(self):
-        """Return a map of application-name:Application for all applications
-        offers currently in the model.
-        """
-        return self._live_entity_map('applicationOffer')
-
-    @property
-    def machines(self):
-        """Return a map of machine-id:Machine for all machines currently in
-        the model.
-
-        """
-        return self._live_entity_map('machine')
-
-    @property
-    def units(self):
-        """Return a map of unit-id:Unit for all units currently in
-        the model.
-
-        """
-        return self._live_entity_map('unit')
-
-    @property
-    def relations(self):
-        """Return a map of relation-id:Relation for all relations currently in
-        the model.
-
-        """
-        return self._live_entity_map('relation')
-
-    def entity_history(self, entity_type, entity_id):
-        """Return the history deque for an entity.
-
-        """
-        return self.state[entity_type][entity_id]
-
-    def entity_data(self, entity_type, entity_id, history_index):
-        """Return the data dict for an entity at a specific index of its
-        history.
-
-        """
-        return self.entity_history(entity_type, entity_id)[history_index]
-
-    def apply_delta(self, delta):
-        """Apply delta to our state and return a copy of the
-        affected object as it was before and after the update, e.g.:
-
-            old_obj, new_obj = self.apply_delta(delta)
-
-        old_obj may be None if the delta is for the creation of a new object,
-        e.g. a new application or unit is deployed.
-
-        new_obj will never be None, but may be dead (new_obj.dead == True)
-        if the object was deleted as a result of the delta being applied.
-
-        """
-        history = (
-            self.state
-            .setdefault(delta.entity, {})
-            .setdefault(delta.get_id(), collections.deque())
-        )
-
-        history.append(delta.data)
-        if delta.type == 'remove':
-            history.append(None)
-
-        entity = self.get_entity(delta.entity, delta.get_id())
-        return entity.previous(), entity
-
-    def get_entity(
-            self, entity_type, entity_id, history_index=-1, connected=True):
-        """Return an object instance for the given entity_type and id.
-
-        By default the object state matches the most recent state from
-        Juju. To get an instance of the object in an older state, pass
-        history_index, an index into the history deque for the entity.
-
-        """
-
-        if history_index < 0 and history_index != -1:
-            history_index += len(self.entity_history(entity_type, entity_id))
-            if history_index < 0:
-                return None
-
-        try:
-            self.entity_data(entity_type, entity_id, history_index)
-        except IndexError:
-            return None
-
-        entity_class = get_entity_class(entity_type)
-        return entity_class(
-            entity_id, self.model, history_index=history_index,
-            connected=connected)
-
-
-class ModelEntity:
-    """An object in the Model tree"""
-
-    def __init__(self, entity_id, model, history_index=-1, connected=True):
-        """Initialize a new entity
-
-        :param entity_id str: The unique id of the object in the model
-        :param model: The model instance in whose object tree this
-            entity resides
-        :history_index int: The index of this object's state in the model's
-            history deque for this entity
-        :connected bool: Flag indicating whether this object gets live updates
-            from the model.
-
-        """
-        self.entity_id = entity_id
-        self.model = model
-        self._history_index = history_index
-        self.connected = connected
-        self.connection = model.connection()
-
-    def __repr__(self):
-        return '<{} entity_id="{}">'.format(type(self).__name__,
-                                            self.entity_id)
-
-    def __getattr__(self, name):
-        """Fetch object attributes from the underlying data dict held in the
-        model.
-
-        """
-        try:
-            return self.safe_data[name]
-        except KeyError:
-            name = name.replace('_', '-')
-            if name in self.safe_data:
-                return self.safe_data[name]
-            else:
-                raise
-
-    def __bool__(self):
-        return bool(self.data)
-
-    def on_change(self, callable_):
-        """Add a change observer to this entity.
-
-        """
-        self.model.add_observer(
-            callable_, self.entity_type, 'change', self.entity_id)
-
-    def on_remove(self, callable_):
-        """Add a remove observer to this entity.
-
-        """
-        self.model.add_observer(
-            callable_, self.entity_type, 'remove', self.entity_id)
-
-    @property
-    def entity_type(self):
-        """A string identifying the entity type of this object, e.g.
-        'application' or 'unit', etc.
-
-        """
-        # Allow the overriding of entity names from the type instead of from
-        # the class name. Useful because Model and ModelInfo clash and we really
-        # want ModelInfo to be called Model.
-        if hasattr(self.__class__, "type_name_override") and callable(self.__class__.type_name_override):
-            return self.__class__.type_name_override()
-
-        def first_lower(s):
-            if len(s) == 0:
-                return s
-            else:
-                return s[0].lower() + s[1:]
-        return first_lower(self.__class__.__name__)
-
-    @property
-    def current(self):
-        """Return True if this object represents the current state of the
-        entity in the underlying model.
-
-        This will be True except when the object represents an entity at a
-        non-latest state in history, e.g. if the object was obtained by calling
-        .previous() on another object.
-
-        """
-        return self._history_index == -1
-
-    @property
-    def dead(self):
-        """Returns True if this entity no longer exists in the underlying
-        model.
-
-        """
-        return (
-            self.data is None or
-            self.model.state.entity_data(
-                self.entity_type, self.entity_id, -1) is None
-        )
-
-    @property
-    def alive(self):
-        """Returns True if this entity still exists in the underlying
-        model.
-
-        """
-        return not self.dead
-
-    @property
-    def data(self):
-        """The data dictionary for this entity.
-
-        """
-        return self.model.state.entity_data(
-            self.entity_type, self.entity_id, self._history_index)
-
-    @property
-    def safe_data(self):
-        """The data dictionary for this entity.
-
-        If this `ModelEntity` points to the dead state, it will
-        raise `DeadEntityException`.
-
-        """
-        if self.data is None:
-            raise DeadEntityException(
-                "Entity {}:{} is dead - its attributes can no longer be "
-                "accessed. Use the .previous() method on this object to get "
-                "a copy of the object at its previous state.".format(
-                    self.entity_type, self.entity_id))
-        return self.data
-
-    def previous(self):
-        """Return a copy of this object as was at its previous state in
-        history.
-
-        Returns None if this object is new (and therefore has no history).
-
-        The returned object is always "disconnected", i.e. does not receive
-        live updates.
-
-        """
-        return self.model.state.get_entity(
-            self.entity_type, self.entity_id, self._history_index - 1,
-            connected=False)
-
-    def next(self):
-        """Return a copy of this object at its next state in
-        history.
-
-        Returns None if this object is already the latest.
-
-        The returned object is "disconnected", i.e. does not receive
-        live updates, unless it is current (latest).
-
-        """
-        if self._history_index == -1:
-            return None
-
-        new_index = self._history_index + 1
-        connected = (
-            new_index == len(self.model.state.entity_history(
-                self.entity_type, self.entity_id)) - 1
-        )
-        return self.model.state.get_entity(
-            self.entity_type, self.entity_id, self._history_index - 1,
-            connected=connected)
-
-    def latest(self):
-        """Return a copy of this object at its current state in the model.
-
-        Returns self if this object is already the latest.
-
-        The returned object is always "connected", i.e. receives
-        live updates from the model.
-
-        """
-        if self._history_index == -1:
-            return self
-
-        return self.model.state.get_entity(self.entity_type, self.entity_id)
-
 
 class DeployTypeResult:
     """DeployTypeResult represents the result of a deployment type after a
@@ -563,13 +179,8 @@ class Model:
             jujudata=jujudata,
         )
         self._observers = weakref.WeakValueDictionary()
-        self.state = ModelState(self)
         self._info = None
         self._mode = None
-        self._watch_stopping = jasyncio.Event()
-        self._watch_stopped = jasyncio.Event()
-        self._watch_received = jasyncio.Event()
-        self._watch_stopped.set()
 
         self._charmhub = CharmHub(self)
 
@@ -643,9 +254,6 @@ class Model:
         :param specified_facades: Overwrite the facades with a series of
             specified facades.
         """
-        is_debug_log_conn = 'debug_log_conn' in kwargs
-        # if not is_debug_log_conn:
-        #     await self.disconnect()
         model_name = model_uuid = None
         if 'endpoint' not in kwargs and len(args) < 2:
             # Then we're using the model_name to pick the model
@@ -692,72 +300,32 @@ class Model:
                 raise ValueError('Authentication parameters are required '
                                  'if model_name not given')
             self._connector.connect(**kwargs)
-        #if not is_debug_log_conn:
-        #    await self._after_connect(model_name, model_uuid)
 
-    async def connect_model(self, model_name, **kwargs):
-        """
-        .. deprecated:: 0.6.2
-           Use ``connect(model_name=model_name)`` instead.
-        """
-        return await self.connect(model_name=model_name, **kwargs)
-
-    async def connect_current(self):
-        """
-        .. deprecated:: 0.6.2
-           Use ``connect()`` instead.
-        """
-        return await self.connect()
-
-    async def connect_to(self, connection):
+    def connect_to(self, connection):
         conn_params = connection.connect_params()
-        await self._connect_direct(**conn_params)
+        self._connect_direct(**conn_params)
 
-    async def _connect_direct(self, **kwargs):
+    def _connect_direct(self, **kwargs):
         if self.info:
             uuid = self.info.uuid
         elif 'uuid' in kwargs:
             uuid = kwargs['uuid']
         else:
             raise PylibjujuError("Unable to find uuid for the model")
-        await self.disconnect()
-        await self._connector.connect(**kwargs)
-        await self._after_connect(model_uuid=uuid)
-
-    async def _after_connect(self, model_name=None, model_uuid=None):
-        self._watch()
-
-        # Wait for the first packet of data from the AllWatcher,
-        # which contains all information on the model.
-        # TODO this means that we can't do anything until
-        # we've received all the model data, which might be
-        # a whole load of unneeded data if all the client wants
-        # to do is make one RPC call.
-        await self._watch_received.wait()
-
-        if self.info is None:
-            contr = await self.get_controller()
-            self._info = await contr.get_model_info(model_name, model_uuid)
-            log.debug('Got ModelInfo: %s', vars(self.info))
-
-        self.uuid = self.info.uuid
+        self.disconnect()
+        self._connector.connect(**kwargs)
 
     def disconnect(self):
         """Shut down the watcher task and close websockets.
 
         """
-        if not self._watch_stopped.is_set():
-            log.debug('Stopping watcher task')
-            self._watch_stopping.set()
-            self._watch_stopped.wait()
-            self._watch_stopping.clear()
 
         if self.is_connected():
             log.debug('Closing model connection')
             self._connector.disconnect()
             self._info = None
 
-    async def add_local_charm_dir(self, charm_dir, series):
+    def add_local_charm_dir(self, charm_dir, series):
         """Upload a local charm to the model.
 
         This will automatically generate an archive from
@@ -774,10 +342,7 @@ class Model:
             fn = tempfile.NamedTemporaryFile().name
             CharmArchiveGenerator(str(charm_dir)).make_archive(fn)
         with open(str(fn), 'rb') as fh:
-            func = partial(
-                self.add_local_charm, fh, series, os.stat(str(fn)).st_size)
-            loop = jasyncio.get_running_loop()
-            charm_url = await loop.run_in_executor(None, func)
+            charm_url = self.add_local_charm(fh, series, os.stat(str(fn)).st_size)
 
         log.debug('Uploaded local charm: %s -> %s', charm_dir, charm_url)
         return charm_url
@@ -825,7 +390,7 @@ class Model:
                 return False
         return True
 
-    async def reset(self, force=False):
+    def reset(self, force=False):
         """Reset the model to a clean state.
 
         :param bool force: Force-terminate machines.
@@ -834,19 +399,20 @@ class Model:
         means no applications or machines exist in the model.
 
         """
+        # TODO: Replace block_until with context managers!!! 
         log.debug('Resetting model')
         for app in self.applications.values():
-            await app.destroy()
-        await self.block_until(
-            lambda: len(self.applications) == 0
-        )
+            app.destroy()
+        # self.block_until(
+        #    lambda: len(self.applications) == 0
+        #)
         for machine in self.machines.values():
-            await machine.destroy(force=force)
-        await self.block_until(
-            lambda: len(self.machines) == 0
-        )
+            machine.destroy(force=force)
+        # self.block_until(
+        #    lambda: len(self.machines) == 0
+        #)
 
-    async def create_storage_pool(self, name, provider_type, attributes=""):
+    def create_storage_pool(self, name, provider_type, attributes=""):
         """Create or define a storage pool.
 
         :param str name: a pool name
@@ -859,22 +425,22 @@ class Model:
         _attrs = [splt.split("=") for splt in attributes.split()]
 
         storage_facade = client.StorageFacade.from_connection(self.connection())
-        return await storage_facade.CreatePool(pools=[client.StoragePool(
+        return storage_facade.CreatePool(pools=[client.StoragePool(
             name=name,
             provider=provider_type,
             attrs=dict(_attrs)
         )])
 
-    async def remove_storage_pool(self, name):
+    def remove_storage_pool(self, name):
         """Remove an existing storage pool.
 
         :param str name:
         :return:
         """
         storage_facade = client.StorageFacade.from_connection(self.connection())
-        return await storage_facade.RemovePool(pools=[client.StoragePoolDeleteArg(name)])
+        return storage_facade.RemovePool(pools=[client.StoragePoolDeleteArg(name)])
 
-    async def update_storage_pool(self, name, attributes=""):
+    def update_storage_pool(self, name, attributes=""):
         """ Update storage pool attributes.
 
         :param name:
@@ -886,12 +452,12 @@ class Model:
             raise JujuError("Expected at least one attribute to update")
 
         storage_facade = client.StorageFacade.from_connection(self.connection())
-        return await storage_facade.UpdatePool(pools=[client.StoragePool(
+        return storage_facade.UpdatePool(pools=[client.StoragePool(
             name=name,
             attrs=_attrs,
         )])
 
-    async def list_storage(self, filesystem=False, volume=False):
+    def list_storage(self, filesystem=False, volume=False):
         """Lists storage details.
 
         :param bool filesystem: List filesystem storage
@@ -903,11 +469,11 @@ class Model:
         if filesystem and volume:
             raise JujuError("--filesystem and --volume can not be used together")
         if filesystem:
-            _res = await storage_facade.ListFilesystems(filters=[client.FilesystemFilter()])
+            _res = storage_facade.ListFilesystems(filters=[client.FilesystemFilter()])
         elif volume:
-            _res = await storage_facade.ListVolumes(filters=[client.VolumeFilter()])
+            _res = storage_facade.ListVolumes(filters=[client.VolumeFilter()])
         else:
-            _res = await storage_facade.ListStorageDetails(filters=[client.StorageFilter()])
+            _res = storage_facade.ListStorageDetails(filters=[client.StorageFilter()])
 
         err = _res.results[0].error
         res = _res.results[0].result
@@ -917,7 +483,7 @@ class Model:
 
         return [details.serialize() for details in res]
 
-    async def show_storage_details(self, *storage_ids):
+    def show_storage_details(self, *storage_ids):
         """Shows storage instance information.
 
         :param []str storage_ids:
@@ -927,23 +493,23 @@ class Model:
             raise JujuError("Expected at least one storage ID")
 
         storage_facade = client.StorageFacade.from_connection(self.connection())
-        res = await storage_facade.StorageDetails(entities=[client.Entity(tag.storage(s)) for s in storage_ids])
+        res = storage_facade.StorageDetails(entities=[client.Entity(tag.storage(s)) for s in storage_ids])
         return [s.result.serialize() for s in res.results]
 
-    async def list_storage_pools(self):
+    def list_storage_pools(self):
         """List storage pools.
 
         :return:
         """
         # TODO (cderici): Filter on pool type, name.
         storage_facade = client.StorageFacade.from_connection(self.connection())
-        res = await storage_facade.ListPools(filters=[client.StoragePoolFilter()])
+        res = storage_facade.ListPools(filters=[client.StoragePoolFilter()])
         err = res.results[0].error
         if err:
             raise JujuError(err.message)
         return [p.serialize() for p in res.results[0].storage_pools]
 
-    async def remove_storage(self, *storage_ids, force=False, destroy_storage=False):
+    def remove_storage(self, *storage_ids, force=False, destroy_storage=False):
         """Removes storage from the model.
 
         :param bool force: Remove storage even if it is currently attached
@@ -955,7 +521,7 @@ class Model:
             raise JujuError("Expected at least one storage ID")
 
         storage_facade = client.StorageFacade.from_connection(self.connection())
-        ret = await storage_facade.Remove(storage=[client.RemoveStorageInstance(
+        ret = storage_facade.Remove(storage=[client.RemoveStorageInstance(
             destroy_storage=destroy_storage,
             force=force,
             tag=s,
@@ -963,7 +529,7 @@ class Model:
         if ret.results[0].error:
             raise JujuError(ret.results[0].error.message)
 
-    async def remove_application(self, app_name, block_until_done=False, force=False, destroy_storage=False, no_wait=False):
+    def remove_application(self, app_name, block_until_done=False, force=False, destroy_storage=False, no_wait=False):
         """Removes the given application from the model.
 
         :param str app_name: Name of the application
@@ -977,29 +543,21 @@ class Model:
             raise JujuError("Given application doesn't seem to appear in the\
              model: %s\nCurrent applications are: %s" %
                             (app_name, self.applications))
-        await self.applications[app_name].remove(destroy_storage=destroy_storage,
+        self.applications[app_name].remove(destroy_storage=destroy_storage,
                                                  force=force,
                                                  no_wait=no_wait,
                                                  )
+        # TODO: Replace with context manager
         if block_until_done:
-            await self.block_until(lambda: app_name not in self.applications)
+            self.block_until(lambda: app_name not in self.applications)
 
-    async def block_until(self, *conditions, timeout=None, wait_period=0.5):
+    def block_until(self, *conditions, timeout=None, wait_period=0.5):
         """Return only after all conditions are true.
 
         Raises `websockets.ConnectionClosed` if disconnected.
         """
-        def _disconnected():
-            return not (self.is_connected() and self.connection().is_open)
-
-        def done():
-            return _disconnected() or all(c() for c in conditions)
-
-        await utils.block_until(done,
-                                timeout=timeout,
-                                wait_period=wait_period)
-        if _disconnected():
-            raise websockets.ConnectionClosed(1006, 'no reason')
+        log.warning("the block_until function has to be refactored!!!!!")
+        pass
 
     @property
     def tag(self):
@@ -1080,235 +638,7 @@ class Model:
     def strict_mode(self):
         return self._mode is not None and "strict" in self._mode
 
-    def add_observer(
-            self, callable_, entity_type=None, action=None, entity_id=None,
-            predicate=None):
-        """Register an "on-model-change" callback
-
-        Once the model is connected, ``callable_``
-        will be called each time the model changes. ``callable_`` should
-        be Awaitable and accept the following positional arguments:
-
-            delta - An instance of :class:`juju.delta.EntityDelta`
-                containing the raw delta data recv'd from the Juju
-                websocket.
-
-            old_obj - If the delta modifies an existing object in the model,
-                old_obj will be a copy of that object, as it was before the
-                delta was applied. Will be None if the delta creates a new
-                entity in the model.
-
-            new_obj - A copy of the new or updated object, after the delta
-                is applied. Will be None if the delta removes an entity
-                from the model.
-
-            model - The :class:`Model` itself.
-
-        Events for which ``callable_`` is called can be specified by passing
-        entity_type, action, and/or entitiy_id filter criteria, e.g.::
-
-            add_observer(
-                myfunc,
-                entity_type='application', action='add', entity_id='ubuntu')
-
-        For more complex filtering conditions, pass a predicate function. It
-        will be called with a delta as its only argument. If the predicate
-        function returns True, the ``callable_`` will be called.
-
-        """
-        observer = _Observer(
-            callable_, entity_type, action, entity_id, predicate)
-        self._observers[observer] = callable_
-
-    def _watch(self):
-        """Start an asynchronous watch against this model.
-
-        See :meth:`add_observer` to register an onchange callback.
-
-        """
-        def _post_step(obj):
-            # Once we get the model, ensure we're running in the correct state
-            # as a post step.
-            if isinstance(obj, ModelInfo) and obj.safe_data is not None:
-                model_config = obj.safe_data["config"]
-                if "mode" in model_config:
-                    self._mode = model_config["mode"]
-
-        async def _all_watcher():
-            # First attempt to get the model config so we know what mode the
-            # library should be running in.
-            model_config = await self.get_config()
-            if "mode" in model_config:
-                self._mode = model_config["mode"]["value"]
-
-            try:
-                allwatcher = client.AllWatcherFacade.from_connection(
-                    self.connection())
-                while not self._watch_stopping.is_set():
-                    try:
-                        results = await utils.run_with_interrupt(
-                            allwatcher.Next(),
-                            self._watch_stopping)
-                    except JujuAPIError as e:
-                        if 'watcher was stopped' not in str(e):
-                            raise
-                        if self._watch_stopping.is_set():
-                            # this shouldn't ever actually happen, because
-                            # the event should trigger before the controller
-                            # has a chance to tell us the watcher is stopped
-                            # but handle it gracefully, just in case
-                            break
-                        # controller stopped our watcher for some reason
-                        # but we're not actually stopping, so just restart it
-                        log.warning(
-                            'Watcher: watcher stopped, restarting')
-                        del allwatcher.Id
-                        continue
-                    except websockets.ConnectionClosed:
-                        monitor = self.connection().monitor
-                        if monitor.status == monitor.ERROR:
-                            # closed unexpectedly, try to reopen
-                            log.warning(
-                                'Watcher: connection closed, reopening')
-                            await self.connection().reconnect()
-                            if monitor.status != monitor.CONNECTED:
-                                # reconnect failed; abort and shutdown
-                                log.error('Watcher: automatic reconnect '
-                                          'failed; stopping watcher')
-                                break
-                            del allwatcher.Id
-                            continue
-                        else:
-                            # closed on request, go ahead and shutdown
-                            break
-                    if self._watch_stopping.is_set():
-                        try:
-                            await allwatcher.Stop()
-                        except websockets.ConnectionClosed:
-                            pass  # can't stop on a closed conn
-                        break
-                    for delta in results.deltas:
-                        entity = None
-                        try:
-                            entity = get_entity_delta(delta)
-                        except KeyError:
-                            if self.strict_mode:
-                                raise JujuError("unknown delta type '{}'".format(delta.entity))
-
-                        if not self.strict_mode and entity is None:
-                            continue
-                        old_obj, new_obj = self.state.apply_delta(entity)
-                        await self._notify_observers(entity, old_obj, new_obj)
-                        # Post step ensure that we can handle any settings
-                        # that need to be correctly set as a post step.
-                        _post_step(new_obj)
-                    self._watch_received.set()
-            except CancelledError:
-                pass
-            except Exception:
-                log.exception('Error in watcher')
-                raise
-            finally:
-                self._watch_stopped.set()
-
-        log.debug('Starting watcher task')
-        self._watch_received.clear()
-        self._watch_stopping.clear()
-        self._watch_stopped.clear()
-        jasyncio.ensure_future(_all_watcher())
-
-    async def _notify_observers(self, delta, old_obj, new_obj):
-        """Call observing callbacks, notifying them of a change in model state
-
-        :param delta: The raw change from the watcher
-            (:class:`juju.client.overrides.Delta`)
-        :param old_obj: The object in the model that this delta updates.
-            May be None.
-        :param new_obj: The object in the model that is created or updated
-            by applying this delta.
-
-        """
-        if new_obj and not old_obj:
-            delta.type = 'add'
-
-        log.debug(
-            'Model changed: %s %s %s',
-            delta.entity, delta.type, delta.get_id())
-
-        for o in self._observers:
-            if o.cares_about(delta):
-                jasyncio.ensure_future(o(delta, old_obj, new_obj, self))
-
-    async def _wait(self, entity_type, entity_id, action, predicate=None):
-        """
-        Block the calling routine until a given action has happened to the
-        given entity
-
-        :param entity_type: The entity's type.
-        :param entity_id: The entity's id.
-        :param action: the type of action (e.g., 'add', 'change', or 'remove')
-        :param predicate: optional callable that must take as an
-            argument a delta, and must return a boolean, indicating
-            whether the delta contains the specific action we're looking
-            for. For example, you might check to see whether a 'change'
-            has a 'completed' status. See the _Observer class for details.
-
-        """
-        q = jasyncio.Queue()
-
-        async def callback(delta, old, new, model):
-            await q.put(delta.get_id())
-
-        self.add_observer(callback, entity_type, action, entity_id, predicate)
-        entity_id = await q.get()
-        # object might not be in the entity_map if we were waiting for a
-        # 'remove' action
-        return self.state._live_entity_map(entity_type).get(entity_id)
-
-    async def _wait_for_new(self, entity_type, entity_id):
-        """Wait for a new object to appear in the Model and return it.
-
-        Waits for an object of type ``entity_type`` with id ``entity_id``
-        to appear in the model.  This is similar to watching for the
-        object using ``block_until``, but uses the watcher rather than
-        polling.
-
-        """
-        # if the entity is already in the model, just return it
-        if entity_id in self.state._live_entity_map(entity_type):
-            return self.state._live_entity_map(entity_type)[entity_id]
-        return await self._wait(entity_type, entity_id, None)
-
-    async def wait_for_action(self, action_id):
-        """Given an action, wait for it to complete."""
-
-        if action_id.startswith("action-"):
-            # if we've been passed action.tag, transform it into the
-            # id that the api deltas will use.
-            action_id = action_id[7:]
-
-        def predicate(delta):
-            return delta.data['status'] in ('completed', 'failed')
-
-        return await self._wait('action', action_id, None, predicate)
-
-    async def get_annotations(self):
-        """Get annotations on this model.
-
-        :return dict: The annotations for this model
-        """
-        return await _get_annotations(self.tag, self.connection())
-
-    async def set_annotations(self, annotations):
-        """Set annotations on this model.
-
-        :param annotations map[string]string: the annotations as key/value
-            pairs.
-
-        """
-        return await _set_annotations(self.tag, annotations, self.connection())
-
-    async def add_machine(
+    def add_machine(
             self, spec=None, constraints=None, disks=None, series=None):
         """Start a new, empty machine and optionally a container, or add a
         container to a machine.
@@ -1401,7 +731,7 @@ class Model:
 
         # Submit the request.
         client_facade = client.MachineManagerFacade.from_connection(self.connection())
-        results = await client_facade.AddMachines(params=[params])
+        results = client_facade.AddMachines(params=[params])
         error = results.machines[0].error
         if error:
             raise ValueError("Error adding machine: %s" % error.message)
@@ -1411,21 +741,21 @@ class Model:
             if spec.startswith("ssh:"):
                 # Need to run this after AddMachines has been called,
                 # as we need the machine_id
-                await sshProvisioner.install_agent(
+                sshProvisioner.install_agent(
                     self.connection(),
                     params.nonce,
                     machine_id,
                 )
 
         log.debug('Added new machine %s', machine_id)
-        return await self._wait_for_new('machine', machine_id)
+        return self._wait_for_new('machine', machine_id)
 
-    async def add_relation(self, relation1, relation2):
+    def add_relation(self, relation1, relation2):
         """
         .. deprecated:: 2.9.9
            Use ``relate()`` instead
         """
-        return await self.relate(relation1, relation2)
+        return self.relate(relation1, relation2)
 
     async def integrate(self, relation1, relation2):
         """Add a relation between two applications.
@@ -1465,10 +795,10 @@ class Model:
                 raise JujuError("cannot add relation to {}: remote endpoints not supported".format(remote_endpoint.string()))
 
             if remote_endpoint.has_empty_source():
-                async with ConnectedController(self.connection()) as current:
+                with ConnectedController(self.connection()) as current:
                     remote_endpoint.source = current.controller_name
             # consume the remote endpoint
-            await self.consume(remote_endpoint.string(),
+            self.consume(remote_endpoint.string(),
                                application_alias=remote_endpoint.application,
                                controller_name=remote_endpoint.source)
 
@@ -1483,7 +813,7 @@ class Model:
 
         app_facade = facade_cls.from_connection(self.connection())
         try:
-            result = await app_facade.AddRelation(endpoints=endpoints, via_cidrs=None)
+            result = app_facade.AddRelation(endpoints=endpoints, via_cidrs=None)
         except JujuAPIError as e:
             if 'relation already exists' not in e.message:
                 raise
@@ -1496,17 +826,17 @@ class Model:
         specs = ['{}:{}'.format(app, data['name'])
                  for app, data in result.endpoints.items()]
 
-        await self.block_until(lambda: _find_relation(*specs) is not None)
+        self.block_until(lambda: _find_relation(*specs) is not None)
         return _find_relation(*specs)
 
-    async def relate(self, relation1, relation2):
+    def relate(self, relation1, relation2):
         """The relate function is deprecated in favor of instead.
         The logic is the same.
         """
         log.warn("relate is deprecated and will be removed. Use integrate instead.")
-        return await self.integrate(relation1, relation2)
+        return self.integrate(relation1, relation2)
 
-    async def add_space(self, name, cidrs=None, public=True):
+    def add_space(self, name, cidrs=None, public=True):
         """Add a new network space.
 
         Adds a new space with the given name and associates the given
@@ -1521,9 +851,9 @@ class Model:
                 "cidrs": cidrs,
                 "space-tag": tag.space(name),
                 "public": public}]
-        return await space_facade.CreateSpaces(spaces=spaces)
+        return space_facade.CreateSpaces(spaces=spaces)
 
-    async def add_ssh_key(self, user, key):
+    def add_ssh_key(self, user, key):
         """Add a public SSH key to this model.
 
         :param str user: The username of the user
@@ -1531,7 +861,7 @@ class Model:
 
         """
         key_facade = client.KeyManagerFacade.from_connection(self.connection())
-        return await key_facade.AddKeys(ssh_keys=[key], user=user)
+        return key_facade.AddKeys(ssh_keys=[key], user=user)
     add_ssh_keys = add_ssh_key
 
     async def get_backups(self):
@@ -1540,13 +870,13 @@ class Model:
         :return [dict]: List of metadata for the stored backups
         """
         backups_facade = client.BackupsFacade.from_connection(self.connection())
-        _backups_metadata = await backups_facade.List()
+        _backups_metadata = backups_facade.List()
         backups_metadata = _backups_metadata.serialize()
         if 'list' not in backups_metadata:
             raise JujuAPIError("Unexpected response metadata : %s" % backups_metadata)
         return backups_metadata['list']
 
-    async def create_backup(self, notes=None):
+    def create_backup(self, notes=None):
         """Create a backup of this model.
 
         :param str note: A note to store with the backup
@@ -1556,7 +886,7 @@ class Model:
 
         """
         backups_facade = client.BackupsFacade.from_connection(self.connection())
-        results = await backups_facade.Create(notes=notes)
+        results = backups_facade.Create(notes=notes)
 
         if results is None:
             raise JujuAPIError("unable to create a backup")
@@ -1572,7 +902,7 @@ class Model:
 
         return file_name, backup_metadata
 
-    async def debug_log(
+    def debug_log(
             self, target=sys.stdout, no_tail=False, exclude_module=[],
             include_module=[], include=[], level="", limit=sys.maxsize,
             lines=10, exclude=[]):
@@ -1594,7 +924,7 @@ class Model:
 
         """
         if not self.is_connected():
-            await self.connect()
+            self.connect()
 
         params = {
             'no_tail': no_tail,
@@ -1606,9 +936,9 @@ class Model:
             'lines': lines,
             'exclude': exclude,
         }
-        await self.connect(debug_log_conn=target, debug_log_params=params)
+        self.connect(debug_log_conn=target, debug_log_params=params)
 
-    async def deploy(
+    def deploy(
             self, entity_url, application_name=None, bind=None,
             channel=None, config=None, constraints=None, force=False,
             num_units=1, overlays=[], base=None, resources=None, series=None,
@@ -1670,12 +1000,12 @@ class Model:
         else:
             url = URL.parse(str(entity_url))
 
-        architecture = await self._resolve_architecture(url)
+        architecture = self._resolve_architecture(url)
 
         if str(url.schema) not in self.deploy_types:
             raise JujuError("unknown deploy type {}, expected charmhub or local".format(url.schema))
 
-        res = await self.deploy_types[str(url.schema)].resolve(url, architecture, application_name, channel, series, entity_url)
+        res = self.deploy_types[str(url.schema)].resolve(url, architecture, application_name, channel, series, entity_url)
 
         if res.identifier is None:
             raise JujuError('unknown charm or bundle {}'.format(entity_url))
@@ -1688,13 +1018,14 @@ class Model:
 
         if res.is_bundle:
             handler = BundleHandler(self, trusted=trust, forced=force)
-            await handler.fetch_plan(url, charm_origin, overlays=overlays)
-            await handler.execute_plan()
+            handler.fetch_plan(url, charm_origin, overlays=overlays)
+            handler.execute_plan()
             extant_apps = {app for app in self.applications}
             pending_apps = handler.applications - extant_apps
             if pending_apps:
                 # new apps will usually be in the model by now, but if some
                 # haven't made it yet we'll need to wait on them to be added
+                # TODO: refactor this to use context managers
                 await jasyncio.gather(*[
                     jasyncio.ensure_future(
                         self._wait_for_new('application', app_name))
@@ -1708,7 +1039,7 @@ class Model:
             # XXX: we're dropping local resources here, but we don't
             # actually support them yet anyway
             if not res.is_local:
-                add_charm_res = await self._add_charm(identifier, charm_origin)
+                add_charm_res = self._add_charm(identifier, charm_origin)
                 if isinstance(add_charm_res, dict):
                     # This is for backwards compatibility for older
                     # versions where AddCharm returns a dictionary
@@ -1717,10 +1048,10 @@ class Model:
                 else:
                     charm_origin = add_charm_res.charm_origin
                 if Schema.CHARM_HUB.matches(url.schema):
-                    resources = await self._add_charmhub_resources(res.app_name,
+                    resources = self._add_charmhub_resources(res.app_name,
                                                                    identifier,
                                                                    add_charm_res.charm_origin)
-                    is_sub = await self.charmhub.is_subordinate(url.name)
+                    is_sub = self.charmhub.is_subordinate(url.name)
                     if is_sub:
                         if num_units > 1:
                             raise JujuError("cannot use num_units with subordinate application")
@@ -1730,7 +1061,7 @@ class Model:
                 # We have a local charm dir that needs to be uploaded
                 charm_dir = os.path.abspath(os.path.expanduser(identifier))
                 metadata = utils.get_local_charm_metadata(charm_dir)
-                charm_series = charm_series or await get_charm_series(metadata,
+                charm_series = charm_series or get_charm_series(metadata,
                                                                       self)
                 if not base:
                     charm_origin.base = utils.get_local_charm_base(
@@ -1745,9 +1076,9 @@ class Model:
                         "Either series or base is needed to deploy the "
                         "charm at {}. ".format(charm_dir))
 
-                identifier = await self.add_local_charm_dir(charm_dir,
+                identifier = self.add_local_charm_dir(charm_dir,
                                                             charm_series)
-                resources = await self.add_local_resources(application_name,
+                resources = self.add_local_resources(application_name,
                                                            identifier,
                                                            metadata,
                                                            resources=resources)
@@ -1757,7 +1088,7 @@ class Model:
             if trust:
                 config["trust"] = "true"
 
-            return await self._deploy(
+            return self._deploy(
                 charm_url=identifier,
                 application=res.app_name,
                 series=charm_series,
@@ -1774,18 +1105,18 @@ class Model:
                 attach_storage=attach_storage,
             )
 
-    async def _add_charm(self, charm_url, origin):
+    def _add_charm(self, charm_url, origin):
         # client facade is deprecated with in Juju, and smaller, more focused
         # facades have been created and we'll use that if it's available.
         charms_cls = client.CharmsFacade
         if charms_cls.best_facade_version(self.connection()) > 2:
             charms_facade = charms_cls.from_connection(self.connection())
-            return await charms_facade.AddCharm(charm_origin=origin, url=charm_url, force=False)
+            return charms_facade.AddCharm(charm_origin=origin, url=charm_url, force=False)
 
         client_facade = client.ClientFacade.from_connection(self.connection())
-        return await client_facade.AddCharm(channel=str(origin.risk), url=charm_url, force=False)
+        return client_facade.AddCharm(channel=str(origin.risk), url=charm_url, force=False)
 
-    async def _resolve_charm(self, url, origin):
+    def _resolve_charm(self, url, origin):
         """Calls Charms.ResolveCharms to resolve all the fields of the
         charm_origin and also the url and the supported_series
 
@@ -1814,7 +1145,7 @@ class Model:
                           'track': origin.track, 'risk': origin.risk,
                           'base': origin.base}
 
-        resp = await charms_facade.ResolveCharms(resolve=[{
+        resp = charms_facade.ResolveCharms(resolve=[{
             'reference': str(url),
             'charm-origin': resolve_origin
         }])
@@ -1827,22 +1158,22 @@ class Model:
 
         return (result.url, result.charm_origin, result.supported_series)
 
-    async def _resolve_architecture(self, url):
+    def _resolve_architecture(self, url):
         if url.architecture:
             return url.architecture
 
-        constraints = await self.get_constraints()
+        constraints = self.get_constraints()
         if 'arch' in constraints:
             return constraints['arch']
 
         return DEFAULT_ARCHITECTURE
 
-    async def _add_charmhub_resources(self, application,
+    def _add_charmhub_resources(self, application,
                                       entity_url,
                                       origin,
                                       overrides=None):
         charm_facade = client.CharmsFacade.from_connection(self.connection())
-        res = await charm_facade.CharmInfo(entity_url)
+        res = charm_facade.CharmInfo(entity_url)
 
         resources = []
         for resource in res.meta.resources.values():
@@ -1868,7 +1199,7 @@ class Model:
 
         resources_facade = client.ResourcesFacade.from_connection(
             self.connection())
-        response = await resources_facade.AddPendingResources(
+        response = resources_facade.AddPendingResources(
             application_tag=tag.application(application),
             charm_url=entity_url,
             charm_origin=origin,
@@ -1883,7 +1214,7 @@ class Model:
 
         return resource_map
 
-    async def add_local_resources(self, application, entity_url, metadata, resources):
+    def add_local_resources(self, application, entity_url, metadata, resources):
         if not resources:
             return None
 
@@ -1908,7 +1239,7 @@ class Model:
 
             resources_facade = client.ResourcesFacade.from_connection(
                 self.connection())
-            response = await resources_facade.AddPendingResources(
+            response = resources_facade.AddPendingResources(
                 application_tag=tag.application(application),
                 charm_url=entity_url,
                 resources=[client.CharmResource(**charmresource)])
@@ -1953,7 +1284,7 @@ class Model:
 
         return resource_map
 
-    async def _deploy(self, charm_url, application, series, config,
+    def _deploy(self, charm_url, application, series, config,
                       constraints, endpoint_bindings, resources, storage,
                       channel=None, num_units=None, placement=None,
                       devices=None, charm_origin=None, attach_storage=[]):
@@ -1985,13 +1316,13 @@ class Model:
             devices=devices,
             attach_storage=attach_storage,
         )
-        result = await app_facade.Deploy(applications=[app])
+        result = app_facade.Deploy(applications=[app])
         errors = [r.error.message for r in result.results if r.error]
         if errors:
             raise JujuError('\n'.join(errors))
-        return await self._wait_for_new('application', application)
+        return self._wait_for_new('application', application)
 
-    async def destroy_unit(self, unit_id, destroy_storage=False, dry_run=False, force=False, max_wait=None):
+    def destroy_unit(self, unit_id, destroy_storage=False, dry_run=False, force=False, max_wait=None):
         """Destroy units by name.
 
         """
@@ -2007,7 +1338,7 @@ class Model:
         log.debug(
             'Destroying unit %s', unit_id)
 
-        return await app_facade.DestroyUnit(units=[{
+        return app_facade.DestroyUnit(units=[{
             'unit-tag': unit_tag,
             'destroy-storage': destroy_storage,
             'force': force,
@@ -2015,12 +1346,12 @@ class Model:
             'dry-run': dry_run,
         }])
 
-    async def destroy_units(self, *unit_names, destroy_storage=False, dry_run=False, force=False, max_wait=None):
+    def destroy_units(self, *unit_names, destroy_storage=False, dry_run=False, force=False, max_wait=None):
         """Destroy several units at once.
 
         """
         for u in unit_names:
-            await self.destroy_unit(u, destroy_storage, dry_run, force, max_wait)
+            self.destroy_unit(u, destroy_storage, dry_run, force, max_wait)
 
     def download_backup(self, archive_id, target_filename=None):
         """Download a backup archive file.
@@ -2075,7 +1406,7 @@ class Model:
             config[key] = client.ConfigValue.from_json(value)
         return config
 
-    async def get_constraints(self):
+    def get_constraints(self):
         """Return the machine constraints for this model.
 
         :returns: A ``dict`` of constraints.
@@ -2084,7 +1415,7 @@ class Model:
         facade_cls = client.ModelConfigFacade
 
         facade = facade_cls.from_connection(self.connection())
-        result = await facade.GetModelConstraints()
+        result = facade.GetModelConstraints()
 
         # GetModelConstraints returns GetConstraintsResults which has a
         # 'constraints' attribute. If no constraints have been set
@@ -2114,7 +1445,7 @@ class Model:
         Returns a List of :class:`~juju._definitions.Space` instances.
         """
         space_facade = client.SpacesFacade.from_connection(self.connection())
-        response = await space_facade.ListSpaces()
+        response = space_facade.ListSpaces()
         return response.results
 
     async def get_ssh_key(self, raw_ssh=False):
@@ -2126,7 +1457,7 @@ class Model:
         key_facade = client.KeyManagerFacade.from_connection(self.connection())
         entity = {'tag': tag.model(self.info.uuid)}
         entities = client.Entities([entity])
-        return await key_facade.ListKeys(entities=entities, mode=raw_ssh)
+        return key_facade.ListKeys(entities=entities, mode=raw_ssh)
     get_ssh_keys = get_ssh_key
 
     async def remove_backup(self, backup_id):
@@ -2136,7 +1467,7 @@ class Model:
 
         """
         backups_facade = client.BackupsFacade.from_connection(self.connection())
-        return await backups_facade.Remove([backup_id])
+        return backups_facade.Remove([backup_id])
 
     async def remove_backups(self, backup_ids):
         """Delete the given backups.
@@ -2145,9 +1476,9 @@ class Model:
 
         """
         backups_facade = client.BackupsFacade.from_connection(self.connection())
-        return await backups_facade.Remove(backup_ids)
+        return backups_facade.Remove(backup_ids)
 
-    async def remove_ssh_key(self, user, key):
+    def remove_ssh_key(self, user, key):
         """Remove a public SSH key(s) from this model.
 
         :param str key: Full ssh key
@@ -2158,25 +1489,10 @@ class Model:
         key = base64.b64decode(bytes(key.strip().split()[1].encode('ascii')))
         key = hashlib.md5(key).hexdigest()
         key = ':'.join(a + b for a, b in zip(key[::2], key[1::2]))
-        await key_facade.DeleteKeys(ssh_keys=[key], user=user)
+        key_facade.DeleteKeys(ssh_keys=[key], user=user)
     remove_ssh_keys = remove_ssh_key
 
-    def restore_backup(
-            self, backup_id, bootstrap=False,
-            constraints=None, archive=None, upload_tools=False):
-        """Restore a backup archive to a new controller.
-
-        :param str backup_id: Id of backup to restore
-        :param bool bootstrap: Bootstrap a new state machine
-        :param constraints: Model constraints
-        :type constraints: :class:`juju.Constraints`
-        :param str archive: Path to backup archive to restore
-        :param bool upload_tools: Upload tools if bootstrapping a new machine
-
-        """
-        raise DeprecationWarning("juju restore-backup is deprecated in favor of the stand-alone 'juju-restore' tool: https://github.com/juju/juju-restore")
-
-    async def set_config(self, config):
+    def set_config(self, config):
         """Set configuration keys on this model.
 
         :param dict config: Mapping of config keys to either string values or
@@ -2194,9 +1510,9 @@ class Model:
                 new_conf[key] = value
             else:
                 raise JujuModelConfigError("Expected either a string or a ConfigValue as a config value, found : %s of type %s" % (value, type(value)))
-        await config_facade.ModelSet(config=new_conf)
+        config_facade.ModelSet(config=new_conf)
 
-    async def set_constraints(self, constraints):
+    def set_constraints(self, constraints):
         """Set machine constraints on this model.
 
         :param dict config: Mapping of model constraints
@@ -2206,11 +1522,11 @@ class Model:
 
         facade = facade_cls.from_connection(self.connection())
 
-        await facade.SetModelConstraints(
+        facade.SetModelConstraints(
             application='',
             constraints=constraints)
 
-    async def get_action_output(self, action_uuid, wait=None):
+    def get_action_output(self, action_uuid, wait=None):
         """ Get the results of an action by ID.
 
         :param str action_uuid: Id of the action
@@ -2218,11 +1534,11 @@ class Model:
         :return dict: Output from action
         :raises: :class:`JujuError` if invalid action_uuid
         """
-        action = await self._get_completed_action(action_uuid, wait=wait)
+        action = self._get_completed_action(action_uuid, wait=wait)
         # ActionResult.output is None if the action produced no output
         return {} if action.output is None else action.output
 
-    async def _get_completed_action(self, action_uuid, wait=None):
+    def _get_completed_action(self, action_uuid, wait=None):
         """Get the completed internal _definitions.Action object.
 
         :param str action_uuid: Id of the action
@@ -2239,20 +1555,21 @@ class Model:
         # model deltas and checking if they match our type. If the action
         # has already occured then the delta has gone.
 
-        async def _wait_for_action_status():
+        def _wait_for_action_status():
             while True:
-                action_output = await action_facade.Actions(entities=entity)
+                action_output = action_facade.Actions(entities=entity)
                 if action_output.results[0].status in ('completed', 'failed'):
                     return
                 else:
-                    await jasyncio.sleep(1)
-        await jasyncio.wait_for(
+                    time.sleep(1)
+        # TODO: replace with context manager
+        jasyncio.wait_for(
             _wait_for_action_status(),
             timeout=wait)
-        action_results = await action_facade.Actions(entities=entity)
+        action_results = action_facade.Actions(entities=entity)
         return action_results.results[0]
 
-    async def get_action_status(self, uuid_or_prefix=None, name=None):
+    def get_action_status(self, uuid_or_prefix=None, name=None):
         """Get the status of all actions, filtered by ID, ID prefix, or name.
 
         :param str uuid_or_prefix: Filter by action uuid or prefix
@@ -2265,23 +1582,23 @@ class Model:
             self.connection()
         )
         if name:
-            name_results = await action_facade.FindActionsByNames(names=[name])
+            name_results = action_facade.FindActionsByNames(names=[name])
             action_results.extend(name_results.actions[0].actions)
         if uuid_or_prefix:
             # Collect list of actions matching uuid or prefix
-            matching_actions = await action_facade.FindActionTagsByPrefix(
+            matching_actions = action_facade.FindActionTagsByPrefix(
                 prefixes=[uuid_or_prefix])
             entities = []
             for actions in matching_actions.matches.values():
                 entities = [{'tag': a.tag} for a in actions]
             # Get action results matching action tags
-            uuid_results = await action_facade.Actions(entities=entities)
+            uuid_results = action_facade.Actions(entities=entities)
             action_results.extend(uuid_results.results)
         for a in action_results:
             results[tag.untag('action-', a.action.tag)] = a.status
         return results
 
-    async def get_status(self, filters=None, utc=False):
+    def get_status(self, filters=None, utc=False):
         """Return the status of the model.
 
         :param str filters: Optional list of applications, units, or machines
@@ -2290,9 +1607,9 @@ class Model:
 
         """
         client_facade = client.ClientFacade.from_connection(self.connection())
-        return await client_facade.FullStatus(patterns=filters)
+        return client_facade.FullStatus(patterns=filters)
 
-    async def get_metrics(self, *tags):
+    def get_metrics(self, *tags):
         """Retrieve metrics.
 
         :param str *tags: Tags of entities from which to retrieve metrics.
@@ -2307,7 +1624,7 @@ class Model:
             self.connection())
 
         entities = [client.Entity(tag) for tag in tags]
-        metrics_result = await metrics_facade.GetMetrics(entities=entities)
+        metrics_result = metrics_facade.GetMetrics(entities=entities)
 
         metrics = collections.defaultdict(list)
 
@@ -2324,7 +1641,7 @@ class Model:
 
         return metrics
 
-    async def create_offer(self, endpoint, offer_name=None, application_name=None):
+    def create_offer(self, endpoint, offer_name=None, application_name=None):
         """
         Offer a deployed application using a series of endpoints for use by
         consumers.
@@ -2332,30 +1649,30 @@ class Model:
         @param endpoint: holds the application and endpoint you want to offer
         @param offer_name: over ride the offer name to help the consumer
         """
-        async with ConnectedController(self.connection()) as controller:
-            return await controller.create_offer(self.info.uuid, endpoint,
+        with ConnectedController(self.connection()) as controller:
+            return controller.create_offer(self.info.uuid, endpoint,
                                                  offer_name=offer_name,
                                                  application_name=application_name)
 
-    async def list_offers(self):
+    def list_offers(self):
         """
         Offers list information about applications' endpoints that have been
         shared and who is connected.
         """
-        async with ConnectedController(self.connection()) as controller:
-            return await controller.list_offers(self.name)
+        with ConnectedController(self.connection()) as controller:
+            return controller.list_offers(self.name)
 
-    async def remove_offer(self, endpoint, force=False):
+    def remove_offer(self, endpoint, force=False):
         """
         Remove offer for an application.
 
         Offers will also remove relations to those offers, use force to do
         so, without an error.
         """
-        async with ConnectedController(self.connection()) as controller:
-            return await controller.remove_offer(self.info.uuid, endpoint, force)
+        with ConnectedController(self.connection()) as controller:
+            return controller.remove_offer(self.info.uuid, endpoint, force)
 
-    async def consume(self, endpoint, application_alias="", controller_name=None, controller=None):
+    def consume(self, endpoint, application_alias="", controller_name=None, controller=None):
         """
         Adds a remote offer to the model. Relations can be created later using
         "juju relate".
@@ -2375,7 +1692,7 @@ class Model:
 
         source = None
         if controller_name:
-            source = await self._get_source_api(offer, controller_name=controller_name)
+            source = self._get_source_api(offer, controller_name=controller_name)
         else:
             if controller:
                 source = controller
@@ -2383,15 +1700,15 @@ class Model:
                 source = Controller()
                 kwargs = self.connection().connect_params()
                 kwargs["uuid"] = None
-                await source._connect_direct(**kwargs)
+                source._connect_direct(**kwargs)
 
-        consume_details = await source.get_consume_details(offer.as_local().string())
+        consume_details = source.get_consume_details(offer.as_local().string())
 
         # Only disconnect when the controller object has been created within
         # with function We don't want to disconnect the object passed by the
         # user in the controller argument
         if not controller:
-            await source.disconnect()
+            source.disconnect()
         if consume_details is None or consume_details.offer is None:
             raise JujuAPIError("missing consuming offer url for {}".format(offer.string()))
 
@@ -2406,7 +1723,7 @@ class Model:
                                    consume_details.external_controller)
 
         facade = client.ApplicationFacade.from_connection(self.connection())
-        results = await facade.Consume(args=[arg])
+        results = facade.Consume(args=[arg])
         if len(results.results) != 1:
             raise JujuAPIError("expected 1 result, recieved {}".format(len(results.results)))
         if results.results[0].error is not None:
@@ -2416,7 +1733,7 @@ class Model:
             local_name = application_alias
         return local_name
 
-    async def remove_saas(self, name):
+    def remove_saas(self, name):
         """
         Removing a consumed (SAAS) application will terminate any relations that
         application has, potentially leaving any related local applications
@@ -2429,14 +1746,14 @@ class Model:
         arg.application_tag = application_tag(name)
 
         facade = client.ApplicationFacade.from_connection(self.connection())
-        return await facade.DestroyConsumedApplications(applications=[arg])
+        return facade.DestroyConsumedApplications(applications=[arg])
 
-    async def export_bundle(self, filename=None):
+    def export_bundle(self, filename=None):
         """
         Exports the current model configuration as a reusable bundle.
         """
         facade = client.BundleFacade.from_connection(self.connection())
-        result = await facade.ExportBundle()
+        result = facade.ExportBundle()
         if result.error is not None:
             raise JujuAPIError(result.error)
 
@@ -2449,23 +1766,23 @@ class Model:
         except IOError:
             raise
 
-    async def list_secrets(self, filter="", show_secrets=False):
+    def list_secrets(self, filter="", show_secrets=False):
         """
         Returns the list of available secrets.
         """
         facade = client.SecretsFacade.from_connection(self.connection())
-        return await facade.ListSecrets({
+        return facade.ListSecrets({
             'filter': filter,
             'show-secrets': show_secrets,
         })
 
-    async def _get_source_api(self, url, controller_name=None):
+    def _get_source_api(self, url, controller_name=None):
         controller = Controller()
         if url.has_empty_source():
-            async with ConnectedController(self.connection()) as current:
+            with ConnectedController(self.connection()) as current:
                 if current.controller_name is not None:
                     controller_name = current.controller_name
-        await controller.connect(controller_name=controller_name)
+        controller.connect(controller_name=controller_name)
         return controller
 
     async def wait_for_idle(self, apps=None, raise_on_error=True, raise_on_blocked=False,
@@ -2750,14 +2067,3 @@ class CharmArchiveGenerator:
             return True
         if path.startswith('.'):
             return True
-
-
-class ModelInfo(ModelEntity):
-
-    @property
-    def tag(self):
-        return tag.model(self.uuid)
-
-    @staticmethod
-    def type_name_override():
-        return "model"

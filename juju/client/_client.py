@@ -4,11 +4,7 @@
 from juju.client._definitions import *
 
 
-<<<<<<< HEAD
-from juju.client import _client7, _client1, _client3, _client2, _client14, _client4, _client6, _client5, _client11, _client9, _client18, _client15
-=======
 from juju.client import _client7, _client1, _client3, _client4, _client2, _client17, _client6, _client11, _client10, _client5, _client9, _client18
->>>>>>> upstream/master
 
 
 CLIENTS = {
@@ -23,12 +19,7 @@ CLIENTS = {
     "10": _client10,
     "5": _client5,
     "9": _client9,
-<<<<<<< HEAD
-    "18": _client18,
-    "15": _client15
-=======
     "18": _client18
->>>>>>> upstream/master
 }
 
 

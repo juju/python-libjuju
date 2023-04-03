@@ -1557,7 +1557,7 @@ class CAASApplicationProvisionerFacade(Type):
 
 
     @ReturnMapping(NotifyWatchResults)
-    async def WatchProvisioningInfo(self, entities=None):
+    def WatchProvisioningInfo(self, entities=None):
         '''
         WatchProvisioningInfo provides a watcher for changes that affect the
         information returned by ProvisioningInfo. This is useful for ensuring the
@@ -1576,7 +1576,7 @@ class CAASApplicationProvisionerFacade(Type):
                    version=1,
                    params=_params)
         _params['entities'] = entities
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
@@ -1606,513 +1606,6 @@ class CAASApplicationProvisionerFacade(Type):
 
 
 
-<<<<<<< HEAD
-class CAASFirewallerEmbeddedFacade(Type):
-    name = 'CAASFirewallerEmbedded'
-    version = 1
-    schema =     {'definitions': {'ApplicationGetConfigResults': {'additionalProperties': False,
-                                                     'properties': {'Results': {'items': {'$ref': '#/definitions/ConfigResult'},
-                                                                                'type': 'array'}},
-                                                     'required': ['Results'],
-                                                     'type': 'object'},
-                     'BoolResult': {'additionalProperties': False,
-                                    'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                   'result': {'type': 'boolean'}},
-                                    'required': ['result'],
-                                    'type': 'object'},
-                     'BoolResults': {'additionalProperties': False,
-                                     'properties': {'results': {'items': {'$ref': '#/definitions/BoolResult'},
-                                                                'type': 'array'}},
-                                     'required': ['results'],
-                                     'type': 'object'},
-                     'Charm': {'additionalProperties': False,
-                               'properties': {'actions': {'$ref': '#/definitions/CharmActions'},
-                                              'config': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmOption'}},
-                                                         'type': 'object'},
-                                              'lxd-profile': {'$ref': '#/definitions/CharmLXDProfile'},
-                                              'manifest': {'$ref': '#/definitions/CharmManifest'},
-                                              'meta': {'$ref': '#/definitions/CharmMeta'},
-                                              'metrics': {'$ref': '#/definitions/CharmMetrics'},
-                                              'revision': {'type': 'integer'},
-                                              'url': {'type': 'string'}},
-                               'required': ['revision', 'url', 'config'],
-                               'type': 'object'},
-                     'CharmActionSpec': {'additionalProperties': False,
-                                         'properties': {'description': {'type': 'string'},
-                                                        'params': {'patternProperties': {'.*': {'additionalProperties': True,
-                                                                                                'type': 'object'}},
-                                                                   'type': 'object'}},
-                                         'required': ['description', 'params'],
-                                         'type': 'object'},
-                     'CharmActions': {'additionalProperties': False,
-                                      'properties': {'specs': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmActionSpec'}},
-                                                               'type': 'object'}},
-                                      'type': 'object'},
-                     'CharmBase': {'additionalProperties': False,
-                                   'properties': {'architectures': {'items': {'type': 'string'},
-                                                                    'type': 'array'},
-                                                  'channel': {'type': 'string'},
-                                                  'name': {'type': 'string'}},
-                                   'type': 'object'},
-                     'CharmContainer': {'additionalProperties': False,
-                                        'properties': {'mounts': {'items': {'$ref': '#/definitions/CharmMount'},
-                                                                  'type': 'array'},
-                                                       'resource': {'type': 'string'}},
-                                        'type': 'object'},
-                     'CharmDeployment': {'additionalProperties': False,
-                                         'properties': {'min-version': {'type': 'string'},
-                                                        'mode': {'type': 'string'},
-                                                        'service': {'type': 'string'},
-                                                        'type': {'type': 'string'}},
-                                         'required': ['type',
-                                                      'mode',
-                                                      'service',
-                                                      'min-version'],
-                                         'type': 'object'},
-                     'CharmDevice': {'additionalProperties': False,
-                                     'properties': {'CountMax': {'type': 'integer'},
-                                                    'CountMin': {'type': 'integer'},
-                                                    'Description': {'type': 'string'},
-                                                    'Name': {'type': 'string'},
-                                                    'Type': {'type': 'string'}},
-                                     'required': ['Name',
-                                                  'Description',
-                                                  'Type',
-                                                  'CountMin',
-                                                  'CountMax'],
-                                     'type': 'object'},
-                     'CharmLXDProfile': {'additionalProperties': False,
-                                         'properties': {'config': {'patternProperties': {'.*': {'type': 'string'}},
-                                                                   'type': 'object'},
-                                                        'description': {'type': 'string'},
-                                                        'devices': {'patternProperties': {'.*': {'patternProperties': {'.*': {'type': 'string'}},
-                                                                                                 'type': 'object'}},
-                                                                    'type': 'object'}},
-                                         'required': ['config',
-                                                      'description',
-                                                      'devices'],
-                                         'type': 'object'},
-                     'CharmManifest': {'additionalProperties': False,
-                                       'properties': {'bases': {'items': {'$ref': '#/definitions/CharmBase'},
-                                                                'type': 'array'}},
-                                       'type': 'object'},
-                     'CharmMeta': {'additionalProperties': False,
-                                   'properties': {'assumes-expr': {'$ref': '#/definitions/ExpressionTree'},
-                                                  'categories': {'items': {'type': 'string'},
-                                                                 'type': 'array'},
-                                                  'containers': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmContainer'}},
-                                                                 'type': 'object'},
-                                                  'deployment': {'$ref': '#/definitions/CharmDeployment'},
-                                                  'description': {'type': 'string'},
-                                                  'devices': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmDevice'}},
-                                                              'type': 'object'},
-                                                  'extra-bindings': {'patternProperties': {'.*': {'type': 'string'}},
-                                                                     'type': 'object'},
-                                                  'min-juju-version': {'type': 'string'},
-                                                  'name': {'type': 'string'},
-                                                  'payload-classes': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmPayloadClass'}},
-                                                                      'type': 'object'},
-                                                  'peers': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmRelation'}},
-                                                            'type': 'object'},
-                                                  'provides': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmRelation'}},
-                                                               'type': 'object'},
-                                                  'requires': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmRelation'}},
-                                                               'type': 'object'},
-                                                  'resources': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmResourceMeta'}},
-                                                                'type': 'object'},
-                                                  'series': {'items': {'type': 'string'},
-                                                             'type': 'array'},
-                                                  'storage': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmStorage'}},
-                                                              'type': 'object'},
-                                                  'subordinate': {'type': 'boolean'},
-                                                  'summary': {'type': 'string'},
-                                                  'tags': {'items': {'type': 'string'},
-                                                           'type': 'array'},
-                                                  'terms': {'items': {'type': 'string'},
-                                                            'type': 'array'}},
-                                   'required': ['name',
-                                                'summary',
-                                                'description',
-                                                'subordinate'],
-                                   'type': 'object'},
-                     'CharmMetric': {'additionalProperties': False,
-                                     'properties': {'description': {'type': 'string'},
-                                                    'type': {'type': 'string'}},
-                                     'required': ['type', 'description'],
-                                     'type': 'object'},
-                     'CharmMetrics': {'additionalProperties': False,
-                                      'properties': {'metrics': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmMetric'}},
-                                                                 'type': 'object'},
-                                                     'plan': {'$ref': '#/definitions/CharmPlan'}},
-                                      'required': ['metrics', 'plan'],
-                                      'type': 'object'},
-                     'CharmMount': {'additionalProperties': False,
-                                    'properties': {'location': {'type': 'string'},
-                                                   'storage': {'type': 'string'}},
-                                    'type': 'object'},
-                     'CharmOption': {'additionalProperties': False,
-                                     'properties': {'default': {'additionalProperties': True,
-                                                                'type': 'object'},
-                                                    'description': {'type': 'string'},
-                                                    'type': {'type': 'string'}},
-                                     'required': ['type'],
-                                     'type': 'object'},
-                     'CharmPayloadClass': {'additionalProperties': False,
-                                           'properties': {'name': {'type': 'string'},
-                                                          'type': {'type': 'string'}},
-                                           'required': ['name', 'type'],
-                                           'type': 'object'},
-                     'CharmPlan': {'additionalProperties': False,
-                                   'properties': {'required': {'type': 'boolean'}},
-                                   'required': ['required'],
-                                   'type': 'object'},
-                     'CharmRelation': {'additionalProperties': False,
-                                       'properties': {'interface': {'type': 'string'},
-                                                      'limit': {'type': 'integer'},
-                                                      'name': {'type': 'string'},
-                                                      'optional': {'type': 'boolean'},
-                                                      'role': {'type': 'string'},
-                                                      'scope': {'type': 'string'}},
-                                       'required': ['name',
-                                                    'role',
-                                                    'interface',
-                                                    'optional',
-                                                    'limit',
-                                                    'scope'],
-                                       'type': 'object'},
-                     'CharmResourceMeta': {'additionalProperties': False,
-                                           'properties': {'description': {'type': 'string'},
-                                                          'name': {'type': 'string'},
-                                                          'path': {'type': 'string'},
-                                                          'type': {'type': 'string'}},
-                                           'required': ['name',
-                                                        'type',
-                                                        'path',
-                                                        'description'],
-                                           'type': 'object'},
-                     'CharmStorage': {'additionalProperties': False,
-                                      'properties': {'count-max': {'type': 'integer'},
-                                                     'count-min': {'type': 'integer'},
-                                                     'description': {'type': 'string'},
-                                                     'location': {'type': 'string'},
-                                                     'minimum-size': {'type': 'integer'},
-                                                     'name': {'type': 'string'},
-                                                     'properties': {'items': {'type': 'string'},
-                                                                    'type': 'array'},
-                                                     'read-only': {'type': 'boolean'},
-                                                     'shared': {'type': 'boolean'},
-                                                     'type': {'type': 'string'}},
-                                      'required': ['name',
-                                                   'description',
-                                                   'type',
-                                                   'shared',
-                                                   'read-only',
-                                                   'count-min',
-                                                   'count-max',
-                                                   'minimum-size'],
-                                      'type': 'object'},
-                     'CharmURL': {'additionalProperties': False,
-                                  'properties': {'url': {'type': 'string'}},
-                                  'required': ['url'],
-                                  'type': 'object'},
-                     'ConfigResult': {'additionalProperties': False,
-                                      'properties': {'config': {'patternProperties': {'.*': {'additionalProperties': True,
-                                                                                             'type': 'object'}},
-                                                                'type': 'object'},
-                                                     'error': {'$ref': '#/definitions/Error'}},
-                                      'required': ['config'],
-                                      'type': 'object'},
-                     'Entities': {'additionalProperties': False,
-                                  'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
-                                                              'type': 'array'}},
-                                  'required': ['entities'],
-                                  'type': 'object'},
-                     'Entity': {'additionalProperties': False,
-                                'properties': {'tag': {'type': 'string'}},
-                                'required': ['tag'],
-                                'type': 'object'},
-                     'Error': {'additionalProperties': False,
-                               'properties': {'code': {'type': 'string'},
-                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
-                                                                                    'type': 'object'}},
-                                                       'type': 'object'},
-                                              'message': {'type': 'string'}},
-                               'required': ['message', 'code'],
-                               'type': 'object'},
-                     'ExpressionTree': {'additionalProperties': False,
-                                        'properties': {'Expression': {'additionalProperties': True,
-                                                                      'type': 'object'}},
-                                        'required': ['Expression'],
-                                        'type': 'object'},
-                     'LifeResult': {'additionalProperties': False,
-                                    'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                   'life': {'type': 'string'}},
-                                    'required': ['life'],
-                                    'type': 'object'},
-                     'LifeResults': {'additionalProperties': False,
-                                     'properties': {'results': {'items': {'$ref': '#/definitions/LifeResult'},
-                                                                'type': 'array'}},
-                                     'required': ['results'],
-                                     'type': 'object'},
-                     'NotifyWatchResult': {'additionalProperties': False,
-                                           'properties': {'NotifyWatcherId': {'type': 'string'},
-                                                          'error': {'$ref': '#/definitions/Error'}},
-                                           'required': ['NotifyWatcherId'],
-                                           'type': 'object'},
-                     'NotifyWatchResults': {'additionalProperties': False,
-                                            'properties': {'results': {'items': {'$ref': '#/definitions/NotifyWatchResult'},
-                                                                       'type': 'array'}},
-                                            'required': ['results'],
-                                            'type': 'object'},
-                     'StringsWatchResult': {'additionalProperties': False,
-                                            'properties': {'changes': {'items': {'type': 'string'},
-                                                                       'type': 'array'},
-                                                           'error': {'$ref': '#/definitions/Error'},
-                                                           'watcher-id': {'type': 'string'}},
-                                            'required': ['watcher-id'],
-                                            'type': 'object'},
-                     'StringsWatchResults': {'additionalProperties': False,
-                                             'properties': {'results': {'items': {'$ref': '#/definitions/StringsWatchResult'},
-                                                                        'type': 'array'}},
-                                             'required': ['results'],
-                                             'type': 'object'}},
-     'properties': {'ApplicationCharmInfo': {'description': 'ApplicationCharmInfo '
-                                                            'returns information '
-                                                            'about an '
-                                                            "application's charm.",
-                                             'properties': {'Params': {'$ref': '#/definitions/Entity'},
-                                                            'Result': {'$ref': '#/definitions/Charm'}},
-                                             'type': 'object'},
-                    'ApplicationsConfig': {'description': 'ApplicationsConfig '
-                                                          'returns the config for '
-                                                          'the specified '
-                                                          'applications.',
-                                           'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                          'Result': {'$ref': '#/definitions/ApplicationGetConfigResults'}},
-                                           'type': 'object'},
-                    'CharmInfo': {'description': 'CharmInfo returns information '
-                                                 'about the requested charm.',
-                                  'properties': {'Params': {'$ref': '#/definitions/CharmURL'},
-                                                 'Result': {'$ref': '#/definitions/Charm'}},
-                                  'type': 'object'},
-                    'IsExposed': {'description': 'IsExposed returns whether the '
-                                                 'specified applications are '
-                                                 'exposed.',
-                                  'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                 'Result': {'$ref': '#/definitions/BoolResults'}},
-                                  'type': 'object'},
-                    'Life': {'description': 'Life returns the life status of every '
-                                            'supplied entity, where available.',
-                             'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                            'Result': {'$ref': '#/definitions/LifeResults'}},
-                             'type': 'object'},
-                    'Watch': {'description': 'Watch starts an NotifyWatcher for '
-                                             'each given entity.',
-                              'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                             'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
-                              'type': 'object'},
-                    'WatchApplications': {'description': 'WatchApplications starts '
-                                                         'a StringsWatcher to '
-                                                         'watch applications\n'
-                                                         'deployed to this model.',
-                                          'properties': {'Result': {'$ref': '#/definitions/StringsWatchResult'}},
-                                          'type': 'object'},
-                    'WatchOpenedPorts': {'description': 'WatchOpenedPorts returns '
-                                                        'a new StringsWatcher for '
-                                                        'each given\n'
-                                                        'model tag.',
-                                         'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                        'Result': {'$ref': '#/definitions/StringsWatchResults'}},
-                                         'type': 'object'}},
-     'type': 'object'}
-    
-
-    @ReturnMapping(Charm)
-    def ApplicationCharmInfo(self, tag=None):
-        '''
-        ApplicationCharmInfo returns information about an application's charm.
-
-        tag : str
-        Returns -> Charm
-        '''
-        if tag is not None and not isinstance(tag, (bytes, str)):
-            raise Exception("Expected tag to be a str, received: {}".format(type(tag)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='CAASFirewallerEmbedded',
-                   request='ApplicationCharmInfo',
-                   version=1,
-                   params=_params)
-        _params['tag'] = tag
-        reply = self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ApplicationGetConfigResults)
-    def ApplicationsConfig(self, entities=None):
-        '''
-        ApplicationsConfig returns the config for the specified applications.
-
-        entities : typing.Sequence[~Entity]
-        Returns -> ApplicationGetConfigResults
-        '''
-        if entities is not None and not isinstance(entities, (bytes, str, list)):
-            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='CAASFirewallerEmbedded',
-                   request='ApplicationsConfig',
-                   version=1,
-                   params=_params)
-        _params['entities'] = entities
-        reply = self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(Charm)
-    def CharmInfo(self, url=None):
-        '''
-        CharmInfo returns information about the requested charm.
-
-        url : str
-        Returns -> Charm
-        '''
-        if url is not None and not isinstance(url, (bytes, str)):
-            raise Exception("Expected url to be a str, received: {}".format(type(url)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='CAASFirewallerEmbedded',
-                   request='CharmInfo',
-                   version=1,
-                   params=_params)
-        _params['url'] = url
-        reply = self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(BoolResults)
-    def IsExposed(self, entities=None):
-        '''
-        IsExposed returns whether the specified applications are exposed.
-
-        entities : typing.Sequence[~Entity]
-        Returns -> BoolResults
-        '''
-        if entities is not None and not isinstance(entities, (bytes, str, list)):
-            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='CAASFirewallerEmbedded',
-                   request='IsExposed',
-                   version=1,
-                   params=_params)
-        _params['entities'] = entities
-        reply = self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(LifeResults)
-    def Life(self, entities=None):
-        '''
-        Life returns the life status of every supplied entity, where available.
-
-        entities : typing.Sequence[~Entity]
-        Returns -> LifeResults
-        '''
-        if entities is not None and not isinstance(entities, (bytes, str, list)):
-            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='CAASFirewallerEmbedded',
-                   request='Life',
-                   version=1,
-                   params=_params)
-        _params['entities'] = entities
-        reply = self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(NotifyWatchResults)
-    def Watch(self, entities=None):
-        '''
-        Watch starts an NotifyWatcher for each given entity.
-
-        entities : typing.Sequence[~Entity]
-        Returns -> NotifyWatchResults
-        '''
-        if entities is not None and not isinstance(entities, (bytes, str, list)):
-            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='CAASFirewallerEmbedded',
-                   request='Watch',
-                   version=1,
-                   params=_params)
-        _params['entities'] = entities
-        reply = self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(StringsWatchResult)
-    def WatchApplications(self):
-        '''
-        WatchApplications starts a StringsWatcher to watch applications
-        deployed to this model.
-
-
-        Returns -> StringsWatchResult
-        '''
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='CAASFirewallerEmbedded',
-                   request='WatchApplications',
-                   version=1,
-                   params=_params)
-
-        reply = self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(StringsWatchResults)
-    def WatchOpenedPorts(self, entities=None):
-        '''
-        WatchOpenedPorts returns a new StringsWatcher for each given
-        model tag.
-
-        entities : typing.Sequence[~Entity]
-        Returns -> StringsWatchResults
-        '''
-        if entities is not None and not isinstance(entities, (bytes, str, list)):
-            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='CAASFirewallerEmbedded',
-                   request='WatchOpenedPorts',
-                   version=1,
-                   params=_params)
-        _params['entities'] = entities
-        reply = self.rpc(msg)
-        return reply
-
-
-
-=======
->>>>>>> upstream/master
 class CAASFirewallerFacade(Type):
     name = 'CAASFirewaller'
     version = 1
@@ -3003,7 +2496,7 @@ class CAASFirewallerSidecarFacade(Type):
 
 
     @ReturnMapping(ApplicationOpenedPortsResults)
-    async def GetApplicationOpenedPorts(self, tag=None):
+    def GetApplicationOpenedPorts(self, tag=None):
         '''
         GetApplicationOpenedPorts returns all the opened ports for each given application tag.
 
@@ -3020,7 +2513,7 @@ class CAASFirewallerSidecarFacade(Type):
                    version=1,
                    params=_params)
         _params['tag'] = tag
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
@@ -4976,257 +4469,6 @@ class CharmDownloaderFacade(Type):
 
 
 
-<<<<<<< HEAD
-class CharmHubFacade(Type):
-    name = 'CharmHub'
-    version = 1
-    schema =     {'definitions': {'BundleCharm': {'additionalProperties': False,
-                                     'properties': {'name': {'type': 'string'},
-                                                    'package-id': {'type': 'string'}},
-                                     'required': ['name', 'package-id'],
-                                     'type': 'object'},
-                     'Channel': {'additionalProperties': False,
-                                 'properties': {'platforms': {'items': {'$ref': '#/definitions/Platform'},
-                                                              'type': 'array'},
-                                                'released-at': {'type': 'string'},
-                                                'revision': {'type': 'integer'},
-                                                'risk': {'type': 'string'},
-                                                'size': {'type': 'integer'},
-                                                'track': {'type': 'string'},
-                                                'version': {'type': 'string'}},
-                                 'required': ['released-at',
-                                              'track',
-                                              'risk',
-                                              'revision',
-                                              'size',
-                                              'version',
-                                              'platforms'],
-                                 'type': 'object'},
-                     'CharmHubBundle': {'additionalProperties': False,
-                                        'properties': {'charms': {'items': {'$ref': '#/definitions/BundleCharm'},
-                                                                  'type': 'array'}},
-                                        'required': ['charms'],
-                                        'type': 'object'},
-                     'CharmHubCharm': {'additionalProperties': False,
-                                       'properties': {'config': {'patternProperties': {'.*': {'$ref': '#/definitions/CharmOption'}},
-                                                                 'type': 'object'},
-                                                      'relations': {'patternProperties': {'.*': {'patternProperties': {'.*': {'type': 'string'}},
-                                                                                                 'type': 'object'}},
-                                                                    'type': 'object'},
-                                                      'subordinate': {'type': 'boolean'},
-                                                      'used-by': {'items': {'type': 'string'},
-                                                                  'type': 'array'}},
-                                       'required': ['config',
-                                                    'relations',
-                                                    'subordinate',
-                                                    'used-by'],
-                                       'type': 'object'},
-                     'CharmHubEntityFindResult': {'additionalProperties': False,
-                                                  'properties': {'errors': {'$ref': '#/definitions/ErrorResponse'},
-                                                                 'result': {'items': {'$ref': '#/definitions/FindResponse'},
-                                                                            'type': 'array'}},
-                                                  'required': ['result', 'errors'],
-                                                  'type': 'object'},
-                     'CharmHubEntityInfoResult': {'additionalProperties': False,
-                                                  'properties': {'errors': {'$ref': '#/definitions/ErrorResponse'},
-                                                                 'result': {'$ref': '#/definitions/InfoResponse'}},
-                                                  'required': ['result', 'errors'],
-                                                  'type': 'object'},
-                     'CharmHubError': {'additionalProperties': False,
-                                       'properties': {'code': {'type': 'string'},
-                                                      'message': {'type': 'string'}},
-                                       'required': ['code', 'message'],
-                                       'type': 'object'},
-                     'CharmOption': {'additionalProperties': False,
-                                     'properties': {'default': {'additionalProperties': True,
-                                                                'type': 'object'},
-                                                    'description': {'type': 'string'},
-                                                    'type': {'type': 'string'}},
-                                     'required': ['type'],
-                                     'type': 'object'},
-                     'ErrorResponse': {'additionalProperties': False,
-                                       'properties': {'error-list': {'$ref': '#/definitions/CharmHubError'}},
-                                       'required': ['error-list'],
-                                       'type': 'object'},
-                     'FindResponse': {'additionalProperties': False,
-                                      'properties': {'architectures': {'items': {'type': 'string'},
-                                                                       'type': 'array'},
-                                                     'id': {'type': 'string'},
-                                                     'name': {'type': 'string'},
-                                                     'os': {'items': {'type': 'string'},
-                                                            'type': 'array'},
-                                                     'publisher': {'type': 'string'},
-                                                     'series': {'items': {'type': 'string'},
-                                                                'type': 'array'},
-                                                     'store-url': {'type': 'string'},
-                                                     'summary': {'type': 'string'},
-                                                     'type': {'type': 'string'},
-                                                     'version': {'type': 'string'}},
-                                      'required': ['type',
-                                                   'id',
-                                                   'name',
-                                                   'publisher',
-                                                   'summary',
-                                                   'version',
-                                                   'store-url'],
-                                      'type': 'object'},
-                     'Info': {'additionalProperties': False,
-                              'properties': {'channel': {'type': 'string'},
-                                             'tag': {'type': 'string'}},
-                              'required': ['tag'],
-                              'type': 'object'},
-                     'InfoResponse': {'additionalProperties': False,
-                                      'properties': {'bundle': {'$ref': '#/definitions/CharmHubBundle'},
-                                                     'channel-map': {'patternProperties': {'.*': {'$ref': '#/definitions/Channel'}},
-                                                                     'type': 'object'},
-                                                     'charm': {'$ref': '#/definitions/CharmHubCharm'},
-                                                     'description': {'type': 'string'},
-                                                     'id': {'type': 'string'},
-                                                     'name': {'type': 'string'},
-                                                     'publisher': {'type': 'string'},
-                                                     'series': {'items': {'type': 'string'},
-                                                                'type': 'array'},
-                                                     'store-url': {'type': 'string'},
-                                                     'summary': {'type': 'string'},
-                                                     'tags': {'items': {'type': 'string'},
-                                                              'type': 'array'},
-                                                     'tracks': {'items': {'type': 'string'},
-                                                                'type': 'array'},
-                                                     'type': {'type': 'string'}},
-                                      'required': ['type',
-                                                   'id',
-                                                   'name',
-                                                   'description',
-                                                   'publisher',
-                                                   'summary',
-                                                   'series',
-                                                   'store-url',
-                                                   'tags',
-                                                   'channel-map',
-                                                   'tracks'],
-                                      'type': 'object'},
-                     'Platform': {'additionalProperties': False,
-                                  'properties': {'architecture': {'type': 'string'},
-                                                 'channel': {'type': 'string'},
-                                                 'os': {'type': 'string'},
-                                                 'series': {'type': 'string'}},
-                                  'required': ['architecture',
-                                               'os',
-                                               'channel',
-                                               'series'],
-                                  'type': 'object'},
-                     'Query': {'additionalProperties': False,
-                               'properties': {'category': {'type': 'string'},
-                                              'channel': {'type': 'string'},
-                                              'platforms': {'type': 'string'},
-                                              'publisher': {'type': 'string'},
-                                              'query': {'type': 'string'},
-                                              'relation-provides': {'type': 'string'},
-                                              'relation-requires': {'type': 'string'},
-                                              'type': {'type': 'string'}},
-                               'required': ['query'],
-                               'type': 'object'}},
-     'properties': {'Find': {'description': 'Find queries the CharmHub API with a '
-                                            'given entity ID.',
-                             'properties': {'Params': {'$ref': '#/definitions/Query'},
-                                            'Result': {'$ref': '#/definitions/CharmHubEntityFindResult'}},
-                             'type': 'object'},
-                    'Info': {'description': 'Info queries the CharmHub API with a '
-                                            'given entity ID.',
-                             'properties': {'Params': {'$ref': '#/definitions/Info'},
-                                            'Result': {'$ref': '#/definitions/CharmHubEntityInfoResult'}},
-                             'type': 'object'}},
-     'type': 'object'}
-    
-
-    @ReturnMapping(CharmHubEntityFindResult)
-    def Find(self, category=None, channel=None, platforms=None, publisher=None, query=None, relation_provides=None, relation_requires=None, type_=None):
-        '''
-        Find queries the CharmHub API with a given entity ID.
-
-        category : str
-        channel : str
-        platforms : str
-        publisher : str
-        query : str
-        relation_provides : str
-        relation_requires : str
-        type_ : str
-        Returns -> CharmHubEntityFindResult
-        '''
-        if category is not None and not isinstance(category, (bytes, str)):
-            raise Exception("Expected category to be a str, received: {}".format(type(category)))
-
-        if channel is not None and not isinstance(channel, (bytes, str)):
-            raise Exception("Expected channel to be a str, received: {}".format(type(channel)))
-
-        if platforms is not None and not isinstance(platforms, (bytes, str)):
-            raise Exception("Expected platforms to be a str, received: {}".format(type(platforms)))
-
-        if publisher is not None and not isinstance(publisher, (bytes, str)):
-            raise Exception("Expected publisher to be a str, received: {}".format(type(publisher)))
-
-        if query is not None and not isinstance(query, (bytes, str)):
-            raise Exception("Expected query to be a str, received: {}".format(type(query)))
-
-        if relation_provides is not None and not isinstance(relation_provides, (bytes, str)):
-            raise Exception("Expected relation_provides to be a str, received: {}".format(type(relation_provides)))
-
-        if relation_requires is not None and not isinstance(relation_requires, (bytes, str)):
-            raise Exception("Expected relation_requires to be a str, received: {}".format(type(relation_requires)))
-
-        if type_ is not None and not isinstance(type_, (bytes, str)):
-            raise Exception("Expected type_ to be a str, received: {}".format(type(type_)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='CharmHub',
-                   request='Find',
-                   version=1,
-                   params=_params)
-        _params['category'] = category
-        _params['channel'] = channel
-        _params['platforms'] = platforms
-        _params['publisher'] = publisher
-        _params['query'] = query
-        _params['relation-provides'] = relation_provides
-        _params['relation-requires'] = relation_requires
-        _params['type'] = type_
-        reply = self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(CharmHubEntityInfoResult)
-    def Info(self, channel=None, tag=None):
-        '''
-        Info queries the CharmHub API with a given entity ID.
-
-        channel : str
-        tag : str
-        Returns -> CharmHubEntityInfoResult
-        '''
-        if channel is not None and not isinstance(channel, (bytes, str)):
-            raise Exception("Expected channel to be a str, received: {}".format(type(channel)))
-
-        if tag is not None and not isinstance(tag, (bytes, str)):
-            raise Exception("Expected tag to be a str, received: {}".format(type(tag)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='CharmHub',
-                   request='Info',
-                   version=1,
-                   params=_params)
-        _params['channel'] = channel
-        _params['tag'] = tag
-        reply = self.rpc(msg)
-        return reply
-
-
-
-=======
->>>>>>> upstream/master
 class CredentialManagerFacade(Type):
     name = 'CredentialManager'
     version = 1
@@ -5485,7 +4727,7 @@ class CrossModelSecretsFacade(Type):
     
 
     @ReturnMapping(StringResults)
-    async def GetSecretAccessScope(self, relations=None):
+    def GetSecretAccessScope(self, relations=None):
         '''
         GetSecretAccessScope returns the tokens for the access scope of the specified secrets and consumers.
 
@@ -5502,13 +4744,13 @@ class CrossModelSecretsFacade(Type):
                    version=1,
                    params=_params)
         _params['relations'] = relations
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(SecretContentResults)
-    async def GetSecretContentInfo(self, relations=None):
+    def GetSecretContentInfo(self, relations=None):
         '''
         GetSecretContentInfo returns the secret values for the specified secrets.
 
@@ -5525,7 +4767,7 @@ class CrossModelSecretsFacade(Type):
                    version=1,
                    params=_params)
         _params['relations'] = relations
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
@@ -10273,7 +9515,7 @@ class SecretBackendsFacade(Type):
     
 
     @ReturnMapping(ErrorResults)
-    async def AddSecretBackends(self, args=None):
+    def AddSecretBackends(self, args=None):
         '''
         AddSecretBackends adds new secret backends.
 
@@ -10290,13 +9532,13 @@ class SecretBackendsFacade(Type):
                    version=1,
                    params=_params)
         _params['args'] = args
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ListSecretBackendsResults)
-    async def ListSecretBackends(self, names=None, reveal=None):
+    def ListSecretBackends(self, names=None, reveal=None):
         '''
         ListSecretBackends lists available secret backends.
 
@@ -10318,13 +9560,13 @@ class SecretBackendsFacade(Type):
                    params=_params)
         _params['names'] = names
         _params['reveal'] = reveal
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def RemoveSecretBackends(self, args=None):
+    def RemoveSecretBackends(self, args=None):
         '''
         RemoveSecretBackends removes secret backends.
 
@@ -10341,13 +9583,13 @@ class SecretBackendsFacade(Type):
                    version=1,
                    params=_params)
         _params['args'] = args
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(ErrorResults)
-    async def UpdateSecretBackends(self, args=None):
+    def UpdateSecretBackends(self, args=None):
         '''
         UpdateSecretBackends updates secret backends.
 
@@ -10364,7 +9606,7 @@ class SecretBackendsFacade(Type):
                    version=1,
                    params=_params)
         _params['args'] = args
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
@@ -10432,7 +9674,7 @@ class SecretBackendsManagerFacade(Type):
     
 
     @ReturnMapping(ErrorResults)
-    async def RotateBackendTokens(self, backend_ids=None):
+    def RotateBackendTokens(self, backend_ids=None):
         '''
         RotateBackendTokens rotates the tokens for the specified backends.
 
@@ -10449,13 +9691,13 @@ class SecretBackendsManagerFacade(Type):
                    version=1,
                    params=_params)
         _params['backend-ids'] = backend_ids
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(SecretBackendRotateWatchResult)
-    async def WatchSecretBackendsRotateChanges(self):
+    def WatchSecretBackendsRotateChanges(self):
         '''
         WatchSecretBackendsRotateChanges sets up a watcher to notify of changes to secret backend rotations.
 
@@ -10470,7 +9712,7 @@ class SecretBackendsManagerFacade(Type):
                    version=1,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
@@ -10517,7 +9759,7 @@ class SecretBackendsRotateWatcherFacade(Type):
     
 
     @ReturnMapping(SecretBackendRotateWatchResult)
-    async def Next(self):
+    def Next(self):
         '''
         Next returns when a change has occurred to an entity of the
         collection being watched since the most recent call to Next
@@ -10534,13 +9776,13 @@ class SecretBackendsRotateWatcherFacade(Type):
                    version=1,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
     @ReturnMapping(None)
-    async def Stop(self):
+    def Stop(self):
         '''
         Stop stops the watcher.
 
@@ -10555,12 +9797,12 @@ class SecretBackendsRotateWatcherFacade(Type):
                    version=1,
                    params=_params)
 
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
 
-    async def rpc(self, msg):
+    def rpc(self, msg):
         '''
         Patch rpc method to add Id.
         '''
@@ -10569,7 +9811,7 @@ class SecretBackendsRotateWatcherFacade(Type):
         msg['Id'] = id
 
         from .facade import TypeEncoder
-        reply = await self.connection.rpc(msg, encoder=TypeEncoder)
+        reply = self.connection.rpc(msg, encoder=TypeEncoder)
         return reply
 
 
@@ -11201,7 +10443,7 @@ class SecretsManagerFacade(Type):
 
 
     @ReturnMapping(SecretBackendConfigResults)
-    async def GetSecretBackendConfig(self, backend_ids=None):
+    def GetSecretBackendConfig(self, backend_ids=None):
         '''
         GetSecretBackendConfig gets the config needed to create a client to secret backends.
 
@@ -11218,7 +10460,7 @@ class SecretsManagerFacade(Type):
                    version=1,
                    params=_params)
         _params['backend-ids'] = backend_ids
-        reply = await self.rpc(msg)
+        reply = self.rpc(msg)
         return reply
 
 
@@ -11267,13 +10509,8 @@ class SecretsManagerFacade(Type):
 
 
 
-<<<<<<< HEAD
-    @ReturnMapping(SecretStoreConfig)
-    def GetSecretStoreConfig(self):
-=======
     @ReturnMapping(SecretContentResults)
-    async def GetSecretRevisionContentInfo(self, pending_delete=None, revisions=None, uri=None):
->>>>>>> upstream/master
+    def GetSecretRevisionContentInfo(self, pending_delete=None, revisions=None, uri=None):
         '''
         GetSecretRevisionContentInfo returns the secret values for the specified secret revisions.
         Used when deleting a secret; only returns external revision info.
@@ -11298,15 +10535,10 @@ class SecretsManagerFacade(Type):
                    request='GetSecretRevisionContentInfo',
                    version=1,
                    params=_params)
-<<<<<<< HEAD
-
-        reply = self.rpc(msg)
-=======
         _params['pending-delete'] = pending_delete
         _params['revisions'] = revisions
         _params['uri'] = uri
-        reply = await self.rpc(msg)
->>>>>>> upstream/master
+        reply = self.rpc(msg)
         return reply
 
 
@@ -11524,110 +10756,6 @@ class SecretsManagerFacade(Type):
 
 
 
-<<<<<<< HEAD
-class SecretsRotationWatcherFacade(Type):
-    name = 'SecretsRotationWatcher'
-    version = 1
-    schema =     {'definitions': {'Error': {'additionalProperties': False,
-                               'properties': {'code': {'type': 'string'},
-                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
-                                                                                    'type': 'object'}},
-                                                       'type': 'object'},
-                                              'message': {'type': 'string'}},
-                               'required': ['message', 'code'],
-                               'type': 'object'},
-                     'SecretRotationChange': {'additionalProperties': False,
-                                              'properties': {'last-rotate-time': {'format': 'date-time',
-                                                                                  'type': 'string'},
-                                                             'rotate-interval': {'type': 'integer'},
-                                                             'secret-id': {'type': 'integer'},
-                                                             'url': {'type': 'string'}},
-                                              'required': ['secret-id',
-                                                           'url',
-                                                           'rotate-interval',
-                                                           'last-rotate-time'],
-                                              'type': 'object'},
-                     'SecretRotationWatchResult': {'additionalProperties': False,
-                                                   'properties': {'changes': {'items': {'$ref': '#/definitions/SecretRotationChange'},
-                                                                              'type': 'array'},
-                                                                  'error': {'$ref': '#/definitions/Error'},
-                                                                  'watcher-id': {'type': 'string'}},
-                                                   'required': ['watcher-id',
-                                                                'changes'],
-                                                   'type': 'object'}},
-     'properties': {'Next': {'description': 'Next returns when a change has '
-                                            'occurred to an entity of the\n'
-                                            'collection being watched since the '
-                                            'most recent call to Next\n'
-                                            'or the Watch call that created the '
-                                            'srvSecretRotationWatcher.',
-                             'properties': {'Result': {'$ref': '#/definitions/SecretRotationWatchResult'}},
-                             'type': 'object'},
-                    'Stop': {'description': 'Stop stops the watcher.',
-                             'type': 'object'}},
-     'type': 'object'}
-    
-
-    @ReturnMapping(SecretRotationWatchResult)
-    def Next(self):
-        '''
-        Next returns when a change has occurred to an entity of the
-        collection being watched since the most recent call to Next
-        or the Watch call that created the srvSecretRotationWatcher.
-
-
-        Returns -> SecretRotationWatchResult
-        '''
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='SecretsRotationWatcher',
-                   request='Next',
-                   version=1,
-                   params=_params)
-
-        reply = self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(None)
-    def Stop(self):
-        '''
-        Stop stops the watcher.
-
-
-        Returns -> None
-        '''
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='SecretsRotationWatcher',
-                   request='Stop',
-                   version=1,
-                   params=_params)
-
-        reply = self.rpc(msg)
-        return reply
-
-
-
-    def rpc(self, msg):
-        '''
-        Patch rpc method to add Id.
-        '''
-        if not hasattr(self, 'Id'):
-            raise RuntimeError('Missing "Id" field')
-        msg['Id'] = id
-
-        from .facade import TypeEncoder
-        reply = self.connection.rpc(msg, encoder=TypeEncoder)
-        return reply
-
-
-
-=======
->>>>>>> upstream/master
 class SecretsTriggerWatcherFacade(Type):
     name = 'SecretsTriggerWatcher'
     version = 1

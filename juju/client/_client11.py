@@ -2565,11 +2565,7 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(FindToolsResult)
-<<<<<<< HEAD
-    def FindTools(self, agentstream=None, arch=None, major=None, minor=None, number=None, os_type=None):
-=======
-    async def FindTools(self, agentstream=None, arch=None, major=None, number=None, os_type=None):
->>>>>>> upstream/master
+    def FindTools(self, agentstream=None, arch=None, major=None, number=None, os_type=None):
         '''
         FindTools returns a List containing all tools matching the given parameters.
 
