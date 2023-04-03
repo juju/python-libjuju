@@ -1,5 +1,5 @@
 name: file-resource-charm
-series: ["focal"]
+series: ["jammy"]
 summary: "test local file resource"
 description: "charm for test deploy local file resource"
 maintainers: ["test"]

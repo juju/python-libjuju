@@ -1,0 +1,10 @@
+# Copyright 2021 Canonical Ltd.
+# See LICENSE file for licensing details.
+type: charm
+bases:
+  - build-on:
+      - name: "ubuntu"
+        channel: "20.04"
+    run-on:
+      - name: "ubuntu"
+        channel: "20.04"

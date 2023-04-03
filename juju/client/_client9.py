@@ -5,6 +5,7 @@ from juju.client.facade import Type, ReturnMapping
 from juju.client._definitions import *
 
 
+<<<<<<< HEAD
 class MachineManagerFacade(Type):
     name = 'MachineManager'
     version = 9
@@ -657,6 +658,8 @@ class MachineManagerFacade(Type):
 
 
 
+=======
+>>>>>>> upstream/master
 class ModelManagerFacade(Type):
     name = 'ModelManager'
     version = 9
@@ -733,7 +736,8 @@ class ModelManagerFacade(Type):
                                                         'mem': {'type': 'integer'},
                                                         'root-disk': {'type': 'integer'},
                                                         'tags': {'items': {'type': 'string'},
-                                                                 'type': 'array'}},
+                                                                 'type': 'array'},
+                                                        'virt-type': {'type': 'string'}},
                                          'type': 'object'},
                      'MapResult': {'additionalProperties': False,
                                    'properties': {'error': {'$ref': '#/definitions/Error'},
@@ -754,6 +758,10 @@ class ModelManagerFacade(Type):
                                               'uuid': {'type': 'string'}},
                                'required': ['name', 'uuid', 'type', 'owner-tag'],
                                'type': 'object'},
+                     'ModelApplicationInfo': {'additionalProperties': False,
+                                              'properties': {'name': {'type': 'string'}},
+                                              'required': ['name'],
+                                              'type': 'object'},
                      'ModelCreateArgs': {'additionalProperties': False,
                                          'properties': {'cloud-tag': {'type': 'string'},
                                                         'config': {'patternProperties': {'.*': {'additionalProperties': True,
@@ -812,6 +820,7 @@ class ModelManagerFacade(Type):
                                                   'cloud-region': {'type': 'string'},
                                                   'cloud-tag': {'type': 'string'},
                                                   'controller-uuid': {'type': 'string'},
+                                                  'default-base': {'type': 'string'},
                                                   'default-series': {'type': 'string'},
                                                   'is-controller': {'type': 'boolean'},
                                                   'life': {'type': 'string'},
@@ -821,6 +830,8 @@ class ModelManagerFacade(Type):
                                                   'name': {'type': 'string'},
                                                   'owner-tag': {'type': 'string'},
                                                   'provider-type': {'type': 'string'},
+                                                  'secret-backends': {'items': {'$ref': '#/definitions/SecretBackendResult'},
+                                                                      'type': 'array'},
                                                   'sla': {'$ref': '#/definitions/ModelSLAInfo'},
                                                   'status': {'$ref': '#/definitions/EntityStatus'},
                                                   'supported-features': {'items': {'$ref': '#/definitions/SupportedFeature'},
@@ -839,6 +850,7 @@ class ModelManagerFacade(Type):
                                                 'life',
                                                 'users',
                                                 'machines',
+                                                'secret-backends',
                                                 'sla',
                                                 'agent-version'],
                                    'type': 'object'},
@@ -878,6 +890,8 @@ class ModelManagerFacade(Type):
                                       'type': 'object'},
                      'ModelStatus': {'additionalProperties': False,
                                      'properties': {'application-count': {'type': 'integer'},
+                                                    'applications': {'items': {'$ref': '#/definitions/ModelApplicationInfo'},
+                                                                     'type': 'array'},
                                                     'error': {'$ref': '#/definitions/Error'},
                                                     'filesystems': {'items': {'$ref': '#/definitions/ModelFilesystemInfo'},
                                                                     'type': 'array'},
@@ -1015,6 +1029,29 @@ class ModelManagerFacade(Type):
                                                                  'type': 'object'}},
                                         'required': ['region-name', 'value'],
                                         'type': 'object'},
+                     'SecretBackend': {'additionalProperties': False,
+                                       'properties': {'backend-type': {'type': 'string'},
+                                                      'config': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                              'type': 'object'}},
+                                                                 'type': 'object'},
+                                                      'name': {'type': 'string'},
+                                                      'token-rotate-interval': {'type': 'integer'}},
+                                       'required': ['name',
+                                                    'backend-type',
+                                                    'config'],
+                                       'type': 'object'},
+                     'SecretBackendResult': {'additionalProperties': False,
+                                             'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                            'id': {'type': 'string'},
+                                                            'message': {'type': 'string'},
+                                                            'num-secrets': {'type': 'integer'},
+                                                            'result': {'$ref': '#/definitions/SecretBackend'},
+                                                            'status': {'type': 'string'}},
+                                             'required': ['result',
+                                                          'id',
+                                                          'num-secrets',
+                                                          'status'],
+                                             'type': 'object'},
                      'SetModelDefaults': {'additionalProperties': False,
                                           'properties': {'config': {'items': {'$ref': '#/definitions/ModelDefaultValues'},
                                                                     'type': 'array'}},

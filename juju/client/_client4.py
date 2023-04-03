@@ -663,6 +663,7 @@ class ApplicationOffersFacade(Type):
 
 
 
+<<<<<<< HEAD
 class CharmsFacade(Type):
     name = 'Charms'
     version = 4
@@ -1393,6 +1394,8 @@ class CharmsFacade(Type):
 
 
 
+=======
+>>>>>>> upstream/master
 class InstancePollerFacade(Type):
     name = 'InstancePoller'
     version = 4
@@ -4195,6 +4198,7 @@ class StorageProvisionerFacade(Type):
         return reply
 
 
+<<<<<<< HEAD
 
 class SubnetsFacade(Type):
     name = 'Subnets'
@@ -4428,3 +4432,5 @@ class SubnetsFacade(Type):
         return reply
 
 
+=======
+>>>>>>> upstream/master

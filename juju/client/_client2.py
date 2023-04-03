@@ -5,6 +5,7 @@ from juju.client.facade import Type, ReturnMapping
 from juju.client._definitions import *
 
 
+<<<<<<< HEAD
 class AllWatcherFacade(Type):
     name = 'AllWatcher'
     version = 2
@@ -86,6 +87,8 @@ class AllWatcherFacade(Type):
 
 
 
+=======
+>>>>>>> upstream/master
 class AnnotationsFacade(Type):
     name = 'Annotations'
     version = 2
@@ -2884,6 +2887,7 @@ class HighAvailabilityFacade(Type):
 
 
 
+<<<<<<< HEAD
 class ImageManagerFacade(Type):
     name = 'ImageManager'
     version = 2
@@ -2992,6 +2996,8 @@ class ImageManagerFacade(Type):
 
 
 
+=======
+>>>>>>> upstream/master
 class LeadershipServiceFacade(Type):
     name = 'LeadershipService'
     version = 2
@@ -4679,6 +4685,7 @@ class RemoteRelationsFacade(Type):
 
 
 
+<<<<<<< HEAD
 class ResourcesFacade(Type):
     name = 'Resources'
     version = 2
@@ -4942,6 +4949,8 @@ class ResumerFacade(Type):
 
 
 
+=======
+>>>>>>> upstream/master
 class SingularFacade(Type):
     name = 'Singular'
     version = 2

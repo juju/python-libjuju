@@ -451,6 +451,8 @@ class {}(Type):
         capture.clear(name)
         capture[name].write(source)
         capture[name].write("\n\n")
+        if name is None:
+            print(source)
         co = compile(source, __name__, "exec")
         ns = _getns(schema)
         exec(co, ns)

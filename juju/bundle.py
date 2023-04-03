@@ -15,7 +15,7 @@ from .client import client
 from .constraints import parse as parse_constraints, parse_storage_constraint, parse_device_constraint
 from .errors import JujuError
 from . import utils, jasyncio
-from .origin import Channel
+from .origin import Channel, Source
 from .url import Schema, URL
 
 log = logging.getLogger(__name__)
@@ -34,7 +34,6 @@ class BundleHandler:
         self.overlays = []
         self.overlay_removed_charms = set()
 
-        self.charmstore = model.charmstore
         self.plan = []
         self.references = {}
         self._units_by_app = {}
@@ -124,11 +123,10 @@ class BundleHandler:
                 pass
             except FileNotFoundError:
                 continue
-            series = (
-                app_dict.get('series') or
-                default_series or
-                await get_charm_series(charm_dir, self.model)
-            )
+            series = (app_dict.get('series') or default_series)
+            if not series:
+                metadata = utils.get_local_charm_metadata(charm_dir)
+                series = await get_charm_series(metadata, self.model)
             if not self.model.connection().is_using_old_client and not series:
                 raise JujuError(
                     "Couldn't determine series for charm at {}. "
@@ -236,11 +234,7 @@ class BundleHandler:
             bundle_yaml = (Path(entity_id) / "bundle.yaml").read_text()
             bundle_dir = Path(entity_id)
 
-        if Schema.CHARM_STORE.matches(charm_url.schema):
-            bundle_yaml = await self.charmstore.files(entity_id,
-                                                      filename='bundle.yaml',
-                                                      read_file=True)
-        elif Schema.CHARM_HUB.matches(charm_url.schema):
+        if Schema.CHARM_HUB.matches(charm_url.schema):
             bundle_yaml = await self._download_bundle(charm_url, origin)
 
         if not bundle_yaml:
@@ -362,15 +356,13 @@ class BundleHandler:
                 channel = Channel.parse(spec['channel'])
                 track, risk = channel.track, channel.risk
 
-                # if not track and series:
-                #     track = utils.get_series_version(series)
             if self.charms_facade is not None:
                 if cons is not None and cons['arch'] != '':
                     architecture = cons['arch']
                 else:
                     architecture = await self.model._resolve_architecture(charm_url)
 
-                origin = client.CharmOrigin(source="charm-hub",
+                origin = client.CharmOrigin(source=Source.CHARM_HUB.value,
                                             architecture=architecture,
                                             risk=risk,
                                             track=track)
@@ -380,9 +372,7 @@ class BundleHandler:
                 charm_url, charm_origin, _ = await self.model._resolve_charm(charm_url, origin)
                 spec['charm'] = str(charm_url)
             else:
-                results = await self.model.charmstore.entity(str(charm_url))
-                charm_url = results.get('Id', charm_url)
-                charm_origin = client.CharmOrigin(source="charm-store",
+                charm_origin = client.CharmOrigin(source=Source.CHARM_HUB.value,
                                                   risk=risk,
                                                   track=track)
 
@@ -430,32 +420,17 @@ def is_local_charm(charm_url):
     return charm_url.startswith('.') or charm_url.startswith('local:') or os.path.isabs(charm_url)
 
 
-async def get_charm_series(path, model):
-    """Inspects the charm directory at ``path`` and returns a default
-    series from its metadata.yaml (the first item in the 'series' list).
+async def get_charm_series(metadata, model):
+    """Inspects the given metadata and returns a default series from its
+    metadata.yaml (the first item in the 'series' list).
 
-    Tries to extract the informiation from the given model if no
-    series is determined from the path.
+    Tries to extract the information from the given model if no
+    series is determined from the given metadata.
     Returns None if no series can be determined.
 
     """
-    path = Path(path)
-    try:
-        if path.suffix == '.charm':
-            md = "metadata.yaml in %s" % path
-            with zipfile.ZipFile(str(path), 'r') as charm_file:
-                data = yaml.safe_load(charm_file.read('metadata.yaml'))
-        else:
-            md = path / "metadata.yaml"
-            if not md.exists():
-                return None
-            data = yaml.safe_load(md.open())
-    except yaml.YAMLError as exc:
-        if hasattr(exc, "problem_mark"):
-            mark = exc.problem_mark
-            log.error("Error parsing YAML file {}, line {}, column: {}".format(md, mark.line, mark.column))
-        raise
-    _series = data.get('series')
+
+    _series = metadata.get('series')
     series = _series[0] if _series else None
 
     if series is None:
@@ -612,9 +587,7 @@ class AddApplicationChange(ChangeInfo):
 
         # set the channel to the default value if not specified
         if not self.channel:
-            if Schema.CHARM_STORE.matches(url.schema):
-                self.channel = "stable"
-            elif Schema.CHARM_HUB.matches(url.schema):
+            if Schema.CHARM_HUB.matches(url.schema):
                 self.channel = "latest/stable"
             else:   # for local charms
                 self.channel = ""
@@ -632,17 +605,13 @@ class AddApplicationChange(ChangeInfo):
         if origin is None:
             raise JujuError("expected origin to be valid for application {} and charm {} with channel {}".format(self.application, str(url), str(channel)))
 
-        if self.series is None or self.series == "":
+        if not self.series:
             self.series = context.bundle.get("series", None)
 
-        if Schema.CHARM_STORE.matches(url.schema):
-            resources = await context.model._add_store_resources(
-                self.application, charm, overrides=self.resources)
-        elif Schema.CHARM_HUB.matches(url.schema):
+        resources = context.bundle.get("applications", {}).get(self.application, {}).get("resources", {})
+        if Schema.CHARM_HUB.matches(url.schema):
             resources = await context.model._add_charmhub_resources(
                 self.application, charm, origin, overrides=self.resources)
-        else:
-            resources = context.bundle.get("applications", {}).get(self.application, {}).get("resources", {})
 
         await context.model._deploy(
             charm_url=charm,
@@ -739,13 +708,6 @@ class AddCharmChange(ChangeInfo):
         if Schema.LOCAL.matches(url.schema):
             return self.charm
 
-        if Schema.CHARM_STORE.matches(url.schema):
-            entity_id = await context.charmstore.entityId(self.charm, channel=self.channel)
-            log.debug('Adding %s', entity_id)
-            await context.charms_facade.AddCharm(channel=self.channel, url=entity_id, force=False)
-            identifier = entity_id
-            origin = client.CharmOrigin(source="charm-store", risk="stable")
-
         if Schema.CHARM_HUB.matches(url.schema):
             ch = Channel('latest', 'stable')
             if self.channel:
@@ -753,7 +715,7 @@ class AddCharmChange(ChangeInfo):
             arch = self.architecture
             if not arch:
                 arch = await context.model._resolve_architecture(url)
-            origin = client.CharmOrigin(source="charm-hub",
+            origin = client.CharmOrigin(source=Source.CHARM_HUB.value,
                                         architecture=arch,
                                         risk=ch.risk,
                                         track=ch.track)

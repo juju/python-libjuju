@@ -13,6 +13,7 @@ import websocket
 from juju import errors, tag, utils, jasyncio
 from juju.client import client
 from juju.utils import IdQueue
+from juju.version import TARGET_JUJU_VERSION
 
 log = logging.getLogger('juju.client.connection')
 
@@ -23,23 +24,22 @@ client_facades = {
     'Agent': {'versions': [2, 3]},
     'AgentTools': {'versions': [1]},
     'AllModelWatcher': {'versions': [2, 3, 4]},
-    'AllWatcher': {'versions': [1, 2, 3]},
+    'AllWatcher': {'versions': [1, 2, 3, 4]},
     'Annotations': {'versions': [2]},
-    'Application': {'versions': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
-                                 14, 15]},
+    'Application': {'versions': [14, 15, 16, 17]},
     'ApplicationOffers': {'versions': [1, 2, 4]},
     'ApplicationScaler': {'versions': [1]},
     'Backups': {'versions': [1, 2, 3]},
     'Block': {'versions': [2]},
-    'Bundle': {'versions': [1, 2, 3, 4, 5, 6]},
+    'Bundle': {'versions': [5, 6]},
     'CharmHub': {'versions': [1]},
     'CharmRevisionUpdater': {'versions': [2]},
     'CharmDownloader': {'versions': [1]},
-    'Charms': {'versions': [2, 3, 4, 5]},
+    'Charms': {'versions': [5, 6]},
     'Cleaner': {'versions': [2]},
-    'Client': {'versions': [1, 2, 5, 6]},
+    'Client': {'versions': [5, 6]},
     'Cloud': {'versions': [1, 2, 3, 4, 5, 7]},
-    'Controller': {'versions': [3, 4, 5, 6, 7, 8, 9, 11]},
+    'Controller': {'versions': [9, 11]},
     'CrossModelRelations': {'versions': [1, 2]},
     'CrossController': {'versions': [1]},
     'CredentialManager': {'versions': [1]},
@@ -81,7 +81,7 @@ client_facades = {
     'LogForwarding': {'versions': [1]},
     'Machiner': {'versions': [1, 2, 5]},
     'MachineActions': {'versions': [1]},
-    'MachineManager': {'versions': [2, 3, 4, 7, 8, 9]},
+    'MachineManager': {'versions': [9, 10]},
     'MachineUndertaker': {'versions': [1]},
     'MeterStatus': {'versions': [1, 2]},
     'MetricsAdder': {'versions': [2]},
@@ -102,7 +102,7 @@ client_facades = {
     'Payloads': {'versions': [1]},
     'PayloadsHookContext': {'versions': [1]},
     'Pinger': {'versions': [1]},
-    'Provisioner': {'versions': [3, 4, 5, 6, 11]},
+    'Provisioner': {'versions': [11]},
     'ProxyUpdater': {'versions': [1, 2]},
     'RaftLease': {'versions': [1, 2]},
     'Reboot': {'versions': [2]},
@@ -116,10 +116,13 @@ client_facades = {
     'RetryStrategy': {'versions': [1]},
     'Secrets': {'versions': [1]},
     'SecretsManager': {'versions': [1]},
+    'SecretBackends': {'versions': [1]},
+    'SecretBackendsManager': {'versions': [1]},
+    'SecretBackendsRotateWatcher': {'versions': [1]},
     'SecretsRotationWatcher': {'versions': [1]},
     'SecretsTriggerWatcher': {'versions': [1]},
     'Singular': {'versions': [2]},
-    'Spaces': {'versions': [2, 3, 4, 5, 6]},
+    'Spaces': {'versions': [6]},
     'StatusHistory': {'versions': [2]},
     'Storage': {'versions': [3, 4, 6]},
     'StorageProvisioner': {'versions': [3, 4]},
@@ -128,7 +131,7 @@ client_facades = {
     'SSHClient': {'versions': [1, 2, 3, 4]},
     'Undertaker': {'versions': [1]},
     'UnitAssigner': {'versions': [1]},
-    'Uniter': {'versions': [4, 5, 6, 7, 8, 18]},
+    'Uniter': {'versions': [18]},
     'Upgrader': {'versions': [1]},
     'UpgradeSeries': {'versions': [1, 3]},
     'UpgradeSteps': {'versions': [1, 2]},
@@ -862,9 +865,6 @@ class Connection:
                 macaroonJSON = result.get('discharge-required')
                 if macaroonJSON is None:
                     self.info = result
-                    # Whenever a connection is established, set
-                    # the new_client flag in the Client module
-                    client.set_new_client(self.info['server-version'])
                     success = True
                     return result
                 macaroon = bakery.Macaroon.from_dict(macaroonJSON)
@@ -940,6 +940,8 @@ class Connection:
 
     def login(self):
         params = {}
+        # Set the client version
+        params['client-version'] = TARGET_JUJU_VERSION
         params['auth-tag'] = self.usertag
         if self.password:
             params['credentials'] = self.password

@@ -710,6 +710,7 @@ class AgentFacade(Type):
 
 
 
+<<<<<<< HEAD
 class AllModelWatcherFacade(Type):
     name = 'AllModelWatcher'
     version = 3
@@ -791,6 +792,8 @@ class AllModelWatcherFacade(Type):
 
 
 
+=======
+>>>>>>> upstream/master
 class AllWatcherFacade(Type):
     name = 'AllWatcher'
     version = 3
@@ -2455,8 +2458,8 @@ class ResourcesFacade(Type):
                                                            'are not available '
                                                            'until\n'
                                                            'resolved. Handles '
-                                                           'CharmHub, CharmStore '
-                                                           'and Local charms.',
+                                                           'CharmHub and Local '
+                                                           'charms.',
                                             'properties': {'Params': {'$ref': '#/definitions/AddPendingResourcesArgsV2'},
                                                            'Result': {'$ref': '#/definitions/AddPendingResourcesResult'}},
                                             'type': 'object'},
@@ -2474,7 +2477,7 @@ class ResourcesFacade(Type):
         '''
         AddPendingResources adds the provided resources (info) to the Juju
         model in a pending state, meaning they are not available until
-        resolved. Handles CharmHub, CharmStore and Local charms.
+        resolved. Handles CharmHub and Local charms.
 
         entity : Entity
         charm_origin : CharmOrigin
@@ -2542,6 +2545,7 @@ class ResourcesFacade(Type):
 
 
 
+<<<<<<< HEAD
 class SSHClientFacade(Type):
     name = 'SSHClient'
     version = 3
@@ -2794,6 +2798,8 @@ class SSHClientFacade(Type):
 
 
 
+=======
+>>>>>>> upstream/master
 class UpgradeSeriesFacade(Type):
     name = 'UpgradeSeries'
     version = 3
@@ -2866,7 +2872,8 @@ class UpgradeSeriesFacade(Type):
                                                 'required': ['results'],
                                                 'type': 'object'},
                      'PinnedLeadershipResult': {'additionalProperties': False,
-                                                'properties': {'result': {'patternProperties': {'.*': {'items': {'type': 'string'},
+                                                'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                               'result': {'patternProperties': {'.*': {'items': {'type': 'string'},
                                                                                                        'type': 'array'}},
                                                                           'type': 'object'}},
                                                 'type': 'object'},

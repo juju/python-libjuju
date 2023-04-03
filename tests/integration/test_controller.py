@@ -1,5 +1,6 @@
 import asyncio
 import uuid
+import hvac
 
 from juju.client.connection import Connection
 from juju.client import client
@@ -235,3 +236,77 @@ async def test_add_remove_cloud(event_loop):
             assert cloud.type_ == "kubernetes"
         finally:
             await controller.remove_cloud(cloud_name)
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_secrets_backend_lifecycle(event_loop):
+    """Testing the add_secret_backends is particularly
+    costly in term of resources. This test sets a vault
+    charm, add it to the controller and plays with the
+    list, removal, and update. """
+    async with base.CleanModel() as m:
+        controller = await m.get_controller()
+        # deploy postgresql
+        await m.deploy('postgresql', series="focal")
+        # deploy vault
+        await m.deploy("vault", series="focal")
+        # relate/integrate
+        await m.relate("vault:db", "postgresql:db")
+        # wait for the
+        await m.wait_for_idle(["vault"])
+        # expose vault
+        vault_app = m.applications["vault"]
+        await vault_app.expose()
+
+        # Get a vault client
+        # Deploy this entire thing
+        status = await m.get_status()
+        target = ""
+        for unit in status.applications['vault'].units.values():
+            target = unit.public_address
+
+        vault_url = "http://%s:8200" % target
+        vault_client = hvac.Client(url=vault_url)
+
+        # Initialize vault
+        keys = vault_client.sys.initialize(3, 2)
+
+        # authorize charm
+        target_unit = m.applications['vault'].units[0]
+        action = await target_unit.run_action("authorize-charm", token=keys['root_token'])
+        action = await action.wait()
+
+        # Unseal vault
+        vault_client.sys.submit_unseal_keys(keys['keys'])
+
+        # Add the secret backend
+        response = await controller.add_secret_backends("1001", "myvault", "vault", {"endpoint": vault_url})
+        assert response["results"] is not None
+        assert response["results"][0]['error'] is None
+
+        # List the secrets backend
+        list = await controller.list_secret_backends()
+        assert len(list["results"]) == 2
+        # consider the internal secrets backend
+        for entry in list["results"]:
+            assert entry["result"].name == "internal" or entry["result"].name == "myvault"
+
+        # Update it
+        resp = await controller.update_secret_backends("myvault", name_change="changed_name")
+        assert resp["results"][0]["error"] is None
+
+        # List the secrets backend
+        list = await controller.list_secret_backends()
+        assert len(list["results"]) == 2
+        # consider the internal secrets backend
+        for entry in list["results"]:
+            assert entry["result"].name == "internal" or entry["result"].name == "changed_name"
+
+        # Remove it
+        await controller.remove_secret_backends("changed_name")
+
+        # Finally after removing
+        list_after = await controller.list_secret_backends()
+        assert len(list_after["results"]) == 1
+        assert list_after["results"][0]["result"].name == "internal"

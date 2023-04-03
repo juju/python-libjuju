@@ -2621,6 +2621,7 @@ class FirewallerFacade(Type):
         return reply
 
 
+<<<<<<< HEAD
 
 class MachineManagerFacade(Type):
     name = 'MachineManager'
@@ -3335,3 +3336,5 @@ class MachineManagerFacade(Type):
         return reply
 
 
+=======
+>>>>>>> upstream/master

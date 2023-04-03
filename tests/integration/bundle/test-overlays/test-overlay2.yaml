@@ -1,7 +1,7 @@
-description: An overlay for the wiki-simple bundle to remove mysql and add memcached
+description: An overlay for the grafana bundle to remove prometheus and add memcached
 applications:
   test:
-  mysql:
+  prometheus:
   memcached:
     charm: "memcached"
     channel: stable

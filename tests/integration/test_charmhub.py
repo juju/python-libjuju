@@ -9,8 +9,8 @@ from juju import jasyncio
 @pytest.mark.asyncio
 async def test_info(event_loop):
     async with base.CleanModel() as model:
-        _, name = await model.charmhub.get_charm_id("hello-juju")
-        assert name == "hello-juju"
+        _, name = await model.charmhub.get_charm_id("ubuntu")
+        assert name == "ubuntu"
 
         charm_name = 'juju-qa-test'
         charm_info = await model.charmhub.info(charm_name)
@@ -96,6 +96,7 @@ async def test_find_all(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.skip('This tries to test juju controller logic')
 async def test_subordinate_charm_zero_units(event_loop):
     # normally in pylibjuju deploy num_units defaults to 1, we switch
     # that to 0 behind the scenes if we see that the charmhub charm

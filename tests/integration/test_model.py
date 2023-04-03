@@ -49,11 +49,15 @@ async def test_deploy_local_bundle_dir(event_loop):
     async with base.CleanModel() as model:
         await model.deploy(str(bundle_path))
 
-        keystone = model.applications.get('keystone')
-        mysql = model.applications.get('mysql-innodb')
-        assert keystone and mysql
-        await model.block_until(lambda: (len(keystone.units) == 1 and
-                                len(mysql.units) == 1),
+        app1 = model.applications.get('grafana')
+        app2 = model.applications.get('prometheus')
+        with open("/tmp/output", "w") as writer:
+            writer.write(str(bundle_path) + "\n")
+            for (k, v) in model.applications.items():
+                writer.write(k)
+        assert app1 and app2
+        await model.block_until(lambda: (len(app1.units) == 1 and
+                                len(app2.units) == 1),
                                 timeout=60 * 4)
 
 
@@ -66,11 +70,11 @@ async def test_deploy_local_bundle_file(event_loop):
     async with base.CleanModel() as model:
         await model.deploy(str(mini_bundle_file_path))
 
-        ghost = model.applications.get('ghost')
-        mysql = model.applications.get('mysql')
-        assert ghost and mysql
-        await model.block_until(lambda: (len(ghost.units) == 1 and
-                                len(mysql.units) == 1),
+        app1 = model.applications.get('grafana')
+        app2 = model.applications.get('prometheus')
+        assert app1 and app2
+        await model.block_until(lambda: (len(app1.units) == 1 and
+                                len(app2.units) == 1),
                                 timeout=60 * 4)
 
 
@@ -97,12 +101,12 @@ async def test_deploy_local_bundle_include_file(event_loop):
     async with base.CleanModel() as model:
         await model.deploy(str(bundle_yaml_path))
 
-        mysql = model.applications.get('mysql', None)
-        ghost = model.applications.get('ghost', None)
+        appa = model.applications.get('helloa', None)
+        appb = model.applications.get('hellob', None)
         test = model.applications.get('test', None)
-        assert mysql and ghost and test
-        assert ghost.config.get('port', None) == 2369
-        assert ghost.config.get('url', "") == 'http://my-ghost.blg'
+        assert appa and appb and test
+        assert appa.config.get('port', None) == 666
+        assert appa.config.get('application-repo', "") == "http://my-juju.com"
 
 
 @base.bootstrapped
@@ -114,11 +118,11 @@ async def test_deploy_local_bundle_include_base64(event_loop):
     async with base.CleanModel() as model:
         await model.deploy(str(bundle_yaml_path))
 
-        mysql = model.applications.get('mysql', None)
-        ghost = model.applications.get('ghost', None)
+        appa = model.applications.get('helloa', None)
+        appb = model.applications.get('hellob', None)
         test = model.applications.get('test', None)
-        assert mysql and ghost and test
-        assert mysql.config.get('tuning-level', '') == 'fast'
+        assert appa and appb and test
+        assert appa.config.get('application-repo', "") == "http://my-juju.com"
 
 
 @base.bootstrapped
@@ -150,6 +154,18 @@ async def test_deploy_invalid_bundle(event_loop):
 @pytest.mark.asyncio
 async def test_deploy_local_charm(event_loop):
     charm_path = TESTS_DIR / 'charm'
+
+    async with base.CleanModel() as model:
+        await model.deploy(str(charm_path))
+        assert 'charm' in model.applications
+        await model.wait_for_idle(status="active")
+        assert model.units['charm/0'].workload_status == 'active'
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_deploy_local_charm_base_charmcraft_yaml(event_loop):
+    charm_path = HERE_DIR / 'charm-base-charmcraft-yaml'
 
     async with base.CleanModel() as model:
         await model.deploy(str(charm_path))
@@ -251,16 +267,11 @@ async def test_deploy_bundle_with_multiple_overlays_with_include_files(event_loo
         overlay2_path = OVERLAYS_DIR / 'test-overlay3.yaml'
 
         await model.deploy(str(bundle_yaml_path), overlays=[overlay1_path, overlay2_path])
-        # the bundle : installs ghost, mysql and a local test charm
-        # overlay1   : removes test, mysql, installs memcached
-        # overlay2   : removes memcached, adds config to ghost with include-file
-        assert 'mysql' not in model.applications
+
+        assert 'influxdb' not in model.applications
         assert 'test' not in model.applications
         assert 'memcached' not in model.applications
-        assert 'ghost' in model.applications
-        ghost = model.applications.get('ghost', None)
-        assert ghost.config.get('port', None) == 2369
-        assert ghost.config.get('url', "") == 'http://my-ghost.blg'
+        assert 'grafana' in model.applications
 
 
 @base.bootstrapped
@@ -296,23 +307,6 @@ async def test_deploy_trusted_bundle(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_deploy_channels_revs(event_loop):
-    pytest.skip('Revise to use local charms - shouldnt fail b/c of origin')
-    async with base.CleanModel() as model:
-        charm = 'cs:~johnsca/libjuju-test'
-        stable = await model.deploy(charm, 'a1')
-        edge = await model.deploy(charm, 'a2', channel='edge')
-        rev = await model.deploy(charm + '-2', 'a3')
-
-        assert [a.charm_url for a in (stable, edge, rev)] == [
-            'cs:~johnsca/libjuju-test-1',
-            'cs:~johnsca/libjuju-test-2',
-            'cs:~johnsca/libjuju-test-2',
-        ]
-
-
-@base.bootstrapped
-@pytest.mark.asyncio
 async def test_deploy_from_ch_with_series(event_loop):
     charm = 'ch:ubuntu'
     for series in ['focal']:
@@ -340,6 +334,14 @@ async def test_deploy_from_ch_with_invalid_series(event_loop):
             assert False, 'Invalid deployment should raise JujuError'
         except JujuError:
             pass
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_deploy_with_base(event_loop):
+    async with base.CleanModel() as model:
+        await model.deploy("ubuntu", base="ubuntu@22.04")
+        await model.wait_for_idle(status='active')
 
 
 @base.bootstrapped
@@ -833,14 +835,15 @@ async def test_wait_for_idle_with_exact_units_scale_down(event_loop):
         app = await model.deploy(
             'ubuntu',
             application_name='ubuntu',
-            series='bionic',
+            series='jammy',
             channel='stable',
             num_units=3,
         )
         await model.wait_for_idle(timeout=5 * 60, wait_for_exact_units=3)
 
         two_units_to_remove = [u.name for u in app.units[:2]]
-        await app.destroy_units(*two_units_to_remove)
+        for unit_tag in two_units_to_remove:
+            await app.destroy_units(unit_tag)
 
         # assert that the following wait is not returning instantaneously
         start_time = time.perf_counter()
@@ -861,15 +864,15 @@ async def test_wait_for_idle_with_exact_units_scale_down_zero(event_loop):
         app = await model.deploy(
             'ubuntu',
             application_name='ubuntu',
-            series='bionic',
+            series='jammy',
             channel='stable',
             num_units=3,
         )
         await model.wait_for_idle(timeout=5 * 60, wait_for_exact_units=3)
 
-        units_to_remove = [u.name for u in app.units]
         # Remove all the units
-        await app.destroy_units(*units_to_remove)
+        for u in app.units:
+            await app.destroy_units(u.name)
 
         # assert that the following wait is not returning instantaneously
         start_time = time.perf_counter()
@@ -877,6 +880,23 @@ async def test_wait_for_idle_with_exact_units_scale_down_zero(event_loop):
         end_time = time.perf_counter()
         # checking if waited more than 10ms
         assert (end_time - start_time) > 0.001
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_destroy_units(event_loop):
+    async with base.CleanModel() as model:
+        app = await model.deploy(
+            'ubuntu',
+            application_name='ubuntu',
+            series='jammy',
+            channel='stable',
+            num_units=3,
+        )
+        await model.wait_for_idle(status='active')
+        await model.destroy_units(*[u.name for u in app.units])
+        await model.wait_for_idle(timeout=5 * 60, wait_for_exact_units=0)
+        assert app.units == []
 
 
 @base.bootstrapped
@@ -1066,6 +1086,7 @@ async def test_connect_to_connection(event_loop):
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_connect_current(event_loop):
+    pytest.skip("This assumes that we have a model to connect to...")
     m = Model()
     await m.connect_current()
     assert m.is_connected()
@@ -1205,9 +1226,10 @@ async def test_list_storage(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_storage_pools(event_loop):
+async def test_storage_pools_on_lxd(event_loop):
+    # This will fail when ran on anything but lxd
     async with base.CleanModel() as model:
-        await model.deploy('postgresql')
+        await model.deploy('ubuntu')
         await model.wait_for_idle(status="active")
 
         await model.create_storage_pool("test-pool", "lxd")
@@ -1218,3 +1240,24 @@ async def test_storage_pools(event_loop):
         await jasyncio.sleep(5)
         pools = await model.list_storage_pools()
         assert "test-pool" not in [p['name'] for p in pools]
+
+
+# This test can only work if we can fully upgrade the whole charm
+# with the corresponding logic :)
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_list_secrets(event_loop):
+    """Use the charm-secret charm definition and see if the
+    arguments defined in the secret are correct or not."""
+
+    charm_path = TESTS_DIR / 'charm-secret/charm-secret_ubuntu-22.04-amd64.charm'
+
+    async with base.CleanModel() as model:
+        await model.deploy(str(charm_path))
+        assert 'charm-secret' in model.applications
+        await model.wait_for_idle(status="active")
+        assert model.units['charm-secret/0'].workload_status == 'active'
+
+        secrets = await model.list_secrets(show_secrets=True)
+        assert secrets.results is not None
+        assert len(secrets.results) == 1

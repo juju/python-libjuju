@@ -5,6 +5,7 @@ from juju.client.facade import Type, ReturnMapping
 from juju.client._definitions import *
 
 
+<<<<<<< HEAD
 class CharmsFacade(Type):
     name = 'Charms'
     version = 5
@@ -2633,6 +2634,8 @@ class ClientFacade(Type):
 
 
 
+=======
+>>>>>>> upstream/master
 class MachinerFacade(Type):
     name = 'Machiner'
     version = 5

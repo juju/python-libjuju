@@ -1,6 +1,34 @@
 Changelog
 ---------
 
+3.1.0.1
+^^^^^^^
+
+Friday 10th February 2023
+
+This release targets juju version 3.1.0 and enables the new secrets backend api.
+Connectivity with juju controllers in the 3.x series is allowed, connections with different major version controllers (e.g. 2.x, 4.x, etc.) will be cancelled.
+
+This version is only tested using Juju 3.1.0.
+
+## What's Changed
+* setup.py: adjust websockets versions for py38-310 by @mert-kirpici in https://github.com/juju/python-libjuju/pull/731
+* [JUJU-2175] Remove juju 2.9 support on 3.1.0 by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/774
+* [JUJU-2276] Series or base for local charms by @cderici in https://github.com/juju/python-libjuju/pull/777
+* [JUJU-2391] Fix wrong bases analysis. by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/782
+* [JUJU-2401] Added release candidate workflow. by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/784
+* [JUJU-2402] Prepare nightly juju edge testing. by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/785
+* [JUJU-2237] Remove charmstore charm support from pylibjuju by @cderici in https://github.com/juju/python-libjuju/pull/786
+* [JUJU-2426] Secrets support by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/791
+* [JUJU-2573] Base argument for model deploy by @cderici in https://github.com/juju/python-libjuju/pull/798
+* Add compatibility for juju 3.1.0 by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/799
+* Replace schemas.json with a wellformed version. by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/800
+
+## New Contributors
+* @mert-kirpici made their first contribution in https://github.com/juju/python-libjuju/pull/731
+
+**Full Changelog**: https://github.com/juju/python-libjuju/compare/3.0.4...3.1.0.1
+
 3.0.4
 ^^^^^
 
