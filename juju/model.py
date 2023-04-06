@@ -552,22 +552,13 @@ class CharmhubDeployType:
         origin = client.CharmOrigin(source="charm-hub",
                                     architecture=architecture,
                                     risk=ch.risk,
-                                    track=ch.track)
+                                    track=ch.track,
+                                    series=series)
 
-        charm_url_str, origin, supported_series = await self.charm_resolver(url, origin)
-        charm_url = URL.parse(charm_url_str)
+        charm_url, origin = await self.charm_resolver(url, origin, force)
 
         if app_name is None:
             app_name = url.name
-
-        if series:
-            # Check whether the charm supports this series
-            # or we force it
-            if series in supported_series or force:
-                origin.series = series
-                charm_url.series = series
-            else:
-                raise JujuError("Series {} not supported for {}. Only {}".format(series, url, supported_series))
 
         return DeployTypeResult(
             identifier=str(charm_url),
@@ -1722,7 +1713,7 @@ class Model:
         client_facade = client.ClientFacade.from_connection(self.connection())
         return await client_facade.AddCharm(channel=str(origin.risk), url=charm_url, force=False)
 
-    async def _resolve_charm(self, url, origin):
+    async def _resolve_charm(self, url, origin, force):
         charms_cls = client.CharmsFacade
         if charms_cls.best_facade_version(self.connection()) < 3:
             raise JujuError("resolve charm")
@@ -1733,9 +1724,11 @@ class Model:
             source = "charm-store"
         else:
             source = "charm-hub"
+
         resp = await charms_facade.ResolveCharms(resolve=[{
             'reference': str(url),
             'charm-origin': {
+                'series': origin.series,
                 'source': source,
                 'architecture': origin.architecture,
                 'track': origin.track,
@@ -1749,7 +1742,18 @@ class Model:
         if result.error:
             raise JujuError(result.error.message)
 
-        return (result.url, result.charm_origin, result.supported_series)
+        supported_series = result.supported_series
+        charm_url = URL.parse(result.url)
+        if origin.series:
+            # Check whether the charm supports this series
+            # or we force it
+            if origin.series in supported_series or force:
+                result.charm_origin.series = origin.series
+                charm_url.series = origin.series
+            else:
+                raise JujuError("Series {} not supported for {}. Only {}".format(origin.series, result.url, supported_series))
+
+        return charm_url, result.charm_origin
 
     async def _resolve_architecture(self, url):
         if url.architecture:
