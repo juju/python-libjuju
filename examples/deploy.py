@@ -25,10 +25,9 @@ async def main():
             channel='stable',
         )
 
+
         print('Waiting for active')
-        await model.block_until(
-            lambda: all(unit.workload_status == 'active'
-                        for unit in application.units))
+        await model.wait_for_idle(status='active')
 
         print('Removing ubuntu')
         await application.remove()
