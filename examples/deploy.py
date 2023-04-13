@@ -25,7 +25,6 @@ async def main():
             channel='stable',
         )
 
-
         print('Waiting for active')
         await model.wait_for_idle(status='active')
 
