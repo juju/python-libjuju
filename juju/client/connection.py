@@ -873,9 +873,13 @@ class Connection:
         if not self._pinger_task:
             self._pinger_task = jasyncio.create_task(self._pinger())
 
-    def _build_facades(self, facades):
+    # _build_facades takes the facade list that comes from the connection with the controller,
+    # validates that the client knows about them (client_facades) and builds the facade list
+    # (into the self.specified facades) with the max versions that both the client and the controller
+    # can negotiate on
+    def _build_facades(self, facades_from_connection):
         self.facades.clear()
-        for facade in facades:
+        for facade in facades_from_connection:
             name = facade['name']
             # the following attempts to get the best facade version for the
             # client. The client knows about the best facade versions it speaks,
@@ -884,31 +888,31 @@ class Connection:
             if (name not in client_facades) and (name not in self.specified_facades):
                 # if a facade is required but the client doesn't know about
                 # it, then log a warning.
-                log.warning('unknown facade {}'.format(name))
+                log.warning(f'unexpected facade {name} received from the controller')
 
             try:
-                known = []
                 # allow the ability to specify a set of facade versions, so the
-                # client can define the non-conservitive facade client pinning.
+                # client can define the non-conservative facade client pinning.
                 if name in self.specified_facades:
-                    known = self.specified_facades[name]['versions']
+                    client_versions = self.specified_facades[name]['versions']
                 elif name in client_facades:
-                    known = client_facades[name]['versions']
-                else:
-                    raise errors.JujuConnectionError("unexpected facade {}".format(name))
-                discovered = facade['versions']
-                version = max(set(known).intersection(set(discovered)))
+                    client_versions = client_facades[name]['versions']
+
+                controller_versions = facade['versions']
+                # select the max version that both the client and the controller know
+                version = max(set(client_versions).intersection(set(controller_versions)))
             except ValueError:
-                # this can occur if known is [1, 2] and discovered is [3, 4]
-                # there is just no way to know how to communicate with the
-                # facades we're trying to call.
-                log.warning("unknown common facade version for {}".format(name))
+                # this can occur if client_verisons is [1, 2] and controller_versions is [3, 4]
+                # there is just no way to know how to communicate with the facades we're trying to call.
+                log.warning(f'unknown common facade version for {name},\n'
+                            f'versions known to client : {client_versions}\n'
+                            f'versions known to controller : {controller_versions}')
             except errors.JujuConnectionError:
                 # If the facade isn't with in the local facades then it's not
                 # possible to reason about what version should be used. In this
                 # case we should log the facade was found, but we couldn't
                 # handle it.
-                log.warning("unexpected facade {} found, unable to decipher version to use".format(name))
+                log.warning(f'unexpected facade {name} found, unable to determine which version to use')
             else:
                 self.facades[name] = version
 
