@@ -583,18 +583,18 @@ class UniterFacade(Type):
                                                                        'type': 'array'}},
                                             'required': ['results'],
                                             'type': 'object'},
-                     'OpenMachinePortRangesByEndpointResult': {'additionalProperties': False,
-                                                               'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                                              'unit-port-ranges': {'patternProperties': {'.*': {'items': {'$ref': '#/definitions/OpenUnitPortRangesByEndpoint'},
-                                                                                                                                'type': 'array'}},
-                                                                                                   'type': 'object'}},
-                                                               'required': ['unit-port-ranges'],
-                                                               'type': 'object'},
-                     'OpenMachinePortRangesByEndpointResults': {'additionalProperties': False,
-                                                                'properties': {'results': {'items': {'$ref': '#/definitions/OpenMachinePortRangesByEndpointResult'},
-                                                                                           'type': 'array'}},
-                                                                'required': ['results'],
-                                                                'type': 'object'},
+                     'OpenPortRangesByEndpointResult': {'additionalProperties': False,
+                                                        'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                                       'unit-port-ranges': {'patternProperties': {'.*': {'items': {'$ref': '#/definitions/OpenUnitPortRangesByEndpoint'},
+                                                                                                                         'type': 'array'}},
+                                                                                            'type': 'object'}},
+                                                        'required': ['unit-port-ranges'],
+                                                        'type': 'object'},
+                     'OpenPortRangesByEndpointResults': {'additionalProperties': False,
+                                                         'properties': {'results': {'items': {'$ref': '#/definitions/OpenPortRangesByEndpointResult'},
+                                                                                    'type': 'array'}},
+                                                         'required': ['results'],
+                                                         'type': 'object'},
                      'OpenUnitPortRangesByEndpoint': {'additionalProperties': False,
                                                       'properties': {'endpoint': {'type': 'string'},
                                                                      'port-ranges': {'items': {'$ref': '#/definitions/PortRange'},
@@ -782,7 +782,8 @@ class UniterFacade(Type):
                                               'required': ['results'],
                                               'type': 'object'},
                      'SecretRevision': {'additionalProperties': False,
-                                        'properties': {'create-time': {'format': 'date-time',
+                                        'properties': {'backend-name': {'type': 'string'},
+                                                       'create-time': {'format': 'date-time',
                                                                        'type': 'string'},
                                                        'expire-time': {'format': 'date-time',
                                                                        'type': 'string'},
@@ -1281,7 +1282,21 @@ class UniterFacade(Type):
                                                                       'revisions '
                                                                       'for the '
                                                                       'specified '
-                                                                      'secrets.',
+                                                                      'secrets.\n'
+                                                                      'This facade '
+                                                                      'method is '
+                                                                      'used for '
+                                                                      'remote '
+                                                                      'watcher to '
+                                                                      'get the '
+                                                                      'latest '
+                                                                      'secret '
+                                                                      'revisions '
+                                                                      'and labels '
+                                                                      'for a '
+                                                                      'secret '
+                                                                      'changed '
+                                                                      'hook.',
                                                        'properties': {'Params': {'$ref': '#/definitions/GetSecretConsumerInfoArgs'},
                                                                       'Result': {'$ref': '#/definitions/SecretConsumerInfoResults'}},
                                                        'type': 'object'},
@@ -1425,12 +1440,8 @@ class UniterFacade(Type):
                                                                              'ranges '
                                                                              'opened '
                                                                              'by '
-                                                                             'each\n'
-                                                                             'application '
-                                                                             'grouped '
-                                                                             'by '
-                                                                             'application '
-                                                                             'endpoint.',
+                                                                             'each '
+                                                                             'application.',
                                                               'properties': {'Params': {'$ref': '#/definitions/Entity'},
                                                                              'Result': {'$ref': '#/definitions/ApplicationOpenedPortsResults'}},
                                                               'type': 'object'},
@@ -1449,8 +1460,15 @@ class UniterFacade(Type):
                                                                          'application '
                                                                          'endpoint.',
                                                           'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                                         'Result': {'$ref': '#/definitions/OpenMachinePortRangesByEndpointResults'}},
+                                                                         'Result': {'$ref': '#/definitions/OpenPortRangesByEndpointResults'}},
                                                           'type': 'object'},
+                    'OpenedPortRangesByEndpoint': {'description': 'OpenedPortRangesByEndpoint '
+                                                                  'returns the '
+                                                                  'port ranges '
+                                                                  'opened by the '
+                                                                  'unit.',
+                                                   'properties': {'Result': {'$ref': '#/definitions/OpenPortRangesByEndpointResults'}},
+                                                   'type': 'object'},
                     'PrivateAddress': {'description': 'PrivateAddress returns the '
                                                       'private address for each '
                                                       'given unit, if set.',
@@ -2656,6 +2674,7 @@ class UniterFacade(Type):
     async def GetConsumerSecretsRevisionInfo(self, consumer_tag=None, uris=None):
         '''
         GetConsumerSecretsRevisionInfo returns the latest secret revisions for the specified secrets.
+        This facade method is used for remote watcher to get the latest secret revisions and labels for a secret changed hook.
 
         consumer_tag : str
         uris : typing.Sequence[str]
@@ -3159,8 +3178,7 @@ class UniterFacade(Type):
     @ReturnMapping(ApplicationOpenedPortsResults)
     async def OpenedApplicationPortRangesByEndpoint(self, tag=None):
         '''
-        OpenedApplicationPortRangesByEndpoint returns the port ranges opened by each
-        application grouped by application endpoint.
+        OpenedApplicationPortRangesByEndpoint returns the port ranges opened by each application.
 
         tag : str
         Returns -> ApplicationOpenedPortsResults
@@ -3180,14 +3198,14 @@ class UniterFacade(Type):
 
 
 
-    @ReturnMapping(OpenMachinePortRangesByEndpointResults)
+    @ReturnMapping(OpenPortRangesByEndpointResults)
     async def OpenedMachinePortRangesByEndpoint(self, entities=None):
         '''
         OpenedMachinePortRangesByEndpoint returns the port ranges opened by each
         unit on the provided machines grouped by application endpoint.
 
         entities : typing.Sequence[~Entity]
-        Returns -> OpenMachinePortRangesByEndpointResults
+        Returns -> OpenPortRangesByEndpointResults
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
             raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
@@ -3199,6 +3217,27 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(OpenPortRangesByEndpointResults)
+    async def OpenedPortRangesByEndpoint(self):
+        '''
+        OpenedPortRangesByEndpoint returns the port ranges opened by the unit.
+
+
+        Returns -> OpenPortRangesByEndpointResults
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='OpenedPortRangesByEndpoint',
+                   version=18,
+                   params=_params)
+
         reply = await self.rpc(msg)
         return reply
 

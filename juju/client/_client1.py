@@ -2386,14 +2386,12 @@ class CAASFirewallerSidecarFacade(Type):
                                   'properties': {'Params': {'$ref': '#/definitions/CharmURL'},
                                                  'Result': {'$ref': '#/definitions/Charm'}},
                                   'type': 'object'},
-                    'GetApplicationOpenedPorts': {'description': 'GetApplicationOpenedPorts '
-                                                                 'returns all the '
-                                                                 'opened ports for '
-                                                                 'each given '
-                                                                 'application tag.',
-                                                  'properties': {'Params': {'$ref': '#/definitions/Entity'},
-                                                                 'Result': {'$ref': '#/definitions/ApplicationOpenedPortsResults'}},
-                                                  'type': 'object'},
+                    'GetOpenedPorts': {'description': 'GetOpenedPorts returns all '
+                                                      'the opened ports for each '
+                                                      'given application tag.',
+                                       'properties': {'Params': {'$ref': '#/definitions/Entity'},
+                                                      'Result': {'$ref': '#/definitions/ApplicationOpenedPortsResults'}},
+                                       'type': 'object'},
                     'IsExposed': {'description': 'IsExposed returns whether the '
                                                  'specified applications are '
                                                  'exposed.',
@@ -2496,9 +2494,9 @@ class CAASFirewallerSidecarFacade(Type):
 
 
     @ReturnMapping(ApplicationOpenedPortsResults)
-    async def GetApplicationOpenedPorts(self, tag=None):
+    async def GetOpenedPorts(self, tag=None):
         '''
-        GetApplicationOpenedPorts returns all the opened ports for each given application tag.
+        GetOpenedPorts returns all the opened ports for each given application tag.
 
         tag : str
         Returns -> ApplicationOpenedPortsResults
@@ -2509,7 +2507,7 @@ class CAASFirewallerSidecarFacade(Type):
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='CAASFirewallerSidecar',
-                   request='GetApplicationOpenedPorts',
+                   request='GetOpenedPorts',
                    version=1,
                    params=_params)
         _params['tag'] = tag
@@ -9452,6 +9450,211 @@ class SecretBackendsFacade(Type):
 
 
 
+class SecretBackendsManagerFacade(Type):
+    name = 'SecretBackendsManager'
+    version = 1
+    schema =     {'definitions': {'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ErrorResult': {'additionalProperties': False,
+                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
+                                     'type': 'object'},
+                     'ErrorResults': {'additionalProperties': False,
+                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
+                                                                 'type': 'array'}},
+                                      'required': ['results'],
+                                      'type': 'object'},
+                     'RotateSecretBackendArgs': {'additionalProperties': False,
+                                                 'properties': {'backend-ids': {'items': {'type': 'string'},
+                                                                                'type': 'array'}},
+                                                 'required': ['backend-ids'],
+                                                 'type': 'object'},
+                     'SecretBackendRotateChange': {'additionalProperties': False,
+                                                   'properties': {'backend-name': {'type': 'string'},
+                                                                  'id': {'type': 'string'},
+                                                                  'next-trigger-time': {'format': 'date-time',
+                                                                                        'type': 'string'}},
+                                                   'required': ['id',
+                                                                'backend-name',
+                                                                'next-trigger-time'],
+                                                   'type': 'object'},
+                     'SecretBackendRotateWatchResult': {'additionalProperties': False,
+                                                        'properties': {'changes': {'items': {'$ref': '#/definitions/SecretBackendRotateChange'},
+                                                                                   'type': 'array'},
+                                                                       'error': {'$ref': '#/definitions/Error'},
+                                                                       'watcher-id': {'type': 'string'}},
+                                                        'required': ['watcher-id',
+                                                                     'changes'],
+                                                        'type': 'object'}},
+     'properties': {'RotateBackendTokens': {'description': 'RotateBackendTokens '
+                                                           'rotates the tokens for '
+                                                           'the specified '
+                                                           'backends.',
+                                            'properties': {'Params': {'$ref': '#/definitions/RotateSecretBackendArgs'},
+                                                           'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                            'type': 'object'},
+                    'WatchSecretBackendsRotateChanges': {'description': 'WatchSecretBackendsRotateChanges '
+                                                                        'sets up a '
+                                                                        'watcher '
+                                                                        'to notify '
+                                                                        'of '
+                                                                        'changes '
+                                                                        'to secret '
+                                                                        'backend '
+                                                                        'rotations.',
+                                                         'properties': {'Result': {'$ref': '#/definitions/SecretBackendRotateWatchResult'}},
+                                                         'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(ErrorResults)
+    async def RotateBackendTokens(self, backend_ids=None):
+        '''
+        RotateBackendTokens rotates the tokens for the specified backends.
+
+        backend_ids : typing.Sequence[str]
+        Returns -> ErrorResults
+        '''
+        if backend_ids is not None and not isinstance(backend_ids, (bytes, str, list)):
+            raise Exception("Expected backend_ids to be a Sequence, received: {}".format(type(backend_ids)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SecretBackendsManager',
+                   request='RotateBackendTokens',
+                   version=1,
+                   params=_params)
+        _params['backend-ids'] = backend_ids
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SecretBackendRotateWatchResult)
+    async def WatchSecretBackendsRotateChanges(self):
+        '''
+        WatchSecretBackendsRotateChanges sets up a watcher to notify of changes to secret backend rotations.
+
+
+        Returns -> SecretBackendRotateWatchResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SecretBackendsManager',
+                   request='WatchSecretBackendsRotateChanges',
+                   version=1,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+class SecretBackendsRotateWatcherFacade(Type):
+    name = 'SecretBackendsRotateWatcher'
+    version = 1
+    schema =     {'definitions': {'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'SecretBackendRotateChange': {'additionalProperties': False,
+                                                   'properties': {'backend-name': {'type': 'string'},
+                                                                  'id': {'type': 'string'},
+                                                                  'next-trigger-time': {'format': 'date-time',
+                                                                                        'type': 'string'}},
+                                                   'required': ['id',
+                                                                'backend-name',
+                                                                'next-trigger-time'],
+                                                   'type': 'object'},
+                     'SecretBackendRotateWatchResult': {'additionalProperties': False,
+                                                        'properties': {'changes': {'items': {'$ref': '#/definitions/SecretBackendRotateChange'},
+                                                                                   'type': 'array'},
+                                                                       'error': {'$ref': '#/definitions/Error'},
+                                                                       'watcher-id': {'type': 'string'}},
+                                                        'required': ['watcher-id',
+                                                                     'changes'],
+                                                        'type': 'object'}},
+     'properties': {'Next': {'description': 'Next returns when a change has '
+                                            'occurred to an entity of the\n'
+                                            'collection being watched since the '
+                                            'most recent call to Next\n'
+                                            'or the Watch call that created the '
+                                            'srvSecretRotationWatcher.',
+                             'properties': {'Result': {'$ref': '#/definitions/SecretBackendRotateWatchResult'}},
+                             'type': 'object'},
+                    'Stop': {'description': 'Stop stops the watcher.',
+                             'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(SecretBackendRotateWatchResult)
+    async def Next(self):
+        '''
+        Next returns when a change has occurred to an entity of the
+        collection being watched since the most recent call to Next
+        or the Watch call that created the srvSecretRotationWatcher.
+
+
+        Returns -> SecretBackendRotateWatchResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SecretBackendsRotateWatcher',
+                   request='Next',
+                   version=1,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def Stop(self):
+        '''
+        Stop stops the watcher.
+
+
+        Returns -> None
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SecretBackendsRotateWatcher',
+                   request='Stop',
+                   version=1,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    async def rpc(self, msg):
+        '''
+        Patch rpc method to add Id.
+        '''
+        if not hasattr(self, 'Id'):
+            raise RuntimeError('Missing "Id" field')
+        msg['Id'] = id
+
+        from .facade import TypeEncoder
+        reply = await self.connection.rpc(msg, encoder=TypeEncoder)
+        return reply
+
+
+
 class SecretsFacade(Type):
     name = 'Secrets'
     version = 1
@@ -9501,7 +9704,8 @@ class SecretsFacade(Type):
                                          'required': ['show-secrets', 'filter'],
                                          'type': 'object'},
                      'SecretRevision': {'additionalProperties': False,
-                                        'properties': {'create-time': {'format': 'date-time',
+                                        'properties': {'backend-name': {'type': 'string'},
+                                                       'create-time': {'format': 'date-time',
                                                                        'type': 'string'},
                                                        'expire-time': {'format': 'date-time',
                                                                        'type': 'string'},
@@ -9739,7 +9943,8 @@ class SecretsManagerFacade(Type):
                                               'required': ['results'],
                                               'type': 'object'},
                      'SecretRevision': {'additionalProperties': False,
-                                        'properties': {'create-time': {'format': 'date-time',
+                                        'properties': {'backend-name': {'type': 'string'},
+                                                       'create-time': {'format': 'date-time',
                                                                        'type': 'string'},
                                                        'expire-time': {'format': 'date-time',
                                                                        'type': 'string'},
@@ -9866,7 +10071,21 @@ class SecretsManagerFacade(Type):
                                                                       'revisions '
                                                                       'for the '
                                                                       'specified '
-                                                                      'secrets.',
+                                                                      'secrets.\n'
+                                                                      'This facade '
+                                                                      'method is '
+                                                                      'used for '
+                                                                      'remote '
+                                                                      'watcher to '
+                                                                      'get the '
+                                                                      'latest '
+                                                                      'secret '
+                                                                      'revisions '
+                                                                      'and labels '
+                                                                      'for a '
+                                                                      'secret '
+                                                                      'changed '
+                                                                      'hook.',
                                                        'properties': {'Params': {'$ref': '#/definitions/GetSecretConsumerInfoArgs'},
                                                                       'Result': {'$ref': '#/definitions/SecretConsumerInfoResults'}},
                                                        'type': 'object'},
@@ -10040,6 +10259,7 @@ class SecretsManagerFacade(Type):
     async def GetConsumerSecretsRevisionInfo(self, consumer_tag=None, uris=None):
         '''
         GetConsumerSecretsRevisionInfo returns the latest secret revisions for the specified secrets.
+        This facade method is used for remote watcher to get the latest secret revisions and labels for a secret changed hook.
 
         consumer_tag : str
         uris : typing.Sequence[str]
