@@ -262,11 +262,6 @@ class ApplicationFacade(Type):
                                              'name': {'type': 'string'}},
                               'required': ['name', 'channel'],
                               'type': 'object'},
-                     'Channel': {'additionalProperties': False,
-                                 'properties': {'branch': {'type': 'string'},
-                                                'risk': {'type': 'string'},
-                                                'track': {'type': 'string'}},
-                                 'type': 'object'},
                      'CharmOrigin': {'additionalProperties': False,
                                      'properties': {'architecture': {'type': 'string'},
                                                     'base': {'$ref': '#/definitions/Base'},
@@ -334,6 +329,7 @@ class ApplicationFacade(Type):
                                                'properties': {'ApplicationOfferDetails': {'$ref': '#/definitions/ApplicationOfferDetails'},
                                                               'application-alias': {'type': 'string'},
                                                               'application-description': {'type': 'string'},
+                                                              'auth-token': {'type': 'string'},
                                                               'bindings': {'patternProperties': {'.*': {'type': 'string'}},
                                                                            'type': 'object'},
                                                               'endpoints': {'items': {'$ref': '#/definitions/RemoteEndpoint'},
@@ -363,41 +359,34 @@ class ApplicationFacade(Type):
                                                  'properties': {'ApplicationName': {'type': 'string'},
                                                                 'AttachStorage': {'items': {'type': 'string'},
                                                                                   'type': 'array'},
-                                                                'Base': {'$ref': '#/definitions/Base'},
-                                                                'Channel': {'$ref': '#/definitions/Channel'},
                                                                 'CharmName': {'type': 'string'},
                                                                 'ConfigYAML': {'type': 'string'},
                                                                 'Cons': {'$ref': '#/definitions/Value'},
                                                                 'Devices': {'patternProperties': {'.*': {'$ref': '#/definitions/Constraints'}},
                                                                             'type': 'object'},
                                                                 'DryRun': {'type': 'boolean'},
-                                                                'EndpointBindings': {'patternProperties': {'.*': {'type': 'string'}},
-                                                                                     'type': 'object'},
-                                                                'Force': {'type': 'boolean'},
-                                                                'NumUnits': {'type': 'integer'},
                                                                 'Placement': {'items': {'$ref': '#/definitions/Placement'},
                                                                               'type': 'array'},
-                                                                'Resources': {'patternProperties': {'.*': {'type': 'string'}},
-                                                                              'type': 'object'},
-                                                                'Revision': {'type': 'integer'},
                                                                 'Storage': {'patternProperties': {'.*': {'$ref': '#/definitions/Constraints'}},
                                                                             'type': 'object'},
-                                                                'Trust': {'type': 'boolean'}},
+                                                                'Trust': {'type': 'boolean'},
+                                                                'base': {'$ref': '#/definitions/Base'},
+                                                                'channel': {'type': 'string'},
+                                                                'endpoint-bindings': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                                      'type': 'object'},
+                                                                'force': {'type': 'boolean'},
+                                                                'num-units': {'type': 'integer'},
+                                                                'resources': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                              'type': 'object'},
+                                                                'revision': {'type': 'integer'}},
                                                  'required': ['CharmName',
                                                               'ApplicationName',
                                                               'AttachStorage',
-                                                              'Base',
-                                                              'Channel',
                                                               'ConfigYAML',
                                                               'Cons',
                                                               'Devices',
                                                               'DryRun',
-                                                              'EndpointBindings',
-                                                              'Force',
-                                                              'NumUnits',
                                                               'Placement',
-                                                              'Revision',
-                                                              'Resources',
                                                               'Storage',
                                                               'Trust'],
                                                  'type': 'object'},
@@ -406,11 +395,22 @@ class ApplicationFacade(Type):
                                                                           'type': 'array'}},
                                                   'required': ['Args'],
                                                   'type': 'object'},
+                     'DeployFromRepositoryInfo': {'additionalProperties': False,
+                                                  'properties': {'architecture': {'type': 'string'},
+                                                                 'base': {'$ref': '#/definitions/Base'},
+                                                                 'channel': {'type': 'string'},
+                                                                 'effective-channel': {'type': 'string'},
+                                                                 'name': {'type': 'string'},
+                                                                 'revision': {'type': 'integer'}},
+                                                  'required': ['architecture',
+                                                               'channel',
+                                                               'name',
+                                                               'revision'],
+                                                  'type': 'object'},
                      'DeployFromRepositoryResult': {'additionalProperties': False,
                                                     'properties': {'Errors': {'items': {'$ref': '#/definitions/Error'},
                                                                               'type': 'array'},
-                                                                   'Info': {'items': {'type': 'string'},
-                                                                            'type': 'array'},
+                                                                   'Info': {'$ref': '#/definitions/DeployFromRepositoryInfo'},
                                                                    'PendingResourceUploads': {'items': {'$ref': '#/definitions/PendingResourceUpload'},
                                                                                               'type': 'array'}},
                                                     'required': ['Errors',
@@ -569,11 +569,11 @@ class ApplicationFacade(Type):
                      'PendingResourceUpload': {'additionalProperties': False,
                                                'properties': {'Filename': {'type': 'string'},
                                                               'Name': {'type': 'string'},
-                                                              'PendingID': {'type': 'string'},
-                                                              'Type': {'type': 'string'}},
+                                                              'Type': {'type': 'string'},
+                                                              'pending-id': {'type': 'string'}},
                                                'required': ['Name',
                                                             'Filename',
-                                                            'PendingID',
+                                                            'pending-id',
                                                             'Type'],
                                                'type': 'object'},
                      'Placement': {'additionalProperties': False,
@@ -734,6 +734,7 @@ class ApplicationFacade(Type):
                                               'container': {'type': 'string'},
                                               'cores': {'type': 'integer'},
                                               'cpu-power': {'type': 'integer'},
+                                              'image-id': {'type': 'string'},
                                               'instance-role': {'type': 'string'},
                                               'instance-type': {'type': 'string'},
                                               'mem': {'type': 'integer'},
@@ -2383,18 +2384,18 @@ class UniterFacade(Type):
                                                                        'type': 'array'}},
                                             'required': ['results'],
                                             'type': 'object'},
-                     'OpenMachinePortRangesByEndpointResult': {'additionalProperties': False,
-                                                               'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                                              'unit-port-ranges': {'patternProperties': {'.*': {'items': {'$ref': '#/definitions/OpenUnitPortRangesByEndpoint'},
-                                                                                                                                'type': 'array'}},
-                                                                                                   'type': 'object'}},
-                                                               'required': ['unit-port-ranges'],
-                                                               'type': 'object'},
-                     'OpenMachinePortRangesByEndpointResults': {'additionalProperties': False,
-                                                                'properties': {'results': {'items': {'$ref': '#/definitions/OpenMachinePortRangesByEndpointResult'},
-                                                                                           'type': 'array'}},
-                                                                'required': ['results'],
-                                                                'type': 'object'},
+                     'OpenPortRangesByEndpointResult': {'additionalProperties': False,
+                                                        'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                                       'unit-port-ranges': {'patternProperties': {'.*': {'items': {'$ref': '#/definitions/OpenUnitPortRangesByEndpoint'},
+                                                                                                                         'type': 'array'}},
+                                                                                            'type': 'object'}},
+                                                        'required': ['unit-port-ranges'],
+                                                        'type': 'object'},
+                     'OpenPortRangesByEndpointResults': {'additionalProperties': False,
+                                                         'properties': {'results': {'items': {'$ref': '#/definitions/OpenPortRangesByEndpointResult'},
+                                                                                    'type': 'array'}},
+                                                         'required': ['results'],
+                                                         'type': 'object'},
                      'OpenUnitPortRangesByEndpoint': {'additionalProperties': False,
                                                       'properties': {'endpoint': {'type': 'string'},
                                                                      'port-ranges': {'items': {'$ref': '#/definitions/PortRange'},
@@ -3094,7 +3095,21 @@ class UniterFacade(Type):
                                                                       'revisions '
                                                                       'for the '
                                                                       'specified '
-                                                                      'secrets.',
+                                                                      'secrets.\n'
+                                                                      'This facade '
+                                                                      'method is '
+                                                                      'used for '
+                                                                      'remote '
+                                                                      'watcher to '
+                                                                      'get the '
+                                                                      'latest '
+                                                                      'secret '
+                                                                      'revisions '
+                                                                      'and labels '
+                                                                      'for a '
+                                                                      'secret '
+                                                                      'changed '
+                                                                      'hook.',
                                                        'properties': {'Params': {'$ref': '#/definitions/GetSecretConsumerInfoArgs'},
                                                                       'Result': {'$ref': '#/definitions/SecretConsumerInfoResults'}},
                                                        'type': 'object'},
@@ -3120,14 +3135,14 @@ class UniterFacade(Type):
                                       'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                      'Result': {'$ref': '#/definitions/StringResults'}},
                                       'type': 'object'},
-                    'GetSecretBackendConfig': {'description': 'GetSecretBackendConfig '
-                                                              'gets the config '
-                                                              'needed to create a '
-                                                              'client to secret '
-                                                              'backends.',
-                                               'properties': {'Params': {'$ref': '#/definitions/SecretBackendArgs'},
-                                                              'Result': {'$ref': '#/definitions/SecretBackendConfigResults'}},
-                                               'type': 'object'},
+                    'GetSecretBackendConfigs': {'description': 'GetSecretBackendConfigs '
+                                                               'gets the config '
+                                                               'needed to create a '
+                                                               'client to secret '
+                                                               'backends.',
+                                                'properties': {'Params': {'$ref': '#/definitions/SecretBackendArgs'},
+                                                               'Result': {'$ref': '#/definitions/SecretBackendConfigResults'}},
+                                                'type': 'object'},
                     'GetSecretContentInfo': {'description': 'GetSecretContentInfo '
                                                             'returns the secret '
                                                             'values for the '
@@ -3238,12 +3253,8 @@ class UniterFacade(Type):
                                                                              'ranges '
                                                                              'opened '
                                                                              'by '
-                                                                             'each\n'
-                                                                             'application '
-                                                                             'grouped '
-                                                                             'by '
-                                                                             'application '
-                                                                             'endpoint.',
+                                                                             'each '
+                                                                             'application.',
                                                               'properties': {'Params': {'$ref': '#/definitions/Entity'},
                                                                              'Result': {'$ref': '#/definitions/ApplicationOpenedPortsResults'}},
                                                               'type': 'object'},
@@ -3262,8 +3273,15 @@ class UniterFacade(Type):
                                                                          'application '
                                                                          'endpoint.',
                                                           'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                                         'Result': {'$ref': '#/definitions/OpenMachinePortRangesByEndpointResults'}},
+                                                                         'Result': {'$ref': '#/definitions/OpenPortRangesByEndpointResults'}},
                                                           'type': 'object'},
+                    'OpenedPortRangesByEndpoint': {'description': 'OpenedPortRangesByEndpoint '
+                                                                  'returns the '
+                                                                  'port ranges '
+                                                                  'opened by the '
+                                                                  'unit.',
+                                                   'properties': {'Result': {'$ref': '#/definitions/OpenPortRangesByEndpointResults'}},
+                                                   'type': 'object'},
                     'PrivateAddress': {'description': 'PrivateAddress returns the '
                                                       'private address for each '
                                                       'given unit, if set.',
@@ -4469,6 +4487,7 @@ class UniterFacade(Type):
     async def GetConsumerSecretsRevisionInfo(self, consumer_tag=None, uris=None):
         '''
         GetConsumerSecretsRevisionInfo returns the latest secret revisions for the specified secrets.
+        This facade method is used for remote watcher to get the latest secret revisions and labels for a secret changed hook.
 
         consumer_tag : str
         uris : typing.Sequence[str]
@@ -4585,9 +4604,9 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(SecretBackendConfigResults)
-    async def GetSecretBackendConfig(self, backend_ids=None):
+    async def GetSecretBackendConfigs(self, backend_ids=None):
         '''
-        GetSecretBackendConfig gets the config needed to create a client to secret backends.
+        GetSecretBackendConfigs gets the config needed to create a client to secret backends.
 
         backend_ids : typing.Sequence[str]
         Returns -> SecretBackendConfigResults
@@ -4598,7 +4617,7 @@ class UniterFacade(Type):
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter',
-                   request='GetSecretBackendConfig',
+                   request='GetSecretBackendConfigs',
                    version=18,
                    params=_params)
         _params['backend-ids'] = backend_ids
@@ -4953,8 +4972,7 @@ class UniterFacade(Type):
     @ReturnMapping(ApplicationOpenedPortsResults)
     async def OpenedApplicationPortRangesByEndpoint(self, tag=None):
         '''
-        OpenedApplicationPortRangesByEndpoint returns the port ranges opened by each
-        application grouped by application endpoint.
+        OpenedApplicationPortRangesByEndpoint returns the port ranges opened by each application.
 
         tag : str
         Returns -> ApplicationOpenedPortsResults
@@ -4974,14 +4992,14 @@ class UniterFacade(Type):
 
 
 
-    @ReturnMapping(OpenMachinePortRangesByEndpointResults)
+    @ReturnMapping(OpenPortRangesByEndpointResults)
     async def OpenedMachinePortRangesByEndpoint(self, entities=None):
         '''
         OpenedMachinePortRangesByEndpoint returns the port ranges opened by each
         unit on the provided machines grouped by application endpoint.
 
         entities : typing.Sequence[~Entity]
-        Returns -> OpenMachinePortRangesByEndpointResults
+        Returns -> OpenPortRangesByEndpointResults
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
             raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
@@ -4993,6 +5011,27 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(OpenPortRangesByEndpointResults)
+    async def OpenedPortRangesByEndpoint(self):
+        '''
+        OpenedPortRangesByEndpoint returns the port ranges opened by the unit.
+
+
+        Returns -> OpenPortRangesByEndpointResults
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='OpenedPortRangesByEndpoint',
+                   version=18,
+                   params=_params)
+
         reply = await self.rpc(msg)
         return reply
 

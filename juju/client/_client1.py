@@ -1080,6 +1080,7 @@ class CAASApplicationProvisionerFacade(Type):
                                               'container': {'type': 'string'},
                                               'cores': {'type': 'integer'},
                                               'cpu-power': {'type': 'integer'},
+                                              'image-id': {'type': 'string'},
                                               'instance-role': {'type': 'string'},
                                               'instance-type': {'type': 'string'},
                                               'mem': {'type': 'integer'},
@@ -2386,14 +2387,12 @@ class CAASFirewallerSidecarFacade(Type):
                                   'properties': {'Params': {'$ref': '#/definitions/CharmURL'},
                                                  'Result': {'$ref': '#/definitions/Charm'}},
                                   'type': 'object'},
-                    'GetApplicationOpenedPorts': {'description': 'GetApplicationOpenedPorts '
-                                                                 'returns all the '
-                                                                 'opened ports for '
-                                                                 'each given '
-                                                                 'application tag.',
-                                                  'properties': {'Params': {'$ref': '#/definitions/Entity'},
-                                                                 'Result': {'$ref': '#/definitions/ApplicationOpenedPortsResults'}},
-                                                  'type': 'object'},
+                    'GetOpenedPorts': {'description': 'GetOpenedPorts returns all '
+                                                      'the opened ports for each '
+                                                      'given application tag.',
+                                       'properties': {'Params': {'$ref': '#/definitions/Entity'},
+                                                      'Result': {'$ref': '#/definitions/ApplicationOpenedPortsResults'}},
+                                       'type': 'object'},
                     'IsExposed': {'description': 'IsExposed returns whether the '
                                                  'specified applications are '
                                                  'exposed.',
@@ -2496,9 +2495,9 @@ class CAASFirewallerSidecarFacade(Type):
 
 
     @ReturnMapping(ApplicationOpenedPortsResults)
-    async def GetApplicationOpenedPorts(self, tag=None):
+    async def GetOpenedPorts(self, tag=None):
         '''
-        GetApplicationOpenedPorts returns all the opened ports for each given application tag.
+        GetOpenedPorts returns all the opened ports for each given application tag.
 
         tag : str
         Returns -> ApplicationOpenedPortsResults
@@ -2509,7 +2508,7 @@ class CAASFirewallerSidecarFacade(Type):
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='CAASFirewallerSidecar',
-                   request='GetApplicationOpenedPorts',
+                   request='GetOpenedPorts',
                    version=1,
                    params=_params)
         _params['tag'] = tag
@@ -10058,11 +10057,6 @@ class SecretsManagerFacade(Type):
                                                                       'type': 'array'}},
                                            'required': ['results'],
                                            'type': 'object'},
-                     'SecretBackendArgs': {'additionalProperties': False,
-                                           'properties': {'backend-ids': {'items': {'type': 'string'},
-                                                                          'type': 'array'}},
-                                           'required': ['backend-ids'],
-                                           'type': 'object'},
                      'SecretBackendConfig': {'additionalProperties': False,
                                              'properties': {'params': {'patternProperties': {'.*': {'additionalProperties': True,
                                                                                                     'type': 'object'}},
@@ -10070,22 +10064,17 @@ class SecretsManagerFacade(Type):
                                                             'type': {'type': 'string'}},
                                              'required': ['type'],
                                              'type': 'object'},
-                     'SecretBackendConfigResult': {'additionalProperties': False,
-                                                   'properties': {'config': {'$ref': '#/definitions/SecretBackendConfig'},
-                                                                  'draining': {'type': 'boolean'},
-                                                                  'model-controller': {'type': 'string'},
-                                                                  'model-name': {'type': 'string'},
-                                                                  'model-uuid': {'type': 'string'}},
-                                                   'required': ['model-controller',
-                                                                'model-uuid',
-                                                                'model-name',
-                                                                'draining'],
-                                                   'type': 'object'},
                      'SecretBackendConfigResults': {'additionalProperties': False,
                                                     'properties': {'active-id': {'type': 'string'},
-                                                                   'results': {'patternProperties': {'.*': {'$ref': '#/definitions/SecretBackendConfigResult'}},
-                                                                               'type': 'object'}},
-                                                    'required': ['active-id'],
+                                                                   'configs': {'patternProperties': {'.*': {'$ref': '#/definitions/SecretBackendConfig'}},
+                                                                               'type': 'object'},
+                                                                   'model-controller': {'type': 'string'},
+                                                                   'model-name': {'type': 'string'},
+                                                                   'model-uuid': {'type': 'string'}},
+                                                    'required': ['model-controller',
+                                                                 'model-uuid',
+                                                                 'model-name',
+                                                                 'active-id'],
                                                     'type': 'object'},
                      'SecretConsumerInfoResult': {'additionalProperties': False,
                                                   'properties': {'error': {'$ref': '#/definitions/Error'},
@@ -10104,10 +10093,8 @@ class SecretsManagerFacade(Type):
                                                             'value-ref': {'$ref': '#/definitions/SecretValueRef'}},
                                              'type': 'object'},
                      'SecretContentResult': {'additionalProperties': False,
-                                             'properties': {'backend-config': {'$ref': '#/definitions/SecretBackendConfigResult'},
-                                                            'content': {'$ref': '#/definitions/SecretContentParams'},
-                                                            'error': {'$ref': '#/definitions/Error'},
-                                                            'latest-revision': {'type': 'integer'}},
+                                             'properties': {'content': {'$ref': '#/definitions/SecretContentParams'},
+                                                            'error': {'$ref': '#/definitions/Error'}},
                                              'required': ['content'],
                                              'type': 'object'},
                      'SecretContentResults': {'additionalProperties': False,
@@ -10244,7 +10231,21 @@ class SecretsManagerFacade(Type):
                                                                       'revisions '
                                                                       'for the '
                                                                       'specified '
-                                                                      'secrets.',
+                                                                      'secrets.\n'
+                                                                      'This facade '
+                                                                      'method is '
+                                                                      'used for '
+                                                                      'remote '
+                                                                      'watcher to '
+                                                                      'get the '
+                                                                      'latest '
+                                                                      'secret '
+                                                                      'revisions '
+                                                                      'and labels '
+                                                                      'for a '
+                                                                      'secret '
+                                                                      'changed '
+                                                                      'hook.',
                                                        'properties': {'Params': {'$ref': '#/definitions/GetSecretConsumerInfoArgs'},
                                                                       'Result': {'$ref': '#/definitions/SecretConsumerInfoResults'}},
                                                        'type': 'object'},
@@ -10253,8 +10254,7 @@ class SecretsManagerFacade(Type):
                                                               'needed to create a '
                                                               'client to secret '
                                                               'backends.',
-                                               'properties': {'Params': {'$ref': '#/definitions/SecretBackendArgs'},
-                                                              'Result': {'$ref': '#/definitions/SecretBackendConfigResults'}},
+                                               'properties': {'Result': {'$ref': '#/definitions/SecretBackendConfigResults'}},
                                                'type': 'object'},
                     'GetSecretContentInfo': {'description': 'GetSecretContentInfo '
                                                             'returns the secret '
@@ -10274,17 +10274,18 @@ class SecretsManagerFacade(Type):
                                                                     'for the '
                                                                     'specified '
                                                                     'secret '
-                                                                    'revisions.\n'
-                                                                    'Used when '
-                                                                    'deleting a '
-                                                                    'secret; only '
-                                                                    'returns '
-                                                                    'external '
-                                                                    'revision '
-                                                                    'info.',
+                                                                    'revisions.',
                                                      'properties': {'Params': {'$ref': '#/definitions/SecretRevisionArg'},
                                                                     'Result': {'$ref': '#/definitions/SecretContentResults'}},
                                                      'type': 'object'},
+                    'GetSecretStoreConfig': {'description': 'GetSecretStoreConfig '
+                                                            'is for 3.0.x agents.\n'
+                                                            'TODO(wallyworld) - '
+                                                            'remove when we auto '
+                                                            'upgrade migrated '
+                                                            'models.',
+                                             'properties': {'Result': {'$ref': '#/definitions/SecretBackendConfig'}},
+                                             'type': 'object'},
                     'RemoveSecrets': {'description': 'RemoveSecrets removes the '
                                                      'specified secrets.',
                                       'properties': {'Params': {'$ref': '#/definitions/DeleteSecretArgs'},
@@ -10418,6 +10419,7 @@ class SecretsManagerFacade(Type):
     async def GetConsumerSecretsRevisionInfo(self, consumer_tag=None, uris=None):
         '''
         GetConsumerSecretsRevisionInfo returns the latest secret revisions for the specified secrets.
+        This facade method is used for remote watcher to get the latest secret revisions and labels for a secret changed hook.
 
         consumer_tag : str
         uris : typing.Sequence[str]
@@ -10443,15 +10445,13 @@ class SecretsManagerFacade(Type):
 
 
     @ReturnMapping(SecretBackendConfigResults)
-    async def GetSecretBackendConfig(self, backend_ids=None):
+    async def GetSecretBackendConfig(self):
         '''
         GetSecretBackendConfig gets the config needed to create a client to secret backends.
 
-        backend_ids : typing.Sequence[str]
+
         Returns -> SecretBackendConfigResults
         '''
-        if backend_ids is not None and not isinstance(backend_ids, (bytes, str, list)):
-            raise Exception("Expected backend_ids to be a Sequence, received: {}".format(type(backend_ids)))
 
         # map input types to rpc msg
         _params = dict()
@@ -10459,7 +10459,7 @@ class SecretsManagerFacade(Type):
                    request='GetSecretBackendConfig',
                    version=1,
                    params=_params)
-        _params['backend-ids'] = backend_ids
+
         reply = await self.rpc(msg)
         return reply
 
@@ -10513,7 +10513,6 @@ class SecretsManagerFacade(Type):
     async def GetSecretRevisionContentInfo(self, pending_delete=None, revisions=None, uri=None):
         '''
         GetSecretRevisionContentInfo returns the secret values for the specified secret revisions.
-        Used when deleting a secret; only returns external revision info.
 
         pending_delete : bool
         revisions : typing.Sequence[int]
@@ -10538,6 +10537,28 @@ class SecretsManagerFacade(Type):
         _params['pending-delete'] = pending_delete
         _params['revisions'] = revisions
         _params['uri'] = uri
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SecretBackendConfig)
+    async def GetSecretStoreConfig(self):
+        '''
+        GetSecretStoreConfig is for 3.0.x agents.
+        TODO(wallyworld) - remove when we auto upgrade migrated models.
+
+
+        Returns -> SecretBackendConfig
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SecretsManager',
+                   request='GetSecretStoreConfig',
+                   version=1,
+                   params=_params)
+
         reply = await self.rpc(msg)
         return reply
 
@@ -10752,6 +10773,101 @@ class SecretsManagerFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+class SecretsRevisionWatcherFacade(Type):
+    name = 'SecretsRevisionWatcher'
+    version = 1
+    schema =     {'definitions': {'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'SecretRevisionChange': {'additionalProperties': False,
+                                              'properties': {'revision': {'type': 'integer'},
+                                                             'uri': {'type': 'string'}},
+                                              'required': ['uri', 'revision'],
+                                              'type': 'object'},
+                     'SecretRevisionWatchResult': {'additionalProperties': False,
+                                                   'properties': {'changes': {'items': {'$ref': '#/definitions/SecretRevisionChange'},
+                                                                              'type': 'array'},
+                                                                  'error': {'$ref': '#/definitions/Error'},
+                                                                  'watcher-id': {'type': 'string'}},
+                                                   'required': ['watcher-id',
+                                                                'changes'],
+                                                   'type': 'object'}},
+     'properties': {'Next': {'description': 'Next returns when a change has '
+                                            'occurred to an entity of the\n'
+                                            'collection being watched since the '
+                                            'most recent call to Next\n'
+                                            'or the Watch call that created the '
+                                            'srvSecretRotationWatcher.',
+                             'properties': {'Result': {'$ref': '#/definitions/SecretRevisionWatchResult'}},
+                             'type': 'object'},
+                    'Stop': {'description': 'Stop stops the watcher.',
+                             'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(SecretRevisionWatchResult)
+    async def Next(self):
+        '''
+        Next returns when a change has occurred to an entity of the
+        collection being watched since the most recent call to Next
+        or the Watch call that created the srvSecretRotationWatcher.
+
+
+        Returns -> SecretRevisionWatchResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SecretsRevisionWatcher',
+                   request='Next',
+                   version=1,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def Stop(self):
+        '''
+        Stop stops the watcher.
+
+
+        Returns -> None
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SecretsRevisionWatcher',
+                   request='Stop',
+                   version=1,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    async def rpc(self, msg):
+        '''
+        Patch rpc method to add Id.
+        '''
+        if not hasattr(self, 'Id'):
+            raise RuntimeError('Missing "Id" field')
+        msg['Id'] = id
+
+        from .facade import TypeEncoder
+        reply = await self.connection.rpc(msg, encoder=TypeEncoder)
         return reply
 
 
