@@ -492,7 +492,7 @@ class CharmhubDeployType:
     def __init__(self, charm_resolver):
         self.charm_resolver = charm_resolver
 
-    async def resolve(self, url, architecture, app_name=None, channel=None, series=None, entity_url=None):
+    async def resolve(self, url, architecture, app_name=None, channel=None, series=None, revision=None, entity_url=None):
         """resolve attempts to resolve charmhub charms or bundles. A request to
         the charmhub API is required to correctly determine the charm url and
         underlying origin.
@@ -511,6 +511,7 @@ class CharmhubDeployType:
                                     risk=ch.risk,
                                     track=ch.track,
                                     base=base,
+                                    revision=revision,
                                     )
 
         charm_url_str, origin, supported_series = await self.charm_resolver(url, origin)
@@ -1611,7 +1612,7 @@ class Model:
     async def deploy(
             self, entity_url, application_name=None, bind=None,
             channel=None, config=None, constraints=None, force=False,
-            num_units=1, overlays=[], base=None, resources=None, series=None,
+            num_units=1, overlays=[], base=None, resources=None, series=None, revision=None,
             storage=None, to=None, devices=None, trust=False, attach_storage=[]):
         """Deploy a new service or bundle.
 
@@ -1630,6 +1631,8 @@ class Model:
         :param str base: The base on which to deploy
         :param dict resources: <resource name>:<file path> pairs
         :param str series: Series on which to deploy DEPRECATED: use --base (with Juju 3.1)
+        :param int revision: specifying a revision requires a channel for future upgrades for charms.
+            For bundles, revision and channel are mutually exclusive.
         :param dict storage: Storage constraints TODO how do these look?
         :param to: Placement directive as a string. For example:
 
@@ -1675,7 +1678,7 @@ class Model:
         if str(url.schema) not in self.deploy_types:
             raise JujuError("unknown deploy type {}, expected charmhub or local".format(url.schema))
 
-        res = await self.deploy_types[str(url.schema)].resolve(url, architecture, application_name, channel, series, entity_url)
+        res = await self.deploy_types[str(url.schema)].resolve(url, architecture, application_name, channel, series, revision, entity_url)
 
         if res.identifier is None:
             raise JujuError('unknown charm or bundle {}'.format(entity_url))
