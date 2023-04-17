@@ -461,6 +461,14 @@ class SecretBackendsFacade(TypeFactory):
     pass
 
 
+class SecretBackendsManagerFacade(TypeFactory):
+    pass
+
+
+class SecretBackendsRotateWatcherFacade(TypeFactory):
+    pass
+
+
 class SecretsFacade(TypeFactory):
     pass
 
