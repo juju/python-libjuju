@@ -741,7 +741,26 @@ class Model:
         # we've received all the model data, which might be
         # a whole load of unneeded data if all the client wants
         # to do is make one RPC call.
-        await self._watch_received.wait()
+        async def watch_received_waiter():
+            await self._watch_received.wait()
+        waiter = jasyncio.create_task(watch_received_waiter())
+
+        # If we just wait for the _watch_received event and the _all_watcher task
+        # fails (e.g. because API fails like migration is in progress), then
+        # we'll hang because the _watch_received will never be set
+        # Instead, we watch for two things, 1) _watch_received, 2) _all_watcher done
+        # If _all_watcher is done before the _watch_received, then we should see
+        # (and raise) an exception coming from the _all_watcher
+        # Otherwise (i.e. _watch_received is set), then we're good to go
+        done, pending = await jasyncio.wait([waiter, self._watcher_task],
+                                            return_when=jasyncio.FIRST_COMPLETED)
+        if self._watcher_task in done:
+            # Cancel the _watch_received.wait
+            waiter.cancel()
+            # If there's no exception, then why did the _all_watcher broke its loop?
+            if not self._watcher_task.exception():
+                raise JujuError("AllWatcher task is finished abruptly without an exception.")
+            raise self._watcher_task.exception()
 
         if self.info is None:
             contr = await self.get_controller()
@@ -757,6 +776,12 @@ class Model:
         if not self._watch_stopped.is_set():
             log.debug('Stopping watcher task')
             self._watch_stopping.set()
+            # If the _all_watcher task is finished,
+            # check to see an exception, if yes, raise,
+            # otherwise we should see the _watch_stopped
+            # flag is set
+            if self._watcher_task.done() and self._watcher_task.exception():
+                raise self._watcher_task.exception()
             await self._watch_stopped.wait()
             self._watch_stopping.clear()
 
@@ -1134,6 +1159,7 @@ class Model:
         See :meth:`add_observer` to register an onchange callback.
 
         """
+
         def _post_step(obj):
             # Once we get the model, ensure we're running in the correct state
             # as a post step.
@@ -1223,7 +1249,7 @@ class Model:
         self._watch_received.clear()
         self._watch_stopping.clear()
         self._watch_stopped.clear()
-        jasyncio.ensure_future(_all_watcher())
+        self._watcher_task = jasyncio.create_task(_all_watcher())
 
     async def _notify_observers(self, delta, old_obj, new_obj):
         """Call observing callbacks, notifying them of a change in model state
