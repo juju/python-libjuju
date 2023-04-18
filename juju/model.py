@@ -441,10 +441,12 @@ class LocalDeployType:
     """LocalDeployType deals with local only deployments.
     """
 
-    async def resolve(self, url, architecture, app_name=None, channel=None, series=None, entity_url=None):
+    async def resolve(self, url, architecture, app_name=None, channel=None, series=None, revision=None, entity_url=None):
         """resolve attempts to resolve a local charm or bundle using the url
         and architecture. If information is missing, it will attempt to backfill
         that information, before sending the result back.
+
+        -- revision flag is ignored for local charms
         """
 
         entity_url = url.path()
