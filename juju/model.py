@@ -499,6 +499,8 @@ class CharmhubDeployType:
         the charmhub API is required to correctly determine the charm url and
         underlying origin.
         """
+        if revision and not channel:
+            raise JujuError('ERROR specifying a revision requires a channel for future upgrades. Please use --channel')
 
         ch = Channel('latest', 'stable')
         if channel is not None:
