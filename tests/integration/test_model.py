@@ -12,7 +12,7 @@ import paramiko
 
 import pylxd
 import pytest
-from juju import jasyncio, tag
+from juju import jasyncio, tag, url
 from juju.client import client
 from juju.errors import JujuError, JujuModelError, JujuUnitError, JujuConnectionError
 from juju.model import Model, ModelObserver
@@ -90,6 +90,18 @@ async def test_deploy_bundle_local_resource_relative_path(event_loop):
         assert app
         await model.block_until(lambda: (len(app.units) == 1),
                                 timeout=60 * 4)
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_deploy_by_revision(event_loop):
+    async with base.CleanModel() as model:
+        app = await model.deploy('juju-qa-test',
+                                 application_name='test',
+                                 channel='2.0/stable',
+                                 revision=22,)
+
+        assert url.URL.parse(app.charm_url).revision == 22
 
 
 @base.bootstrapped
