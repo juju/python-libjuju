@@ -1790,8 +1790,7 @@ class Model:
         client_facade = client.ClientFacade.from_connection(self.connection())
         return await client_facade.AddCharm(channel=str(origin.risk), url=charm_url, force=False)
 
-
-    async def _resolve_charm(self, url, origin, force):
+    async def _resolve_charm(self, url, origin, force=False):
         """Calls Charms.ResolveCharms to resolve all the fields of the
         charm_origin and also the url and the supported_series
 
@@ -1844,7 +1843,7 @@ class Model:
             else:
                 raise JujuError("Series {} not supported for {}. Only {}".format(origin.series, result.url, supported_series))
 
-        return charm_url, result.charm_origin
+        return result.url, result.charm_origin
 
     async def _resolve_architecture(self, url):
         if url.architecture:
