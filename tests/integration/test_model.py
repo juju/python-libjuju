@@ -106,6 +106,26 @@ async def test_deploy_by_revision(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_deploy_by_revision_validate_flags(event_loop):
+    # Make sure we fail gracefully when invalid --revision/--channel
+    # flags are used
+
+    async with base.CleanModel() as model:
+        # For charms --revision requires --channel
+        with pytest.raises(JujuError):
+            await model.deploy('juju-qa-test',
+                               # channel='2.0/stable',
+                               revision=22)
+
+        # For bundles, --revision and --channel are mutually exclusive
+        with pytest.raises(JujuError):
+            await model.deploy('ch:canonical-livepatch-onprem',
+                               channel='latest/stable',
+                               revision=4)
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_deploy_local_bundle_include_file(event_loop):
     bundle_dir = TESTS_DIR / 'integration' / 'bundle'
     bundle_yaml_path = bundle_dir / 'bundle-include-file.yaml'
