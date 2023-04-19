@@ -2014,7 +2014,13 @@ class Model:
             'max-wait': max_wait,
             'dry-run': dry_run,
         }])
-    destroy_units = destroy_unit
+
+    async def destroy_units(self, *unit_names, destroy_storage=False, dry_run=False, force=False, max_wait=None):
+        """Destroy several units at once.
+
+        """
+        for u in unit_names:
+            await self.destroy_unit(u, destroy_storage, dry_run, force, max_wait)
 
     def download_backup(self, archive_id, target_filename=None):
         """Download a backup archive file.

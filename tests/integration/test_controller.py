@@ -240,6 +240,7 @@ async def test_add_remove_cloud(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+#@pytest.mark.skip('Skip secrets tests until vault charm works as expected')
 async def test_secrets_backend_lifecycle(event_loop):
     """Testing the add_secret_backends is particularly
     costly in term of resources. This test sets a vault
@@ -248,13 +249,13 @@ async def test_secrets_backend_lifecycle(event_loop):
     async with base.CleanModel() as m:
         controller = await m.get_controller()
         # deploy postgresql
-        await m.deploy('postgresql')
+        await m.deploy('postgresql', series="focal")
         # deploy vault
         await m.deploy("vault", series="focal")
         # relate/integrate
-        await m.relate("vault:db", "postgresql:db")
-        # wait for the
-        await m.wait_for_idle(["vault"])
+        await m.integrate("vault:db", "postgresql:db")
+        # wait for the postgresql app
+        await m.wait_for_idle(["postgresql"])
         # expose vault
         vault_app = m.applications["vault"]
         await vault_app.expose()
@@ -275,8 +276,13 @@ async def test_secrets_backend_lifecycle(event_loop):
         # Unseal vault
         vault_client.sys.submit_unseal_keys(keys['keys'])
 
+         # authorize charm
+        target_unit = m.applications['vault'].units[0]
+        action = await target_unit.run_action("authorize-charm", token=keys["root_token"])
+        action_result = await action.wait()
+
         # Add the secret backend
-        response = await controller.add_secret_backends("1001", "myvault", "vault", {"endpoint": vault_url})
+        response = await controller.add_secret_backends("1001", "myvault", "vault", {"endpoint": vault_url, "token": keys["root_token"]})
         assert response["results"] is not None
         assert response["results"][0]['error'] is None
 
