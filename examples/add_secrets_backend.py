@@ -13,13 +13,13 @@ async def main():
     await m.connect_current()
 
     # # deploy postgresql
-    #await m.deploy('postgresql', series="focal")
+    await m.deploy('postgresql', series="focal")
     # # deploy vault
     await m.deploy("vault", series="focal")
     # # relate/integrate
     await m.integrate("vault:db", "postgresql:db")
     # # wait for the
-    #await m.wait_for_idle(["postgresql"])
+    await m.wait_for_idle(["postgresql"])
     await m.wait_for_idle(["vault"])
     # # expose vault
     vault_app = m.applications["vault"]
