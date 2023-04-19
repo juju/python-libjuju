@@ -35,7 +35,7 @@ async def test_model_name(event_loop):
     with pytest.raises(JujuModelError):
         model.name
 
-    async with base.CleanModel() as new_model:
+    async with base.CachedModel() as new_model:
         await model.connect(new_model.name)
         assert model.name == new_model.name
         await model.disconnect()
@@ -46,7 +46,7 @@ async def test_model_name(event_loop):
 async def test_deploy_local_bundle_dir(event_loop):
     bundle_path = TESTS_DIR / 'bundle'
 
-    async with base.CleanModel() as model:
+    async with base.CachedModel() as model:
         await model.deploy(str(bundle_path))
 
         app1 = model.applications.get('grafana')
