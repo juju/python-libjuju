@@ -500,7 +500,7 @@ class CharmhubDeployType:
         underlying origin.
         """
         if revision and not channel:
-            raise JujuError('ERROR specifying a revision requires a channel for future upgrades. Please use --channel')
+            raise JujuError('specifying a revision requires a channel for future upgrades. Please use --channel')
 
         ch = Channel('latest', 'stable')
         if channel is not None:
@@ -519,6 +519,11 @@ class CharmhubDeployType:
                                     )
 
         charm_url_str, origin, supported_series = await self.charm_resolver(url, origin)
+
+        is_bundle = origin.type_ == "bundle"
+        if is_bundle and revision and channel:
+            raise JujuError('revision and channel are mutually exclusive when deploying a bundle. Please choose one.')
+
         charm_url = URL.parse(charm_url_str)
 
         if app_name is None:
@@ -535,7 +540,7 @@ class CharmhubDeployType:
             identifier=str(charm_url),
             app_name=app_name,
             origin=origin,
-            is_bundle=origin.type_ == "bundle",
+            is_bundle=is_bundle,
         )
 
 
