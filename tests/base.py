@@ -62,7 +62,7 @@ class CleanController():
         await self._controller.disconnect()
 
 
-class CleanModel():
+class CleanModel:
     """
     Context manager that automatically connects to the currently active
     controller, adds a fresh model, returns the connection to that model,
@@ -116,6 +116,72 @@ class CleanModel():
         # do not wait more than a minute for the model to be destroyed
         await self._controller.destroy_model(self._model_uuid, force=True, max_wait=60)
         await self._controller.disconnect()
+
+
+MODEL_CACHE = {
+    '_controller': None,
+    '_controller_name': None,
+    '_model': None,
+    '_model_uuid': None,
+    '_user_name': None,
+    'model_name': "cached-model-for-testing",
+}
+
+
+class CachedModel:
+    """
+    Context manager that does the same thing as CleanModel(), however, instead of
+    creating a new model every time it's entered, it reuses the cached model and
+    retains the underlying connection
+
+    It needs to clean up the cached model every time it exists
+
+    It needs to cleanup, disconnect and re-create the model when --reset flag is used.
+    """
+    def __init__(self):
+        self._model = MODEL_CACHE['_model']
+        self.jujudata = TestJujuData()
+
+    async def init_cache(self):
+        MODEL_CACHE['_controller'] = Controller(jujudata=self.jujudata)
+        MODEL_CACHE['_controller_name'] = self.jujudata.current_controller()
+        MODEL_CACHE['_user_name'] = self.jujudata.accounts()[MODEL_CACHE['_controller_name']]['user']
+        await MODEL_CACHE['_controller'].connect(MODEL_CACHE['_controller_name'])
+        MODEL_CACHE['_model'] = await MODEL_CACHE['_controller'].add_model(MODEL_CACHE['model_name'])
+        self._model = MODEL_CACHE['_model']
+
+    async def __aenter__(self):
+        if self._model is None:
+            await self.init_cache()
+
+        # save the model UUID in case test closes model
+        MODEL_CACHE['_model_uuid'] = self._model.info.uuid
+
+        # Change the JujuData instance so that it will return the new
+        # model as the current model name, so that we'll connect
+        # to it by default.
+        self.jujudata.set_model(
+            MODEL_CACHE['_controller_name'],
+            MODEL_CACHE['_user_name'] + "/" + MODEL_CACHE['model_name'],
+            MODEL_CACHE['_model_uuid'],
+        )
+
+        return self._model
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        for app in self._model.applications:
+            await app.remove(destroy_storage=True, force=True, no_wait=True)
+
+    async def reset(self):
+        await self._model.disconnect()
+        await MODEL_CACHE['_controller'].destroy_model(MODEL_CACHE['_model_uuid'], force=True, max_wait=60)
+        await MODEL_CACHE['_controller'].disconnect()
+        MODEL_CACHE['_controller'] = None
+        MODEL_CACHE['_controller_name'] = None
+        MODEL_CACHE['_model'] = None
+        MODEL_CACHE['_model_uuid'] = None
+        MODEL_CACHE['_user_name'] = None
+        await self.init_cache()
 
 
 class TestJujuData(FileJujuData):
