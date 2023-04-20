@@ -776,6 +776,28 @@ async def test_wait_for_idle_with_not_enough_units(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_wait_for_idle_more_units_than_needed(event_loop):
+    async with base.CleanModel() as model:
+        charm_path = TESTS_DIR / 'charm'
+
+        # we add 2 units of a local charm that does nothing
+        # (i.e. can't go into active/idle)
+        await model.deploy(str(charm_path), num_units=2)
+
+        # then add 1 unit of ubuntu charm
+        await model.deploy(
+            'ubuntu',
+            application_name='ubuntu',
+            num_units=1,
+        )
+
+        # because the wait_for_units=1, wait_for_idle should return without timing out
+        # even though there are two more units that aren't active/idle
+        await model.wait_for_idle(timeout=5 * 60, wait_for_units=1, status='active')
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_wait_for_idle_with_enough_units(event_loop):
     async with base.CleanModel() as model:
         await model.deploy(
