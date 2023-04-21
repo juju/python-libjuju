@@ -358,7 +358,7 @@ class BundleHandler:
                                             architecture=architecture,
                                             risk=risk,
                                             track=track)
-                charm_url, charm_origin, _ = await self.model._resolve_charm(charm_url, origin)
+                charm_url, charm_origin = await self.model._resolve_charm(charm_url, origin)
 
                 spec['charm'] = str(charm_url)
             else:
@@ -731,7 +731,7 @@ class AddCharmChange(ChangeInfo):
                                         architecture=arch,
                                         risk=ch.risk,
                                         track=ch.track)
-            identifier, origin, _ = await context.model._resolve_charm(url, origin)
+            identifier, origin = await context.model._resolve_charm(url, origin)
 
         if identifier is None:
             raise JujuError('unknown charm {}'.format(self.charm))
