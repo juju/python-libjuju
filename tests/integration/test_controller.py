@@ -254,7 +254,7 @@ async def test_secrets_backend_lifecycle(event_loop):
         # relate/integrate
         await m.integrate("vault:db", "postgresql:db")
         # wait for the postgresql app
-        await m.wait_for_idle(["postgresql"])
+        await m.wait_for_idle(["postgresql", "vault"], timeout=600)
         # expose vault
         vault_app = m.applications["vault"]
         await vault_app.expose()
@@ -293,7 +293,9 @@ async def test_secrets_backend_lifecycle(event_loop):
             assert entry["result"].name == "internal" or entry["result"].name == "myvault"
 
         # Update it
-        resp = await controller.update_secret_backends("myvault", name_change="changed_name")
+        # There is an ongoing error if no token_rotate_interval is provided
+        resp = await controller.update_secret_backends("myvault", name_change="changed_name",
+        token_rotate_interval=3600000000000)
         assert resp["results"][0]["error"] is None
 
         # List the secrets backend
