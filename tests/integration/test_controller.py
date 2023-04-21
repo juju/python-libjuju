@@ -296,7 +296,7 @@ async def test_secrets_backend_lifecycle(event_loop):
         # There is an ongoing error if no token_rotate_interval is provided
         resp = await controller.update_secret_backends(
             "myvault",
-            name_change="changed_name", 
+            name_change="changed_name",
             token_rotate_interval=3600000000000)
         assert resp["results"][0]["error"] is None
 
