@@ -798,8 +798,8 @@ async def test_wait_for_idle_with_not_enough_units(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-@pytest.skip("This is testing juju functionality")
 async def test_wait_for_idle_with_enough_units(event_loop):
+    pytest.skip("This is testing juju functionality")
     async with base.CleanModel() as model:
         await model.deploy(
             'ubuntu',
@@ -813,8 +813,8 @@ async def test_wait_for_idle_with_enough_units(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-@pytest.skip("This is testing juju functionality")
 async def test_wait_for_idle_with_exact_units(event_loop):
+    pytest.skip("This is testing juju functionality")
     async with base.CleanModel() as model:
         await model.deploy(
             'ubuntu',
@@ -828,12 +828,12 @@ async def test_wait_for_idle_with_exact_units(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-@pytest.skip("This is testing juju functionality")
 async def test_wait_for_idle_with_exact_units_scale_down(event_loop):
     """Deploys 3 units, waits for them to be idle, then removes 2 of them,
     then waits for exactly 1 unit to be left.
 
     """
+    pytest.skip("This is testing juju functionality")
     async with base.CleanModel() as model:
         app = await model.deploy(
             'ubuntu',
@@ -858,12 +858,12 @@ async def test_wait_for_idle_with_exact_units_scale_down(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-@pytest.skip("This is testing juju functionality")
 async def test_wait_for_idle_with_exact_units_scale_down_zero(event_loop):
     """Deploys 3 units, waits for them to be idle, then removes 3 of them,
     then waits for exactly 0 unit to be left.
 
     """
+    pytest.skip("This is testing juju functionality")
     async with base.CleanModel() as model:
         app = await model.deploy(
             'ubuntu',
