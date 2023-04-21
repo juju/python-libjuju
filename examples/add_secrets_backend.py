@@ -38,14 +38,12 @@ async def main():
     keys = vault_client.sys.initialize(3, 2)
     print(keys)
 
-     # Unseal vault
+    # Unseal vault
     vault_client.sys.submit_unseal_keys(keys["keys"])
 
     target_unit = m.applications['vault'].units[0]
     action = await target_unit.run_action("authorize-charm", token=keys["root_token"])
     await action.wait()
-
-   
 
     # Add the secret backend
     c = await m.get_controller()
@@ -58,8 +56,8 @@ async def main():
     print("Output from list secret backends")
     print(list["results"])
 
-    # # Remove it
-    #await c.remove_secret_backends("examplevault")
+    # Remove it
+    await c.remove_secret_backends("examplevault")
 
     # # Finally after removing
     list = await c.list_secret_backends()
