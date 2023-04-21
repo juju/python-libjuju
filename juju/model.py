@@ -2457,6 +2457,7 @@ class Model:
         start_time = datetime.now()
         apps = apps or self.applications
         idle_times = {}
+        units_ready = set()  # The units that are in the desired state
         last_log_time = None
         log_interval = timedelta(seconds=30)
 
@@ -2478,6 +2479,9 @@ class Model:
                 ))
 
         while True:
+            # The list 'busy' is what keeps this loop going,
+            # i.e. it'll stop when busy is empty after all the
+            # units are scanned
             busy = []
             errors = {}
             blocks = {}
@@ -2490,15 +2494,20 @@ class Model:
                     errors.setdefault("App", []).append(app.name)
                 if raise_on_blocked and app.status == "blocked":
                     blocks.setdefault("App", []).append(app.name)
+                # Check if wait_for_exact_units flag is used
                 if wait_for_exact_units > 0:
                     if len(app.units) != wait_for_exact_units:
                         busy.append(app.name + " (waiting for exactly %s units, current : %s)" %
                                     (wait_for_exact_units, len(app.units)))
                         continue
+                # If we have less # of units then required, then wait a bit more
                 elif len(app.units) < wait_for_units:
                     busy.append(app.name + " (not enough units yet - %s/%s)" %
                                 (len(app.units), wait_for_units))
                     continue
+                elif len(units_ready) >= wait_for_units:
+                    # No need to keep looking, we have the desired number of units ready to go
+                    break
                 for unit in app.units:
                     if unit.machine is not None and unit.machine.status == "error":
                         errors.setdefault("Machine", []).append(unit.machine.id)
@@ -2512,10 +2521,17 @@ class Model:
                     if raise_on_blocked and unit.workload_status == "blocked":
                         blocks.setdefault("Unit", []).append(unit.name)
                         continue
-                    waiting_for_status = status and unit.workload_status != status
-                    if not waiting_for_status and unit.agent_status == "idle":
+                    waiting_for_a_particular_status = status and unit.workload_status != status
+                    if not waiting_for_a_particular_status and unit.agent_status == "idle":
+                        # We'll be here in two cases:
+                        # 1) We're not waiting for a particular status and the agent is "idle"
+                        # 2) We're waiting for a particular status and the workload is in that status
+                        # Either way, the unit is ready, start measuring the time period that
+                        # it needs to stay in that state (i.e. idle_period)
+                        units_ready.add(unit.name)
                         now = datetime.now()
                         idle_start = idle_times.setdefault(unit.name, now)
+                        print(f'unit {unit.name} is waiting since : {idle_start} -- now : {now} -- waiting for : {now - idle_start}')
                         if now - idle_start < idle_period:
                             busy.append("{} [{}] {}: {}".format(unit.name,
                                                                 unit.agent_status,
