@@ -306,6 +306,22 @@ class TestModelWaitForIdle(asynctest.TestCase):
                 machine=None,
                 agent_status="idle",
             )],
+        ),
+            "not_dumm_app": SimpleNamespace(
+            status="active",
+            units=[SimpleNamespace(
+                name="not_dumm_app/0",
+                workload_status="waiting",
+                workload_status_message="workload_status_message",
+                machine=None,
+                agent_status="executing",
+            ), SimpleNamespace(
+                name="not_dumm_app/1",
+                workload_status="waiting",
+                workload_status_message="workload_status_message",
+                machine=None,
+                agent_status="executing",
+            )],
         )}
 
         with patch.object(Model, 'applications', new_callable=PropertyMock) as mock_apps:
@@ -320,5 +336,56 @@ class TestModelWaitForIdle(asynctest.TestCase):
 
             # use both `status` and `wait_for_active` - `wait_for_active` takes precedence
             await m.wait_for_idle(apps=["dummy_app"], wait_for_active=True, status="doesn't matter")
+
+            with pytest.raises(jasyncio.TimeoutError) as cm:
+                await m.wait_for_idle(wait_for_active=True, status="active", wait_for_units=1)
+
+        mock_apps.assert_called_with()
+
+    @pytest.mark.asyncio
+    async def test_wait_for_active_status_passes(self):
+        # create a custom apps mock
+        from types import SimpleNamespace
+        apps = {"dummy_app": SimpleNamespace(
+            status="active",
+            units=[SimpleNamespace(
+                name="mockunit/0",
+                workload_status="active",
+                workload_status_message="workload_status_message",
+                machine=None,
+                agent_status="idle",
+            )],
+        ),
+            "not_dumm_app": SimpleNamespace(
+                status="active",
+                units=[SimpleNamespace(
+                    name="not_dumm_app/0",
+                    workload_status="active",
+                    workload_status_message="workload_status_message",
+                    machine=None,
+                    agent_status="idle",
+                ), SimpleNamespace(
+                    name="not_dumm_app/1",
+                    workload_status="waiting",
+                    workload_status_message="workload_status_message",
+                    machine=None,
+                    agent_status="executing",
+                )],
+            )}
+
+        with patch.object(Model, 'applications', new_callable=PropertyMock) as mock_apps:
+            mock_apps.return_value = apps
+            m = Model()
+
+            # pass "active" via `status` (str)
+            await m.wait_for_idle(apps=["dummy_app"], status="active")
+
+            # pass "active" via `wait_for_active` (bool; deprecated)
+            await m.wait_for_idle(apps=["dummy_app"], wait_for_active=True)
+
+            # use both `status` and `wait_for_active` - `wait_for_active` takes precedence
+            await m.wait_for_idle(apps=["dummy_app"], wait_for_active=True, status="doesn't matter")
+
+            await m.wait_for_idle(wait_for_active=True, status="active", wait_for_units=1)
 
         mock_apps.assert_called_with()

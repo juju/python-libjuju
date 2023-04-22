@@ -2457,7 +2457,6 @@ class Model:
         start_time = datetime.now()
         apps = apps or self.applications
         idle_times = {}
-        units_ready = set()  # The units that are in the desired state
         last_log_time = None
         log_interval = timedelta(seconds=30)
 
@@ -2486,6 +2485,7 @@ class Model:
             errors = {}
             blocks = {}
             for app_name in apps:
+                units_ready = set()  # The units that are in the desired state
                 if app_name not in self.applications:
                     busy.append(app_name + " (missing)")
                     continue
@@ -2505,9 +2505,7 @@ class Model:
                     busy.append(app.name + " (not enough units yet - %s/%s)" %
                                 (len(app.units), wait_for_units))
                     continue
-                elif len(units_ready) >= wait_for_units:
-                    # No need to keep looking, we have the desired number of units ready to go
-                    break
+
                 for unit in app.units:
                     if unit.machine is not None and unit.machine.status == "error":
                         errors.setdefault("Machine", []).append(unit.machine.id)
@@ -2543,6 +2541,10 @@ class Model:
                                                             unit.agent_status,
                                                             unit.workload_status,
                                                             unit.workload_status_message))
+                    if len(units_ready) >= wait_for_units:
+                        # No need to keep looking, we have the desired number of units ready to go
+                        break
+
             _raise_for_status(errors, "error")
             _raise_for_status(blocks, "blocked")
             if not busy:
