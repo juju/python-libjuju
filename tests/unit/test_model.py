@@ -337,7 +337,7 @@ class TestModelWaitForIdle(asynctest.TestCase):
             # use both `status` and `wait_for_active` - `wait_for_active` takes precedence
             await m.wait_for_idle(apps=["dummy_app"], wait_for_active=True, status="doesn't matter")
 
-            with pytest.raises(jasyncio.TimeoutError) as cm:
+            with pytest.raises(jasyncio.TimeoutError):
                 await m.wait_for_idle(wait_for_active=True, status="active", wait_for_units=1)
 
         mock_apps.assert_called_with()
@@ -371,7 +371,7 @@ class TestModelWaitForIdle(asynctest.TestCase):
                     machine=None,
                     agent_status="executing",
                 )],
-            )}
+            )}  # noqa
 
         with patch.object(Model, 'applications', new_callable=PropertyMock) as mock_apps:
             mock_apps.return_value = apps
