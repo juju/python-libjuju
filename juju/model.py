@@ -2529,7 +2529,6 @@ class Model:
                         units_ready.add(unit.name)
                         now = datetime.now()
                         idle_start = idle_times.setdefault(unit.name, now)
-                        print(f'unit {unit.name} is waiting since : {idle_start} -- now : {now} -- waiting for : {now - idle_start}')
                         if now - idle_start < idle_period:
                             busy.append("{} [{}] {}: {}".format(unit.name,
                                                                 unit.agent_status,
