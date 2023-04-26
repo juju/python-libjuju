@@ -97,11 +97,18 @@ async def test_deploy_bundle_local_resource_relative_path(event_loop):
 async def test_deploy_by_revision(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy('juju-qa-test',
-                                 application_name='test',
+                                 application_name='test1',
                                  channel='2.0/stable',
-                                 revision=22,)
+                                 revision=22)
 
         assert url.URL.parse(app.charm_url).revision == 22
+
+        app = await model.deploy('juju-qa-test',
+                                 application_name='test2',
+                                 channel='latest/edge',
+                                 revision=19)
+
+        assert url.URL.parse(app.charm_url).revision == 19
 
 
 @base.bootstrapped
