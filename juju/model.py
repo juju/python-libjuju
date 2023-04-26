@@ -441,7 +441,10 @@ class LocalDeployType:
     """LocalDeployType deals with local only deployments.
     """
 
-    async def resolve(self, url, architecture, app_name=None, channel=None, series=None, revision=None, entity_url=None, force=False):
+    async def resolve(self, url, architecture,
+                      app_name=None, channel=None, series=None,
+                      revision=None, entity_url=None, force=False,
+                      model_conf=None):
         """resolve attempts to resolve a local charm or bundle using the url
         and architecture. If information is missing, it will attempt to backfill
         that information, before sending the result back.
@@ -485,6 +488,7 @@ class LocalDeployType:
             is_bundle=is_bundle,
         )
 
+
 class CharmhubDeployType:
     """CharmhubDeployType defines a class for resolving and deploying charmhub
     charms and bundles.
@@ -493,7 +497,10 @@ class CharmhubDeployType:
     def __init__(self, charm_resolver):
         self.charm_resolver = charm_resolver
 
-    async def resolve(self, url, architecture, app_name=None, channel=None, series=None, revision=None, entity_url=None, force=False):
+    async def resolve(self, url, architecture,
+                      app_name=None, channel=None, series=None,
+                      revision=None, entity_url=None, force=False,
+                      model_conf=None):
         """resolve attempts to resolve charmhub charms or bundles. A request to
         the charmhub API is required to correctly determine the charm url and
         underlying origin.
@@ -515,15 +522,13 @@ class CharmhubDeployType:
                                     track=ch.track,
                                     base=base,
                                     revision=revision,
-                                    series=series
                                     )
+
+        charm_url, origin = await self.charm_resolver(url, origin, force, series, model_conf)
 
         is_bundle = origin.type_ == "bundle"
         if is_bundle and revision and channel:
             raise JujuError('revision and channel are mutually exclusive when deploying a bundle. Please choose one.')
-
-
-        charm_url, origin = await self.charm_resolver(url, origin, force)
 
         if app_name is None:
             app_name = url.name
@@ -1679,7 +1684,12 @@ class Model:
         if str(url.schema) not in self.deploy_types:
             raise JujuError("unknown deploy type {}, expected charmhub or local".format(url.schema))
 
-        res = await self.deploy_types[str(url.schema)].resolve(url, architecture, application_name, channel, series, revision, entity_url, force)
+        model_conf = await self.get_config()
+        res = await self.deploy_types[str(url.schema)].resolve(url, architecture,
+                                                               application_name, channel,
+                                                               series, revision,
+                                                               entity_url, force,
+                                                               model_conf)
 
         if res.identifier is None:
             raise JujuError('unknown charm or bundle {}'.format(entity_url))
@@ -1790,7 +1800,7 @@ class Model:
         client_facade = client.ClientFacade.from_connection(self.connection())
         return await client_facade.AddCharm(channel=str(origin.risk), url=charm_url, force=False)
 
-    async def _resolve_charm(self, url, origin, force=False):
+    async def _resolve_charm(self, url, origin, force=False, series=None, model_config=None):
         """Calls Charms.ResolveCharms to resolve all the fields of the
         charm_origin and also the url and the supported_series
 
@@ -1817,8 +1827,7 @@ class Model:
 
         resolve_origin = {'source': source, 'architecture': origin.architecture,
                           'track': origin.track, 'risk': origin.risk,
-                          'base': origin.base, 'series': origin.series,
-                          'revision': origin.revision,
+                          'base': origin.base, 'revision': origin.revision,
                           }
 
         resp = await charms_facade.ResolveCharms(resolve=[{
@@ -1833,15 +1842,13 @@ class Model:
             raise JujuError(result.error.message)
 
         supported_series = result.supported_series
+        resolved_origin = result.charm_origin
         charm_url = URL.parse(result.url)
-        if origin.series:
-            # Check whether the charm supports this series
-            # or we force it
-            if origin.series in supported_series or force:
-                result.charm_origin.series = origin.series
-                charm_url.series = origin.series
-            else:
-                raise JujuError("Series {} not supported for {}. Only {}".format(origin.series, result.url, supported_series))
+
+        # run the series selector to get a series for the base
+        selected_series = utils.series_selector(series, url, model_config, supported_series, force)
+        result.charm_origin.base = utils.get_base_from_origin_or_channel(resolved_origin, selected_series)
+        charm_url.series = selected_series
 
         return result.url, result.charm_origin
 
