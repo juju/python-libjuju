@@ -105,11 +105,11 @@ async def test_deploy_local_bundle_include_base64(event_loop):
     async with base.CleanModel() as model:
         await model.deploy(str(bundle_yaml_path))
 
-        mysql = model.applications.get('mysql', None)
-        ghost = model.applications.get('ghost', None)
+        appa = model.applications.get('helloa', None)
+        appb = model.applications.get('hellob', None)
         test = model.applications.get('test', None)
-        assert mysql and ghost and test
-        assert mysql.config.get('tuning-level', '') == 'fast'
+        assert appa and appb and test
+        assert appa.config.get('application-repo', "") == "http://my-juju.com"
 
 
 @base.bootstrapped
