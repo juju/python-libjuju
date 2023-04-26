@@ -10,6 +10,6 @@ description: Another overlay for test multi-overlay
 applications:
   memcached:
   mysql:
-    charm: "mysql"
-    channel: candidate
+    charm: "prometheus"
+    channel: stable
     num_units: 1
