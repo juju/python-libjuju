@@ -1,14 +1,14 @@
 applications:
   ghost:
-    charm: "ghost"
+    charm: "prometheus"
     channel: stable
     num_units: 1
   mysql:
-    charm: "mysql"
-    channel: candidate
+    charm: "prometheus"
+    channel: stable
     num_units: 1
 relations:
-  - ["ghost", "mysql"]    
+  - ["ghost:grafana-source", "mysql:grafana-source"]
 --- # overlay.yaml
 description: Overlay to remove the ghost app and the relation
 applications:
