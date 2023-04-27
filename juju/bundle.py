@@ -17,6 +17,7 @@ from .errors import JujuError
 from . import utils, jasyncio
 from .origin import Channel, Source
 from .url import Schema, URL
+from .utils import get_base_from_origin_or_channel
 
 log = logging.getLogger(__name__)
 
@@ -350,11 +351,13 @@ class BundleHandler:
 
             charm_url = URL.parse(spec['charm'])
             channel = None
-            series = spec.get('series', None)
+            base = None
             track, risk = '', ''
             if 'channel' in spec:
                 channel = Channel.parse(spec['channel'])
                 track, risk = channel.track, channel.risk
+                series = spec.get('series', None)
+                base = get_base_from_origin_or_channel(channel, series)
 
             if self.charms_facade is not None:
                 if cons is not None and cons['arch'] != '':
@@ -365,16 +368,18 @@ class BundleHandler:
                 origin = client.CharmOrigin(source=Source.CHARM_HUB.value,
                                             architecture=architecture,
                                             risk=risk,
-                                            track=track)
-                if not self.model.connection().is_using_old_client and series:
-                    origin.base = client.Base(
-                        channel=utils.get_series_version(series), name='ubuntu')
-                charm_url, charm_origin, _ = await self.model._resolve_charm(charm_url, origin)
+                                            track=track,
+                                            base=base,
+                                            )
+
+                charm_url, charm_origin = await self.model._resolve_charm(charm_url, origin)
                 spec['charm'] = str(charm_url)
             else:
                 charm_origin = client.CharmOrigin(source=Source.CHARM_HUB.value,
                                                   risk=risk,
-                                                  track=track)
+                                                  track=track,
+                                                  base=base,
+                                                  )
 
             if str(channel) not in self.origins:
                 self.origins[str(charm_url)] = {}
@@ -715,15 +720,13 @@ class AddCharmChange(ChangeInfo):
             arch = self.architecture
             if not arch:
                 arch = await context.model._resolve_architecture(url)
+            base = get_base_from_origin_or_channel(ch, self.series)
             origin = client.CharmOrigin(source=Source.CHARM_HUB.value,
                                         architecture=arch,
                                         risk=ch.risk,
-                                        track=ch.track)
-            if not context.model.connection().is_using_old_client and self.series:
-                origin.base = client.Base(
-                    channel=utils.get_series_version(self.series),
-                    name='ubuntu')
-            identifier, origin, _ = await context.model._resolve_charm(url, origin)
+                                        track=ch.track,
+                                        base=base)
+            identifier, origin = await context.model._resolve_charm(url, origin)
 
         if identifier is None:
             raise JujuError('unknown charm {}'.format(self.charm))

@@ -11,6 +11,7 @@ import zipfile
 
 from . import jasyncio, origin, errors
 from .client import client
+from .errors import JujuError
 
 
 async def execute_process(*cmd, log=None):
@@ -412,7 +413,104 @@ def parse_base_arg(base):
     """
     client.CharmBase()
     if type(base) != str or "@" not in base:
-        raise errors.JujuError("expected base string to contain os and channel separated by '@'")
+        raise errors.JujuError(f"expected base string to contain os and channel separated by '@', got : {base}")
 
     name, channel = base.split('@')
     return client.Base(name=name, channel=channel)
+
+
+DEFAULT_SUPPORTED_LTS = 'jammy'
+DEFAULT_SUPPORTED_LTS_BASE = client.Base(channel='22.04', name='ubuntu')
+
+
+def base_channel_from_series(track, risk, series=None):
+    return origin.Channel(track=track, risk=risk).normalize().compute_base_channel(series=series)
+
+
+def get_os_from_series(series=None):
+    if not series or series in UBUNTU_SERIES:
+        return 'ubuntu'
+    raise JujuError(f'os for the series {series} needs to be added')
+
+
+def get_base_from_origin_or_channel(origin_or_channel, series=None):
+    channel = base_channel_from_series(origin_or_channel.track, origin_or_channel.risk, series)
+    os_name = get_os_from_series(series)
+    return client.Base(channel=channel, name=os_name)
+
+
+def series_for_charm(requested_series, supported_series):
+    """series_for_charm takes a requested series and a list of series supported by a
+    charm and returns the series which is relevant.
+    If the requested series is empty, then the first supported series is used,
+    otherwise the requested series is validated against the supported series.
+    """
+    if len(supported_series) == 1 and supported_series[0] == '':
+        raise JujuError("invalid supported series reported by charm : ['']")
+    if len(supported_series) == 0:
+        if requested_series == '':
+            raise JujuError("missing series")
+        return requested_series
+
+    # use the charm default
+    if requested_series == '':
+        return supported_series[-1]
+
+    for s in supported_series:
+        if requested_series == s:
+            return requested_series
+    raise JujuError(f'requested series {requested_series} is not among the supported series {supported_series}')
+
+
+def user_requested(series_arg, supported_series, force):
+    series = series_for_charm(series_arg, supported_series)
+    if force:
+        series = series_arg
+    # Todo (cderici): validate the series with workload_series to see if juju is supporting that
+    return series
+
+
+def series_selector(series_arg='', charm_url=None, model_config=None, supported_series=[], force=False):
+    """
+    series_selector corresponds to the CharmSeries() in
+    https://github.com/juju/juju/blob/develop/core/charm/series_selector.go
+
+    determines what series to use with a charm.
+    Order of preference is:
+    - user requested with --series or defined by bundle when deploying
+    - user requested in charm's url (e.g. juju deploy jammy/ubuntu)
+    - model default, if set, acts like --series
+    - default from charm metadata supported series / series in url
+    - default LTS
+    """
+
+    # User has requested a series with --series.
+    if series_arg:
+        return user_requested(series_arg, supported_series, force)
+
+    # User specified a series in the charm URL, e.g.
+    # juju deploy precise/ubuntu.
+    if charm_url and charm_url.series:
+        return user_requested(charm_url.series, supported_series, force)
+
+    # No series explicitly requested by the user.
+    # Use model default series, if explicitly set and supported by the charm.
+    if model_config and model_config['default-base'].value:
+        default_base = model_config['default-base'].value
+        base = parse_base_arg(default_base)
+        series = base_channel_to_series(base.channel)
+        return user_requested(series, supported_series, force)
+
+    # Next fall back to the charm's list of series, filtered to what's supported
+    # by Juju. Preserve the order of the supported series from the charm
+    # metadata, as the order could be out of order compared to Ubuntu series
+    # order (precise, xenial, bionic, trusty, etc).
+    try:
+        # TODO (cderici): restrict the supported_series with JujuSupportedSeries
+        return user_requested('', supported_series, force)
+    except JujuError:
+        pass
+
+    # Charm hasn't specified a default (likely due to being a local charm
+    # deployed by path). Last chance, best we can do is default to LTS.
+    return DEFAULT_SUPPORTED_LTS

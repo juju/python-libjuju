@@ -441,10 +441,15 @@ class LocalDeployType:
     """LocalDeployType deals with local only deployments.
     """
 
-    async def resolve(self, url, architecture, app_name=None, channel=None, series=None, entity_url=None):
+    async def resolve(self, url, architecture,
+                      app_name=None, channel=None, series=None,
+                      revision=None, entity_url=None, force=False,
+                      model_conf=None):
         """resolve attempts to resolve a local charm or bundle using the url
         and architecture. If information is missing, it will attempt to backfill
         that information, before sending the result back.
+
+        -- revision flag is ignored for local charms
         """
 
         entity_url = url.path()
@@ -492,11 +497,16 @@ class CharmhubDeployType:
     def __init__(self, charm_resolver):
         self.charm_resolver = charm_resolver
 
-    async def resolve(self, url, architecture, app_name=None, channel=None, series=None, entity_url=None):
+    async def resolve(self, url, architecture,
+                      app_name=None, channel=None, series=None,
+                      revision=None, entity_url=None, force=False,
+                      model_conf=None):
         """resolve attempts to resolve charmhub charms or bundles. A request to
         the charmhub API is required to correctly determine the charm url and
         underlying origin.
         """
+        if revision and not channel:
+            raise JujuError('specifying a revision requires a channel for future upgrades. Please use --channel')
 
         ch = Channel('latest', 'stable')
         if channel is not None:
@@ -511,26 +521,23 @@ class CharmhubDeployType:
                                     risk=ch.risk,
                                     track=ch.track,
                                     base=base,
+                                    revision=revision,
                                     )
 
-        charm_url_str, origin, supported_series = await self.charm_resolver(url, origin)
-        charm_url = URL.parse(charm_url_str)
+        charm_url, origin = await self.charm_resolver(url, origin, force, series, model_conf)
+
+        is_bundle = origin.type_ == "bundle"
+        if is_bundle and revision and channel:
+            raise JujuError('revision and channel are mutually exclusive when deploying a bundle. Please choose one.')
 
         if app_name is None:
             app_name = url.name
-
-        if series:
-            if series in supported_series:
-                origin.series = series
-                charm_url.series = series
-            else:
-                raise JujuError("Series {} not supported for {}. Only {}".format(series, url, supported_series))
 
         return DeployTypeResult(
             identifier=str(charm_url),
             app_name=app_name,
             origin=origin,
-            is_bundle=origin.type_ == "bundle",
+            is_bundle=is_bundle,
         )
 
 
@@ -1611,7 +1618,7 @@ class Model:
     async def deploy(
             self, entity_url, application_name=None, bind=None,
             channel=None, config=None, constraints=None, force=False,
-            num_units=1, overlays=[], base=None, resources=None, series=None,
+            num_units=1, overlays=[], base=None, resources=None, series=None, revision=None,
             storage=None, to=None, devices=None, trust=False, attach_storage=[]):
         """Deploy a new service or bundle.
 
@@ -1630,6 +1637,8 @@ class Model:
         :param str base: The base on which to deploy
         :param dict resources: <resource name>:<file path> pairs
         :param str series: Series on which to deploy DEPRECATED: use --base (with Juju 3.1)
+        :param int revision: specifying a revision requires a channel for future upgrades for charms.
+            For bundles, revision and channel are mutually exclusive.
         :param dict storage: Storage constraints TODO how do these look?
         :param to: Placement directive as a string. For example:
 
@@ -1675,7 +1684,12 @@ class Model:
         if str(url.schema) not in self.deploy_types:
             raise JujuError("unknown deploy type {}, expected charmhub or local".format(url.schema))
 
-        res = await self.deploy_types[str(url.schema)].resolve(url, architecture, application_name, channel, series, entity_url)
+        model_conf = await self.get_config()
+        res = await self.deploy_types[str(url.schema)].resolve(url, architecture,
+                                                               application_name, channel,
+                                                               series, revision,
+                                                               entity_url, force,
+                                                               model_conf)
 
         if res.identifier is None:
             raise JujuError('unknown charm or bundle {}'.format(entity_url))
@@ -1772,6 +1786,7 @@ class Model:
                 devices=devices,
                 charm_origin=charm_origin,
                 attach_storage=attach_storage,
+                force=force,
             )
 
     async def _add_charm(self, charm_url, origin):
@@ -1785,7 +1800,7 @@ class Model:
         client_facade = client.ClientFacade.from_connection(self.connection())
         return await client_facade.AddCharm(channel=str(origin.risk), url=charm_url, force=False)
 
-    async def _resolve_charm(self, url, origin):
+    async def _resolve_charm(self, url, origin, force=False, series=None, model_config=None):
         """Calls Charms.ResolveCharms to resolve all the fields of the
         charm_origin and also the url and the supported_series
 
@@ -1812,7 +1827,8 @@ class Model:
 
         resolve_origin = {'source': source, 'architecture': origin.architecture,
                           'track': origin.track, 'risk': origin.risk,
-                          'base': origin.base}
+                          'base': origin.base, 'revision': origin.revision,
+                          }
 
         resp = await charms_facade.ResolveCharms(resolve=[{
             'reference': str(url),
@@ -1825,7 +1841,16 @@ class Model:
         if result.error:
             raise JujuError(result.error.message)
 
-        return (result.url, result.charm_origin, result.supported_series)
+        supported_series = result.supported_series
+        resolved_origin = result.charm_origin
+        charm_url = URL.parse(result.url)
+
+        # run the series selector to get a series for the base
+        selected_series = utils.series_selector(series, url, model_config, supported_series, force)
+        result.charm_origin.base = utils.get_base_from_origin_or_channel(resolved_origin, selected_series)
+        charm_url.series = selected_series
+
+        return result.url, result.charm_origin
 
     async def _resolve_architecture(self, url):
         if url.architecture:
@@ -1956,7 +1981,8 @@ class Model:
     async def _deploy(self, charm_url, application, series, config,
                       constraints, endpoint_bindings, resources, storage,
                       channel=None, num_units=None, placement=None,
-                      devices=None, charm_origin=None, attach_storage=[]):
+                      devices=None, charm_origin=None, attach_storage=[],
+                      force=False):
         """Logic shared between `Model.deploy` and `BundleHandler.deploy`.
         """
         log.info('Deploying %s', charm_url)
@@ -1984,6 +2010,7 @@ class Model:
             placement=placement,
             devices=devices,
             attach_storage=attach_storage,
+            force=force,
         )
         result = await app_facade.Deploy(applications=[app])
         errors = [r.error.message for r in result.results if r.error]
