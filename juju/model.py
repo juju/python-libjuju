@@ -2478,8 +2478,7 @@ class Model:
             warnings.warn("wait_for_active is deprecated; use status", DeprecationWarning)
             status = "active"
 
-        if wait_for_units is None:
-            _wait_for_units = 1
+        _wait_for_units = wait_for_units if wait_for_units is not None else 1
 
         timeout = timedelta(seconds=timeout) if timeout is not None else None
         idle_period = timedelta(seconds=idle_period)
