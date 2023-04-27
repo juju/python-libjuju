@@ -2497,7 +2497,7 @@ class Model:
 
     async def wait_for_idle(self, apps=None, raise_on_error=True, raise_on_blocked=False,
                             wait_for_active=False, timeout=10 * 60, idle_period=15, check_freq=0.5,
-                            status=None, wait_for_units=1, wait_for_exact_units=None):
+                            status=None, wait_for_units=None, wait_for_exact_units=-1):
         """Wait for applications in the model to settle into an idle state.
 
         :param apps (list[str]): Optional list of specific app names to wait on.
@@ -2544,6 +2544,9 @@ class Model:
         if wait_for_active:
             warnings.warn("wait_for_active is deprecated; use status", DeprecationWarning)
             status = "active"
+
+        if wait_for_units is None:
+            _wait_for_units = 1
 
         timeout = timedelta(seconds=timeout) if timeout is not None else None
         idle_period = timedelta(seconds=idle_period)
@@ -2605,12 +2608,14 @@ class Model:
                                     (wait_for_exact_units, len(app.units)))
                         continue
                 # If we have less # of units then required, then wait a bit more
-                elif len(app.units) < wait_for_units:
+                elif len(app.units) < _wait_for_units:
                     busy.append(app.name + " (not enough units yet - %s/%s)" %
-                                (len(app.units), wait_for_units))
+                                (len(app.units), _wait_for_units))
                     continue
-                elif len(units_ready) >= wait_for_units:
-                    # No need to keep looking, we have the desired number of units ready to go
+                # User wants to see a certain # of units, and we have enough
+                elif wait_for_units and len(units_ready) >= _wait_for_units:
+                    # So no need to keep looking, we have the desired number of units ready to go,
+                    # exit the loop. Don't return, though, we might still have some errors to raise
                     break
                 for unit in app.units:
                     if unit.machine is not None and unit.machine.status == "error":
