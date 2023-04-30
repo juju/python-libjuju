@@ -1171,6 +1171,7 @@ async def test_model_cache_update(event_loop):
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_add_storage(event_loop):
+    pytest.skip('skip in favour of test_add_and_list_storage')
     async with base.CleanModel() as model:
         app = await model.deploy('postgresql')
         await model.wait_for_idle(status="active")
@@ -1254,12 +1255,13 @@ async def test_detach_storage(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_list_storage(event_loop):
+async def test_add_and_list_storage(event_loop):
     async with base.CleanModel() as model:
-        app = await model.deploy('postgresql')
+        #app = await model.deploy('postgresql')
+        app = await model.deploy('mysql', channel="8.0/stable")
         await model.wait_for_idle(status="active")
         unit = app.units[0]
-        await unit.add_storage("pgdata")
+        await unit.add_storage("pgdata", size=512)
         storages = await model.list_storage()
         await model.list_storage(filesystem=True)
         await model.list_storage(volume=True)
