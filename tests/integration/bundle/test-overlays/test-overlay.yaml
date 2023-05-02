@@ -2,12 +2,10 @@ description: An overlay for tests
 applications:
   ntp:
   ghost:
-    charm: "ghost"
+    charm: "prometheus"
     channel: stable
     num_units: 1
   mysql:
-    charm: "mysql"
-    channel: candidate
-    num_units: 1  
-relations:
-  - ["ghost", "mysql"]
+    charm: "prometheus"
+    channel: stable
+    num_units: 1

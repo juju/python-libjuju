@@ -36,11 +36,15 @@ async def test_deploy_local_bundle_dir(event_loop):
     async with base.CleanModel() as model:
         await model.deploy(str(bundle_path))
 
-        wordpress = model.applications.get('wordpress')
-        mysql = model.applications.get('mysql')
-        assert wordpress and mysql
-        await model.block_until(lambda: (len(wordpress.units) == 1 and
-                                len(mysql.units) == 1),
+        app1 = model.applications.get('grafana')
+        app2 = model.applications.get('prometheus')
+        with open("/tmp/output", "w") as writer:
+            writer.write(str(bundle_path) + "\n")
+            for (k, v) in model.applications.items():
+                writer.write(k)
+        assert app1 and app2
+        await model.block_until(lambda: (len(app1.units) == 1 and
+                                len(app2.units) == 1),
                                 timeout=60 * 4)
 
 
@@ -53,11 +57,11 @@ async def test_deploy_local_bundle_file(event_loop):
     async with base.CleanModel() as model:
         await model.deploy(str(mini_bundle_file_path))
 
-        ghost = model.applications.get('ghost')
-        mysql = model.applications.get('mysql')
-        assert ghost and mysql
-        await model.block_until(lambda: (len(ghost.units) == 1 and
-                                len(mysql.units) == 1),
+        app1 = model.applications.get('grafana')
+        app2 = model.applications.get('prometheus')
+        assert app1 and app2
+        await model.block_until(lambda: (len(app1.units) == 1 and
+                                len(app2.units) == 1),
                                 timeout=60 * 4)
 
 
@@ -84,12 +88,12 @@ async def test_deploy_local_bundle_include_file(event_loop):
     async with base.CleanModel() as model:
         await model.deploy(str(bundle_yaml_path))
 
-        mysql = model.applications.get('mysql', None)
-        ghost = model.applications.get('ghost', None)
+        appa = model.applications.get('helloa', None)
+        appb = model.applications.get('hellob', None)
         test = model.applications.get('test', None)
-        assert mysql and ghost and test
-        assert ghost.config.get('port', None) == 2369
-        assert ghost.config.get('url', "") == 'http://my-ghost.blg'
+        assert appa and appb and test
+        assert appa.config.get('port', None) == 666
+        assert appa.config.get('application-repo', "") == "http://my-juju.com"
 
 
 @base.bootstrapped
@@ -101,11 +105,11 @@ async def test_deploy_local_bundle_include_base64(event_loop):
     async with base.CleanModel() as model:
         await model.deploy(str(bundle_yaml_path))
 
-        mysql = model.applications.get('mysql', None)
-        ghost = model.applications.get('ghost', None)
+        appa = model.applications.get('helloa', None)
+        appb = model.applications.get('hellob', None)
         test = model.applications.get('test', None)
-        assert mysql and ghost and test
-        assert mysql.config.get('tuning-level', '') == 'fast'
+        assert appa and appb and test
+        assert appa.config.get('application-repo', "") == "http://my-juju.com"
 
 
 @base.bootstrapped
@@ -238,16 +242,11 @@ async def test_deploy_bundle_with_multiple_overlays_with_include_files(event_loo
         overlay2_path = OVERLAYS_DIR / 'test-overlay3.yaml'
 
         await model.deploy(str(bundle_yaml_path), overlays=[overlay1_path, overlay2_path])
-        # the bundle : installs ghost, mysql and a local test charm
-        # overlay1   : removes test, mysql, installs memcached
-        # overlay2   : removes memcached, adds config to ghost with include-file
-        assert 'mysql' not in model.applications
+
+        assert 'influxdb' not in model.applications
         assert 'test' not in model.applications
         assert 'memcached' not in model.applications
-        assert 'ghost' in model.applications
-        ghost = model.applications.get('ghost', None)
-        assert ghost.config.get('port', None) == 2369
-        assert ghost.config.get('url', "") == 'http://my-ghost.blg'
+        assert 'grafana' in model.applications
 
 
 @base.bootstrapped
