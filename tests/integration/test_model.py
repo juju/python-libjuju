@@ -1193,6 +1193,7 @@ async def test_model_attach_storage_at_deploy(event_loop):
         # - Remove app
         # - Re-deploy with attach_storage parameter
         # - Make sure the storage is there
+        
         app = await model.deploy('postgresql')
         await model.wait_for_idle(status="active")
 
