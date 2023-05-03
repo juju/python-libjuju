@@ -332,6 +332,16 @@ async def test_deploy_local_charm_folder_symlink(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_deploy_from_ch_channel_revision_success(event_loop):
+    async with base.CleanModel() as model:
+        # Ensure we're able to resolve charm these with channel and revision,
+        # or channel without revision (note that revision requires channel,
+        # but not vice versa)
+        await model.deploy("postgresql", application_name="test1", channel='latest/stable')
+        await model.deploy("postgresql", application_name="test2", channel='latest/stable', revision=290)
+
+
+@pytest.mark.asyncio
 async def test_deploy_trusted_bundle(event_loop):
     async with base.CleanModel() as model:
         await model.deploy('canonical-livepatch-onprem', channel='stable', trust=True)
