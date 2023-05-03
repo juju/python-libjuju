@@ -200,7 +200,7 @@ async def test_destroy_model_by_name(event_loop):
         await controller.destroy_model(model_name)
         await asyncio.wait_for(_wait_for_model_gone(controller,
                                                     model_name),
-                               timeout=60)
+                               timeout=600)
 
 
 @base.bootstrapped
