@@ -1267,8 +1267,8 @@ async def test_detach_storage(event_loop):
 @pytest.mark.asyncio
 async def test_add_and_list_storage(event_loop):
     async with base.CleanModel() as model:
-        app = await model.deploy('postgresql', channel="latest/stable", revision=290)
-        await model.wait_for_idle(status="active")
+        app = await model.deploy('postgresql', channel="latest/stable")
+        await model.wait_for_idle(status="active", timeout=900)
         unit = app.units[0]
         await unit.add_storage("pgdata", size=512)
         storages = await model.list_storage()

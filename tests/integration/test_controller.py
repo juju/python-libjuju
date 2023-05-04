@@ -254,7 +254,7 @@ async def test_secrets_backend_lifecycle(event_loop):
         # relate/integrate
         await m.integrate("vault:db", "postgresql:db")
         # wait for the postgresql app
-        await m.wait_for_idle(["postgresql", "vault"], timeout=600)
+        await m.wait_for_idle(["postgresql", "vault"], timeout=900)
         # expose vault
         vault_app = m.applications["vault"]
         await vault_app.expose()
