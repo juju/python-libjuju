@@ -248,7 +248,7 @@ async def test_secrets_backend_lifecycle(event_loop):
     async with base.CleanModel() as m:
         controller = await m.get_controller()
         # deploy postgresql
-        await m.deploy('postgresql', series="focal")
+        await m.deploy('postgresql', channel="latest/stable", series="focal")
         # deploy vault
         await m.deploy("vault", series="focal")
         # relate/integrate
