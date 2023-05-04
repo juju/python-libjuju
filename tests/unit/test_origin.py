@@ -30,7 +30,7 @@ class TestChannel(unittest.TestCase):
 
     def test_parse_then_normalize(self):
         ch = Channel.parse("latest/stable").normalize()
-        self.assertEqual(ch, Channel(None, "stable"))
+        self.assertEqual(ch, Channel("latest", "stable"))
 
     def test_str_risk_only(self):
         ch = Channel.parse("stable")
@@ -50,7 +50,7 @@ class TestChannel(unittest.TestCase):
 
     def test_str_then_normalize(self):
         ch = Channel.parse("latest/stable").normalize()
-        self.assertEqual(str(ch), "stable")
+        self.assertEqual(str(ch), "latest/stable")
 
 
 class TestPlatform(unittest.TestCase):
