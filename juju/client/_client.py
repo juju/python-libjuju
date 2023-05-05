@@ -229,6 +229,10 @@ class CrossModelRelationsFacade(TypeFactory):
     pass
 
 
+class CrossModelSecretsFacade(TypeFactory):
+    pass
+
+
 class DeployerFacade(TypeFactory):
     pass
 

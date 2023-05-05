@@ -1,34 +1,28 @@
-"""
-This example:
-
-1. Connects to the current model
-2. Deploy a charm and waits until it reports itself active
-3. Destroys the unit and application
-
-"""
 from juju import jasyncio
 from juju.model import Model
 
 
 async def main():
+    charm = 'juju-qa-test'
+
     model = Model()
     print('Connecting to model')
     # connect to current model with current user, per Juju CLI
     await model.connect()
 
     try:
-        print('Deploying ubuntu')
+        print(f'Deploying {charm} --channel 2.0/stable --revision 22')
         application = await model.deploy(
-            'ch:ubuntu',
-            application_name='ubuntu',
-            series='trusty',
-            channel='stable',
+            'juju-qa-test',
+            application_name='test',
+            channel='2.0/stable',
+            revision=22,
         )
 
         print('Waiting for active')
         await model.wait_for_idle(status='active')
 
-        print('Removing ubuntu')
+        print(f'Removing {charm}')
         await application.remove()
     finally:
         print('Disconnecting from model')

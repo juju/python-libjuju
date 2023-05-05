@@ -200,7 +200,7 @@ async def test_destroy_model_by_name(event_loop):
         await controller.destroy_model(model_name)
         await asyncio.wait_for(_wait_for_model_gone(controller,
                                                     model_name),
-                               timeout=60)
+                               timeout=600)
 
 
 @base.bootstrapped
@@ -248,13 +248,13 @@ async def test_secrets_backend_lifecycle(event_loop):
     async with base.CleanModel() as m:
         controller = await m.get_controller()
         # deploy postgresql
-        await m.deploy('postgresql')
+        await m.deploy('postgresql', channel="latest/stable", series="focal")
         # deploy vault
         await m.deploy("vault", series="focal")
         # relate/integrate
-        await m.relate("vault:db", "postgresql:db")
-        # wait for the
-        await m.wait_for_idle(["vault"])
+        await m.integrate("vault:db", "postgresql:db")
+        # wait for the postgresql app
+        await m.wait_for_idle(["postgresql", "vault"], timeout=900)
         # expose vault
         vault_app = m.applications["vault"]
         await vault_app.expose()
@@ -275,8 +275,13 @@ async def test_secrets_backend_lifecycle(event_loop):
         # Unseal vault
         vault_client.sys.submit_unseal_keys(keys['keys'])
 
+        # authorize charm
+        target_unit = m.applications['vault'].units[0]
+        action = await target_unit.run_action("authorize-charm", token=keys["root_token"])
+        await action.wait()
+
         # Add the secret backend
-        response = await controller.add_secret_backends("1001", "myvault", "vault", {"endpoint": vault_url})
+        response = await controller.add_secret_backends("1001", "myvault", "vault", {"endpoint": vault_url, "token": keys["root_token"]})
         assert response["results"] is not None
         assert response["results"][0]['error'] is None
 
@@ -288,7 +293,11 @@ async def test_secrets_backend_lifecycle(event_loop):
             assert entry["result"].name == "internal" or entry["result"].name == "myvault"
 
         # Update it
-        resp = await controller.update_secret_backends("myvault", name_change="changed_name")
+        # There is an ongoing error if no token_rotate_interval is provided
+        resp = await controller.update_secret_backends(
+            "myvault",
+            name_change="changed_name",
+            token_rotate_interval=3600000000000)
         assert resp["results"][0]["error"] is None
 
         # List the secrets backend

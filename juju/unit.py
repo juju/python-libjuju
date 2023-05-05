@@ -134,14 +134,14 @@ class Unit(model.ModelEntity):
 
         :return: []str storage_tags
         """
-        constraints = client.StorageConstraints(count=count)
+        constraints = client.StorageConstraints(count=count, size=size)
         if pool:
             constraints = client.StorageConstraints(pool=pool, count=count, size=size)
 
         storage_facade = client.StorageFacade.from_connection(self.connection)
         res = await storage_facade.AddToUnit(storages=[client.StorageAddParams(
             name=storage_name,
-            unit=tag.unit(self.name),
+            unit=self.tag,
             storage=constraints,
         )])
         result = res.results[0]
