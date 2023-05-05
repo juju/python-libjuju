@@ -1,6 +1,24 @@
 Changelog
 ---------
 
+3.1.2.0
+^^^^^^^
+
+Friday 5th May 2022
+
+This release has been tested with Juju 3.1.2 and contains the new 
+endpoints for secrets backend.
+
+This release works with any Juju 3.x controller.
+
+## What's Changed
+* [JUJU-3202] Add facades for 3.1.1. by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/807
+* Add destroy units by @cderici in https://github.com/juju/python-libjuju/pull/812
+* [JUJU-3517] Revisit _build_facades in connection by @cderici in https://github.com/juju/python-libjuju/pull/826
+* [JUJU-3527] Added 3.1.2 and 3.2-beta2 schemas. by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/828
+* [JUJU-1628] Deploy by revision by @cderici in https://github.com/juju/python-libjuju/pull/830
+* [JUJU-3552] Prepare 3.1.2.1 release by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/836
+
 3.1.0.1
 ^^^^^^^
 
