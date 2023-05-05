@@ -240,7 +240,7 @@ class TestAddApplicationChangeRun:
 
         context = Mock()
         context.resolve.return_value = "ch:charm1"
-        context.origins = {"ch:charm1": {"stable": Mock()}}
+        context.origins = {"ch:charm1": {"latest/stable": Mock()}}
         context.trusted = False
         context.model = model
 
@@ -409,7 +409,7 @@ class TestAddCharmChangeRun:
     @pytest.mark.asyncio
     async def test_run(self, event_loop):
         change = AddCharmChange(1, [], params={"charm": "ch:charm",
-                                               "series": "series",
+                                               "series": "jammy",
                                                "channel": "channel"})
 
         charms_facade = mock.Mock()
@@ -419,7 +419,7 @@ class TestAddCharmChangeRun:
         model._add_charm = base.AsyncMock(return_value=None)
         model._resolve_architecture = base.AsyncMock(return_value=None)
         model._resolve_charm = base.AsyncMock(return_value=("entity_id",
-                                                            None, None))
+                                                            None))
 
         context = mock.Mock()
 

@@ -9,7 +9,6 @@ jobs:
     strategy:
       matrix:
         python:
-          - "3.8"
           - "3.9"
           - "3.10"
     steps:
@@ -31,7 +30,6 @@ jobs:
     strategy:
       matrix:
         python:
-          - "3.8"
           - "3.9"
           - "3.10"
     steps:
@@ -56,7 +54,6 @@ jobs:
         python:
           # We will reduce the workload to 3.10 to 
           # save some resources for now.
-          # - "3.8"
           # - "3.9"
           - "3.10"
     steps:

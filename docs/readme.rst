@@ -11,8 +11,7 @@ Documentation: https://pythonlibjuju.readthedocs.io/en/latest/
 Requirements
 ------------
 
-* Python 3.8/3.9/3.10
-* Tested using Juju 3.1.0
+* Python 3.9/3.10
 
 
 Design Notes

@@ -98,7 +98,7 @@ class Channel:
         return Channel(track, risk)
 
     def normalize(self):
-        track = self.track if self.track != "latest" else ""
+        track = self.track if self.track != "" else ""
         risk = self.risk if self.risk != "" else ""
         return Channel(track, risk)
 

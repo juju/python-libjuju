@@ -4611,6 +4611,165 @@ class CrossControllerFacade(Type):
 
 
 
+class CrossModelSecretsFacade(Type):
+    name = 'CrossModelSecrets'
+    version = 1
+    schema =     {'definitions': {'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'GetRemoteSecretAccessArg': {'additionalProperties': False,
+                                                  'properties': {'application-token': {'type': 'string'},
+                                                                 'unit-id': {'type': 'integer'},
+                                                                 'uri': {'type': 'string'}},
+                                                  'required': ['application-token',
+                                                               'unit-id',
+                                                               'uri'],
+                                                  'type': 'object'},
+                     'GetRemoteSecretAccessArgs': {'additionalProperties': False,
+                                                   'properties': {'relations': {'items': {'$ref': '#/definitions/GetRemoteSecretAccessArg'},
+                                                                                'type': 'array'}},
+                                                   'required': ['relations'],
+                                                   'type': 'object'},
+                     'GetRemoteSecretContentArg': {'additionalProperties': False,
+                                                   'properties': {'application-token': {'type': 'string'},
+                                                                  'bakery-version': {'type': 'integer'},
+                                                                  'macaroons': {'items': {'$ref': '#/definitions/Macaroon'},
+                                                                                'type': 'array'},
+                                                                  'peek': {'type': 'boolean'},
+                                                                  'refresh': {'type': 'boolean'},
+                                                                  'revision': {'type': 'integer'},
+                                                                  'unit-id': {'type': 'integer'},
+                                                                  'uri': {'type': 'string'}},
+                                                   'required': ['application-token',
+                                                                'unit-id',
+                                                                'uri'],
+                                                   'type': 'object'},
+                     'GetRemoteSecretContentArgs': {'additionalProperties': False,
+                                                    'properties': {'relations': {'items': {'$ref': '#/definitions/GetRemoteSecretContentArg'},
+                                                                                 'type': 'array'}},
+                                                    'required': ['relations'],
+                                                    'type': 'object'},
+                     'Macaroon': {'additionalProperties': False, 'type': 'object'},
+                     'SecretBackendConfig': {'additionalProperties': False,
+                                             'properties': {'params': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                    'type': 'object'}},
+                                                                       'type': 'object'},
+                                                            'type': {'type': 'string'}},
+                                             'required': ['type'],
+                                             'type': 'object'},
+                     'SecretBackendConfigResult': {'additionalProperties': False,
+                                                   'properties': {'config': {'$ref': '#/definitions/SecretBackendConfig'},
+                                                                  'draining': {'type': 'boolean'},
+                                                                  'model-controller': {'type': 'string'},
+                                                                  'model-name': {'type': 'string'},
+                                                                  'model-uuid': {'type': 'string'}},
+                                                   'required': ['model-controller',
+                                                                'model-uuid',
+                                                                'model-name',
+                                                                'draining'],
+                                                   'type': 'object'},
+                     'SecretContentParams': {'additionalProperties': False,
+                                             'properties': {'data': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                     'type': 'object'},
+                                                            'value-ref': {'$ref': '#/definitions/SecretValueRef'}},
+                                             'type': 'object'},
+                     'SecretContentResult': {'additionalProperties': False,
+                                             'properties': {'backend-config': {'$ref': '#/definitions/SecretBackendConfigResult'},
+                                                            'content': {'$ref': '#/definitions/SecretContentParams'},
+                                                            'error': {'$ref': '#/definitions/Error'},
+                                                            'latest-revision': {'type': 'integer'}},
+                                             'required': ['content'],
+                                             'type': 'object'},
+                     'SecretContentResults': {'additionalProperties': False,
+                                              'properties': {'results': {'items': {'$ref': '#/definitions/SecretContentResult'},
+                                                                         'type': 'array'}},
+                                              'required': ['results'],
+                                              'type': 'object'},
+                     'SecretValueRef': {'additionalProperties': False,
+                                        'properties': {'backend-id': {'type': 'string'},
+                                                       'revision-id': {'type': 'string'}},
+                                        'required': ['backend-id', 'revision-id'],
+                                        'type': 'object'},
+                     'StringResult': {'additionalProperties': False,
+                                      'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                     'result': {'type': 'string'}},
+                                      'required': ['result'],
+                                      'type': 'object'},
+                     'StringResults': {'additionalProperties': False,
+                                       'properties': {'results': {'items': {'$ref': '#/definitions/StringResult'},
+                                                                  'type': 'array'}},
+                                       'required': ['results'],
+                                       'type': 'object'}},
+     'properties': {'GetSecretAccessScope': {'description': 'GetSecretAccessScope '
+                                                            'returns the tokens '
+                                                            'for the access scope '
+                                                            'of the specified '
+                                                            'secrets and '
+                                                            'consumers.',
+                                             'properties': {'Params': {'$ref': '#/definitions/GetRemoteSecretAccessArgs'},
+                                                            'Result': {'$ref': '#/definitions/StringResults'}},
+                                             'type': 'object'},
+                    'GetSecretContentInfo': {'description': 'GetSecretContentInfo '
+                                                            'returns the secret '
+                                                            'values for the '
+                                                            'specified secrets.',
+                                             'properties': {'Params': {'$ref': '#/definitions/GetRemoteSecretContentArgs'},
+                                                            'Result': {'$ref': '#/definitions/SecretContentResults'}},
+                                             'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(StringResults)
+    async def GetSecretAccessScope(self, relations=None):
+        '''
+        GetSecretAccessScope returns the tokens for the access scope of the specified secrets and consumers.
+
+        relations : typing.Sequence[~GetRemoteSecretAccessArg]
+        Returns -> StringResults
+        '''
+        if relations is not None and not isinstance(relations, (bytes, str, list)):
+            raise Exception("Expected relations to be a Sequence, received: {}".format(type(relations)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CrossModelSecrets',
+                   request='GetSecretAccessScope',
+                   version=1,
+                   params=_params)
+        _params['relations'] = relations
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SecretContentResults)
+    async def GetSecretContentInfo(self, relations=None):
+        '''
+        GetSecretContentInfo returns the secret values for the specified secrets.
+
+        relations : typing.Sequence[~GetRemoteSecretContentArg]
+        Returns -> SecretContentResults
+        '''
+        if relations is not None and not isinstance(relations, (bytes, str, list)):
+            raise Exception("Expected relations to be a Sequence, received: {}".format(type(relations)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CrossModelSecrets',
+                   request='GetSecretContentInfo',
+                   version=1,
+                   params=_params)
+        _params['relations'] = relations
+        reply = await self.rpc(msg)
+        return reply
+
+
+
 class DeployerFacade(Type):
     name = 'Deployer'
     version = 1
