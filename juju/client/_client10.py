@@ -252,7 +252,6 @@ class MachineManagerFacade(Type):
                                               'container': {'type': 'string'},
                                               'cores': {'type': 'integer'},
                                               'cpu-power': {'type': 'integer'},
-                                              'image-id': {'type': 'string'},
                                               'instance-role': {'type': 'string'},
                                               'instance-type': {'type': 'string'},
                                               'mem': {'type': 'integer'},

@@ -240,7 +240,7 @@ class TestAddApplicationChangeRun:
 
         context = Mock()
         context.resolve.return_value = "ch:charm1"
-        context.origins = {"ch:charm1": {"stable": Mock()}}
+        context.origins = {"ch:charm1": {"latest/stable": Mock()}}
         context.trusted = False
         context.model = model
 

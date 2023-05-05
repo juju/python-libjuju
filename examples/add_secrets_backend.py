@@ -10,16 +10,16 @@ async def main():
     """
 
     m = Model()
-    await m.connect_current()
+    await m.connect()
 
     # # deploy postgresql
-    # await m.deploy('postgresql', series="focal")
+    await m.deploy('postgresql', series="focal")
     # # deploy vault
     await m.deploy("vault", series="focal")
     # # relate/integrate
     await m.integrate("vault:db", "postgresql:db")
     # # wait for the
-    await m.wait_for_idle(["vault"])
+    await m.wait_for_idle(["postgresql", "vault"])
     # # expose vault
     vault_app = m.applications["vault"]
     await vault_app.expose()
@@ -38,16 +38,16 @@ async def main():
     keys = vault_client.sys.initialize(3, 2)
     print(keys)
 
-    target_unit = m.applications['vault'].units[0]
-    action = await target_unit.run_action("authorize-charm", token=keys['token'])
-    await action.wait()
-
     # Unseal vault
     vault_client.sys.submit_unseal_keys(keys["keys"])
 
+    target_unit = m.applications['vault'].units[0]
+    action = await target_unit.run_action("authorize-charm", token=keys["root_token"])
+    await action.wait()
+
     # Add the secret backend
     c = await m.get_controller()
-    response = await c.add_secret_backends("1000", "myvault", "vault", {"endpoint": vault_url})
+    response = await c.add_secret_backends("1111", "examplevault", "vault", {"endpoint": vault_url, "token": keys["root_token"]})
     print("Output from add secret backends")
     print(response["results"])
 
@@ -57,9 +57,9 @@ async def main():
     print(list["results"])
 
     # Remove it
-    await c.remove_secret_backends("myvault")
+    await c.remove_secret_backends("examplevault")
 
-    # Finally after removing
+    # # Finally after removing
     list = await c.list_secret_backends()
     print("Output from list secret backends after removal")
     print(list["results"])

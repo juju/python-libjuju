@@ -1080,7 +1080,6 @@ class CAASApplicationProvisionerFacade(Type):
                                               'container': {'type': 'string'},
                                               'cores': {'type': 'integer'},
                                               'cpu-power': {'type': 'integer'},
-                                              'image-id': {'type': 'string'},
                                               'instance-role': {'type': 'string'},
                                               'instance-type': {'type': 'string'},
                                               'mem': {'type': 'integer'},
@@ -10773,101 +10772,6 @@ class SecretsManagerFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
-        return reply
-
-
-
-class SecretsRevisionWatcherFacade(Type):
-    name = 'SecretsRevisionWatcher'
-    version = 1
-    schema =     {'definitions': {'Error': {'additionalProperties': False,
-                               'properties': {'code': {'type': 'string'},
-                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
-                                                                                    'type': 'object'}},
-                                                       'type': 'object'},
-                                              'message': {'type': 'string'}},
-                               'required': ['message', 'code'],
-                               'type': 'object'},
-                     'SecretRevisionChange': {'additionalProperties': False,
-                                              'properties': {'revision': {'type': 'integer'},
-                                                             'uri': {'type': 'string'}},
-                                              'required': ['uri', 'revision'],
-                                              'type': 'object'},
-                     'SecretRevisionWatchResult': {'additionalProperties': False,
-                                                   'properties': {'changes': {'items': {'$ref': '#/definitions/SecretRevisionChange'},
-                                                                              'type': 'array'},
-                                                                  'error': {'$ref': '#/definitions/Error'},
-                                                                  'watcher-id': {'type': 'string'}},
-                                                   'required': ['watcher-id',
-                                                                'changes'],
-                                                   'type': 'object'}},
-     'properties': {'Next': {'description': 'Next returns when a change has '
-                                            'occurred to an entity of the\n'
-                                            'collection being watched since the '
-                                            'most recent call to Next\n'
-                                            'or the Watch call that created the '
-                                            'srvSecretRotationWatcher.',
-                             'properties': {'Result': {'$ref': '#/definitions/SecretRevisionWatchResult'}},
-                             'type': 'object'},
-                    'Stop': {'description': 'Stop stops the watcher.',
-                             'type': 'object'}},
-     'type': 'object'}
-    
-
-    @ReturnMapping(SecretRevisionWatchResult)
-    async def Next(self):
-        '''
-        Next returns when a change has occurred to an entity of the
-        collection being watched since the most recent call to Next
-        or the Watch call that created the srvSecretRotationWatcher.
-
-
-        Returns -> SecretRevisionWatchResult
-        '''
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='SecretsRevisionWatcher',
-                   request='Next',
-                   version=1,
-                   params=_params)
-
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(None)
-    async def Stop(self):
-        '''
-        Stop stops the watcher.
-
-
-        Returns -> None
-        '''
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='SecretsRevisionWatcher',
-                   request='Stop',
-                   version=1,
-                   params=_params)
-
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    async def rpc(self, msg):
-        '''
-        Patch rpc method to add Id.
-        '''
-        if not hasattr(self, 'Id'):
-            raise RuntimeError('Missing "Id" field')
-        msg['Id'] = id
-
-        from .facade import TypeEncoder
-        reply = await self.connection.rpc(msg, encoder=TypeEncoder)
         return reply
 
 

@@ -481,10 +481,6 @@ class SecretsManagerFacade(TypeFactory):
     pass
 
 
-class SecretsRevisionWatcherFacade(TypeFactory):
-    pass
-
-
 class SecretsTriggerWatcherFacade(TypeFactory):
     pass
 

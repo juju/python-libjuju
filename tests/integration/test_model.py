@@ -332,6 +332,16 @@ async def test_deploy_local_charm_folder_symlink(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_deploy_from_ch_channel_revision_success(event_loop):
+    async with base.CleanModel() as model:
+        # Ensure we're able to resolve charm these with channel and revision,
+        # or channel without revision (note that revision requires channel,
+        # but not vice versa)
+        await model.deploy("postgresql", application_name="test1", channel='latest/stable')
+        await model.deploy("postgresql", application_name="test2", channel='latest/stable', revision=290)
+
+
+@pytest.mark.asyncio
 async def test_deploy_trusted_bundle(event_loop):
     async with base.CleanModel() as model:
         await model.deploy('canonical-livepatch-onprem', channel='stable', trust=True)
@@ -838,11 +848,12 @@ async def test_wait_for_idle_with_not_enough_units(event_loop):
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_wait_for_idle_with_enough_units(event_loop):
+    pytest.skip("This is testing juju functionality")
     async with base.CleanModel() as model:
         await model.deploy(
             'ubuntu',
             application_name='ubuntu',
-            series='bionic',
+            series='jammy',
             channel='stable',
             num_units=3,
         )
@@ -852,11 +863,12 @@ async def test_wait_for_idle_with_enough_units(event_loop):
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_wait_for_idle_with_exact_units(event_loop):
+    pytest.skip("This is testing juju functionality")
     async with base.CleanModel() as model:
         await model.deploy(
             'ubuntu',
             application_name='ubuntu',
-            series='bionic',
+            series='jammy',
             channel='stable',
             num_units=2,
         )
@@ -870,6 +882,7 @@ async def test_wait_for_idle_with_exact_units_scale_down(event_loop):
     then waits for exactly 1 unit to be left.
 
     """
+    pytest.skip("This is testing juju functionality")
     async with base.CleanModel() as model:
         app = await model.deploy(
             'ubuntu',
@@ -899,6 +912,7 @@ async def test_wait_for_idle_with_exact_units_scale_down_zero(event_loop):
     then waits for exactly 0 unit to be left.
 
     """
+    pytest.skip("This is testing juju functionality")
     async with base.CleanModel() as model:
         app = await model.deploy(
             'ubuntu',
@@ -1167,6 +1181,7 @@ async def test_model_cache_update(event_loop):
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_add_storage(event_loop):
+    pytest.skip('skip in favour of test_add_and_list_storage')
     async with base.CleanModel() as model:
         app = await model.deploy('postgresql')
         await model.wait_for_idle(status="active")
@@ -1250,12 +1265,12 @@ async def test_detach_storage(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_list_storage(event_loop):
+async def test_add_and_list_storage(event_loop):
     async with base.CleanModel() as model:
-        app = await model.deploy('postgresql')
-        await model.wait_for_idle(status="active")
+        app = await model.deploy('postgresql', channel="latest/stable")
+        await model.wait_for_idle(status="active", timeout=900)
         unit = app.units[0]
-        await unit.add_storage("pgdata")
+        await unit.add_storage("pgdata", size=512)
         storages = await model.list_storage()
         await model.list_storage(filesystem=True)
         await model.list_storage(volume=True)

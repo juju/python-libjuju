@@ -350,14 +350,11 @@ class BundleHandler:
                 continue
 
             charm_url = URL.parse(spec['charm'])
-            channel = None
-            base = None
-            track, risk = '', ''
-            if 'channel' in spec:
-                channel = Channel.parse(spec['channel'])
-                track, risk = channel.track, channel.risk
-                series = spec.get('series', None)
-                base = get_base_from_origin_or_channel(channel, series)
+
+            channel = Channel.parse(spec['channel']) if 'channel' in spec else Channel('latest', 'stable')
+            track, risk = channel.track, channel.risk
+            series = spec.get('series', self.bundle.get('series', None))
+            base = get_base_from_origin_or_channel(channel, series)
 
             if self.charms_facade is not None:
                 if cons is not None and cons['arch'] != '':

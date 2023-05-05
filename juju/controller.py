@@ -937,7 +937,7 @@ class Controller:
 
     async def update_secret_backends(self, name, config=None, force=False, name_change=None, token_rotate_interval=None):
         """
-        Update a backend
+        Update a backend.
 
         Parameters
         ----------
